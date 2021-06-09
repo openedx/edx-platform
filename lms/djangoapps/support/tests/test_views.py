@@ -77,6 +77,9 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         Tests password assistance
         """
+        # Ensure that user is not logged in if they need
+        # password assistance.
+        self.client.logout()
         url = '/password_assistance'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

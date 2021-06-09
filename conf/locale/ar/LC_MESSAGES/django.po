@@ -28,7 +28,6 @@
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
 # Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
-# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -62,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-05-25 12:49+0000\n"
+"POT-Creation-Date: 2021-06-03 13:45+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9633,7 +9632,7 @@ msgstr "مساقات أساسية"
 
 #: openedx/adg/lms/applications/models.py
 msgid "Business Unit Prerequisite Courses Passed"
-msgstr "مساقات أساسية"
+msgstr ""
 
 #: openedx/adg/lms/applications/models.py
 msgid "Written Application Submitted"
@@ -9641,7 +9640,7 @@ msgstr ""
 
 #: openedx/adg/lms/applications/models.py
 msgid "Application Submitted"
-msgstr ""
+msgstr "حالة التحقق"
 
 #: openedx/adg/lms/applications/models.py
 msgid "Submission Date"
@@ -9827,6 +9826,10 @@ msgstr ""
 #: openedx/adg/lms/branding_extension/helpers.py
 msgid "Our Team"
 msgstr "الفريق"
+
+#: openedx/adg/lms/branding_extension/helpers.py
+msgid "Support"
+msgstr "غير مدعوم"
 
 #: openedx/adg/lms/branding_extension/helpers.py
 msgid "Terms"
@@ -25348,15 +25351,3 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "أُنقر على زر \"بدء الامتحان المراقب\" في الأسفل للمتابعة."
-
-#~ msgid "Application Overview"
-#~ msgstr "اسم التطبيق"
-
-#~ msgid "Step 2: Prerequisite Courses"
-#~ msgstr "المتطلّبات الأساسية"
-
-#~ msgid "Business Line Courses"
-#~ msgstr "تصفّح المساقات"
-
-#~ msgid "Please note: "
-#~ msgstr "يرجى الانتظار"

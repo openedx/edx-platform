@@ -3,10 +3,12 @@ Tests for helpers of branding_extension app
 """
 import mock
 import pytest
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from freezegun import freeze_time
 
+from openedx.adg.lms.branding_extension.constants import TARGET_BLANK, TARGET_SELF
 from openedx.adg.lms.branding_extension.helpers import (
     get_copyright,
     get_footer_navigation_links,
@@ -22,23 +24,32 @@ def test_get_footer_navigation_links(mocker):
     mocker.patch('openedx.adg.lms.branding_extension.helpers.marketing_link', return_value=test_url)
 
     branding_links = get_footer_navigation_links()
-    assert len(branding_links) == 4
+    assert len(branding_links) == 5
     assert branding_links == [
         {
             'url': test_url,
             'title': 'About',
+            'target': TARGET_SELF,
         },
         {
             'url': reverse('our_team'),
             'title': 'Our Team',
-        },
-        {
-            'url': test_url,
-            'title': 'Terms',
+            'target': TARGET_SELF,
         },
         {
             'url': test_url,
             'title': 'Contact',
+            'target': TARGET_SELF,
+        },
+        {
+            'url': settings.SUPPORT_LINK,
+            'title': 'Support',
+            'target': TARGET_BLANK,
+        },
+        {
+            'url': test_url,
+            'title': 'Terms',
+            'target': TARGET_SELF,
         },
     ]
 

@@ -4113,3 +4113,6 @@ NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'
 
 # CDN link for s3 amazon aws server
 CDN_LINK = 'https://static.omnipreneurshipacademy.com/'
+
+# ADG zendesk support help desk link
+SUPPORT_LINK = 'https://support.omnipreneurshipacademy.com/'

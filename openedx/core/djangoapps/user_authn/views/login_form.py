@@ -25,7 +25,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import (
     is_secondary_email_feature_enabled
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import (
     should_redirect_to_logistration_mircrofrontend,
     third_party_auth_context
@@ -158,11 +158,13 @@ def login_and_registration_form(request, initial_mode="login"):
     redirect_to = get_next_url_for_login_page(request)
 
     # If we're already logged in, redirect to the dashboard
-    # Note: We check for the existence of login-related cookies in addition to is_authenticated
+    # Note: If the session is valid, we update all logged_in cookies(in particular JWTs)
     #  since Django's SessionAuthentication middleware auto-updates session cookies but not
-    #  the other login-related cookies. See ARCH-282.
-    if request.user.is_authenticated and are_logged_in_cookies_set(request):
-        return redirect(redirect_to)
+    #  the other login-related cookies. See ARCH-282 and ARCHBOM-1718
+    if request.user.is_authenticated:
+        response = redirect(redirect_to)
+        response = set_logged_in_cookies(request, response, request.user)
+        return response
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
