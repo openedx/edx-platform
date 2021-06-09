@@ -243,7 +243,7 @@ class UserApplication(TimeStampedModel):
         """
         Check user completed the education and experience step in user application
         """
-        return self.is_education_completed and self.is_work_experience_completed and self.background_question
+        return self.is_education_completed and self.is_work_experience_completed and bool(self.background_question)
 
 
 class UserStartAndEndDates(TimeStampedModel):

@@ -200,7 +200,9 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
         if self.is_valid():
             self.user_profile_form.save()
             self.extended_profile_form.save(request=request)
-            self.application_form.save()
+            instance = self.application_form.save(commit=False)
+            instance.user = request.user
+            instance.save()
             return redirect(reverse_lazy('application_education_experience'))
 
         return render(request, self.template_name, forms)
@@ -222,7 +224,7 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
         Returns:
             None.
         """
-        application, _ = UserApplication.objects.get_or_create(user=request.user)
+        application = UserApplication.objects.filter(user=request.user).first()
 
         if request.method == 'GET':
             self.user_profile_form = UserProfileForm(instance=request.user.profile)
