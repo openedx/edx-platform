@@ -5,9 +5,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { StatusAlert } from '@edx/paragon';
-
-import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import ShowErrors from './errors_list';
 import LoggedInUser from './logged_in_user';
@@ -28,11 +25,16 @@ class RenderForm extends React.Component {
     this.userInformation = this.props.context.user;
     const course = this.userInformation ? this.userInformation.course_id : '';
     this.courseDiscussionURL = '/courses/{course_id}/discussion/forum';
+    this.learnerSupportCenterURL = 'https://support.edx.org';
+    this.zendeskApiUrl = 'https://edxsupport.zendesk.com';
     this.submitButton = null;
     this.state = {
       currentRequest: null,
       errorList: initialFormErrors,
       success: false,
+      activeSuggestion: 0,
+      suggestions: [],
+      typingTimeout: 0,
       formData: {
         course,
         subject: '',
@@ -47,7 +49,17 @@ class RenderForm extends React.Component {
     };
     this.handleClick = this.handleClick.bind(this);
     this.reDirectUser = this.reDirectUser.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.formOnChangeCallback = this.formOnChangeCallback.bind(this);
+    this.handleSearchButton = this.handleSearchButton.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.handleSuggestionClick = this.handleSuggestionClick.bind(this);
+    this.ignoreBlur = false;
+    this.handleBlur = this.handleBlur.bind(this);
+  }
+
+  setIgnoreBlur(ignore) {
+    this.ignoreBlur = ignore;
   }
 
   getFormDataFromState() {
@@ -111,12 +123,12 @@ class RenderForm extends React.Component {
   handleClick(event) {
     event.preventDefault();
     this.submitButton = event.currentTarget;
-    this.submitButton.setAttribute("disabled", true);
+    this.submitButton.setAttribute('disabled', true);
     const formData = this.getFormDataFromState();
     this.clearErrorState();
     this.validateFormData(formData);
     if (this.formHasErrors()) {
-      this.submitButton.removeAttribute("disabled");
+      this.submitButton.removeAttribute('disabled');
       return this.scrollToTop();
     }
     this.createZendeskTicket(formData);
@@ -142,18 +154,18 @@ class RenderForm extends React.Component {
     request.send(JSON.stringify(data));
     request.onreadystatechange = function success() {
       if (request.readyState === 4) {
-        this.submitButton.removeAttribute("disabled");
+        this.submitButton.removeAttribute('disabled');
         if (request.status === 201) {
-            this.setState({
-                success: true,
-            });
+          this.setState({
+            success: true,
+          });
         }
       }
     }.bind(this);
 
     request.onerror = function error() {
       this.updateErrorInState('request', this.formValidationErrors.request);
-      this.submitButton.removeAttribute("disabled");
+      this.submitButton.removeAttribute('disabled');
       this.scrollToTop();
     }.bind(this);
   }
@@ -183,8 +195,77 @@ class RenderForm extends React.Component {
     );
   }
 
+  handleInputChange(event) {
+    event.preventDefault();
+    const queryString = event.target.value;
+    const { typingTimeout } = this.state;
+    if (queryString.length > 3) {
+      if (typingTimeout) { clearTimeout(typingTimeout); }
+      const getSuggestions = async () => {
+        const response = await fetch(`${this.zendeskApiUrl}/api/v2/help_center/articles/search.json?query=${queryString}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        let suggestions = await response.json();
+        suggestions = suggestions.results.slice(0, 6);
+        this.setState({ suggestions });
+      };
+      this.setState({
+        typingTimeout: setTimeout(async () => {
+          getSuggestions();
+        }, 500),
+      });
+    } else {
+      this.setState({
+        suggestions: [],
+        activeSuggestion: 0,
+      });
+    }
+  }
+
+  onKeyDown(event) {
+    const { activeSuggestion, suggestions } = this.state;
+    const enterKeyCode = 13,
+      upArrowKeyCode = 38,
+      downArrowKeyCode = 40;
+
+    if (event.keyCode === enterKeyCode) {
+      window.location.href = suggestions[activeSuggestion].html_url;
+    } else if (event.keyCode === upArrowKeyCode) {
+      (activeSuggestion === 0) ?
+        this.setState({ activeSuggestion: suggestions.length - 1 }) :
+        this.setState({ activeSuggestion: activeSuggestion - 1 });
+    } else if (event.keyCode === downArrowKeyCode) {
+      (activeSuggestion + 1 === suggestions.length) ?
+        this.setState({ activeSuggestion: 0 }) :
+        this.setState({ activeSuggestion: activeSuggestion + 1 });
+    }
+  }
+
+  handleBlur(event) {
+    if (!this.ignoreBlur) {
+      this.setState({
+        suggestions: [],
+        activeSuggestion: 0,
+      });
+    }
+  }
+
+  handleSearchButton(query) {
+    const queryString = query.replace(' ', '+');
+
+    window.location.href = `${this.learnerSupportCenterURL}/hc/en-us/search?&query=${queryString}`;
+  }
+
+  handleSuggestionClick(url) {
+    window.location.href = url;
+  }
+
   renderSupportForm() {
-    let userElement;
+    const { activeSuggestion, suggestions } = this.state;
+    let userElement,
+      suggestionsListComponent = null;
     if (this.userInformation) {
       userElement = (<LoggedInUser
         userInformation={this.userInformation}
@@ -201,6 +282,23 @@ class RenderForm extends React.Component {
         loginQuery={this.props.context.loginQuery}
         supportEmail={this.props.context.supportEmail}
       />);
+    }
+    if (suggestions !== null && suggestions.length) {
+      suggestionsListComponent = (
+        <ul className="suggestions">
+          {suggestions.map((suggestion, index) => (
+            <li
+              className={index === activeSuggestion ? 'suggestion-active' : null}
+              key={index}
+              onMouseDown={() => this.setIgnoreBlur(true)}
+              onClick={() => this.handleSuggestionClick(suggestion.html_url)}
+              onMouseOver={() => this.setState({ activeSuggestion: index })}
+            >
+              <div dangerouslySetInnerHTML={{ __html: suggestion.title }} />
+            </li>
+            ))}
+        </ul>
+      );
     }
 
     return (
@@ -225,16 +323,32 @@ class RenderForm extends React.Component {
         </div>
 
         <div className="row">
-          <div className="col-sm-12">
-            <a
-              href={this.props.context.marketingUrl}
-              className="btn btn-secondary help-button"
+          <div className="col-sm-8">
+            <label className="sr-only">Search the Learner Help Center</label>
+            <input
+              type="search"
+              className="form-control"
+              id="query"
+              placeholder="Search the Learner Help Center"
+              autoComplete="off"
+              onChange={this.handleInputChange}
+              onKeyDown={this.onKeyDown}
+              onBlur={this.handleBlur}
+            />
+          </div>
+          <div className="col-sm-4">
+            <button
+              className="btn btn-primary btn-submit btn"
+              type="button"
+              onClick={() => this.handleSearchButton(document.getElementById('query').value)}
             >
-              {StringUtils.interpolate(
-                gettext('Search the {platform} Help Center'),
-                { platform: this.props.context.platformName },
-              )}
-            </a>
+              Search
+            </button>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-8">
+            {suggestionsListComponent}
           </div>
         </div>
 
