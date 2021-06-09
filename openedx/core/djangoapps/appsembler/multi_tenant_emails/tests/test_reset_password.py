@@ -6,6 +6,8 @@ import re
 from django.core import mail
 from rest_framework.test import APITestCase
 
+from openedx.core.djangoapps.user_authn.views import password_reset
+
 from .test_utils import lms_multi_tenant_test, with_organization_context, create_org_user
 
 
@@ -94,3 +96,19 @@ class ResetPasswordMultiTenantTests(APITestCase):
             assert response.status_code == 200, response.content
             assert response.json()['success'], response.content
             assert len(mail.outbox) == 0, 'Should not break multi-tenancy'
+
+    def test_get_user_from_email(self):
+        """
+        Test the `_get_user_from_email` utility works well with Multi-Tenant Emails.
+        """
+        with with_organization_context(site_color=self.RED) as org:
+            red_ahmed = create_org_user(org, email=self.AHMED_EMAIL, password=self.PASSWORD)
+
+        with with_organization_context(site_color=self.BLUE) as org:
+            blue_ahmed = create_org_user(org, email=self.AHMED_EMAIL, password=self.PASSWORD)
+            user = password_reset._get_user_from_email(self.AHMED_EMAIL)  # Shouldn't throw MultipleObjectsReturned
+            assert user.pk == blue_ahmed.pk, 'should return the correct blue org user'
+
+        with with_organization_context(site_color=self.RED):
+            user = password_reset._get_user_from_email(self.AHMED_EMAIL)  # Shouldn't throw MultipleObjectsReturned
+            assert user.pk == red_ahmed.pk, 'should return the correct red org user'
