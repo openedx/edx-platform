@@ -1,8 +1,8 @@
 ########################
-Contributing to Open edX
+Contributing to the Open edX Platform
 ########################
 
-Contributions to Open edX are very welcome, and strongly encouraged! We've
+Contributions to the Open edX Platform are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
 
@@ -67,7 +67,7 @@ between 13:00 and 21:00 UTC (9am to 5pm US Eastern time),
 but interesting conversations can happen at any time.
 There are many different channels available for different topics, including:
 
-* ``#events`` for upcoming events related to Open edX
+* ``#events`` for upcoming events related to Open edX project
 * ``#content`` for discussions about course content and creating the best courses
 
 And lots more! You can also make your own channels to discuss new topics.
@@ -107,12 +107,11 @@ it.
 .. _Individual Contributor Agreement: https://openedx.org/cla
 
 If you will be contributing code on behalf of your employer or another
-institution you are affiliated with, please reach out by email to legal@edx.org
+institution you are affiliated with, please reach out by email to openedx@edx.org
 to request the Entity Contributor Agreement.
 
 Once we have received and processed your agreement, we will reach out to you by
-email to confirm. (Please make sure to indicate your email correctly in the
-agreement.) After that we can begin reviewing and merging your work.
+email to confirm. After that we can begin reviewing and merging your work.
 
 Step 2: Fork, Commit, and Pull Request
 ======================================
@@ -156,7 +155,7 @@ Step 4: Approval by Community Manager and Product Owner
 A community manager will read the description of your pull request. If the
 description is understandable, the community manager will send the pull request
 to a product owner. The product owner will evaluate if the pull request is a
-good idea for Open edX, and if not, your pull request will be rejected. This
+good idea for the Open edX platform, and if not, your pull request will be rejected. This
 is another good reason why you should discuss your ideas with other members
 of the community before working on a pull request!
 
