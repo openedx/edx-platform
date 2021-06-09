@@ -70,6 +70,15 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         update_search_index.delay(course_key_str, datetime.now(UTC).isoformat())
 
 
+@receiver(SignalHandler.course_deleted)
+def listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Catches the signal that a course has been deleted
+    and removes its entry from the Course About Search index.
+    """
+    CourseAboutSearchIndexer.remove_deleted_items(course_key)
+
+
 @receiver(SignalHandler.library_updated)
 def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable=unused-argument
     """

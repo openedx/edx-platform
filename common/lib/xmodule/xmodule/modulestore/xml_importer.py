@@ -29,6 +29,7 @@ import re
 from abc import abstractmethod
 
 import xblock
+from django.utils.translation import ugettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -37,7 +38,6 @@ from xblock.core import XBlockMixin
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from cms.djangoapps.contentstore.exceptions import ErrorReadingFileException, ModuleFailedToImport
 from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
@@ -59,6 +59,39 @@ from .store_utilities import rewrite_nonportable_content_links
 log = logging.getLogger(__name__)
 
 DEFAULT_STATIC_CONTENT_SUBDIR = 'static'
+
+
+class CourseImportException(Exception):
+    """
+    Base exception class for course import workflows.
+    """
+
+    def __init__(self):
+        super().__init__(self.description)  # pylint: disable=no-member
+
+
+class ErrorReadingFileException(CourseImportException):
+    """
+    Raised when error occurs while trying to read a file.
+    """
+
+    MESSAGE_TEMPLATE = _('Error while reading {}. Check file for XML errors.')
+
+    def __init__(self, filename, **kwargs):
+        self.description = self.MESSAGE_TEMPLATE.format(filename)
+        super().__init__(**kwargs)
+
+
+class ModuleFailedToImport(CourseImportException):
+    """
+    Raised when a module is failed to import.
+    """
+
+    MESSAGE_TEMPLATE = _('Failed to import module: {} at location: {}')
+
+    def __init__(self, display_name, location, **kwargs):
+        self.description = self.MESSAGE_TEMPLATE.format(display_name, location)
+        super().__init__(**kwargs)
 
 
 class LocationMixin(XBlockMixin):
