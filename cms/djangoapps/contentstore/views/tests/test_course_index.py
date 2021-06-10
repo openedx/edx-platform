@@ -6,6 +6,7 @@ Unit tests for getting the list of courses and the course outline.
 import datetime
 import json
 from unittest import mock
+from unittest.mock import patch
 
 import ddt
 import lxml
@@ -19,7 +20,12 @@ from search.api import perform_search
 
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.utils import (
+    add_instructor,
+    get_proctored_exam_settings_url,
+    reverse_course_url,
+    reverse_usage_url
+)
 from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
@@ -588,6 +594,28 @@ class TestCourseOutline(CourseTestCase):
             info,
             expected_block_types
         )
+
+    @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
+    @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
+    def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
+        """
+        Test to check proctored exam settings mfe url is rendering properly
+        """
+        mock_validate_proctoring_settings.return_value = [
+            {
+                'key': 'proctoring_provider',
+                'message': 'error message',
+                'model': {'display_name': 'proctoring_provider'}
+            },
+            {
+                'key': 'proctoring_provider',
+                'message': 'error message',
+                'model': {'display_name': 'proctoring_provider'}
+            }
+        ]
+        response = self.client.get_html(reverse_course_url('course_handler', self.course.id))
+        proctored_exam_settings_url = get_proctored_exam_settings_url(self.course.id)
+        self.assertContains(response, proctored_exam_settings_url, 2)
 
 
 class TestCourseReIndex(CourseTestCase):

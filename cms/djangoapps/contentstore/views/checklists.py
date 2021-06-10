@@ -28,17 +28,8 @@ def checklists_handler(request, course_key_string=None):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
-
-    course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
-    proctored_exam_settings_url = (
-        '{course_authoring_microfrontend_url}/proctored-exam-settings/{course_key_string}'.format(
-            course_authoring_microfrontend_url=course_authoring_microfrontend_url,
-            course_key_string=course_key_string,
-        )
-    )
-
     return render_to_response('checklists.html', {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_module,
-        'proctored_exam_settings_url': proctored_exam_settings_url,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
     })
