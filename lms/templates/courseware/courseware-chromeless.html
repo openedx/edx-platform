@@ -134,17 +134,21 @@ ${HTML(fragment.foot_html())}
 
         if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
-            // it is referencing an element's id (not an external website). If
-            // the href attribute is an id, the location of the selected focus
+            // it is referencing an element's id or name (not an external website). If
+            // the href attribute is an id or name, the location of the selected focus
             // element is sent through its offset attribute. The offset will
             // allow the page to scroll to the location of the focus element so
-            // that it is at the top of the page.
+            // that it is at the top of the page. Unique ids and names are
+            // required for proper scrolling.
 
             $('a').on("click", function(event){
               if ($(this).attr('href')[0] === "#") {
-                event.preventDefault()
-                var targetId = $(this).attr('href')
-                window.parent.postMessage({"offset": $(targetId).offset().top}, document.referrer)
+                event.preventDefault();
+                var targetId = $(this).attr('href');
+                var targetName = $(this).attr('href').slice(1);
+                // Checks if the target uses an id or name to focus and gets offset.
+                var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
+                window.parent.postMessage({"offset": targetOffset.top}, document.referrer);
               }
             })
           return;
