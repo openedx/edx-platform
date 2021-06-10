@@ -681,11 +681,9 @@ imagesize==1.2.0
 importlib-metadata==4.5.0
     # via
     #   -r requirements/edx/testing.txt
-    #   inflect
     #   pytest-randomly
-inflect==3.0.2
+inflect==5.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   jinja2-pluralize
 inflection==0.5.1
@@ -1182,7 +1180,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-ruamel.yaml==0.17.8
+ruamel.yaml==0.17.9
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
