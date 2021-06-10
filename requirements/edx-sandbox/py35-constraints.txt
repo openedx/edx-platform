@@ -1,8 +1,6 @@
 # constraints required for Python 3.5 support in sandbox codejail environments
 # All of these constraints require python3.6+ for larger versions
 
-celery<5.0              # celery 5.0 has dropped python3.5 support.
-
 geoip2<4.0.1            # geoip2 requires Python 3.6
 
 inflect<4.0.0           # 4.0.0 dropped support for Python 3.5
