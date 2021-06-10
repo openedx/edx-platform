@@ -29,8 +29,7 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
-    course_home_mfe_dates_tab_is_active,
-    course_home_mfe_outline_tab_is_active
+    course_home_mfe_is_active
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -162,7 +161,7 @@ class OutlineTabView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
         course_usage_key = modulestore().make_course_usage_key(course_key)
 
-        if not course_home_mfe_outline_tab_is_active(course_key):
+        if not course_home_mfe_is_active(course_key):
             raise Http404
 
         # Enable NR tracing for this view based on course
@@ -192,7 +191,7 @@ class OutlineTabView(RetrieveAPIView):
         user_timezone = user_timezone_locale['user_timezone']
 
         dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
-        if course_home_mfe_dates_tab_is_active(course.id):
+        if course_home_mfe_is_active(course.id):
             dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
 
         # Set all of the defaults

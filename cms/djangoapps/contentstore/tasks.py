@@ -61,9 +61,8 @@ from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
+from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 
-from .exceptions import CourseImportException
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled

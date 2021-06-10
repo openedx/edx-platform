@@ -742,6 +742,8 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
+
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -771,6 +773,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'verification_errors': verification_errors,
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+        'show_account_activation_popup': show_account_activation_popup,
         'user': user,
         'logout_url': reverse('logout'),
         'platform_name': platform_name,
@@ -830,4 +833,12 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'resume_button_urls': resume_button_urls
     })
 
-    return render_to_response('dashboard.html', context)
+    response = render_to_response('dashboard.html', context)
+    if show_account_activation_popup:
+        response.delete_cookie(
+            settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            path='/',
+        )
+
+    return response

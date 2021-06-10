@@ -68,7 +68,7 @@ class IntegritySignatureView(AuthenticatedAPIView):
         Only staff should be able to access this endpoint for other users.
         """
         # check that waffle flag is enabled
-        if not is_integrity_signature_enabled():
+        if not is_integrity_signature_enabled(CourseKey.from_string(course_id)):
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -112,7 +112,7 @@ class IntegritySignatureView(AuthenticatedAPIView):
             }
         """
         # check that waffle flag is enabled
-        if not is_integrity_signature_enabled():
+        if not is_integrity_signature_enabled(CourseKey.from_string(course_id)):
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
             )

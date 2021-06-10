@@ -1641,6 +1641,59 @@ a.fade-cover {
   }
 }
 
+#activate-account-modal {
+    display: block;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -60px;
+    text-align: left;
+    height: 252px;
+    width: 450px;
+    box-shadow: none;
+    background: none;
+
+    .inner-wrapper {
+      h3 {
+          font-family: inherit;
+          padding: 1.5rem 1rem 1rem 1rem;
+          text-align: left;
+          font-weight: bold;
+          font-size: 1.3rem;
+          line-height: 1.75rem;
+      }
+        border: none;
+        border-radius: 5px;
+    }
+}
+
+@media (max-width: 460px) and (min-width: 360px) {
+    #activate-account-modal {
+        width: 350px;
+    }
+}
+
+@media (max-width: 360px) {
+    #activate-account-modal {
+        width: 300px;
+    }
+}
+
+.activate-account-modal-button {
+    text-align: right;
+    display: block;
+    padding: 1rem 1rem 1rem 0;
+
+    .btn-primary {
+        text-transform: none;
+        font-weight: 500;
+    }
+}
+.activate-account-modal-body {
+    padding: 0 1rem;
+}
+
 .reasons_survey {
   margin: 20px;
 

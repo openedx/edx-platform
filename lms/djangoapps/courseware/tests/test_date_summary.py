@@ -17,7 +17,7 @@ from pytz import utc
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
 from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
@@ -736,14 +736,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            if mfe_active:
-                with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True), \
-                     override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True):
-                    response = self.client.get(url, follow=True)
-            else:
+            with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=mfe_active):
                 response = self.client.get(url, follow=True)
-            for html in html_elements:
-                assert_function(response, html)
+            if mfe_active and not user.is_staff:
+                assert 404 == response.status_code
+            else:
+                for html in html_elements:
+                    assert_function(response, html)
             self.client.logout()
 
         with freeze_time('2015-01-02'):

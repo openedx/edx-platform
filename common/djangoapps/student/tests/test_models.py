@@ -33,7 +33,6 @@ from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -248,7 +247,6 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         assert enrollment_refetched.all()[0] == enrollment
 
 
-@override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
 class UserCelebrationTests(SharedModuleStoreTestCase):

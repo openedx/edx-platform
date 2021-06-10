@@ -46,7 +46,9 @@ from common.djangoapps.student.models import CourseEnrollment
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard') | n, js_escaped_string}",
         signInUser: "${reverse('signin_user') | n, js_escaped_string}",
-        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}"
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}",
+        sendAccountActivationEmail: "${reverse('send_account_activation_email') | n, js_escaped_string}"
+
       });
     });
   </script>
@@ -315,6 +317,35 @@ from common.djangoapps.student.models import CourseEnrollment
       </div>
     </div>
 </main>
+
+%if show_account_activation_popup:
+    <div id="activate-account-modal" class="modal activate-account-modal" aria-hidden="true">
+      <div class="inner-wrapper" role="dialog" aria-labelledby="activate-account-modal-title" aria-live="polite">
+          <h3>
+             ${_("Activate your account so you can log back in")}
+            <span class="sr">,
+              ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+              ${_("window open")}
+            </span>
+        </h3>
+          <p class="activate-account-modal-body">${Text(_("We sent an email to {strong_start}{email}{strong_end} with a link to activate your account. Can’t find it? Check your spam folder or {link_start}resend the email{link_end}.")).format(
+              strong_start=HTML('<strong>'),
+              email=user.email,
+              strong_end=HTML('</strong>'),
+              link_start=HTML('<a href="#" id="send_cta_email" >'),
+              link_end=HTML('</a>')
+              )}
+          </p>
+           <div class="activate-account-modal-button">
+               <button class="btn btn-primary" id="button">
+                   ${Text(_("Continue to {platform_name}")).format(platform_name=settings.PLATFORM_NAME)}
+                   <svg  style="vertical-align:bottom" width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>
+               </button>
+           </div>
+
+      </div>
+    </div>
+%endif
 
 <div id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
