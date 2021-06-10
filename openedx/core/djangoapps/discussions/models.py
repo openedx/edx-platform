@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 DEFAULT_PROVIDER_TYPE = 'legacy'
 
 
-DocumentLinks = namedtuple('DocumentLinks', ['learn_more', 'configuration_documentation', 'documentation', 'accessibility_documentation', 'email_id'])
+ProviderExternalLinks = namedtuple('ProviderExternalLinks', ['learn_more', 'configuration', 'general', 'accessibility', 'contact_email'])
 
 
 class Features(Enum):
@@ -75,7 +75,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             '',
             '',
             '',
@@ -98,7 +98,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             'https://piazza.com/product/overview',
             'https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',
             'https://support.piazza.com/',
@@ -124,7 +124,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.DISCUSSION_CONTENT_PROMPTS.value,
             Features.GRADED_DISCUSSIONS.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             '',
             '',
             '',
@@ -146,7 +146,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             'https://www.youtube.com/watch?v=ZACief-qMwY',
             '',
             'https://hubs.ly/H0J5Bn7',
@@ -159,7 +159,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.LTI_BASIC_CONFIGURATION.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             '',
             '',
             'https://www.inscribeapp.com/',
@@ -173,7 +173,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.LTI_BASIC_CONFIGURATION.value,
             Features.LTI_ADVANCED_SHARING_MODE.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             '',
             '',
             'http://discourse.org/',
@@ -193,7 +193,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.EMAIL_NOTIFICATIONS.value,
         ],
-        'documentation_urls': DocumentLinks(
+        'external_links': ProviderExternalLinks(
             '',
             '',
             'https://edstem.org/us/',
@@ -362,7 +362,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         """
         Check if the provider supports some feature
         """
-        features = AVAILABLE_PROVIDER_MAP.get(self.provider_type).get('features') or []
+        features = AVAILABLE_PROVIDER_MAP.get(self.provider_type)['features'] or []
         has_support = bool(feature in features)
         return has_support
 
