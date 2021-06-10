@@ -35,3 +35,5 @@ def plugin_settings(settings):
     settings.SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
     settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
+
+    settings.HIJACK_LOGIN_REDIRECT_URL = '/home'
