@@ -20,7 +20,7 @@ from openedx.adg.lms.applications.forms import (
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
-from .helpers import send_application_submission_confirmation_email
+from .helpers import get_application_hub_instructions, get_course_card_information
 from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
 
@@ -74,17 +74,15 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
 
     def is_precondition_satisfied(self):
         """
-        Checks if a user's application is already submitted or not.
+        Checks if a user's application exists or not.
 
         Returns:
-            Boolean, True or False.
+            Boolean, True if application exists otherwise False.
         """
-        user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-
         if self.request.method == 'POST':
-            return user_application_hub.are_application_pre_reqs_completed()
-        else:
-            return not user_application_hub.is_application_submitted
+            return False
+
+        return ApplicationHub.objects.filter(user=self.request.user).exists()
 
     def handle_no_permission(self):
         """
@@ -96,7 +94,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         if self.request.method == 'POST':
             return HttpResponse(status=400)
         else:
-            return redirect('application_success')
+            return redirect('application_introduction')
 
     def get(self, request):
         """
@@ -105,67 +103,42 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         Returns:
             HttpResponse object.
         """
-        user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-        pre_req_courses = MultilingualCourseGroup.objects.get_user_program_prereq_courses(request.user)
+        user_application_hub = ApplicationHub.objects.get(user=self.request.user)
+        pre_req_courses = business_line_courses = []
+        is_any_prerequisite_started = is_locked = is_any_bu_course_started = False
+
+        if user_application_hub.is_written_application_completed:
+            pre_req_courses, is_any_prerequisite_started, is_locked = get_course_card_information(
+                request.user,
+                MultilingualCourseGroup.objects.get_user_program_prereq_courses(request.user)
+            )
+
+            business_line_courses, is_any_bu_course_started, _ = get_course_card_information(
+                request.user,
+                MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(
+                    request.user
+                )
+            )
+
+        messages = get_application_hub_instructions(
+            user_application_hub,
+            is_any_prerequisite_started,
+            is_any_bu_course_started
+        )
+
+        context = {
+            'user_application_hub': user_application_hub,
+            'pre_req_courses': pre_req_courses,
+            'business_line_courses': business_line_courses,
+            'is_locked': is_locked,
+            'messages': messages
+        }
 
         return render(
             request,
             self.template_name,
-            context={'user_application_hub': user_application_hub, 'pre_req_courses': pre_req_courses}
+            context=context
         )
-
-    def post(self, request):
-        """
-        Submit user application, send mandrill email according to the Application Confirmation Email format. In the
-        end, it redirects to the application success page.
-
-        Returns:
-            HttpResponse object.
-        """
-        if not request.user.application_hub.is_application_submitted:
-            request.user.application_hub.submit_application_for_current_date()
-            send_application_submission_confirmation_email(request.user.email)
-        return redirect('application_success')
-
-
-class ApplicationSuccessView(RedirectToLoginOrRelevantPageMixin, TemplateView):
-    """
-    View entailing successfully submitted application status of a user.
-    """
-
-    template_name = 'adg/lms/applications/success.html'
-
-    def is_precondition_satisfied(self):
-        """
-        Checks if a user's application is already submitted or not.
-
-        Returns:
-            Boolean, True or False.
-        """
-        try:
-            return self.request.user.application_hub.is_application_submitted
-        except ApplicationHub.DoesNotExist:
-            return False
-
-    def handle_no_permission(self):
-        """
-        Redirects on test failure, `test_func()` returns False.
-
-        Returns:
-            HttpResponse object.
-        """
-        return HttpResponse(status=400)
-
-    def get_context_data(self, **kwargs):
-        """
-        Send the application submission date for the authenticated user in the context dictionary.
-
-        Returns:
-            dict object.
-        """
-        context = super(ApplicationSuccessView, self).get_context_data(**kwargs)
-        context['submission_date'] = self.request.user.application_hub.submission_date
-        return context
 
 
 class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
@@ -479,3 +452,14 @@ class ApplicationIntroductionView(RedirectToLoginOrRelevantPageMixin, TemplateVi
             bool: True if user has visited the hub page else False
         """
         return not ApplicationHub.objects.filter(user=self.request.user).exists()
+
+    def post(self, request):
+        """
+        Creates an Application Hub object for the user and redirects to Application Hub.
+
+        Returns:
+            HttpResponse object.
+        """
+        ApplicationHub.objects.get_or_create(user=self.request.user)
+
+        return redirect('application_hub')

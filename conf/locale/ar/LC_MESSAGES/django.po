@@ -28,6 +28,7 @@
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
 # Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -61,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-09 14:13+0000\n"
+"POT-Creation-Date: 2021-06-10 10:21+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -145,6 +146,7 @@ msgstr "هناك مشكلة في ملف النص هذا. حاول تحميل م�
 #. Translators: This is the status for a video that the servers are currently
 #. processing
 #: cms/djangoapps/contentstore/views/videos.py
+#: openedx/adg/lms/applications/constants.py
 #: openedx/adg/lms/applications/models.py
 msgid "In Progress"
 msgstr "العلامات"
@@ -9558,6 +9560,81 @@ msgid ""
 "business line or common for all business lines"
 msgstr ""
 
+#: openedx/adg/lms/applications/constants.py
+msgid "Congratulations! You have completed the written application."
+msgstr "تهانينا! أنت الآن مسجَّل في المساق {course_name}"
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Get started on the Omnipreneurship Courses in order to move forward with "
+"your application."
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Finish up the Omnipreneurship Courses in order to complete your application."
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid "Congratulations! You have completed the Omnipreneurship Courses!"
+msgstr "تهانينا! أنت الآن مسجَّل في المساق {course_name}"
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Get started on the Business Line Courses in order to move forward with your "
+"application."
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Finish up the Business Line Courses in order to complete your application."
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Congratulations! You have completed all of the requirements and submitted "
+"your application. "
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Your application is now under review by an admin. If you are selected for "
+"the program, they will be in contact with you to begin the process of "
+"establishing your business. This will involve legal documentation and on-"
+"the-job training. More details regarding this will be provided later. "
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"Please take the assessments in this course again in order to obtain a "
+"passing grade and complete your application!"
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"This course will unlock when you have completed and received a passing grade"
+" in"
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid "Locked"
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid "Not Started"
+msgstr "لم يجرِ تحديده"
+
+#: openedx/adg/lms/applications/constants.py
+msgid "Re-Take Course"
+msgstr "جرت إضافة مساق"
+
+#: openedx/adg/lms/applications/constants.py
+#: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr "اكتملت البيانات"
+
 #: openedx/adg/lms/applications/forms.py
 msgid "Please enter a valid date"
 msgstr "يُرجى إدخال اسم المستخدم"
@@ -9607,6 +9684,10 @@ msgstr ""
 msgid "to"
 msgstr ""
 
+#: openedx/adg/lms/applications/helpers.py
+msgid "{message[:-1]}."
+msgstr ""
+
 #: openedx/adg/lms/applications/models.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "User"
@@ -9623,10 +9704,6 @@ msgstr ""
 #: openedx/adg/lms/applications/models.py
 msgid "Written Application Submitted"
 msgstr ""
-
-#: openedx/adg/lms/applications/models.py
-msgid "Application Submitted"
-msgstr "حالة التحقق"
 
 #: openedx/adg/lms/applications/models.py
 msgid "Submission Date"
@@ -14506,12 +14583,6 @@ msgstr "التالي"
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "تسلسل"
-
-#: lms/templates/courseware/dates.html lms/templates/seq_module.html
-#: lms/templates/vert_module.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "Completed"
-msgstr "استُكملت العملية"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -20798,18 +20869,8 @@ msgid "FOR SUCCESSFULLY COMPLETING THE COURSE"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/course.html
-msgid "Not Started"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/course.html
-msgid "Grade: 42%"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/course.html
-msgid ""
-"This course will unlock when you have completed and received a passing grade"
-" in Omnipreneurship 101."
-msgstr ""
+msgid "Grade: "
+msgstr "جرى التقييم"
 
 #: themes/edx-platform/adg/lms/templates/footer.html
 msgid "Footer"
@@ -21131,21 +21192,14 @@ msgid "My Experience"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
-msgid "Welcome to the Omni in a Box application!"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"Congratulations! You have completed all of the requirements and submitted "
-"your application."
+msgid "Omni in a Box Application Dashboard"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
 msgid ""
 "You can view the application requirements and track your progress on this "
-"page. After you submit your written application, the Omni in a Box team will"
-" review your application."
+"page. After you complete all of the requirements, the Omni in a Box team "
+"will review your application."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
@@ -21161,22 +21215,30 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Submitted Application"
+msgstr "إعادة تقديم التحقّق"
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
 msgid "WRITTEN APPLICATION"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "PREREQUISITE COURSES"
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
+msgid "OMNIPRENEURSHIP COURSES"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"Get started on the prerequisite Omnipreneurship courses in order to complete"
-" your application!"
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
+msgid "BUSINESS LINE COURSES"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
 msgid "Written Application"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Your written application has been completed and submitted."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
@@ -21187,15 +21249,11 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "Prerequisite Courses"
-msgstr ""
+msgid "Omnipreneurship Courses"
+msgstr "إدارة المساقات"
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "In order to complete your application requirements, you will have to"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "complete"
+msgid "You will have to complete"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
@@ -21203,19 +21261,12 @@ msgid "both"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "Omnipreneurship courses."
+msgid ""
+"of the Omnipreneurship courses. However, you will have to enroll in and"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "However, you will have to enroll in"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "and complete"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "Omnipreneurship 101 first."
+msgid "complete Omnipreneurship 101 first."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
@@ -21225,25 +21276,27 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "Business Line Courses (Optional)"
+msgid ""
+"Omnipreneurship 102 has been unlocked for you to enroll in and complete!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Business Line Courses"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "In order to complete your application requirements, you will have to "
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
 msgid ""
-"While your application is under review, you can get started on the "
-"recommended courses and training for your chosen Business Line. Your "
-"applicaion will not be affected by your performance in these courses."
+"complete all of the Business Line Courses and obtain a passing grade in "
+"them."
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "Dukan Courses"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"These are the recommended courses based on your business line selection of "
-"Dukan. These courses are not required for the application, but suggested for"
-" you to get started on for your job training."
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
+msgid "Welcome to the Omni in a Box application!"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
@@ -21322,14 +21375,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
 msgid "Please note: "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
-msgid "OMNIPRENEURSHIP COURSES"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
-msgid "BUSINESS LINE COURSES"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/introduction.html
@@ -21460,10 +21505,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "There are currently no courses available. Please check back soon!"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/courses.html
-msgid "Business Line Courses"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/courses.html
@@ -26450,3 +26491,6 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "أُنقر على زر \"بدء الامتحان المراقب\" في الأسفل للمتابعة."
+
+#~ msgid "Application Submitted"
+#~ msgstr "حالة التحقق"

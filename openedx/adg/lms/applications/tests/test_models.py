@@ -1,8 +1,6 @@
 """
 Tests for all the models in applications app.
 """
-from datetime import date
-
 import factory
 import mock
 import pytest
@@ -50,6 +48,15 @@ def test_set_is_prerequisite_courses_passed_in_application_hub(application_hub):
     assert ApplicationHubFactory(user=application_hub.user).is_prerequisite_courses_passed
 
 
+@pytest.mark.django_db
+def test_set_is_bu_prerequisite_courses_passed_in_application_hub(application_hub):
+    """
+    Test if the is_bu_prerequisite_courses_passed is being set correctly by the model method.
+    """
+    application_hub.set_is_bu_prerequisite_courses_passed()
+    assert ApplicationHubFactory(user=application_hub.user).is_bu_prerequisite_courses_passed
+
+
 def mark_objectives_complete(application_hub, objectives_completed):
     """
     Mark the given objectives complete in the model object
@@ -85,22 +92,15 @@ def test_progress_of_objectives_completed_in_float_in_application_hub(
 
 
 @pytest.mark.django_db
-def test_submit_application_for_current_date_in_application_hub(application_hub):
-    """
-    Test if the `submit_application_for_current_date` model method works as expected.
-    """
-    application_hub.submit_application_for_current_date()
-    user_application_hub = ApplicationHubFactory(user=application_hub.user)
-    assert user_application_hub.is_application_submitted
-    assert user_application_hub.submission_date == date.today()
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize('objectives_completed,expected_return_value', [
     ([], False),
     (['is_prerequisite_courses_passed'], False),
     (['is_written_application_completed'], False),
-    (['is_prerequisite_courses_passed', 'is_written_application_completed'], True)
+    (['is_bu_prerequisite_courses_passed'], False),
+    (['is_prerequisite_courses_passed', 'is_written_application_completed'], False),
+    (['is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'], False),
+    (['is_written_application_completed', 'is_bu_prerequisite_courses_passed'], False),
+    (['is_written_application_completed', 'is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'], True)
 ])
 def test_are_application_pre_reqs_completed_in_application_hub(
     objectives_completed, expected_return_value, application_hub

@@ -8,21 +8,39 @@ import mock
 import pytest
 from django.core.exceptions import ValidationError
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.adg.lms.applications import helpers
 from openedx.adg.lms.applications.constants import (
+    APPLICATION_SUBMISSION_CONGRATS,
+    APPLICATION_SUBMISSION_INSTRUCTION,
+    COMPLETED,
     FILE_MAX_SIZE,
+    IN_PROGRESS,
     INTEREST,
+    LOCKED,
+    LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
     MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
-    SCORES
+    NOT_STARTED,
+    PREREQUISITE_COURSES_COMPLETION_CONGRATS,
+    PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
+    PREREQUISITE_COURSES_COMPLETION_MSG,
+    RETAKE,
+    RETAKE_COURSE_MESSAGE,
+    SCORES,
+    WRITTEN_APPLICATION_COMPLETION_CONGRATS,
+    WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
+    WRITTEN_APPLICATION_COMPLETION_MSG
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
     check_validations_for_current_record,
     check_validations_for_past_record,
+    get_application_hub_instructions,
+    get_course_card_information,
     get_courses_from_course_groups,
     get_duration,
     get_extra_context_for_application_review_page,
@@ -38,12 +56,14 @@ from openedx.adg.lms.applications.helpers import (
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.applications.tests.factories import (
     ApplicationHubFactory,
+    CourseOverviewFactory,
     MultilingualCourseFactory,
     MultilingualCourseGroupFactory,
     UserApplicationFactory
 )
 
 from .constants import EMAIL, TEST_TEXT_INPUT
+from .factories import ApplicationHubFactory
 
 DATE_COMPLETED_MONTH = 5
 DATE_COMPLETED_YEAR = 2020
@@ -337,7 +357,7 @@ def test_get_courses_from_course_groups(user_client, courses):
     user, _ = user_client
 
     UserApplicationFactory(user=user)
-    ApplicationHubFactory(user=user, is_application_submitted=True)
+    ApplicationHubFactory(user=user)
 
     course_group = MultilingualCourseGroupFactory(is_common_business_line_prerequisite=True)
     MultilingualCourseFactory(
@@ -387,3 +407,143 @@ def test_validate_word_limit(text_input, is_valid):
     else:
         with pytest.raises(ValidationError):
             validate_word_limit(text_input)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'written_application, omni_courses, bu_courses, omni_courses_started, bu_courses_started, congrats, msg, inst',
+    [
+        (False, False, False, False, False, '', '', ''),
+        (
+            True, False, False, False, False, WRITTEN_APPLICATION_COMPLETION_CONGRATS,
+            WRITTEN_APPLICATION_COMPLETION_MSG, ''
+        ),
+        (True, False, False, True, False, '', '', WRITTEN_APPLICATION_COMPLETION_INSTRUCTION),
+        (
+            True, True, False, False, False, PREREQUISITE_COURSES_COMPLETION_CONGRATS,
+            PREREQUISITE_COURSES_COMPLETION_MSG, ''
+        ),
+        (True, True, False, False, True, '', '', PREREQUISITE_COURSES_COMPLETION_INSTRUCTION),
+        (True, True, True, False, False, APPLICATION_SUBMISSION_CONGRATS, APPLICATION_SUBMISSION_INSTRUCTION, ''),
+    ],
+    ids=[
+        'no_step_completed', 'written_app_completed', 'omni_courses_started',
+        'omni_courses_completed', 'bu_courses_started', 'all_steps_completed'
+    ]
+)
+def test_get_application_hub_instructions(
+    written_application,
+    omni_courses,
+    bu_courses,
+    omni_courses_started,
+    bu_courses_started,
+    congrats,
+    msg,
+    inst,
+    test_user
+):
+    """
+    Test the congratulation messages and instructions for each requirement completion till application submission.
+    """
+    application_hub = ApplicationHubFactory(user=test_user)
+
+    if written_application:
+        application_hub.submit_written_application_for_current_date()
+    if omni_courses:
+        application_hub.set_is_prerequisite_courses_passed()
+    if bu_courses:
+        application_hub.set_is_bu_prerequisite_courses_passed()
+
+    actual_messages = get_application_hub_instructions(application_hub, omni_courses_started, bu_courses_started)
+
+    expected_messages = {
+        'congrats': congrats,
+        'message': msg,
+        'instruction': inst
+    }
+
+    assert actual_messages == expected_messages
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_enrolled, is_completed, all_modules_attempted, status, grade, message',
+    [
+        (False, False, False, NOT_STARTED, '', ''),
+        (True, False, False, IN_PROGRESS, '', ''),
+        (True, False, True, RETAKE, '0', RETAKE_COURSE_MESSAGE),
+        (True, True, True, COMPLETED, '100', ''),
+    ],
+    ids=['not_enrolled', 'enrolled_in_course', 'failed_in_course', 'completed_course']
+)
+def test_get_course_card_information_with_and_without_enrollment(
+    is_enrolled, is_completed, all_modules_attempted, status, grade, message, test_user, mocker
+):
+    """
+    Test the course card information when the user has not enrolled in a course, when the user has enrolled in a course,
+    when the user has failed the course and when the user has completed the course
+    """
+    if is_completed:
+        mocker.patch.object(helpers.CourseGradeFactory, 'read', return_value=Mock(passed=True, percent=1))
+    elif is_enrolled:
+        mocker.patch(
+            'openedx.adg.lms.applications.helpers.has_attempted_all_modules', return_value=all_modules_attempted
+        )
+
+    course = CourseOverviewFactory()
+
+    if is_enrolled:
+        CourseEnrollmentFactory(user=test_user, course=course)
+
+    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
+
+    assert course_cards == [{
+        'course': course,
+        'status': status,
+        'grade': grade,
+        'message': message
+    }]
+
+    assert is_any_course_started if is_enrolled else not is_any_course_started
+    assert not is_locked
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_passed, status, message, is_course_locked',
+    [
+        (False, LOCKED, LOCKED_COURSE_MESSAGE, True),
+        (True, NOT_STARTED, '', False),
+    ],
+    ids=['un_passed_prerequisite', 'passed_prerequisite']
+)
+def test_get_course_card_information_of_a_course_with_prerequisite(
+    is_passed, status, message, is_course_locked, test_user, mocker
+):
+    """
+    Test the course card information when a course has a prerequisite that has not been passed yet and when a course has
+    a prerequisite that has been passed
+    """
+    course = CourseOverviewFactory(display_name='course')
+    prerequisite_course = CourseOverviewFactory(display_name='pre_course')
+
+    mocker.patch.object(helpers.CourseGradeFactory, 'read', return_value=Mock(passed=is_passed))
+    mocker.patch(
+        'openedx.adg.lms.applications.helpers.get_prerequisite_courses_display', return_value=[{
+            'key': prerequisite_course.id
+        }]
+    )
+
+    if is_course_locked:
+        message = f'{message} pre_course.'
+
+    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
+
+    assert course_cards == [{
+        'course': course,
+        'status': status,
+        'grade': '',
+        'message': message
+    }]
+    assert not is_any_course_started
+    assert is_locked == is_course_locked

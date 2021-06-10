@@ -98,3 +98,11 @@ def expired_course_overview(current_time):
 @pytest.fixture(name='course_group')
 def multilingual_course_group():
     return MultilingualCourseGroupFactory()
+
+
+@pytest.fixture()
+def test_user():
+    """
+    Fixture which returns a user
+    """
+    return UserFactory()

@@ -36,7 +36,6 @@ class ApplicationHub(TimeStampedModel):
     is_written_application_completed = models.BooleanField(
         default=False, verbose_name=_('Written Application Submitted'),
     )
-    is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
     submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
 
     class Meta:
@@ -47,6 +46,13 @@ class ApplicationHub(TimeStampedModel):
         Mark pre_req_course objective as complete i.e set is_prerequisite_courses_passed to True.
         """
         self.is_prerequisite_courses_passed = True
+        self.save()
+
+    def set_is_bu_prerequisite_courses_passed(self):
+        """
+        Mark business line courses objective as complete i.e set is_bu_prerequisite_courses_passed to True.
+        """
+        self.is_bu_prerequisite_courses_passed = True
         self.save()
 
     def submit_written_application_for_current_date(self):
@@ -65,7 +71,8 @@ class ApplicationHub(TimeStampedModel):
         Returns:
             bool: True if all objectives are done, otherwise False.
         """
-        return self.is_prerequisite_courses_passed and self.is_written_application_completed
+        return (self.is_prerequisite_courses_passed and self.is_written_application_completed and
+                self.is_bu_prerequisite_courses_passed)
 
     @property
     def progress_of_objectives_completed_in_float(self):
@@ -78,14 +85,6 @@ class ApplicationHub(TimeStampedModel):
         number_of_objectives_completed = sum([self.is_written_application_completed,
                                               self.is_prerequisite_courses_passed])
         return number_of_objectives_completed / self.TOTAL_APPLICATION_OBJECTIVES
-
-    def submit_application_for_current_date(self):
-        """
-        Set the is_application_submitted flag and add the submission_date of the current date.
-        """
-        self.is_application_submitted = True
-        self.submission_date = date.today()
-        self.save()
 
     @property
     def is_written_application_started(self):
