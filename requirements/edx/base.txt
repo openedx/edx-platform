@@ -272,7 +272,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
-django-user-tasks==2.0.2
+django-user-tasks==2.0.3
     # via -r requirements/edx/base.in
 django-waffle==2.2.0
     # via
@@ -455,7 +455,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.13.1
+edx-proctoring==3.13.2
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -591,7 +591,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==2.9.1
+lti-consumer-xblock==2.10.1
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via
@@ -865,7 +865,7 @@ rest-condition==1.0.3
     #   edx-drf-extensions
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml
-ruamel.yaml==0.17.7
+ruamel.yaml==0.17.8
     # via drf-yasg
 rules==3.0
     # via
