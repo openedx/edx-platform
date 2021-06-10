@@ -4729,4 +4729,5 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_description: Flag would be used to show account activation popup after the registration
 # .. toggle_use_cases: open_edx
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
+# .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
