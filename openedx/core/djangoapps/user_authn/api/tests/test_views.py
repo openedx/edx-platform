@@ -9,6 +9,9 @@ from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
@@ -175,3 +178,32 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
 
         assert response.status_code == 200
         assert response.data['countryCode'] == self.country_code
+
+
+@skip_unless_lms
+class SendAccountActivationEmail(UserAPITestCase):
+    """
+    Test for send activation email view
+    """
+
+    def setUp(self):
+        """
+        Create a user, then log in.
+        """
+        super().setUp()
+        self.user = UserFactory()
+        Registration().register(self.user)
+        result = self.client.login(username=self.user.username, password="test")
+        assert result, 'Could not log in'
+        self.path = reverse('send_account_activation_email')
+
+    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    def test_send_email_to_inactive_user_via_cta_dialog(self, email):
+        """
+        Tests when user clicks on resend activation email on CTA dialog box, system
+        sends an activation email to the user.
+        """
+        self.user.is_active = False
+        self.user.save()
+        self.client.post(self.path)
+        assert email.called is True, 'method should have been called'

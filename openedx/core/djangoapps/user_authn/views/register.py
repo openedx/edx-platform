@@ -538,6 +538,14 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
+        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA:
+            response.set_cookie(
+                settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
+                True,
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path='/',
+                secure=request.is_secure()
+            )  # setting the cookie to show account activation dialogue in platform and learning MFE
         return response
 
     def _handle_duplicate_email_username(self, request, data):
