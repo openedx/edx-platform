@@ -1,6 +1,7 @@
 """
 Outline Tab Views
 """
+from datetime import datetime, timezone
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
@@ -37,6 +38,10 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
+from openedx.core.djangoapps.content.learning_sequences.api import (
+    get_user_course_outline,
+    public_api_available as learning_sequences_api_available,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -276,6 +281,35 @@ class OutlineTabView(RetrieveAPIView):
                                                'edX Support if you have questions.')
             elif course.invitation_only:
                 enroll_alert['can_enroll'] = False
+
+        # Sometimes there are sequences returned by Course Blocks that we
+        # don't actually want to show to the user, such as when a sequence is
+        # composed entirely of units that the user can't access. The Learning
+        # Sequences API knows how to roll this up, so we use it determine which
+        # sequences we should remove from course_blocks.
+        #
+        # The long term goal is to remove the Course Blocks API call entirely,
+        # so this is a tiny first step in that migration.
+        if course_blocks and learning_sequences_api_available(course_key, request.user):
+            user_course_outline = get_user_course_outline(
+                course_key, request.user, datetime.now(tz=timezone.utc)
+            )
+            available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
+
+            # course_blocks is a reference to the root of the course, so we go
+            # through the chapters (sections) to look for sequences to remove.
+            for chapter_data in course_blocks['children']:
+                chapter_data['children'] = [
+                    seq_data
+                    for seq_data in chapter_data['children']
+                    if (
+                        seq_data['id'] in available_seq_ids or
+                        # Edge case: Sometimes we have weird course structures.
+                        # We expect only sequentials here, but if there is
+                        # another type, just skip it (don't filter it out).
+                        seq_data['type'] != 'sequential'
+                    )
+                ]
 
         data = {
             'access_expiration': access_expiration,

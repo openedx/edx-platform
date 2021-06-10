@@ -3,20 +3,22 @@ Top level API tests. Tests API public contracts only. Do not import/create/mock
 models for this app.
 """
 from datetime import datetime, timezone
-from unittest import TestCase
 from unittest.mock import patch
+import unittest
 
-import ddt
-import pytest
-import attr
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import signals
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_flag
 from edx_when.api import set_dates_for_course
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from edx_toggles.toggles.testutils import override_waffle_flag
+import attr
+import ddt
+import django.test
+import pytest
+
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.course_modes.models import CourseMode
@@ -38,19 +40,21 @@ from ...data import (
     VisibilityData,
 
 )
+from ...toggles import USE_FOR_OUTLINES
 from ..outlines import (
     get_content_errors,
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
     key_supports_outlines,
+    public_api_available,
     replace_course_outline,
 )
 from ..processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 from .test_data import generate_sections
 
 
-class OutlineSupportTestCase(TestCase):
+class OutlineSupportTestCase(unittest.TestCase):
     """
     Make sure we know what kinds of course-like keys we support for outlines.
     """
@@ -61,6 +65,62 @@ class OutlineSupportTestCase(TestCase):
     def test_unsupported_types(self):
         assert not key_supports_outlines(CourseKey.from_string("edX/100/2021"))
         assert not key_supports_outlines(LibraryLocator(org="edX", library="100"))
+
+
+class PublicApiAvailableTestCase(django.test.TestCase):
+    """
+    Test API availability checks.
+    """
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """
+        Create an empty course outline.
+        """
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Learn+Roundtrip")
+        cls.course_outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="PublicApiAvailableTestCase Test Course!",
+            published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2021",
+            entrance_exam_id=None,
+            days_early_for_beta=None,
+            sections=[],
+            self_paced=False,
+            course_visibility=CourseVisibility.PRIVATE
+        )
+        replace_course_outline(cls.course_outline)
+
+        cls.global_staff = User.objects.create_user(
+            'global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = User.objects.create_user(
+            'student', email='student@example.com', is_staff=False
+        )
+        cls.fake_course_1 = CourseKey.from_string("course-v1:Not+Really+Here")
+        cls.fake_course_2 = CourseKey.from_string("Also/Not/Here")
+
+    def test_flag_inactive(self):
+        # Old Mongo and non-existent courses are always unavailable
+        for user in [self.global_staff, self.student]:
+            assert not public_api_available(self.fake_course_1, user)
+            assert not public_api_available(self.fake_course_2, user)
+
+        # Since the waffle flag is off, only global staff can use the Learning
+        # Sequences API.
+        assert public_api_available(self.course_key, self.global_staff)
+        assert not public_api_available(self.course_key, self.student)
+
+    @override_waffle_flag(USE_FOR_OUTLINES, active=True)
+    def test_flag_active(self):
+        # Old Mongo and non-existent courses are always unavailable
+        for user in [self.global_staff, self.student]:
+            assert not public_api_available(self.fake_course_1, user)
+            assert not public_api_available(self.fake_course_2, user)
+
+        # Since the waffle flag is on, both global staff and students can use
+        # the Learning Sequences API.
+        assert public_api_available(self.course_key, self.global_staff)
+        assert public_api_available(self.course_key, self.student)
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
