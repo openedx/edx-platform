@@ -64,9 +64,6 @@ def test_education_serializer_with_invalid_data(education_data):  # pylint: disa
         ],
         'date_completed_month': [
             'Date completed month isn\'t applicable for degree in progress'
-        ],
-        'area_of_study': [
-            'Area of study is required for all degrees above High School Diploma'
         ]
     }
     serializer = EducationSerializer(data=education_data)
@@ -89,24 +86,29 @@ def test_education_serializer_with_valid_data(education_data):  # pylint: disabl
     assert not serializer.errors
 
 
+@pytest.mark.parametrize(
+    'degree, area_of_study, expected_area_of_study', [
+        (Education.HIGH_SCHOOL_DIPLOMA, 'Computer Sciences', ''),
+        (Education.HIGH_SCHOOL_DIPLOMA, '', ''),
+        (Education.BACHELOR_DEGREE, 'Computer Sciences', 'Computer Sciences')
+    ]
+)
 @pytest.mark.django_db
-def test_education_serializer_with_valid_degree_data(education_data):  # pylint: disable=redefined-outer-name
+def test_education_serializer_with_valid_degree_data(
+    degree, area_of_study, expected_area_of_study, education_data
+):  # pylint: disable=redefined-outer-name
     """
     Verify the education serializer behavior for different degree values
     """
     education_data['is_in_progress'] = False
-    education_data['area_of_study'] = 'Computer Sciences'
+    education_data['area_of_study'] = area_of_study
+    education_data['degree'] = degree
+
     serializer = EducationSerializer(data=education_data)
 
     assert serializer.is_valid()
     assert not serializer.errors
-    assert serializer.data['area_of_study'] == 'Computer Sciences'
-
-    education_data['degree'] = Education.HIGH_SCHOOL_DIPLOMA
-    serializer = EducationSerializer(data=education_data)
-
-    assert serializer.is_valid()
-    assert not serializer.data['area_of_study']
+    assert serializer.data['area_of_study'] == expected_area_of_study
 
 
 @pytest.mark.django_db

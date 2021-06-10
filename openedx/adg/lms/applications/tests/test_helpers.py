@@ -7,8 +7,6 @@ from unittest.mock import Mock, patch
 import mock
 import pytest
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.utils.html import format_html
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.adg.lms.applications import helpers
@@ -16,13 +14,13 @@ from openedx.adg.lms.applications.constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
     COMPLETED,
-    COVER_LETTER_ONLY,
     FILE_MAX_SIZE,
-    HTML_FOR_EMBEDDED_FILE_VIEW,
     IN_PROGRESS,
+    INTEREST,
     LOCKED,
     LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
+    MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
@@ -45,15 +43,15 @@ from openedx.adg.lms.applications.helpers import (
     get_course_card_information,
     get_courses_from_course_groups,
     get_duration,
-    get_embedded_view_html,
     get_extra_context_for_application_review_page,
     has_admin_permissions,
-    is_displayable_on_browser,
+    is_user_qualified_for_bu_prereq_courses,
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_email,
     validate_file_size,
-    validate_logo_size
+    validate_logo_size,
+    validate_word_limit
 )
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.applications.tests.factories import (
@@ -64,7 +62,7 @@ from openedx.adg.lms.applications.tests.factories import (
     UserApplicationFactory
 )
 
-from .constants import EMAIL
+from .constants import EMAIL, TEST_TEXT_INPUT
 from .factories import ApplicationHubFactory
 
 DATE_COMPLETED_MONTH = 5
@@ -248,36 +246,6 @@ def test_validate_file_size_with_valid_size(size, expected):
 
 
 @pytest.mark.parametrize(
-    'filename, expected_is_displayable_on_browser', [
-        ('test.pdf', True),
-        ('test.doc', False)
-    ]
-)
-def test_is_displayable_on_browser(filename, expected_is_displayable_on_browser):
-    """
-    Test that the `is_displayable_on_browser` function returns False if the input file is a .doc file, True otherwise.
-    """
-    test_file = SimpleUploadedFile(filename, b'')
-    actual_is_displayable_on_browser = is_displayable_on_browser(test_file)
-
-    assert expected_is_displayable_on_browser == actual_is_displayable_on_browser
-
-
-def test_get_embedded_view_html():
-    """
-    Test that the `get_embedded_view_html` function returns the correct and safe HTML to render the input file in an
-    embedded view.
-    """
-    test_file = SimpleUploadedFile('test.pdf', b'')
-    test_file.url = 'test_url'
-
-    expected_html = format_html(HTML_FOR_EMBEDDED_FILE_VIEW.format(path_to_file=test_file.url))
-    actual_html = get_embedded_view_html(test_file)
-
-    assert expected_html == actual_html
-
-
-@pytest.mark.parametrize(
     'is_current, expected_duration', [
         (True, 'January 2020 to Present'),
         (False, 'January 2020 to December 2020')
@@ -346,8 +314,8 @@ def test_get_extra_context_for_application_review_page(mock_get_application_revi
         'application': user_application,
         'reviewer': 'reviewed_by',
         'review_date': 'review_date',
-        'COVER_LETTER_ONLY': COVER_LETTER_ONLY,
-        'SCORES': SCORES
+        'SCORES': SCORES,
+        'INTEREST': INTEREST,
     }
     actual_context = get_extra_context_for_application_review_page(user_application)
 
@@ -400,6 +368,45 @@ def test_get_courses_from_course_groups(user_client, courses):
     catalog_courses = get_courses_from_course_groups([course_group], user)
 
     assert catalog_courses == [courses['test_course1']]
+
+
+@pytest.mark.django_db
+def test_user_is_not_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `False` for a user with no application and application_hub.
+    """
+    user, _ = user_client
+    assert not is_user_qualified_for_bu_prereq_courses(user)
+
+
+@pytest.mark.django_db
+def test_user_is_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `True` for user with application and application_hub and
+    has passed program prerequisites.
+    """
+    user, _ = user_client
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user, is_prerequisite_courses_passed=True)
+    assert is_user_qualified_for_bu_prereq_courses(user)
+
+
+@pytest.mark.parametrize('text_input, is_valid', [
+    (TEST_TEXT_INPUT, True),
+    (TEST_TEXT_INPUT * MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT, True),
+    (TEST_TEXT_INPUT * (MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT + 1), False)
+])
+@pytest.mark.django_db
+def test_validate_word_limit(text_input, is_valid):
+    """
+    Check if the `validate_word_limit` function raises a ValidationError if the total
+    number of words exceed the provided limit
+    """
+    if is_valid:
+        assert not validate_word_limit(text_input)
+    else:
+        with pytest.raises(ValidationError):
+            validate_word_limit(text_input)
 
 
 @pytest.mark.django_db

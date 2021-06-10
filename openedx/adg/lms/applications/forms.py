@@ -8,17 +8,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
-from openedx.adg.lms.applications.constants import (
-    APPLICATION_REVIEW_ERROR_MSG,
-    FILE_MAX_SIZE,
-    MAXIMUM_AGE_LIMIT,
-    MINIMUM_AGE_LIMIT
-)
+from openedx.adg.lms.applications.constants import APPLICATION_REVIEW_ERROR_MSG, MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT
 from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 
 from .constants import COURSE_GROUP_PREREQ_VALIDATION_ERROR
-from .helpers import validate_file_size
+from .helpers import validate_word_limit
 
 
 class ExtendedUserProfileForm(forms.Form):
@@ -30,6 +25,7 @@ class ExtendedUserProfileForm(forms.Form):
     birth_month = forms.IntegerField()
     birth_year = forms.IntegerField()
     saudi_national = forms.BooleanField(required=False)
+    hear_about_omni = forms.CharField(required=False, max_length=255)
 
     def save(self, request=None):
         """
@@ -43,6 +39,7 @@ class ExtendedUserProfileForm(forms.Form):
             defaults={
                 'birth_date': data.get('birth_date'),
                 'saudi_national': data.get('saudi_national'),
+                'hear_about_omni': data.get('hear_about_omni'),
             }
         )
 
@@ -71,7 +68,10 @@ class ExtendedUserProfileForm(forms.Form):
             age = relativedelta(date.today(), birth_date).years
             if age < MINIMUM_AGE_LIMIT or age > MAXIMUM_AGE_LIMIT:
                 raise forms.ValidationError(
-                    {'birth_day': [_('Sorry, the age limit for the program is 21-60'), ]}
+                    # pylint: disable=no-member
+                    {'birth_day': [_('Sorry, the age limit for the program is {min_age}-{max_age}').format(
+                        min_age=MINIMUM_AGE_LIMIT, max_age=MAXIMUM_AGE_LIMIT),
+                    ]}
                 )
             cleaned_data['birth_date'] = birth_date
         return cleaned_data
@@ -95,18 +95,7 @@ class UserApplicationForm(forms.ModelForm):
 
     class Meta:
         model = UserApplication
-        fields = ['organization', 'linkedin_url', 'resume']
-
-    def clean_resume(self):
-        """
-        Validate resume size is less than maximum allowed size
-        """
-        resume = self.cleaned_data.get('resume')
-        if resume:
-            error = validate_file_size(resume, FILE_MAX_SIZE)
-            if error:
-                raise forms.ValidationError(error)
-        return resume
+        fields = ['organization', 'linkedin_url']
 
 
 class UserProfileForm(forms.ModelForm):
@@ -137,7 +126,6 @@ class UserApplicationAdminForm(forms.ModelForm):
     class Meta:
         model = UserApplication
         fields = '__all__'
-        help_texts = {'cover_letter_file': None, 'resume': None}
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
@@ -149,47 +137,64 @@ class UserApplicationAdminForm(forms.ModelForm):
             raise forms.ValidationError(APPLICATION_REVIEW_ERROR_MSG)
 
 
-class UserApplicationCoverLetterForm(forms.ModelForm):
+class BusinessLineInterestForm(forms.ModelForm):
     """
-    User Application Form for Cover Letter Page
+    User Application Form for Business Line & Interest Page
     """
 
     class Meta:
         model = UserApplication
-        fields = ['business_line', 'cover_letter_file', 'cover_letter']
+        fields = ['business_line', 'interest_in_business']
 
-    def clean_cover_letter_file(self):
+    def clean_business_line(self):
         """
-        Validate cover letter file size is less than maximum allowed size
+        Validates that on submit the user should have selected a business line or returns an error
         """
-        cover_letter_file = self.cleaned_data.get('cover_letter_file')
-        if cover_letter_file:
-            error = validate_file_size(cover_letter_file, FILE_MAX_SIZE)
-            if error:
-                raise forms.ValidationError(error)
-        return cover_letter_file
+        business_line = self.cleaned_data.get('business_line')
+        submit_button_clicked = self.data.get('submit_or_back_clicked') == 'submit'
 
-    def clean(self):
-        """
-        In addition to pre-defined validation it validates that either cover letter file or text is sent
-        """
-        super().clean()
+        if submit_button_clicked and not business_line:
+            raise forms.ValidationError(_('This field is required'))
 
-        if 'cover_letter_file' in self.changed_data and self.cleaned_data.get('cover_letter'):
-            self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
-        elif self.data.get('button_click') == 'submit' and self.cleaned_data.get('business_line') is None:
-            self.add_error('business_line', _('This field is required'))
+        return business_line
 
-    def save_form(self, post_data):
+    def clean_interest_in_business(self):
         """
-        Before saving user application it checks if the cover letter file needs to be deleted if user has removed it
+        Validates that on submit the user should have added their interest in the business line or returns an error.
+        Also, validates the word limit
         """
-        instance = self.save(commit=False)
+        interest_in_business = self.cleaned_data.get('interest_in_business')
+        submit_button_clicked = self.data.get('submit_or_back_clicked') == 'submit'
 
-        if 'cover_letter_file' in post_data and 'cover_letter' in post_data:
-            instance.cover_letter_file.delete()
+        if submit_button_clicked and not interest_in_business:
+            raise forms.ValidationError(_('This field is required'))
 
-        instance.save()
+        validate_word_limit(interest_in_business)
+        return interest_in_business
+
+
+class EducationExperienceBackgroundForm(forms.ModelForm):
+    """
+    Form for background question in Application
+    """
+
+    class Meta:
+        model = UserApplication
+        fields = ('background_question',)
+
+    def clean_background_question(self):
+        """
+        Validates that on next click, the user should have added their background question or returns an error.
+        Also validates the word limit
+        """
+        background_question = self.cleaned_data.get('background_question')
+        next_button_clicked = self.data.get('next_or_back_clicked') == 'next'
+
+        if next_button_clicked and not background_question:
+            raise forms.ValidationError(_('This field is required'))
+
+        validate_word_limit(background_question)
+        return background_question
 
 
 class MultilingualCourseGroupForm(forms.ModelForm):

@@ -6,8 +6,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
 from django.urls import reverse
-from django.utils.html import format_html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
@@ -24,12 +23,12 @@ from .constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
     COMPLETED,
-    COVER_LETTER_ONLY,
-    HTML_FOR_EMBEDDED_FILE_VIEW,
     IN_PROGRESS,
+    INTEREST,
     LOCKED,
     LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
+    MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
@@ -139,6 +138,28 @@ def update_errors_if_future_date(date, errors, key):
     return errors
 
 
+def validate_word_limit(text_area_input):
+    """
+    Validate that the text input does not exceed the word limit
+
+    Arguments:
+        text_area_input (str): String input from the textarea
+
+    Returns:
+        None
+    """
+    if text_area_input is None:
+        return
+
+    all_words = text_area_input.strip().split(' ')
+    non_empty_words = [word for word in all_words if word]
+    total_num_of_words = len(non_empty_words)
+    if total_num_of_words > MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT:
+        raise ValidationError(
+            _('This field cannot exceed {max_words} words').format(max_words=MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT)
+        )
+
+
 def send_application_submission_confirmation_email(recipient_email):
     """
     Send an email to the recipient_email according to the mandrill template
@@ -196,36 +217,6 @@ def validate_file_size(data_file, max_size):
     if size and max_size < size:
         return _('File size must not exceed {size} MB').format(size=max_size / 1024 / 1024)
     return None
-
-
-def is_displayable_on_browser(file):
-    """
-    Check if the input file can be displayed as an embedded view on a browser
-
-    Arguments:
-        file (FieldFile): file to be checked
-
-    Returns:
-        bool: False if file type is 'doc', True otherwise
-    """
-    filename = str(file).lower()
-
-    return not filename.endswith('.doc')
-
-
-def get_embedded_view_html(file):
-    """
-    Return html to display file in browser
-
-    Arguments:
-        file (File): file that needs to be rendered
-
-    Returns:
-        SafeText: HTML to display embedded view of image or pdf file
-    """
-    html = HTML_FOR_EMBEDDED_FILE_VIEW.format(path_to_file=file.url)
-
-    return format_html(html)
 
 
 def get_duration(entry, is_current):
@@ -286,8 +277,8 @@ def get_extra_context_for_application_review_page(application):
         'application': application,
         'reviewer': reviewed_by,
         'review_date': review_date,
-        'COVER_LETTER_ONLY': COVER_LETTER_ONLY,
         'SCORES': SCORES,
+        'INTEREST': INTEREST,
     }
 
     return extra_context
@@ -329,6 +320,29 @@ def get_courses_from_course_groups(course_groups, user):
             courses_list.append(multilingual_course.course)
 
     return courses_list
+
+
+def is_user_qualified_for_bu_prereq_courses(user):
+    """
+    Checks whether a user satisfies all the conditions to attempt business line prerequisite courses.
+
+    Following are the conditions:
+    1. User has passed all the program prerequisites courses.
+    2. User has selected a business line in the written application.
+
+    Args:
+        user (User): User object
+
+    Returns:
+        bool: True if user is eligible to attempt business line prerequisite courses else False
+    """
+    return (
+        user.is_authenticated and
+        hasattr(user, 'application_hub') and
+        user.application_hub.is_prerequisite_courses_passed and
+        hasattr(user, 'application') and
+        user.application.business_line
+    )
 
 
 def get_course_card_information(user, courses):
