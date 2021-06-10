@@ -89,11 +89,11 @@ rebuild_cache_for_db() {
     echo "Using the dumpdata command to save the $db fixture data to the filesystem."
     ./manage.py lms --settings $SETTINGS dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json --exclude=api_admin.Catalog
     echo "Saving the schema of the $db bok_choy DB to the filesystem."
-    mysqldump --column_statistics=0 $MYSQL_HOST -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
+    mysqldump $MYSQL_HOST -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
 
     # dump_data does not dump the django_migrations table so we do it separately.
     echo "Saving the django_migrations table of the $db bok_choy DB to the filesystem."
-    mysqldump --column_statistics=0 $MYSQL_HOST -u root --no-create-info --skip-comments --skip-dump-date "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+    mysqldump $MYSQL_HOST -u root --no-create-info --skip-comments --skip-dump-date "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
 }
 
 for db in "${database_order[@]}"; do
