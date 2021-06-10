@@ -285,3 +285,48 @@ def has_admin_permissions(user):
 
     is_user_admin = user.is_superuser or is_adg_admin(user) or BusinessLine.is_user_business_line_admin(user)
     return user.is_staff and is_user_admin
+
+
+def get_courses_from_course_groups(course_groups, user):
+    """
+    Get courses from the given course groups for the user.
+
+    Args:
+        course_groups (list): List of course groups
+        user (User): User for which courses will be returned
+
+    Returns:
+        list: List of courses for the user
+    """
+    courses_list = []
+    for course_group in course_groups:
+        open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
+        multilingual_course = open_multilingual_courses.multilingual_course(user)
+
+        if multilingual_course:
+            courses_list.append(multilingual_course.course)
+
+    return courses_list
+
+
+def is_user_qualified_for_bu_prereq_courses(user):
+    """
+    Checks whether a user satisfies all the conditions to attempt business line prerequisite courses.
+
+    Following are the conditions:
+    1. User has passed all the program prerequisites courses.
+    2. User has selected a business line in the written application.
+
+    Args:
+        user (User): User object
+
+    Returns:
+        bool: True if user is eligible to attempt business line prerequisite courses else False
+    """
+    return (
+        user.is_authenticated and
+        hasattr(user, 'application_hub') and
+        user.application_hub.is_prerequisite_courses_passed and
+        hasattr(user, 'application') and
+        user.application.business_line
+    )

@@ -3,8 +3,10 @@ Managers for the models of applications app
 """
 from datetime import datetime
 
-from django.db.models import Manager, QuerySet
+from django.db.models import Manager, Q, QuerySet
 from django.utils.translation import get_language
+
+from .helpers import get_courses_from_course_groups
 
 
 class SubmittedApplicationsManager(Manager):
@@ -23,33 +25,78 @@ class MultilingualCourseGroupManager(Manager):
     Manager for MultilingualCourseGroup
     """
 
-    def prereq_course_groups(self):
+    def program_prereq_and_all_non_prereq_course_groups(self):
         """
-        Get non-empty prerequisite course groups
+        All course groups which are not business line or common business line prerequisites course groups.
+        """
+        return self.get_queryset().filter(
+            is_common_business_line_prerequisite=False, business_line_prerequisite__isnull=True
+        )
+
+    def program_prereq_course_groups(self):
+        """
+        Non-empty program prerequisite course groups.
         """
         return self.get_queryset().filter(is_program_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
-    def get_courses(self, user, is_prereq=False):
+    def business_line_and_common_business_line_prereq_course_groups_for_user(self, user):
         """
-        Get courses from course groups.
+        Returns prerequisite course groups for the selected business line and common prerequisite course groups
+        for all business lines.
 
         Args:
-            is_prereq (bool):  List of MultilingualCourseGroups
-            user (User): user for which we need to find courses
+            user (User): User for which prerequisite course groups will be returned
 
         Returns:
-            list: List of courses which contains a course from each group
+            list: List of business line prerequisite course groups for a user
         """
-        courses_list = []
-        course_groups = self.prereq_course_groups() if is_prereq else self.get_queryset()
+        return self.get_queryset().filter(
+            Q(is_common_business_line_prerequisite=True) | Q(business_line_prerequisite=user.application.business_line)
+        )
 
-        for course_group in course_groups:
-            open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
-            multilingual_course = open_multilingual_courses.multilingual_course(user)
-            if multilingual_course:
-                courses_list.append(multilingual_course.course)
+    def get_user_business_line_and_common_business_line_prereq_courses(self, user):
+        """
+        Returns prerequisite courses for the selected business line and common prerequisite courses
+        for all business lines for a user.
 
-        return courses_list
+        Args:
+            user (User): User for which business line prerequisites will be returned
+
+        Returns:
+            list: List of prereq courses for a business line selected by user
+            and common courses for all the business lines
+        """
+        return get_courses_from_course_groups(
+            self.business_line_and_common_business_line_prereq_course_groups_for_user(user), user
+        )
+
+    def get_user_program_prereq_courses(self, user):
+        """
+        Returns program prerequisite courses for a user.
+
+        Args:
+            user (User): User for which program prerequisite courses will be returned
+
+        Returns:
+            list: List of program prerequisite courses for a user
+        """
+        return get_courses_from_course_groups(
+            self.program_prereq_course_groups(), user
+        )
+
+    def get_user_program_prereq_courses_and_all_non_prereq_courses(self, user):
+        """
+        Returns program prerequisite courses and non prerequisite courses for a user.
+
+        Args:
+            user (User): User for which courses will be returned
+
+        Returns:
+            list: List of program prerequisite and non prerequisite courses
+        """
+        return get_courses_from_course_groups(
+            self.program_prereq_and_all_non_prereq_course_groups(), user
+        )
 
 
 class MultilingualCourseQuerySet(QuerySet):

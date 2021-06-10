@@ -213,7 +213,7 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = MultilingualCourseGroup.objects.get_courses(self.user, is_prereq=True)
+        prereq_course_overviews = MultilingualCourseGroup.objects.get_user_program_prereq_courses(self.user)
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:
