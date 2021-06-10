@@ -2,6 +2,7 @@
 
 
 import unittest
+import urllib.parse
 from datetime import datetime
 from unittest.mock import patch
 from uuid import uuid4
@@ -17,6 +18,7 @@ from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 
 FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
@@ -167,13 +169,17 @@ class TestActivateAccount(TestCase):
     @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
     @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
-    def test_account_activation_with_valid_next_url(self):
+    def test_authenticated_account_activation_with_valid_next_url(self):
         """
         Verify that an activation link with a valid next URL will redirect
-        the activated user to that next URL, even if the AuthN MFE is active
-        and redirects to it are enabled.
+        the activated enterprise user to that next URL, even if the AuthN
+        MFE is active and redirects to it are enabled.
         """
         self._assert_user_active_state(expected_active_state=False)
+        EnterpriseCustomerUserFactory(user_id=self.user.id)
+
+        # Make sure the user is authenticated before activation.
+        self.login()
 
         redirect_url = 'http://localhost:1991/pied-piper/learn'
         base_activation_url = reverse('activate', args=[self.registration.activation_key])
@@ -242,6 +248,38 @@ class TestActivateAccount(TestCase):
         # Open account activation page with an invalid activation link, the query param should contain error
         response = self.client.get(reverse('activate', args=[uuid4().hex]))
         assert response.url == (login_page_url + 'error')
+
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
+    def test_unauthenticated_user_redirects_to_mfe_with_valid_next_url(self):
+        """
+        Verify that if Authn MFE is enabled then authenticated user redirects to
+        login page with correct account_activation_status param.  Additionally, if a valid
+        `next` redirect URL is provided to the activation URL, it should be included
+        as a parameter in the login page the requesting user is redirected to.
+        """
+        login_page_url = "{authn_mfe}/login?account_activation_status=".format(
+            authn_mfe=settings.AUTHN_MICROFRONTEND_URL
+        )
+
+        self._assert_user_active_state(expected_active_state=False)
+
+        redirect_url = 'http://localhost:1991/pied-piper/learn'
+        encoded_next_param = urllib.parse.urlencode({'next': redirect_url})
+        base_activation_url = reverse('activate', args=[self.registration.activation_key])
+        activation_url = '{base}?{params}'.format(
+            base=base_activation_url,
+            params=urlencode({'next': redirect_url}),
+        )
+
+        # HTTP_ACCEPT is needed so the safe redirect checks pass.
+        response = self.client.get(activation_url, HTTP_ACCEPT='*/*')
+        assert response.url == (login_page_url + 'success&' + encoded_next_param)
+
+        # Access activation link again, the user is redirected to login page with info query param
+        response = self.client.get(activation_url, HTTP_ACCEPT='*/*')
+        assert response.url == (login_page_url + 'info&' + encoded_next_param)
 
     def test_authenticated_user_cannot_activate_another_account(self):
         """
