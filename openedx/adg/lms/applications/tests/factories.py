@@ -35,6 +35,7 @@ class UserApplicationFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = UserApplication
+        django_get_or_create = ('user',)
 
     user = factory.SubFactory(UserFactory)
     business_line = factory.SubFactory(BusinessLineFactory)

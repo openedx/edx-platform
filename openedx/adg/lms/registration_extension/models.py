@@ -20,12 +20,24 @@ class ExtendedUserProfile(models.Model):
     company = models.ForeignKey(
         BusinessLine, verbose_name=_('Company'), on_delete=models.CASCADE, null=True, blank=True
     )
+    hear_about_omni = models.CharField(
+        verbose_name=_('How did you hear about this program?'),
+        max_length=255,
+        blank=True,
+    )
 
     @property
     def is_saudi_national(self):
         if self.saudi_national:
             return _('Yes')
         return _('No')
+
+    @property
+    def is_saudi_national_and_has_birthdate(self):
+        """
+        Checks if a user is a saudi national and has the birthdate field added
+        """
+        return self.saudi_national and self.birth_date is not None
 
     class Meta:
         app_label = 'registration_extension'

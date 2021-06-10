@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-09 13:57+0000\n"
+"POT-Creation-Date: 2021-06-10 10:21+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -5801,6 +5801,28 @@ msgstr "الإنجازات"
 msgid "Profile"
 msgstr "الملف الشخصي"
 
+#: themes/edx-platform/adg/lms/static/js/applications/business_line_interest.js
+msgid "Submit your written application?"
+msgstr "نعتذّر لتعذّر تقديم الطلب"
+
+#: themes/edx-platform/adg/lms/static/js/applications/business_line_interest.js
+msgid "You will not be able to edit your answers after submitting."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static/js/applications/business_line_interest.js
+msgid "yes, submit"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static/js/applications/business_line_interest.js
+msgid "keep editing"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static/js/applications/business_line_interest.js
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
+#: themes/edx-platform/adg/lms/static/js/applications/limit_words.js
+msgid "This field is required."
+msgstr "كلمة المرور مطلوبة"
+
 #: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
 msgid "This field is required"
 msgstr "كلمة المرور مطلوبة"
@@ -5842,12 +5864,8 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/static/js/applications/education_experience_navigation_handler.js
-msgid "Please add your education and work experience"
+msgid "Please fill all the mandatory sections."
 msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
-msgid "This field is required."
-msgstr "كلمة المرور مطلوبة"
 
 #: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
 msgid "Date must not be in future."
@@ -5856,6 +5874,14 @@ msgstr ""
 #: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
 msgid "Completed date must be greater than started date."
 msgstr "لايمكن أن يسبق تاريخ الاستحقاق تاريخ الابتداء."
+
+#: themes/edx-platform/adg/lms/static/js/applications/limit_words.js
+msgid "This field cannot exceed "
+msgstr "كلمة المرور مطلوبة"
+
+#: themes/edx-platform/adg/lms/static/js/applications/limit_words.js
+msgid " words."
+msgstr "كلمات كاملة"
 
 #: themes/edx-platform/adg/lms/static/js/common/forms_handler.js
 msgid "Please save the previous record first to add a new form"

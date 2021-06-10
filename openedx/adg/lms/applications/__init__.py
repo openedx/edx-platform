@@ -10,13 +10,14 @@ consists of two mandatory steps i.e. prerequisite courses and written applicatio
 Prerequisite courses
 ------------
 Application hub shows (configured) courses in its dashboard which are mandatory to pass in order to submit
-the application.
+the application. There are two type of mandatory courses: Program specific prerequisite courses and the business line
+specific prerequisite courses.
 
 Written application
 ------------
 Written application is another mandatory step to submit the application. It asks the applicant few questions from
-various sections including, contact information, education and business line/unit to apply to. User can upload CV
-and cover letter as well. All the data is saved in database.
+various sections including, contact information, education and business line/unit to apply to. All the data is saved in
+the database.
 
 Admin Dashboard
 ------------
