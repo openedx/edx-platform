@@ -1,13 +1,10 @@
 # constraints required for Python 3.5 support in sandbox codejail environments
 # All of these constraints require python3.6+ for larger versions
 
-celery<5.0              # celery 5.0 has dropped python3.5 support.
-
-geoip2<4.0.1            # geoip2 requires Python 3.6
-
-inflect<4.0.0           # 4.0.0 dropped support for Python 3.5
-
-isort<5.0.0             # 5.0.0 dropped support for Python 3.5
+# maxminddb 2.0.0 has dropped support for Python 3.5
+maxminddb<2.0.0
+# geoip2 requires Python 3.6 && geoip2>4.0.2 requires maxminddb>=2.0.0
+geoip2<4.0.1
 
 joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
 
@@ -17,11 +14,7 @@ kiwisolver<1.2.0        # kiwisolver 1.2.0 requires Python 3.6+
 
 matplotlib<3.1          # Matplotlib 3.1 requires Python 3.6
 
-maxminddb<2.0.0         # maxminddb 2.0.0 has dropped support for Python 3.5
-
 numpy<1.19.0            # numpy 1.19.0 drops support for Python 3.5
-
-path<13.2.0             # path 13.2.0 drops support for Python 3.5
 
 stevedore<2.0.0         # stevedore 2.0.0 requires python >= 3.6
 

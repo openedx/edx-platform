@@ -12,6 +12,9 @@
 # This file contains all common constraints for edx-repos
 -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
 
+# celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
+celery<5.0.0
+
 # edx-platform currently only supported for Django 2.2.x
 django<2.3
 
@@ -88,14 +91,8 @@ click<8.0.0
 
 # constraints present due to Python35 support. Need to be tested and removed independently.
 
-celery<5.0              # celery 5.0 has dropped python3.5 support.
-inflect<4.0.0           # 4.0.0 dropped support for Python 3.5
-isort<5.0.0             # 5.0.0 dropped support for Python 3.5
 joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
 kiwisolver<1.2.0        # kiwisolver 1.2.0 requires Python 3.6+
 matplotlib<3.1          # Matplotlib 3.1 requires Python 3.6
-maxminddb<2.0.0         # maxminddb 2.0.0 has dropped support for Python 3.5
-path<13.2.0             # path 13.2.0 drops support for Python 3.5
 zipp==1.0.0             # zipp 2.0.0 requires Python >= 3.6
-geoip2<4.0.1            # geoip2 requires Python 3.6
