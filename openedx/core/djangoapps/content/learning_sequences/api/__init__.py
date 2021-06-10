@@ -6,5 +6,6 @@ from .outlines import (
     get_user_course_outline,
     get_user_course_outline_details,
     key_supports_outlines,
+    public_api_available,
     replace_course_outline,
 )

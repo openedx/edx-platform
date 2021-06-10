@@ -3,7 +3,7 @@ Tests for Outline Tab API in the Course Home API
 """
 
 import itertools
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 import ddt
@@ -18,6 +18,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
+from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
+from openedx.core.djangoapps.content.learning_sequences.toggles import USE_FOR_OUTLINES
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
@@ -366,3 +369,39 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         response = self.client.get(self.url)
         assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    def test_hide_learning_sequences(self):
+        """
+        Check that Learning Sequences filters out sequences.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+
+        # Normal behavior: the sequence exists
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        blocks = response.data['course_blocks']['blocks']
+        seq_block_id = next(
+            block_id
+            for block_id, block in blocks.items()
+            if block['type'] == 'sequential'
+        )
+
+        # With Learning Sequences active and a course outline loaded, the same
+        # sequence is removed.
+        with override_waffle_flag(USE_FOR_OUTLINES, active=True):
+            new_learning_seq_outline = CourseOutlineData(
+                course_key=self.course.id,
+                title="Test Course Outline!",
+                published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
+                published_version="5ebece4b69dd593d82fe2022",
+                entrance_exam_id=None,
+                days_early_for_beta=None,
+                sections=[],
+                self_paced=False,
+                course_visibility=CourseVisibility.PRIVATE
+            )
+            replace_course_outline(new_learning_seq_outline)
+            response = self.client.get(self.url)
+            blocks = response.data['course_blocks']['blocks']
+            assert seq_block_id not in blocks

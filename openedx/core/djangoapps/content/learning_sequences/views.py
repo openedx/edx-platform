@@ -12,12 +12,12 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.lib.api.permissions import IsStaff
 from .api import get_user_course_outline_details
+from .api.permissions import can_call_public_api
 from .data import CourseOutlineData
 
 User = get_user_model()
@@ -30,9 +30,6 @@ class CourseOutlineView(APIView):
     """
     # We want to eventually allow unauthenticated users to use this as well...
     authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser)
-
-    # For early testing, restrict this to only global staff...
-    permission_classes = (IsStaff,)
 
     class UserCourseOutlineDataSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
         """
@@ -154,36 +151,35 @@ class CourseOutlineView(APIView):
         """
         The CourseOutline, customized for a given user.
 
-        Currently restricted to global staff.
-
         TODO: Swagger docs of API. For an exemplar to imitate, see:
         https://github.com/edx/edx-platform/blob/master/lms/djangoapps/program_enrollments/rest_api/v1/views.py#L792-L820
         """
-        # Translate input params and do any substitutions...
+        # Translate input params and do course key validation (will cause HTTP
+        # 400 error if an invalid CourseKey was entered, instead of 404).
         course_key = self._validate_course_key(course_key_str)
         at_time = datetime.now(timezone.utc)
-        user = self._determine_user(request)
 
-        # Grab the user's outline and send our response...
+        if not can_call_public_api(request.user, course_key):
+            raise PermissionDenied()
+
         try:
-            user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
+            # Grab the user's outline and send our response...
+            outline_user = self._determine_user(request)
+            user_course_outline_details = get_user_course_outline_details(course_key, outline_user, at_time)
         except CourseOutlineData.DoesNotExist as does_not_exist_err:
             raise NotFound() from does_not_exist_err
 
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
-    def _validate_course_key(self, course_key_str):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _validate_course_key(self, course_key_str):
+        """Validate the Course Key and raise a ValidationError if it fails."""
         try:
             course_key = CourseKey.from_string(course_key_str)
-        except InvalidKeyError:
-            raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                f"{course_key_str} is not a valid CourseKey"
-            )
+        except InvalidKeyError as err:
+            raise serializers.ValidationError(f"{course_key_str} is not a valid CourseKey") from err
         if course_key.deprecated:
-            raise serializers.ValidationError(
-                "Deprecated CourseKeys (Org/Course/Run) are not supported."
-            )
+            raise serializers.ValidationError("Deprecated CourseKeys (Org/Course/Run) are not supported.")
         return course_key
 
     def _determine_user(self, request):
@@ -193,7 +189,20 @@ class CourseOutlineView(APIView):
         until we have more full fledged permissions/masquerading.
         """
         requested_username = request.GET.get("user")
-        if request.user.is_staff and requested_username:
-            return User.objects.get(username=requested_username)
 
-        return request.user
+        # Simple case: No username passed in, so it's just the request.user
+        if not requested_username:
+            return request.user
+
+        # If we're here, then the requesting user is asking for someone else's
+        # course outline. Right now, only global staff is allowed to do that.
+        if request.user.is_staff:
+            try:
+                user = User.objects.get(username=requested_username)
+                return user
+            except User.DoesNotExist as err:
+                raise NotFound("User {requested_username} does not exist.") from err
+
+        raise PermissionDenied(
+            "User {request.user.username} does not have permission to view course outline as {requested_username}"
+        )
