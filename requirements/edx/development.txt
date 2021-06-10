@@ -350,7 +350,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-user-tasks==2.0.2
+django-user-tasks==2.0.3
     # via -r requirements/edx/testing.txt
 django-waffle==2.2.0
     # via
@@ -549,7 +549,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.13.1
+edx-proctoring==3.13.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -681,11 +681,9 @@ imagesize==1.2.0
 importlib-metadata==4.5.0
     # via
     #   -r requirements/edx/testing.txt
-    #   inflect
     #   pytest-randomly
-inflect==3.0.2
+inflect==5.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   jinja2-pluralize
 inflection==0.5.1
@@ -776,7 +774,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==2.9.1
+lti-consumer-xblock==2.10.1
     # via -r requirements/edx/testing.txt
 lxml==4.5.0
     # via
@@ -1182,7 +1180,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-ruamel.yaml==0.17.7
+ruamel.yaml==0.17.9
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
