@@ -25,11 +25,13 @@ from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
     check_validations_for_current_record,
     check_validations_for_past_record,
+    get_courses_from_course_groups,
     get_duration,
     get_embedded_view_html,
     get_extra_context_for_application_review_page,
     has_admin_permissions,
     is_displayable_on_browser,
+    is_user_qualified_for_bu_prereq_courses,
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_email,
@@ -37,6 +39,12 @@ from openedx.adg.lms.applications.helpers import (
     validate_logo_size
 )
 from openedx.adg.lms.applications.models import UserApplication
+from openedx.adg.lms.applications.tests.factories import (
+    ApplicationHubFactory,
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory,
+    UserApplicationFactory
+)
 
 from .constants import EMAIL
 
@@ -352,3 +360,45 @@ def test_has_admin_permissions(mocker, is_business_line_admin, is_superuser, is_
     test_user = UserFactory(is_superuser=is_superuser, is_staff=is_staff)
 
     assert has_admin_permissions(test_user) == expected_result
+
+
+@pytest.mark.django_db
+def test_get_courses_from_course_groups(user_client, courses):
+    """
+    Tests `get_courses_from_course_groups` returns a valid list of courses.
+    """
+    user, _ = user_client
+
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user, is_application_submitted=True)
+
+    course_group = MultilingualCourseGroupFactory(is_common_business_line_prerequisite=True)
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+
+    catalog_courses = get_courses_from_course_groups([course_group], user)
+
+    assert catalog_courses == [courses['test_course1']]
+
+
+@pytest.mark.django_db
+def test_user_is_not_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `False` for a user with no application and application_hub.
+    """
+    user, _ = user_client
+    assert not is_user_qualified_for_bu_prereq_courses(user)
+
+
+@pytest.mark.django_db
+def test_user_is_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `True` for user with application and application_hub and
+    has passed program prerequisites.
+    """
+    user, _ = user_client
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user, is_prerequisite_courses_passed=True)
+    assert is_user_qualified_for_bu_prereq_courses(user)

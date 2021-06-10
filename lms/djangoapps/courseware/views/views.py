@@ -90,7 +90,11 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.adg.lms.courseware_override.helpers import get_courses, get_extra_course_about_context
+from openedx.adg.lms.courseware_override.helpers import (
+    get_business_line_prereq_courses,
+    get_courses,
+    get_extra_course_about_context,
+)
 from openedx.adg.lms.webinars.models import Webinar
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
@@ -276,6 +280,7 @@ def courses(request):
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
             'webinars': Webinar.objects.upcoming_webinars().order_by('start_time'),
+            'business_line_courses': get_business_line_prereq_courses(request.user),
         }
     )
 

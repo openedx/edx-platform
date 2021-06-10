@@ -4,7 +4,9 @@ Helpers for courseware app
 from django.utils.translation import get_language_info
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from lms.djangoapps.courseware.courses import get_courses as get_courses_core
+from openedx.adg.lms.applications.helpers import is_user_qualified_for_bu_prereq_courses
 from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 
@@ -13,7 +15,26 @@ def get_courses(user):
     """
     Return courses using core method if environment is test environment else uses customized method for courses list.
     """
-    return get_courses_core(user) if is_testing_environment() else MultilingualCourseGroup.objects.get_courses(user)
+    if is_testing_environment():
+        return get_courses_core(user)
+
+    return MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(user)
+
+
+def get_business_line_prereq_courses(user):
+    """
+    Get business line courses for a user.
+
+    Args:
+        user (User): User for which courses will be retrieved
+
+    Returns:
+        list: List of business line courses for the user
+    """
+    if not is_user_qualified_for_bu_prereq_courses(user):
+        return
+
+    return MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(user)
 
 
 def get_language_names_from_codes(language_codes_with_course_id):
@@ -59,8 +80,16 @@ def get_extra_course_about_context(request, course):
 
     course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total')
 
+    course_requirements = None
+    if request.user.is_authenticated:
+        course_requirements = get_pre_requisite_courses_not_completed(
+            request.user,
+            [course.id]
+        )
+
     context = {
         'course_languages': course_language_names,
+        'course_requirements': course_requirements,
         'total_enrollments': course_enrollment_count,
         'self_paced': course.self_paced,
         'effort': course.effort,

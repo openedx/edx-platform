@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):  # pylint: disable=unused-argument
-        prereq_course_groups = MultilingualCourseGroup.objects.prereq_course_groups()
+        prereq_course_groups = MultilingualCourseGroup.objects.program_prereq_course_groups()
 
         if not prereq_course_groups:
             sys.exit('Exiting!!! No open pre-req courses found but there must be some pre-reqs. Please add from admin')
