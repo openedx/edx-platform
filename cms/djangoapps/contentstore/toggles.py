@@ -65,6 +65,7 @@ def bypass_olx_failure_enabled():
 
 
 # .. toggle_name: FEATURES['ENABLE_EXAM_SETTINGS_HTML_VIEW']
+# .. toggle_use_cases: open_edx
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
 # .. toggle_description: When enabled, users can access the new course authoring view for proctoring exams
