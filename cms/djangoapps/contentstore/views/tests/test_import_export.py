@@ -28,7 +28,6 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore import errors as import_error
-from cms.djangoapps.contentstore.exceptions import ErrorReadingFileException, ModuleFailedToImport
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -45,7 +44,13 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctori
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import CourseImportManager, import_course_from_xml, import_library_from_xml
+from xmodule.modulestore.xml_importer import (
+    CourseImportManager,
+    ErrorReadingFileException,
+    import_course_from_xml,
+    import_library_from_xml,
+    ModuleFailedToImport,
+)
 
 TASK_LOGGER = 'cms.djangoapps.contentstore.tasks.LOGGER'
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)

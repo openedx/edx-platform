@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.tabs import DatesTab
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
@@ -34,7 +34,7 @@ class CourseDatesFragmentView(EdxFragmentView):
         course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
         dates_tab_enabled = DatesTab.is_enabled(course, request.user)
-        if course_home_mfe_dates_tab_is_active(course_key):
+        if course_home_mfe_is_active(course_key):
             dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
         else:
             dates_tab_link = reverse('dates', args=[course.id])

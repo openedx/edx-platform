@@ -4720,3 +4720,13 @@ DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
 ################# Settings for olx validation. #################
 COURSE_OLX_VALIDATION_STAGE = 1
 COURSE_OLX_VALIDATION_IGNORE_LIST = None
+
+################# show account activate cta after register ########################
+SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
+# .. toggle_name: SOME_FEATURE_NAME
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Flag would be used to show account activation popup after the registration
+# .. toggle_use_cases: open_edx
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
+SHOW_ACCOUNT_ACTIVATION_CTA = False

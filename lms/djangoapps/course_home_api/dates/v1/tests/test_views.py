@@ -6,12 +6,11 @@ from datetime import datetime
 
 import ddt
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
@@ -27,7 +26,6 @@ class DatesTabTestViews(BaseCourseHomeTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
@@ -40,7 +38,6 @@ class DatesTabTestViews(BaseCourseHomeTests):
         assert all(block.get('learner_has_access') for block in date_blocks)
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     @ddt.data(True, False)
     def test_get_authenticated_user_not_enrolled(self, has_previously_enrolled):
         if has_previously_enrolled:
@@ -51,21 +48,18 @@ class DatesTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 401
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
         assert response.status_code == 401
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     def test_get_unknown_course(self):
         url = reverse('course-home-dates-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     def test_banner_data_is_returned(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         response = self.client.get(self.url)
@@ -76,7 +70,6 @@ class DatesTabTestViews(BaseCourseHomeTests):
         self.assertContains(response, 'verified_upgrade_link')
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
-    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)
     def test_masquerade(self):
         self.switch_to_staff()
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')

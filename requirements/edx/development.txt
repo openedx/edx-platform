@@ -350,7 +350,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-user-tasks==2.0.2
+django-user-tasks==2.0.3
     # via -r requirements/edx/testing.txt
 django-waffle==2.2.0
     # via
@@ -515,7 +515,7 @@ edx-drf-extensions==6.5.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.23.11
+edx-enterprise==3.23.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -549,7 +549,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.13.0
+edx-proctoring==3.13.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -776,7 +776,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==2.9.1
+lti-consumer-xblock==2.10.1
     # via -r requirements/edx/testing.txt
 lxml==4.5.0
     # via
@@ -853,7 +853,7 @@ mpmath==1.2.1
     #   sympy
 mypy-extensions==0.4.3
     # via mypy
-mypy==0.812
+mypy==0.901
     # via -r requirements/edx/development.in
 mysqlclient==2.0.3
     # via -r requirements/edx/testing.txt
@@ -883,7 +883,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
-ora2==3.6.1
+ora2==3.6.2
     # via -r requirements/edx/testing.txt
 packaging==20.9
     # via
@@ -1182,7 +1182,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-ruamel.yaml==0.17.7
+ruamel.yaml==0.17.8
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
@@ -1358,6 +1358,7 @@ tincan==1.0.0
 toml==0.10.2
     # via
     #   -r requirements/edx/testing.txt
+    #   mypy
     #   pylint
     #   pytest
     #   pytest-cov
@@ -1375,8 +1376,6 @@ tqdm==4.61.0
     #   nltk
 transifex-client==0.14.2
     # via -r requirements/edx/testing.txt
-typed-ast==1.4.3
-    # via mypy
 typing-extensions==3.10.0.0
     # via mypy
 ua-parser==0.10.0

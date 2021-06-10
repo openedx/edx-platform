@@ -3078,7 +3078,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=875 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=877 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3537,11 +3537,12 @@ CREATE TABLE `enterprise_enrollmentnotificationemailtemplate` (
   `plaintext_template` longtext NOT NULL,
   `html_template` longtext NOT NULL,
   `subject_line` varchar(100) NOT NULL,
-  `enterprise_customer_id` char(32) NOT NULL,
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `template_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_enrollmen_enterprise_customer__df17d9ff_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enterpriseanalyticsuser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3817,6 +3818,7 @@ CREATE TABLE `enterprise_historicalenrollmentnotificationemailtemplate` (
   `history_user_id` int(11) DEFAULT NULL,
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
+  `template_type` varchar(255) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_f2a6d605_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenroll_id_d4b3fed2` (`id`),

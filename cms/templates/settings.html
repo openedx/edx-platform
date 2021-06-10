@@ -669,8 +669,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
-            % if course_authoring_microfrontend_url:
-              <li class="nav-item"><a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_id}">${_("Proctored Exam Settings")}</a></li>
+            % if mfe_proctored_exam_settings_url:
+              <li class="nav-item"><a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a></li>
             % endif
           </ul>
         </nav>
