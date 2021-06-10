@@ -4,6 +4,7 @@ Toggles for courseware in-course experience.
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace, SettingToggle
 from opaque_keys.edx.keys import CourseKey
+from django.conf import settings
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.util.xmodule_django import get_current_request_hostname
@@ -123,7 +124,7 @@ def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     if course_key.deprecated:
         return False
     # TEMP: DENY: Course preview doesn't work in the MFE
-    if hostname.startswith("preview"):
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
@@ -142,6 +143,9 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     #     Waffle flag.
     if COURSEWARE_USE_LEGACY_FRONTEND.is_enabled(course_key):
         return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+        return False
     # OTHERWISE: MFE courseware experience is active by default.
     return True
 
@@ -159,7 +163,7 @@ def courseware_mfe_is_visible(
     if course_key.deprecated:
         return False
     # TEMP: DENY: Course preview doesn't work in the MFE
-    if hostname.startswith("preview"):
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
         return False
     # ALLOW: Where techincally possible, global staff may always see the MFE.
     if is_global_staff:
@@ -190,7 +194,7 @@ def courseware_mfe_is_advertised(
     if course_key.deprecated:
         return False
     # TEMP: DENY: Course preview doesn't work in the MFE
-    if hostname.startswith("preview"):
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
         return False
     # ALLOW: Both global and course staff can see the MFE link if the course team
     #        preview is enabled.
@@ -216,7 +220,7 @@ def courseware_legacy_is_visible(
     if is_global_staff:
         return True
     # TEMP: ALLOW: All course previews will be shown in Legacy experience
-    if hostname.startswith("preview"):
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
         return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,
