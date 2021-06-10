@@ -1,8 +1,6 @@
 # constraints required for Python 3.5 support in sandbox codejail environments
 # All of these constraints require python3.6+ for larger versions
 
-geoip2<4.0.1            # geoip2 requires Python 3.6
-
 isort<5.0.0             # 5.0.0 dropped support for Python 3.5
 
 joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
