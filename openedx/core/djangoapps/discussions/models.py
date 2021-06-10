@@ -150,7 +150,7 @@ AVAILABLE_PROVIDER_MAP = {
             'https://www.youtube.com/watch?v=ZACief-qMwY',
             '',
             'https://hubs.ly/H0J5Bn7',
-            'https://drive.google.com/file/d/1FT6E2ajMabFQI3NqgInPgGsQnLH7e2Mb/view?usp=sharing',
+            '',
             'learnmore@yellowdig.com',
         )._asdict(),
     },
