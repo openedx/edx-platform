@@ -3,14 +3,13 @@ Tests for the Agreements API
 """
 import logging
 
-from django.core.cache import cache
 from testfixtures import LogCapture
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
     get_integrity_signature,
-    get_integrity_signatures_for_course
+    get_integrity_signatures_for_course,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -63,17 +62,15 @@ class TestIntegritySignatureApi(SharedModuleStoreTestCase):
         Test to get an integrity signature
         """
         create_integrity_signature(self.user.username, self.course_id)
-        with self.assertNumQueries(0):
-            signature = get_integrity_signature(self.user.username, self.course_id)
-            self._assert_integrity_signature(signature)
+        signature = get_integrity_signature(self.user.username, self.course_id)
+        self._assert_integrity_signature(signature)
 
     def test_get_nonexistent_integrity_signature(self):
         """
         Test that None is returned if an integrity signature does not exist
         """
-        with self.assertNumQueries(2):
-            signature = get_integrity_signature(self.user.username, self.course_id)
-            self.assertIsNone(signature)
+        signature = get_integrity_signature(self.user.username, self.course_id)
+        self.assertIsNone(signature)
 
     def test_get_integrity_signatures_for_course(self):
         """
@@ -101,21 +98,3 @@ class TestIntegritySignatureApi(SharedModuleStoreTestCase):
         """
         self.assertEqual(signature.user, self.user)
         self.assertEqual(signature.course_key, self.course.id)
-
-    def test_get_integrity_signatures_for_course_cached(self):
-        """
-        Test to ensure the integrity_signatures retrieved by course is also set into cache
-        """
-        create_integrity_signature(self.user.username, self.course_id)
-        second_user = UserFactory()
-        create_integrity_signature(second_user.username, self.course_id)
-        cache.clear()
-        with self.assertNumQueries(1):
-            get_integrity_signatures_for_course(self.course_id)
-
-        with self.assertNumQueries(0):
-            signature = get_integrity_signature(self.user.username, self.course_id)
-            self._assert_integrity_signature(signature)
-
-        with self.assertNumQueries(0):
-            get_integrity_signature(second_user.username, self.course_id)
