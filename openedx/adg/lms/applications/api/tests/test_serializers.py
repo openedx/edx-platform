@@ -114,9 +114,7 @@ def test_education_serializer_with_valid_data(education_data):
     ]
 )
 @pytest.mark.django_db
-def test_education_serializer_with_valid_degree_data(
-    degree, area_of_study, expected_area_of_study, education_data
-):
+def test_education_serializer_with_valid_degree_data(degree, area_of_study, expected_area_of_study, education_data):
     """
     Verify the education serializer behavior for different degree values
     """

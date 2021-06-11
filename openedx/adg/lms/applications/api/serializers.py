@@ -1,7 +1,6 @@
 """
 Serializers for applications app
 """
-from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from openedx.adg.lms.applications.constants import MAX_NUMBER_OF_REFERENCES, MAX_REFERENCE_ERROR_MSG

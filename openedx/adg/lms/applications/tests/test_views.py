@@ -25,7 +25,13 @@ from .constants import (
     USERNAME,
     VALID_USER_BIRTH_DATE_FOR_APPLICATION
 )
-from .factories import ApplicationHubFactory, BusinessLineFactory, EducationFactory, UserApplicationFactory
+from .factories import (
+    ApplicationHubFactory,
+    BusinessLineFactory,
+    EducationFactory,
+    ReferenceFactory,
+    UserApplicationFactory
+)
 
 
 @pytest.mark.django_db
@@ -548,6 +554,7 @@ def business_line_interest_view_prereqs_completed(user):
     EducationFactory(user_application=user.application)
     user.application.is_work_experience_not_applicable = True
     user.application.background_question = TEST_BACKGROUND_QUESTION
+    ReferenceFactory(user_application=user.application)
 
 
 @pytest.fixture(name='business_line_interest_view_get_request')
@@ -620,25 +627,23 @@ def test_response_for_user_with_complete_written_application_business_line_inter
 @mock.patch('openedx.adg.lms.applications.views.render')
 @mock.patch('openedx.adg.lms.applications.views.BusinessLine.objects.all')
 @mock.patch('openedx.adg.lms.applications.views.BusinessLineInterestForm')
-@pytest.mark.parametrize('has_user_application, added_work_exp, added_education, bg_question, will_redirect', [
-    (False, True, True, True, True),
-    (True, False, True, True, True),
-    (True, True, False, True, True),
-    (True, True, True, False, True),
-    (True, False, False, True, True),
-    (True, True, False, False, True),
-    (True, False, True, False, True),
-    (True, True, True, True, False)
-], ids=[
-    'no_application',
-    'application_with_no_work',
-    'application_with_no_education',
-    'application_with_no_bg_question',
-    'application_with_no_work_no_education',
-    'application_with_no_education_no_bg_question',
-    'application_with_no_work_no_bg_question',
-    'application_with_work_education_bg_question'
-])
+@pytest.mark.parametrize(
+    'has_user_application, added_work_exp, added_education, bg_question, added_reference, will_redirect', [
+        (False, True, True, True, True, True),
+        (True, False, True, True, True, True),
+        (True, True, False, True, True, True),
+        (True, True, True, False, True, True),
+        (True, True, True, True, False, True),
+        (True, True, True, True, True, False)
+    ], ids=[
+        'no_application',
+        'application_with_no_work',
+        'application_with_no_education',
+        'application_with_no_bg_question',
+        'application_with_no_reference',
+        'application_with_work_education_bg_question_reference'
+    ]
+)
 def test_get_with_or_without_required_prereqs_completed_business_line_interest_view(
     mock_business_line_interest_form,
     mock_business_lines,
@@ -648,13 +653,14 @@ def test_get_with_or_without_required_prereqs_completed_business_line_interest_v
     added_work_exp,
     added_education,
     bg_question,
+    added_reference,
     will_redirect
 ):
     """
-    Test that if a user tries to get the business line page with incomplete prereqs e.g no education
-    added, no work added, no background etc, the user must be redirected to application hub page.
+    Test that if a user tries to get the business line page with incomplete prereqs e.g no education added,
+    no work added, no background or no reference added, the user must be redirected to application hub page.
     The user is only allowed to visit the url with complete required data added from the previous
-    step i.e Education & Experience page
+    step i.e. "My Experience" page
     """
     mock_business_line_interest_form.return_value = 'form'
     mock_business_lines.return_value = 'business_lines'
@@ -666,6 +672,8 @@ def test_get_with_or_without_required_prereqs_completed_business_line_interest_v
             EducationFactory(user_application=user.application)
         user.application.is_work_experience_not_applicable = added_work_exp
         user.application.background_question = TEST_BACKGROUND_QUESTION if bg_question else ''
+        if added_reference:
+            ReferenceFactory(user_application=user.application)
 
     response = BusinessLineInterestView.as_view()(business_line_interest_view_get_request)
 
