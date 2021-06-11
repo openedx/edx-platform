@@ -463,8 +463,8 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
     @classmethod
     def tearDownClass(cls):
-        super(TestCase, cls).tearDownClass()  # pylint: disable=bad-super-call
         cls.end_cache_isolation()  # call this from CacheIsolationMixin
+        super(TestCase, cls).tearDownClass()  # pylint: disable=bad-super-call
 
     def _fixture_setup(self):
         return super(TestCase, self)._fixture_setup()  # pylint: disable=bad-super-call
