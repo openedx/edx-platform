@@ -147,8 +147,12 @@ def mfe_proctored_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    hostname = get_current_request_hostname()
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS.is_enabled(course_key)
