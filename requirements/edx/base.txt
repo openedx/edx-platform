@@ -36,6 +36,8 @@
     # via -r requirements/edx/local.in
 acid-xblock==0.2.1
     # via -r requirements/edx/base.in
+aiohttp==3.7.4.post0
+    # via geoip2
 amqp==2.6.1
     # via kombu
 analytics-python==1.3.1
@@ -46,9 +48,12 @@ aniso8601==9.0.1
     #   tincan
 appdirs==1.4.4
     # via fs
+async-timeout==3.0.1
+    # via aiohttp
 attrs==21.2.0
     # via
     #   -r requirements/edx/base.in
+    #   aiohttp
     #   edx-ace
 babel==2.9.1
     # via
@@ -106,6 +111,7 @@ cffi==1.14.5
 chardet==4.0.0
     # via
     #   -r requirements/edx/paver.txt
+    #   aiohttp
     #   pysrt
     #   requests
 chem==1.2.0
@@ -233,7 +239,7 @@ django-mptt==0.12.0
     #   django-wiki
 django-multi-email-field==0.6.2
     # via edx-enterprise
-django-mysql==3.11.1
+django-mysql==3.12.0
     # via -r requirements/edx/base.in
 django-oauth-toolkit==1.3.2
     # via
@@ -520,10 +526,8 @@ future==0.18.2
     #   edx-enterprise
     #   pycontracts
     #   pyjwkest
-geoip2==3.0.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+geoip2==4.2.0
+    # via -r requirements/edx/base.in
 glob2==0.7
     # via -r requirements/edx/base.in
 gunicorn==20.1.0
@@ -540,6 +544,7 @@ idna==2.10
     # via
     #   -r requirements/edx/paver.txt
     #   requests
+    #   yarl
 inflection==0.5.1
     # via drf-yasg
 ipaddress==1.0.23
@@ -629,10 +634,8 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   xblock
-maxminddb==1.5.4
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   geoip2
+maxminddb==2.0.3
+    # via geoip2
 mock==4.0.3
     # via
     #   -r requirements/edx/paver.txt
@@ -646,6 +649,10 @@ monotonic==1.6
     # via analytics-python
 mpmath==1.2.1
     # via sympy
+multidict==5.1.0
+    # via
+    #   aiohttp
+    #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.in
 newrelic==6.4.1.158
@@ -976,6 +983,8 @@ tincan==1.0.0
     # via edx-event-routing-backends
 tqdm==4.61.0
     # via nltk
+typing-extensions==3.10.0.0
+    # via aiohttp
 ua-parser==0.10.0
     # via django-cookies-samesite
 unicodecsv==0.14.1
@@ -1057,6 +1066,8 @@ xmlsec==1.3.11
     # via python3-saml
 xss-utils==0.2.0
     # via -r requirements/edx/base.in
+yarl==1.6.3
+    # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
