@@ -11,4 +11,4 @@ mkdir -p test_root/log/
 pip3 install ora2==2.11.5.1
 
 # Test given parameter
-DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest $1
+EDXAPP_TEST_MONGO_HOST=mongodb python -Wd -m pytest --ds=cms.envs.test --junitxml=/openedx/edx-platform/reports/cms/nosetests.xml $1
