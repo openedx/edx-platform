@@ -14,3 +14,9 @@ services:
     depends_on:
       - memcached
       - mongodb
+  
+  cms:
+    image: eoluchile/edx-platform:testing-koa
+    depends_on:
+      - memcached
+      - mongodb
