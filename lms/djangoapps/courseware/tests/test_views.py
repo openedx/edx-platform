@@ -3569,6 +3569,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         assert self.client.get(lms_url).status_code == 200
 
+
 @ddt.ddt
 class PreviewRedirectTests(BaseViewsTestCase):
     """docstring for PreviewRedirectTests."""
