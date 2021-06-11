@@ -14,6 +14,7 @@ from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseDataResearcherRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -53,6 +54,8 @@ class TestBlocksView(SharedModuleStoreTestCase):
         # create and enroll user in the toy course
         self.user = UserFactory.create()
         self.admin_user = AdminFactory.create()
+        self.data_researcher = UserFactory.create()
+        CourseDataResearcherRole(self.course_key).add_users(self.data_researcher)
         self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
 
@@ -358,6 +361,17 @@ class TestBlocksView(SharedModuleStoreTestCase):
                 block_data,
                 block_data['type'] == 'course'
             )
+
+    def test_data_researcher_access(self):
+        """
+        Test if data researcher has access to the api endpoint
+        """
+        self.client.login(username=self.data_researcher.username, password='test')
+
+        self.verify_response(params={
+            'all_blocks': True,
+            'course_id': str(self.course_key)
+        })
 
     def test_navigation_param(self):
         response = self.verify_response(params={'nav_depth': 10})
