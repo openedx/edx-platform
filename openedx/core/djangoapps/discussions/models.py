@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 from enum import Enum
 
+from collections import namedtuple
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -16,7 +17,6 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
-from collections import namedtuple
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -26,7 +26,10 @@ log = logging.getLogger(__name__)
 DEFAULT_PROVIDER_TYPE = 'legacy'
 
 
-ProviderExternalLinks = namedtuple('ProviderExternalLinks', ['learn_more', 'configuration', 'general', 'accessibility', 'contact_email'])
+ProviderExternalLinks = namedtuple(
+    'ProviderExternalLinks',
+    ['learn_more', 'configuration', 'general', 'accessibility', 'contact_email']
+)
 
 
 class Features(Enum):
