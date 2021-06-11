@@ -3569,6 +3569,52 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         assert self.client.get(lms_url).status_code == 200
 
+@ddt.ddt
+class PreviewRedirectTests(BaseViewsTestCase):
+    """docstring for PreviewRedirectTests."""
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+        lms_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(self.course_key),
+                'chapter': str(self.chapter.location.block_id),
+                'section': str(self.section2.location.block_id),
+            }
+        )
+        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
+
+        return lms_url, preview_url
+
+    def test_staff_no_redirect(self):
+        lms_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+
+        # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
+        course_staff = UserFactory.create(is_staff=False)
+        CourseStaffRole(self.course_key).add_users(course_staff)
+        self.client.login(username=course_staff.username, password='test')
+
+        with _set_mfe_flag(activate_mfe=False):
+            assert self.client.get(preview_url).status_code == 200
+        assert self.client.get(preview_url).status_code == 302
+
+        # global staff will never be redirected
+        self._create_global_staff_user()
+        with _set_mfe_flag(activate_mfe=False):
+            assert self.client.get(preview_url).status_code == 200
+        assert self.client.get(preview_url).status_code == 200
+
+    def test_exam_no_redirect(self):
+        # exams will not redirect to the mfe, for the time being
+        self.section2.is_time_limited = True
+        self.store.update_item(self.section2, self.user.id)
+
+        lms_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+
+        assert self.client.get(preview_url).status_code == 200
+
 
 class ContentOptimizationTestCase(ModuleStoreTestCase):
     """
