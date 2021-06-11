@@ -7,12 +7,9 @@ import pytest
 from django.utils import timezone
 
 from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
-from openedx.adg.lms.applications.tests.factories import (
-    MultilingualCourseFactory,
-    MultilingualCourseGroupFactory
-)
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.adg.lms.applications.tests.constants import BUSINESS_LINE_PRE_REQ
+from openedx.adg.lms.applications.tests.factories import MultilingualCourseFactory, MultilingualCourseGroupFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 @pytest.fixture(name='current_time')
@@ -60,6 +57,8 @@ def create_prerequisite_course_group(request):
     """
     This fixture takes in a tuple to set the batch size of course groups to be created and to make these
     course groups either program or business line prerequisite e.g. (10, 'business_line_pre_req')
+
+    request: a fixture providing information of the requesting test function
     """
 
     if request.param[1] == BUSINESS_LINE_PRE_REQ:
@@ -77,6 +76,6 @@ def create_prerequisite_course_group(request):
         )
         # Ended prereq course
         MultilingualCourseFactory(
-            course__start_date=now + timedelta(days=2), course__end_date=now, multilingual_course_group=course_group
+            course__start_date=now - timedelta(days=2), course__end_date=now, multilingual_course_group=course_group
         )
     return course_groups

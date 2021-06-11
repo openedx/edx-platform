@@ -1,6 +1,7 @@
 """
 Helper methods for applications
 """
+import logging
 from datetime import datetime
 
 from django.conf import settings
@@ -45,6 +46,8 @@ from .constants import (
     WRITTEN_APPLICATION_COMPLETION_MSG
 )
 from .rules import is_adg_admin
+
+logger = logging.getLogger(__name__)
 
 
 def validate_logo_size(file_):
@@ -567,3 +570,22 @@ def has_user_passed_given_courses(user, courses):
             return False
 
     return True
+
+
+def bulk_update_application_hub_flag(flag, users):
+    """
+    Set the given application hub flag for the provided list of users
+
+    Arguments:
+        flag (str): Flag to be updated
+        users (list): List of User objects
+
+    Returns:
+        None
+    """
+    from .models import ApplicationHub
+
+    user_application_hubs = ApplicationHub.objects.filter(user__in=users)
+    user_application_hubs.update(**{flag: True})
+
+    logger.info(f'`{flag}` flag is updated for all pending users')

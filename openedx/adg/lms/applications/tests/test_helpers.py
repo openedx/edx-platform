@@ -1,6 +1,7 @@
 """
 All tests for applications helpers functions
 """
+import logging
 from datetime import date
 from unittest.mock import Mock, patch
 
@@ -38,6 +39,7 @@ from openedx.adg.lms.applications.constants import (
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
+    bulk_update_application_hub_flag,
     check_validations_for_current_record,
     check_validations_for_past_record,
     get_application_hub_instructions,
@@ -62,7 +64,7 @@ from openedx.adg.lms.applications.tests.factories import (
     CourseOverviewFactory,
     MultilingualCourseFactory,
     MultilingualCourseGroupFactory,
-    UserApplicationFactory,
+    UserApplicationFactory
 )
 
 from .constants import EMAILS, PROGRAM_PRE_REQ, TEST_TEXT_INPUT
@@ -97,7 +99,7 @@ def test_validate_logo_size_with_invalid_size():
 @patch('openedx.adg.lms.applications.helpers.task_send_mandrill_email')
 def test_send_application_submission_confirmation_emails(mocked_task_send_mandrill_email):
     """
-    Check if the emails is being sent correctly
+    Check if the emails are being sent correctly
     """
     send_application_submission_confirmation_emails(EMAILS)
     assert mocked_task_send_mandrill_email.delay.called
@@ -589,3 +591,25 @@ def test_get_users_with_active_enrollments_from_course_groups(prereq_course_grou
     CourseEnrollmentFactory(user=users[0], course=multilingual_courses[0].course)
 
     assert get_users_with_active_enrollments_from_course_groups(users_ids, prereq_course_groups) == [users[0]]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('flag', ('is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'))
+def test_bulk_update_application_hub_flag(flag, caplog):
+    """
+    Assert that flag is successfully updated in application hub model
+    """
+    application_hubs = ApplicationHubFactory.create_batch(2)
+    users = [application_hub.user for application_hub in application_hubs]
+
+    caplog.set_level(logging.INFO)
+    bulk_update_application_hub_flag(flag, users)
+
+    for application_hub in application_hubs:
+        application_hub.refresh_from_db()
+        if flag == 'is_prerequisite_courses_passed':
+            assert application_hub.is_prerequisite_courses_passed
+        else:
+            assert application_hub.is_bu_prerequisite_courses_passed
+
+    assert f'`{flag}` flag is updated' in caplog.messages[0]
