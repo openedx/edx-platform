@@ -6,8 +6,6 @@ maxminddb<2.0.0
 # geoip2 requires Python 3.6 && geoip2>4.0.2 requires maxminddb>=2.0.0
 geoip2<4.0.1
 
-isort<5.0.0             # 5.0.0 dropped support for Python 3.5
-
 joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
 
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
