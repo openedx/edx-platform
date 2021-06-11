@@ -561,6 +561,17 @@ def _update_user_partition_groups(upg_data: Dict[int, FrozenSet[int]],
                 )
                 model_obj.user_partition_groups.add(upg)
 
+    # Temporarily fill-in the new and old user_partition_group fields.
+    # Switchover to the new field will occur after all models have been repopulated.
+    model_obj.new_user_partition_groups.all().delete()
+    if upg_data:
+        for partition_id, group_ids in upg_data.items():
+            for group_id in group_ids:
+                upg, _ = UserPartitionGroup.objects.get_or_create(
+                    partition_id=partition_id, group_id=group_id
+                )
+                model_obj.new_user_partition_groups.add(upg)
+
 
 def _update_publish_report(course_outline: CourseOutlineData,
                            content_errors: List[ContentErrorData],
