@@ -90,6 +90,8 @@ def get_blocks(
             ),
             HiddenContentTransformer()
         ]
+    else:
+        transformers += [course_blocks_api.visibility.VisibilityTransformer()]
 
     # Note: A change to the BlockCompletionTransformer (https://github.com/edx/edx-platform/pull/27622/)
     # will be introducing a bug if hide_access_denials is True.  I'm accepting this risk because in

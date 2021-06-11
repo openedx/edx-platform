@@ -53,7 +53,9 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
     def test_no_user(self):
         blocks = get_blocks(self.request, self.course.location)
-        assert str(self.html_block.location) in blocks['blocks']
+        assert str(self.html_block.location) not in blocks['blocks']
+        vertical_block = self.store.get_item(self.course.id.make_usage_key('vertical', 'vertical_x1a'))
+        assert str(vertical_block.location) in blocks['blocks']
 
     def test_access_before_api_transformer_order(self):
         """
