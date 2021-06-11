@@ -10,10 +10,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
+from openedx.adg.lms.applications.models import Education, Reference, WorkExperience
 from openedx.core.lib.api.view_utils import view_auth_classes
 
-from .models import Education, WorkExperience
-from .serializers import EducationSerializer, WorkExperienceSerializer
+from .serializers import EducationSerializer, ReferenceSerializer, WorkExperienceSerializer
 
 
 @view_auth_classes(is_authenticated=True)
@@ -27,7 +27,7 @@ class ApplicationRequirementsViewSet(viewsets.ModelViewSet):
 
     def filter_queryset(self, queryset):
         """
-        Filter queryset to allows users to filter only their own objects.
+        Filter queryset to allow users to filter only their own objects.
         """
         queryset = queryset.filter(user_application__user=self.request.user)
         return super(ApplicationRequirementsViewSet, self).filter_queryset(queryset)
@@ -41,7 +41,7 @@ class EducationViewSet(ApplicationRequirementsViewSet):
         Return a single education record that matches requested id.
 
     **Example Requests**
-    GET /api/applications/education/
+    GET /api/applications/education/<id>/
 
     list:
         Return all education records belong to the requested user.
@@ -66,15 +66,15 @@ class EducationViewSet(ApplicationRequirementsViewSet):
         Remove an existing education record.
 
     **Example Requests**
-    DELETE /api/applications/education/
+    DELETE /api/applications/education/<id>/
 
     update:
         Update an existing education record.
 
     **Example Requests**
-    PUT /api/applications/education/
-
+    PUT /api/applications/education/<id>/
     """
+
     queryset = Education.objects.all()
     serializer_class = EducationSerializer
 
@@ -87,7 +87,7 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
         Return a single work experience record that matches requested id.
 
     **Example Requests**
-    GET /api/applications/work_experience/
+    GET /api/applications/work_experience/<id>/
 
     list:
         Return all work experience records belong to the requested user.
@@ -111,21 +111,21 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
         Remove an existing work experience record.
 
     **Example Requests**
-    DELETE /api/applications/work_experience/
+    DELETE /api/applications/work_experience/<id>/
 
     update:
         Update an existing work experience record.
 
     **Example Requests**
-    PUT /api/applications/work_experience/
+    PUT /api/applications/work_experience/<id>/
 
     partial_update:
         Update user work_experience is not applicable
 
     **Example Requests**
     PATCH /api/applications/work_experience/update_is_not_applicable/
-
     """
+
     queryset = WorkExperience.objects.all()
     serializer_class = WorkExperienceSerializer
 
@@ -144,3 +144,46 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
                 user_application.applications_workexperiences.all().delete()
 
         return Response({}, status=HTTP_200_OK)
+
+
+class ReferenceViewSet(ApplicationRequirementsViewSet):
+    """
+    ViewSet for reference APIs
+
+    retrieve:
+        Return a single reference record that matches requested id.
+
+    **Example Requests**
+    GET /api/applications/reference/<id>/
+
+    list:
+        Return all reference records belong to the requested user.
+
+    **Example Requests**
+    GET /api/applications/reference/
+
+    create:
+        Create a new reference record.
+
+    Following points must be kept in mind when creating a new reference record:
+
+    * Id field is read only and would have no effect if provided explicitly.
+
+    **Example Requests**
+    POST /api/applications/reference/
+
+    delete:
+        Remove an existing reference record.
+
+    **Example Requests**
+    DELETE /api/applications/reference/<id>/
+
+    update:
+        Update an existing reference record.
+
+    **Example Requests**
+    PUT /api/applications/reference/<id>/
+    """
+
+    queryset = Reference.objects.all()
+    serializer_class = ReferenceSerializer

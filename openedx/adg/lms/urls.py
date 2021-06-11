@@ -10,7 +10,7 @@ adg_url_patterns = [
 
     # ADG Applications app
     path('application/', include('openedx.adg.lms.applications.urls')),
-    path('api/applications/', include('openedx.adg.lms.applications.api_urls', namespace='applications_api')),
+    path('api/applications/', include('openedx.adg.lms.applications.api.urls', namespace='applications_api')),
 
     # ADG our_team app
     path('our_team/', include('openedx.adg.lms.our_team.urls')),

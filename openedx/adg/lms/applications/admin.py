@@ -50,6 +50,7 @@ from .models import (
     Education,
     MultilingualCourse,
     MultilingualCourseGroup,
+    Reference,
     UserApplication,
     WorkExperience
 )
@@ -683,3 +684,5 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
 adg_admin_site = ADGAdmin(name='adg_admin')
 adg_admin_site.register(UserApplication, UserApplicationADGAdmin)
+
+admin.site.register(Reference)

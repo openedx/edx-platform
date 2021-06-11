@@ -6,8 +6,9 @@ import pytest
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.admin import UserApplicationAdmin
 
-
 # pylint: disable=redefined-outer-name
+
+
 @pytest.fixture
 def mock_request(request, mocker):
     """

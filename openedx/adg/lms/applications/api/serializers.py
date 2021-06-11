@@ -3,8 +3,9 @@ Serializers for applications app
 """
 from rest_framework import serializers
 
-from .helpers import check_validations_for_current_record, check_validations_for_past_record
-from .models import Education, WorkExperience
+from openedx.adg.lms.applications.constants import MAX_NUMBER_OF_REFERENCES, MAX_REFERENCE_ERROR_MSG
+from openedx.adg.lms.applications.helpers import check_validations_for_current_record, check_validations_for_past_record
+from openedx.adg.lms.applications.models import Education, Reference, WorkExperience
 
 
 class EducationSerializer(serializers.ModelSerializer):
@@ -89,3 +90,27 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id', 'created', 'modified',
         )
+
+
+class ReferenceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the `Reference` model
+    """
+
+    def validate_user_application(self, value):
+        """
+        Validate that max reference limit against a user application is not exceeded in case of a create request
+        """
+        is_update_request = bool(self.instance)
+        if is_update_request:
+            return value
+
+        max_limit_reached = Reference.objects.filter(user_application=value).count() == MAX_NUMBER_OF_REFERENCES
+        if max_limit_reached:
+            raise serializers.ValidationError(MAX_REFERENCE_ERROR_MSG)
+
+        return value
+
+    class Meta:
+        model = Reference
+        fields = ['id', 'name', 'position', 'relationship', 'phone_number', 'email', 'user_application']

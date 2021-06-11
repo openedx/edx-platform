@@ -10,6 +10,7 @@ from openedx.adg.lms.applications.models import (
     Education,
     MultilingualCourse,
     MultilingualCourseGroup,
+    Reference,
     UserApplication,
     WorkExperience
 )
@@ -113,3 +114,12 @@ class MultilingualCourseFactory(factory.DjangoModelFactory):
     class Meta:
         model = MultilingualCourse
         django_get_or_create = ('course', 'multilingual_course_group')
+
+
+class ReferenceFactory(factory.DjangoModelFactory):
+    """
+    Factory for Reference model
+    """
+
+    class Meta:
+        model = Reference
