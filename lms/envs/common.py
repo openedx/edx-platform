@@ -3891,8 +3891,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'account_privacy',
         'profile_image',
         'username',
-        "email",
-        "id",
     ],
 }
 
@@ -3923,6 +3921,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
 # The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
+        "email",
+        "id",
         "extended_profile",
         "gender",
         "state",
