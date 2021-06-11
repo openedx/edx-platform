@@ -5,9 +5,11 @@ Agreements API
 import logging
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.agreements.cache import get_integrity_signature_cache_key
 from openedx.core.djangoapps.agreements.models import IntegritySignature
 
 log = logging.getLogger(__name__)
@@ -33,6 +35,9 @@ def create_integrity_signature(username, course_id):
             'Integrity signature already exists for user_id={user_id} and '
             'course_id={course_id}'.format(user_id=user.id, course_id=course_id)
         )
+    cache_key = get_integrity_signature_cache_key(username, course_id)
+    # Write into the cache for future retrieval
+    cache.set(cache_key, signature)
     return signature
 
 
@@ -48,10 +53,17 @@ def get_integrity_signature(username, course_id):
         * An IntegritySignature object, or None if one does not exist for the
           user + course combination.
     """
+    cache_key = get_integrity_signature_cache_key(username, course_id)
+    cached_integrity_signature = cache.get(cache_key)
+    if cached_integrity_signature:
+        return cached_integrity_signature
+
     user = User.objects.get(username=username)
     course_key = CourseKey.from_string(course_id)
     try:
-        return IntegritySignature.objects.get(user=user, course_key=course_key)
+        signature = IntegritySignature.objects.get(user=user, course_key=course_key)
+        cache.set(cache_key, signature)
+        return signature
     except ObjectDoesNotExist:
         return None
 
@@ -66,5 +78,12 @@ def get_integrity_signatures_for_course(course_id):
     Returns:
         * QuerySet of IntegritySignature objects (can be empty).
     """
+
     course_key = CourseKey.from_string(course_id)
-    return IntegritySignature.objects.filter(course_key=course_key)
+    course_integrity_signature = IntegritySignature.objects.filter(
+        course_key=course_key
+    ).select_related('user')
+    for signature in course_integrity_signature:
+        cache_key = get_integrity_signature_cache_key(signature.user.username, course_id)
+        cache.set(cache_key, signature)
+    return course_integrity_signature
