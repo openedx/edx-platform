@@ -1,5 +1,5 @@
 from django.test import TestCase
-from organizations.models import UserOrganizationMapping, UserSiteMapping
+from organizations.models import UserOrganizationMapping
 from organizations.tests.factories import UserFactory, OrganizationFactory
 from rest_framework.test import APIRequestFactory
 
@@ -11,8 +11,7 @@ class AMCAdminPermissionsTestCase(TestCase):
     """
     Verify permissions for AMC users.
 
-    If the user is an admin user and either a part of an organization or a site, they should
-    be able to have access.
+    If the user is an admin user of an organization, they should be able to have access.
     """
 
     def setUp(self):
@@ -36,12 +35,4 @@ class AMCAdminPermissionsTestCase(TestCase):
 
     def test_organization_admin_user(self):
         UserOrganizationMapping.objects.create(user=self.user, organization=self.organization, is_amc_admin=True)
-        self.assertTrue(AMCAdminPermission().has_permission(self.request, None))
-
-    def test_site_nonadmin_user(self):
-        UserSiteMapping.objects.create(user=self.user, site=self.site, is_amc_admin=False)
-        self.assertFalse(AMCAdminPermission().has_permission(self.request, None))
-
-    def test_site_admin_user(self):
-        UserSiteMapping.objects.create(user=self.user, site=self.site, is_amc_admin=True)
         self.assertTrue(AMCAdminPermission().has_permission(self.request, None))
