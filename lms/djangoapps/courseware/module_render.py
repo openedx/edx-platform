@@ -3,7 +3,6 @@ Module rendering
 """
 
 
-import beeline
 import hashlib
 import json
 import logging
@@ -140,7 +139,6 @@ def make_track_function(request):
     return function
 
 
-@beeline.traced(name="lms.courseware.module_render.toc_for_course")
 def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
@@ -255,7 +253,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         }
 
 
-@beeline.traced(name="lms.courseware.module_render._add_timed_exam_info")
 def _add_timed_exam_info(user, course, section, section_context):
     """
     Add in rendering context if exam is a timed exam (which includes proctored)
@@ -294,7 +291,6 @@ def _add_timed_exam_info(user, course, section, section_context):
             })
 
 
-@beeline.traced(name="lms.courseware.module_render.get_module")
 def get_module(user, request, usage_key, field_data_cache,
                position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
@@ -384,7 +380,6 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
     return msg_fragment
 
 
-@beeline.traced(name="lms.courseware.module_render.get_xqueue_callback_url_prefix")
 def get_xqueue_callback_url_prefix(request):
     """
     Calculates default prefix based on request, but allows override via settings
@@ -401,7 +396,6 @@ def get_xqueue_callback_url_prefix(request):
 
 
 # pylint: disable=too-many-statements
-@beeline.traced(name="lms.courseware.module_render.get_module_for_descriptor")
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path='', disable_staff_debug_info=False,
@@ -480,7 +474,6 @@ def get_module_system_for_user(
         (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
     """
 
-    @beeline.traced(name="lms.courseware.module_render.make_xqueue_callback")
     def make_xqueue_callback(dispatch='score_update'):
         """
         Returns fully qualified callback URL for external queueing system
@@ -533,7 +526,6 @@ def get_module_system_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    @beeline.traced(name="lms.courseware.module_render.get_event_handler")
     def get_event_handler(event_type):
         """
         Return an appropriate function to handle the event.
@@ -550,7 +542,6 @@ def get_module_system_for_user(
             })
         return handlers.get(event_type)
 
-    @beeline.traced(name="lms.courseware.module_render.publish")
     def publish(block, event_type, event):
         """
         A function that allows XModules to publish events.
@@ -571,7 +562,6 @@ def get_module_system_for_user(
             with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
 
-    @beeline.traced(name="lms.courseware.module_render.handle_completion_event")
     def handle_completion_event(block, event):
         """
         Submit a completion object for the block.
@@ -585,7 +575,6 @@ def get_module_system_for_user(
                 completion=event['completion'],
             )
 
-    @beeline.traced(name="lms.courseware.module_render.handle_grade_event")
     def handle_grade_event(block, event):
         """
         Submit a grade for the block.
@@ -602,7 +591,6 @@ def get_module_system_for_user(
                 grader_response=event.get('grader_response')
             )
 
-    @beeline.traced(name="lms.courseware.module_render.handle_deprecated_progress_event")
     def handle_deprecated_progress_event(block, event):
         """
         DEPRECATED: Submit a completion for the block represented by the
@@ -631,7 +619,6 @@ def get_module_system_for_user(
                     completion=1.0,
                 )
 
-    @beeline.traced(name="lms.courseware.module_render.rebind_noauth_module_to_user")
     def rebind_noauth_module_to_user(module, real_user):
         """
         A function that allows a module to get re-bound to a real user if it was previously bound to an AnonymousUser.
@@ -933,12 +920,10 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     return descriptor
 
 
-@beeline.traced(name="lms.courseware.module_render.load_single_xblock")
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):
     """
     Load a single XBlock identified by usage_key_string.
     """
-    beeline.add_context_field("usage_key", usage_key_string)
     usage_key = UsageKey.from_string(usage_key_string)
     course_key = CourseKey.from_string(course_id)
     usage_key = usage_key.map_into_course(course_key)
@@ -1087,7 +1072,6 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-@beeline.traced(name="lms.courseware.module_render.get_module_by_usage_id")
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
@@ -1151,7 +1135,6 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     return (instance, tracking_context)
 
 
-@beeline.traced(name="lms.courseware.module_render._invoke_xblock_handler")
 def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=None):
     """
     Invoke an XBlock handler, either authenticated or not.
@@ -1243,7 +1226,6 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=True)
-@beeline.traced(name="lms.courseware.module_render.xblock_view")
 def xblock_view(request, course_id, usage_id, view_name):
     """
     Returns the rendered view of a given XBlock, with related resources
@@ -1311,7 +1293,6 @@ def _check_files_limits(files):
     return None
 
 
-@beeline.traced(name="lms.courseware.module_render.append_data_to_webob_response")
 def append_data_to_webob_response(response, data):
     """
     Appends data to a JSON webob response.
