@@ -18,6 +18,13 @@ edX product team. You may get some valuable feedback that changes how you think
 about your idea, or you may find other developers who have the same idea and want
 to work together.
 
+Documentation
+-------------
+
+The Open edX documentation is at `https://docs.edx.org
+<https://docs.edx.org>`_.  A number of topics are covered there, from
+operations to development.
+
 JIRA
 ----
 
