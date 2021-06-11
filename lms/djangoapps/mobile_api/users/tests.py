@@ -33,6 +33,7 @@ from lms.djangoapps.mobile_api.testutils import (
 )
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_module import DEFAULT_START_DATE
@@ -459,10 +460,12 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     @classmethod
     def setUpClass(cls):
         super(TestCase, cls).setUpClass()  # pylint: disable=bad-super-call
+        super(CacheIsolationMixin, cls).setUpClass()  # pylint: disable=bad-super-call
 
     @classmethod
     def tearDownClass(cls):
         super(TestCase, cls).tearDownClass()  # pylint: disable=bad-super-call
+        super(CacheIsolationMixin, cls).tearDownClass()  # pylint: disable=bad-super-call
 
     def _fixture_setup(self):
         return super(TestCase, self)._fixture_setup()  # pylint: disable=bad-super-call
