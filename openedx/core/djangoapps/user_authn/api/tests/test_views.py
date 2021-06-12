@@ -1,33 +1,42 @@
 """
 Logistration API View Tests
 """
+from unittest.mock import patch
+from urllib.parse import urlencode
+import socket
 import ddt
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
 from rest_framework.test import APITestCase
-from six.moves.urllib.parse import urlencode
 
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 
 
 @skip_unless_lms
 @ddt.ddt
-class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
+class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
     """
-    Third party auth context tests
+    MFE context tests
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
         """
         Test Setup
         """
-        super(TPAContextViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
-        self.url = reverse('third_party_auth_context')
+        self.url = reverse('mfe_context')
         self.query_params = {'next': '/dashboard'}
+
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        self.country_code = country_code_from_ip(ip_address)
 
         # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
@@ -42,7 +51,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Construct the login URL to start third party authentication
         """
-        return u'{url}?auth_entry={auth_entry}&{param_str}'.format(
+        return '{url}?auth_entry={auth_entry}&{param_str}'.format(
             url=reverse('social:begin', kwargs={'backend': backend_name}),
             auth_entry=auth_entry,
             param_str=urlencode(params)
@@ -75,7 +84,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
 
     def get_context(self, params=None, current_provider=None, backend_name=None, add_user_details=False):
         """
-        Returns the third party auth context
+        Returns the MFE context
         """
         return {
             'currentProvider': current_provider,
@@ -86,7 +95,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'errorMessage': None,
             'registerFormSubmitButtonText': 'Create Account',
             'syncLearnerProfileData': False,
-            'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {}
+            'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
+            'countryCode': self.country_code
         }
 
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
@@ -159,3 +169,41 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
 
         response = self.client.get(self.url, self.query_params)
         assert response.data['providers'] == provider_data
+
+    def test_user_country_code(self):
+        """
+        Test api that returns country code of user
+        """
+        response = self.client.get(self.url, self.query_params)
+
+        assert response.status_code == 200
+        assert response.data['countryCode'] == self.country_code
+
+
+@skip_unless_lms
+class SendAccountActivationEmail(UserAPITestCase):
+    """
+    Test for send activation email view
+    """
+
+    def setUp(self):
+        """
+        Create a user, then log in.
+        """
+        super().setUp()
+        self.user = UserFactory()
+        Registration().register(self.user)
+        result = self.client.login(username=self.user.username, password="test")
+        assert result, 'Could not log in'
+        self.path = reverse('send_account_activation_email')
+
+    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    def test_send_email_to_inactive_user_via_cta_dialog(self, email):
+        """
+        Tests when user clicks on resend activation email on CTA dialog box, system
+        sends an activation email to the user.
+        """
+        self.user.is_active = False
+        self.user.save()
+        self.client.post(self.path)
+        assert email.called is True, 'method should have been called'

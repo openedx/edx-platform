@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
-
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 import pytest
 from django.core.management import CommandError, call_command
 

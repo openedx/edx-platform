@@ -114,33 +114,33 @@ class RetirementTestCase(TestCase):
         `responses` for performance reasons.
         """
         retirement_dict = {
-            u'id': retirement.id,
-            u'user': {
-                u'id': retirement.user.id,
-                u'username': retirement.user.username,
-                u'email': retirement.user.email,
-                u'profile': {
-                    u'id': retirement.user.profile.id,
-                    u'name': retirement.user.profile.name
+            'id': retirement.id,
+            'user': {
+                'id': retirement.user.id,
+                'username': retirement.user.username,
+                'email': retirement.user.email,
+                'profile': {
+                    'id': retirement.user.profile.id,
+                    'name': retirement.user.profile.name
                 },
             },
-            u'original_username': retirement.original_username,
-            u'original_email': retirement.original_email,
-            u'original_name': retirement.original_name,
-            u'retired_username': retirement.retired_username,
-            u'retired_email': retirement.retired_email,
-            u'current_state': {
-                u'id': retirement.current_state.id,
-                u'state_name': retirement.current_state.state_name,
-                u'state_execution_order': retirement.current_state.state_execution_order,
+            'original_username': retirement.original_username,
+            'original_email': retirement.original_email,
+            'original_name': retirement.original_name,
+            'retired_username': retirement.retired_username,
+            'retired_email': retirement.retired_email,
+            'current_state': {
+                'id': retirement.current_state.id,
+                'state_name': retirement.current_state.state_name,
+                'state_execution_order': retirement.current_state.state_execution_order,
             },
-            u'last_state': {
-                u'id': retirement.last_state.id,
-                u'state_name': retirement.last_state.state_name,
-                u'state_execution_order': retirement.last_state.state_execution_order,
+            'last_state': {
+                'id': retirement.last_state.id,
+                'state_name': retirement.last_state.state_name,
+                'state_execution_order': retirement.last_state.state_execution_order,
             },
-            u'created': retirement.created,
-            u'modified': retirement.modified
+            'created': retirement.created,
+            'modified': retirement.modified
         }
 
         if all_fields:

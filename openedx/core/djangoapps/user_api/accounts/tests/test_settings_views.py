@@ -1,8 +1,7 @@
 """ Tests for views related to account settings. """
-# -*- coding: utf-8 -*-
 
 
-import mock
+from unittest import mock
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
@@ -49,7 +48,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
 
     @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
     def setUp(self):  # pylint: disable=arguments-differ
-        super(AccountSettingsViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         CommerceConfiguration.objects.create(cache_ttl=10, enabled=True)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -242,20 +241,31 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         assert len(order_detail) == 1
 
     def test_redirect_view(self):
+        old_url_path = reverse('account_settings')
         with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
-            old_url_path = reverse('account_settings')
-
-            # Test with waffle flag active and site setting disabled, does not redirect
-            response = self.client.get(path=old_url_path)
-            for attribute in self.FIELDS:
-                self.assertContains(response, attribute)
-
-            # Test with waffle flag active and site setting enabled, redirects to microfrontend
-            site_domain = 'othersite.example.com'
-            self.set_up_site(site_domain, {
-                'SITE_NAME': site_domain,
-                'ENABLE_ACCOUNT_MICROFRONTEND': True
-            })
-            self.client.login(username=self.USERNAME, password=self.PASSWORD)
+            # Test with waffle flag active and none site setting, redirects to microfrontend
             response = self.client.get(path=old_url_path)
             self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)
+
+        # Test with waffle flag disabled and site setting disabled, does not redirect
+        response = self.client.get(path=old_url_path)
+        for attribute in self.FIELDS:
+            self.assertContains(response, attribute)
+
+        # Test with site setting disabled, does not redirect
+        site_domain = 'othersite.example.com'
+        site = self.set_up_site(site_domain, {
+            'SITE_NAME': site_domain,
+            'ENABLE_ACCOUNT_MICROFRONTEND': False
+        })
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        response = self.client.get(path=old_url_path)
+        for attribute in self.FIELDS:
+            self.assertContains(response, attribute)
+
+        # Test with site setting enabled, redirects to microfrontend
+        site.configuration.site_values['ENABLE_ACCOUNT_MICROFRONTEND'] = True
+        site.configuration.save()
+        site.__class__.objects.clear_cache()
+        response = self.client.get(path=old_url_path)
+        self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)

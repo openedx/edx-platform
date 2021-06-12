@@ -120,4 +120,16 @@ class CourseData:
 
     @property
     def effective_structure(self):
+        """
+        Get whichever course block structure is already loaded, if any.
+
+        This may give either the user-specific course structure or the generic
+        structure, depending on which is cached at the moment. Because of that,
+        this should only be used for queries related to the root block of the
+        course, which will always exist in either structure.
+
+        For anything else, such as queries involving course sections or blocks,
+        use either .structure or .collected_structure to explicitly state
+        whether you want the user-specific version of the course or not.
+        """
         return self._structure or self._collected_block_structure

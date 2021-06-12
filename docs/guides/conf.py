@@ -6,7 +6,6 @@
 # http://www.sphinx-doc.org/en/master/config
 
 
-import datetime  # lint-amnesty, pylint: disable=unused-import
 import os
 import sys
 from subprocess import check_call

@@ -6,7 +6,6 @@ Tests for verified_track_content/partition_scheme.py.
 from datetime import datetime, timedelta
 
 import pytz
-import six
 import pytest
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -26,7 +25,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollmentTrackUserPartitionTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def test_only_default_mode(self):
@@ -95,7 +94,7 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollmentTrackPartitionSchemeTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.student = UserFactory()
 
@@ -107,7 +106,7 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
 
     def test_create_user_partition(self):
         user_partition = UserPartition.get_scheme('enrollment_track').create_user_partition(
-            301, "partition", "test partition", parameters={"course_id": six.text_type(self.course.id)}
+            301, "partition", "test partition", parameters={"course_id": str(self.course.id)}
         )
         assert isinstance(user_partition, EnrollmentTrackUserPartition)
         assert user_partition.name == 'partition'
@@ -186,7 +185,7 @@ def create_enrollment_track_partition(course):
         id=1,
         name="Test Enrollment Track Partition",
         description="Test partition for segmenting users by enrollment track",
-        parameters={"course_id": six.text_type(course.id)}
+        parameters={"course_id": str(course.id)}
     )
     return partition
 

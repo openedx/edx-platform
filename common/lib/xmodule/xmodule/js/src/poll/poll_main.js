@@ -63,7 +63,8 @@
             // Initialize Conditional constructors.
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
-                    new window.Conditional(value, _this.id.replace(/^poll_/, ''));
+                    // eslint-disable-next-line no-new
+                    new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
                 });
             }
         }
@@ -103,7 +104,8 @@
             // notifying the constructor that this is a reset operation.
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
-                    new window.Conditional(value, _this.id.replace(/^poll_/, ''));
+                    // eslint-disable-next-line no-new
+                    new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
                 });
             }
         }
@@ -234,9 +236,10 @@
 
         return PollMain;
 
-        function PollMain(el) {
+        function PollMain(el, runtime) {
             var _this;
 
+            this.runtime = runtime;
             this.questionEl = $(el).find('.poll_question');
             if (this.questionEl.length !== 1) {
         // We require one question DOM element.

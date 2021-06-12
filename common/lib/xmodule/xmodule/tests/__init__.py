@@ -132,7 +132,7 @@ def get_test_system(
         replace_urls=str,
         user=user,
         get_real_user=lambda __: user,
-        filestore=Mock(name='get_test_system.filestore'),
+        filestore=Mock(name='get_test_system.filestore', root_path='.'),
         debug=True,
         hostname="edx.org",
         xqueue={

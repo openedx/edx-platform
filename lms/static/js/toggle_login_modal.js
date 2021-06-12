@@ -39,7 +39,7 @@
             // Deleting the video (clone) prevents the odd back button behavior.
                         var modal_clone = $(modal_id).clone(true, true);
                         modal_clone.attr('id', 'modal_clone');
-                        $(modal_id).after(modal_clone);
+                        $(modal_id).after(modal_clone); // xss-lint: disable=javascript-jquery-insertion
                         modal_id = '#modal_clone';
                     }
 

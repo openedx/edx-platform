@@ -125,6 +125,31 @@ class TestCourseOutlineData(TestCase):
             "A positive value will shift back the starting date for Beta users by that many days."
         )
 
+    def test_empty_user_partition_groups(self):
+        """
+        A user partition group entry with no groups is an error.
+
+        This would mean that a piece of content is associated with a partition
+        but nobody would ever be able to see it because it's not associated with
+        any group in the partition.
+        """
+        sections = generate_sections(self.course_key, [1])
+        valid_section = attr.evolve(
+            sections[0],
+            user_partition_groups={
+                50: frozenset([1, 2, 3]),
+                51: frozenset([1]),
+            }
+        )
+        with self.assertRaises(ValueError):
+            attr.evolve(
+                valid_section,
+                user_partition_groups={
+                    50: frozenset([1, 2, 3]),
+                    51: frozenset(),  # This is not allowed
+                }
+            )
+
 
 def generate_sections(course_key, num_sequences):
     """

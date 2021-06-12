@@ -134,8 +134,8 @@ class TestSubsectionGating(CourseTestCase):
         mock_is_prereq.return_value = True
         mock_get_required_content.return_value = str(self.seq1.location), min_score, min_completion
         mock_get_prereqs.return_value = [
-            {'namespace': '{}{}'.format(str(self.seq1.location), GATING_NAMESPACE_QUALIFIER)},
-            {'namespace': '{}{}'.format(str(self.seq2.location), GATING_NAMESPACE_QUALIFIER)}
+            {'namespace': f'{str(self.seq1.location)}{GATING_NAMESPACE_QUALIFIER}'},
+            {'namespace': f'{str(self.seq2.location)}{GATING_NAMESPACE_QUALIFIER}'}
         ]
         resp = json.loads(self.client.get_json(self.seq2_url).content.decode('utf-8'))
         mock_is_prereq.assert_called_with(self.course.id, self.seq2.location)

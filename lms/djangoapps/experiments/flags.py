@@ -11,6 +11,7 @@ from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.track import segment
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -76,7 +77,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, f'{flag_name}.{bucket}', module_name)
+            CourseWaffleFlag(waffle_namespace, f'{flag_name}.{bucket}', module_name)  # lint-amnesty, pylint: disable=toggle-missing-annotation
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing
@@ -174,6 +175,8 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
         Arguments:
             course_key (Optional[CourseKey])
+                This argument should always be passed in a course-aware context even if
+                course aware bucketing is False.
             track (bool):
                 Whether an analytics event should be generated if the user is
                 bucketed for the first time.
@@ -262,6 +265,21 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[session_key] = True
+
+            # Temporary event for AA-759 experiment
+            if course_key and self._experiment_name == 'discount_experiment_AA759':
+                modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
+                verified_mode = modes_dict.get('verified', None)
+                if verified_mode:
+                    segment.track(
+                        user_id=user.id,
+                        event_name='edx.bi.experiment.AA759.bucketed',
+                        properties={
+                            'course_id': str(course_key),
+                            'bucket': bucket,
+                            'sku': verified_mode.sku,
+                        }
+                    )
 
         return self._cache_bucket(experiment_name, bucket)
 

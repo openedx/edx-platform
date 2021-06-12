@@ -87,7 +87,6 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
-from openedx.core.djangoapps.user_api.accounts.utils import is_multiple_sso_accounts_association_to_saml_user_enabled
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.third_party_auth.utils import (
@@ -826,19 +825,16 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                              'Provider ID: %s, Exception: %s', current_user.id, current_user.email,
                              current_provider.provider_id, ex)
 
-    # this is waffle switch to enable and disable this functionality from admin panel.
-    if is_multiple_sso_accounts_association_to_saml_user_enabled():
+    saml_provider, current_provider = is_saml_provider(strategy.request.backend.name, kwargs)
 
-        saml_provider, current_provider = is_saml_provider(strategy.request.backend.name, kwargs)
+    if saml_provider:
+        # get the user by matching email if the pipeline user is not available.
+        current_user = user if user else get_user()
 
-        if saml_provider:
-            # get the user by matching email if the pipeline user is not available.
-            current_user = user if user else get_user()
-
-            # Verify that the user linked to enterprise customer of current identity provider and an active user
-            associate_response = associate_by_email_if_enterprise_user() if current_user else None
-            if associate_response:
-                return associate_response
+        # Verify that the user linked to enterprise customer of current identity provider and an active user
+        associate_response = associate_by_email_if_enterprise_user() if current_user else None
+        if associate_response:
+            return associate_response
 
 
 def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg

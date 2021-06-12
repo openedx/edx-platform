@@ -74,7 +74,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'grade'
         with patch('common.djangoapps.terrain.stubs.lti.requests.post') as mocked_post:
             mocked_post.return_value = Mock(content='Test response', status_code=200)
-            response = urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')  # lint-amnesty, pylint: disable=consider-using-with
             assert b'Test response' in response.read()
 
     @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -84,7 +84,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_outcome'
         with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')  # lint-amnesty, pylint: disable=consider-using-with
             assert b'LTI consumer (edX) responded with HTTP 200' in response.read()
 
     @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -94,5 +94,5 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_delete'
         with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')  # lint-amnesty, pylint: disable=consider-using-with
             assert b'LTI consumer (edX) responded with HTTP 200' in response.read()

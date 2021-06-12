@@ -388,7 +388,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            "<article class=\"course {}\"".format(self.MODE_CLASSES[status])
+            f"<article class=\"course {self.MODE_CLASSES[status]}\""
         )
 
         # Verify that the correct copy is rendered on the dashboard

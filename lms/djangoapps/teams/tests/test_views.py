@@ -24,9 +24,9 @@ from search.search_engine_base import SearchEngine
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.util.testing import EventTestMixin
 from common.test.utils import skip_signal
-from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -2951,7 +2951,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         team1 = 'team wind power'
         team2 = 'team 2'
         for name_enum in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g']):
-            username = 'user_{}'.format(name_enum[1])
+            username = f'user_{name_enum[1]}'
             self.create_and_enroll_student(username=username, mode=CourseMode.MASTERS)
             csv_content += f'{username},masters,{team1},{team2}' + '\n'
 
@@ -2964,7 +2964,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['errors'][0] == 'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        assert response_text['errors'][0] == f'New membership for team {team1} would exceed max size of {3}.'
 
     def test_deletion_via_upload_csv(self):
         # create a team membership that will be used further down

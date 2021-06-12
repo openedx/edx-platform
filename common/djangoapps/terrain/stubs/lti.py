@@ -79,7 +79,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
                 host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
-                submit_url = '//{}:{}'.format(host, self.server.server_address[1])
+                submit_url = f'//{host}:{self.server.server_address[1]}'
                 content = self._create_content(status_message, submit_url)
                 self.send_response(200, content)
             else:

@@ -50,5 +50,5 @@ def cursor_paginate_serializer(inner_serializer_class):
             help_text="The list of result objects on this page.",
         )
 
-    PageOfInnerSerializer.__name__ = 'PageOf{}'.format(inner_serializer_class.__name__)
+    PageOfInnerSerializer.__name__ = f'PageOf{inner_serializer_class.__name__}'
     return PageOfInnerSerializer

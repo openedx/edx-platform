@@ -116,7 +116,7 @@ class Command(BaseCommand):
         """
 
         self.stdout.write(
-            '\tFetching Enrollments from {start} to {end}'.format(start=offset, end=offset + batch_size)
+            f'\tFetching Enrollments from {offset} to {offset + batch_size}'
         )
         enrollments = enrollments_queryset.select_related(
             'enterprise_customer_user', 'enterprise_customer_user__enterprise_customer'
@@ -133,7 +133,7 @@ class Command(BaseCommand):
         invalid = 0
 
         self.stdout.write(
-            '\t\tProcessing Total : {},'.format(len(enrollments_batch))
+            f'\t\tProcessing Total : {len(enrollments_batch)},'
         )
 
         for enrollment in enrollments_batch:
@@ -167,7 +167,7 @@ class Command(BaseCommand):
                 continue
             enrollments_payload.append(enrollment_payload)
 
-        self.stdout.write('\t\tFound {count} Paid enrollments to sync'.format(count=len(enrollments_payload)))
+        self.stdout.write(f'\t\tFound {len(enrollments_payload)} Paid enrollments to sync')
         if not enrollments_payload:
             return 0, 0, 0, invalid, non_paid, []
 

@@ -163,7 +163,7 @@ def update_account_settings(requesting_user, update, username=None):
         raise err
     except Exception as err:
         raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-            "Error thrown when saving account updates: '{}'".format(str(err))
+            f"Error thrown when saving account updates: '{str(err)}'"
         )
 
     _send_email_change_requests_if_needed(update, user)
@@ -200,7 +200,7 @@ def _validate_email_change(user, data, field_errors):
         student_views.validate_new_email(user, new_email)
     except ValueError as err:
         field_errors["email"] = {
-            "developer_message": "Error thrown from validate_new_email: '{}'".format(str(err)),
+            "developer_message": f"Error thrown from validate_new_email: '{str(err)}'",
             "user_message": str(err)
         }
         return
@@ -222,7 +222,7 @@ def _validate_secondary_email(user, data, field_errors):
         student_views.validate_secondary_email(user, secondary_email)
     except ValueError as err:
         field_errors["secondary_email"] = {
-            "developer_message": "Error thrown from validate_secondary_email: '{}'".format(str(err)),
+            "developer_message": f"Error thrown from validate_secondary_email: '{str(err)}'",
             "user_message": str(err)
         }
     else:
@@ -321,7 +321,7 @@ def _send_email_change_requests_if_needed(data, user):
             student_views.do_email_change_request(user, new_email)
         except ValueError as err:
             raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                f"Error thrown from do_email_change_request: '{str(err)}'",
                 user_message=str(err)
             )
 
@@ -335,7 +335,7 @@ def _send_email_change_requests_if_needed(data, user):
             )
         except ValueError as err:
             raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                f"Error thrown from do_email_change_request: '{str(err)}'",
                 user_message=str(err)
             )
 
@@ -363,16 +363,17 @@ def get_username_validation_error(username):
     return _validate(_validate_username, errors.AccountUsernameInvalid, username)
 
 
-def get_email_validation_error(email):
+def get_email_validation_error(email, api_version='v1'):
     """Get the built-in validation error message for when
     the email is invalid in some way.
 
     :param email: The proposed email (unicode).
+    :param api_version: registration validation api version
     :param default: The message to default to in case of no error.
     :return: Validation error message.
 
     """
-    return _validate(_validate_email, errors.AccountEmailInvalid, email)
+    return _validate(_validate_email, errors.AccountEmailInvalid, email, api_version)
 
 
 def get_secondary_email_validation_error(email):
@@ -425,28 +426,30 @@ def get_country_validation_error(country):
     return _validate(_validate_country, errors.AccountCountryInvalid, country)
 
 
-def get_username_existence_validation_error(username):
+def get_username_existence_validation_error(username, api_version='v1'):
     """Get the built-in validation error message for when
     the username has an existence conflict.
 
     :param username: The proposed username (unicode).
+    :param api_version: registration validation api version
     :param default: The message to default to in case of no error.
     :return: Validation error message.
 
     """
-    return _validate(_validate_username_doesnt_exist, errors.AccountUsernameAlreadyExists, username)
+    return _validate(_validate_username_doesnt_exist, errors.AccountUsernameAlreadyExists, username, api_version)
 
 
-def get_email_existence_validation_error(email):
+def get_email_existence_validation_error(email, api_version='v1'):
     """Get the built-in validation error message for when
     the email has an existence conflict.
 
     :param email: The proposed email (unicode).
+    :param api_version: registration validation api version
     :param default: The message to default to in case of no error.
     :return: Validation error message.
 
     """
-    return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
+    return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email, api_version)
 
 
 def _get_user_and_profile(username):
@@ -513,11 +516,12 @@ def _validate_username(username):
         raise errors.AccountUsernameInvalid(validation_err.message)
 
 
-def _validate_email(email):
+def _validate_email(email, api_version='v1'):
     """Validate the format of the email address.
 
     Arguments:
         email (unicode): The proposed email.
+        api_version(str): Validation API version; it is used to determine the error message
 
     Returns:
         None
@@ -530,7 +534,9 @@ def _validate_email(email):
         _validate_unicode(email)
         _validate_type(email, str, accounts.EMAIL_BAD_TYPE_MSG)
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
-        validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
+        validate_email.message = (
+            accounts.EMAIL_INVALID_MSG.format(email=email) if api_version == 'v1' else accounts.AUTHN_EMAIL_INVALID_MSG
+        )
         validate_email(email)
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_email_err:
         raise errors.AccountEmailInvalid(str(invalid_email_err))
@@ -590,26 +596,37 @@ def _validate_country(country):
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
 
-def _validate_username_doesnt_exist(username):
+def _validate_username_doesnt_exist(username, api_version='v1'):
     """Validate that the username is not associated with an existing user.
 
     :param username: The proposed username (unicode).
+    :param api_version: Validation API version; it is used to determine the error message
     :return: None
     :raises: errors.AccountUsernameAlreadyExists
     """
+    if api_version == 'v1':
+        error_message = accounts.USERNAME_CONFLICT_MSG.format(username=username)
+    else:
+        error_message = accounts.AUTHN_USERNAME_CONFLICT_MSG
     if username is not None and username_exists_or_retired(username):
-        raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))  # lint-amnesty, pylint: disable=translation-of-non-string
+        raise errors.AccountUsernameAlreadyExists(_(error_message))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
-def _validate_email_doesnt_exist(email):
+def _validate_email_doesnt_exist(email, api_version='v1'):
     """Validate that the email is not associated with an existing user.
 
     :param email: The proposed email (unicode).
+    :param api_version: Validation API version; it is used to determine the error message
     :return: None
     :raises: errors.AccountEmailAlreadyExists
     """
+    if api_version == 'v1':
+        error_message = accounts.EMAIL_CONFLICT_MSG.format(email_address=email)
+    else:
+        error_message = accounts.AUTHN_EMAIL_CONFLICT_MSG
+
     if email is not None and email_exists_or_retired(email):
-        raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))  # lint-amnesty, pylint: disable=translation-of-non-string
+        raise errors.AccountEmailAlreadyExists(_(error_message))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def _validate_secondary_email_doesnt_exist(email):

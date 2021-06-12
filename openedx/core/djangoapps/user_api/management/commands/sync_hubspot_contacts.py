@@ -11,7 +11,7 @@ import traceback
 from datetime import datetime, timedelta
 from textwrap import dedent
 
-import six.moves.urllib.parse  # pylint: disable=import-error
+import urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from edx_rest_api_client.client import EdxRestApiClient
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         """
         start_date = datetime.now().date() - timedelta(initial_days)
         end_date = datetime.now().date() - timedelta(1)
-        self.stdout.write(u'Getting users from {start} to {end}'.format(start=start_date, end=end_date))
+        self.stdout.write(f'Getting users from {start_date} to {end_date}')
         users_qs = User.objects.filter(
             date_joined__date__gte=start_date,
             date_joined__date__lte=end_date
@@ -68,7 +68,7 @@ class Command(BaseCommand):
         """
 
         self.stdout.write(
-            u'Fetching Users for site {site} from {start} to {end}'.format(
+            'Fetching Users for site {site} from {start} to {end}'.format(
                 site=site_domain, start=offset, end=offset + users_query_batch_size
             )
         )
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             user for user in users
             if UserAttribute.get_user_attribute(user, 'created_on_site') == site_domain
         ]
-        self.stdout.write(u'\tSite Users={count}'.format(count=len(site_users)))
+        self.stdout.write(f'\tSite Users={len(site_users)}')
 
         return site_users
 
@@ -88,15 +88,15 @@ class Command(BaseCommand):
         contacts = []
         for user in users_batch:
             if not hasattr(user, 'profile'):
-                self.stdout.write(u'skipping user {} due to no profile found'.format(user))
+                self.stdout.write(f'skipping user {user} due to no profile found')
                 continue
             if not user.profile.meta:
-                self.stdout.write(u'skipping user {} due to no profile meta found'.format(user))
+                self.stdout.write(f'skipping user {user} due to no profile meta found')
                 continue
             try:
                 meta = json.loads(user.profile.meta)
             except ValueError:
-                self.stdout.write(u'skipping user {} due to invalid profile meta found'.format(user))
+                self.stdout.write(f'skipping user {user} due to invalid profile meta found')
                 continue
 
             contact = {
@@ -139,13 +139,13 @@ class Command(BaseCommand):
             contacts.append(contact)
 
         api_key = site_conf.get_value('HUBSPOT_API_KEY')
-        client = EdxRestApiClient(six.moves.urllib.parse.urljoin(HUBSPOT_API_BASE_URL, 'contacts/v1/contact'))
+        client = EdxRestApiClient(urllib.parse.urljoin(HUBSPOT_API_BASE_URL, 'contacts/v1/contact'))
         try:
             client.batch.post(contacts, hapikey=api_key)
             return len(contacts)
         except (HttpClientError, HttpServerError) as ex:
-            message = u'An error occurred while syncing batch of contacts for site {domain}, {message}'.format(
-                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member
+            message = 'An error occurred while syncing batch of contacts for site {domain}, {message}'.format(
+                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member, exception-message-attribute
             )
             self.stderr.write(message)
             return 0
@@ -155,7 +155,7 @@ class Command(BaseCommand):
             Syncs a single site
         """
         site_domain = site_conf.site.domain
-        self.stdout.write(u'Syncing process started for site {site}'.format(site=site_domain))
+        self.stdout.write(f'Syncing process started for site {site_domain}')
 
         offset = 0
         users_queue = []
@@ -165,7 +165,7 @@ class Command(BaseCommand):
         while offset < users_count:
             is_last_iteration = (offset + users_query_batch_size) >= users_count
             self.stdout.write(
-                u'Syncing users batch from {start} to {end} for site {site}'.format(
+                'Syncing users batch from {start} to {end} for site {site}'.format(
                     start=offset, end=offset + users_query_batch_size, site=site_domain
                 )
             )
@@ -177,14 +177,14 @@ class Command(BaseCommand):
                 successfully_synced_contacts += self._sync_with_hubspot(users_batch, site_conf)
                 time.sleep(0.1)  # to make sure request per second could not exceed by 10
             self.stdout.write(
-                u'Successfully synced users batch from {start} to {end} for site {site}'.format(
+                'Successfully synced users batch from {start} to {end} for site {site}'.format(
                     start=offset, end=offset + users_query_batch_size, site=site_domain
                 )
             )
             offset += users_query_batch_size
 
         self.stdout.write(
-            u'{count} contacts found and sycned for site {site}'.format(
+            '{count} contacts found and sycned for site {site}'.format(
                 count=successfully_synced_contacts, site=site_domain
             )
         )
@@ -215,15 +215,15 @@ class Command(BaseCommand):
         initial_sync_days = options['initial_sync_days']
         batch_size = options['batch_size']
         try:
-            self.stdout.write(u'Command execution started with options = {}.'.format(options))
+            self.stdout.write(f'Command execution started with options = {options}.')
             hubspot_sites = self._get_hubspot_enabled_sites()
-            self.stdout.write(u'{count} hubspot enabled sites found.'.format(count=len(hubspot_sites)))
+            self.stdout.write(f'{len(hubspot_sites)} hubspot enabled sites found.')
             users_queryset = self._get_users_queryset(initial_sync_days)
             users_count = users_queryset.count()
-            self.stdout.write(u'Users count={count}'.format(count=users_count))
+            self.stdout.write(f'Users count={users_count}')
             for site_conf in hubspot_sites:
                 self._sync_site(site_conf, users_queryset, users_count, batch_size)
 
         except Exception as ex:
             traceback.print_exc()
-            raise CommandError(u'Command failed with traceback %s' % str(ex))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError('Command failed with traceback %s' % str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

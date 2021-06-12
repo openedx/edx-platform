@@ -45,7 +45,7 @@ def get_display_time_zone(time_zone_name):
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 
-    return u"{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=tz_abbr, offset=tz_offset).replace("_", " ")
+    return f"{time_zone} ({tz_abbr}, UTC{tz_offset})".replace("_", " ")
 
 
 TIME_ZONE_CHOICES = sorted(

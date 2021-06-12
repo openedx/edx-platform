@@ -22,7 +22,7 @@ import unicodedata
 from copy import deepcopy
 from functools import reduce
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 import sympy
 from lxml import etree
 from sympy import latex, sympify

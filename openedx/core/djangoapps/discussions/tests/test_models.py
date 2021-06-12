@@ -9,6 +9,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from organizations.models import Organization
 
+from ..models import DEFAULT_PROVIDER_TYPE
 from ..models import DiscussionsConfiguration
 from ..models import ProviderFilter
 
@@ -215,16 +216,16 @@ class DiscussionsConfigurationModelTest(TestCase):
         is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
         assert not is_enabled
 
-    def test_get_nonexistent_empty(self):
+    def test_get_nonexistent_defaults_to_legacy(self):
         """
-        Assert we get an "empty" model back for nonexistent records
+        Assert we get a "legacy" model back for nonexistent records
         """
         configuration = DiscussionsConfiguration.get(self.course_key_without_config)
         assert configuration is not None
         assert not configuration.enabled
         assert not configuration.lti_configuration
         assert not configuration.plugin_configuration
-        assert not configuration.provider_type
+        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
 
     def test_get_defaults(self):
         """

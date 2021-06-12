@@ -89,7 +89,7 @@ class Model:
         record the class name of the model.
         """
         tags = [
-            '{}.{}:{}'.format(self.__class__.__name__, attr, self[attr])
+            f'{self.__class__.__name__}.{attr}:{self[attr]}'
             for attr in self.metric_tag_fields
             if attr in self.attributes
         ]
@@ -180,7 +180,7 @@ class Model:
             raise CommentClientRequestError("Must provide base_url when using default url function")
         if action not in cls.DEFAULT_ACTIONS:  # lint-amnesty, pylint: disable=no-else-raise
             raise ValueError(
-                "Invalid action {}. The supported action must be in {}".format(action, str(cls.DEFAULT_ACTIONS))
+                f"Invalid action {action}. The supported action must be in {str(cls.DEFAULT_ACTIONS)}"
             )
         elif action in cls.DEFAULT_ACTIONS_WITH_ID:
             try:

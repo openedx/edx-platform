@@ -55,22 +55,22 @@ def delete_rows(model_mgr,
         sleep_between (float): Number of seconds to sleep between transactions.
     """
     if chunk_size <= 0:
-        raise CommandError(u'Only positive chunk size is allowed ({}).'.format(chunk_size))
+        raise CommandError(f'Only positive chunk size is allowed ({chunk_size}).')
     if sleep_between < 0:
-        raise CommandError(u'Only non-negative sleep between seconds is allowed ({}).'.format(sleep_between))
+        raise CommandError(f'Only non-negative sleep between seconds is allowed ({sleep_between}).')
 
     # The "as id" below fools Django raw query into thinking the primary key is being queried.
     # It's necessary because Django will throw an exception if the raw SQL does not query the primary key.
     min_max_ids = model_mgr.raw(
-        u'SELECT MIN({}) as id, MAX({}) as max_id FROM {}'.format(primary_id_name, primary_id_name, table_name)  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+        f'SELECT MIN({primary_id_name}) as id, MAX({primary_id_name}) as max_id FROM {table_name}'  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
     )[0]
     min_id = min_max_ids.id
     max_id = min_max_ids.max_id
     if not min_id or not max_id:
-        log.info(u"No data exists in table %s - skipping.", table_name)
+        log.info("No data exists in table %s - skipping.", table_name)
         return
     log.info(
-        u"STARTED: Deleting around %s rows with chunk size of %s and %s seconds between chunks.",
+        "STARTED: Deleting around %s rows with chunk size of %s and %s seconds between chunks.",
         max_id - min_id + 1, chunk_size, sleep_between
     )
 
@@ -78,10 +78,10 @@ def delete_rows(model_mgr,
     while lower_id <= max_id:
         deletions_now = min(chunk_size, max_id - lower_id + 1)
         upper_id = lower_id + deletions_now
-        log.info(u"Deleting around %s rows between ids %s and %s...", deletions_now, lower_id, upper_id)
+        log.info("Deleting around %s rows between ids %s and %s...", deletions_now, lower_id, upper_id)
         with transaction.atomic():
             # xss-lint: disable=python-wrap-html
-            delete_sql = u'DELETE FROM {} WHERE {} >= {} AND {} < {}'.format(  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+            delete_sql = 'DELETE FROM {} WHERE {} >= {} AND {} < {}'.format(  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
                 table_name, primary_id_name, lower_id, primary_id_name, upper_id
             )
             log.info(delete_sql)
@@ -93,9 +93,9 @@ def delete_rows(model_mgr,
                 # But - it will cause a "TypeError: 'NoneType' object is not iterable" to be ignored.
                 pass
         lower_id += deletions_now
-        log.info(u"Sleeping %s seconds...", sleep_between)
+        log.info("Sleeping %s seconds...", sleep_between)
         time.sleep(sleep_between)
-    log.info(u"FINISHED: Deleted at most %s rows total.", max_id - min_id + 1)
+    log.info("FINISHED: Deleted at most %s rows total.", max_id - min_id + 1)
 
 
 class BaseDeletionCommand(BaseCommand):

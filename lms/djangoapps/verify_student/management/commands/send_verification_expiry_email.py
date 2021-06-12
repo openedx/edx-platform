@@ -104,12 +104,6 @@ class Command(BaseCommand):
                 Q(expiration_date__isnull=False) & (
                     Q(expiration_date__gte=start_date, expiration_date__lt=end_date) |
                     Q(expiry_email_date__lte=date_resend_days_ago)
-                ) |
-                # Account for old entries still using `expiry_date` rather than`expiration_date`
-                # (this will be deprecated)
-                Q(expiry_date__isnull=False) & (
-                    Q(expiry_date__gte=start_date, expiry_date__lt=end_date) |
-                    Q(expiry_email_date__lte=date_resend_days_ago)
                 )
             )
         ).order_by()

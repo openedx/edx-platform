@@ -28,4 +28,4 @@ class DateTimeJSONEncoder(json.JSONEncoder):
         elif isinstance(obj, date):
             return obj.isoformat()
 
-        return super(DateTimeJSONEncoder, self).default(obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().default(obj)  # lint-amnesty, pylint: disable=super-with-arguments

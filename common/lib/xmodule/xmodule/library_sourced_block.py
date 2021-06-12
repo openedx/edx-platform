@@ -13,7 +13,6 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from webob import Response
 from web_fragments.fragment import Fragment
 
-from cms.lib.xblock.runtime import handler_url
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
 
@@ -78,7 +77,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
         )
         fragment.content = loader.render_django_template('templates/library-sourced-block-studio-view.html', {
             'react_content': react_content,
-            'save_url': handler_url(self, 'submit_studio_edits'),
+            'save_url': self.runtime.handler_url(self, 'submit_studio_edits'),
         })
 
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_source_block.js'))

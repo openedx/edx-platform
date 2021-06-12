@@ -22,8 +22,9 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
-from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
@@ -679,8 +680,8 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
                f'{scheme}://edx.org/courses/{self.course_org}/{self.course_number}/{self.course_run}/'
         assert email_context['course_image_url'] == \
                f'{scheme}://edx.org/c4x/{self.course_org}/{self.course_number}/asset/images_course_image.jpg'
-        assert email_context['email_settings_url'] == '{}://edx.org/dashboard'.format(scheme)
-        assert email_context['account_settings_url'] == '{}://edx.org/account/settings'.format(scheme)
+        assert email_context['email_settings_url'] == f'{scheme}://edx.org/dashboard'
+        assert email_context['account_settings_url'] == f'{scheme}://edx.org/account/settings'
 
     @override_settings(LMS_ROOT_URL="http://edx.org")
     def test_insecure_email_context(self):

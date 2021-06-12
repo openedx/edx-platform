@@ -178,9 +178,15 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             parameter.
 
           * lms_web_url: (string) The URL to the navigational container of the
-            xBlock on the web LMS.  This URL can be used as a further fallback
+            xBlock on the web. This URL can be used as a further fallback
             if the student_view_url and the student_view_data fields are not
-            supported.
+            supported. Will direct to either the "New" (micro-frontend) or
+            "Legacy" (Django-template-rendered) frontend experience depending
+            on which experience is active.
+
+          * legacy_web_url: (string) Like `lms_web_url`, but always directs to
+            the "Legacy" frontend experience. Should only be used for
+            transitional purposes; will be removed as part of DEPR-109.
 
           * lti_url: The block URL for an LTI consumer. Returned only if the
             "ENABLE_LTI_PROVIDER" Django settign is set to "True".
@@ -236,7 +242,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(str(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @view_auth_classes(is_authenticated=False)
@@ -299,7 +305,7 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(str(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f"'{str(course_key_string)}' is not a valid course key.")  # lint-amnesty, pylint: disable=raise-missing-from
         response = super().list(request, course_usage_key,
                                 hide_access_denials=hide_access_denials)
 

@@ -312,9 +312,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         with mock_passing_grade(percent=0.75):
             with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
                 mock_mode_for_course.return_value = 'honor'
-                regenerate_user_certificates(self.student, self.course_key,
-                                             course=self.course)
-
+                regenerate_user_certificates(self.student, self.course_key)
                 mock_generate_cert.assert_called()
 
     def test_regenerate_certificate_missing_params(self):

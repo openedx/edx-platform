@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Tests the ``notify_credentials`` management command.
 """
 
@@ -8,13 +8,10 @@ from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import connection, reset_queries
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings  # lint-amnesty, pylint: disable=unused-import
 from freezegun import freeze_time
 
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from lms.djangoapps.certificates.models import GeneratedCertificate, CertificateStatuses
-from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -22,7 +19,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 from ..notify_credentials import Command
 
-COMMAND_MODULE = 'openedx.core.djangoapps.credentials.management.commands.notify_credentials'
+NOTIFY_CREDENTIALS_TASK = 'openedx.core.djangoapps.credentials.tasks.v1.tasks.handle_notify_credentials.run'
 
 
 @skip_unless_lms
@@ -34,203 +31,243 @@ class TestNotifyCredentials(TestCase):
         super().setUp()
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
+        self.expected_options = {
+            'args_from_database': False,
+            'auto': False,
+            'courses': None,
+            'delay': 0,
+            'dry_run': False,
+            'end_date': None,
+            'force_color': False,
+            'no_color': False,
+            'notify_programs': False,
+            'page_size': 100,
+            'program_uuids': None,
+            'pythonpath': None,
+            'settings': None,
+            'site': None,
+            'start_date': None,
+            'traceback': False,
+            'user_ids': None,
+            'verbose': False,
+            'verbosity': 1,
+            'skip_checks': True,
+        }
 
-        with freeze_time(datetime(2017, 1, 1)):
-            self.cert1 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+1')
-        with freeze_time(datetime(2017, 2, 1, 0)):
-            self.cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+2')
-        with freeze_time(datetime(2017, 3, 1)):
-            self.cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:testX+Test+3')
-        with freeze_time(datetime(2017, 2, 1, 5)):
-            self.cert4 = GeneratedCertificateFactory(
-                user=self.user2, course_id='course-v1:edX+Test+4', status=CertificateStatuses.downloadable
-            )
-        print(('self.cert1.modified_date', self.cert1.modified_date))
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_course_args(self, mock_task):
+        course_1_id = 'course-v1:edX+Test+1'
+        course_2_id = 'course-v1:edX+Test+2'
+        self.expected_options['courses'] = [course_1_id, course_2_id]
 
-        # No factory for these
-        with freeze_time(datetime(2017, 1, 1)):
-            self.grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+1',
-                                                               percent_grade=1)
-        with freeze_time(datetime(2017, 2, 1)):
-            self.grade2 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+2',
-                                                               percent_grade=1)
-        with freeze_time(datetime(2017, 3, 1)):
-            self.grade3 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:testX+Test+3',
-                                                               percent_grade=1)
-        with freeze_time(datetime(2017, 2, 1, 5)):
-            self.grade4 = PersistentCourseGrade.objects.create(user_id=self.user2.id, course_id='course-v1:edX+Test+4',
-                                                               percent_grade=1)
-        print(('self.grade1.modified', self.grade1.modified))
+        call_command(Command(), '--course', course_1_id, course_2_id)
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_course_args(self, mock_send):
-        call_command(Command(), '--course', 'course-v1:edX+Test+1', 'course-v1:edX+Test+2')
-        assert mock_send.called
-        assert list(mock_send.call_args[0][0]) == [self.cert1, self.cert2]
-        assert list(mock_send.call_args[0][1]) == [self.grade1, self.grade2]
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    @mock.patch(
+        'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
+    )
+    def test_program_uuid_args(self, mock_get_programs, mock_task):
+        course_1_id = 'course-v1:edX+Test+1'
+        course_2_id = 'course-v1:edX+Test+2'
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_1_id),
+                        CourseRunFactory(key=course_2_id)
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+        self.expected_options['program_uuids'] = [program['uuid']]
+        mock_get_programs.return_value = [program]
+        call_command(Command(), '--program_uuids', program['uuid'])
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
+
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    @mock.patch(
+        'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
+    )
+    def test_multiple_programs_uuid_args(self, mock_get_programs, mock_task):
+        course_1_id = 'course-v1:edX+Test+1'
+        course_2_id = 'course-v1:edX+Test+2'
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_1_id),
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+
+        program2 = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_2_id)
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+        program_list = [program['uuid'], program2['uuid']]
+        self.expected_options['program_uuids'] = program_list
+        mock_get_programs.return_value = [program, program2]
+        call_command(Command(), '--program_uuids', program['uuid'], program2['uuid'])
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
     @freeze_time(datetime(2017, 5, 1, 4))
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_auto_execution(self, mock_send):
-        cert_filter_args = {}
-
-        with freeze_time(datetime(2017, 5, 1, 0)):
-            cert1 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+11')
-        with freeze_time(datetime(2017, 5, 1, 3)):
-            cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+22')
-
-        with freeze_time(datetime(2017, 5, 1, 0)):
-            grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+11',
-                                                          percent_grade=1)
-        with freeze_time(datetime(2017, 5, 1, 3)):
-            grade2 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+22',
-                                                          percent_grade=1)
-
-        total_certificates = GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
-        total_grades = PersistentCourseGrade.objects.all()
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_auto_execution(self, mock_task):
+        self.expected_options['auto'] = True
+        self.expected_options['start_date'] = '2017-05-01T00:00:00'
+        self.expected_options['end_date'] = '2017-05-01T04:00:00'
 
         call_command(Command(), '--auto')
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [cert1, cert2])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [grade1, grade2])
-
-        assert len(list(mock_send.call_args[0][0])) <= len(total_certificates)
-        assert len(list(mock_send.call_args[0][1])) <= len(total_grades)
-
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_date_args(self, mock_send):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_date_args(self, mock_task):
+        self.expected_options['start_date'] = '2017-01-31T00:00:00Z'
         call_command(Command(), '--start-date', '2017-01-31')
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4, self.cert3])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4, self.grade3])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
         call_command(Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02')
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = None
+        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
         call_command(Command(), '--end-date', '2017-02-02')
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['end_date'] = '2017-02-01T04:00:00Z'
         call_command(Command(), '--start-date', "2017-02-01 00:00:00", '--end-date', '2017-02-01 04:00:00')
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_username_arg(self, mock_send):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_username_arg(self, mock_task):
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['user_ids'] = [str(self.user2.id)]
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user2.id
+            'notify_credentials', '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user2.id
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = None
+        self.expected_options['end_date'] = None
+        self.expected_options['user_ids'] = [str(self.user2.id)]
         call_command(
-            Command(), '--user_ids', self.user2.id
+            'notify_credentials', '--user_ids', self.user2.id
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['user_ids'] = [str(self.user.id)]
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user.id
+            'notify_credentials', '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user.id
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = None
+        self.expected_options['end_date'] = None
+        self.expected_options['user_ids'] = [str(self.user.id)]
         call_command(
-            Command(), '--user_ids', self.user.id
+            'notify_credentials', '--user_ids', self.user.id
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert3])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade3])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
+        self.expected_options['start_date'] = None
+        self.expected_options['end_date'] = None
+        self.expected_options['user_ids'] = [str(self.user.id), str(self.user2.id)]
         call_command(
-            Command(), '--user_ids', self.user.id, self.user2.id
+            'notify_credentials', '--user_ids', self.user.id, self.user2.id
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4, self.cert3])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4, self.grade3])
-        mock_send.reset_mock()
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        mock_task.reset_mock()
 
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_no_args(self, mock_send):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_no_args(self, mock_task):
         with self.assertRaisesRegex(CommandError, 'You must specify a filter.*'):
             call_command(Command())
-        assert not mock_send.called
+        assert not mock_task.called
 
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_dry_run(self, mock_send):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_dry_run(self, mock_task):
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['dry_run'] = True
         call_command(Command(), '--dry-run', '--start-date', '2017-02-01')
-        assert not mock_send.called
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(COMMAND_MODULE + '.handle_course_cert_awarded')
-    @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
-    @mock.patch(COMMAND_MODULE + '.handle_course_cert_changed')
-    def test_hand_off(self, mock_grade_interesting, mock_program_changed, mock_program_awarded):
-        call_command(Command(), '--start-date', '2017-02-01')
-        assert mock_grade_interesting.call_count == 3
-        assert mock_program_changed.call_count == 3
-        assert mock_program_awarded.call_count == 0
-        mock_grade_interesting.reset_mock()
-        mock_program_changed.reset_mock()
-        mock_program_awarded.reset_mock()
-
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_hand_off(self, mock_task):
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['notify_programs'] = True
         call_command(Command(), '--start-date', '2017-02-01', '--notify_programs')
-        assert mock_grade_interesting.call_count == 3
-        assert mock_program_changed.call_count == 3
-        assert mock_program_awarded.call_count == 1
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(COMMAND_MODULE + '.time')
-    def test_delay(self, mock_time):
-        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
-        assert mock_time.sleep.call_count == 0
-        mock_time.sleep.reset_mock()
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_delay(self, mock_task):
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['delay'] = 0.2
+        call_command(Command(), '--start-date', '2017-02-01', '--delay', '0.2')
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2', '--delay', '0.2')
-        assert mock_time.sleep.call_count == 2
-        # Between each page, twice (2 pages, for certs and grades)
-        assert mock_time.sleep.call_args[0][0] == 0.2
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_page_size(self, mock_task):
+        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['page_size'] = 2
+        call_command(Command(), '--start-date', '2017-02-01', '--page-size=2')
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @override_settings(DEBUG=True)
-    def test_page_size(self):
-        reset_queries()
-        call_command(Command(), '--start-date', '2017-01-01')
-        baseline = len(connection.queries)
-
-        reset_queries()
-        call_command(Command(), '--start-date', '2017-01-01', '--page-size=1')
-        assert len(connection.queries) == (baseline + 6)
-        # two extra page queries each for certs & grades
-
-        reset_queries()
-        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
-        assert len(connection.queries) == (baseline + 2)
-        # one extra page query each for certs & grades
-
-    @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
-    def test_site(self, mock_grade_interesting):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_site(self, mock_task):
         site_config = SiteConfigurationFactory.create(
             site_values={'course_org_filter': ['testX']}
         )
+        self.expected_options['site'] = site_config.site.domain
+        self.expected_options['start_date'] = '2017-01-01T00:00:00Z'
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
-        assert mock_grade_interesting.call_count == 1
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
-    def test_args_from_database(self, mock_send):
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    def test_args_from_database(self, mock_task):
         # Nothing in the database, should default to disabled
         with self.assertRaisesRegex(CommandError, 'NotifyCredentialsConfig is disabled.*'):
             call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
@@ -242,13 +279,17 @@ class TestNotifyCredentials(TestCase):
         config.save()
 
         # Not told to use config, should ignore it
+        self.expected_options['start_date'] = '2017-01-01T00:00:00Z'
         call_command(Command(), '--start-date', '2017-01-01')
-        assert len(mock_send.call_args[0][0]) == 4
-        # Number of certs expected
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
         # Told to use it, and enabled. Should use config in preference of command line
+        self.expected_options['start_date'] = '2017-03-01T00:00:00Z'
+        del self.expected_options['skip_checks']
         call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
-        assert len(mock_send.call_args[0][0]) == 1
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
 
         config.enabled = False
         config.save()

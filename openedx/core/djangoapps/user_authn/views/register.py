@@ -28,7 +28,6 @@ from ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
@@ -52,7 +51,9 @@ from openedx.core.djangoapps.user_api.accounts.api import (
 )
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
+from openedx.core.djangoapps.user_authn.utils import (
+    generate_password, generate_username_suggestions, is_registration_api_v1
+)
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
     RegistrationFormFactory,
@@ -106,8 +107,8 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=u'registration'),
-    flag_name=u'enable_failure_logging',
+    waffle_namespace=LegacyWaffleFlagNamespace(name='registration'),
+    flag_name='enable_failure_logging',
     module_name=__name__,
 )
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
@@ -179,7 +180,7 @@ def create_account_with_params(request, params):
         raise ValidationError(
             {
                 'session_expired': [
-                    _(u"Registration using {provider} has timed out.").format(
+                    _("Registration using {provider} has timed out.").format(
                         provider=params.get('social_auth_provider'))
                 ],
                 'error_code': 'tpa-session-expired',
@@ -234,13 +235,15 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        compose_and_send_activation_email(user, profile, registration)
+        redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
+        redirect_url = get_redirect_url_with_host(root_url, redirect_to)
+        compose_and_send_activation_email(user, profile, registration, redirect_url)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
     _track_user_registration(user, profile, params, third_party_provider)
 
@@ -258,7 +261,7 @@ def create_account_with_params(request, params):
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+        AUDIT_LOG.info(f"Login success on new account creation - {new_user.username}")
 
     return new_user
 
@@ -287,7 +290,7 @@ def _link_user_to_third_party_provider(
         if not social_access_token:
             raise ValidationError({
                 'access_token': [
-                    _(u"An access_token is required when passing value ({}) for provider.").format(
+                    _("An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
                 ],
@@ -333,7 +336,7 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
-                'country': text_type(profile.country),
+                'country': str(profile.country),
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -409,7 +412,7 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
     # log the cases where skip activation email flag is set, but email validity check fails
     if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
         log.info(
-            u'[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
+            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
             'Account activation email sent as user\'s system email differs from SSO email.',
             user.email,
             sso_pipeline_email,
@@ -483,7 +486,7 @@ class RegistrationView(APIView):
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(RegistrationView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(request, *args, **kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
@@ -535,6 +538,14 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
+        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA:
+            response.set_cookie(
+                settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
+                True,
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path='/',
+                secure=request.is_secure()
+            )  # setting the cookie to show account activation dialogue in platform and learning MFE
         return response
 
     def _handle_duplicate_email_username(self, request, data):
@@ -544,14 +555,24 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
+        # TODO: remove the is_authn_mfe check and use the new error message as default after redesign
+        is_authn_mfe = data.get('is_authn_mfe', False)
+
         error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
             error_code += '-email'
-            errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
+            error_message = accounts_settings.AUTHN_EMAIL_CONFLICT_MSG if is_authn_mfe else (
+                accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)
+            )
+            errors['email'] = [{'user_message': error_message}]
 
         if username is not None and username_exists_or_retired(username):
             error_code += '-username'
-            errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
+            error_message = accounts_settings.AUTHN_USERNAME_CONFLICT_MSG if is_authn_mfe else (
+                accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)
+            )
+            errors['username'] = [{'user_message': error_message}]
+            errors['username_suggestions'] = generate_username_suggestions(username)
 
         if errors:
             return self._create_response(request, errors, status_code=409, error_code=error_code)
@@ -573,7 +594,7 @@ class RegistrationView(APIView):
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
-                err.field: [{"user_message": text_type(err)}]
+                err.field: [{"user_message": str(err)}]
             }
             response = self._create_response(request, errors, status_code=409, error_code=err.error_code)
         except ValidationError as err:
@@ -715,8 +736,11 @@ class RegistrationValidationView(APIView):
 
     # This end-point is available to anonymous users, so no authentication is needed.
     authentication_classes = []
+    username_suggestions = []
+    api_version = 'v1'
 
     def name_handler(self, request):
+        """ Validates whether fullname is valid """
         name = request.data.get('name')
         return get_name_validation_error(name)
 
@@ -724,7 +748,9 @@ class RegistrationValidationView(APIView):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
         invalid_username_error = get_username_validation_error(username)
-        username_exists_error = get_username_existence_validation_error(username)
+        username_exists_error = get_username_existence_validation_error(username, self.api_version)
+        if username_exists_error:
+            self.username_suggestions = generate_username_suggestions(username)
         # We prefer seeing for invalidity first.
         # Some invalid usernames (like for superusers) may exist.
         return invalid_username_error or username_exists_error
@@ -732,24 +758,27 @@ class RegistrationValidationView(APIView):
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
         email = request.data.get('email')
-        invalid_email_error = get_email_validation_error(email)
-        email_exists_error = get_email_existence_validation_error(email)
+        invalid_email_error = get_email_validation_error(email, self.api_version)
+        email_exists_error = get_email_existence_validation_error(email, self.api_version)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error
 
     def confirm_email_handler(self, request):
+        """ Confirm email validator """
         email = request.data.get('email')
         confirm_email = request.data.get('confirm_email')
         return get_confirm_email_validation_error(confirm_email, email)
 
     def password_handler(self, request):
+        """ Password validator """
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
         return get_password_validation_error(password, username, email)
 
     def country_handler(self, request):
+        """ Country validator """
         country = request.data.get('country')
         return get_country_validation_error(country)
 
@@ -785,19 +814,33 @@ class RegistrationValidationView(APIView):
         can get extra verification checks if entered along with others,
         like when the password may not equal the username.
         """
+        # TODO: remove is_authn_mfe after redesign-master is merged in frontend-app-authn
+        #  and use the new messages as default
+        is_auth_mfe = request.data.get('is_authn_mfe')
+        field_key = request.data.get('form_field_key')
         validation_decisions = {}
-        for form_field_key in self.validation_handlers:
-            # For every field requiring validation from the client,
-            # request a decision for it from the appropriate handler.
-            if form_field_key in request.data:
-                handler = self.validation_handlers[form_field_key]
-                validation_decisions.update({
-                    form_field_key: handler(self, request)
-                })
 
-        field_name = request.data.get('fieldName')  # adding field name for authn MFE use case
-        if field_name:
-            validation_decisions.update({
-                'fieldName': field_name
-            })
-        return Response({"validation_decisions": validation_decisions})
+        def update_validations(field_name):
+            """
+            Updates the validation decisions
+            """
+            validation = self.validation_handlers[field_name](self, request)
+            validation_decisions[field_name] = validation
+
+        if is_auth_mfe:
+            self.api_version = 'v2'
+
+        if field_key and field_key in self.validation_handlers:
+            update_validations(field_key)
+        else:
+            for form_field_key in self.validation_handlers:
+                # For every field requiring validation from the client,
+                # request a decision for it from the appropriate handler.
+                if form_field_key in request.data:
+                    update_validations(form_field_key)
+
+        response_dict = {'validation_decisions': validation_decisions}
+        if self.username_suggestions:
+            response_dict['username_suggestions'] = self.username_suggestions
+
+        return Response(response_dict)

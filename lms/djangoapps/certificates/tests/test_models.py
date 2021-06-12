@@ -16,6 +16,7 @@ from path import Path as path
 
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
+    CertificateAllowlist,
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -25,7 +26,11 @@ from lms.djangoapps.certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory,
+    TemporaryCertificateAllowlistFactory,
+)
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -47,7 +52,7 @@ class ExampleCertificateTest(TestCase):
 
     DESCRIPTION = 'test'
     TEMPLATE = 'test.pdf'
-    DOWNLOAD_URL = 'http://www.example.com'
+    DOWNLOAD_URL = 'https://www.example.com'
     ERROR_REASON = 'Kaboom!'
 
     def setUp(self):
@@ -105,11 +110,11 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         super().setUp()
         self.configuration_string = """{
             "default": {
-                "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png"
+                "url": "https://www.edx.org",
+                "logo_src": "https://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+                "logo_src": "https://www.edx.org/static/images/honor-logo.png"
             }
         }"""
         self.config = CertificateHtmlViewConfiguration(configuration=self.configuration_string)
@@ -136,11 +141,11 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.config.save()
         expected_config = {
             "default": {
-                "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png"
+                "url": "https://www.edx.org",
+                "logo_src": "https://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+                "logo_src": "https://www.edx.org/static/images/honor-logo.png"
             }
         }
         assert self.config.get_config() == expected_config
@@ -240,8 +245,8 @@ class TestCertificateGenerationHistory(TestCase):
     Test the CertificateGenerationHistory model's methods
     """
     @ddt.data(
-        ({"student_set": "whitelisted_not_generated"}, "For exceptions", True),
-        ({"student_set": "whitelisted_not_generated"}, "For exceptions", False),
+        ({"student_set": "allowlisted_not_generated"}, "For exceptions", True),
+        ({"student_set": "allowlisted_not_generated"}, "For exceptions", False),
         # check "students" key for backwards compatibility
         ({"students": [1, 2, 3]}, "For exceptions", True),
         ({"students": [1, 2, 3]}, "For exceptions", False),
@@ -301,6 +306,9 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory()
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id
+        )
         self.user = UserFactory()
         self.course_id = self.course.id  # pylint: disable=no-member
         self.certificate = GeneratedCertificateFactory.create(
@@ -343,4 +351,166 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         self.certificate.invalidate()
 
         assert mock_revoke_task.call_count == 1
-        assert mock_revoke_task.call_args[0] == (self.user.username, self.course_id)
+        assert mock_revoke_task.call_args[0] == (self.user.username, str(self.course_id))
+
+
+class GeneratedCertificateTest(SharedModuleStoreTestCase):
+    """
+    Test GeneratedCertificates
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+
+        self.course = CourseOverviewFactory()
+        self.course_key = self.course.id
+
+    def _assert_event_data(self, mocked_function_call, expected_event_data):
+        """Utility function that verifies the mocked function was called with the expected arguments."""
+
+        mocked_function_call.assert_called_with(
+            'revoked',
+            self.user,
+            str(self.course_key),
+            event_data=expected_event_data
+        )
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_invalidate(self, mock_emit_certificate_event):
+        """
+        Test the invalidate method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        source = 'invalidated_test'
+        cert.invalidate(source=source)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.unavailable
+
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_notpassing(self, mock_emit_certificate_event):
+        """
+        Test the notpassing method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        grade = '.3'
+        source = "notpassing_test"
+        cert.mark_notpassing(grade, source=source)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.notpassing
+        assert cert.grade == grade
+
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_unverified(self, mock_emit_certificate_event):
+        """
+        Test the unverified method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        source = "unverified_test"
+        cert.mark_unverified(source=source)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.unverified
+
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+
+class CertificateAllowlistTest(SharedModuleStoreTestCase):
+    """
+    Tests for the CertificateAllowlist model.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.username = 'fun_username'
+        self.user_email = 'a@b.com'
+        self.user = UserFactory(username=self.username, email=self.user_email)
+        self.second_user = UserFactory()
+
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+
+    def test_get_allowlist_empty(self):
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=None, student=None)
+        assert len(ret) == 0
+
+    def test_get_allowlist_multiple_users(self):
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key)
+        assert len(ret) == 2
+
+    def test_get_allowlist_no_cert(self):
+        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
+        assert len(ret) == 1
+
+        item = ret[0]
+        assert item['id'] == allowlist_item.id
+        assert item['user_id'] == self.user.id
+        assert item['user_name'] == self.username
+        assert item['user_email'] == self.user_email
+        assert item['course_id'] == str(self.course_run_key)
+        assert item['created'] == allowlist_item.created.strftime("%B %d, %Y")
+        assert item['certificate_generated'] == ''
+        assert item['notes'] == allowlist_item.notes
+
+    def test_get_allowlist_cert(self):
+        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_run_key
+        )
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
+        assert len(ret) == 1
+
+        item = ret[0]
+        assert item['id'] == allowlist_item.id
+        assert item['certificate_generated'] == cert.created_date.strftime("%B %d, %Y")

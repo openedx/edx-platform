@@ -25,7 +25,7 @@ from xblock.runtime import KeyValueStore
 FIELD_DATA_TIMEOUT = None  # keep in cache indefinitely, until cache needs pruning
 
 
-class NotFound(object):
+class NotFound:
     """
     This class is a unique value that can be stored in a cache to indicate "not found"
     """
@@ -40,7 +40,7 @@ class EphemeralKeyValueStore(KeyValueStore):
         """
         Expand the given XBlock key tuple to a format we can use as a key.
         """
-        return u"ephemeral-xblock:{}".format(repr(tuple(key)))
+        return f"ephemeral-xblock:{repr(tuple(key))}"
 
     @property
     def _cache(self):

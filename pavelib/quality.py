@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
@@ -70,6 +70,14 @@ def top_python_dirs(dirname):
         if os.path.exists(subdir) and not os.path.exists(subdir_init):
             dirs = os.listdir(subdir)
             top_dirs.extend(d for d in dirs if os.path.isdir(os.path.join(subdir, d)))
+
+    # sandbox-packages module causes F0001: module-not-found error when running pylint
+    # this will exclude sandbox-packages module from pylint execution
+    # TODO: upgrade the functionality to run pylint tests on sandbox-packages module too.
+    modules_to_remove = ['sandbox-packages', '__pycache__']
+    for module in modules_to_remove:
+        if module in top_dirs:
+            top_dirs.remove(module)
 
     return top_dirs
 
@@ -161,7 +169,6 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("errors", "e", "Check for errors only"),
-    ("limit=", "l", "Limits for number of acceptable violations - either <upper> or <lower>:<upper>"),
 ])
 @timed
 def run_pylint(options):
@@ -169,12 +176,11 @@ def run_pylint(options):
     Run pylint on system code. When violations limit is passed in,
     fail the task if too many violations are found.
     """
-    lower_violations_limit, upper_violations_limit, errors, systems = _parse_pylint_options(options)
     errors = getattr(options, 'errors', False)
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
     result_name = 'pylint_{}'.format('_'.join(systems))
 
-    num_violations, _ = _get_pylint_violations(systems, errors)
+    num_violations, violations_list = _get_pylint_violations(systems, errors)
 
     # Print number of violations to log
     violations_count_str = "Number of pylint violations: " + str(num_violations)
@@ -184,49 +190,14 @@ def run_pylint(options):
     with open(Env.METRICS_DIR / "pylint", "w") as f:
         f.write(violations_count_str)
 
-    # Fail when number of violations is less than the lower limit,
-    # which likely means that pylint did not run successfully.
-    # If pylint *did* run successfully, then great! Modify the lower limit.
-    if num_violations < lower_violations_limit > -1:
-        fail_quality(
-            result_name,
-            "FAILURE: Too few pylint violations. "
-            "Expected to see at least {lower_limit} pylint violations. "
-            "Either pylint is not running correctly -or- "
-            "the limits should be lowered and/or the lower limit should be removed.".format(
-                lower_limit=lower_violations_limit
-            )
-        )
-
-    # Fail when number of violations is greater than the upper limit.
-    if num_violations > upper_violations_limit > -1:
-        fail_quality(
-            result_name,
-            "FAILURE: Too many pylint violations. "
-            "The limit is {upper_limit}.".format(upper_limit=upper_violations_limit)
-        )
+    # Fail if there are violations found in pylint report.
+    if num_violations > 0:
+        failure_message = "FAILURE: Pylint violations found.\n"
+        for violation in violations_list:
+            failure_message += violation  # lint-amnesty, pylint: disable=consider-using-join
+        fail_quality(result_name, failure_message)
     else:
         write_junit_xml(result_name)
-
-
-def _parse_pylint_options(options):
-    """
-    Parse the options passed to run_pylint.
-    """
-    lower_violations_limit = upper_violations_limit = -1
-    violations_limit = getattr(options, 'limit', '').split(':')
-    if violations_limit[0]:
-        # Limit was specified.
-        if len(violations_limit) == 1:
-            # Only upper limit was specified.
-            upper_violations_limit = int(violations_limit[0])
-        else:
-            # Upper and lower limits were both specified.
-            lower_violations_limit = int(violations_limit[0])
-            upper_violations_limit = int(violations_limit[1])
-    errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
-    return lower_violations_limit, upper_violations_limit, errors, systems
 
 
 def _count_pylint_violations(report_file):
@@ -859,30 +830,15 @@ def check_keywords():
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
-@cmdopts([
-    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
-    ("percentage=", "p", "fail if diff-quality is below this percentage"),
-    ("limit=", "l", "Limits for number of acceptable violations - either <upper> or <lower>:<upper>"),
-])
 @timed
 # pylint: disable=too-many-statements
-def run_quality(options):
+def run_quality():
     """
-    Build the html diff quality reports, and print the reports to the console.
-    :param: b, the branch to compare against, defaults to origin/master
-    :param: p, diff-quality will fail if the quality percentage calculated is
-        below this percentage. For example, if p is set to 80, and diff-quality finds
-        quality of the branch vs the compare branch is less than 80%, then this task will fail.
+    Build the html quality reports, and print the reports to the console.
     """
-    # Directory to put the diff reports in.
-    # This makes the folder if it doesn't already exist.
-    dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
-
-    # Save the pass variable. It will be set to false later if failures are detected.
-    diff_quality_pass = True
     failure_reasons = []
 
-    def _lint_output(linter, count, violations_list, is_html=False, limit=0):
+    def _lint_output(linter, count, violations_list, is_html=False):
         """
         Given a count & list of pylint violations, pretty-print the output.
         If `is_html`, will print out with HTML markup.
@@ -903,13 +859,13 @@ def run_quality(options):
             title = f"Quality Report: {linter}\n"
             violations_str = ''.join(violations_list)
             violations_count_str = "Violations: {count}\n"
-            fail_line = f"FAILURE: {linter} count should be {limit}\n"
+            fail_line = f"FAILURE: {linter} count should be 0\n"
 
         violations_count_str = violations_count_str.format(count=count)
 
         lines.extend([sep, title, sep, violations_str, sep, violations_count_str])
 
-        if count > limit > -1:
+        if count > 0:
             lines.append(fail_line)
         lines.append(sep + '\n')
         if is_html:
@@ -917,103 +873,14 @@ def run_quality(options):
 
         return ''.join(lines)
 
-    # If pylint reports exist, use those
-    # Otherwise, `diff-quality` will call pylint itself
     (count, violations_list) = _get_pylint_violations(clean=False)
-    _, upper_violations_limit, _, _ = _parse_pylint_options(options)
 
     # Print total number of violations to log
-    print(_lint_output('pylint', count, violations_list, limit=upper_violations_limit))
-    if count > upper_violations_limit > -1:
-        diff_quality_pass = False
-        failure_reasons.append('Too many total violations.')
-
-    # ----- Set up for diff-quality pylint call -----
-    # Set the string to be used for the diff-quality --compare-branch switch.
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
-    compare_commit = sh(f'git merge-base HEAD {compare_branch}', capture=True).strip()
-    if sh('git rev-parse HEAD', capture=True).strip() != compare_commit:
-        compare_branch_string = f'--compare-branch={compare_commit}'
-
-        # Set the string, if needed, to be used for the diff-quality --fail-under switch.
-        diff_threshold = int(getattr(options, 'percentage', -1))
-        percentage_string = ''
-        if diff_threshold > -1:
-            percentage_string = f'--fail-under={diff_threshold}'
-
-        pylint_files = get_violations_reports("pylint")
-        pylint_reports = ' '.join(pylint_files)
-        if not run_diff_quality(
-            violations_type="pylint",
-            reports=pylint_reports,
-            percentage_string=percentage_string,
-            branch_string=compare_branch_string,
-            dquality_dir=dquality_dir
-        ):
-            diff_quality_pass = False
-            failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
-
-        eslint_files = get_violations_reports("eslint")
-        eslint_reports = ' '.join(eslint_files)
-        if not run_diff_quality(
-                violations_type="eslint",
-                reports=eslint_reports,
-                percentage_string=percentage_string,
-                branch_string=compare_branch_string,
-                dquality_dir=dquality_dir
-        ):
-            diff_quality_pass = False
-            failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
-
-    # If one of the quality runs fails, then paver exits with an error when it is finished
-    if not diff_quality_pass:
+    print(_lint_output('pylint', count, violations_list))
+    if count > 0:
+        failure_reasons.append('Too many total pylint violations.')
         msg = "FAILURE: " + " ".join(failure_reasons)
-        fail_quality('diff_quality', msg)
-    else:
-        write_junit_xml('diff_quality')
-
-
-def run_diff_quality(
-        violations_type=None, reports=None, percentage_string=None, branch_string=None, dquality_dir=None
-):
-    """
-    This executes the diff-quality commandline tool for the given violation type (e.g., pylint, eslint).
-    If diff-quality fails due to quality issues, this method returns False.
-
-    """
-    try:
-        sh(
-            "diff-quality --violations={type} "
-            "{reports} {percentage_string} {compare_branch_string} "
-            "--html-report {dquality_dir}/diff_quality_{type}.html ".format(
-                type=violations_type,
-                reports=reports,
-                percentage_string=percentage_string,
-                compare_branch_string=branch_string,
-                dquality_dir=dquality_dir,
-            )
-        )
-        return True
-    except BuildFailure as failure:
-        if is_percentage_failure(failure.args):
-            return False
-        else:
-            fail_quality(
-                'diff_quality',
-                f'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {failure}'
-            )
-
-
-def is_percentage_failure(error_message):
-    """
-    When diff-quality is run with a threshold percentage, it ends with an exit code of 1. This bubbles up to
-    paver with a subprocess return code error. If the subprocess exits with anything other than 1, raise
-    a paver exception.
-    """
-    if "Subprocess return code: 1" not in error_message:
-        return False
-    else:
-        return True
+        fail_quality('Quality Failure', msg)
 
 
 def get_violations_reports(violations_type):

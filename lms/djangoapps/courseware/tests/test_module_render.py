@@ -42,6 +42,9 @@ from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -50,12 +53,7 @@ from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor, hash_resource
-from lms.djangoapps.courseware.tests.factories import (
-    GlobalStaffFactory,
-    RequestFactoryNoCsrf,
-    StudentModuleFactory,
-    UserFactory
-)
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -899,6 +897,31 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         assert not mock_score_signal.called
 
+    @ddt.data(
+        # See seq_module.py for the definition of these handlers
+        ('get_completion', True),  # has the 'will_recheck_access' attribute set to True
+        ('goto_position', False),  # does not set it
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor', wraps=get_module_for_descriptor)
+    def test_will_recheck_access_handler_attribute(self, handler, will_recheck_access, mock_get_module):
+        """Confirm that we pay attention to any 'will_recheck_access' attributes on handler methods"""
+        course = CourseFactory.create()
+        descriptor_kwargs = {
+            'category': 'sequential',
+            'parent': course,
+        }
+        descriptor = ItemFactory.create(**descriptor_kwargs)
+        usage_id = str(descriptor.location)
+
+        # Send no special parameters, which will be invalid, but we don't care
+        request = self.request_factory.post('/', data='{}', content_type='application/json')
+        request.user = self.mock_user
+
+        render.handle_xblock_callback(request, str(course.id), usage_id, handler)
+        assert mock_get_module.call_count == 1
+        assert mock_get_module.call_args[1]['will_recheck_access'] == will_recheck_access
+
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
@@ -1594,7 +1617,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        assert '/courses/{course_id}/bar/content'.format(course_id=str(self.course.id)) in result_fragment.content
+        assert f'/courses/{str(self.course.id)}/bar/content' in result_fragment.content
 
 
 class XBlockWithJsonInitData(XBlock):

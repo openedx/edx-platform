@@ -21,7 +21,6 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
 
-
 import json
 import logging
 import mimetypes
@@ -62,12 +61,46 @@ log = logging.getLogger(__name__)
 DEFAULT_STATIC_CONTENT_SUBDIR = 'static'
 
 
+class CourseImportException(Exception):
+    """
+    Base exception class for course import workflows.
+    """
+
+    def __init__(self):
+        super().__init__(self.description)  # pylint: disable=no-member
+
+
+class ErrorReadingFileException(CourseImportException):
+    """
+    Raised when error occurs while trying to read a file.
+    """
+
+    MESSAGE_TEMPLATE = _('Error while reading {}. Check file for XML errors.')
+
+    def __init__(self, filename, **kwargs):
+        self.description = self.MESSAGE_TEMPLATE.format(filename)
+        super().__init__(**kwargs)
+
+
+class ModuleFailedToImport(CourseImportException):
+    """
+    Raised when a module is failed to import.
+    """
+
+    MESSAGE_TEMPLATE = _('Failed to import module: {} at location: {}')
+
+    def __init__(self, display_name, location, **kwargs):
+        self.description = self.MESSAGE_TEMPLATE.format(display_name, location)
+        super().__init__(**kwargs)
+
+
 class LocationMixin(XBlockMixin):
     """
     Adds a `location` property to an :class:`XBlock` so it is more compatible
     with old-style :class:`XModule` API. This is a simplified version of
     :class:`XModuleMixin`.
     """
+
     @property
     def location(self):
         """ Get the UsageKey of this block. """
@@ -234,7 +267,6 @@ class ImportManager:
             create_if_not_present=False, raise_on_failure=False,
             static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
             python_lib_filename='python_lib.zip',
-            status=None
     ):
         self.store = store
         self.user_id = user_id
@@ -259,7 +291,6 @@ class ImportManager:
             xblock_select=store.xblock_select,
             target_course_id=target_id,
         )
-        self.status = status
         self.logger, self.errors = make_error_tracker()
 
     def preflight(self):
@@ -362,12 +393,10 @@ class ImportManager:
             logging.info(f'Course import {course_id}: No {assets_filename} file present.')
             return
         except Exception as exc:  # pylint: disable=W0703
-            monitor_import_failure(course_id, 'Updating', exception=exc)
-            logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
-                if self.status:
-                    self.status.fail(_('Error while reading {}. Check file for XML errors.').format(assets_filename))
-                raise
+                monitor_import_failure(course_id, 'Updating', exception=exc)
+                logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
+                raise ErrorReadingFileException(assets_filename)  # pylint: disable=raise-missing-from
             else:
                 return
 
@@ -484,13 +513,7 @@ class ImportManager:
                         log.exception(
                             f'Course import {dest_id}: failed to import module location {child.location}'
                         )
-                        if self.status:
-                            self.status.fail(
-                                _('Failed to import module: {} at location: {}').format(
-                                    child.display_name, child.location
-                                )
-                            )
-                        raise
+                        raise ModuleFailedToImport(child.display_name, child.location)  # pylint: disable=raise-missing-from
 
                     depth_first(child)
 
@@ -511,15 +534,11 @@ class ImportManager:
                     runtime=courselike.runtime,
                 )
             except Exception:
-                msg = f'Course import {dest_id}: failed to import module location {leftover}'
-                log.error(msg)
-                if self.status:
-                    self.status.fail(
-                        _('Failed to import module: {} at location: {}').format(
-                            leftover.display_name, leftover.location
-                        )
-                    )
-                raise
+                log.exception(
+                    f'Course import {dest_id}: failed to import module location {leftover}'
+                )
+                # pylint: disable=raise-missing-from
+                raise ModuleFailedToImport(leftover.display_name, leftover.location)
 
     def run_imports(self):
         """
@@ -605,10 +624,6 @@ class CourseImportManager(ImportManager):
                     "Skipping import of course with id, %s, "
                     "since it collides with an existing one", dest_id
                 )
-                if self.status:
-                    self.status.fail(
-                        _('Aborting import because a course with this id: {} already exists.').format(dest_id)
-                    )
                 raise
 
         return dest_id, runtime
@@ -718,8 +733,6 @@ class LibraryImportManager(ImportManager):
                     "Skipping import of Library with id %s, "
                     "since it collides with an existing one", dest_id
                 )
-                if self.status:
-                    self.status.fail(_('Aborting import since a library with this id already exists.'))
                 raise
 
         return dest_id, runtime
@@ -784,6 +797,7 @@ def _update_and_import_module(
         """
         Move the module to a new course.
         """
+
         def _convert_ref_fields_to_new_namespace(reference):
             """
             Convert a reference to the new namespace, but only
@@ -990,7 +1004,7 @@ def _import_course_draft(
                 # Skip any OSX quarantine files, prefixed with a '._'.
                 continue
             module_path = os.path.join(rootdir, filename)
-            with open(module_path, 'r') as f:
+            with open(module_path) as f:
                 try:
                     xml = f.read()
 

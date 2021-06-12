@@ -172,3 +172,9 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             if possible_graded_override is None:
                 expected_possible = persistent_grade.possible_graded
             self.assert_grade(grade, expected_earned, expected_possible)
+
+    def test_display_name_not_escaped(self):
+        """Confirm that we don't escape the display name - downstream consumers will do that instead"""
+        # first, do an update to create a persistent grade
+        grade = self.subsection_grade_factory.update(self.sequence)
+        assert grade.display_name == 'Test Sequential X with an & Ampersand'

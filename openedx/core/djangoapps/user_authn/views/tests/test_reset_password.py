@@ -7,6 +7,7 @@ import re
 import unicodedata
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
@@ -23,7 +24,6 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
-from mock import Mock, patch
 from oauth2_provider import models as dot_models
 from pytz import UTC
 
@@ -41,7 +41,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
 from common.djangoapps.student.tests.test_email import mock_render_to_string
-from common.djangoapps.student.models import AccountRecovery
+from common.djangoapps.student.models import AccountRecovery, LoginFailures
 
 from common.djangoapps.util.password_policy_validators import create_validator_config
 from common.djangoapps.util.testing import EventTestMixin
@@ -290,7 +290,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         assert self.user.email in sent_message.to
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None,
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='password', old=None, new=None,
         )
 
         # Test that the user is not active
@@ -321,7 +321,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         assert expected_msg in msg
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='password', old=None, new=None
         )
 
     @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
@@ -345,17 +345,17 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 sent_message = mail.outbox[0]
                 msg = sent_message.body
 
-                reset_msg = u"you requested a password reset for your user account at {}"
+                reset_msg = "you requested a password reset for your user account at {}"
                 reset_msg = reset_msg.format(site_name)
 
                 assert reset_msg in msg
                 assert settings.AUTHN_MICROFRONTEND_URL in msg
 
-                sign_off = u"The {} Team".format(platform_name)
+                sign_off = f"The {platform_name} Team"
                 assert sign_off in msg
 
                 self.assert_event_emitted(
-                    SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+                    SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='password', old=None, new=None
                 )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -384,14 +384,14 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         body = bodies[body_type]
 
-        reset_msg = u"you requested a password reset for your user account at {}".format(
+        reset_msg = "you requested a password reset for your user account at {}".format(
             fake_get_value('PLATFORM_NAME')
         )
 
         assert reset_msg in body
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='password', old=None, new=None
         )
         assert sent_message.from_email == 'no-reply@fakeuniversity.com'
 
@@ -516,7 +516,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         method of NFKC.
         In this test, the input password is u'p\u212bssword'. It should be normalized to u'p\xc5ssword'
         """
-        password = u'p\u212bssword'
+        password = 'p\u212bssword'
         request_params = {'new_password1': password, 'new_password2': password}
         confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
         process_request(confirm_request)
@@ -527,7 +527,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         user = User.objects.get(pk=self.user.pk)
         salt_val = user.password.split('$')[1]
-        expected_user_password = make_password(unicodedata.normalize('NFKC', u'p\u212bssword'), salt_val)
+        expected_user_password = make_password(unicodedata.normalize('NFKC', 'p\u212bssword'), salt_val)
         assert expected_user_password == user.password
 
         self.assert_email_sent_successfully({
@@ -611,6 +611,66 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertRaises(Http404, PasswordResetConfirmWrapper.as_view(), reset_request, uidb36=self.uidb36,
                           token=self.token)
 
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True}, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_with_login_failures_feature_enabled(self):
+        """
+        Tests that user's login failures lockout counter is reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password1'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+
+        # Verify the response status code is 302 with password reset success and also verify that
+        # the user's login failures lockout count is reset.
+        assert resp.status_code == 302
+        assert not LoginFailures.is_user_locked_out(confirm_request.user)
+
+        # Verify that the user's login failures lockout counter is not reset upon
+        # password reset failure.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request with mismatching passwords.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+        assert resp.status_code == 200
+        assert LoginFailures.is_user_locked_out(self.user)
+
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_with_login_failures_feature_disabled(self):
+        """
+        Tests that user's login failures lockout counter is not reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # does not reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password1'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+
+        # Verify that the user's login failures lockout count is not reset.
+        assert resp.status_code == 302
+        assert not LoginFailures.is_feature_enabled()
+        assert LoginFailures.is_user_locked_out(confirm_request.user)
+
 
 @ddt.ddt
 @skip_unless_lms
@@ -618,7 +678,7 @@ class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("user_api_password_reset")
 
     @ddt.data("get", "post")
@@ -652,7 +712,7 @@ class PasswordResetViewTest(UserAPITestCase):
         assert form_desc['fields'] ==\
                [{'name': 'email', 'defaultValue': '', 'type': 'email', 'required': True,
                  'label': 'Email', 'placeholder': 'username@domain.com',
-                 'instructions': u'The email address you used to register with {platform_name}'
+                 'instructions': 'The email address you used to register with {platform_name}'
                 .format(platform_name=settings.PLATFORM_NAME),
                  'restrictions': {'min_length': EMAIL_MIN_LENGTH,
                                   'max_length': EMAIL_MAX_LENGTH},
@@ -666,7 +726,7 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetTokenValidateViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -822,7 +882,7 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
         self.assert_event_emitted(
             SETTING_CHANGE_INITIATED,
             user_id=self.user.id,
-            setting=u'email',
+            setting='email',
             old=self.user.email,
             new=updated_user.email
         )
@@ -872,3 +932,53 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
             assert response.status_code != 429
         response = self.client.post(path, request_param)
         assert response.status_code == 429
+
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True}, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_request_with_login_failures_feature_enabled(self):
+        """
+        Tests that user's login failures lockout counter is reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False)
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        json_response = reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+        json_response = json.loads(json_response.content.decode('utf-8'))
+
+        # Verify that the user's login failures lockout count is reset.
+        assert json_response.get('reset_status')
+        assert not LoginFailures.is_user_locked_out(self.user)
+
+        # Verify that the user's login failures lockout counter is not reset upon
+        # password reset failure.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False, 'new_password2')
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+
+        assert LoginFailures.is_user_locked_out(self.user)
+
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_request_with_login_failures_feature_disabled(self):
+        """
+        Tests that user's login failures lockout counter is not reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # does not reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False)
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+
+        # Verify that the user's login failures lockout count is not reset.
+        assert not LoginFailures.is_feature_enabled()
+        assert LoginFailures.is_user_locked_out(self.user)

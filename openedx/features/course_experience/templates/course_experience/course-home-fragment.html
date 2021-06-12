@@ -63,9 +63,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
     </header>
     <div class="page-content">
         <div class="page-content-main">
-            % if offer_banner_fragment:
-                ${HTML(offer_banner_fragment.content)}
-            % endif
             % if course_expiration_fragment:
                 ${HTML(course_expiration_fragment.content)}
             % endif
@@ -84,9 +81,8 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % endif
         </div>
         <aside class="page-content-secondary course-sidebar">
-            % if show_proctoring_info_panel:
-                <div class="proctoring-info-panel" data-course-id="${course_key}"></div>
-            % endif
+            <div class="proctoring-info-panel"
+                    data-course-id="${course_key}" data-username="${username}"></div>
             % if has_goal_permission:
                 <div class="section section-goals ${'' if current_goal else 'hidden'}">
                     <div class="current-goal-container">
@@ -195,11 +191,9 @@ from openedx.features.course_experience.course_tools import HttpMethod
 
   var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
   var fbeLink = $("#FBE_banner");
-  var welcomeLink = $("#welcome");
   var sockLink = $("#sock");
   var upgradeDateLink = $("#course_home_dates");
   var GreenUpgradeLink = $("#green_upgrade");
-  var courseToolsUpgradeLink = $(document.querySelectorAll("[data-analytics-id='edx.tool.verified_upgrade']"));
   var GreenUpgradeLink = $("#green_upgrade");
   var certificateUpsellLink = $("#certificate_upsell");
 
@@ -213,12 +207,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
       pageName: "course_home",
       linkType: "link",
       linkCategory: "FBE_banner"
-    });
-
-    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
-      pageName: "course_home",
-      linkType: "link",
-      linkCategory: "welcome"
     });
 
     TrackECommerceEvents.trackUpsellClick(sockLink, 'course_home_sock', {
@@ -237,12 +225,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
       pageName: "course_home",
       linkType: "button",
       linkCategory: "green_upgrade"
-    });
-
-    TrackECommerceEvents.trackUpsellClick(courseToolsUpgradeLink, 'course_home_course_tools', {
-      pageName: "course_home",
-      linkType: "link",
-      linkCategory: "(none)"
     });
 
     TrackECommerceEvents.trackUpsellClick(certificateUpsellLink, 'course_home_certificate', {

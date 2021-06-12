@@ -8,7 +8,6 @@ from collections import OrderedDict, defaultdict
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 
 from openedx.core.lib.grade_utils import round_away_from_zero
@@ -20,7 +19,6 @@ from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
 
-@python_2_unicode_compatible
 class CourseGradeBase:
     """
     Base class for Course Grades.
@@ -55,12 +53,23 @@ class CourseGradeBase:
         """
         Returns the subsection grade for the given subsection usage key.
 
-        Note: does NOT check whether the user has access to the subsection.
-        Assumes that if a grade exists, the user has access to it.  If the
-        grade doesn't exist then either the user does not have access to
-        it or hasn't attempted any problems in the subsection.
+        Raises `KeyError` if the course structure does not contain the key.
+
+        If the course structure contains the key, this will always succeed
+        (and return a grade) regardless of whether the user can access that section;
+        it is up to the caller to ensure that the grade isn't
+        shown to users that shouldn't be able to access it
+        (e.g. a student shouldn't see a grade for an unreleased subsection);
         """
-        return self._get_subsection_grade(self.course_data.effective_structure[subsection_key])
+        # look in the user structure first and fallback to the collected;
+        # however, we assume the state of course_data is intentional,
+        # so we use effective_structure to avoid additional fetching
+        subsection = (
+            self.course_data.effective_structure[subsection_key]
+            if subsection_key in self.course_data.effective_structure
+            else self.course_data.collected_structure[subsection_key]
+        )
+        return self._get_subsection_grade(subsection)
 
     @lazy
     def graded_subsections_by_format(self):
@@ -210,8 +219,7 @@ class CourseGradeBase:
         """
         chapter_subsection_grades = self._get_subsection_grades(course_structure, chapter.location)
         return {
-            # xss-lint: disable=python-deprecated-display-name
-            'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
+            'display_name': block_metadata_utils.display_name_with_default(chapter),
             'url_name': block_metadata_utils.url_name_for_block(chapter),
             'sections': chapter_subsection_grades,
         }

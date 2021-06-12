@@ -84,8 +84,8 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/doc \
 	requirements/edx/paver \
-	requirements/edx-sandbox/shared \
 	requirements/edx-sandbox/py35 \
+	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
@@ -111,16 +111,17 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
+check-types: ## run static type-checking tests
+	mypy
+
 # These make targets currently only build LMS images.
 docker_build:
 	docker build . -f Dockerfile --target lms -t openedx/edx-platform
 	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:latest-newrelic
-	docker build . -f Dockerfile --target lms-devstack -t openedx/edx-platform:latest-devstack
 
 docker_tag: docker_build
 	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
 	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
-	docker tag openedx/edx-platform:latest-devstack openedx/edx-platform:${GITHUB_SHA}-devstack
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
@@ -130,5 +131,3 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/edx-platform:${GITHUB_SHA}"
 	docker push 'openedx/edx-platform:latest-newrelic'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
-	docker push 'openedx/edx-platform:latest-devstack'
-	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"

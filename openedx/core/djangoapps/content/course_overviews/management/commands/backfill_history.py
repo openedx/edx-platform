@@ -128,7 +128,7 @@ class Command(BaseCommand):
                         )
                         continue
                     elif count != 0:
-                        raise Exception("Database count: {} does not match input count: {}".format(count, len(ids)))
+                        raise Exception(f"Database count: {count} does not match input count: {len(ids)}")
 
                     values = [[row[column.upper()] for column in columns] for row in rows]
 

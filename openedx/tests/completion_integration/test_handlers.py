@@ -3,15 +3,14 @@ Test signal handlers for completion.
 """
 
 from datetime import datetime
+from unittest.mock import patch
 
 import ddt
 import pytest
-import six
 from completion import handlers
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionSetUpMixin
 from django.test import TestCase
-from mock import patch
 from pytz import utc
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -47,7 +46,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = True
 
     def setUp(self):
-        super(ScorableCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
@@ -63,8 +62,8 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.context_key),
-            usage_id=six.text_type(block_key),
+            course_id=str(self.context_key),
+            usage_id=str(block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
             modified=datetime.utcnow().replace(tzinfo=utc),
@@ -124,8 +123,8 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
                 user_id=self.user.id,
-                course_id=six.text_type(self.context_key),
-                usage_id=six.text_type(self.block_key),
+                course_id=str(self.context_key),
+                usage_id=str(self.block_key),
                 weighted_earned=0.0,
                 weighted_possible=3.0,
                 modified=datetime.utcnow().replace(tzinfo=utc),
@@ -143,15 +142,15 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = False
 
     def setUp(self):
-        super(DisabledCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.context_key),
-            usage_id=six.text_type(self.block_key),
+            course_id=str(self.context_key),
+            usage_id=str(self.block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
             modified=datetime.utcnow().replace(tzinfo=utc),

@@ -2,13 +2,9 @@
 Minimal Django settings for tests of common/lib.
 Required in Django 1.9+ due to imports of models in stock Django apps.
 """
-
-
-import sys  # lint-amnesty, pylint: disable=unused-import
 import tempfile
 
 from django.utils.translation import ugettext_lazy as _
-from path import Path  # lint-amnesty, pylint: disable=unused-import
 
 ALL_LANGUAGES = []
 
@@ -86,6 +82,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.theming.apps.ThemingConfig',
     'openedx.core.djangoapps.external_user_ids',
     'openedx.core.djangoapps.demographics',
+    'openedx.core.djangoapps.agreements',
 
     'lms.djangoapps.experiments',
     'openedx.features.content_type_gating',

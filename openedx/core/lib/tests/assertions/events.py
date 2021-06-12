@@ -3,7 +3,6 @@
 
 import json
 import pprint
-import six
 
 
 def assert_event_matches(expected, actual, tolerate=None):
@@ -86,7 +85,7 @@ def assert_event_matches(expected, actual, tolerate=None):
         raise AssertionError('Unexpected differences found in structs:\n\n' + '\n'.join(message_lines))
 
 
-class EventMatchTolerates(object):
+class EventMatchTolerates:
     """
     Represents groups of flags that specify the level of tolerance for deviation between an expected event and an actual
     event.
@@ -196,7 +195,7 @@ def parse_event_payload(event):
     parsed. It will never modify the event in place.
     """
     payload_key = 'event' if 'event' in event else 'data'
-    if payload_key in event and isinstance(event[payload_key], six.string_types):
+    if payload_key in event and isinstance(event[payload_key], str):
         event = event.copy()
         try:
             event[payload_key] = json.loads(event[payload_key])
@@ -224,18 +223,18 @@ def compare_structs(expected, actual, should_strict_compare=None, path=None):
         actual_keys = frozenset(list(actual.keys()))
 
         for key in expected_keys - actual_keys:
-            differences.append(u'{0}: not found in actual'.format(_path_to_string(path + [key])))
+            differences.append(f'{_path_to_string(path + [key])}: not found in actual')
 
         if should_strict_compare is not None and should_strict_compare(path):
             for key in actual_keys - expected_keys:
-                differences.append(u'{0}: only defined in actual'.format(_path_to_string(path + [key])))
+                differences.append(f'{_path_to_string(path + [key])}: only defined in actual')
 
         for key in expected_keys & actual_keys:
             child_differences = compare_structs(expected[key], actual[key], should_strict_compare, path + [key])
             differences.extend(child_differences)
 
     elif expected != actual:
-        differences.append(u'{path}: {a} != {b} (expected != actual)'.format(
+        differences.append('{path}: {a} != {b} (expected != actual)'.format(
             path=_path_to_string(path),
             a=repr(expected),
             b=repr(actual)

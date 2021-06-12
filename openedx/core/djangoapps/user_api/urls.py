@@ -31,6 +31,10 @@ ACCOUNT_LIST = AccountViewSet.as_view({
     'get': 'list',
 })
 
+ACCOUNT_SEARCH_EMAILS = AccountViewSet.as_view({
+    'post': 'search_emails',
+})
+
 ACCOUNT_DETAIL = AccountViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
@@ -87,6 +91,11 @@ urlpatterns = [
         r'^v1/accounts$',
         ACCOUNT_LIST,
         name='accounts_detail_api'
+    ),
+    url(
+        r'^v1/accounts/search_emails$',
+        ACCOUNT_SEARCH_EMAILS,
+        name='accounts_search_emails_api'
     ),
     url(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}$',

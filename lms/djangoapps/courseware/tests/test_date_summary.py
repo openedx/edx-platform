@@ -4,21 +4,20 @@
 
 from datetime import datetime, timedelta
 
-from unittest.mock import patch
 import crum
 import ddt
-import waffle
+import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from freezegun import freeze_time
 from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
 from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
@@ -40,8 +39,8 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory  # pylint: disable=unused-import
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -113,7 +112,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
          {'verification_status': 'expired'},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate)),
         # Verified enrollment with `approved` photo-verification during course run
-        ({'days_till_start': -10, },
+        ({'days_till_start': -10},
          {'verification_status': 'approved'},
          (TodaysDate, CourseEndDate)),
         # Verified enrollment with *NO* course end date
@@ -150,7 +149,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
         """
         Creates a course with multiple subsections to test all of the different
@@ -309,7 +308,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 for html_tag in assignment_title_html:
                     assert html_tag in assignment_title
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @ddt.data(
         ([], 3),
         ([{
@@ -375,7 +374,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
         assert len(blocks) == date_block_count
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_enabled_block_types_with_expired_course(self):
         course = create_course_run(days_till_start=-100)
         user = create_user()
@@ -521,15 +520,17 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
-        assert block.description == 'To earn a certificate, you must complete all requirements before this date.'
+        assert block.description == ('After this date, the course will be archived, which means you can review the '
+                                     'course content but can no longer participate in graded assignments or work '
+                                     'towards earning a certificate.')
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CourseEndDate(course, user)
-        assert block.description == 'After this date, course content will be archived.'
-        assert block.title == 'Course End'
+        assert block.description == 'After the course ends, the course content will be archived and no longer active.'
+        assert block.title == 'Course ends'
 
     def test_course_end_date_after_course(self):
         course = create_course_run(days_till_start=-2, days_till_end=-1)
@@ -538,35 +539,26 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = CourseEndDate(course, user)
         assert block.description ==\
                'This course is archived, which means you can review course content but it is no longer active.'
-        assert block.title == 'Course End'
+        assert block.title == 'Course ends'
 
-    @ddt.data(
-        {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
-        {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
-    )
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
-    def test_course_end_date_self_paced(self, cr_details):
+    @ddt.data(300, 400)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    def test_course_end_date_self_paced(self, days_till_end):
         """
-        In self-paced courses, the end date will now only show up if the learner
-        views the course within the course's weeks to complete (as defined in
-        the course-discovery service). E.g. if the weeks to complete is 5 weeks
-        and the course doesn't end for 10 weeks, there will be no end date, but
-        if the course ends in 3 weeks, the end date will appear.
+        In self-paced courses, the end date will only show up if the learner
+        views the course within 365 days of the course end date.
         """
         now = datetime.now(utc)
-        end_timedelta_number = 5
         course = CourseFactory.create(
-            start=now + timedelta(days=-7), end=now + timedelta(weeks=end_timedelta_number), self_paced=True)
+            start=now + timedelta(days=-7), end=now + timedelta(days=days_till_end), self_paced=True)
         user = create_user()
-        self.make_request(user)
-        with patch('lms.djangoapps.courseware.date_summary.get_course_run_details') as mock_get_cr_details:
-            mock_get_cr_details.return_value = cr_details
-            block = CourseEndDate(course, user)
-            assert block.title == 'Course End'
-            if cr_details['weeks_to_complete'] > end_timedelta_number:
-                assert block.date == course.end
-            else:
-                assert block.date is None
+        block = CourseEndDate(course, user)
+        assert block.title == 'Course ends'
+        if 365 > days_till_end:
+            assert block.date == course.end
+        else:
+            assert block.date is None
+            assert block.description == ''
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
@@ -727,7 +719,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_dates_tab_link_render(self, url_name, mfe_active):
         """ The dates tab link should only show for enrolled or staff users """
         course = create_course_run()
@@ -744,14 +736,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            if mfe_active:
-                with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True), \
-                     override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True):
-                    response = self.client.get(url, follow=True)
-            else:
+            with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=mfe_active):
                 response = self.client.get(url, follow=True)
-            for html in html_elements:
-                assert_function(response, html)
+            if mfe_active and not user.is_staff:
+                assert 404 == response.status_code
+            else:
+                for html in html_elements:
+                    assert_function(response, html)
             self.client.logout()
 
         with freeze_time('2015-01-02'):
@@ -1016,7 +1007,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         if enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course=course_overview)
         OrgDynamicUpgradeDeadlineConfiguration.objects.create(
             enabled=org_config_enabled, opt_out=org_config_opt_out, org_id=course.id.org
         )
@@ -1024,7 +1016,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
             enabled=course_config_enabled, opt_out=course_config_opt_out, course_id=course.id
         )
         if not enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course=course_overview)
 
         # The enrollment has a schedule, and the upgrade_deadline is set when expected_dynamic_deadline is True
         if not enroll_first:

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 from unittest.mock import patch
 import pytest
@@ -85,8 +84,8 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
 
     def test_course_with_no_highlights(self):
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(display_name=u"Week 1")
-            self._create_chapter(display_name=u"Week 2")
+            self._create_chapter(display_name="Week 1")
+            self._create_chapter(display_name="Week 2")
 
         self.course = self.store.get_course(self.course_key)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         assert len(self.course.get_children()) == 2
@@ -158,7 +157,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         assert get_next_section_highlights(self.user, self.course_key, two_days_ago, three_days.date()) == (None, None)
         assert get_next_section_highlights(self.user, self.course_key, two_days_ago, four_days.date()) ==\
                (['final week!'], 4)
-        exception_message = 'Last section was reached. There are no more highlights for {}'.format(self.course_key)
+        exception_message = f'Last section was reached. There are no more highlights for {self.course_key}'
         with pytest.raises(CourseUpdateDoesNotExist):
             get_next_section_highlights(self.user, self.course_key, two_days_ago, six_days.date())
 
@@ -167,7 +166,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         mock_get_module.return_value = None
 
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(highlights='Test highlight')
+            self._create_chapter(highlights=['Test highlight'])
 
         with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
             get_week_highlights(self.user, self.course_key, 1)

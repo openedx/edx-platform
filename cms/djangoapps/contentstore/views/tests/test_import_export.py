@@ -1,7 +1,6 @@
 """
 Unit tests for course import and export
 """
-
 import copy
 import json
 import logging
@@ -17,6 +16,8 @@ from uuid import uuid4
 import ddt
 import lxml
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import SuspiciousOperation
 from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -26,6 +27,8 @@ from storages.backends.s3boto import S3BotoStorage
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
+from cms.djangoapps.contentstore import errors as import_error
+from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -37,14 +40,23 @@ from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
+from xmodule.modulestore.xml_importer import (
+    CourseImportManager,
+    ErrorReadingFileException,
+    import_course_from_xml,
+    import_library_from_xml,
+    ModuleFailedToImport,
+)
 
+TASK_LOGGER = 'cms.djangoapps.contentstore.tasks.LOGGER'
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+User = get_user_model()
 
 log = logging.getLogger(__name__)
 
@@ -106,7 +118,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(str(self.course.id))
+        exam_url = f'/course/{str(self.course.id)}/entrance_exam/'
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
@@ -178,42 +190,68 @@ class ImportTestCase(CourseTestCase):
             btar.add(bad_dir)
 
         self.unsafe_common_dir = path(tempfile.mkdtemp(dir=self.content_dir))
+        self.log_prefix = f"Course import {self.course.id}:"
 
-    def test_no_coursexml(self):
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates data shared by all tests.
+        """
+        super().setUpClass()
+        cls.UnpackingError = -1
+        cls.VerifyingError = -2
+        cls.UpdatingError = -3
+
+    def assertImportStatusResponse(self, response, status=None, expected_message=None):
+        """
+        Fail if the import response does not match with the provided status and message.
+        """
+        self.assertEqual(response["ImportStatus"], status)
+        if expected_message:
+            self.assertEqual(response['Message'], expected_message)
+
+    def get_import_status(self, course_id, tarfile_path):
+        """Helper method to get course import status."""
+        resp = self.client.get(
+            reverse_course_url(
+                'import_status_handler',
+                course_id,
+                kwargs={'filename': os.path.split(tarfile_path)[1]}
+            )
+        )
+        return json.loads(resp.content)
+
+    def import_tarfile_in_course(self, tarfile_path):
+        """Helper method to import provided tarfile in the course."""
+        with open(tarfile_path, 'rb') as gtar:
+            args = {"name": tarfile_path, "course-data": [gtar]}
+            return self.client.post(self.url, args)
+
+    @patch(TASK_LOGGER)
+    def test_no_coursexml(self, mocked_log):
         """
         Check that the response for a tar.gz import without a course.xml is
         correct.
         """
-        with open(self.bad_tar, 'rb') as btar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            resp = self.client.post(
-                self.url,
-                {
-                    "name": self.bad_tar,
-                    "course-data": [btar]
-                })
-        self.assertEqual(resp.status_code, 200)
+        error_msg = import_error.FILE_MISSING.format('course.xml')
+        expected_error_mesg = f'{self.log_prefix} {error_msg}'
+        response = self.import_tarfile_in_course(self.bad_tar)
+
+        self.assertEqual(response.status_code, 200)
+        mocked_log.error.assert_called_once_with(expected_error_mesg)
+
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
-        resp_status = self.client.get(
-            reverse_course_url(
-                'import_status_handler',
-                self.course.id,
-                kwargs={'filename': os.path.split(self.bad_tar)[1]}
-            )
-        )
-
-        self.assertEqual(json.loads(resp_status.content.decode('utf-8'))["ImportStatus"], -2)
+        resp_status = self.get_import_status(self.course.id, self.bad_tar)
+        self.assertImportStatusResponse(resp_status, self.VerifyingError, error_msg)
 
     def test_with_coursexml(self):
         """
         Check that the response for a tar.gz import with a course.xml is
         correct.
         """
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            args = {"name": self.good_tar, "course-data": [gtar]}
-            resp = self.client.post(self.url, args)
-
-        self.assertEqual(resp.status_code, 200)
+        response = self.import_tarfile_in_course(self.good_tar)
+        self.assertEqual(response.status_code, 200)
 
     def test_import_in_existing_course(self):
         """
@@ -228,10 +266,8 @@ class ImportTestCase(CourseTestCase):
         display_name_before_import = course.display_name
 
         # Check that global staff user can import course
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            args = {"name": self.good_tar, "course-data": [gtar]}
-            resp = self.client.post(self.url, args)
-        self.assertEqual(resp.status_code, 200)
+        response = self.import_tarfile_in_course(self.good_tar)
+        self.assertEqual(response.status_code, 200)
 
         course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
@@ -246,9 +282,7 @@ class ImportTestCase(CourseTestCase):
 
         # Now course staff user can also successfully import course
         self.client.login(username=nonstaff_user.username, password='foo')
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            args = {"name": self.good_tar, "course-data": [gtar]}
-            resp = self.client.post(self.url, args)
+        resp = self.import_tarfile_in_course(self.good_tar)
         self.assertEqual(resp.status_code, 200)
 
         # Now check that non_staff user has his same role
@@ -340,19 +374,11 @@ class ImportTestCase(CourseTestCase):
 
         def try_tar(tarpath):
             """ Attempt to tar an unacceptable file """
-            with open(tarpath, 'rb') as tar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-                args = {"name": tarpath, "course-data": [tar]}
-                resp = self.client.post(self.url, args)
+            resp = self.import_tarfile_in_course(tarpath)
             self.assertEqual(resp.status_code, 200)
-            resp = self.client.get(
-                reverse_course_url(
-                    'import_status_handler',
-                    self.course.id,
-                    kwargs={'filename': os.path.split(tarpath)[1]}
-                )
-            )
-            status = json.loads(resp.content.decode('utf-8'))["ImportStatus"]
-            self.assertEqual(status, -1)
+
+            resp = self.get_import_status(self.course.id, tarpath)
+            self.assertEqual(resp["ImportStatus"], -1)
 
         try_tar(self._fifo_tar())
         try_tar(self._symlink_tar())
@@ -367,14 +393,8 @@ class ImportTestCase(CourseTestCase):
         # Check that `import_status` returns the appropriate stage (i.e.,
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
-        resp_status = self.client.get(
-            reverse_course_url(
-                'import_status_handler',
-                self.course.id,
-                kwargs={'filename': os.path.split(self.good_tar)[1]}
-            )
-        )
-        import_status = json.loads(resp_status.content.decode('utf-8'))["ImportStatus"]
+        resp_status = self.get_import_status(self.course.id, self.good_tar)
+        import_status = resp_status["ImportStatus"]
         self.assertIn(import_status, (0, 3))
 
     def test_library_import(self):
@@ -525,6 +545,134 @@ class ImportTestCase(CourseTestCase):
                     finally:
                         shutil.rmtree(extract_dir)
 
+    @patch(TASK_LOGGER)
+    def test_import_failed_with_no_user_permission(self, mocked_log):
+        """
+        Tests course import failure when user have no permission
+        """
+        expected_error_mesg = f'{self.log_prefix} User permission denied: {self.user.username}'
+        with patch('cms.djangoapps.contentstore.tasks.has_course_author_access', Mock(return_value=False)):
+            response = self.import_tarfile_in_course(self.good_tar)
+        self.assertEqual(response.status_code, 200)
+        mocked_log.error.assert_called_once_with(expected_error_mesg)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UnpackingError, import_error.COURSE_PERMISSION_DENIED)
+
+    @patch(TASK_LOGGER)
+    def test_import_failed_with_unknown_user(self, mocked_log):
+        """
+        Tests that course import failure with an unknown user id.
+        """
+        expected_error_mesg = f'{self.log_prefix} Unknown User: {self.user.id}'
+
+        with patch('django.contrib.auth.models.User.objects.get', side_effect=User.DoesNotExist):
+            response = self.import_tarfile_in_course(self.good_tar)
+            self.assertEqual(response.status_code, 200)
+            mocked_log.error.assert_called_once_with(expected_error_mesg)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UnpackingError, import_error.USER_PERMISSION_DENIED)
+
+    @patch(TASK_LOGGER)
+    def test_import_failed_with_unsafe_tarfile(self, mocked_log):
+        """
+        Tests course import failure with unsafe tar file.
+        """
+        expected_error_mesg = f'{self.log_prefix} Unsafe tar file'
+        with patch('cms.djangoapps.contentstore.tasks.safetar_extractall', side_effect=SuspiciousOperation):
+            response = self.import_tarfile_in_course(self.good_tar)
+
+        self.assertEqual(response.status_code, 200)
+        mocked_log.error.assert_called_once_with(expected_error_mesg)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UnpackingError, import_error.UNSAFE_TAR_FILE)
+
+    @patch(TASK_LOGGER)
+    def test_import_failed_with_unknown_unpacking_error(self, mocked_log):
+        """
+        Tests that course import failure for unknown error while unpacking
+        """
+        expected_error_mesg = f'{self.log_prefix} Unknown error while unpacking'
+        with patch.object(course_import_export_storage, 'open', side_effect=Exception):
+            response = self.import_tarfile_in_course(self.good_tar)
+
+        self.assertEqual(response.status_code, 200)
+        mocked_log.exception.assert_called_once_with(expected_error_mesg, exc_info=True)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UnpackingError, import_error.UNKNOWN_ERROR_IN_UNPACKING)
+
+    @patch(TASK_LOGGER)
+    @patch('olxcleaner.validate')
+    @patch('cms.djangoapps.contentstore.tasks.report_error_summary')
+    @patch('cms.djangoapps.contentstore.tasks.report_errors')
+    def test_import_failed_with_olx_validations(self, mocked_report, mocked_summary, mocked_validate, mocked_log):
+        """
+        Tests that course import failure for unknown error while unpacking
+        """
+        errors = [Mock(description='DuplicateURLNameError', level_val=3)]
+        mocked_summary.return_value = [f'ERROR {error.description} found in content' for error in errors]
+        mocked_report.return_value = [f'Errors: {len(errors)}']
+        mocked_validate.return_value = [
+            Mock(), Mock(errors=errors, return_error=Mock(return_value=True)), Mock()
+        ]
+        expected_error_mesg = f'{self.log_prefix} CourseOlx validation failed.'
+        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True):
+            response = self.import_tarfile_in_course(self.good_tar)
+
+        self.assertEqual(response.status_code, 200)
+        mocked_log.error.assert_called_once_with(expected_error_mesg)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.VerifyingError, import_error.OLX_VALIDATION_FAILED)
+
+    @patch(TASK_LOGGER)
+    @patch.object(CourseImportManager, 'import_children')
+    @ddt.data(
+        (
+            InvalidProctoringProvider('foo', ['bar']),
+            "The selected proctoring provider, foo, is not a valid provider. Please select from one of ['bar'].",
+        ),
+        (DuplicateCourseError("foo", "foobar"), 'Cannot create course foo, which duplicates foobar'),
+        (ErrorReadingFileException("assets.xml"), "Error while reading assets.xml. Check file for XML errors."),
+        (ModuleFailedToImport("Unit 1", "foo/bar"), "Failed to import module: Unit 1 at location: foo/bar"),
+    )
+    @ddt.unpack
+    def test_import_failure_is_descriptive_for_known_failures(self, exc, expected_mesg, mocked_import, mocked_log):
+        """
+        Test that when course import fails with a known failure, user get a descriptive error message.
+        """
+        mocked_import.side_effect = exc
+        expected_exception_messages = f"{self.log_prefix} Error while importing course: {str(exc)}"
+        response = self.import_tarfile_in_course(self.good_tar)
+        self.assertEqual(response.status_code, 200)
+        mocked_log.exception.assert_called_once_with(expected_exception_messages)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UpdatingError, expected_mesg)
+
+    @patch(TASK_LOGGER)
+    @patch.object(CourseImportManager, 'import_children')
+    @ddt.data(
+        Exception("foo exbar"),
+        KeyError("foo kebar"),
+        ValueError("foo vebar"),
+    )
+    def test_import_failure_for_unknown_failures(self, exception, mocked_import, mocked_log):
+        """
+        Test that import status and logged exception when course import fails with an unknown failure.
+        """
+        mocked_import.side_effect = exception
+        expected_exc_mesg = f"{self.log_prefix} Error while importing course: {str(exception)}"
+        response = self.import_tarfile_in_course(self.good_tar)
+        self.assertEqual(response.status_code, 200)
+        mocked_log.exception.assert_called_once_with(expected_exc_mesg)
+
+        status_response = self.get_import_status(self.course.id, self.good_tar)
+        self.assertImportStatusResponse(status_response, self.UpdatingError, import_error.UNKNOWN_ERROR_IN_IMPORT)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 @ddt.ddt
@@ -577,7 +725,7 @@ class ExportTestCase(CourseTestCase):
             resp_content += item
 
         buff = BytesIO(resp_content)
-        return tarfile.open(fileobj=buff)
+        return tarfile.open(fileobj=buff)  # lint-amnesty, pylint: disable=consider-using-with
 
     def _verify_export_succeeded(self, resp):
         """ Export success helper method. """

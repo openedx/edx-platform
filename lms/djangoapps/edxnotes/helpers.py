@@ -308,7 +308,7 @@ def construct_pagination_urls(request, course_id, api_next_url, api_previous_url
         query_params = parse_qs(parsed.query)
 
         encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
-        return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
+        return f"{request.build_absolute_uri(base_url)}?{encoded_query_params}"
 
     base_url = reverse("notes", kwargs={"course_id": course_id})
     next_url = lms_url(api_next_url)

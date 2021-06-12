@@ -84,7 +84,7 @@
              return properties;
          }
 
-         function setDialogAttributes(isPaidCourse, certNameLong,
+         function setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
                                         courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
              var diagAttr = {};
 
@@ -99,6 +99,9 @@
              } else if (enrollmentMode !== 'verified') {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from {courseName} ' +
                                                    '({courseNumber})?');
+             } else if (showRefundOption && !isCourseVoucherRefundable) {
+                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
+                                                   '{certNameLong}  track of {courseName}  ({courseNumber})?');
              } else if (showRefundOption) {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
                                                    '{certNameLong}  track of {courseName}  ({courseNumber})?');
@@ -134,6 +137,7 @@
          });
          $('.action-unenroll').click(function(event) {
              var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True',
+                 isCourseVoucherRefundable = $(event.target).data('is-course-voucher-refundable') === 'True',
                  certNameLong = $(event.target).data('course-cert-name-long'),
                  enrollmentMode = $(event.target).data('course-enrollment-mode'),
                  courseNumber = $(event.target).data('course-number'),
@@ -149,7 +153,7 @@
              });
              request.success(function(data, textStatus, xhr) {
                  if (xhr.status === 200) {
-                     dialogMessageAttr = setDialogAttributes(isPaidCourse, certNameLong,
+                     dialogMessageAttr = setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
                                     courseNumber, courseName, enrollmentMode, data.course_refundable_status, courseKey);
 
                      $('#track-info').empty();
@@ -223,6 +227,50 @@
              });
              return false;
          });
+
+         $('#send_cta_email').click(function(e) {
+             $.ajax({
+                 type: 'POST',
+                 url: urls.sendAccountActivationEmail,
+                 data: $(this).serializeArray(),
+                 success: function() {
+                     $('#activate-account-modal p svg').remove();
+                      // xss-lint: disable=javascript-jquery-append
+                     $('#activate-account-modal p').append(
+                       // xss-lint: disable=javascript-concat-html
+                       '<svg  style="vertical-align:bottom" width="20" height="20"' +
+                       // xss-lint: disable=javascript-concat-html
+                       'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+                       // xss-lint: disable=javascript-concat-html
+                       '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
+                       '</svg>'
+                     );
+                 }
+             });
+             e.preventDefault();
+             $('#activate-account-modal p svg').remove();
+             // xss-lint: disable=javascript-jquery-append
+             $('#activate-account-modal p').append(
+               // xss-lint: disable=javascript-concat-html
+               '<svg  class="fa-pulse" style="vertical-align:bottom" width="24" height="24"' +
+               // xss-lint: disable=javascript-concat-html
+               'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+               // xss-lint: disable=javascript-concat-html
+               '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n' +
+               '</svg>'
+             );
+         });
+
+         $('#activate-account-modal').on('click', '#button', function() {
+             $('#activate-account-modal').css('display', 'none');
+             $('#lean_overlay').css({display: 'none'});
+         });
+         if ($('#activate-account-modal').css('display') === 'block') {
+             $('#lean_overlay').css({
+                 display: 'block',
+                 'z-index': 0
+             });
+         }
 
          $('.action-email-settings').each(function(index) {
              $(this).attr('id', 'email-settings-' + index);

@@ -52,17 +52,17 @@ def safemembers(members, base):
 
     for finfo in members:
         if _is_bad_path(finfo.name, base):  # lint-amnesty, pylint: disable=no-else-raise
-            log.debug(u"File %r is blocked (illegal path)", finfo.name)
+            log.debug("File %r is blocked (illegal path)", finfo.name)
             raise SuspiciousOperation("Illegal path")
         elif finfo.issym() and _is_bad_link(finfo, base):
-            log.debug(u"File %r is blocked: Hard link to %r", finfo.name, finfo.linkname)
+            log.debug("File %r is blocked: Hard link to %r", finfo.name, finfo.linkname)
             raise SuspiciousOperation("Hard link")
         elif finfo.islnk() and _is_bad_link(finfo, base):
-            log.debug(u"File %r is blocked: Symlink to %r", finfo.name,
+            log.debug("File %r is blocked: Symlink to %r", finfo.name,
                       finfo.linkname)
             raise SuspiciousOperation("Symlink")
         elif finfo.isdev():
-            log.debug(u"File %r is blocked: FIFO, device or character file",
+            log.debug("File %r is blocked: FIFO, device or character file",
                       finfo.name)
             raise SuspiciousOperation("Dev file")
 

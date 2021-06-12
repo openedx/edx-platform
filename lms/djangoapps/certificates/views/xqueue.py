@@ -26,7 +26,6 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -48,9 +47,8 @@ def request_certificate(request):
             username = request.user.username
             student = User.objects.get(username=username)
             course_key = CourseKey.from_string(request.POST.get('course_id'))
-            course = modulestore().get_course(course_key, depth=2)
-
             status = certificate_status_for_student(student, course_key)['status']
+
             if can_generate_certificate_task(student, course_key):
                 log.info(f'{course_key} is using V2 course certificates. Attempt will be made to generate a V2 '
                          f'certificate for user {student.id}.')
@@ -58,7 +56,7 @@ def request_certificate(request):
             elif status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = 'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
-                status = generate_user_certificates(student, course_key, course=course)
+                status = generate_user_certificates(student, course_key)
             return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
 

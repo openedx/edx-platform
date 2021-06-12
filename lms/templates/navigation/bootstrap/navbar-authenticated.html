@@ -47,13 +47,6 @@ from django.utils.translation import ugettext as _
         </li>
       % endif
     % endif
-
-    % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
-      <li class="nav-item mt-2 nav-item-open-collapsed">
-        ## Translators: This is short for "System administration".
-        <a class="nav-link" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
-      </li>
-    % endif
   </ul>
 
   <ul class="navbar-nav navbar-right">

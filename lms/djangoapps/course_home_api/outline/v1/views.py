@@ -29,14 +29,14 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
-    course_home_mfe_dates_tab_is_active,
-    course_home_mfe_outline_tab_is_active
+    course_home_mfe_is_active
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
+from lms.djangoapps.courseware.views.views import get_cert_data
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -83,7 +83,7 @@ class OutlineTabView(RetrieveAPIView):
             expiration_date: (str) When the access expires, in ISO 8601 notation
             masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
             upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
-            upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
+            upgrade_url: (str) Upgrade link (or None if can't upgrade anymore)
         course_blocks:
             blocks: List of serialized Course Block objects. Each serialization has the following fields:
                 id: (str) The usage ID of the block.
@@ -161,7 +161,7 @@ class OutlineTabView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
         course_usage_key = modulestore().make_course_usage_key(course_key)
 
-        if not course_home_mfe_outline_tab_is_active(course_key):
+        if not course_home_mfe_is_active(course_key):
             raise Http404
 
         # Enable NR tracing for this view based on course
@@ -191,11 +191,12 @@ class OutlineTabView(RetrieveAPIView):
         user_timezone = user_timezone_locale['user_timezone']
 
         dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
-        if course_home_mfe_dates_tab_is_active(course.id):
+        if course_home_mfe_is_active(course.id):
             dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
 
         # Set all of the defaults
         access_expiration = None
+        cert_data = None
         course_blocks = None
         course_goals = {
             'goal_options': [],
@@ -232,6 +233,7 @@ class OutlineTabView(RetrieveAPIView):
 
             offer_data = generate_offer_data(request.user, course_overview)
             access_expiration = get_access_expiration_data(request.user, course_overview)
+            cert_data = get_cert_data(request.user, course, enrollment.mode) if is_enrolled else None
 
             # Only show the set course goal message for enrolled, unverified
             # users in a course that allows for verified statuses.
@@ -277,6 +279,7 @@ class OutlineTabView(RetrieveAPIView):
 
         data = {
             'access_expiration': access_expiration,
+            'cert_data': cert_data,
             'course_blocks': course_blocks,
             'course_goals': course_goals,
             'course_tools': course_tools,

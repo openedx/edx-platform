@@ -114,4 +114,4 @@ class TestVerifyStudentCommand(TestCase):
         Verify command raises the CommandError for invalid file path.
         """
         with pytest.raises(CommandError):
-            call_command('manual_verifications', '--email-ids-file', u'invalid/email_id/file/path')
+            call_command('manual_verifications', '--email-ids-file', 'invalid/email_id/file/path')

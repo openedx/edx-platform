@@ -61,7 +61,7 @@ class SettingsService:
     def get_settings_bucket(self, block, default=None):
         """ Gets xblock settings dictionary from settings. """
         if not block:
-            raise ValueError("Expected XBlock instance, got {} of type {}".format(block, type(block)))
+            raise ValueError(f"Expected XBlock instance, got {block} of type {type(block)}")
 
         actual_default = default if default is not None else {}
         xblock_settings_bucket = getattr(block, self.xblock_settings_bucket_selector, block.unmixed_class.__name__)

@@ -115,7 +115,7 @@ class StartView(TestCase):
     """
 
     def start_url(self, course_id=""):
-        return "/verify_student/{}".format(urllib.parse.quote(course_id))
+        return f"/verify_student/{urllib.parse.quote(course_id)}"
 
     def test_start_new_verification(self):
         """
@@ -1233,6 +1233,8 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     IMAGE_DATA = "data:image/png;base64,1234"
     FULL_NAME = "Ḟüḷḷ Ṅäṁë"
     EXPERIMENT_NAME = "test-experiment"
+    PORTRAIT_PHOTO_MODE = "upload"
+    ID_PHOTO_MODE = "camera"
 
     def setUp(self):
         super().setUp()
@@ -1392,12 +1394,14 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         self._submit_photos(face_image=self.IMAGE_DATA)
 
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_experiment_name_param(self, mock_segment_track):
+    def test_experiment_params(self, mock_segment_track):
         # Submit the photos
         self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
-            experiment_name=self.EXPERIMENT_NAME
+            experiment_name=self.EXPERIMENT_NAME,
+            portrait_photo_mode=self.PORTRAIT_PHOTO_MODE,
+            id_photo_mode=self.ID_PHOTO_MODE
         )
 
         # Verify that the attempt is created in the database
@@ -1405,15 +1409,23 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         assert attempt.status == 'submitted'
 
         # assert that segment tracking has been called with experiment name
-        data = {
+        experiment_data = {
             "attempt_id": attempt.id,
             "experiment_name": self.EXPERIMENT_NAME
         }
-        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt", data)
+        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt", experiment_data)
+
+        mode_data = {
+            "attempt_id": attempt.id,
+            "portrait_photo_mode": self.PORTRAIT_PHOTO_MODE,
+            "id_photo_mode": self.ID_PHOTO_MODE
+        }
+        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt.photo.mode", mode_data)
 
     def _submit_photos(
         self, face_image=None, photo_id_image=None,
-        full_name=None, experiment_name=None, expected_status_code=200
+        full_name=None, experiment_name=None,
+        portrait_photo_mode=None, id_photo_mode=None, expected_status_code=200
     ):
         """Submit photos for verification.
 
@@ -1442,6 +1454,12 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
 
         if experiment_name is not None:
             params['experiment_name'] = experiment_name
+
+        if portrait_photo_mode is not None:
+            params['portrait_photo_mode'] = portrait_photo_mode
+
+        if id_photo_mode is not None:
+            params['id_photo_mode'] = id_photo_mode
 
         with self.immediate_on_commit():
             response = self.client.post(url, params)
@@ -1603,9 +1621,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_passed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
+    def test_passed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed.
         """
@@ -1646,14 +1663,38 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
+    @patch.dict(settings.VERIFY_STUDENT, {'USE_DJANGO_MAIL': True})
+    def test_approved_email_without_ace(self):
+        """
+        Test basic email for verification approved.
+        """
+        expiration_datetime = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+
+        self._assert_verification_approved_email(expiration_datetime.date())
+
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_first_time_verification(self, mock_segment_track, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
+    def test_first_time_verification(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed if the learner does not have any previous verification
         """
@@ -1693,9 +1734,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_failed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
+    def test_failed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for failed verification.
         """

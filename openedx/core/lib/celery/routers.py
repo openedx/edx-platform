@@ -37,7 +37,7 @@ def ensure_queue_env(desired_env):
         (
             queue
             for queue in queues
-            if '.{}.'.format(desired_env) in queue
+            if f'.{desired_env}.' in queue
         ),
         None
     )

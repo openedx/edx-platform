@@ -1,18 +1,19 @@
 """
 User Auth Views Utils
 """
-import six
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from ipware.ip import get_client_ip
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 
-
+API_V1 = 'v1'
 UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
-ENTERPRISE_ENROLLMENT_URL_REGEX = r'/enterprise/{}/course/{}/enroll'.format(UUID4_REGEX, settings.COURSE_KEY_REGEX)
+ENTERPRISE_ENROLLMENT_URL_REGEX = fr'/enterprise/{UUID4_REGEX}/course/{settings.COURSE_KEY_REGEX}/enroll'
 
 
 def third_party_auth_context(request, redirect_to, tpa_hint=None):
@@ -84,7 +85,21 @@ def third_party_auth_context(request, redirect_to, tpa_hint=None):
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":
                 # msg may or may not be translated. Try translating [again] in case we are able to:
-                context["errorMessage"] = _(six.text_type(msg))  # pylint: disable=E7610
+                context["errorMessage"] = _(str(msg))  # pylint: disable=E7610
                 break
 
+    return context
+
+
+def get_mfe_context(request, redirect_to, tpa_hint=None):
+    """
+    Returns Authn MFE context.
+    """
+
+    ip_address = get_client_ip(request)[0]
+    country_code = country_code_from_ip(ip_address)
+    context = third_party_auth_context(request, redirect_to, tpa_hint)
+    context.update({
+        'countryCode': country_code,
+    })
     return context

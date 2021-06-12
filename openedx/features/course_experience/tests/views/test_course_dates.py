@@ -5,7 +5,7 @@ Tests for course dates fragment.
 
 from datetime import datetime, timedelta
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -20,7 +20,7 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
     """Tests for the course dates fragment view."""
 
     def setUp(self):
-        super(TestCourseDatesFragmentView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         with self.store.default_store(ModuleStoreEnum.Type.split):
             self.course = CourseFactory.create(
                 org='edX',
@@ -35,13 +35,13 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
         self.dates_fragment_url = reverse(
             'openedx.course_experience.mobile_dates_fragment_view',
             kwargs={
-                'course_id': six.text_type(self.course.id)
+                'course_id': str(self.course.id)
             }
         )
 
     def test_course_dates_fragment(self):
         response = self.client.get(self.dates_fragment_url)
-        self.assertContains(response, 'Course End')
+        self.assertContains(response, 'Course ends')
 
         self.client.logout()
         response = self.client.get(self.dates_fragment_url)

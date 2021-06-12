@@ -81,8 +81,6 @@ RUN npm set progress=false && npm install
 
 ENV LMS_CFG /edx/etc/lms.yml
 ENV STUDIO_CFG /edx/etc/studio.yml
-COPY lms/devstack.yml /edx/etc/lms.yml
-COPY cms/devstack.yml /edx/etc/studio.yml
 
 # Copy over remaining code.
 # We do this as late as possible so that small changes to the repo don't bust
@@ -99,15 +97,6 @@ FROM lms as lms-newrelic
 RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
-FROM lms as lms-devstack
-# TODO: This compiles static assets.
-# However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
-# We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
-RUN mkdir -p test_root/log
-ENV DJANGO_SETTINGS_MODULE ""
-RUN NO_PREREQ_INSTALL=1 paver update_assets lms --settings devstack_decentralized
-ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
-
 FROM base as studio
 ENV SERVICE_VARIANT cms
 ENV DJANGO_SETTINGS_MODULE cms.envs.production
@@ -117,12 +106,3 @@ CMD gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name c
 FROM studio as studio-newrelic
 RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8010 --max-requests=1000 --access-logfile - cms.wsgi:application
-
-FROM studio as studio-devstack
-# TODO: This compiles static assets.
-# However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
-# We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
-RUN mkdir -p test_root/log
-ENV DJANGO_SETTINGS_MODULE ""
-RUN NO_PREREQ_INSTALL=1 paver update_assets cms --settings devstack_decentralized
-ENV DJANGO_SETTINGS_MODULE cms.envs.devstack_decentralized

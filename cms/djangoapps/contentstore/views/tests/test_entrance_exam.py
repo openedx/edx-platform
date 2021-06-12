@@ -42,8 +42,8 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         super().setUp()
         self.course_key = self.course.id
         self.usage_key = self.course.location
-        self.course_url = '/course/{}'.format(str(self.course.id))
-        self.exam_url = '/course/{}/entrance_exam/'.format(str(self.course.id))
+        self.course_url = f'/course/{str(self.course.id)}'
+        self.exam_url = f'/course/{str(self.course.id)}/entrance_exam/'
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
     def test_entrance_exam_milestone_addition(self):

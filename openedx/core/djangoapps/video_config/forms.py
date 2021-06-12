@@ -22,7 +22,7 @@ class CourseSpecificFlagAdminBaseForm(forms.ModelForm):
     """
 
     # Make abstract base class
-    class Meta(object):
+    class Meta:
         abstract = True
 
     def clean_course_id(self):
@@ -37,7 +37,7 @@ class CourseHLSPlaybackFlagAdminForm(CourseSpecificFlagAdminBaseForm):
     Form for course-specific HLS Playback configuration.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseHLSPlaybackEnabledFlag
         fields = '__all__'
 
@@ -47,7 +47,7 @@ class CourseYoutubeBlockedFlagAdminForm(CourseSpecificFlagAdminBaseForm):
     Form for course-specific youtube blocking configuration.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseYoutubeBlockedFlag
         fields = '__all__'
 
@@ -57,6 +57,6 @@ class CourseVideoTranscriptFlagAdminForm(CourseSpecificFlagAdminBaseForm):
     Form for course-specific Video Transcript configuration.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseVideoTranscriptEnabledFlag
         fields = '__all__'

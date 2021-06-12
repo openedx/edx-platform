@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 reset_db
 ========
@@ -16,10 +15,10 @@ originally from http://www.djangosnippets.org/snippets/828/ by dnordberg
 
 import logging
 
+import configparser
 import django
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from six.moves import configparser
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -40,7 +39,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         router = options.get('router')
         dbinfo = settings.DATABASES.get(router)
         if dbinfo is None:
-            raise CommandError(u"Unknown database router %s" % router)
+            raise CommandError("Unknown database router %s" % router)
 
         engine = dbinfo.get('ENGINE').split('.')[-1]
 
@@ -64,7 +63,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if engine in ('sqlite3', 'spatialite'):
             import os
             try:
-                logging.info(u"Unlinking %s database", engine)
+                logging.info("Unlinking %s database", engine)
                 os.unlink(database_name)
             except OSError:
                 pass
@@ -84,9 +83,9 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 kwargs['port'] = int(database_port)
 
             connection = Database.connect(**kwargs)
-            drop_query = u'DROP DATABASE IF EXISTS `%s`' % database_name
+            drop_query = 'DROP DATABASE IF EXISTS `%s`' % database_name
             utf8_support = 'CHARACTER SET utf8'
-            create_query = u'CREATE DATABASE `%s` %s' % (database_name, utf8_support)
+            create_query = f'CREATE DATABASE `{database_name}` {utf8_support}'
             logging.info('Executing... "' + drop_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
             connection.query(drop_query)
             logging.info('Executing... "' + create_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
@@ -112,35 +111,35 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             connection.set_isolation_level(0)  # autocommit false
             cursor = connection.cursor()
 
-            drop_query = u"DROP DATABASE \"%s\";" % database_name
+            drop_query = "DROP DATABASE \"%s\";" % database_name
             logging.info('Executing... "' + drop_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
             try:
                 cursor.execute(drop_query)
             except Database.ProgrammingError as e:
-                logging.exception(u"Error: %s", e)
+                logging.exception("Error: %s", e)
 
-            create_query = u"CREATE DATABASE \"%s\"" % database_name
+            create_query = "CREATE DATABASE \"%s\"" % database_name
             if owner:
-                create_query += u" WITH OWNER = \"%s\" " % owner
-            create_query += u" ENCODING = 'UTF8'"
+                create_query += " WITH OWNER = \"%s\" " % owner
+            create_query += " ENCODING = 'UTF8'"
 
             if engine == 'postgis' and django.VERSION < (1, 9):
                 # For PostGIS 1.5, fetch template name if it exists
                 from django.contrib.gis.db.backends.postgis.base import DatabaseWrapper
                 postgis_template = DatabaseWrapper(dbinfo).template_postgis  # lint-amnesty, pylint: disable=no-member
                 if postgis_template is not None:
-                    create_query += u' TEMPLATE = %s' % postgis_template
+                    create_query += ' TEMPLATE = %s' % postgis_template
 
             if settings.DEFAULT_TABLESPACE:
-                create_query += u' TABLESPACE = %s;' % settings.DEFAULT_TABLESPACE
+                create_query += ' TABLESPACE = %s;' % settings.DEFAULT_TABLESPACE
             else:
-                create_query += u';'
+                create_query += ';'
 
             logging.info('Executing... "' + create_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
             cursor.execute(create_query)
 
         else:
-            raise CommandError(u"Unknown database engine %s" % engine)
+            raise CommandError("Unknown database engine %s" % engine)
 
         if verbosity >= 2:
             print("Reset successful.")

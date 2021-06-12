@@ -30,7 +30,6 @@ SKIP_DIRS = (
     'spec',
     'test_root',
     'vendor',
-    'import_shims',
 )
 
 

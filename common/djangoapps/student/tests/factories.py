@@ -7,12 +7,11 @@ from uuid import uuid4
 import factory
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.test.client import RequestFactory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
@@ -25,8 +24,14 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserStanding
 )
-
-# Factories are self documenting
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.roles import OrgInstructorRole
+from common.djangoapps.student.roles import OrgStaffRole
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 TEST_PASSWORD = 'test'
 
@@ -107,6 +112,16 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
 
         for group_name in extracted:
             self.groups.add(GroupFactory.simple_generate(create, name=group_name))  # lint-amnesty, pylint: disable=no-member
+
+
+class RequestFactoryNoCsrf(RequestFactory):
+    """
+    RequestFactory, which disables csrf checks.
+    """
+    def request(self, **kwargs):
+        request = super().request(**kwargs)
+        setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
+        return request
 
 
 class AnonymousUserFactory(factory.Factory):
@@ -226,3 +241,84 @@ class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disab
     user = None
     secondary_email = factory.Sequence('robot+test+recovery+{}@edx.org'.format)
     is_active = True
+
+
+class BetaTesterFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with beta-tester
+    permissions for `course`.
+    """
+    last_name = 'Beta-Tester'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for a beta-tester user')
+        CourseBetaTesterRole(extracted).add_users(self)
+
+
+class GlobalStaffFactory(UserFactory):
+    """
+    Returns a User object with global staff access
+    """
+    last_name = 'GlobalStaff'
+
+    @factory.post_generation
+    def set_staff(self, _create, _extracted, **kwargs):
+        GlobalStaff().add_users(self)
+
+
+class InstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with instructor
+    permissions for `course`.
+    """
+    last_name = 'Instructor'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for a course instructor user')
+        CourseInstructorRole(extracted).add_users(self)
+
+
+class OrgInstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-instructor
+    permissions for `course`.
+    """
+    last_name = 'Org-Instructor'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for an org-instructor user')
+        OrgInstructorRole(extracted.org).add_users(self)
+
+
+class OrgStaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-staff
+    permissions for `course`.
+    """
+    last_name = 'Org-Staff'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for an org-staff user')
+        OrgStaffRole(extracted.org).add_users(self)
+
+
+class StaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with staff
+    permissions for `course`.
+    """
+    last_name = 'Staff'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for a course staff user')
+        CourseStaffRole(extracted).add_users(self)

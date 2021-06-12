@@ -114,17 +114,17 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
     if user_access['is_anonymous'] and not allow_anonymous:
-        sign_in_or_register_text = (_(u'{sign_in_link} or {register_link} and then enroll in this course.')
+        sign_in_or_register_text = (_('{sign_in_link} or {register_link} and then enroll in this course.')
                                     if not CourseMode.is_masters_only(course.id)
-                                    else _(u'{sign_in_link} or {register_link}.'))
+                                    else _('{sign_in_link} or {register_link}.'))
         CourseHomeMessages.register_info_message(
             request,
             Text(sign_in_or_register_text).format(
-                sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                     sign_in_label=_('Sign in'),
                     current_url=urlquote_plus(request.path),
                 ),
-                register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                     register_label=_('register'),
                     current_url=urlquote_plus(request.path),
                 )
@@ -134,7 +134,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     if not user_access['is_anonymous'] and not user_access['is_staff'] and \
             not user_access['is_enrolled']:
 
-        title = Text(_(u'Welcome to {course_display_name}')).format(
+        title = Text(_('Welcome to {course_display_name}')).format(
             course_display_name=course.display_name
         )
 
@@ -150,7 +150,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    u'{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
+                    '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
                 )).format(
                     open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
                     close_enroll_link=HTML('</button>')
@@ -171,7 +171,7 @@ def _register_course_goal_message(request, course):
     course_goal_options = get_course_goal_options()
     goal_choices_html = Text(_(
         'To start, set a course goal by selecting the option below that best describes '
-        u'your learning plan. {goal_options_container}'
+        'your learning plan. {goal_options_container}'
     )).format(
         goal_options_container=HTML('<div class="row goal-options-container">')
     )
@@ -181,11 +181,11 @@ def _register_course_goal_message(request, course):
         '{initial_tag}{choice}{closing_tag}'
     ).format(
         initial_tag=HTML(
-            u'<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
+            '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
             'data-choice="{goal_key}">'
         ).format(
             goal_key=GOAL_KEY_CHOICES.unsure,
-            aria_label_choice=Text(_(u"Set goal to: {choice}")).format(
+            aria_label_choice=Text(_("Set goal to: {choice}")).format(
                 choice=course_goal_options[GOAL_KEY_CHOICES.unsure],
             ),
         ),
@@ -204,11 +204,11 @@ def _register_course_goal_message(request, course):
             '{initial_tag}{goal_text}{closing_tag}'
         ).format(
             initial_tag=HTML(
-                u'<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn-outline-primary" '
+                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn-outline-primary" '
                 'data-choice="{goal_key}">'
             ).format(
                 goal_key=goal_key,
-                aria_label_choice=Text(_(u"Set goal to: {goal_text}")).format(
+                aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
                     goal_text=Text(_(goal_text))  # lint-amnesty, pylint: disable=translation-of-non-string
                 )
             ),
@@ -222,7 +222,7 @@ def _register_course_goal_message(request, course):
             goal_choices_html=goal_choices_html,
             closing_tag=HTML('</div>')
         ),
-        title=Text(_(u'Welcome to {course_display_name}')).format(
+        title=Text(_('Welcome to {course_display_name}')).format(
             course_display_name=course.display_name
         )
     )

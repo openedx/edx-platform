@@ -306,7 +306,7 @@ class Command(BaseCommand):
         for course_key in course_keys[:COURSES_TO_SHOW]:
             print("   ", course_key)
         if len(course_keys) > COURSES_TO_SHOW:
-            print("    (+ {} more)".format(len(course_keys) - COURSES_TO_SHOW))
+            print(f"    (+ {len(course_keys) - COURSES_TO_SHOW} more)")
 
 
 def get_receiver_names():

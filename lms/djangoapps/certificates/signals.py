@@ -15,7 +15,7 @@ from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task,
     generate_allowlist_certificate_task,
     generate_certificate_task,
-    is_using_certificate_allowlist_and_is_on_allowlist
+    is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
@@ -52,21 +52,21 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
     ))
 
 
-@receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
-def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
+@receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_allowlist")
+def _listen_for_certificate_allowlist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Listen for a user being added to or modified on the whitelist (allowlist)
+    Listen for a user being added to or modified on the allowlist
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(instance.user, instance.course_id):
-        log.info(f'{instance.course_id} is using allowlist certificates, and the user {instance.user.id} is now on '
-                 f'its allowlist. Attempt will be made to generate an allowlist certificate.')
-        return generate_allowlist_certificate_task(instance.user, instance.course_id)
-
     if not auto_certificate_generation_enabled():
         return
 
+    if is_on_certificate_allowlist(instance.user, instance.course_id):
+        log.info(f'User {instance.user.id} is now on the allowlist for course {instance.course_id}. Attempt will be '
+                 f'made to generate an allowlist certificate.')
+        return generate_allowlist_certificate_task(instance.user, instance.course_id)
+
     if _fire_ungenerated_certificate_task(instance.user, instance.course_id):
-        log.info('Certificate generation task initiated for {user} : {course} via whitelist'.format(
+        log.info('Certificate generation task initiated for {user} : {course} via allowlist'.format(
             user=instance.user.id,
             course=instance.course_id
         ))
@@ -75,16 +75,22 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
 @receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_learner")
 def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
     """
-    Listen for a learner passing a course, send cert generation task,
-    downstream signal from COURSE_GRADE_CHANGED
+    Listen for a signal indicating that the user has passed a course run.
+
+    If needed, generate a certificate task.
     """
+    if not auto_certificate_generation_enabled():
+        return
+
     if can_generate_certificate_task(user, course_id):
+        cert = GeneratedCertificate.certificate_for_student(user, course_id)
+        if cert is not None and CertificateStatuses.is_passing_status(cert.status):
+            log.info(f'{course_id} is using V2 certificates, and the cert status is already passing for user '
+                     f'{user.id}. Passing grade signal will be ignored.')
+            return
         log.info(f'{course_id} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'{user.id} as a passing grade was received.')
         return generate_certificate_task(user, course_id)
-
-    if not auto_certificate_generation_enabled():
-        return
 
     if _fire_ungenerated_certificate_task(user, course_id):
         log.info('Certificate generation task initiated for {user} : {course} via passing grade'.format(
@@ -96,19 +102,19 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
 @receiver(COURSE_GRADE_NOW_FAILED, dispatch_uid="new_failing_learner")
 def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pylint: disable=unused-argument
     """
-    Listen for a learner failing a course, mark the cert as notpassing
-    if it is currently passing,
-    downstream signal from COURSE_GRADE_CHANGED
+    Listen for a signal indicating that the user has failed a course run.
+
+    If needed, mark the certificate as notpassing.
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_id):
-        log.info('{course_id} is using allowlist certificates, and the user {user_id} is on its allowlist. The '
-                 'failing grade will not affect the certificate.'.format(course_id=course_id, user_id=user.id))
+    if is_on_certificate_allowlist(user, course_id):
+        log.info(f'User {user.id} is on the allowlist for {course_id}. The failing grade will not affect the '
+                 f'certificate.')
         return
 
     cert = GeneratedCertificate.certificate_for_student(user, course_id)
     if cert is not None:
         if CertificateStatuses.is_passing_status(cert.status):
-            cert.mark_notpassing(grade.percent)
+            cert.mark_notpassing(grade.percent, source='notpassing_signal')
             log.info('Certificate marked not passing for {user} : {course} via failing grade: {grade}'.format(
                 user=user.id,
                 course=course_id,
@@ -119,8 +125,9 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
 def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
-    Catches a track change signal, determines user status,
-    calls _fire_ungenerated_certificate_task for passing grades
+    Listen for a signal indicating that the user's id verification status has changed.
+
+    If needed, generate a certificate task.
     """
     if not auto_certificate_generation_enabled():
         return
@@ -200,7 +207,8 @@ def _fire_ungenerated_certificate_task(user, course_key, expected_verification_s
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
 
     generate_learner_certificate = (
-        enrollment_mode in allowed_enrollment_modes_list and (cert is None or cert.status == 'unverified')
+        enrollment_mode in allowed_enrollment_modes_list and (
+            cert is None or cert.status == CertificateStatuses.unverified)
     )
 
     if generate_learner_certificate:

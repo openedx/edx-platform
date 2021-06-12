@@ -79,6 +79,115 @@ def _error_for_not_sequence(section, not_sequence):
     )
 
 
+def _bubbled_up_groups_from_units(group_access_from_units):
+    """
+    Return {user_partition_id: [group_ids]} to bubble up from Units to Sequence.
+
+    This is to handle a special case: If *all* of the Units in a sequence have
+    the exact same group for a given user partition, bubble that value up to the
+    Sequence as a whole. For example, say that every Unit in a Sequence has a
+    group_access that looks like: { ENROLLMENT: [MASTERS] } (where both
+    constants are ints). In this case, an Audit user has nothing to see in the
+    Sequence at all, and it's not useful to give them an empty shell. So we'll
+    act as if the Sequence as a whole had that group setting. Note that there is
+    currently no way to set the group_access setting at the sequence level in
+    Studio, so course teams can only manipulate it for individual Units.
+    """
+    # If there are no Units, there's nothing to bubble up.
+    if not group_access_from_units:
+        return {}
+
+    def _normalize_group_access_dict(group_access):
+        return {
+            user_partition_id: sorted(group_ids)  # sorted for easier comparison
+            for user_partition_id, group_ids in group_access.items()
+            if group_ids  # Ignore empty groups
+        }
+
+    normalized_group_access_dicts = [
+        _normalize_group_access_dict(group_access) for group_access in group_access_from_units
+    ]
+    first_unit_group_access = normalized_group_access_dicts[0]
+    rest_of_seq_group_access_list = normalized_group_access_dicts[1:]
+
+    # If there's only a single Unit, bubble up its group_access.
+    if not rest_of_seq_group_access_list:
+        return first_unit_group_access
+
+    # Otherwise, go through the user partitions and groups in our first unit
+    # and compare them to all the other group_access dicts from the units in the
+    # rest of the sequence. Only keep the ones that match exactly and do not
+    # have empty groups.
+    common_group_access = {
+        user_partition_id: group_ids
+        for user_partition_id, group_ids in first_unit_group_access.items()
+        if group_ids and all(
+            group_ids == group_access.get(user_partition_id)
+            for group_access in rest_of_seq_group_access_list
+        )
+    }
+    return common_group_access
+
+
+def _make_user_partition_groups(usage_key, group_access):
+    """
+    Return a (Dict, Optional[ContentErrorData]) of user partition groups.
+
+    The Dict is a mapping of user partition ID to list of group IDs. If any
+    empty groups are encountered, we create a ContentErrorData about that. If
+    there are no empty groups, we pass back (Dict, None).
+    """
+    empty_partitions = sorted(
+        part_id for part_id, group_ids in group_access.items() if not group_ids
+    )
+    empty_partitions_txt = ", ".join([str(part_id) for part_id in empty_partitions])
+    if empty_partitions:
+        error = ContentErrorData(
+            message=(
+                f'<{usage_key.block_type}> with url_name="{usage_key.block_id}"'
+                f' has the following empty group_access user partitions: '
+                f'{empty_partitions_txt}. This would make this content '
+                f'unavailable to anyone except course staff. Ignoring these '
+                f'group_access settings when building outline.'
+            ),
+            usage_key=_remove_version_info(usage_key),
+        )
+    else:
+        error = None
+
+    user_partition_groups = {
+        part_id: group_ids for part_id, group_ids in group_access.items() if group_ids
+    }
+    return user_partition_groups, error
+
+
+def _make_bubbled_up_error(seq_usage_key, user_partition_id, group_ids):
+    return ContentErrorData(
+        message=(
+            f'<{seq_usage_key.block_type}> with url_name="{seq_usage_key.block_id}"'
+            f' was assigned group_ids {group_ids} for user_partition_id '
+            f'{user_partition_id} because all of its child Units had that '
+            f'group_access setting. This is permitted, but is an unusual usage '
+            f'that may cause unexpected behavior while browsing the course.'
+        ),
+        usage_key=_remove_version_info(seq_usage_key),
+    )
+
+
+def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_id, group_ids):
+    return ContentErrorData(
+        message=(
+            f'<{seq_usage_key.block_type}> with url_name="{seq_usage_key.block_id}" '
+            f'has children with only group_ids {group_ids} for user_partition_id '
+            f'{user_partition_id}, but its own group_access setting is '
+            f'{seq_group_access}, which takes precedence. This is permitted, '
+            f'but probably not intended, since it means that the content is '
+            f'effectively unusable by anyone except staff.'
+        ),
+        usage_key=_remove_version_info(seq_usage_key),
+    )
+
+
 def _make_section_data(section):
     """
     Return a (CourseSectionData, List[ContentDataError]) from a SectionBlock.
@@ -105,6 +214,13 @@ def _make_section_data(section):
         section_errors.append(_error_for_not_section(section))
         return (None, section_errors)
 
+    section_user_partition_groups, error = _make_user_partition_groups(
+        section.location, section.group_access
+    )
+    # Invalid user partition errors aren't fatal. Just log and continue on.
+    if error:
+        section_errors.append(error)
+
     # We haven't officially killed off problemset and videosequence yet, so
     # treat them as equivalent to sequential for now.
     valid_sequence_tags = ['sequential', 'problemset', 'videosequence']
@@ -114,6 +230,33 @@ def _make_section_data(section):
         if sequence.location.block_type not in valid_sequence_tags:
             section_errors.append(_error_for_not_sequence(section, sequence))
             continue
+
+        seq_user_partition_groups, error = _make_user_partition_groups(
+            sequence.location, sequence.group_access
+        )
+        if error:
+            section_errors.append(error)
+
+        # Bubble up User Partition Group settings from Units if appropriate.
+        sequence_upg_from_units = _bubbled_up_groups_from_units(
+            [unit.group_access for unit in sequence.get_children()]
+        )
+        for user_partition_id, group_ids in sequence_upg_from_units.items():
+            # If there's an existing user partition ID set at the sequence
+            # level, we respect it, even if it seems nonsensical. The hack of
+            # bubbling things up from the Unit level is only done if there's
+            # no conflicting value set at the Sequence level.
+            if user_partition_id not in seq_user_partition_groups:
+                section_errors.append(
+                    _make_bubbled_up_error(sequence.location, user_partition_id, group_ids)
+                )
+                seq_user_partition_groups[user_partition_id] = group_ids
+            else:
+                section_errors.append(
+                    _make_not_bubbled_up_error(
+                        sequence.location, sequence.group_access, user_partition_id, group_ids
+                    )
+                )
 
         sequences_data.append(
             CourseLearningSequenceData(
@@ -129,6 +272,7 @@ def _make_section_data(section):
                     hide_from_toc=sequence.hide_from_toc,
                     visible_to_staff_only=sequence.visible_to_staff_only,
                 ),
+                user_partition_groups=seq_user_partition_groups,
             )
         )
 
@@ -140,6 +284,7 @@ def _make_section_data(section):
             hide_from_toc=section.hide_from_toc,
             visible_to_staff_only=section.visible_to_staff_only,
         ),
+        user_partition_groups=section_user_partition_groups,
     )
     return section_data, section_errors
 
@@ -158,7 +303,8 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
     content_errors = []
 
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
-        course = store.get_course(course_key, depth=2)
+        # Pull course with depth=3 so we prefetch Section -> Sequence -> Unit
+        course = store.get_course(course_key, depth=3)
         sections_data = []
         for section in course.get_children():
             section_data, section_errors = _make_section_data(section)

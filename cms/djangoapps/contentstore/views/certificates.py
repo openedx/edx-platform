@@ -46,9 +46,9 @@ from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 
+from ..exceptions import AssetNotFoundException
 from ..utils import get_lms_link_for_certificate_web_view, get_proctored_exam_settings_url, reverse_course_url
 from .assets import delete_asset
-from .exception import AssetNotFoundException
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -411,11 +411,7 @@ def certificates_list_handler(request, course_key_string):
                 )
             else:
                 certificate_web_view_url = None
-
             is_active, certificates = CertificateManager.is_activated(course)
-
-            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course)
-
             return render_to_response('certificates.html', {
                 'context_course': course,
                 'certificate_url': certificate_url,
@@ -428,7 +424,7 @@ def certificates_list_handler(request, course_key_string):
                 'is_active': is_active,
                 'is_global_staff': GlobalStaff().has_user(request.user),
                 'certificate_activation_handler_url': activation_handler_url,
-                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
+                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             # Retrieve the list of certificates for the specified course

@@ -334,12 +334,10 @@ COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL", '')
 COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY", '')
 CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 
-# git repo loading  environment
-GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
-GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
-GIT_IMPORT_PYTHON_LIB = ENV_TOKENS.get('GIT_IMPORT_PYTHON_LIB', True)
+# Python lib settings
 PYTHON_LIB_FILENAME = ENV_TOKENS.get('PYTHON_LIB_FILENAME', 'python_lib.zip')
 
+# Code jail settings
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
@@ -603,6 +601,9 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get(
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = ENV_TOKENS.get('LOGISTRATION_RATELIMIT_RATE', LOGISTRATION_RATELIMIT_RATE)
 LOGISTRATION_API_RATELIMIT = ENV_TOKENS.get('LOGISTRATION_API_RATELIMIT', LOGISTRATION_API_RATELIMIT)
+LOGIN_AND_REGISTER_FORM_RATELIMIT = ENV_TOKENS.get(
+    'LOGIN_AND_REGISTER_FORM_RATELIMIT', LOGIN_AND_REGISTER_FORM_RATELIMIT
+)
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = ENV_TOKENS.get(
     'RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT', RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT
 )
@@ -624,6 +625,9 @@ SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = AUTH_TOKENS.get("SESSION_INACTIVITY_TIME
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEADLINES",
                                                    TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+
+#### PROCTORED EXAM SETTINGS ####
+PROCTORED_EXAM_VIEWABLE_PAST_DUE = ENV_TOKENS.get('PROCTORED_EXAM_VIEWABLE_PAST_DUE', False)
 
 ##### Third-party auth options ################################################
 ENABLE_REQUIRE_THIRD_PARTY_AUTH = ENV_TOKENS.get('ENABLE_REQUIRE_THIRD_PARTY_AUTH', False)
@@ -720,6 +724,9 @@ DEFAULT_MOBILE_AVAILABLE = ENV_TOKENS.get(
 
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = ENV_TOKENS.get('ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT', 60)
+
+# Ecommerce Orders API Cache Timeout
+ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_ORDERS_API_CACHE_TIMEOUT', 3600)
 
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
    FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \
@@ -1006,14 +1013,6 @@ EXPLICIT_QUEUES = {
         'queue': GRADES_DOWNLOAD_ROUTING_KEY},
     'lms.djangoapps.instructor_task.tasks.generate_certificates': {
         'queue': GRADES_DOWNLOAD_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.get_email_cookies_via_sailthru': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_user': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_user_email': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_course_enrollment': {
-        'queue': ACE_ROUTING_KEY},
     'lms.djangoapps.verify_student.tasks.send_verification_status_email': {
         'queue': ACE_ROUTING_KEY},
     'lms.djangoapps.verify_student.tasks.send_ace_message': {
@@ -1034,16 +1033,29 @@ EXPLICIT_QUEUES = {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3': {
         'queue': RECALCULATE_GRADES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.award_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.update_certificate_visible_date_on_course_update': {
+    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate': {
+    'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
+
+############## XBlock extra mixins ############################
+XBLOCK_MIXINS += tuple(XBLOCK_EXTRA_MIXINS)
+
+############## Settings for course import olx validation ############################
+COURSE_OLX_VALIDATION_STAGE = ENV_TOKENS.get('COURSE_OLX_VALIDATION_STAGE', COURSE_OLX_VALIDATION_STAGE)
+COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
+    'COURSE_OLX_VALIDATION_IGNORE_LIST',
+    COURSE_OLX_VALIDATION_IGNORE_LIST
+)
+
+################# show account activate cta after register ########################
+SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)

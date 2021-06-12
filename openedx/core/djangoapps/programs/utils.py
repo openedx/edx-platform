@@ -206,7 +206,7 @@ class ProgramProgressMeter:
         ]
 
         if runs_with_required_mode:
-            not_failed_runs = [run for run in runs_with_required_mode if run not in self.failed_course_runs]
+            not_failed_runs = [run for run in runs_with_required_mode if run['key'] not in self.failed_course_runs]
             if not_failed_runs:
                 return True
 
@@ -417,7 +417,7 @@ class ProgramProgressMeter:
         Determine which course runs have been failed by the user.
 
         Returns:
-            list of dicts, each a course run ID
+            list of strings, each a course run ID
         """
         return [run['course_run_id'] for run in self.course_runs_with_state['failed']]
 
@@ -426,6 +426,9 @@ class ProgramProgressMeter:
         """
         Determine which course runs have been completed and failed by the user.
 
+        A course run is considered completed for a user if they have a certificate in the correct state and
+        the certificate is available.
+
         Returns:
             dict with a list of completed and failed runs
         """
@@ -433,12 +436,20 @@ class ProgramProgressMeter:
 
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
+            course_key = certificate['course_key']
             course_data = {
-                'course_run_id': str(certificate['course_key']),
+                'course_run_id': str(course_key),
                 'type': self._certificate_mode_translation(certificate['type']),
             }
 
-            if certificate_api.is_passing_status(certificate['status']):
+            try:
+                may_certify = CourseOverview.get_from_id(course_key).may_certify()
+            except CourseOverview.DoesNotExist:
+                may_certify = True
+            if (
+                certificate_api.is_passing_status(certificate['status'])
+                and may_certify
+            ):
                 completed_runs.append(course_data)
             else:
                 failed_runs.append(course_data)

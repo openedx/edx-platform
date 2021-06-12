@@ -640,19 +640,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
     copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
-    # DEPRECATED: the `expiry_date` field has been replaced by `expiration_date`
-    expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
-
     # This field is used to maintain a check for learners to which email
     # to notify for expired verification is already sent.
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
-
-    @property
-    def expiration_datetime(self):
-        """Use expiry_date for older entries if it still exists."""
-        if self.expiry_date:
-            return self.expiry_date
-        return super().expiration_datetime
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):

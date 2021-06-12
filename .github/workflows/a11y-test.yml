@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: a11y
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        node-version: [ 12 ]
+        python-version: [ 3.8 ]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Setup Gecko Driver
+      uses: browser-actions/setup-geckodriver@latest
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install npm Dependencies
+      run: npm install -g rtlcss
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxmlsec1-dev memcached
+
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements/pip.txt
+        pip install -r requirements/edx/development.txt
+
+    - name: Initiate Services
+      env:
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: root
+      run: |
+        sudo systemctl start mongod
+        sudo service memcached start
+        sudo /etc/init.d/mysql start
+
+    - name: Reset mysql password
+      run: |
+        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+          UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+          FLUSH PRIVILEGES;
+        EOF
+
+    - name: Run Tests
+      env:
+        TEST_SUITE: a11y
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: ''
+      run: |
+        sudo service mysql restart
+        SELENIUM_BROWSER=chrome BOKCHOY_HEADLESS=true paver test_a11y
+
+    - name: Save Job Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Build-Artifacts
+        path: |
+          reports/**/*
+          test_root/log/*.png
+          test_root/log/*.log
+          **/TEST-*.xml

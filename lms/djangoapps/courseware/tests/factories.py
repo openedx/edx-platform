@@ -1,131 +1,33 @@
-# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Build courseware-centric test factories
 
-
+Generic, LMS-agnostic factories can be found in:
+`common.djangoapps.student.tests.factories.py`
+"""
 import json
 from functools import partial
 
 import factory
-from django.test.client import RequestFactory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import (
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from common.djangoapps.student.roles import (
-    CourseBetaTesterRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-    GlobalStaff,
-    OrgInstructorRole,
-    OrgStaffRole
-)
-# Imported to re-export
-from common.djangoapps.student.tests.factories import UserFactory  # Imported to re-export
-from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
-# TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
-# pylint: disable=invalid-name
-course_id = CourseKey.from_string('edX/test_course/test')
-location = partial(course_id.make_usage_key, 'problem')
+COURSE_KEY = CourseKey.from_string('edX/test_course/test')
+LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')
 
 
-class UserProfileFactory(StudentUserProfileFactory):
-    courseware = 'course.xml'
-
-
-# For the following factories, these are disabled because we're ok ignoring the
-# unused arguments create and **kwargs in the line:
-# course_key(self, create, extracted, **kwargs)
-# pylint: disable=unused-argument
-
-class InstructorFactory(UserFactory):
+class StudentModuleFactory(DjangoModelFactory):
     """
-    Given a course Location, returns a User object with instructor
-    permissions for `course`.
+    Build StudentModule models
     """
-    last_name = "Instructor"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course instructor user")
-        CourseInstructorRole(extracted).add_users(self)
-
-
-class StaffFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with staff
-    permissions for `course`.
-    """
-    last_name = "Staff"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course staff user")
-        CourseStaffRole(extracted).add_users(self)
-
-
-class BetaTesterFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with beta-tester
-    permissions for `course`.
-    """
-    last_name = "Beta-Tester"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a beta-tester user")
-        CourseBetaTesterRole(extracted).add_users(self)
-
-
-class OrgStaffFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with org-staff
-    permissions for `course`.
-    """
-    last_name = "Org-Staff"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-staff user")
-        OrgStaffRole(extracted.org).add_users(self)
-
-
-class OrgInstructorFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with org-instructor
-    permissions for `course`.
-    """
-    last_name = "Org-Instructor"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-instructor user")
-        OrgInstructorRole(extracted.org).add_users(self)
-
-
-class GlobalStaffFactory(UserFactory):
-    """
-    Returns a User object with global staff access
-    """
-    last_name = "GlobalStaff"
-
-    @factory.post_generation
-    def set_staff(self, create, extracted, **kwargs):
-        GlobalStaff().add_users(self)
-# pylint: enable=unused-argument
-
-
-class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta:
         model = StudentModule
 
@@ -138,16 +40,22 @@ class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable
     done = 'na'
 
 
-class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UserStateSummaryFactory(DjangoModelFactory):
+    """
+    Build XModuleUserStateSummaryField models
+    """
     class Meta:
         model = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('usage_id')
+    usage_id = LOCATION('usage_id')
 
 
-class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StudentPrefsFactory(DjangoModelFactory):
+    """
+    Build XModuleStudentPrefsField models
+    """
     class Meta:
         model = XModuleStudentPrefsField
 
@@ -157,20 +65,13 @@ class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=
     module_type = 'mock_problem'
 
 
-class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StudentInfoFactory(DjangoModelFactory):
+    """
+    Build XModuleStudentInfoField models
+    """
     class Meta:
         model = XModuleStudentInfoField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
-
-
-class RequestFactoryNoCsrf(RequestFactory):
-    """
-    RequestFactory, which disables csrf checks.
-    """
-    def request(self, **kwargs):
-        request = super().request(**kwargs)
-        setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
-        return request

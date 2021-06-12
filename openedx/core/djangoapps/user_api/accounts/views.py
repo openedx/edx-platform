@@ -12,6 +12,8 @@ import uuid
 from functools import wraps
 
 import pytz
+from rest_framework.exceptions import UnsupportedMediaType
+
 from consent.models import DataSharingConsent
 from django.apps import apps
 from django.conf import settings
@@ -34,26 +36,12 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from common.djangoapps.entitlements.models import CourseEntitlement
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
-from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
-from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.profile_images.images import remove_profile_images
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.lib.api.parsers import MergePatchParser
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
-    CourseEnrollment,
     CourseEnrollmentAllowed,
     LoginFailures,
     ManualEnrollmentAudit,
@@ -67,6 +55,17 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_retired_username_by_username,
     is_username_retired
 )
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
+from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.profile_images.images import remove_profile_images
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.parsers import MergePatchParser
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..message_types import DeletionNotificationMessage
@@ -79,8 +78,13 @@ from ..models import (
 )
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
-from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
+from .serializers import (
+    UserRetirementPartnerReportSerializer,
+    UserRetirementStatusSerializer,
+    UserSearchEmailSerializer
+)
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
+from .utils import create_retirement_request_and_deactivate_account
 
 try:
     from coaching.api import has_ever_consented_to_coaching
@@ -136,6 +140,8 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
+            POST /api/user/v1/accounts/search_emails "application/json"
+
         **Notes for PATCH requests to /accounts endpoints**
             * Requested updates to social_links are automatically merged with
               previously set links. That is, any newly introduced platforms are
@@ -164,6 +170,7 @@ class AccountViewSet(ViewSet):
             values.
 
             * id: numerical lms user id in db
+            * activation_key: auto-genrated activation key when signed up via email
             * bio: null or textual representation of user biographical
               information ("about me").
             * country: An ISO 3166 country code or null.
@@ -282,7 +289,7 @@ class AccountViewSet(ViewSet):
         JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
-    parser_classes = (MergePatchParser,)
+    parser_classes = (JSONParser, MergePatchParser,)
 
     def get(self, request):
         """
@@ -316,6 +323,42 @@ class AccountViewSet(ViewSet):
 
         return Response(account_settings)
 
+    def search_emails(self, request):
+        """
+        POST /api/user/v1/accounts/search_emails
+        Content Type: "application/json"
+        {
+            "emails": ["edx@example.com", "staff@example.com"]
+        }
+        Response:
+        [
+            {
+                "username": "edx",
+                "email": "edx@example.com",
+                "id": 3,
+            },
+            {
+                "username": "staff",
+                "email": "staff@example.com",
+                "id": 8,
+            }
+        ]
+        """
+        try:
+            user_emails = request.data['emails']
+        except KeyError as error:
+            error_message = f'{error} field is required'
+            return Response(
+                {
+                    'developer_message': error_message,
+                    'user_message': error_message
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        users = User.objects.filter(email__in=user_emails)
+        data = UserSearchEmailSerializer(users, many=True).data
+        return Response(data)
+
     def retrieve(self, request, username):
         """
         GET /api/user/v1/accounts/{username}/
@@ -336,6 +379,9 @@ class AccountViewSet(ViewSet):
         https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
         else an error response with status code 415 will be returned.
         """
+        if request.content_type != MergePatchParser.media_type:
+            raise UnsupportedMediaType(request.content_type)
+
         try:
             with transaction.atomic():
                 update_account_settings(request.user, request.data, username=username)
@@ -426,23 +472,8 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
-                # Add user to retirement queue.
-                UserRetirementStatus.create_retirement(request.user)
-                # Unlink LMS social auth accounts
-                UserSocialAuth.objects.filter(user_id=request.user.id).delete()
-                # Change LMS password & email
                 user_email = request.user.email
-                request.user.email = get_retired_email_by_email(request.user.email)
-                request.user.save()
-                _set_unusable_password(request.user)
-
-                # TODO: Unlink social accounts & change password on each IDA.
-                # Remove the activation keys sent by email to the user for account activation.
-                Registration.objects.filter(user=request.user).delete()
-
-                # Delete OAuth tokens associated with the user.
-                retire_dot_oauth2_models(request.user)
-                AccountRecovery.retire_recovery_email(request.user.id)
+                create_retirement_request_and_deactivate_account(request.user)
 
                 try:
                     # Send notification email to user
@@ -774,7 +805,7 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(f'Missing required parameter: {str(exc)}',
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
@@ -814,9 +845,9 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response('Invalid start or end date: {}'.format(str(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(f'Invalid start or end date: {str(exc)}', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(f'Missing required parameter: {str(exc)}',
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)

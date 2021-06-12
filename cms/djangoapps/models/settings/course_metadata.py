@@ -4,20 +4,22 @@ Django module for Course Metadata class -- manages advanced settings and related
 
 
 from datetime import datetime
+import logging
 
 import pytz
-from crum import get_current_user
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
-from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidProctoringProvider
+
+LOGGER = logging.getLogger(__name__)
 
 
 class CourseMetadata:
@@ -134,11 +136,6 @@ class CourseMetadata:
         if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
             exclude_list.append('course_visibility')
 
-        # Do not show "Create Zendesk Tickets For Suspicious Proctored Exam Attempts" in
-        # Studio Advanced Settings if the user is not edX staff.
-        if not GlobalStaff().has_user(get_current_user()):
-            exclude_list.append('create_zendesk_tickets')
-
         # Do not show "Proctortrack Exam Escalation Contact" if Proctortrack is not
         # an available proctoring backend.
         if not settings.PROCTORING_BACKENDS or settings.PROCTORING_BACKENDS.get('proctortrack') is None:
@@ -245,7 +242,7 @@ class CourseMetadata:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
-            except (TypeError, ValueError, ValidationError) as err:
+            except (InvalidProctoringProvider, TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'key': key, 'message': str(err), 'model': model})
 
@@ -413,10 +410,15 @@ class CourseMetadata:
             else:
                 escalation_email = descriptor.proctoring_escalation_email
 
+            if proctoring_provider_model:
+                proctoring_provider = proctoring_provider_model.get('value')
+            else:
+                proctoring_provider = descriptor.proctoring_provider
+
             missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
-            if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
+            if proctoring_provider_model and proctoring_provider == 'proctortrack':
                 if not escalation_email:
-                    message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
+                    message = missing_escalation_email_msg.format(provider=proctoring_provider)
                     errors.append({
                         'key': 'proctoring_provider',
                         'message': message,
@@ -425,15 +427,36 @@ class CourseMetadata:
 
             if (
                 escalation_email_model and not proctoring_provider_model and
-                descriptor.proctoring_provider == 'proctortrack'
+                proctoring_provider == 'proctortrack'
             ):
                 if not escalation_email:
-                    message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
+                    message = missing_escalation_email_msg.format(provider=proctoring_provider)
                     errors.append({
                         'key': 'proctoring_escalation_email',
                         'message': message,
                         'model': escalation_email_model
                     })
+
+            # Check that Zendesk field is appropriate for the provider
+            zendesk_ticket_model = settings_dict.get('create_zendesk_tickets')
+            if zendesk_ticket_model:
+                create_zendesk_tickets = zendesk_ticket_model.get('value')
+            else:
+                create_zendesk_tickets = descriptor.create_zendesk_tickets
+
+            if (
+                (proctoring_provider == 'proctortrack' and create_zendesk_tickets)
+                or (proctoring_provider == 'software_secure' and not create_zendesk_tickets)
+            ):
+                LOGGER.info(
+                    'create_zendesk_tickets set to {ticket_value} but proctoring '
+                    'provider is {provider} for course {course_id}. create_zendesk_tickets '
+                    'should be updated for this course.'.format(
+                        ticket_value=create_zendesk_tickets,
+                        provider=proctoring_provider,
+                        course_id=descriptor.id
+                    )
+                )
 
         return errors
 

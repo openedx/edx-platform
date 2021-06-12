@@ -7,7 +7,10 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.contrib.auth import get_backends, login
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
+from django.http import HttpRequest
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
@@ -17,21 +20,30 @@ from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
 
 from common.djangoapps import third_party_auth
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
-from common.djangoapps.student.helpers import get_next_url_for_login_page
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
 
-ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
-def get_data_consent_share_cache_key(user_id, course_id):
+def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):
     """
-        Returns cache key for data sharing consent needed against user_id and course_id
+        Returns cache key for data sharing consent needed against user_id, course_id and enterprise_customer_uuid
     """
+    cache_key_params = dict(
+        type='data_sharing_consent_needed',
+        user_id=user_id,
+        course_id=course_id,
+    )
 
-    return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+    if enterprise_customer_uuid:
+        cache_key_params['enterprise_customer_uuid'] = enterprise_customer_uuid
+
+    return get_cache_key(**cache_key_params)
 
 
 def get_is_enterprise_cache_key(user_id):
@@ -41,11 +53,11 @@ def get_is_enterprise_cache_key(user_id):
     return get_cache_key(type='is_enterprise_learner', user_id=user_id)
 
 
-def clear_data_consent_share_cache(user_id, course_id):
+def clear_data_consent_share_cache(user_id, course_id, enterprise_customer_uuid):
     """
         clears data_sharing_consent_needed cache
     """
-    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid)
     TieredCache.delete_all_tiers(consent_cache_key)
 
 
@@ -278,16 +290,15 @@ def _user_has_social_auth_record(user, enterprise_customer):
     """
     Return True if a `UserSocialAuth` record exists for `user` False otherwise.
     """
-    if enterprise_customer:
-        identity_provider = third_party_auth.provider.Registry.get(
-            provider_id=enterprise_customer['identity_provider'],
-        )
-        if identity_provider:
-            return UserSocialAuth.objects.select_related('user').filter(
-                provider=identity_provider.backend_name,
-                user=user
-            ).exists()
-
+    provider_backend_names = []
+    if enterprise_customer and enterprise_customer['identity_providers']:
+        for idp in enterprise_customer['identity_providers']:
+            identity_provider = third_party_auth.provider.Registry.get(
+                provider_id=idp['provider_id']
+            )
+            provider_backend_names.append(identity_provider.backend_name)
+        return UserSocialAuth.objects.select_related('user').\
+            filter(provider__in=provider_backend_names, user=user).exists()
     return False
 
 
@@ -447,3 +458,43 @@ def get_provider_login_url(request, provider_id, redirect_url=None):
 
 def fetch_enterprise_customer_by_id(enterprise_uuid):
     return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)
+
+
+def _create_placeholder_request(user):
+    """
+    Helper method to create a placeholder request.
+
+    Arguments:
+        user (User): Django User object.
+
+    Returns:
+        request (HttpRequest): A placeholder request object.
+        """
+    request = HttpRequest()
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
+    backend = get_backends()[0]
+    user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+    login(request, user)
+    request.user = user
+    request.META['SERVER_NAME'] = 'edx.org'
+    request.META['SERVER_PORT'] = '8080'
+    return request
+
+
+def is_course_accessed(user, course_id):
+    """
+    Check if the learner accessed the course.
+
+    Arguments:
+        user (User): Django User object.
+        course_id (String): The course identifier
+
+    Returns:
+        (bool): True if course has been accessed by the enterprise learner.
+    """
+    request = _create_placeholder_request(user)
+    course_outline_root_block = get_course_outline_block_tree(request, course_id, user)
+    resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
+    return bool(resume_block)

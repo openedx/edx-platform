@@ -137,6 +137,9 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
     change - for example, to backpopulate missing program credentials for a
     student.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Args:
         username (str): The username of the student
 
@@ -277,6 +280,19 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
     LOGGER.info(f"Successfully completed the task award_program_certificates for username {username}")
 
 
+def post_course_certificate_configuration(client, cert_config, certificate_available_date=None):
+    """
+    POST a configuration for a course certificate and the date the certificate
+    will be available
+    """
+    client.course_certificates.post({
+        "course_id": cert_config['course_id'],
+        "certificate_type": cert_config['mode'],
+        "certificate_available_date": certificate_available_date,
+        "is_active": True
+    })
+
+
 def post_course_certificate(client, username, certificate, visible_date):
     """
     POST a certificate that has been updated to Credentials
@@ -298,12 +314,61 @@ def post_course_certificate(client, username, certificate, visible_date):
     })
 
 
+# pylint: disable=W0613
+@shared_task(bind=True, ignore_result=True)
+@set_code_owner_attribute
+def update_credentials_course_certificate_configuration_available_date(
+    self,
+    course_key,
+    certificate_available_date=None
+):
+    """
+    This task will update the course certificate configuration's available date. This is different from the
+    "visable_date" attribute. This date will always either be the available date that is set in studio for
+    a given course, or it will be None.
+
+    Arguments:
+        course_run_key (str): The course run key to award the certificate for
+        certificate_available_date (str): A string representation of the datetime for when to make the certificate
+            available to the user. If not provided, it will be none.
+    """
+    LOGGER.info(
+        f"Running task update_credentials_course_certificate_configuration_available_date for course {course_key} \
+        with certificate_available_date {certificate_available_date}"
+    )
+    course_key = str(course_key)
+    course_modes = CourseMode.objects.filter(course_id=course_key)
+    # There should only ever be one certificate relevant mode per course run
+    modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+    if len(modes) != 1:
+        LOGGER.exception(
+            f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
+        )
+        return
+
+    credentials_client = get_credentials_api_client(
+        User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+    )
+    cert_config = {
+        'course_id': course_key,
+        'mode': modes[0],
+    }
+    post_course_certificate_configuration(
+        client=credentials_client,
+        cert_config=cert_config,
+        certificate_available_date=certificate_available_date
+    )
+
+
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def award_course_certificate(self, username, course_run_key, certificate_available_date=None):
     """
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
+
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
 
     Arguments:
         username (str): The user to award the Credentials course cert to
@@ -456,7 +521,7 @@ def revoke_program_certificate(client, username, program_uuid):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def revoke_program_certificates(self, username, course_key):
+def revoke_program_certificates(self, username, course_key):  # lint-amnesty, pylint: disable=too-many-statements
     """
     This task is designed to be called whenever a student's course certificate is
     revoked.
@@ -465,9 +530,12 @@ def revoke_program_certificates(self, username, course_key):
     specified user's certificate should be revoked in one or more programs, and
     use the credentials service to revoke the said certificates if so.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Args:
         username (str): The username of the student
-        course_key (str|CourseKey): The course identifier
+        course_key (str): The course identifier
 
     Returns:
         None
@@ -510,7 +578,7 @@ def revoke_program_certificates(self, username, course_key):
 
     try:
         inverted_programs = get_inverted_programs(student)
-        course_specific_programs = inverted_programs.get(str(course_key))
+        course_specific_programs = inverted_programs.get(course_key)
         if not course_specific_programs:
             # No reason to continue beyond this point
             LOGGER.info(
@@ -615,6 +683,9 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
     the credentials API to update all these certificates visible_date value
     to keep certificates in sync on both sides.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Arguments:
         course_key (str): The course identifier
         certificate_available_date (str): The date to update the certificate availablity date to. It's a string
@@ -639,7 +710,11 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
             f"Failed to update certificate availability date for course {course_key}. Reason: {error_msg}"
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
-
+    # Always update the course certificate with the new certificate available date
+    update_credentials_course_certificate_configuration_available_date.delay(
+        str(course_key),
+        certificate_available_date
+    )
     users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
         course_id=course_key
     ).values_list('user__username', flat=True)

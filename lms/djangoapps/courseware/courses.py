@@ -55,6 +55,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
@@ -89,22 +90,6 @@ def get_course(course_id, depth=0):
     if course is None:
         raise CourseRunNotFound(course_key=course_id)
     return course
-
-
-def get_course_by_id(course_key, depth=0):
-    """
-    Given a course id, return the corresponding course descriptor.
-
-    If such a course does not exist, raises a 404.
-
-    depth: The number of levels of children for the modulestore to cache. None means infinite depth
-    """
-    with modulestore().bulk_operations(course_key):
-        course = modulestore().get_course(course_key, depth=depth)
-    if course:
-        return course
-    else:
-        raise Http404("Course not found: {}.".format(str(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
@@ -479,7 +464,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     ]
     blocks.extend([cls(course, user) for cls in default_block_classes])
 
-    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)
+    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)  # lint-amnesty, pylint: disable=filter-builtin-not-iterating
     return sorted(blocks, key=date_block_key_fn)
 
 
@@ -784,7 +769,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return "//{}/{}/{}".format(settings.CMS_BASE, page, str(course.id))
+    return f"//{settings.CMS_BASE}/{page}/{str(course.id)}"
 
 
 def get_cms_block_link(block, page):

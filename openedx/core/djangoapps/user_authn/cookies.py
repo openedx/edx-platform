@@ -7,7 +7,6 @@ import json
 import logging
 import time
 
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.dispatch import Signal
@@ -223,7 +222,7 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
 
 def _convert_to_absolute_uris(request, urls_obj):
     """ Convert relative URL paths to absolute URIs """
-    for url_name, url_path in six.iteritems(urls_obj):
+    for url_name, url_path in urls_obj.items():
         urls_obj[url_name] = request.build_absolute_uri(url_path)
 
     return urls_obj
@@ -350,5 +349,5 @@ def _get_login_oauth_client():
         return Application.objects.get(client_id=login_client_id)
     except Application.DoesNotExist:
         raise AuthFailedError(  # lint-amnesty, pylint: disable=raise-missing-from
-            u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
+            f"OAuth Client for the Login service, '{login_client_id}', is not configured."
         )

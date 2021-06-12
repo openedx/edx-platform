@@ -4,13 +4,15 @@ Utility functions used during user authentication.
 
 import random
 import string
+from urllib.parse import urlparse  # pylint: disable=import-error
+from uuid import uuid4  # lint-amnesty, pylint: disable=unused-import
 
 from django.conf import settings
 from django.utils import http
 from oauth2_provider.models import Application
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import username_exists_or_retired
+from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 
 
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):
@@ -68,3 +70,30 @@ def is_registration_api_v1(request):
     :return: Bool
     """
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
+
+
+def generate_username_suggestions(username):
+    """ Generate 3 available username suggestions """
+    max_length = USERNAME_MAX_LENGTH
+    short_username = username[:max_length - 6] if max_length is not None else username
+    short_username = short_username.replace('_', '').replace('-', '')
+
+    username_suggestions = []
+    int_ranges = [
+        {'min': 0, 'max': 9},
+        {'min': 10, 'max': 99},
+        {'min': 100, 'max': 999},
+        {'min': 1000, 'max': 99999},
+    ]
+    for int_range in int_ranges:
+        for _ in range(10):
+            random_int = random.randint(int_range['min'], int_range['max'])
+            suggestion = f'{short_username}_{random_int}'
+            if not username_exists_or_retired(suggestion):
+                username_suggestions.append(suggestion)
+                break
+
+        if len(username_suggestions) == 3:
+            break
+
+    return username_suggestions

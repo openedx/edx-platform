@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 Tests for cache_utils.py
 """
 
 from unittest import TestCase
+from unittest.mock import Mock
 
 import ddt
-import six
 from edx_django_utils.cache import RequestCache
-from mock import Mock
 
 from openedx.core.lib.cache_utils import request_cached
 
@@ -177,16 +175,16 @@ class TestRequestCachedDecorator(TestCase):
             A dummy function that expects an str and unicode arguments.
             """
             assert isinstance(arg1, str), 'First parameter has to be of type `str`'
-            assert isinstance(arg2, six.text_type), 'Second parameter has to be of type `unicode`'
+            assert isinstance(arg2, str), 'Second parameter has to be of type `unicode`'
             return True
 
-        assert dummy_function('Hello', u'World'), 'Should be callable with ASCII chars'
-        assert dummy_function('H∂llå', u'Wørld'), 'Should be callable with non-ASCII chars'
+        assert dummy_function('Hello', 'World'), 'Should be callable with ASCII chars'
+        assert dummy_function('H∂llå', 'Wørld'), 'Should be callable with non-ASCII chars'
 
         wrapped = request_cached()(dummy_function)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
-        assert wrapped('Hello', u'World'), 'Wrapper should handle ASCII only chars'
-        assert wrapped('H∂llå', u'Wørld'), 'Wrapper should handle non-ASCII chars'
+        assert wrapped('Hello', 'World'), 'Wrapper should handle ASCII only chars'
+        assert wrapped('H∂llå', 'Wørld'), 'Wrapper should handle non-ASCII chars'
 
     def test_request_cached_with_none_result(self):
         """
@@ -276,7 +274,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        arg_map_function = lambda arg: six.text_type(arg == 1)
+        arg_map_function = lambda arg: str(arg == 1)
         wrapped = request_cached(arg_map_function=arg_map_function)(mock_wrapper)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
         # This will be a miss, and make an underlying call.

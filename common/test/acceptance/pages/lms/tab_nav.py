@@ -57,9 +57,9 @@ class TabNavPage(PageObject):
             return None
         else:
             if self.is_using_boostrap_style_tabs():
-                return 'ul.navbar-nav li:nth-of-type({}) a'.format(tab_index + 1)
+                return f'ul.navbar-nav li:nth-of-type({tab_index + 1}) a'
             else:
-                return 'ol.course-tabs li:nth-of-type({}) a'.format(tab_index + 1)
+                return f'ol.course-tabs li:nth-of-type({tab_index + 1}) a'
 
     @property
     def tab_names(self):

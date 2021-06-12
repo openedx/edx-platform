@@ -50,16 +50,17 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
+        self.enterprise_customer_uuid = str(self.enterprise_customer.uuid)
         super().setUp()
 
     @staticmethod
-    def _create_dsc_cache(user_id, course_id):
-        consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    def _create_dsc_cache(user_id, course_id, enterprise_customer_uuid):
+        consent_cache_key = get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid)
         TieredCache.set_all_tiers(consent_cache_key, 0)
 
     @staticmethod
-    def _is_dsc_cache_found(user_id, course_id):
-        consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    def _is_dsc_cache_found(user_id, course_id, enterprise_customer_uuid):
+        consent_cache_key = get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid)
         data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
         return data_sharing_consent_needed_cache.is_found
 
@@ -76,31 +77,17 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
             enterprise_customer_user=enterprise_customer_user,
         )
 
-    @patch('openedx.features.enterprise_support.signals.update_user.delay')
-    def test_register_user(self, mock_update_user):
-        """
-        make sure marketing enterprise user call invokes update_user
-        """
-        self._create_enterprise_enrollment(self.user.id, self.course_id)
-        mock_update_user.assert_called_with(
-            sailthru_vars={
-                'is_enterprise_learner': True,
-                'enterprise_name': self.enterprise_customer.name,
-            },
-            email=self.user.email
-        )
-
     def test_signal_update_dsc_cache_on_course_enrollment(self):
         """
         make sure update_dsc_cache_on_course_enrollment signal clears cache when Enterprise Course Enrollment
         takes place
         """
 
-        self._create_dsc_cache(self.user.id, self.course_id)
-        assert self._is_dsc_cache_found(self.user.id, self.course_id)
+        self._create_dsc_cache(self.user.id, self.course_id, self.enterprise_customer_uuid)
+        assert self._is_dsc_cache_found(self.user.id, self.course_id, self.enterprise_customer_uuid)
 
         self._create_enterprise_enrollment(self.user.id, self.course_id)
-        assert not self._is_dsc_cache_found(self.user.id, self.course_id)
+        assert not self._is_dsc_cache_found(self.user.id, self.course_id, self.enterprise_customer_uuid)
 
     def test_signal_update_dsc_cache_on_enterprise_customer_update(self):
         """
@@ -109,14 +96,14 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         """
 
         self._create_enterprise_enrollment(self.user.id, self.course_id)
-        self._create_dsc_cache(self.user.id, self.course_id)
-        assert self._is_dsc_cache_found(self.user.id, self.course_id)
+        self._create_dsc_cache(self.user.id, self.course_id, self.enterprise_customer_uuid)
+        assert self._is_dsc_cache_found(self.user.id, self.course_id, self.enterprise_customer_uuid)
 
         # updating enable_data_sharing_consent flag
         self.enterprise_customer.enable_data_sharing_consent = False
         self.enterprise_customer.save()
 
-        assert not self._is_dsc_cache_found(self.user.id, self.course_id)
+        assert not self._is_dsc_cache_found(self.user.id, self.course_id, self.enterprise_customer_uuid)
 
     def _create_enrollment_to_refund(self, no_of_days_placed=10, enterprise_enrollment_exists=True):
         """Create enrollment to refund. """
@@ -146,28 +133,42 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
 
         return enrollment
 
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
     @ddt.data(
-        (True, True, 2, False),  # test if skip_refund
-        (False, True, 20, False),  # test refundable time passed
-        (False, False, 2, False),    # test not enterprise enrollment
-        (False, True, 2, True),    # success: no skip_refund, is enterprise enrollment and still in refundable window.
+        (True, True, 2, True, False),  # test if skip_refund
+        (False, True, 20, True, False),  # test refundable time passed
+        (False, False, 2, True, False),    # test not enterprise enrollment
+        (False, True, 2, False, False),    # test order voucher expiration date has already passed
+        (False, True, 2, True, True),  # success: no skip_refund, is enterprise enrollment, coupon voucher is refundable
+        # and is still in refundable window.
     )
     @ddt.unpack
-    def test_refund_order_voucher(self, skip_refund, enterprise_enrollment_exists, no_of_days_placed, api_called):
+    def test_refund_order_voucher(
+        self,
+        skip_refund,
+        enterprise_enrollment_exists,
+        no_of_days_placed,
+        order_voucher_refundable,
+        api_called,
+        mock_is_order_voucher_refundable
+    ):
         """Test refund_order_voucher signal"""
+        mock_is_order_voucher_refundable.return_value = order_voucher_refundable
         enrollment = self._create_enrollment_to_refund(no_of_days_placed, enterprise_enrollment_exists)
         with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             enrollment.update_enrollment(is_active=False, skip_refund=skip_refund)
             assert mock_ecommerce_api_client.called == api_called
 
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
     @ddt.data(
         (HttpClientError, 'INFO'),
         (HttpServerError, 'ERROR'),
         (Exception, 'ERROR'),
     )
     @ddt.unpack
-    def test_refund_order_voucher_with_client_errors(self, mock_error, log_level):
+    def test_refund_order_voucher_with_client_errors(self, mock_error, log_level, mock_is_order_voucher_refundable):
         """Test refund_order_voucher signal client_error"""
+        mock_is_order_voucher_refundable.return_value = True
         enrollment = self._create_enrollment_to_refund()
         with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             client_instance = mock_ecommerce_api_client.return_value

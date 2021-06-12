@@ -2,14 +2,14 @@
 import logging
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
+from openedx.core import types
+
 from common.djangoapps.student.models import EntranceExamConfiguration
 from common.djangoapps.util import milestones_helpers
 
 from .base import OutlineProcessor
 
-User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -21,7 +21,8 @@ class ContentGatingOutlineProcessor(OutlineProcessor):
     - Entrance Exams
     - Chapter gated content
     """
-    def __init__(self, course_key: CourseKey, user: User, at_time: datetime):
+
+    def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         super().__init__(course_key, user, at_time)
         self.required_content = None
         self.can_skip_entrance_exam = False

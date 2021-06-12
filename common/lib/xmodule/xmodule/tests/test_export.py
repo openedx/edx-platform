@@ -32,7 +32,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print("strip filename from {desc}".format(desc=str(descriptor.location)))
+    print(f"strip filename from {str(descriptor.location)}")
     if descriptor._field_data.has(descriptor, 'filename'):  # lint-amnesty, pylint: disable=protected-access
         descriptor._field_data.delete(descriptor, 'filename')  # lint-amnesty, pylint: disable=protected-access
 

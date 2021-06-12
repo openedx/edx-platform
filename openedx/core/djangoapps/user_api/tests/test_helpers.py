@@ -7,7 +7,6 @@ import json
 import re
 from unittest import mock
 
-import ddt  # lint-amnesty, pylint: disable=unused-import
 import pytest
 from django import forms
 from django.test import TestCase

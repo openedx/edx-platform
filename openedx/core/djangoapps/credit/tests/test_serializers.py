@@ -2,7 +2,6 @@
 
 import pytest
 from django.test import TestCase
-from django.test.utils import override_settings  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.credit import serializers, signature

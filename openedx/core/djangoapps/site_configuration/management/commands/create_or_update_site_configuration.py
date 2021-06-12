@@ -83,9 +83,9 @@ class Command(BaseCommand):
                 name=domain,
             )
         if created:
-            LOG.info("Site does not exist. Created new site '{site_name}'".format(site_name=site.domain))
+            LOG.info(f"Site does not exist. Created new site '{site.domain}'")
         else:
-            LOG.info("Found existing site for '{site_name}'".format(site_name=site.domain))
+            LOG.info(f"Found existing site for '{site.domain}'")
 
         site_configuration, created = SiteConfiguration.objects.get_or_create(site=site)
         if created:
@@ -96,7 +96,7 @@ class Command(BaseCommand):
             )
         else:
             LOG.info(
-                "Found existing site configuration for '{site_name}'. Updating it.".format(site_name=site.domain)
+                f"Found existing site configuration for '{site.domain}'. Updating it."
             )
 
         site_configuration_values = configuration or config_file_data

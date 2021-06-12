@@ -18,7 +18,7 @@ from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from lms.djangoapps.certificates.models import CertificateStatuses as status
+from lms.djangoapps.certificates.data import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     ExampleCertificate,
@@ -27,7 +27,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
 LOGGER = logging.getLogger(__name__)
 
@@ -103,22 +103,22 @@ class XQueueCertInterface:
             settings.XQUEUE_INTERFACE['django_auth'],
             requests_auth,
         )
-        self.whitelist = CertificateWhitelist.objects.all()
+        self.allowlist = CertificateWhitelist.objects.all()
         self.use_https = True
 
-    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def regen_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
         """(Re-)Make certificate for a particular student in a particular course
 
         Arguments:
           student   - User.object
           course_id - courseenrollment.course_id (string)
 
+        [PDF Certificates only]
         WARNING: this command will leave the old certificate, if one exists,
                  laying around in AWS taking up space. If this is a problem,
                  take pains to clean up storage before running this command.
 
-        Change the certificate status to unavailable (if it exists) and request
-        grading. Passing grades will put a certificate request on the queue.
+        Invalidate the certificate (if it exists) and request a new certificate.
 
         Return the certificate.
         """
@@ -130,14 +130,8 @@ class XQueueCertInterface:
             certificate = GeneratedCertificate.eligible_certificates.get(user=student, course_id=course_id)
 
             LOGGER.info(
-                (
-                    "Found an existing certificate entry for student %s "
-                    "in course '%s' "
-                    "with status '%s' while regenerating certificates. "
-                ),
-                student.id,
-                str(course_id),
-                certificate.status
+                f"Found an existing certificate entry for student {student.id} in course '{course_id}' with status "
+                f"'{certificate.status}' while regenerating certificates."
             )
 
             if certificate.download_url:
@@ -146,26 +140,18 @@ class XQueueCertInterface:
                 )
                 return None
 
-            certificate.status = status.unavailable
-            certificate.save()
+            certificate.invalidate(source='certificate_regeneration')
 
             LOGGER.info(
-                (
-                    "The certificate status for student %s "
-                    "in course '%s' has been changed to '%s'."
-                ),
-                student.id,
-                str(course_id),
-                certificate.status
+                f"The certificate status for student {student.id} in course '{course_id} has been changed to "
+                f"'{certificate.status}'."
             )
-
         except GeneratedCertificate.DoesNotExist:
             pass
 
         return self.add_cert(
             student,
             course_id,
-            course=course,
             forced_grade=forced_grade,
             template_file=template_file,
             generate_pdf=generate_pdf
@@ -188,7 +174,7 @@ class XQueueCertInterface:
         raise NotImplementedError
 
     # pylint: disable=too-many-statements
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def add_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
         """
         Request a new certificate for a student.
 
@@ -208,7 +194,7 @@ class XQueueCertInterface:
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
 
-        If a student has a passing grade or is in the whitelist
+        If a student has a passing grade or is in the allowlist
         table for the course a request will be made for a new cert.
 
         If a student does not have a passing grade the status
@@ -266,12 +252,6 @@ class XQueueCertInterface:
             )
             return None
 
-        # The caller can optionally pass a course in to avoid
-        # re-fetching it from Mongo. If they have not provided one,
-        # get it from the modulestore.
-        if course is None:
-            course = modulestore().get_course(course_id, depth=0)
-
         profile = UserProfile.objects.get(user=student)
         profile_name = profile.name
 
@@ -279,15 +259,15 @@ class XQueueCertInterface:
         self.request.user = student
         self.request.session = {}
 
-        is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        course_grade = CourseGradeFactory().read(student, course)
+        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, whitelist=True).exists()
+        course_grade = CourseGradeFactory().read(student, course_key=course_id)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = IDVerificationService.user_is_verified(student)
         cert_mode = enrollment_mode
 
         is_eligible_for_certificate = modes_api.is_eligible_for_certificate(enrollment_mode, cert_status)
-        if is_whitelisted and not is_eligible_for_certificate:
+        if is_allowlisted and not is_eligible_for_certificate:
             # check if audit certificates are enabled for audit mode
             is_eligible_for_certificate = enrollment_mode != CourseMode.AUDIT or \
                 not settings.FEATURES['DISABLE_AUDIT_CERTIFICATES']
@@ -357,10 +337,10 @@ class XQueueCertInterface:
                 str(exc)
             )
 
-        # Check if the student is whitelisted
-        if is_whitelisted:
+        # Check if the student is on the allowlist
+        if is_allowlisted:
             LOGGER.info(
-                "Student %s is whitelisted in '%s'",
+                "Student %s is on the certificate allowlist in '%s'",
                 student.id,
                 str(course_id)
             )
@@ -413,14 +393,15 @@ class XQueueCertInterface:
             return cert
 
         # Finally, generate the certificate and send it off.
-        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf)
+        return self._generate_cert(cert, student, grade_contents, template_pdf, generate_pdf)
 
-    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf):
+    def _generate_cert(self, cert, student, grade_contents, template_pdf, generate_pdf):
         """
         Generate a certificate for the student. If `generate_pdf` is True,
         sends a request to XQueue.
         """
-        course_id = str(course.id)
+        course_id = str(cert.course_id)
+        course_overview = get_course_overview(course_id)
 
         key = make_hashkey(random.random())
         cert.key = key
@@ -428,7 +409,7 @@ class XQueueCertInterface:
             'action': 'create',
             'username': student.username,
             'course_id': course_id,
-            'course_name': course.display_name or course_id,
+            'course_name': course_overview.display_name or course_id,
             'name': cert.name,
             'grade': grade_contents,
             'template_pdf': template_pdf,

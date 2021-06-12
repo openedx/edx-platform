@@ -8,20 +8,21 @@ from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import permissions, viewsets  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.util.json_request import JsonResponse
 
 from common.djangoapps.student.models import get_user_by_username_or_email
-from common.djangoapps.util.json_request import JsonResponse
-from lms.djangoapps.courseware import courses
+from common.djangoapps.util.json_request import JsonResponse  # lint-amnesty, pylint: disable=reimported
+from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.experiments import filters, serializers
 from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -107,7 +108,7 @@ class UserMetaDataView(APIView):  # lint-amnesty, pylint: disable=missing-class-
             return JsonResponse({'message': message}, status=404)
 
         try:
-            course = courses.get_course_by_id(CourseKey.from_string(course_id))
+            course = get_course_by_id(CourseKey.from_string(course_id))
         except Http404:
             message = "Provided course is not found"
             return JsonResponse({'message': message}, status=404)

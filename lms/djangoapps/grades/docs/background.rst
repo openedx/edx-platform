@@ -116,16 +116,18 @@ Problem Scores
 * *weighted_possible* (*a.k.a. max_grade*).  The weighted_possible value is the maximum possible score that is achievable on the problem post-weight-computation.
 * *weighted_earned* (*a.k.a. grade*). The weighted_earned value is the learner's score computed from the learner's response to the problem. The process for computing this score can be classified into the following types:
 
- - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
- 
- - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
- 
- - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
- 
-   - a single course staff (staff assessment)
-   - a number of peers (peer assessment)
-   - the self learner (self assessment)
-   
+  - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
+
+  - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
+
+  - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
+
+    - a single course staff (staff assessment)
+
+    - a number of peers (peer assessment)
+
+    - the self learner (self assessment)
+
 .. image:: images/background_problem_score.png
 
 Grading Policy
@@ -136,40 +138,45 @@ As described above in the Grade Computation section, the grading policy is distr
 * Course level (adjusted in *Settings->Grading page in Studio*)
 
   - Grade Range policy: Pass cutoff and letter grade thresholds
-  
+
   - Assignment Type policy: Weights and Allowable drops
-  
+
 * Subsection level (adjusted in *Content->Outline->Subsection->Settings* modal in Studio)
 
   - A subsection's designation to an assignment type
-  
+
   - A subsection's setting of whether it is 'graded'
-  
+
 * Problem level (adjusted in *Content->Outline->Subsection->Unit->Problem->Edit* modal in Studio)
 
   - A problem's weight
-  
+
   - A problem's external grader configuration
-  
+
   - A problem's individual grading policy - as currently supported by `ORA's assessment configuration <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html#how-scores-for-open-response-assessments-are-calculated>`_
 
 
 Grade Overrides/Exceptions
 --------------------------
 
-Today, we support the following features to `adjust grades <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/named-release-birch/running_course/course_grades.html#adjust-grades>`_, but don't have a general feature to override a grade for any xBlock:
+Today, we support the following features to `adjust grades <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_, but don't have a general feature to override a grade for any xBlock:
 
 * In `ORA Studio settings <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/Manage_ORA_Assignment.html#override-a-learner-s-assessment-grade>`_:
 
   - override a learner's grade for an ORA2 block
-  
+
 * In LMS Instructor Dashboard or `Staff Debug Info <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/manage_live_course/staff_debug_info.html>`_:
 
   - reset the number of attempts a learner has made for a problem back to 0
-  
+
   - force a rescore on a submission to update all stored scores
-  
+
   - delete a student state for a problem
+
+* In `Gradebook <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_: 
+
+  - override a subsection grade for a learner
+  - override subsection grades in bulk (master's track only)
 
 ORA2's Immutable Data
 ---------------------

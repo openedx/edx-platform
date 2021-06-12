@@ -15,10 +15,13 @@ from lms.djangoapps.certificates.api import (
     can_generate_certificate_task,
     generate_certificate_task,
     generate_user_certificates,
-    get_allowlisted_users
+    get_allowlisted_users,
+    get_enrolled_allowlisted_users,
+    get_enrolled_allowlisted_not_passing_users,
+    is_using_v2_course_certificates,
 )
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from xmodule.modulestore.django import modulestore
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 from .runner import TaskProgress
 
@@ -37,22 +40,13 @@ def generate_students_certificates(
     students_to_generate_certs_for = CourseEnrollment.objects.users_enrolled_in(course_id)
 
     student_set = task_input.get('student_set')
-    if student_set == 'all_whitelisted':
-        # Generate Certificates for all white listed students.
-        students_to_generate_certs_for = students_to_generate_certs_for.filter(
-            certificatewhitelist__course_id=course_id,
-            certificatewhitelist__whitelist=True
-        )
+    if student_set == 'all_allowlisted':
+        # Generate Certificates for all allowlisted students.
+        students_to_generate_certs_for = get_enrolled_allowlisted_users(course_id)
 
-    elif student_set == 'whitelisted_not_generated':
-        # Whitelist students who did not get certificates already.
-        students_to_generate_certs_for = students_to_generate_certs_for.filter(
-            certificatewhitelist__course_id=course_id,
-            certificatewhitelist__whitelist=True
-        ).exclude(
-            generatedcertificate__course_id=course_id,
-            generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
-        )
+    elif student_set == 'allowlisted_not_generated':
+        # Allowlisted students who did not yet receive certificates
+        students_to_generate_certs_for = get_enrolled_allowlisted_not_passing_users(course_id)
 
     elif student_set == "specific_student":
         specific_student_id = task_input.get('specific_student_id')
@@ -85,7 +79,6 @@ def generate_students_certificates(
     current_step = {'step': 'Generating Certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    course = modulestore().get_course(course_id, depth=0)
     # Generate certificate for each student
     for student in students_require_certs:
         task_progress.attempted += 1
@@ -95,11 +88,7 @@ def generate_students_certificates(
             generate_certificate_task(student, course_id)
         else:
             log.info(f'Attempt will be made to generate a certificate for user {student.id} in {course_id}.')
-            generate_user_certificates(
-                student,
-                course_id,
-                course=course
-            )
+            generate_user_certificates(student, course_id)
     return task_progress.update_task_state(extra_meta=current_step)
 
 
@@ -140,27 +129,33 @@ def _invalidate_generated_certificates(course_id, enrolled_students, certificate
     Invalidate generated certificates for all enrolled students in the given course having status in
     'certificate_statuses', if the student is not on the course's allowlist.
 
-    Generated Certificates are invalidated by marking its status 'unavailable' and updating verify_uuid, download_uuid,
+    Generated Certificates are invalidated by marking its status 'unavailable' and updating error_reason, download_uuid,
     download_url and grade with empty string.
+
+    If V2 of Course Certificates is enabled for this course-run, this step will be skipped.
 
     :param course_id: Course Key for the course whose generated certificates need to be removed
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(
-        user__in=enrolled_students,
-        course_id=course_id,
-        status__in=certificate_statuses,
-    )
+    if is_using_v2_course_certificates(course_id):
+        log.info(f"Course {course_id} is using V2 certificates. Skipping certificate invalidation step of bulk "
+                 "regeneration.")
+    else:
+        certificates = GeneratedCertificate.objects.filter(
+            user__in=enrolled_students,
+            course_id=course_id,
+            status__in=certificate_statuses,
+        )
 
-    allowlisted_users = get_allowlisted_users(course_id)
+        allowlisted_users = get_allowlisted_users(course_id)
 
-    # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order to
-    # save a history of the change.
-    for c in certificates:
-        if c.user in allowlisted_users:
-            log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist for '
-                     f'course {course_id}')
-        else:
-            log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
-            c.invalidate()
+        # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order
+        # to save a history of the change.
+        for c in certificates:
+            if c.user in allowlisted_users:
+                log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist '
+                         f'for course {course_id}')
+            else:
+                log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
+                c.invalidate(source='bulk_certificate_regeneration')

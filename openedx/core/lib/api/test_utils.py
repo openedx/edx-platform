@@ -5,7 +5,6 @@ Helpers for API tests.
 import base64
 import json
 import re
-import six
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -50,7 +49,7 @@ class ApiTestCase(TestCase):
         allow_header = resp.get("Allow")
         assert allow_header is not None
         allowed_methods = re.split('[^A-Z]+', allow_header)
-        six.assertCountEqual(self, allowed_methods, expected_methods)
+        self.assertCountEqual(allowed_methods, expected_methods)
 
     def assertSelfReferential(self, obj):
         """Assert that accessing the "url" entry in the given object returns the same object"""
@@ -86,6 +85,6 @@ class ApiTestCase(TestCase):
         # Django rest framework interprets basic auth headers
         # as an attempt to authenticate with the API.
         # We don't want this for views available to anonymous users.
-        basic_auth_header = "Basic " + base64.b64encode('username:password'.encode('utf-8')).decode('utf-8')
+        basic_auth_header = "Basic " + base64.b64encode(b'username:password').decode('utf-8')
         response = getattr(self.client, method)(uri, HTTP_AUTHORIZATION=basic_auth_header)
         assert response.status_code != 403

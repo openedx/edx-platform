@@ -6,10 +6,9 @@ import random
 import string
 from collections import namedtuple
 from unittest import TestCase
+from unittest import mock
 
 import ddt
-import mock
-from six.moves import range
 from xblock.field_data import DictFieldData
 from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
 from xblock.runtime import Runtime
@@ -23,7 +22,7 @@ def attribute_pair_repr(self):
     Custom string representation for the AttributePair namedtuple which is
     consistent between test runs.
     """
-    return u'<AttributePair name={}>'.format(self.name)
+    return f'<AttributePair name={self.name}>'
 
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
@@ -66,7 +65,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Set up method
         """
-        super(DiscussionXBlockImportExportTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.keys = ScopeIds("any_user", "discussion", "def_id", "usage_id")
         self.runtime_mock = mock.Mock(spec=Runtime)
         self.runtime_mock.construct_xblock_from_class = mock.Mock(side_effect=self._construct_xblock_mock)
@@ -88,7 +87,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Test that xblock export XML format can be parsed preserving field values
         """
-        xblock_xml = u"""
+        xblock_xml = """
         <discussion
             url_name="82bb87a2d22240b1adac2dfcc1e7e5e4" xblock-family="xblock.v1"
             {id_attr}="{id_value}"
@@ -121,7 +120,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         Test that legacy export XML format can be parsed preserving field values
         """
         xblock_xml = """<discussion url_name="82bb87a2d22240b1adac2dfcc1e7e5e4"/>"""
-        xblock_definition_xml = u"""
+        xblock_definition_xml = """
         <discussion
             {id_attr}="{id_value}"
             {category_attr}="{category_value}"

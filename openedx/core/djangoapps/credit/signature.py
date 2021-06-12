@@ -78,7 +78,7 @@ def signature(params, shared_secret):
 
     """
     encoded_params = "".join([
-        "{key}:{value}".format(key=key, value=params[key])
+        f"{key}:{params[key]}"
         for key in sorted(params.keys())
         if key != "signature"
     ])

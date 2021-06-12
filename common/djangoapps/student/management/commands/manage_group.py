@@ -103,7 +103,8 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             except LookupError as exc:
                 raise CommandError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
 
-            content_type = ContentType.objects.get_for_model(model_class)
+            # Fetch content type for model, including proxy models.
+            content_type = ContentType.objects.get_for_model(model_class, for_concrete_model=False)
             try:
                 new_permission = Permission.objects.get(
                     content_type=content_type,

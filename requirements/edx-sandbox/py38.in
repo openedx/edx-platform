@@ -1,0 +1,20 @@
+-c ../constraints.txt
+
+chem                                # A helper library for chemistry calculations
+cryptography                        # Implementations of assorted cryptography algorithms
+lxml                                # XML parser
+matplotlib                          # 2D plotting library
+networkx                            # Utilities for creating, manipulating, and studying network graphs
+nltk                                # Natural language processing; used by the chem package
+numpy                               # Numeric array processing utilities; used by scipy
+openedx-calc
+pyparsing                           # Python Parsing module
+random2                             # Implementation of random module that works identically under Python 2 and 3
+scipy                               # Math, science, and engineering library
+sympy                               # Symbolic math library
+
+# Install these packages from the edx-platform working tree
+# NOTE: if you change code in these packages, you MUST change the version
+# number in its setup.py or the code WILL NOT be installed during deploy.
+-e common/lib/sandbox-packages
+-e common/lib/symmath

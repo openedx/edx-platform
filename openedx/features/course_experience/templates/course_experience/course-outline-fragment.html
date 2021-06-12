@@ -21,7 +21,7 @@ from openedx.features.course_experience import RELATIVE_DATES_FLAG
 <%
 course_sections = blocks.get('children')
 self_paced = context.get('self_paced', False)
-relative_dates_flag_is_enabled = RELATIVE_DATES_FLAG.is_enabled(str(course_key))
+relative_dates_flag_is_enabled = RELATIVE_DATES_FLAG.is_enabled(course_key)
 is_course_staff = bool(user and course and has_access(user, 'staff', course, course.id))
 dates_banner_displayed = False
 %>

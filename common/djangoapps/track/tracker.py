@@ -24,7 +24,7 @@ import inspect
 import warnings
 from importlib import import_module
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 
 from common.djangoapps.track.backends import BaseBackend
@@ -45,7 +45,7 @@ def _initialize_backends_from_django_settings():
 
     config = getattr(settings, 'TRACKING_BACKENDS', {})
 
-    for name, values in six.iteritems(config):
+    for name, values in config.items():
         # Ignore empty values to turn-off default tracker backends
         if values:
             engine = values['ENGINE']
@@ -92,7 +92,7 @@ def send(event):
     warnings.warn(
         'track.tracker module is deprecated. Please use eventtracking to send events.', DeprecationWarning
     )
-    for name, backend in six.iteritems(backends):  # lint-amnesty, pylint: disable=unused-variable
+    for name, backend in backends.items():  # lint-amnesty, pylint: disable=unused-variable
         backend.send(event)
 
 

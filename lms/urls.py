@@ -117,6 +117,9 @@ urlpatterns = [
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
+    # Agreements API RESTful endpoints
+    url(r'^api/agreements/v1/', include('openedx.core.djangoapps.agreements.urls')),
+
     # Entitlement API RESTful endpoints
     url(
         r'^api/entitlements/',
@@ -221,12 +224,6 @@ if settings.FEATURES.get('ENABLE_OPENBADGES'):
 urlpatterns += [
     url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
-
-# sysadmin dashboard, to see what courses are loaded, to delete & load courses
-if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
-    urlpatterns += [
-        url(r'^sysadmin/', include('lms.djangoapps.dashboard.sysadmin_urls')),
-    ]
 
 urlpatterns += [
     url(r'^support/', include('lms.djangoapps.support.urls')),
@@ -1004,3 +1001,9 @@ urlpatterns += [
 urlpatterns += [
     url(r'^api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
 ]
+
+# Bulk User Retirement API urls
+if settings.FEATURES.get('ENABLE_BULK_USER_RETIREMENT'):
+    urlpatterns += [
+        url(r'', include('lms.djangoapps.bulk_user_retirement.urls')),
+    ]

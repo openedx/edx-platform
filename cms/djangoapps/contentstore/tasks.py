@@ -5,12 +5,13 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
-import shutil
-import tarfile
-from datetime import datetime
-from tempfile import NamedTemporaryFile, mkdtemp
+import shutil  # lint-amnesty, pylint: disable=wrong-import-order
+import tarfile  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
+from tempfile import NamedTemporaryFile, mkdtemp  # lint-amnesty, pylint: disable=wrong-import-order
 
 import olxcleaner
+import pkg_resources
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -21,7 +22,6 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
-from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import (
     set_code_owner_attribute,
     set_code_owner_attribute_from_module,
@@ -39,6 +39,7 @@ from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
+import cms.djangoapps.contentstore.errors as UserErrors
 from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
@@ -58,18 +59,23 @@ from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
+from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 
 from .outlines import update_outline_from_modulestore
-from .toggles import course_import_olx_validation_is_enabled
+from .outlines_regenerate import CourseOutlineRegenerate
+from .toggles import bypass_olx_failure_enabled
+from .utils import course_import_olx_validation_is_enabled
 
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
+ALL_ALLOWED_XBLOCKS = frozenset(
+    [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
+)
 
 
 def clone_instance(instance, field_values):
@@ -226,6 +232,31 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.debug('Search indexing successful for library %s', library_id)
 
 
+@shared_task
+@set_code_owner_attribute
+def update_special_exams_and_publish(course_key_str):
+    """
+    Registers special exams for a given course and calls publishing flow.
+
+    on_course_publish expects that the edx-proctoring subsystem has been refreshed
+    before being executed, so both functions are called here synchronously.
+    """
+    from cms.djangoapps.contentstore.proctoring import register_special_exams
+    from openedx.core.djangoapps.credit.signals import on_course_publish
+
+    course_key = CourseKey.from_string(course_key_str)
+    LOGGER.info('Attempting to register exams for course %s', course_key_str)
+    try:
+        register_special_exams(course_key)
+        LOGGER.info('Successfully registered exams for course %s', course_key_str)
+    # pylint: disable=broad-except
+    except Exception as exception:
+        LOGGER.exception(exception)
+
+    LOGGER.info('Publishing course %s', course_key_str)
+    on_course_publish(course_key)
+
+
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for course and library export tasks.
@@ -272,11 +303,11 @@ def export_olx(self, user_id, course_key_string, language):
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         with translation_language(language):
-            self.status.fail(_('Unknown User ID: {0}').format(user_id))
+            self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
         return
     if not has_course_author_access(user, courselike_key):
         with translation_language(language):
-            self.status.fail(_('Permission denied'))
+            self.status.fail(UserErrors.PERMISSION_DENIED)
         return
 
     if isinstance(courselike_key, LibraryLocator):
@@ -305,7 +336,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_module.url_name
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
     try:
@@ -417,7 +448,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             return User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
             with translation_language(language):
-                self.status.fail(_('User permission denied.'))
+                self.status.fail(UserErrors.USER_PERMISSION_DENIED)
             LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -428,7 +459,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not has_access:
             message = f'User permission denied: {user.username}'
             with translation_language(language):
-                self.status.fail(_('Permission denied. You do not have write access to this course.'))
+                self.status.fail(UserErrors.COURSE_PERMISSION_DENIED)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return has_access
@@ -440,7 +471,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not file_is_valid:
             message = f'Unsupported file {archive_name}'
             with translation_language(language):
-                self.status.fail(_('We only support uploading a .tar.gz file.'))
+                self.status.fail(UserErrors.INVALID_FILE_TYPE)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return file_is_valid
@@ -452,7 +483,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not archive_path_exists:
             message = f'Uploaded file {archive_path} not found'
             with translation_language(language):
-                self.status.fail(_('Uploaded Tar file not found. Try again.'))
+                self.status.fail(UserErrors.FILE_NOT_FOUND)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return archive_path_exists
@@ -482,9 +513,9 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         dirpath = get_dir_for_filename(course_dir, root_name)
         if not dirpath:
-            message = f'Could not find the {root_name} file in the package.'
+            message = UserErrors.FILE_MISSING.format(root_name)
             with translation_language(language):
-                self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
+                self.status.fail(message)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
             return
@@ -557,19 +588,19 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             shutil.rmtree(course_dir)
             LOGGER.info(f'{log_prefix}: Temp data cleared')
 
-        self.status.fail(_('An Unknown error occurred during the unpacking step.'))
+        self.status.fail(UserErrors.UNKNOWN_ERROR_IN_UNPACKING)
         LOGGER.exception(f'{log_prefix}: Unknown error while unpacking', exc_info=True)
         monitor_import_failure(courselike_key, current_step, exception=exception)
         return
 
     # try-finally block for proper clean up after receiving file.
     try:
-        tar_file = tarfile.open(temp_filepath)
+        tar_file = tarfile.open(temp_filepath)  # lint-amnesty, pylint: disable=consider-using-with
         try:
             safetar_extractall(tar_file, (course_dir + '/'))
         except SuspiciousOperation as exc:
             with translation_language(language):
-                self.status.fail(_('Unsafe tar file. Aborting import.'))
+                self.status.fail(UserErrors.UNSAFE_TAR_FILE)
             LOGGER.error(f'{log_prefix}: Unsafe tar file')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -602,7 +633,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             static_content_store=contentstore(),
             target_id=courselike_key,
             verbose=True,
-            status=self.status
         )
 
         new_location = courselike_items[0].location
@@ -610,12 +640,10 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         LOGGER.info(f'{log_prefix}: Course import successful')
         set_custom_attribute('course_import_completed', True)
+    except (CourseImportException, InvalidProctoringProvider, DuplicateCourseError) as known_exe:
+        handle_course_import_exception(courselike_key, known_exe, self.status)
     except Exception as exception:  # pylint: disable=broad-except
-        msg = str(exception)
-        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
-        if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(_('Unknown error while importing course.'))
-        monitor_import_failure(courselike_key, current_step, exception=exception)
+        handle_course_import_exception(courselike_key, exception, self.status, known=False)
     finally:
         if course_dir.isdir():
             shutil.rmtree(course_dir)
@@ -640,7 +668,34 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
 @shared_task
 @set_code_owner_attribute
-def update_outline_from_modulestore_task(course_key_str):
+def update_all_outlines_from_modulestore_task():
+    """
+    Celery task that creates multiple celery tasks - one per learning_sequence course outline
+    to regenerate. The list of course keys to regenerate comes from the proxy model itself.
+    """
+    course_key_list = [str(course_key) for course_key in CourseOutlineRegenerate.get_course_outline_ids()]
+    for course_key_str in course_key_list:
+        try:
+            course_key = CourseKey.from_string(course_key_str)
+            if not key_supports_outlines(course_key):
+                LOGGER.warning(
+                    (
+                        "update_multiple_outlines_from_modulestore_task called for course key"
+                        " %s, which does not support learning_sequence outlines."
+                    ),
+                    course_key_str
+                )
+                return
+
+            update_outline_from_modulestore_task.delay(course_key_str)
+        except Exception:  # pylint: disable=broad-except
+            # Swallow the exception to continue the loop through course keys - but log it.
+            LOGGER.exception("Could not create course outline for course %s", course_key_str)
+
+
+@shared_task
+@set_code_owner_attribute
+def update_outline_from_modulestore_task(course_key_str: str):
     """
     Celery task that creates a learning_sequence course outline.
     """
@@ -657,7 +712,7 @@ def update_outline_from_modulestore_task(course_key_str):
             return
 
         update_outline_from_modulestore(course_key)
-    except Exception:  # pylint disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         LOGGER.exception("Could not create course outline for course %s", course_key_str)
         raise  # Re-raise so that errors are noted in reporting.
 
@@ -671,9 +726,10 @@ def validate_course_olx(courselike_key, course_dir, status):
         course_dir: complete path to the course olx
         status: UserTaskStatus object.
     """
-    is_library = isinstance(courselike_key, LibraryLocator)
     olx_is_valid = True
     log_prefix = f'Course import {courselike_key}'
+    validation_failed_mesg = 'CourseOlx validation failed.'
+    is_library = isinstance(courselike_key, LibraryLocator)
 
     if is_library:
         return olx_is_valid
@@ -681,28 +737,34 @@ def validate_course_olx(courselike_key, course_dir, status):
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
     try:
-        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8)
+        __, errorstore, __ = olxcleaner.validate(
+            filename=course_dir,
+            steps=settings.COURSE_OLX_VALIDATION_STAGE,
+            ignore=settings.COURSE_OLX_VALIDATION_IGNORE_LIST,
+            allowed_xblocks=ALL_ALLOWED_XBLOCKS
+        )
     except Exception:  # pylint: disable=broad-except
-        LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
+        LOGGER.exception(f'{log_prefix}: CourseOlx could not be validated')
         return olx_is_valid
-
-    log_errors = len(errorstore.errors) > 0
-    if log_errors:
-        log_errors_to_artifact(errorstore, status)
 
     has_errors = errorstore.return_error(ErrorLevel.ERROR.value)
     if not has_errors:
         return olx_is_valid
 
-    LOGGER.error(f'{log_prefix}: CourseOlx validation failed')
+    LOGGER.error(f'{log_prefix}: {validation_failed_mesg}')
+    log_errors_to_artifact(errorstore, status)
 
-    # TODO: Do not fail the task until we have some data about kinds of
-    #  olx validation failures. TNL-8151
-    return olx_is_valid
+    if bypass_olx_failure_enabled():
+        return olx_is_valid
+
+    monitor_import_failure(courselike_key, status.state, message=validation_failed_mesg)
+    status.fail(UserErrors.OLX_VALIDATION_FAILED)
+    return False
 
 
 def log_errors_to_artifact(errorstore, status):
     """Log errors as a task artifact."""
+
     def get_error_by_type(error_type):
         return [error for error in error_report if error.startswith(error_type)]
 
@@ -714,3 +776,26 @@ def log_errors_to_artifact(errorstore, status):
         'warnings': get_error_by_type(ErrorLevel.WARNING.name),
     })
     UserTaskArtifact.objects.create(status=status, name='OLX_VALIDATION_ERROR', text=message)
+
+
+def handle_course_import_exception(courselike_key, exception, status, known=True):
+    """
+    Handle course import exception and fail task status.
+
+    Arguments:
+        courselike_key: A locator identifies a course resource.
+        exception: Exception object
+        status: UserTaskStatus object.
+        known: boolean indicating if this is a known failure or unknown.
+    """
+    exception_message = str(exception)
+    log_prefix = f"Course import {courselike_key}:"
+    LOGGER.exception(f"{log_prefix} Error while importing course: {exception_message}")
+    task_fail_message = UserErrors.UNKNOWN_ERROR_IN_IMPORT
+    monitor_import_failure(courselike_key, status.state, exception=exception)
+
+    if known:
+        task_fail_message = exception_message
+
+    if status.state != UserTaskStatus.FAILED:
+        status.fail(task_fail_message)

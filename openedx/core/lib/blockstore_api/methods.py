@@ -10,7 +10,6 @@ import dateutil.parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import requests
-import six
 
 from .models import (
     Bundle,
@@ -43,7 +42,7 @@ def api_request(method, url, **kwargs):
     """
     if not settings.BLOCKSTORE_API_AUTH_TOKEN:
         raise ImproperlyConfigured("Cannot use Blockstore unless BLOCKSTORE_API_AUTH_TOKEN is set.")
-    kwargs.setdefault('headers', {})['Authorization'] = "Token {}".format(settings.BLOCKSTORE_API_AUTH_TOKEN)
+    kwargs.setdefault('headers', {})['Authorization'] = f"Token {settings.BLOCKSTORE_API_AUTH_TOKEN}"
     response = requests.request(method, url, **kwargs)
     if response.status_code == 404:
         raise NotFound
@@ -115,7 +114,7 @@ def get_collection(collection_uuid):
     try:
         data = api_request('get', api_url('collections', str(collection_uuid)))
     except NotFound:
-        raise CollectionNotFound("Collection {} does not exist.".format(collection_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CollectionNotFound(f"Collection {collection_uuid} does not exist.")  # lint-amnesty, pylint: disable=raise-missing-from
     return _collection_from_response(data)
 
 
@@ -170,7 +169,7 @@ def get_bundle(bundle_uuid):
     try:
         data = api_request('get', api_url('bundles', str(bundle_uuid)))
     except NotFound:
-        raise BundleNotFound("Bundle {} does not exist.".format(bundle_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise BundleNotFound(f"Bundle {bundle_uuid} does not exist.")  # lint-amnesty, pylint: disable=raise-missing-from
     return _bundle_from_response(data)
 
 
@@ -202,7 +201,8 @@ def update_bundle(bundle_uuid, **fields):
     if "collection_uuid" in fields:
         data["collection_uuid"] = str(fields.pop("collection_uuid"))
     if fields:
-        raise ValueError("Unexpected extra fields passed to update_bundle: {}".format(fields.keys()))
+        raise ValueError(f"Unexpected extra fields passed "  # pylint: disable=dict-keys-not-iterating
+                         f"to update_bundle: {fields.keys()}")
     result = api_request('patch', api_url('bundles', str(bundle_uuid)), json=data)
     return _bundle_from_response(result)
 
@@ -224,7 +224,7 @@ def get_draft(draft_uuid):
     try:
         data = api_request('get', api_url('drafts', str(draft_uuid)))
     except NotFound:
-        raise DraftNotFound("Draft does not exist: {}".format(draft_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise DraftNotFound(f"Draft does not exist: {draft_uuid}")  # lint-amnesty, pylint: disable=raise-missing-from
     return _draft_from_response(data)
 
 
@@ -323,7 +323,7 @@ def get_bundle_files(bundle_uuid, use_draft=None):
     """
     Get an iterator over all the files in the specified bundle or draft.
     """
-    return get_bundle_files_dict(bundle_uuid, use_draft).values()
+    return get_bundle_files_dict(bundle_uuid, use_draft).values()  # lint-amnesty, pylint: disable=dict-values-not-iterating
 
 
 def get_bundle_links(bundle_uuid, use_draft=None):
@@ -354,7 +354,7 @@ def get_bundle_file_metadata(bundle_uuid, path, use_draft=None):
         return files_dict[path]
     except KeyError:
         raise BundleFileNotFound(  # lint-amnesty, pylint: disable=raise-missing-from
-            "Bundle {} (draft: {}) does not contain a file {}".format(bundle_uuid, use_draft, path)
+            f"Bundle {bundle_uuid} (draft: {use_draft}) does not contain a file {path}"
         )
 
 
@@ -409,7 +409,7 @@ def encode_str_for_draft(input_str):
     """
     Given a string, return UTF-8 representation that is then base64 encoded.
     """
-    if isinstance(input_str, six.text_type):
+    if isinstance(input_str, str):
         binary = input_str.encode('utf8')
     else:
         binary = input_str

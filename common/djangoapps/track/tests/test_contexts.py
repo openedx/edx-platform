@@ -23,7 +23,7 @@ class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-doc
     )
     @ddt.unpack
     def test_course_id_from_url(self, course_id, postfix):
-        url = 'http://foo.bar.com/courses/{}{}'.format(course_id, postfix)
+        url = f'http://foo.bar.com/courses/{course_id}{postfix}'
         self.assert_parses_course_id_from_url(url, course_id)
 
     def assert_parses_course_id_from_url(self, format_string, course_id):
@@ -38,7 +38,7 @@ class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-doc
 
     @ddt.data('', '/', '/?', '?format=json')
     def test_malformed_course_id(self, postfix):
-        self.assert_empty_context_for_url('http://foo.bar.com/courses/test/course_name{}'.format(postfix))
+        self.assert_empty_context_for_url(f'http://foo.bar.com/courses/test/course_name{postfix}')
 
     @ddt.data(
         (COURSE_ID, ''),
@@ -50,7 +50,7 @@ class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-doc
     )
     @ddt.unpack
     def test_course_id_later_in_url(self, course_id, postfix):
-        url = 'http://foo.bar.com/x/y/z/courses/{}{}'.format(course_id, postfix)
+        url = f'http://foo.bar.com/x/y/z/courses/{course_id}{postfix}'
         self.assert_parses_course_id_from_url(url, course_id)
 
     def test_no_url(self):

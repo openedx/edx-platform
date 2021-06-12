@@ -8,7 +8,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.certificates.generation_handler import is_using_certificate_allowlist_and_is_on_allowlist
+from lms.djangoapps.certificates.generation_handler import is_on_certificate_allowlist
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.utils import _get_key
 
@@ -26,9 +26,8 @@ class CertificateService:
         course run.
         """
         course_key = _get_key(course_key_or_id, CourseKey)
-        if is_using_certificate_allowlist_and_is_on_allowlist(user_id, course_key):
-            log.info('{course_key} is using allowlist certificates, and the user {user_id} is on its allowlist. The '
-                     'certificate will not be invalidated.'.format(course_key=course_key, user_id=user_id))
+        if is_on_certificate_allowlist(user_id, course_key):
+            log.info(f'User {user_id} is on the allowlist for {course_key}. The certificate will not be invalidated.')
             return False
 
         try:
@@ -36,7 +35,7 @@ class CertificateService:
                 user=user_id,
                 course_id=course_key
             )
-            generated_certificate.invalidate()
+            generated_certificate.invalidate(source='certificate_service')
         except ObjectDoesNotExist:
             log.warning(
                 'Invalidation failed because a certificate for user %d in course %s does not exist.',

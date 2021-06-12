@@ -10,7 +10,7 @@ import subprocess
 import sys
 from distutils import sysconfig
 
-from paver.easy import BuildFailure, sh, task  # lint-amnesty, pylint: disable=unused-import
+from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
 
 from .utils.envs import Env
 from .utils.timer import timed
@@ -135,20 +135,20 @@ def node_prereqs_installation():
         npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.{shard_str}.log'
     else:
         npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
-    npm_log_file = open(npm_log_file_path, 'wb')
+    npm_log_file = open(npm_log_file_path, 'wb')  # lint-amnesty, pylint: disable=consider-using-with
     npm_command = 'npm install --verbose'.split()
 
     # The implementation of Paver's `sh` function returns before the forked
     # actually returns. Using a Popen object so that we can ensure that
     # the forked process has returned
-    proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+    proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
     retcode = proc.wait()
     if retcode == 1:
         # Error handling around a race condition that produces "cb() never called" error. This
         # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
         # npm to 3 or higher. TODO: clean this up when we do that.
         print("npm install error detected. Retrying...")
-        proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+        proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
         retcode = proc.wait()
         if retcode == 1:
             raise Exception(f"npm install failed: See {npm_log_file_path}")

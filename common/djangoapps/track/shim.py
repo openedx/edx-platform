@@ -16,7 +16,7 @@ CONTEXT_FIELDS_TO_INCLUDE = [
 ]
 
 
-class LegacyFieldMappingProcessor(object):
+class LegacyFieldMappingProcessor:
     """Ensures all required fields are included in emitted events"""
 
     def __call__(self, event):
@@ -73,7 +73,7 @@ def remove_shim_context(event):
                 del context[field]
 
 
-class GoogleAnalyticsProcessor(object):
+class GoogleAnalyticsProcessor:
     """Adds course_id as label, and sets nonInteraction property"""
 
     # documentation of fields here: https://segment.com/docs/integrations/google-analytics/
@@ -91,7 +91,7 @@ class GoogleAnalyticsProcessor(object):
         return copied_event
 
 
-class PrefixedEventProcessor(object):
+class PrefixedEventProcessor:
     """
     Process any events whose name or prefix (ending with a '.') is registered
     as an EventTransformer.

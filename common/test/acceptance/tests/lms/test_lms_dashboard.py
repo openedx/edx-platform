@@ -52,7 +52,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
             }
         }
 
-        self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        self.username = f"test_{self.unique_id[0:6]}"
         self.email = f"{self.username}@example.com"
 
         self.course_keys = {}

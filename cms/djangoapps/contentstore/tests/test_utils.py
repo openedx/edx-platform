@@ -1,20 +1,22 @@
 """ Tests for utils. """
 import collections
 from datetime import datetime, timedelta
+from unittest import mock
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
+import ddt
+from django.conf import settings
 from django.test import TestCase
-from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import Mock, mock, patch
+from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 from cms.djangoapps.contentstore import utils
-from cms.djangoapps.contentstore.tasks import validate_course_olx
+from cms.djangoapps.contentstore.tasks import ALL_ALLOWED_XBLOCKS, validate_course_olx
 from cms.djangoapps.contentstore.tests.utils import TEST_DATA_DIR, CourseTestCase
-from cms.djangoapps.contentstore.toggles import COURSE_IMPORT_OLX_VALIDATION
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -32,7 +34,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
         self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                         "@vertical+block@contacting_us")
+                               "@vertical+block@contacting_us")
 
         # test preview
         link = utils.get_lms_link_for_item(location, True)
@@ -46,7 +48,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
         self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                         "@course+block@test")
+                               "@course+block@test")
 
     def lms_link_for_certificate_web_view_test(self):
         """ Tests get_lms_link_for_certificate_web_view. """
@@ -623,8 +625,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         return utils.get_user_partition_info(self.block, schemes=schemes)
 
 
-@override_waffle_flag(COURSE_IMPORT_OLX_VALIDATION, active=True)
+@patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True)
 @mock.patch('olxcleaner.validate')
+@ddt.ddt
 class ValidateCourseOlxTests(CourseTestCase):
     """Tests for olx validation"""
 
@@ -636,7 +639,6 @@ class ValidateCourseOlxTests(CourseTestCase):
         self.status = UserTaskStatus.objects.create(
             user=self.user, task_id=str(uuid4()), task_class='sample_task', name='CourseImport', total_steps=4
         )
-        self.waffle_flg = COURSE_IMPORT_OLX_VALIDATION
 
     def test_with_library_locator(self, mock_olxcleaner_validate):
         """
@@ -646,13 +648,21 @@ class ValidateCourseOlxTests(CourseTestCase):
         self.assertTrue(validate_course_olx(library_key, self.toy_course_path, self.status))
         self.assertFalse(mock_olxcleaner_validate.called)
 
-    def test_waffle_flag_settings(self, mock_olxcleaner_validate):
+    def test_config_settings_enabled(self, mock_olxcleaner_validate):
         """
-        Tests olx validation in case of waffle flag is off.
+        Tests olx validation with config setting is disabled.
         """
-        with override_waffle_flag(self.waffle_flg, active=False):
+        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=False):
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertFalse(mock_olxcleaner_validate.called)
+
+    def test_config_settings_disabled(self, mock_olxcleaner_validate):
+        """
+        Tests olx validation with config setting is enabled.
+        """
+        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True):
+            self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
+            self.assertTrue(mock_olxcleaner_validate.called)
 
     def test_exception_during_validation(self, mock_olxcleaner_validate):
         """
@@ -661,13 +671,12 @@ class ValidateCourseOlxTests(CourseTestCase):
         In case of any unexpected exception during the olx validation,
          the course import continues and information is logged on the server.
         """
-
         mock_olxcleaner_validate.side_effect = Exception
         with mock.patch(self.LOGGER) as patched_log:
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertTrue(mock_olxcleaner_validate.called)
             patched_log.exception.assert_called_once_with(
-                f'Course import {self.course.id}: CourseOlx Could not be validated')
+                f'Course import {self.course.id}: CourseOlx could not be validated')
 
     def test_no_errors(self, mock_olxcleaner_validate):
         """
@@ -689,7 +698,7 @@ class ValidateCourseOlxTests(CourseTestCase):
     def test_creates_artifact(self, mock_report_errors, mock_report_error_summary, mock_olxcleaner_validate):
         """
         Tests olx validation in case of errors.
-        Verify that in case of olx validation errors, course import does not fail & errors
+        Verify that in case of olx validation errors, course import does fail & errors
         are logged in task artifact.
         """
         errors = [Mock(description='DuplicateURLNameError', level_val=3)]
@@ -703,8 +712,27 @@ class ValidateCourseOlxTests(CourseTestCase):
         mock_report_error_summary.return_value = [f'Errors: {len(errors)}']
 
         with patch(self.LOGGER) as patched_log:
-            self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
+            self.assertFalse(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             patched_log.error.assert_called_once_with(
-                f'Course import {self.course.id}: CourseOlx validation failed')
+                f'Course import {self.course.id}: CourseOlx validation failed.')
+
         task_artifact = UserTaskArtifact.objects.filter(status=self.status, name='OLX_VALIDATION_ERROR').first()
         self.assertIsNotNone(task_artifact)
+
+    def test_validate_calls_with(self, mock_olxcleaner_validate):
+        """
+        Tests that olx library is called with expected keyword arguments.
+        """
+        allowed_xblocks = ALL_ALLOWED_XBLOCKS
+        steps = 2
+        ignore = ['edx-xblock']
+        mock_olxcleaner_validate.return_value = [Mock(), Mock(errors=[], return_error=Mock(return_value=False)), Mock()]
+
+        with override_settings(COURSE_OLX_VALIDATION_STAGE=steps, COURSE_OLX_VALIDATION_IGNORE_LIST=ignore):
+            validate_course_olx(self.course.id, self.toy_course_path, self.status)
+            mock_olxcleaner_validate.assert_called_with(
+                filename=self.toy_course_path,
+                steps=steps,
+                ignore=ignore,
+                allowed_xblocks=allowed_xblocks
+            )

@@ -3,7 +3,6 @@
 
 import datetime
 import json
-import sys
 from unittest import mock
 from unittest.mock import Mock, patch
 
@@ -20,8 +19,8 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
@@ -40,11 +39,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     ForumsConfig,
     assign_role
 )
-from openedx.core.djangoapps.django_comment_common.utils import (
-    get_course_discussion_settings,
-    seed_permissions_roles,
-    set_course_discussion_settings
-)
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -166,7 +161,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
         def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=invalid-name
             """Asserts that the given thread has the expected set of properties"""
-            assert set(thread.keys()) == set(['commentable_id', 'courseware_url', 'courseware_title'])
+            assert set(thread.keys()) == {'commentable_id', 'courseware_url', 'courseware_title'}
             assert thread.get('courseware_url') == reverse('jump_to', kwargs={'course_id': str(self.course.id), 'location': str(discussion.location)})
             assert thread.get('courseware_title') == expected_title
 
@@ -657,16 +652,16 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         category_map = utils.get_discussion_category_map(self.course, self.user)
 
         chapter1 = category_map["subcategories"]["Chapter 1"]
-        chapter1_discussions = set(["Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"])
-        chapter1_discussions_with_types = set([("Discussion A", TYPE_ENTRY), ("Discussion B", TYPE_ENTRY),
-                                               ("Discussion A (1)", TYPE_ENTRY), ("Discussion A (2)", TYPE_ENTRY)])
+        chapter1_discussions = {"Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"}
+        chapter1_discussions_with_types = {("Discussion A", TYPE_ENTRY), ("Discussion B", TYPE_ENTRY),
+                                           ("Discussion A (1)", TYPE_ENTRY), ("Discussion A (2)", TYPE_ENTRY)}
         assert set(chapter1['children']) == chapter1_discussions_with_types
         assert set(chapter1['entries'].keys()) == chapter1_discussions
 
         chapter2 = category_map["subcategories"]["Chapter 2"]
         subsection1 = chapter2["subcategories"]["Section 1"]["subcategories"]["Subsection 1"]
-        subsection1_discussions = set(["Discussion", "Discussion (1)"])
-        subsection1_discussions_with_types = set([("Discussion", TYPE_ENTRY), ("Discussion (1)", TYPE_ENTRY)])
+        subsection1_discussions = {"Discussion", "Discussion (1)"}
+        subsection1_discussions_with_types = {("Discussion", TYPE_ENTRY), ("Discussion (1)", TYPE_ENTRY)}
         assert set(subsection1['children']) == subsection1_discussions_with_types
         assert set(subsection1['entries'].keys()) == subsection1_discussions
 
@@ -1388,7 +1383,7 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
         )
 
     def test_discussion_division_disabled(self):
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert CourseDiscussionSettings.NONE == course_discussion_settings.division_scheme
         assert utils.get_group_id_for_user(self.test_user, course_discussion_settings) is None
 
@@ -1396,7 +1391,7 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert CourseDiscussionSettings.COHORT == course_discussion_settings.division_scheme
         assert self.test_cohort.id == utils.get_group_id_for_user(self.test_user, course_discussion_settings)
 
@@ -1404,7 +1399,7 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(
             self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
         )
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert CourseDiscussionSettings.ENROLLMENT_TRACK == course_discussion_settings.division_scheme
         assert (- 2) == utils.get_group_id_for_user(self.test_user, course_discussion_settings)
 
@@ -1423,7 +1418,7 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         )
 
     def test_discussion_division_disabled(self):
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert not utils.course_discussion_division_enabled(course_discussion_settings)
         assert [] == utils.available_division_schemes(self.course.id)
 
@@ -1432,13 +1427,13 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
             self.course.id, enable_cohorts=False, division_scheme=CourseDiscussionSettings.COHORT
         )
         # Because cohorts are disabled, discussion division is not enabled.
-        assert not utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id))
+        assert not utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
         assert [] == utils.available_division_schemes(self.course.id)
         # Now enable cohorts, which will cause discussions to be divided.
         set_discussion_division_settings(
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
-        assert utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id))
+        assert utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
         assert [CourseDiscussionSettings.COHORT] == utils.available_division_schemes(self.course.id)
 
     def test_discussion_division_by_enrollment_track(self):
@@ -1446,12 +1441,12 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
             self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
         )
         # Only a single enrollment track exists, so discussion division is not enabled.
-        assert not utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id))
+        assert not utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
         assert [] == utils.available_division_schemes(self.course.id)
 
         # Now create a second CourseMode, which will cause discussions to be divided.
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        assert utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id))
+        assert utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
         assert [CourseDiscussionSettings.ENROLLMENT_TRACK] == utils.available_division_schemes(self.course.id)
 
 
@@ -1475,7 +1470,7 @@ class GroupNameTestCase(ModuleStoreTestCase):
         )
 
     def test_discussion_division_disabled(self):
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert {} == utils.get_group_names_by_id(course_discussion_settings)
         assert utils.get_group_name((- 1000), course_discussion_settings) is None
 
@@ -1483,7 +1478,7 @@ class GroupNameTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert {self.test_cohort_1.id: self.test_cohort_1.name, self.test_cohort_2.id: self.test_cohort_2.name} == utils.get_group_names_by_id(course_discussion_settings)
         assert self.test_cohort_2.name == utils.get_group_name(self.test_cohort_2.id, course_discussion_settings)
         # Test also with a group_id that doesn't exist.
@@ -1493,7 +1488,7 @@ class GroupNameTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(
             self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
         )
-        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert {(- 1): 'audit course', (- 2): 'verified course'} == utils.get_group_names_by_id(course_discussion_settings)
 
         assert 'verified course' == utils.get_group_name((- 2), course_discussion_settings)
@@ -1698,12 +1693,12 @@ def set_discussion_division_settings(
     COHORT is the default division_scheme, as no other schemes were supported at
     the time that the unit tests were originally written.
     """
-    set_course_discussion_settings(
-        course_key=course_key,
-        divided_discussions=divided_discussions,
-        division_scheme=division_scheme,
-        always_divide_inline_discussions=always_divide_inline_discussions,
-    )
+    discussion_settings = CourseDiscussionSettings.get(course_key)
+    discussion_settings.update({
+        'divided_discussions': divided_discussions,
+        'division_scheme': division_scheme,
+        'always_divide_inline_discussions': always_divide_inline_discussions,
+    })
     set_course_cohorted(course_key, enable_cohorts)
 
 

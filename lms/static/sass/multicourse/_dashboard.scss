@@ -64,10 +64,11 @@
 
         .details {
           @include clearfix();
+          @include padding-right($baseline);
 
           .wrapper-course-image {
             @include float(left);
-            @include margin-right(flex-gutter());
+            @include margin-right($baseline);
 
             width: flex-grid(3);
             max-height: 150px;
@@ -83,6 +84,7 @@
 
               .course-image {
                 width: 100%;
+                padding: 2px;
               }
             }
 
@@ -128,7 +130,7 @@
 
           .wrapper-course-details {
             display: flex;
-            flex-flow: row wrap;
+            flex-flow: column wrap;
             padding: 0;
             margin-bottom: $baseline/2;
             justify-content: space-between;
@@ -156,6 +158,10 @@
             }
 
             .course-info {
+              flex-grow: 1;
+              flex-shrink: 0;
+              min-width: 15em;
+
               [class*="info-"] {
                 font: -apple-system-short-subheadline !important;
                 color: $gray-d1;
@@ -196,20 +202,36 @@
               }
             }
 
-            .wrapper-course-actions {
-              @include margin-right($baseline);
+            .wrapper-course-info-actions {
+              display: flex;
 
-              margin-top: $baseline;
-              align-self: flex-end;
+              .wrapper-course-info-row {
+                width: 100%;
+                display: inline-flex;
+                flex-wrap: wrap;
+
+                .course-info {
+                  flex-shrink: 0;
+                  min-width: 10em;
+                }
+
+                .wrapper-course-actions {
+                  margin-top: $baseline;
+
+                  flex-grow: 1;
+                  flex-shrink: 0;
+                }
+              }
+
+              .continue-button {
+                flex-shrink: 0;
+                flex-grow: 1;
+                align-self: flex-end;
+              }
             }
-
 
             // Responsive behavior
             @include media-breakpoint-down(sm) {
-              width: 100%;
-              display: flex;
-              flex-direction: column;
-
               .course-info,
               .wrapper-course-actions {
                 flex-grow: 1;
@@ -220,6 +242,30 @@
 
                 .wrapper-action-more {
                   padding-top: 3px;
+                }
+              }
+            }
+
+            @include media-breakpoint-down(xs) {
+              margin-bottom: $baseline;
+              @include padding-left($baseline/2);
+
+              .wrapper-course-info-actions {
+                flex-wrap: wrap;
+                flex-flow: row wrap;
+
+                .wrapper-course-info-row {
+                  .wrapper-course-actions {
+                    margin-top: 0px;
+                  }
+                }
+              }
+
+              .continue-button {
+                .enter-course {
+                  flex: 2 100%;
+                  width: 100%;
+                  margin-top: $baseline;
                 }
               }
             }
@@ -414,6 +460,7 @@
             @extend %btn-pl-white-base;
 
             @include float(right);
+            margin-top: $baseline;
 
             &.archived {
               @extend %btn-pl-default-base;
@@ -731,6 +778,11 @@
 
     // TYPE: upsell
     &.message-upsell {
+      padding-left: $baseline;
+      padding-top: $baseline;
+      padding-bottom: $baseline;
+      background-color: #F2F0EF;
+
       .wrapper-tip {
         @include clearfix();
 
@@ -754,13 +806,61 @@
       }
 
       .wrapper-extended {
-        padding: ($baseline/4) 0;
+        display: flex;
+        flex-flow: column wrap;
+        color: #00262B;
 
-        .message-copy {
-          display: inline-block;
+        .wrapper-icon-message {
+          width: 100%;
+          display: inline-flex;
+          flex-wrap: wrap;
 
-          .message-copy-bold {
-            font-weight: 600;
+          svg {
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            margin-left: -5px;
+          }
+
+          .message-copy {
+            margin-left: $baseline/2;
+            min-width: 15rem;
+            flex: 2;
+
+            .message-copy-bold {
+              font-weight: $font-weight-bold;
+            }
+          }
+
+          a.verified-info {
+            color: #00262B;
+            text-decoration: underline;
+          }
+        }
+
+        .action-upgrade-container {
+          flex-shrink: 0;
+          flex-grow: 1;
+          align-self: flex-end;
+        }
+
+        @include media-breakpoint-down(xs) {
+          .action-upgrade-container {
+            width: 100%;
+            margin-top: $baseline;
+          }
+
+          .action-upgrade {
+            width: 100%;
+            flex: 2 100%;
+          }
+        }
+
+        @include media-breakpoint-up(xl) {
+          flex-flow: nowrap;
+
+          .action-upgrade-container {
+            margin-left: 16px;
           }
         }
       }
@@ -965,6 +1065,11 @@
         .btn {
           margin-top: 2px;
         }
+      }
+
+      &.course-status-earned-not-available,
+      &.course-status-certavailable {
+        color: #0d7d4d;
       }
 
       &.course-status-certavailable {
@@ -1534,6 +1639,59 @@ a.fade-cover {
     margin-left: $baseline;
     margin-right: $baseline;
   }
+}
+
+#activate-account-modal {
+    display: block;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -60px;
+    text-align: left;
+    height: 252px;
+    width: 450px;
+    box-shadow: none;
+    background: none;
+
+    .inner-wrapper {
+      h3 {
+          font-family: inherit;
+          padding: 1.5rem 1rem 1rem 1rem;
+          text-align: left;
+          font-weight: bold;
+          font-size: 1.3rem;
+          line-height: 1.75rem;
+      }
+        border: none;
+        border-radius: 5px;
+    }
+}
+
+@media (max-width: 460px) and (min-width: 360px) {
+    #activate-account-modal {
+        width: 350px;
+    }
+}
+
+@media (max-width: 360px) {
+    #activate-account-modal {
+        width: 300px;
+    }
+}
+
+.activate-account-modal-button {
+    text-align: right;
+    display: block;
+    padding: 1rem 1rem 1rem 0;
+
+    .btn-primary {
+        text-transform: none;
+        font-weight: 500;
+    }
+}
+.activate-account-modal-body {
+    padding: 0 1rem;
 }
 
 .reasons_survey {

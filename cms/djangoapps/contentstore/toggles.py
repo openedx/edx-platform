@@ -35,17 +35,17 @@ SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
     module_name=__name__
 )
 
-# .. toggle_name: course_import_olx_validation
+# .. toggle_name: bypass_olx_failure
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables olx validation during course import.
+# .. toggle_description: Enables bypassing olx validation failures during course import.
 # .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-04-01
-# .. toggle_target_removal_date: 2021-05-01
-# .. toggle_tickets: TNL-8151
-COURSE_IMPORT_OLX_VALIDATION = LegacyWaffleFlag(
+# .. toggle_creation_date: 2021-04-15
+# .. toggle_target_removal_date: 2021-05-15
+# .. toggle_tickets: TNL-8214
+BYPASS_OLX_FAILURE = LegacyWaffleFlag(
     waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
-    flag_name='course_import_olx_validation',
+    flag_name='bypass_olx_failure',
     module_name=__name__
 )
 
@@ -57,8 +57,27 @@ def split_library_view_on_dashboard():
     return SPLIT_LIBRARY_ON_DASHBOARD.is_enabled()
 
 
-def course_import_olx_validation_is_enabled():
+def bypass_olx_failure_enabled():
     """
-    Check if course olx validation is enabled on course import.
+    Check if bypass is enabled for course olx validation errors.
     """
-    return COURSE_IMPORT_OLX_VALIDATION.is_enabled()
+    return BYPASS_OLX_FAILURE.is_enabled()
+
+
+# .. toggle_name: FEATURES['ENABLE_EXAM_SETTINGS_HTML_VIEW']
+# .. toggle_use_cases: open_edx
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: False
+# .. toggle_description: When enabled, users can access the new course authoring view for proctoring exams
+# .. toggle_warnings: None
+# .. toggle_creation_date: 2020-07-23
+ENABLE_EXAM_SETTINGS_HTML_VIEW = SettingDictToggle(
+    "FEATURES", "ENABLE_EXAM_SETTINGS_HTML_VIEW", default=False, module_name=__name__
+)
+
+
+def exam_setting_view_enabled():
+    """
+    Returns a boolean if proctoring exam setting mfe view is enabled.
+    """
+    return ENABLE_EXAM_SETTINGS_HTML_VIEW.is_enabled()

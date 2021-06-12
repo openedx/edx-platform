@@ -4,12 +4,11 @@ Tests for xblock_utils.py
 
 
 import uuid
+from unittest.mock import patch
 
 import ddt
-import six
 from django.conf import settings
 from django.test.client import RequestFactory
-from mock import patch
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
@@ -41,7 +40,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestXblockUtils, cls).setUpClass()
+        super().setUpClass()
         cls.course_mongo = CourseFactory.create(
             default_store=ModuleStoreEnum.Type.mongo,
             org='TestX',
@@ -99,7 +98,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that new content is added and the resources are the same.
         """
-        fragment = self.create_fragment(u"<h1>Test!</h1>")
+        fragment = self.create_fragment("<h1>Test!</h1>")
         fragment.initialize_js('BlockMain')  # wrap_block() sets some attributes only if there is JS.
         course = getattr(self, course_id)
         test_wrap_output = wrap_xblock(
@@ -108,7 +107,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             view='baseview',
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
-            usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
+            usage_id_serializer=lambda usage_id: quote_slashes(str(usage_id)),
             request_token=uuid.uuid1().hex
         )
         assert isinstance(test_wrap_output, Fragment)
@@ -117,7 +116,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         assert data_usage_id in test_wrap_output.content
         assert '<h1>Test!</h1>' in test_wrap_output.content
         assert 'data-custom-attribute="custom-value"' in test_wrap_output.content
-        assert test_wrap_output.resources[0].data == u'body {background-color:red;}'
+        assert test_wrap_output.resources[0].data == 'body {background-color:red;}'
         assert test_wrap_output.resources[1].data == 'alert("Hi!");'
 
     @ddt.data('course_mongo', 'course_split')
@@ -235,7 +234,7 @@ class TestXBlockAside(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestXBlockAside, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.block = ItemFactory.create(category='aside', parent=cls.course)
         cls.aside_v2 = AsideUsageKeyV2(cls.block.scope_ids.usage_id, "aside")
@@ -254,4 +253,4 @@ class TestXBlockAside(SharedModuleStoreTestCase):
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     def test_get_aside(self):
         """test get aside success"""
-        assert get_aside_from_xblock(self.block, six.text_type("test_aside")) is not None
+        assert get_aside_from_xblock(self.block, "test_aside") is not None

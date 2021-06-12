@@ -4,12 +4,13 @@ import ddt
 from django.test import RequestFactory
 from django.test.utils import override_settings
 
-from common.lib.xmodule.xmodule.capa_base import SHOWANSWER
+from edx_toggles.toggles.testutils import override_waffle_flag
+
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from xmodule.capa_module import SHOWANSWER
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -36,7 +37,7 @@ class ShowAnswerFieldOverrideTest(ModuleStoreTestCase):
 
     @ddt.data(True, False)
     def test_override_enabled_for(self, active):
-        with override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=active):
+        with override_waffle_flag(RELATIVE_DATES_FLAG, active=active):
             # Instructor paced course will just have the default value
             ip_course = self.setup_course()
             course_module = self.get_course_module(ip_course)
@@ -63,7 +64,7 @@ class ShowAnswerFieldOverrideTest(ModuleStoreTestCase):
         (SHOWANSWER.ALWAYS, SHOWANSWER.ALWAYS),
     )
     @ddt.unpack
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_get(self, initial_value, expected_final_value):
         course = self.setup_course(self_paced=True, showanswer=initial_value)
         course_module = self.get_course_module(course)

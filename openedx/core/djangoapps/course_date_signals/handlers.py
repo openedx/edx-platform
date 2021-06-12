@@ -6,7 +6,7 @@ import logging
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 
-from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
 from xblock.fields import Scope  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum

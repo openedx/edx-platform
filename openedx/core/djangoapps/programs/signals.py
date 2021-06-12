@@ -169,15 +169,11 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.info(
-        'handling COURSE_CERT_REVOKED: username=%s, course_key=%s, mode=%s, status=%s',
-        user,
-        course_key,
-        mode,
-        status,
+        f"handling COURSE_CERT_REVOKED: user={user.id}, course_key={course_key}, mode={mode}, status={status}"
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import revoke_program_certificates
-    revoke_program_certificates.delay(user.username, course_key)
+    revoke_program_certificates.delay(user.username, str(course_key))
 
 
 @receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')

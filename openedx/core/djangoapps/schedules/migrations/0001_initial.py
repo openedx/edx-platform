@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.utils.timezone
 import model_utils.fields
 from django.db import migrations, models
@@ -9,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('student', '0010_auto_20170207_0458'),
+        ('student', '0001_squashed_0031_auto_20200317_1122'),
     ]
 
     operations = [

@@ -2,6 +2,7 @@
 
 import logging
 import re
+from urllib.parse import urlparse
 
 import crum
 from django.conf import settings
@@ -13,12 +14,11 @@ from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import exception_handler
-from six.moves.urllib.parse import urlparse
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
-COURSE_REGEX = re.compile(r'^(.*?/courses/)(?!v[0-9]+/[^/]+){}'.format(settings.COURSE_ID_PATTERN))
+COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
 
 # .. toggle_name: request_utils.capture_cookie_sizes
 # .. toggle_implementation: WaffleFlag
@@ -51,7 +51,7 @@ def get_request_or_stub():
 
         # The settings SITE_NAME may contain a port number, so we need to
         # parse the full URL.
-        full_url = "http://{site_name}".format(site_name=settings.SITE_NAME)
+        full_url = f"http://{settings.SITE_NAME}"
         parsed_url = urlparse(full_url)
 
         # Construct the fake request.  This can be used to construct absolute
@@ -205,7 +205,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
-        log.debug(u'cookies_total_size = %d', total_cookie_size)
+        log.debug('cookies_total_size = %d', total_cookie_size)
 
     def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
         """
@@ -223,8 +223,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         )[:top_n_captured]
         for index, name in enumerate(top_n_cookies, start=1):
             size = names_to_size[name]
-            name_attribute = '{}.{}.name'.format(attribute_prefix, index)
-            size_attribute = '{}.{}.size'.format(attribute_prefix, index)
+            name_attribute = f'{attribute_prefix}.{index}.name'
+            size_attribute = f'{attribute_prefix}.{index}.size'
 
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)

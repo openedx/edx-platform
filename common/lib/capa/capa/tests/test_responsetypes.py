@@ -2304,7 +2304,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
         # Make a zipfile with one module in it with one function.
         zipstring = io.BytesIO()
-        zipf = zipfile.ZipFile(zipstring, "w")
+        zipf = zipfile.ZipFile(zipstring, "w")  # lint-amnesty, pylint: disable=consider-using-with
         zipf.writestr("my_helper.py", textwrap.dedent("""\
             def seventeen():
                 return 17

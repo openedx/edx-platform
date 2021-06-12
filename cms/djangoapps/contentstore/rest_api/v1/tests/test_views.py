@@ -2,14 +2,17 @@
 Unit tests for Contentstore views.
 """
 
+import ddt
+from mock import patch
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -115,6 +118,7 @@ class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStor
         assert response.data == self.get_expected_response_data(self.course, self.course_instructor)
 
 
+@ddt.ddt
 class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleStoreTestCase, APITestCase):
     """ Tests for proctored exam settings POST """
 
@@ -256,10 +260,8 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         self.assertDictEqual(response.data, {
             'detail': [{
-                'proctoring_provider': (
-                    '[\"The selected proctoring provider, notvalidprovider, is not a valid provider. '
-                    'Please select from one of [\'test_proctoring_provider\'].\"]'
-                )
+                'proctoring_provider': "The selected proctoring provider, notvalidprovider, is not a valid provider. "
+                                       "Please select from one of ['test_proctoring_provider']."
             }]
         })
 
@@ -268,7 +270,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         assert updated.enable_proctored_exams is False
         assert updated.proctoring_provider == 'null'
 
-    def test_403_if_instructor_request_includes_opting_out_or_zendesk(self):
+    def test_403_if_instructor_request_includes_opting_out(self):
         self.client.login(username=self.course_instructor, password=self.password)
         data = self.get_request_data()
         response = self.make_request(data=data)
@@ -280,7 +282,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
             'proctortrack': {}
         },
     )
-    def test_200_for_instructor_request(self):
+    def test_200_for_instructor_request_compatibility(self):
         self.client.login(username=self.course_instructor, password=self.password)
         data = {
             'proctored_exam_settings': {
@@ -291,3 +293,45 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         }
         response = self.make_request(data=data)
         assert response.status_code == status.HTTP_200_OK
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'proctortrack': {},
+            'software_secure': {},
+        },
+    )
+    @patch('logging.Logger.info')
+    @ddt.data(
+        ('proctortrack', False, False),
+        ('software_secure', True, False),
+        ('proctortrack', True, True),
+        ('software_secure', False, True),
+    )
+    @ddt.unpack
+    def test_nonadmin_with_zendesk_ticket(self, proctoring_provider, create_zendesk_tickets, expect_log, logger_mock):
+        self.client.login(username=self.course_instructor, password=self.password)
+        data = {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': True,
+                'proctoring_provider': proctoring_provider,
+                'proctoring_escalation_email': 'foo@bar.com',
+                'create_zendesk_tickets': create_zendesk_tickets,
+            }
+        }
+        response = self.make_request(data=data)
+        assert response.status_code == status.HTTP_200_OK
+        if expect_log:
+            logger_string = (
+                'create_zendesk_tickets set to {ticket_value} but proctoring '
+                'provider is {provider} for course {course_id}. create_zendesk_tickets '
+                'should be updated for this course.'.format(
+                    ticket_value=create_zendesk_tickets,
+                    provider=proctoring_provider,
+                    course_id=self.course.id
+                )
+            )
+            logger_mock.assert_any_call(logger_string)
+
+        updated = modulestore().get_item(self.course.location)
+        assert updated.create_zendesk_tickets is create_zendesk_tickets

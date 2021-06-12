@@ -17,7 +17,7 @@ from django.urls import reverse, reverse_lazy
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin
+from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
@@ -28,7 +28,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ....constants import Messages
 from ....tests.mocks import mock_basket_order
 from ....tests.test_views import UserMixin
-from ..views import SAILTHRU_CAMPAIGN_COOKIE
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {
@@ -37,7 +36,7 @@ UTM_COOKIE_CONTENTS = {
 
 
 @ddt.ddt
-class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
+class BasketsViewTests(UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce Baskets view.
     """
@@ -57,7 +56,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
 
-        self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
         if include_utm_cookie:
             self.client.cookies[UTM_COOKIE_NAME] = json.dumps(UTM_COOKIE_CONTENTS)
         return self.client.post(self.url, payload)
@@ -85,9 +83,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
                 sku=sku_string,
                 bulk_sku=f'BULK-{sku_string}'
             )
-
-        # Ignore events fired from UserFactory creation
-        self.reset_tracker()
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restriction(self):

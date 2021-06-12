@@ -384,7 +384,7 @@ class OfflineComputedGradeLog(models.Model):
     nstudents = models.IntegerField(default=0)
 
     def __str__(self):
-        return "[OCGLog] {}: {}".format(str(self.course_id), self.created)
+        return f"[OCGLog] {str(self.course_id)}: {self.created}"
 
 
 class StudentFieldOverride(TimeStampedModel):

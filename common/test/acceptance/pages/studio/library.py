@@ -23,7 +23,7 @@ class LibraryPage(PageObject, HelpMixin):
         """
         URL to the library edit page for the given library.
         """
-        return "{}/library/{}".format(BASE_URL, str(self.locator))
+        return f"{BASE_URL}/library/{str(self.locator)}"
 
     def is_browser_on_page(self):
         """

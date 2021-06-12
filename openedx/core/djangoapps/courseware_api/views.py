@@ -2,10 +2,11 @@
 Course API Views
 """
 
-import json
+import json  # lint-amnesty, pylint: disable=unused-import
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -29,17 +30,27 @@ from lms.djangoapps.courseware.access_response import (
     CoursewareMicrofrontendDisabledAccessError,
 )
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
+from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible, course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import (
+    courseware_legacy_is_visible,
+    courseware_mfe_is_visible,
+    course_exit_page_is_active,
+    mfe_special_exams_is_active,
+    mfe_proctored_exams_is_active,
+)
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.api import get_integrity_signature
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -47,8 +58,7 @@ from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentCelebration,
-    LinkedInAddToProfileConfiguration,
-    UserCelebration
+    LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
@@ -83,6 +93,7 @@ class CoursewareMeta:
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
+        self.course = get_course_by_id(self.course_key)
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
             course_key,
@@ -92,6 +103,10 @@ class CoursewareMeta:
         self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
+        self.can_view_legacy_courseware = courseware_legacy_is_visible(
+            course_key=course_key,
+            is_global_staff=self.original_user_is_global_staff,
+        )
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
@@ -105,6 +120,14 @@ class CoursewareMeta:
             is_global_staff=self.original_user_is_global_staff,
             is_course_staff=self.original_user_is_staff
         )
+
+    @property
+    def is_mfe_special_exams_enabled(self):
+        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_special_exams_is_active(self.course_key)
+
+    @property
+    def is_mfe_proctored_exams_enabled(self):
+        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_proctored_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
@@ -194,15 +217,11 @@ class CoursewareMeta:
     @property
     def celebrations(self):
         """
-        Returns a list of celebrations that should be performed.
+        Returns a dict of celebrations that should be performed.
         """
         browser_timezone = self.request.query_params.get('browser_timezone', None)
-        return {
-            'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
-            'streak_length_to_celebrate': UserCelebration.perform_streak_updates(
-                self.effective_user, self.course_key, browser_timezone
-            ),
-        }
+        celebrations = get_celebrations_dict(self.effective_user, self.enrollment_object, self.course, browser_timezone)
+        return celebrations
 
     @property
     def user_has_passing_grade(self):
@@ -279,6 +298,22 @@ class CoursewareMeta:
             return linkedin_config.add_to_profile_url(
                 self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
+
+    @property
+    def user_needs_integrity_signature(self):
+        """
+        Boolean describing whether the user needs to sign the integrity agreement for a course.
+        """
+        if (
+            is_integrity_signature_enabled(self.course_key)
+            and not self.is_staff
+            and self.enrollment_object
+            and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+        ):
+            signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
+            if not signature:
+                return True
+        return False
 
     @property
     def related_programs(self):
@@ -385,6 +420,7 @@ class CoursewareInformation(RetrieveAPIView):
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
+        * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
         * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
@@ -392,6 +428,7 @@ class CoursewareInformation(RetrieveAPIView):
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
+        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
 
     **Parameters:**
 
@@ -513,7 +550,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
 
-        return Response(json.loads(sequence.handle_ajax('metadata', None, view=view)))
+        return Response(sequence.get_metadata(view=view))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

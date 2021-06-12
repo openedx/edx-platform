@@ -41,6 +41,7 @@ from common.djangoapps.student.models import (
     Registration,
     RegistrationCookieConfiguration,
     UserAttribute,
+    UserCelebration,
     UserProfile,
     UserTestGroup
 )
@@ -537,6 +538,19 @@ class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelA
         return obj.enrollment.user.username
     user.short_description = 'User'
 
+
+@admin.register(UserCelebration)
+class UserCelebrationAdmin(admin.ModelAdmin):
+    """Admin interface for the UserCelebration model."""
+    readonly_fields = ('user', )
+
+    class Meta:
+        model = UserCelebration
+
+    # Disables the index view to avoid possible performance issues when
+    # a large number of user celebrations are present.
+    def has_module_permission(self, request):
+        return False
 
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)

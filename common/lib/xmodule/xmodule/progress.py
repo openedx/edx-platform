@@ -31,10 +31,10 @@ class Progress:  # pylint: disable=eq-without-hash
                 isinstance(b, numbers.Number)):
             raise TypeError(f'a and b must be numbers.  Passed {a}/{b}')
 
-        if a > b:
+        if a > b:  # lint-amnesty, pylint: disable=consider-using-min-builtin
             a = b
 
-        if a < 0:
+        if a < 0:  # lint-amnesty, pylint: disable=consider-using-max-builtin
             a = 0
 
         if b <= 0:
@@ -117,7 +117,7 @@ class Progress:  # pylint: disable=eq-without-hash
         '''
         (a, b) = self.frac()
         display = lambda n: f'{n:.2f}'.rstrip('0').rstrip('.')
-        return "{}/{}".format(display(a), display(b))
+        return f"{display(a)}/{display(b)}"
 
     @staticmethod
     def add_counts(a, b):

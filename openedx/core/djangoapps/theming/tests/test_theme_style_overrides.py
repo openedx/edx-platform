@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangolib.testing.utils import skip_unless_lms  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory
 
 

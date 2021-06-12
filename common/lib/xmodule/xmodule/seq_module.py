@@ -22,7 +22,6 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -33,6 +32,8 @@ from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,
 )
+
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -57,7 +58,7 @@ class_priority = ['video', 'problem']
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
+TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace="xmodule",
     flag_name='rev_1377_rollout',
     module_name=__name__,
@@ -112,7 +113,7 @@ class SequenceMixin(SequenceFields):
             except Exception as e:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
+                    system.error_tracker(f"ERROR: {e}")
                 continue
         return {}, children
 
@@ -308,50 +309,75 @@ class SequenceBlock(
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
-    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking  # lint-amnesty, pylint: disable=arguments-differ
-        ''' get = request.POST instance '''
-        if dispatch == 'goto_position':
-            # set position to default value if either 'position' argument not
-            # found in request or it is a non-positive integer
-            position = data.get('position', '1')
-            if position.isdigit() and int(position) > 0:
-                self.position = int(position)
-            else:
-                self.position = 1
-            return json.dumps({'success': True})
+    @XBlock.json_handler
+    def get_completion(self, data, _suffix=''):
+        """Returns whether the provided vertical is complete based off the 'usage_key' value in the incoming dict"""
+        return self._get_completion(data)
+    # This 'will_recheck_access' attribute is checked by the upper-level handler code, where it will avoid stripping
+    # inaccessible blocks from our tree. We don't want them stripped because 'get_completion' needs to know about FBE
+    # blocks even if the user can't complete them, otherwise it might accidentally say a vertical is complete when
+    # there are still incomplete but access-locked blocks left.
+    get_completion.will_recheck_access = True
 
-        if dispatch == 'get_completion':
-            completion_service = self.runtime.service(self, 'completion')
-
-            usage_key = data.get('usage_key', None)
-            if not usage_key:
-                return None
+    def _get_completion(self, data):
+        """Returns whether the provided vertical is complete based off the 'usage_key' value in the incoming dict"""
+        complete = False
+        usage_key = data.get('usage_key', None)
+        if usage_key:
             item = self.get_child(UsageKey.from_string(usage_key))
-            if not item:
-                return None
+            if item:
+                completion_service = self.runtime.service(self, 'completion')
+                complete = completion_service.vertical_is_complete(item)
+        return {'complete': complete}
 
-            complete = completion_service.vertical_is_complete(item)
-            return json.dumps({
-                'complete': complete
-            })
-        elif dispatch == 'metadata':
-            context = {'exclude_units': True}
-            prereq_met = True
-            prereq_meta_info = {}
-            banner_text = None
-            display_items = self.get_display_items()
+    @XBlock.json_handler
+    def goto_position(self, data, _suffix=''):
+        """Sets the xblock position based off the 'position' value in the incoming dict"""
+        return self._goto_position(data)
 
-            if self._required_prereq():
-                if self.runtime.user_is_staff:
-                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
-                else:
-                    # check if prerequisite has been met
-                    prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
-            meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view)
-            meta['display_name'] = self.display_name_with_default
-            meta['format'] = getattr(self, 'format', '')
-            return json.dumps(meta)
+    def _goto_position(self, data):
+        """Sets the xblock position based off the 'position' value in the incoming dict"""
+        # set position to default value if either 'position' argument not
+        # found in request or it is a non-positive integer
+        position = data.get('position', 1)
+        if isinstance(position, int) and position > 0:
+            self.position = position
+        else:
+            self.position = 1
+        return {'success': True}
+
+    # If you are reading this and it's past the 'Maple' Open edX release, you can delete this handle_ajax method, as
+    # these are now individual xblock-style handler methods. We want to keep these around for a single release, simply
+    # to handle learners that haven't refreshed their courseware page when the server gets updated and their old
+    # javascript calls these old handlers.
+    # If you do clean this up, you can also move the internal private versions just directly into the handler methods,
+    # as nothing else calls them (at time of writing).
+    def handle_ajax(self, dispatch, data):
+        """Old xmodule-style ajax handler"""
+        if dispatch == 'goto_position':
+            return json.dumps(self._goto_position(data))
+        elif dispatch == 'get_completion':
+            return json.dumps(self._get_completion(data))
         raise NotFoundError('Unexpected dispatch type')
+
+    def get_metadata(self, view=STUDENT_VIEW):
+        """Returns a dict of some common block properties"""
+        context = {'exclude_units': True}
+        prereq_met = True
+        prereq_meta_info = {}
+        banner_text = None
+        display_items = self.get_display_items()
+
+        if self._required_prereq():
+            if self.runtime.user_is_staff:
+                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
+            else:
+                # check if prerequisite has been met
+                prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+        meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view)
+        meta['display_name'] = self.display_name_with_default
+        meta['format'] = getattr(self, 'format', '')
+        return meta
 
     @classmethod
     def verify_current_content_visibility(cls, date, hide_after_date):
@@ -402,7 +428,7 @@ class SequenceBlock(
                 self, self.course_id
             )
 
-    def student_view(self, context):
+    def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         _ = self.runtime.service(self, "i18n").ugettext
         context = context or {}
         self._capture_basic_metrics()
@@ -516,9 +542,9 @@ class SequenceBlock(
             'element_id': self.location.html_id(),
             'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
+            'is_proctored': self.is_proctored_enabled,
             'position': self.position,
             'tag': self.location.block_type,
-            'ajax_url': self.ajax_url,
             'next_url': context.get('next_url'),
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
@@ -692,6 +718,9 @@ class SequenceBlock(
         display_items.  Returns a list of dict objects with information about
         the given display_items.
         """
+        # Avoid circular imports.
+        from openedx.core.lib.xblock_utils import get_icon
+
         render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
         completion_service = self.runtime.service(self, 'completion')
@@ -708,8 +737,7 @@ class SequenceBlock(
         ]
         contents = []
         for item in display_items:
-            # NOTE (CCB): This seems like a hack, but I don't see a better method of determining the type/category.
-            item_type = item.get_icon_class()
+            item_type = get_icon(item)
             usage_id = item.scope_ids.usage_id
 
             show_bookmark_button = False
@@ -867,7 +895,7 @@ class SequenceBlock(
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
+                'is_integrity_signature_enabled': is_integrity_signature_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments

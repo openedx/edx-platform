@@ -125,7 +125,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         unicode_content = resp.content.decode(resp.charset)
 
         # Assert we see the proper icon in the top display
-        assert '<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]) in unicode_content
+        assert f'<button class="{self.ICON_CLASSES[user_tag]} inactive nav-item tab"' in unicode_content
 
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:

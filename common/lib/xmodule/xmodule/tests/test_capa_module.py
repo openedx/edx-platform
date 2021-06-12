@@ -16,6 +16,7 @@ import pytest
 import ddt
 import requests
 import webob
+from codejail.safe_exec import SafeExecException
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
@@ -34,7 +35,7 @@ from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 
-from ..capa_base import RANDOMIZATION, SHOWANSWER
+from ..capa_module import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
 
@@ -1231,6 +1232,31 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             with pytest.raises(NotImplementedError):
                 module.rescore(only_if_higher=False)
 
+    def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
+        class CustomCapaFactory(CapaFactory):
+            """
+            A factory for creating a Capa problem with arbitrary xml.
+            """
+            sample_problem_xml = textwrap.dedent(xml)
+
+        return CustomCapaFactory
+
+    def test_codejail_error_upon_problem_creation(self):
+        # Simulate a codejail safe_exec failure upon problem creation.
+        # Create a problem with some script attached.
+        xml_str = textwrap.dedent("""
+            <problem>
+                <script>test=True</script>
+            </problem>
+        """)
+        factory = self.capa_factory_for_problem_xml(xml_str)
+
+        # When codejail safe_exec fails upon problem creation, a LoncapaProblemError should be raised.
+        with pytest.raises(LoncapaProblemError):
+            with patch('capa.capa_problem.safe_exec') as mock_safe_exec:
+                mock_safe_exec.side_effect = SafeExecException()
+                factory.create()
+
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
         # Create the module
@@ -1887,8 +1913,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert 0 <= module.seed < 1000
             i -= 1
 
-    @patch('xmodule.capa_base.log')
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.log')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -1901,7 +1927,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_no_error_if_weight_zero(self, mock_progress):
         """
         Check that if the weight is 0 get_progress does not try to create a Progress object.
@@ -1913,7 +1939,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert progress is None
         assert not mock_progress.called
 
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.

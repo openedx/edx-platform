@@ -21,7 +21,7 @@ class ProblemsTest(UniqueCourseTest):
     def setUp(self):
         super().setUp()
 
-        self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+        self.username = f"test_student_{self.unique_id[0:8]}"
         self.email = f"{self.username}@example.com"
         self.password = "keep it secret; keep it safe."
 

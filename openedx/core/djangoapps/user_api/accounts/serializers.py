@@ -123,6 +123,11 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
         except ObjectDoesNotExist:
             account_recovery = None
 
+        try:
+            activation_key = user.registration.activation_key
+        except ObjectDoesNotExist:
+            activation_key = None
+
         accomplishments_shared = badges_enabled()
         data = {
             "username": user.username,
@@ -138,6 +143,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "date_joined": user.date_joined.replace(microsecond=0),
             "last_login": user.last_login,
             "is_active": user.is_active,
+            "activation_key": activation_key,
             "bio": None,
             "country": None,
             "state": None,
@@ -407,7 +413,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             # If we have encountered any validation errors, return them to the user.
             raise errors.AccountValidationError({
                 'social_links': {
-                    "developer_message": "Error when adding new social link: '{}'".format(str(err)),
+                    "developer_message": f"Error when adding new social link: '{str(err)}'",
                     "user_message": str(err)
                 }
             })
@@ -487,6 +493,15 @@ class UserRetirementStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRetirementStatus
         exclude = ['responses', ]
+
+
+class UserSearchEmailSerializer(serializers.ModelSerializer):
+    """
+    Perform serialization for the User model used in accounts/search_emails endpoint.
+    """
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username')
 
 
 class UserRetirementPartnerReportSerializer(serializers.Serializer):

@@ -3,7 +3,7 @@ course_overview api tests
 """
 from django.test import TestCase
 
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overviews
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview, get_course_overviews
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 from ..models import CourseOverview
@@ -18,6 +18,14 @@ class TestCourseOverviewsApi(TestCase):
         super().setUp()
         for _ in range(3):
             CourseOverviewFactory.create()
+
+    def test_get_course_overview(self):
+        """
+        Test for `get_course_overview` function to retrieve a single course overview.
+        """
+        course_overview = CourseOverviewFactory.create()
+        retrieved_course_overview = get_course_overview(course_overview.id)
+        assert course_overview.id == retrieved_course_overview.id
 
     def test_get_course_overviews(self):
         """

@@ -31,7 +31,7 @@ def audit_log(name, **kwargs):
     """
     # Joins sorted keyword argument keys and values with an "=", wraps each value
     # in quotes, and separates each pair with a comma and a space.
-    payload = u', '.join(['{k}="{v}"'.format(k=k, v=v) for k, v in sorted(kwargs.items())])
-    message = u'{name}: {payload}'.format(name=name, payload=payload)
+    payload = ', '.join([f'{k}="{v}"' for k, v in sorted(kwargs.items())])
+    message = f'{name}: {payload}'
 
     log.info(message)

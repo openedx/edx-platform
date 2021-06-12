@@ -10,7 +10,7 @@ from django.db import connections
 
 from edx_user_state_client.tests import UserStateClientTestBase
 
-from lms.djangoapps.courseware.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

@@ -22,7 +22,7 @@ class UserAccountSettingsTest(TestCase):
     """Unit tests for setting Social Media Links."""
 
     def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
-        super(UserAccountSettingsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def validate_social_link(self, social_platform, link):
         """
@@ -71,7 +71,7 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         """
         Creates a test course that can be used for non-destructive tests
         """
-        super(CompletionUtilsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.override_waffle_switch(True)
         self.engaged_user = UserFactory.create()
         self.cruft_user = UserFactory.create()
@@ -122,7 +122,7 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             self.cruft_user
         )
         assert block_url ==\
-               u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+               'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
                    org=self.course.location.course_key.org,
                    course=self.course.location.course_key.course,
                    run=self.course.location.course_key.run,

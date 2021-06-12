@@ -14,9 +14,9 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -195,13 +195,13 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         expected_response = self.get_expected_response()
         expected_response['is_cohorted'] = False
         assert response == expected_response
-        assert CourseDiscussionSettings.NONE == get_course_discussion_settings(self.course.id).division_scheme
+        assert CourseDiscussionSettings.NONE == CourseDiscussionSettings.get(self.course.id).division_scheme
 
         expected_response['is_cohorted'] = True
         response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
 
         assert response == expected_response
-        assert CourseDiscussionSettings.NONE == get_course_discussion_settings(self.course.id).division_scheme
+        assert CourseDiscussionSettings.NONE == CourseDiscussionSettings.get(self.course.id).division_scheme
 
     def test_update_settings_with_missing_field(self):
         """

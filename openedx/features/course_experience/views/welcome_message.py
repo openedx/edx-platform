@@ -3,7 +3,7 @@ View logic for handling course welcome messages.
 """
 
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -36,7 +36,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
             return None
 
         dismiss_url = reverse(
-            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': six.text_type(course_key)}
+            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': str(course_key)}
         )
 
         context = {

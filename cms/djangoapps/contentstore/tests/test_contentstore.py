@@ -14,7 +14,6 @@ import ddt
 import lxml.html
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.middleware.csrf import _compare_salted_tokens  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 from django.test.utils import override_settings
 from edxval.api import create_video, get_videos_for_course
@@ -1896,7 +1895,7 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def get_unsucceeded_course_action_elements(self, html, course_key):
         """Returns the elements in the unsucceeded course action section that have the given course_key"""
-        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(str(course_key)))
+        return html.cssselect(f'.courses-processing li[data-course-key="{str(course_key)}"]')
 
     def assertInCourseListing(self, course_key):
         """

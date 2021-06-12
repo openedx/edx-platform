@@ -14,7 +14,7 @@ class SiteFactory(DjangoModelFactory):
     """
     Factory class for Site model
     """
-    class Meta(object):
+    class Meta:
         model = Site
         django_get_or_create = ('domain',)
 
@@ -26,7 +26,7 @@ class SiteConfigurationFactory(DjangoModelFactory):
     """
     Factory class for SiteConfiguration model
     """
-    class Meta(object):
+    class Meta:
         model = SiteConfiguration
 
     enabled = True

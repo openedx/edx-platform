@@ -19,6 +19,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from organizations import api as organizations_api
+from edx_django_utils.plugins import pluggable_override
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.edxmako.template import Template
@@ -28,6 +29,7 @@ from common.djangoapps.util.views import handle_500
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.certificates.api import (
+    certificates_viewable_for_course,
     get_active_web_certificate,
     get_certificate_footer_context,
     get_certificate_header_context,
@@ -42,12 +44,12 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
 from lms.djangoapps.certificates.utils import emit_certificate_event, get_certificate_url
-from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
+from openedx.core.djangoapps.certificates.api import display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
@@ -396,7 +398,7 @@ def _track_certificate_events(request, course, user, user_certificate):
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
-        emit_certificate_event('evidence_visited', user, str(course.id), course, {
+        emit_certificate_event('evidence_visited', user, str(course.id), event_data={
             'certificate_id': user_certificate.verify_uuid,
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin
@@ -473,10 +475,12 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
+@pluggable_override('OVERRIDE_RENDER_CERTIFICATE_VIEW')
 def render_html_view(request, course_id, certificate=None):
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
+    It can be overridden by setting `OVERRIDE_RENDER_CERTIFICATE_VIEW` to an alternative implementation.
     """
     user = certificate.user if certificate else request.user
     user_id = user.id

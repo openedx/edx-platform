@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for behavior that is specific to the api methods (vs. the view methods).
 Most of the functionality is covered in test_views.py.
@@ -7,6 +6,7 @@ Most of the functionality is covered in test_views.py.
 
 import itertools
 import unicodedata
+from unittest.mock import Mock, patch
 import pytest
 import ddt
 from django.conf import settings
@@ -16,8 +16,6 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
-from mock import Mock, patch
-from six import iteritems
 from social_django.models import UserSocialAuth
 from common.djangoapps.student.models import (
     AccountRecovery,
@@ -52,7 +50,7 @@ from openedx.features.enterprise_support.tests.factories import EnterpriseCustom
 
 def mock_render_to_string(template_name, context):
     """Return a string that encodes template_name and context"""
-    return str((template_name, sorted(iteritems(context))))
+    return str((template_name, sorted(context.items())))
 
 
 def mock_render_to_response(template_name):
@@ -64,7 +62,7 @@ def mock_render_to_response(template_name):
     return HttpResponse(template_name)
 
 
-class CreateAccountMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CreateAccountMixin:  # lint-amnesty, pylint: disable=missing-class-docstring
     def create_account(self, username, password, email):
         # pylint: disable=missing-docstring
         registration_url = reverse('user_api_registration')
@@ -90,7 +88,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     password = "test"
 
     def setUp(self):
-        super(TestAccountApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request_factory = RequestFactory()
         self.table = "student_languageproficiency"
         self.user = UserFactory.create(password=self.password)
@@ -174,7 +172,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     def test_set_single_social_link(self):
         social_links = [
-            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+            dict(platform="facebook", social_link=f"https://www.facebook.com/{self.user.username}")
         ]
         update_account_settings(self.user, {"social_links": social_links})
         account_settings = get_account_settings(self.default_request)[0]
@@ -182,8 +180,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     def test_set_multiple_social_links(self):
         social_links = [
-            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username)),
-            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
+            dict(platform="facebook", social_link=f"https://www.facebook.com/{self.user.username}"),
+            dict(platform="twitter", social_link=f"https://www.twitter.com/{self.user.username}"),
         ]
         update_account_settings(self.user, {"social_links": social_links})
         account_settings = get_account_settings(self.default_request)[0]
@@ -191,13 +189,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     def test_add_social_links(self):
         original_social_links = [
-            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+            dict(platform="facebook", social_link=f"https://www.facebook.com/{self.user.username}")
         ]
         update_account_settings(self.user, {"social_links": original_social_links})
 
         extra_social_links = [
-            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
-            dict(platform="linkedin", social_link="https://www.linkedin.com/in/{}".format(self.user.username)),
+            dict(platform="twitter", social_link=f"https://www.twitter.com/{self.user.username}"),
+            dict(platform="linkedin", social_link=f"https://www.linkedin.com/in/{self.user.username}"),
         ]
         update_account_settings(self.user, {"social_links": extra_social_links})
 
@@ -229,7 +227,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     def test_unsupported_social_link_platform(self):
         social_links = [
-            dict(platform="unsupported", social_link="https://www.unsupported.com/{}".format(self.user.username))
+            dict(platform="unsupported", social_link=f"https://www.unsupported.com/{self.user.username}")
         ]
         with pytest.raises(AccountValidationError):
             update_account_settings(self.user, {"social_links": social_links})
@@ -274,7 +272,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             mock_customer.return_value.update({
                 'uuid': 'real-ent-uuid',
                 'name': 'Dummy Enterprise',
-                'identity_provider': 'saml-ubc'
+                'identity_provider': 'saml-ubc',
+                'identity_providers': [
+                    {
+                        "provider_id": "saml-ubc",
+                    }
+                ],
             })
         mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
         mock_auth_provider.return_value.backend_name = idp_backend_name
@@ -502,17 +505,15 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
     # pylint: disable=missing-docstring
 
-    USERNAME = u'frank-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'frank+underwood@example.com'
-    ID = -1
+    USERNAME = 'frank-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'frank+underwood@example.com'
 
     def test_create_account(self):
         # Create a new account, which should have empty account settings by default.
         self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
-        self.ID = user.id
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
         account_settings = get_account_settings(request)[0]
@@ -527,12 +528,13 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         assert account_settings == {
             'username': self.USERNAME,
             'email': self.EMAIL,
-            'id': self.ID,
+            'id': user.id,
             'name': self.USERNAME,
-            'gender': None, 'goals': u'',
+            'activation_key': user.registration.activation_key,
+            'gender': None, 'goals': '',
             'is_active': False,
             'level_of_education': None,
-            'mailing_address': u'',
+            'mailing_address': '',
             'year_of_birth': None,
             'country': None,
             'state': None,
@@ -561,11 +563,11 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         """
         # Set user password to NFKD format so that we can test that it is normalized to
         # NFKC format upon account creation.
-        self.create_account(self.USERNAME, unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
+        self.create_account(self.USERNAME, unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
 
         salt_val = user.password.split('$')[1]
 
-        expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
+        expected_user_password = make_password(unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
         assert expected_user_password == user.password

@@ -1,18 +1,18 @@
 """
 Test for lms courseware app, module data (runtime data storage for XBlocks)
 """
-
-
 import json
 from functools import partial
 from unittest.mock import Mock, patch
 import pytest
+
 from django.db import connections, DatabaseError
 from django.test import TestCase
 from xblock.core import XBlock
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.fields import BlockScope, Scope, ScopeIds
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
 from lms.djangoapps.courseware.models import (
     StudentModule,
@@ -20,10 +20,12 @@ from lms.djangoapps.courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
+from lms.djangoapps.courseware.tests.factories import COURSE_KEY
+from lms.djangoapps.courseware.tests.factories import LOCATION
 from lms.djangoapps.courseware.tests.factories import StudentInfoFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
-from lms.djangoapps.courseware.tests.factories import StudentPrefsFactory, UserStateSummaryFactory, course_id, location
-from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import StudentPrefsFactory
+from lms.djangoapps.courseware.tests.factories import UserStateSummaryFactory
 
 
 def mock_field(scope, name):
@@ -35,7 +37,7 @@ def mock_field(scope, name):
 
 def mock_descriptor(fields=[]):  # lint-amnesty, pylint: disable=dangerous-default-value, missing-function-docstring
     descriptor = Mock(entry_point=XBlock.entry_point)
-    descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
+    descriptor.scope_ids = ScopeIds('user1', 'mock_problem', LOCATION('def_id'), LOCATION('usage_id'))
     descriptor.module_class.fields.values.return_value = fields
     descriptor.fields.values.return_value = fields
     descriptor.module_class.__name__ = 'MockProblemModule'
@@ -44,23 +46,27 @@ def mock_descriptor(fields=[]):  # lint-amnesty, pylint: disable=dangerous-defau
 # The user ids here are 1 because we make a student in the setUp functions, and
 # they get an id of 1.  There's an assertion in setUp to ensure that assumption
 # is still true.
-user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, location('usage_id'))
-settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('usage_id'))
-user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, location('usage_id'))
+user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, LOCATION('usage_id'))
+settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, LOCATION('usage_id'))
+user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, LOCATION('usage_id'))
 prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 1, 'mock_problem')
 user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 1, None)
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
-    module_state_key = location('usage_id')
-    course_id = course_id
+    module_state_key = LOCATION('usage_id')
+    course_id = COURSE_KEY
 
 
 class TestInvalidScopes(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username='user')
-        self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)  # lint-amnesty, pylint: disable=line-too-long
+        self.field_data_cache = FieldDataCache(
+            [mock_descriptor([mock_field(Scope.user_state, 'a_field')])],
+            COURSE_KEY,
+            self.user,
+        )
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_invalid_scopes(self):
@@ -102,7 +108,7 @@ class OtherUserFailureTestMixin:
 
 class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     """Tests for user_state storage via StudentModule"""
-    other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
+    other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, LOCATION('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
     # Tell Django to clean out all databases, not just default
     databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
@@ -117,7 +123,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # There should be only one query to load a single descriptor with a single user_state field
         with self.assertNumQueries(1):
             self.field_data_cache = FieldDataCache(
-                [mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user
+                [mock_descriptor([mock_field(Scope.user_state, 'a_field')])],
+                COURSE_KEY,
+                self.user,
             )
 
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
@@ -244,7 +252,11 @@ class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missi
 
         # The descriptor has no fields, so FDC shouldn't send any queries
         with self.assertNumQueries(0):
-            self.field_data_cache = FieldDataCache([mock_descriptor()], course_id, self.user)
+            self.field_data_cache = FieldDataCache(
+                [mock_descriptor()],
+                COURSE_KEY,
+                self.user,
+            )
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_get_field_from_missing_student_module(self):
@@ -273,8 +285,8 @@ class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missi
         student_module = StudentModule.objects.all()[0]
         assert {'a_field': 'a_value'} == json.loads(student_module.state)
         assert self.user == student_module.student
-        assert location('usage_id').replace(run=None) == student_module.module_state_key
-        assert course_id == student_module.course_id
+        assert LOCATION('usage_id').replace(run=None) == student_module.module_state_key
+        assert COURSE_KEY == student_module.course_id
 
     def test_delete_field_from_missing_student_module(self):
         "Test that deleting a field from a missing StudentModule raises a KeyError"
@@ -312,7 +324,11 @@ class StorageTestBase:
         # Each field is stored as a separate row in the table,
         # but we can query them in a single query
         with self.assertNumQueries(1):
-            self.field_data_cache = FieldDataCache([self.mock_descriptor], course_id, self.user)
+            self.field_data_cache = FieldDataCache(
+                [self.mock_descriptor],
+                COURSE_KEY,
+                self.user,
+            )
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_set_and_get_existing_field(self):

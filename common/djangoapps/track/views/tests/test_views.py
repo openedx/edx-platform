@@ -1,10 +1,11 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+
+from unittest.mock import patch, sentinel
+
 import ddt
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import patch, sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.track import views
@@ -20,11 +21,11 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
 
     @classmethod
     def setUpTestData(cls):
-        super(TestTrackViews, cls).setUpTestData()
+        super().setUpTestData()
         User.objects.create(pk=TEST_USER_ID, username=TEST_USERNAME)
 
     def setUp(self):
-        super(TestTrackViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.request_factory = RequestFactory()
 
@@ -110,11 +111,11 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
 
     @ddt.data(
         {
-            'event_data': u'{{"username": "{}"}}'.format(TEST_USERNAME),
+            'event_data': f'{{"username": "{TEST_USERNAME}"}}',
             'expected_event_data': {"username": TEST_USERNAME, "user_id": TEST_USER_ID}
         },
         {
-            'event_data': u'{"username": "unknown-user"}',
+            'event_data': '{"username": "unknown-user"}',
             'expected_event_data': {"username": "unknown-user"},
         }
     )
@@ -183,7 +184,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
                     'course_id': 'foo/bar/baz',
                     'org_id': 'foo',
                     'user_id': user_id,
-                    'path': u'/event'
+                    'path': '/event'
                 },
             }
         finally:
@@ -318,7 +319,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
         }
 
         task_info = {
-            six.text_type(sentinel.task_key): sentinel.task_value
+            str(sentinel.task_key): sentinel.task_value
         }
         expected_event_data = dict(task_info)
         expected_event_data.update(self.event)

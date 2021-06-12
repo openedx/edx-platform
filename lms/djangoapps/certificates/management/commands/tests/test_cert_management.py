@@ -7,18 +7,19 @@ import ddt
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -73,8 +74,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._create_cert(self.courses[0].id, self.user, CertificateStatuses.error, mode)
 
         # Re-submit all certificates with status 'error'
-        with check_mongo_calls(1):
-            call_command(self.command)
+        call_command(self.command)
 
         # Expect that the certificate was re-submitted
         self._assert_cert_status(self.courses[0].id, self.user, CertificateStatuses.notpassing)
@@ -129,24 +129,23 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._create_cert(self.courses[0].id, UserFactory.create(), CertificateStatuses.error)
         self._create_cert(self.courses[0].id, UserFactory.create(), CertificateStatuses.error)
 
-        # Verify that we make only one Mongo query
-        # because the course is cached.
-        with check_mongo_calls(1):
+        course_overview = CourseOverviewFactory.create(
+            id=self.courses[0].id
+        )
+
+        with patch(
+            'lms.djangoapps.certificates.management.commands.resubmit_error_certificates.get_course_overview'
+        ) as mock_get_course_overview:
+            mock_get_course_overview.return_value = course_overview
+
             call_command(self.command)
+
+            mock_get_course_overview.assert_called_once()
 
     def test_invalid_course_key(self):
         invalid_key = "invalid/"
         with self.assertRaisesRegex(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
-
-    def test_course_does_not_exist(self):
-        phantom_course = CourseLocator(org='phantom', course='phantom', run='phantom')
-        self._create_cert(phantom_course, self.user, 'error')
-        call_command(self.command)
-
-        # Expect that the certificate was NOT resubmitted
-        # since the course doesn't actually exist.
-        self._assert_cert_status(phantom_course, self.user, CertificateStatuses.error)
 
 
 @ddt.ddt
@@ -182,7 +181,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
 
-        args = '-u {} -c {}'.format(self.user.email, str(key))
+        args = f'-u {self.user.email} -c {str(key)}'
         call_command(self.command, *args.split(' '))
 
         assert xqueue.return_value.regen_cert.call_args.args == (
@@ -190,7 +189,6 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             key,
         )
         regen_cert_call_kwargs = xqueue.return_value.regen_cert.call_args.kwargs
-        assert regen_cert_call_kwargs.pop('course').location == self.course.location
         assert regen_cert_call_kwargs == {
             'forced_grade': None,
             'template_file': None,
@@ -210,7 +208,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
 
-        args = '-u {} -c {} --insecure'.format(self.user.email, str(key))
+        args = f'-u {self.user.email} -c {str(key)} --insecure'
         call_command(self.command, *args.split(' '))
 
         certificate = GeneratedCertificate.eligible_certificates.get(
@@ -247,7 +245,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
 
         with mock_passing_grade():
-            args = '-c {} --insecure'.format(str(key))
+            args = f'-c {str(key)} --insecure'
             call_command(self.command, *args.split(' '))
 
         assert mock_send_to_queue.called

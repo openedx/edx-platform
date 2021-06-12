@@ -52,10 +52,10 @@ from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_respon
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_home_api.toggles import (
-    course_home_mfe_dates_tab_is_active,
+    course_home_mfe_is_active,
     course_home_mfe_progress_tab_is_active
 )
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
@@ -86,6 +86,8 @@ from lms.djangoapps.courseware.permissions import (  # lint-amnesty, pylint: dis
     VIEW_COURSEWARE,
     VIEW_XQA_INTERFACE
 )
+
+from lms.djangoapps.courseware.toggles import is_courses_default_invite_only_enabled
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -115,7 +117,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
+from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -147,7 +149,7 @@ log = logging.getLogger("edx.courseware")
 REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 
 CertData = namedtuple(
-    "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url"]
+    "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url", "certificate_available_date"]
 )
 EARNED_BUT_NOT_AVAILABLE_CERT_STATUS = 'earned_but_not_available'
 
@@ -156,7 +158,8 @@ AUDIT_PASSING_CERT_DATA = CertData(
     _('Your enrollment: Audit track'),
     _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 HONOR_PASSING_CERT_DATA = CertData(
@@ -164,7 +167,8 @@ HONOR_PASSING_CERT_DATA = CertData(
     _('Your enrollment: Honor track'),
     _('You are enrolled in the honor track for this course. The honor track does not include a certificate.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 INELIGIBLE_PASSING_CERT_DATA = {
@@ -180,7 +184,8 @@ GENERATING_CERT_DATA = CertData(
         "to it will appear here and on your Dashboard when it is ready."
     ),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 INVALID_CERT_DATA = CertData(
@@ -188,7 +193,8 @@ INVALID_CERT_DATA = CertData(
     _('Your certificate has been invalidated'),
     _('Please contact your course team if you have any questions.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 REQUESTING_CERT_DATA = CertData(
@@ -196,7 +202,8 @@ REQUESTING_CERT_DATA = CertData(
     _('Congratulations, you qualified for a certificate!'),
     _("You've earned a certificate for this course."),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 UNVERIFIED_CERT_DATA = CertData(
@@ -207,16 +214,20 @@ UNVERIFIED_CERT_DATA = CertData(
         'verified identity.'
     ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
-EARNED_BUT_NOT_AVAILABLE_CERT_DATA = CertData(
-    EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
-    _('Your certificate will be available soon!'),
-    _('After this course officially ends, you will receive an email notification with your certificate.'),
-    download_url=None,
-    cert_web_view_url=None
-)
+
+def _earned_but_not_available_cert_data(cert_downloadable_status):
+    return CertData(
+        EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
+        _('Your certificate will be available soon!'),
+        _('After this course officially ends, you will receive an email notification with your certificate.'),
+        download_url=None,
+        cert_web_view_url=None,
+        certificate_available_date=cert_downloadable_status.get('certificate_available_date')
+    )
 
 
 def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
@@ -225,7 +236,8 @@ def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
         _('Your certificate is available'),
         _("You've earned a certificate for this course."),
         download_url=download_url,
-        cert_web_view_url=cert_web_view_url
+        cert_web_view_url=cert_web_view_url,
+        certificate_available_date=None
     )
 
 
@@ -385,20 +397,39 @@ def jump_to_id(request, course_id, module_id):
 
 
 @ensure_csrf_cookie
-def jump_to(_request, course_id, location):
+def jump_to(request, course_id, location):
     """
     Show the page that contains a specific location.
+
     If the location is invalid or not in any class, return a 404.
-    Otherwise, delegates to the index view to figure out whether this user
+    Otherwise, delegates to the courseware views to figure out whether this user
     has access, and what they should see.
+
+    By default, this view redirects to the active courseware experience.
+    Alternatively, the `experience` query parameter may be provided as either
+    "new" or "legacy" to force either a Micro-Frontend or Legacy-LMS redirect
+    link to be generated, respectively.
     """
     try:
         course_key = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
     except InvalidKeyError:
         raise Http404("Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
+
+    experience_param = request.GET.get("experience", "").lower()
+    if experience_param == "new":
+        experience = ExperienceOption.NEW
+    elif experience_param == "legacy":
+        experience = ExperienceOption.LEGACY
+    else:
+        experience = ExperienceOption.ACTIVE
+
     try:
-        redirect_url = get_legacy_courseware_url(usage_key, _request)
+        redirect_url = get_courseware_url(
+            usage_key=usage_key,
+            request=request,
+            experience=experience,
+        )
     except ItemNotFoundError:
         raise Http404(f"No data at this location: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
     except NoPathToItem:
@@ -928,7 +959,7 @@ def course_about(request, course_id):
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
-        invitation_only = course.invitation_only
+        invitation_only = is_courses_default_invite_only_enabled() or course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
@@ -1017,7 +1048,7 @@ def dates(request, course_id):
     from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
 
     course_key = CourseKey.from_string(course_id)
-    if course_home_mfe_dates_tab_is_active(course_key) and not request.user.is_staff:
+    if course_home_mfe_is_active(course_key) and not request.user.is_staff:
         microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
         raise Redirect(microfrontend_url)
 
@@ -1218,7 +1249,7 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
 
     if cert_downloadable_status.get('earned_but_not_available'):
-        return EARNED_BUT_NOT_AVAILABLE_CERT_DATA
+        return _earned_but_not_available_cert_data(cert_downloadable_status)
 
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
@@ -1369,7 +1400,7 @@ def submission_history(request, course_id, learner_identifier, location):
     try:
         history_entries = list(user_state_client.get_history(found_user_name, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
-        return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
+        return HttpResponse(escape(_('User {username} has never accessed problem {location}').format(
             username=found_user_name,
             location=location
         )))
@@ -1549,15 +1580,13 @@ def is_course_passed(student, course, course_grade=None):
 @transaction.non_atomic_requests
 @require_POST
 def generate_user_cert(request, course_id):
-    """Start generating a new certificate for the user.
-    Certificate generation is allowed if:
-    * The user has passed the course, and
-    * The user does not already have a pending/completed certificate.
-    Note that if an error occurs during certificate generation
-    (for example, if the queue is down), then we simply mark the
-    certificate generation task status as "error" and re-run
-    the task with a management command.  To students, the certificate
-    will appear to be "generating" until it is re-run.
+    """
+    Request that a course certificate be generated for the user.
+
+    In addition to requesting generation, this method also checks for and returns the certificate status. Note that
+    because generation is an asynchronous process, the certificate may not have been generated when its status is
+    retrieved.
+
     Args:
         request (HttpRequest): The POST request to this view.
         course_id (unicode): The identifier for the course.
@@ -1575,6 +1604,7 @@ def generate_user_cert(request, course_id):
 
     student = request.user
     course_key = CourseKey.from_string(course_id)
+    use_v1_certs = True
 
     course = modulestore().get_course(course_key, depth=2)
     if not course:
@@ -1583,8 +1613,8 @@ def generate_user_cert(request, course_id):
     if certs_api.can_generate_certificate_task(student, course_key):
         log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'user {student.id}.')
+        use_v1_certs = False
         certs_api.generate_certificate_task(student, course_key, 'self')
-        return HttpResponse()
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)
@@ -1604,16 +1634,17 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Certificate has already been created."))
     elif certificate_status["is_generating"]:
         return HttpResponseBadRequest(_("Certificate is being created."))
-    else:
+    elif use_v1_certs:
         # If the certificate is not already in-process or completed,
         # then create a new certificate generation task.
         # If the certificate cannot be added to the queue, this will
         # mark the certificate with "error" status, so it can be re-run
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
-        certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
+        certs_api.generate_user_certificates(student, course.id, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
-        return HttpResponse()
+
+    return HttpResponse()
 
 
 def _track_successful_certificate_generation(user_id, course_id):
@@ -1699,7 +1730,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
-            "Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
+            f"Rendering of the xblock view '{bleach.clean(requested_view, strip=True)}' is not supported."
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
@@ -1933,7 +1964,7 @@ def financial_assistance_request(request):
         return HttpResponseBadRequest('Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
-        return HttpResponseBadRequest('The field {} is required.'.format(str(err)))
+        return HttpResponseBadRequest(f'The field {str(err)} is required.')
 
     zendesk_submitted = create_zendesk_ticket(
         legal_name,

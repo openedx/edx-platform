@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 import ddt
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
@@ -45,11 +46,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         for chapter_index in range(len(self.course.get_children())):
             chapter = self._set_up_block(self.course, chapter_index)
-            setattr(self, 'chapter_{}'.format(chapter_index + 1), chapter)
+            setattr(self, f'chapter_{chapter_index + 1}', chapter)
 
             for sequence_index in range(len(chapter.get_children())):
                 sequence = self._set_up_block(chapter, sequence_index)
-                setattr(self, 'sequence_{}_{}'.format(chapter_index + 1, sequence_index + 1), sequence)
+                setattr(self, f'sequence_{chapter_index + 1}_{sequence_index + 1}', sequence)
 
     @staticmethod
     def _set_up_course_xml():
@@ -369,42 +370,71 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         # assert content shown as normal
         self._assert_ungated(html, self.sequence_1_2)
 
-    def test_handle_ajax_get_completion_success(self):
-        """
-        Test that the completion data is returned successfully on
-        targeted vertical through ajax call
-        """
+    def test_xblock_handler_get_completion_success(self):
+        """Test that the completion data is returned successfully on targeted vertical through ajax call"""
         for child in self.sequence_3_1.get_children():
             usage_key = str(child.location)
-            completion_return = json.loads(self.sequence_3_1.handle_ajax(
-                'get_completion',
-                {'usage_key': usage_key}
-            ))
-            assert completion_return is not None
-            assert 'complete' in completion_return
-            assert completion_return['complete'] is True
+            request = RequestFactory().post(
+                '/',
+                data=json.dumps({'usage_key': usage_key}),
+                content_type='application/json',
+            )
+            completion_return = self.sequence_3_1.handle('get_completion', request)
+            assert completion_return.json == {'complete': True}
 
-    def test_handle_ajax_get_completion_return_none(self):
-        """
-        Test that the completion data is returned successfully None
-        when usage key is None through ajax call
-        """
-        usage_key = None
-        completion_return = self.sequence_3_1.handle_ajax(
-            'get_completion',
-            {'usage_key': usage_key}
+    def test_xblock_handler_get_completion_bad_key(self):
+        """Test that the completion data is returned as False when usage key is None through ajax call"""
+        request = RequestFactory().post(
+            '/',
+            data=json.dumps({'usage_key': None}),
+            content_type='application/json',
         )
-        assert completion_return is None
+        completion_return = self.sequence_3_1.handle('get_completion', request)
+        assert completion_return.json == {'complete': False}
 
-    def test_handle_ajax_metadata(self):
-        """
-        Test that the sequence metadata is returned from the
-        metadata ajax handler.
-        """
+    def test_handle_ajax_get_completion_success(self):
+        """Test that the old-style ajax handler for completion still works"""
+        for child in self.sequence_3_1.get_children():
+            usage_key = str(child.location)
+            completion_return = self.sequence_3_1.handle_ajax('get_completion', {'usage_key': usage_key})
+            assert json.loads(completion_return) == {'complete': True}
+
+    def test_xblock_handler_goto_position_success(self):
+        """Test that we can set position through ajax call"""
+        assert self.sequence_3_1.position != 5
+        request = RequestFactory().post(
+            '/',
+            data=json.dumps({'position': 5}),
+            content_type='application/json',
+        )
+        goto_return = self.sequence_3_1.handle('goto_position', request)
+        assert goto_return.json == {'success': True}
+        assert self.sequence_3_1.position == 5
+
+    def test_xblock_handler_goto_position_bad_position(self):
+        """Test that we gracefully handle bad positions as position 1"""
+        assert self.sequence_3_1.position != 1
+        request = RequestFactory().post(
+            '/',
+            data=json.dumps({'position': -10}),
+            content_type='application/json',
+        )
+        goto_return = self.sequence_3_1.handle('goto_position', request)
+        assert goto_return.json == {'success': True}
+        assert self.sequence_3_1.position == 1
+
+    def test_handle_ajax_goto_position_success(self):
+        """Test that the old-style ajax handler for setting position still works"""
+        goto_return = self.sequence_3_1.handle_ajax('goto_position', {'position': 5})
+        assert json.loads(goto_return) == {'success': True}
+        assert self.sequence_3_1.position == 5
+
+    def test_get_metadata(self):
+        """Test that the sequence metadata is returned correctly"""
         # rather than dealing with json serialization of the Mock object,
         # let's just disable the bookmarks service
         self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None  # lint-amnesty, pylint: disable=protected-access
-        metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
+        metadata = self.sequence_3_1.get_metadata()
         assert len(metadata['items']) == 3
         assert metadata['tag'] == 'sequential'
         assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
@@ -412,14 +442,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
         'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
     ))
-    def test_handle_ajax_metadata_content_type_gated_content(self):
-        """
-        The contains_content_type_gated_content field should reflect
-        whether the given item contains content type gated content
-        """
+    def test_get_metadata_content_type_gated_content(self):
+        """The contains_content_type_gated_content field tells whether the item contains content type gated content"""
         self.sequence_5_1.xmodule_runtime._services['bookmarks'] = None  # pylint: disable=protected-access
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        metadata = json.loads(self.sequence_5_1.handle_ajax('metadata', {}))
+        metadata = self.sequence_5_1.get_metadata()
         assert metadata['items'][0]['contains_content_type_gated_content'] is False
 
         # When a block contains content type gated problems, set the contains_content_type_gated_content field
@@ -428,7 +455,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             enabled_for_enrollment=Mock(return_value=True),
             content_type_gate_for_block=Mock(return_value=Fragment('i_am_gated'))
         ))
-        metadata = json.loads(self.sequence_5_1.handle_ajax('metadata', {}))
+        metadata = self.sequence_5_1.get_metadata()
         assert metadata['items'][0]['contains_content_type_gated_content'] is True
 
     def get_context_dict_from_string(self, data):

@@ -33,7 +33,7 @@ ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
 
 
 FORUM_THREAD_VIEWED_EVENT_LABEL = 'Forum: View Thread'
-BI_SCREEN_VIEWED_EVENT_NAME = u'edx.bi.app.navigation.screen'
+BI_SCREEN_VIEWED_EVENT_NAME = 'edx.bi.app.navigation.screen'
 
 
 @require_POST

@@ -160,6 +160,9 @@ FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 ################### FRONTEND APPLICATION LIBRARY AUTHORING ###################
 LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
 
+################### FRONTEND APPLICATION COURSE AUTHORING ###################
+COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.

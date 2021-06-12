@@ -50,7 +50,7 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         return no_data
 
     if cache_key:
-        cache_key = '{}.{}'.format(cache_key, resource_id) if resource_id is not None else cache_key
+        cache_key = f'{cache_key}.{resource_id}' if resource_id is not None else cache_key
         cache_key += '.zpickled'
 
         cached = cache.get(cache_key)

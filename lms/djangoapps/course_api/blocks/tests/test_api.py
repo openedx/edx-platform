@@ -108,11 +108,10 @@ class TestGetBlocks(SharedModuleStoreTestCase):
             assert block['type'] == 'problem'
 
 
-# TODO: Remove this class after REVE-52 lands and old-mobile-app traffic falls to < 5% of mobile traffic
-@ddt.ddt
-class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
+class TestGetBlocksVideoUrls(SharedModuleStoreTestCase):
     """
-    Tests that requests from the mobile app don't receive empty containers.
+    Tests the video blocks returned have their URL re-written for
+    encoded videos.
     """
 
     @classmethod
@@ -142,19 +141,6 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
-
-    @ddt.data(
-        *product([True, False], ['chapter', 'sequential', 'vertical'])
-    )
-    @ddt.unpack
-    def test_empty_containers(self, is_mobile, container_type):
-        with patch('lms.djangoapps.course_api.blocks.api.is_request_from_mobile_app', return_value=is_mobile):
-            blocks = get_blocks(self.request, self.course.location)
-        full_container_key = self.course.id.make_usage_key(container_type, f'full_{container_type}')
-        assert str(full_container_key) in blocks['blocks']
-        empty_container_key = self.course.id.make_usage_key(container_type, f'empty_{container_type}')
-        assert_containment = self.assertNotIn if is_mobile else self.assertIn
-        assert_containment(str(empty_container_key), blocks['blocks'])
 
     @patch('xmodule.video_module.VideoBlock.student_view_data')
     def test_video_urls_rewrite(self, video_data_patch):
@@ -234,7 +220,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=11 if with_storage_backing else 10,
+                expected_sql_queries=13 if with_storage_backing else 12,
             )
 
     @ddt.data(
@@ -251,9 +237,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 21
+                num_sql_queries = 23
             else:
-                num_sql_queries = 11
+                num_sql_queries = 13
 
             self._get_blocks(
                 course,

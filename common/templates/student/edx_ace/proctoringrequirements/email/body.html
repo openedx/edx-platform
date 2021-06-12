@@ -7,11 +7,12 @@
     <tr>
         <td>
             <h1>
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}
                     Proctoring requirements for {{ course_name }}
                 {% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">
@@ -23,19 +24,21 @@
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}
                     You are enrolled in {{ course_name }} at {{ platform_name }}. This course contains proctored exams.
                 {% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}
                     Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses {{ proctoring_provider }} software for proctoring.
                 {% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </p>
 
             <p style="color: rgba(0,0,0,.75);">

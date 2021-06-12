@@ -18,7 +18,7 @@ def kill_process(proc):
     Kill the process `proc` created with `subprocess`.
     """
     p1_group = psutil.Process(proc.pid)
-    child_pids = p1_group.get_children(recursive=True)  # lint-amnesty, pylint: disable=no-member
+    child_pids = p1_group.children(recursive=True)
 
     for child_pid in child_pids:
         os.kill(child_pid.pid, signal.SIGKILL)
@@ -36,11 +36,11 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
     pids = []
 
     if out_log:
-        out_log_file = open(out_log, 'w')
+        out_log_file = open(out_log, 'w')  # lint-amnesty, pylint: disable=consider-using-with
         kwargs['stdout'] = out_log_file
 
     if err_log:
-        err_log_file = open(err_log, 'w')
+        err_log_file = open(err_log, 'w')  # lint-amnesty, pylint: disable=consider-using-with
         kwargs['stderr'] = err_log_file
 
     # If the user is performing a dry run of a task, then just log
@@ -93,14 +93,14 @@ def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
 
     kwargs = {'shell': True, 'cwd': cwd}
     if out_log:
-        out_log_file = open(out_log, 'w')
+        out_log_file = open(out_log, 'w')  # lint-amnesty, pylint: disable=consider-using-with
         kwargs['stdout'] = out_log_file
 
     if err_log:
-        err_log_file = open(err_log, 'w')
+        err_log_file = open(err_log, 'w')  # lint-amnesty, pylint: disable=consider-using-with
         kwargs['stderr'] = err_log_file
 
-    proc = subprocess.Popen(cmd, **kwargs)
+    proc = subprocess.Popen(cmd, **kwargs)  # lint-amnesty, pylint: disable=consider-using-with
 
     def exit_handler():
         """
@@ -110,7 +110,7 @@ def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
         killed properly.
         """
         p1_group = psutil.Process(proc.pid)
-        child_pids = p1_group.get_children(recursive=True)  # lint-amnesty, pylint: disable=no-member
+        child_pids = p1_group.children(recursive=True)
 
         for child_pid in child_pids:
             os.kill(child_pid.pid, signal.SIGINT)

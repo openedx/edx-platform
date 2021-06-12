@@ -8,14 +8,15 @@ import json
 import logging
 import hashlib
 import re
+import urllib
 
-import six
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib import admin
+from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -37,11 +38,13 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
-from openedx.core.djangoapps.user_authn.views.utils import ENTERPRISE_ENROLLMENT_URL_REGEX, UUID4_REGEX
+from openedx.core.djangoapps.user_authn.views.utils import (
+    ENTERPRISE_ENROLLMENT_URL_REGEX, UUID4_REGEX, API_V1
+)
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.view_utils import require_post_params
+from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.enterprise_support.api import activate_learner_enterprise, get_enterprise_learner_data_from_api
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile
@@ -54,6 +57,7 @@ from common.djangoapps.util.password_policy_validators import normalize_password
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
+USER_MODEL = get_user_model()
 
 
 def _do_third_party_auth(request):
@@ -69,19 +73,19 @@ def _do_third_party_auth(request):
 
     try:
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
-    except User.DoesNotExist:
+    except USER_MODEL.DoesNotExist:
         AUDIT_LOG.info(
-            u"Login failed - user with username {username} has no social auth "
-            u"with backend_name {backend_name}".format(
+            "Login failed - user with username {username} has no social auth "
+            "with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
         message = Text(_(
-            u"You've successfully signed in to your {provider_name} account, "
-            u"but this account isn't linked with your {platform_name} account yet. {blank_lines}"
-            u"Use your {platform_name} username and password to sign in to {platform_name} below, "
-            u"and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
-            u"If you don't have an account on {platform_name} yet, "
-            u"click {register_label_strong} at the top of the page."
+            "You've successfully signed in to your {provider_name} account, "
+            "but this account isn't linked with your {platform_name} account yet. {blank_lines}"
+            "Use your {platform_name} username and password to sign in to {platform_name} below, "
+            "and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
+            "If you don't have an account on {platform_name} yet, "
+            "click {register_label_strong} at the top of the page."
         )).format(
             blank_lines=HTML('<br/><br/>'),
             platform_name=platform_name,
@@ -104,10 +108,27 @@ def _get_user_by_email(request):
     email = request.POST['email']
 
     try:
-        return User.objects.get(email=email)
-    except User.DoesNotExist:
+        return USER_MODEL.objects.get(email=email)
+    except USER_MODEL.DoesNotExist:
         digest = hashlib.shake_128(email.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
         AUDIT_LOG.warning(f"Login failed - Unknown user email {digest}")
+
+
+def _get_user_by_email_or_username(request):
+    """
+    Finds a user object in the database based on the given request, ignores all fields except for email and username.
+    """
+    if 'email_or_username' not in request.POST or 'password' not in request.POST:
+        raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
+
+    email_or_username = request.POST.get('email_or_username', None)
+    try:
+        return USER_MODEL.objects.get(
+            Q(username=email_or_username) | Q(email=email_or_username)
+        )
+    except USER_MODEL.DoesNotExist:
+        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
+        AUDIT_LOG.warning(f"Login failed - Unknown user username/email {digest}")
 
 
 def _check_excessive_login_attempts(user):
@@ -149,12 +170,12 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
         # Allow login, but warn the user that they will be required to reset their password soon.
-        PageLevelMessages.register_warning_message(request, six.text_type(e))
+        PageLevelMessages.register_warning_message(request, str(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AuthFailedError(HTML(str(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
@@ -208,6 +229,7 @@ def _handle_failed_authentication(user, authenticated_user):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
+    failure_count = 0
     if user:
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
@@ -243,12 +265,18 @@ def _handle_failed_authentication(user, authenticated_user):
                     error_code='failed-login-attempt',
                     context={
                         'remaining_attempts': remaining_attempts,
+                        'allowed_failure_attempts': max_failures_allowed,
+                        'failure_count': failure_count,
                     }
                 )
 
             _generate_locked_out_error_message()
 
-    raise AuthFailedError(_('Email or password is incorrect.'), error_code='incorrect-email-or-password')
+    raise AuthFailedError(
+        _('Email or password is incorrect.'),
+        error_code='incorrect-email-or-password',
+        context={'failure_count': failure_count},
+    )
 
 
 def _handle_successful_authentication_and_login(user, request):
@@ -309,8 +337,8 @@ def _create_message(site, root_url, allowed_domain):
     through allowed domain SSO provider.
     """
     msg = Text(_(
-        u'As {allowed_domain} user, You must login with your {allowed_domain} '
-        u'{link_start}{provider} account{link_end}.'
+        'As {allowed_domain} user, You must login with your {allowed_domain} '
+        '{link_start}{provider} account{link_end}.'
     )).format(
         allowed_domain=allowed_domain,
         link_start=HTML("<a href='{root_url}{tpa_provider_link}'>").format(
@@ -404,7 +432,7 @@ def enterprise_selection_page(request, user, next_url):
 
         # Check to see if next url has an enterprise in it. In this case if user is associated with
         # that enterprise, activate that enterprise and bypass the selection page.
-        if re.match(ENTERPRISE_ENROLLMENT_URL_REGEX, six.moves.urllib.parse.unquote(next_url)):
+        if re.match(ENTERPRISE_ENROLLMENT_URL_REGEX, urllib.parse.unquote(next_url)):
             enterprise_in_url = re.search(UUID4_REGEX, next_url).group(0)
             for enterprise in response:
                 if enterprise_in_url == str(enterprise['enterprise_customer']['uuid']):
@@ -428,7 +456,7 @@ def enterprise_selection_page(request, user, next_url):
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
 )  # lint-amnesty, pylint: disable=too-many-statements
-def login_user(request):
+def login_user(request, api_version='v1'):
     """
     AJAX request to log in the user.
 
@@ -493,8 +521,10 @@ def login_user(request):
                 # user successfully authenticated with a third party provider, but has no linked Open edX account
                 response_content = e.get_response()
                 return JsonResponse(response_content, status=403)
-        else:
+        elif api_version == API_V1:
             user = _get_user_by_email(request)
+        else:
+            user = _get_user_by_email_or_username(request)
 
         _check_excessive_login_attempts(user)
 
@@ -547,9 +577,7 @@ def login_user(request):
         if error_code:
             set_custom_attribute('login_error_code', error_code)
 
-        if error_code == 'inactive-user':
-            response_content['email'] = user.email
-
+        response_content['email'] = request.POST.get('email', None)
         response = JsonResponse(response_content, status=400)
         set_custom_attribute('login_user_auth_failed_error', True)
         set_custom_attribute('login_user_response_status', response.status_code)
@@ -592,12 +620,11 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
-    @method_decorator(require_post_params(["email", "password"]))
     @method_decorator(csrf_protect)
-    def post(self, request):
+    def post(self, request, api_version):
         """Log in a user.
 
         See `login_user` for details.
@@ -610,11 +637,11 @@ class LoginSessionView(APIView):
             200 {'success': true}
 
         """
-        return login_user(request)
+        return login_user(request, api_version)
 
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(request, *args, **kwargs)
 
 
 def _parse_analytics_param_for_course_id(request):
@@ -642,7 +669,7 @@ def _parse_analytics_param_for_course_id(request):
         except (ValueError, TypeError):
             set_custom_attribute('shim_analytics_course_id', 'parse-error')
             log.error(
-                u"Could not parse analytics object sent to user API: {analytics}".format(
+                "Could not parse analytics object sent to user API: {analytics}".format(
                     analytics=analytics
                 )
             )

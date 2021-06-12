@@ -13,7 +13,7 @@ from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from common.djangoapps.student.tests.factories import UserFactory
-from common.lib.xmodule.xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -314,3 +314,43 @@ class TestProctoredExams(ModuleStoreTestCase):
         listen_for_course_publish(self, self.course.id)
         exams = get_all_exams_for_course(str(self.course.id))
         assert exams[0]['due_date'] is not None
+
+    def test_async_waffle_flag_publishes(self):
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=10,
+            is_proctored_exam=True,
+            hide_after_due=False,
+            is_onboarding_exam=False,
+            exam_review_rules="allow_use_of_paper",
+        )
+
+        listen_for_course_publish(self, self.course.id)
+
+        exams = get_all_exams_for_course(str(self.course.id))
+        self.assertEqual(len(exams), 1)
+        self._verify_exam_data(sequence, True)
+
+    def test_async_waffle_flag_task(self):
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=10,
+            is_proctored_exam=True,
+            hide_after_due=False,
+            is_onboarding_exam=False,
+            exam_review_rules="allow_use_of_paper",
+        )
+
+        with patch('cms.djangoapps.contentstore.tasks.update_special_exams_and_publish') as mock_task:
+            listen_for_course_publish(self, self.course.id)
+            mock_task.delay.assert_called()

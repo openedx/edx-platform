@@ -40,13 +40,13 @@ def waffle_flags():
 
 
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
-ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
+ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=waffle_flags(),
     flag_name='enable_checklists_quality',
     module_name=__name__,
 )
 
-SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
+SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=waffle_flags(),
     flag_name='show_review_rules',
     module_name=__name__,
@@ -65,5 +65,21 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
 REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name='library_authoring_mfe',
+    module_name=__name__,
+)
+
+
+# .. toggle_name: studio.pages_and_resources_mfe
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to link existing studio views to the new Pages and Resources experience.
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2021-05-24
+# .. toggle_target_removal_date: 2021-12-31
+# .. toggle_warnings: Also set settings.COURSE_AUTHORING_MICROFRONTEND_URL.
+# .. toggle_tickets: None
+ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND = CourseWaffleFlag(
+    waffle_namespace=waffle_flags(),
+    flag_name='pages_and_resources_mfe',
     module_name=__name__,
 )

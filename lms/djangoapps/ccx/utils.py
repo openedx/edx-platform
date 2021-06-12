@@ -22,12 +22,12 @@ from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructor
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params, unenroll_email
 from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.courses import get_course_by_id
 
 log = logging.getLogger("edx.ccx")
 
@@ -332,13 +332,13 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
         send_email (bool): flag to switch on or off email to the users on access grant.
 
     """
-    list_staff = list_with_level(master_course, 'staff')
-    list_instructor = list_with_level(master_course, 'instructor')
+    list_staff = list_with_level(master_course.id, 'staff')
+    list_instructor = list_with_level(master_course.id, 'instructor')
 
     with ccx_course(ccx_key) as course_ccx:
         email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
-        list_staff_ccx = list_with_level(course_ccx, 'staff')
-        list_instructor_ccx = list_with_level(course_ccx, 'instructor')
+        list_staff_ccx = list_with_level(course_ccx.id, 'staff')
+        list_instructor_ccx = list_with_level(course_ccx.id, 'instructor')
         for staff in list_staff:
             # this call should be idempotent
             if staff not in list_staff_ccx:
@@ -401,12 +401,12 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
         send_email (bool): flag to switch on or off email to the users on revoke access.
 
     """
-    list_staff = list_with_level(master_course, 'staff')
-    list_instructor = list_with_level(master_course, 'instructor')
+    list_staff = list_with_level(master_course.id, 'staff')
+    list_instructor = list_with_level(master_course.id, 'instructor')
 
     with ccx_course(ccx_key) as course_ccx:
-        list_staff_ccx = list_with_level(course_ccx, 'staff')
-        list_instructor_ccx = list_with_level(course_ccx, 'instructor')
+        list_staff_ccx = list_with_level(course_ccx.id, 'staff')
+        list_instructor_ccx = list_with_level(course_ccx.id, 'instructor')
         email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
         for staff in list_staff:
             if staff in list_staff_ccx:

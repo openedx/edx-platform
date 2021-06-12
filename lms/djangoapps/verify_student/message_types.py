@@ -4,16 +4,6 @@ ACE message types for the verify_student module.
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 
 
-class VerificationExpiry(BaseMessageType):  # lint-amnesty, pylint: disable=missing-class-docstring
-    APP_LABEL = 'verify_student'
-    Name = 'verificationexpiry'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.options['transactional'] = True
-
-
 class VerificationApproved(BaseMessageType):
     """
     A message to the learner when their ID verification has been approved.
@@ -23,6 +13,16 @@ class VerificationApproved(BaseMessageType):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.options['transactional'] = True
+
+
+class VerificationExpiry(BaseMessageType):  # lint-amnesty, pylint: disable=missing-class-docstring
+    APP_LABEL = 'verify_student'
+    Name = 'verificationexpiry'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.options['transactional'] = True
 
 

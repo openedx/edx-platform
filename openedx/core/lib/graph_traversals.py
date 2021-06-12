@@ -186,7 +186,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):  # lint-amn
     Arguments:
         See description in traverse_topologically.
     """
-    class _Node(object):
+    class _Node:
         """
         Wrapper node class to keep an active children iterator.
         An active iterator is needed in order to determine when all

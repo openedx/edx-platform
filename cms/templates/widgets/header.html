@@ -104,9 +104,9 @@
                   <li class="nav-item nav-course-settings-group-configurations">
                     <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': six.text_type(course_key)})}">${_("Group Configurations")}</a>
                   </li>
-                  % if course_authoring_microfrontend_url:
+                  % if mfe_proctored_exam_settings_url:
                   <li class="nav-item nav-course-settings-exams">
-                    <a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_key}">${_("Proctored Exam Settings")}</a>
+                    <a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a>
                   </li>
                   % endif
                   <li class="nav-item nav-course-settings-advanced">

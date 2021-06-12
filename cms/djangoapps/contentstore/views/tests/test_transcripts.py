@@ -183,7 +183,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         Setup a transcript file with suffix and content.
         """
-        transcript_file = tempfile.NamedTemporaryFile(suffix=suffix)
+        transcript_file = tempfile.NamedTemporaryFile(suffix=suffix)  # lint-amnesty, pylint: disable=consider-using-with
         wrapped_content = textwrap.dedent(content)
         if include_bom:
             wrapped_content = wrapped_content.encode('utf-8-sig')

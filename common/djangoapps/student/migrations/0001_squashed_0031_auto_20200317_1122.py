@@ -37,8 +37,6 @@ def populate_fbeenrollmentexclusion(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('student', '0001_initial'), ('student', '0002_auto_20151208_1034'), ('student', '0003_auto_20160516_0938'), ('student', '0004_auto_20160531_1422'), ('student', '0005_auto_20160531_1653'), ('student', '0006_logoutviewconfiguration'), ('student', '0007_registrationcookieconfiguration'), ('student', '0008_auto_20161117_1209'), ('student', '0009_auto_20170111_0422'), ('student', '0010_auto_20170207_0458'), ('student', '0011_course_key_field_to_foreign_key'), ('student', '0012_sociallink'), ('student', '0013_delete_historical_enrollment_records'), ('student', '0014_courseenrollmentallowed_user'), ('student', '0015_manualenrollmentaudit_add_role'), ('student', '0016_coursenrollment_course_on_delete_do_nothing'), ('student', '0017_accountrecovery'), ('student', '0018_remove_password_history'), ('student', '0019_auto_20181221_0540'), ('student', '0020_auto_20190227_2019'), ('student', '0021_historicalcourseenrollment'), ('student', '0022_indexing_in_courseenrollment'), ('student', '0023_bulkunenrollconfiguration'), ('student', '0024_fbeenrollmentexclusion'), ('student', '0025_auto_20191101_1846'), ('student', '0026_allowedauthuser'), ('student', '0027_courseenrollment_mode_callable_default'), ('student', '0028_historicalmanualenrollmentaudit'), ('student', '0029_add_data_researcher'), ('student', '0030_userprofile_phone_number'), ('student', '0031_auto_20200317_1122')]
-
     initial = True
 
     dependencies = [

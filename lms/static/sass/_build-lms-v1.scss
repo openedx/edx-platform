@@ -72,10 +72,10 @@
 @import 'features/_unsupported-browser-alert';
 @import 'features/content-type-gating';
 @import 'features/course-duration-limits';
-@import 'features/first-purchase-banner';
 
 // search
 @import 'search/search';
+@import 'search/instant-search';
 
 // news
 @import 'notifications';

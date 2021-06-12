@@ -52,7 +52,7 @@ class MakoLoader:
 
         # In order to allow dynamic template overrides, we need to cache templates based on their absolute paths
         # rather than relative paths, overriding templates would have same relative paths.
-        module_directory = self.module_directory.rstrip("/") + "/{dir_hash}/".format(dir_hash=hash(origin.name))
+        module_directory = self.module_directory.rstrip("/") + f"/{hash(origin.name)}/"
 
         if source.startswith("## mako\n"):
             # This is a mako template

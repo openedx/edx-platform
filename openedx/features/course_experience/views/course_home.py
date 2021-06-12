@@ -3,7 +3,6 @@ Views for the course home page.
 """
 
 
-import six
 from django.conf import settings
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
@@ -14,7 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_outline_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.course_goals.api import (
@@ -26,33 +25,30 @@ from lms.djangoapps.course_goals.api import (
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    LATEST_UPDATE_FLAG,
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
+)
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
-from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block, get_start_block
+from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
+from openedx.features.course_experience.views.course_home_messages import CourseHomeMessageFragmentView
+from openedx.features.course_experience.views.course_outline import CourseOutlineFragmentView
+from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
+from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
+from openedx.features.course_experience.views.welcome_message import WelcomeMessageFragmentView
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 
-from .. import (
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    LATEST_UPDATE_FLAG,
-    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-)
-from ..utils import get_course_outline_block_tree, get_resume_block, get_start_block
-from .course_dates import CourseDatesFragmentView
-from .course_home_messages import CourseHomeMessageFragmentView
-from .course_outline import CourseOutlineFragmentView
-from .course_sock import CourseSockFragmentView
-from .latest_update import LatestUpdateFragmentView
-from .welcome_message import WelcomeMessageFragmentView
-
-EMPTY_HANDOUTS_HTML = u'<ol></ol>'
+EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
 
 class CourseHomeView(CourseTabView):
@@ -67,11 +63,11 @@ class CourseHomeView(CourseTabView):
         """
         Displays the home page for the specified course.
         """
-        return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get(request, course_id, 'courseware', **kwargs)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
-        course_id = six.text_type(course.id)
-        if course_home_mfe_outline_tab_is_active(course.id) and not request.user.is_staff:
+        course_id = str(course.id)
+        if course_home_mfe_is_active(course.id) and not request.user.is_staff:
             microfrontend_url = get_learning_mfe_home_url(course_key=course_id, view_name="home")
             raise Redirect(microfrontend_url)
         home_fragment_view = CourseHomeFragmentView()
@@ -140,7 +136,6 @@ class CourseHomeFragmentView(EdxFragmentView):
         outline_fragment = None
         update_message_fragment = None
         course_sock_fragment = None
-        offer_banner_fragment = None
         course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
@@ -164,10 +159,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             )
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
-            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
-                request.user,
-                course_overview
-            )
             course_expiration_fragment = generate_course_expired_fragment(
                 request.user,
                 course_overview
@@ -230,7 +221,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
-            'offer_banner_fragment': offer_banner_fragment,
             'course_expiration_fragment': course_expiration_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
@@ -249,7 +239,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,
             'show_search': show_search,
-            'show_proctoring_info_panel': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_key),
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

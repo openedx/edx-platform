@@ -14,7 +14,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     all_permissions_for_user_in_course
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -145,7 +144,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
                 # or a course has divided discussions, but the current user's content group does not equal
                 # the content group of the commenter/poster,
                 # then the current user does not have group edit permissions.
-                division_scheme = get_course_discussion_settings(course_id).division_scheme
+                division_scheme = CourseDiscussionSettings.get(course_id).division_scheme
                 if (division_scheme is CourseDiscussionSettings.NONE
                         or user_group_id is None
                         or content_user_group is None

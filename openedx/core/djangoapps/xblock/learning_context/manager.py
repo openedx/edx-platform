@@ -39,9 +39,9 @@ def get_learning_context_impl(key):
         context_type = key.context_key.CANONICAL_NAMESPACE
     elif isinstance(key, OpaqueKey):
         # Maybe this is an older modulestore key etc.
-        raise TypeError("Opaque key {} does not have a learning context.".format(key))
+        raise TypeError(f"Opaque key {key} does not have a learning context.")
     else:
-        raise TypeError("key '{}' is not an opaque key. You probably forgot [KeyType].from_string(...)".format(key))
+        raise TypeError(f"key '{key}' is not an opaque key. You probably forgot [KeyType].from_string(...)")
 
     try:
         return _learning_context_cache[context_type]

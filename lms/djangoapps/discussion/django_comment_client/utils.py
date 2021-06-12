@@ -17,7 +17,6 @@ from pytz import UTC
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
@@ -34,8 +33,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     DiscussionsIdMapping,
     Role
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
@@ -358,7 +357,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
 
     xblocks = get_accessible_discussion_xblocks(course, user)
 
-    discussion_settings = get_course_discussion_settings(course.id)
+    discussion_settings = CourseDiscussionSettings.get(course.id)
     discussion_division_enabled = course_discussion_division_enabled(discussion_settings)
     divided_discussion_ids = discussion_settings.divided_discussions
 
@@ -422,7 +421,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
                 # If we've already seen this title, append an incrementing number to disambiguate
                 # the category from other categores sharing the same title in the course discussion UI.
                 dupe_counters[title] += 1
-                title = "{title} ({counter})".format(title=title, counter=dupe_counters[title])
+                title = f"{title} ({dupe_counters[title]})"
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
@@ -797,7 +796,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
             del endorsement["user_id"]
 
     if discussion_division_enabled is None:
-        discussion_division_enabled = course_discussion_division_enabled(get_course_discussion_settings(course_key))
+        discussion_division_enabled = course_discussion_division_enabled(CourseDiscussionSettings.get(course_key))
 
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
@@ -816,7 +815,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
     if discussion_division_enabled:
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
-            course_discussion_settings = get_course_discussion_settings(course_key)
+            course_discussion_settings = CourseDiscussionSettings.get(course_key)
             if group_names_by_id:
                 content['group_name'] = group_names_by_id.get(content.get('group_id'))
             else:
@@ -843,7 +842,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
     Raises:
         ValueError if the requested group_id is invalid
     """
-    course_discussion_settings = get_course_discussion_settings(course_key)
+    course_discussion_settings = CourseDiscussionSettings.get(course_key)
     if commentable_id is None or is_commentable_divided(course_key, commentable_id, course_discussion_settings):
         if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
@@ -870,7 +869,7 @@ def get_group_id_for_user_from_cache(user, course_id):
     Caches the results of get_group_id_for_user, but serializes the course_id
     instead of the course_discussions_settings object as cache keys.
     """
-    return get_group_id_for_user(user, get_course_discussion_settings(course_id))
+    return get_group_id_for_user(user, CourseDiscussionSettings.get(course_id))
 
 
 def get_group_id_for_user(user, course_discussion_settings):
@@ -922,9 +921,9 @@ def is_commentable_divided(course_key, commentable_id, course_discussion_setting
         Http404 if the course doesn't exist.
     """
     if not course_discussion_settings:
-        course_discussion_settings = get_course_discussion_settings(course_key)
+        course_discussion_settings = CourseDiscussionSettings.get(course_key)
 
-    course = courses.get_course_by_id(course_key)
+    course = get_course_by_id(course_key)
 
     if not course_discussion_division_enabled(course_discussion_settings) or get_team(commentable_id):
         # this is the easy case :)
@@ -1034,7 +1033,7 @@ def get_group_names_by_id(course_discussion_settings):
     division_scheme = _get_course_division_scheme(course_discussion_settings)
     course_key = course_discussion_settings.course_id
     if division_scheme == CourseDiscussionSettings.COHORT:
-        return get_cohort_names(courses.get_course_by_id(course_key))
+        return get_cohort_names(get_course_by_id(course_key))
     elif division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK:
         # We negate the group_ids from dynamic partitions so that they will not conflict
         # with cohort IDs (which are an auto-incrementing integer field, starting at 1).

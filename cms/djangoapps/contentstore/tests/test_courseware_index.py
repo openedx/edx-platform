@@ -16,7 +16,6 @@ from django.conf import settings
 from lazy.lazy import lazy
 from pytz import UTC
 from search.search_engine_base import SearchEngine
-from xblock.core import XBlock  # lint-amnesty, pylint: disable=unused-import
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
