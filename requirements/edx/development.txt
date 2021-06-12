@@ -120,7 +120,7 @@ edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
-https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler13.tar.gz  # edx-organizations==5.2.0
+https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler14.tar.gz  # edx-organizations==5.2.0
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
 edx-proctoring==2.4.0     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.2.1           # via -r requirements/edx/testing.txt, edx-enterprise

@@ -24,7 +24,7 @@ from django.utils.text import slugify
 
 from organizations import api as org_api
 from organizations import models as org_models
-from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
+from organizations.models import UserOrganizationMapping, Organization
 
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
 from openedx.core.lib.log_utils import audit_log
@@ -218,17 +218,11 @@ def make_amc_admin(user, org_name):
       - Return the recent tokens.
     """
     org = Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
-    site = get_site_by_organization(org)
 
     uom, _ = UserOrganizationMapping.objects.get_or_create(user=user, organization=org)
     uom.is_active = True
     uom.is_amc_admin = True
     uom.save()
-
-    usm, _ = UserSiteMapping.objects.get_or_create(user=user, site=site)
-    usm.is_active = True
-    usm.is_amc_admin = True
-    usm.save()
 
     return {
         'user_email': user.email,
