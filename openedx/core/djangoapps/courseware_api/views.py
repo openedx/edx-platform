@@ -39,6 +39,7 @@ from lms.djangoapps.courseware.toggles import (
     courseware_mfe_is_visible,
     course_exit_page_is_active,
     mfe_special_exams_is_active,
+    mfe_proctored_exams_is_active,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -123,6 +124,10 @@ class CoursewareMeta:
     @property
     def is_mfe_special_exams_enabled(self):
         return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_special_exams_is_active(self.course_key)
+
+    @property
+    def is_mfe_proctored_exams_enabled(self):
+        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_proctored_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
@@ -300,10 +305,10 @@ class CoursewareMeta:
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
         if (
-            not self.is_staff
+            is_integrity_signature_enabled(self.course_key)
+            and not self.is_staff
             and self.enrollment_object
             and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
-            and is_integrity_signature_enabled()
         ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:

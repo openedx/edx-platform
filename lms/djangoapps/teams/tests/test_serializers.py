@@ -56,8 +56,6 @@ class MembershipSerializerTestCase(SerializerTestCase):
         username = self.user.username
         assert data['user'] == {'url': ('http://testserver/api/user/v1/accounts/' + username),
                                 'username': username,
-                                'id': self.user.id,
-                                'email': self.user.email,
                                 'profile_image': {'image_url_full': 'http://testserver/static/default_500.png',
                                                   'image_url_large': 'http://testserver/static/default_120.png',
                                                   'image_url_medium': 'http://testserver/static/default_50.png',

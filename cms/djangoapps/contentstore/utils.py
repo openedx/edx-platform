@@ -2,7 +2,6 @@
 Common utility functions useful throughout the contentstore
 """
 
-
 import logging
 from contextlib import contextmanager
 from datetime import datetime
@@ -16,6 +15,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
@@ -157,37 +157,39 @@ def get_lms_link_for_certificate_web_view(course_key, mode):
     )
 
 
-def get_course_authoring_url(course_module):
+def get_course_authoring_url(course_locator):
     """
     Gets course authoring microfrontend URL
     """
     return configuration_helpers.get_value_for_org(
-        course_module.location.org,
+        course_locator.org,
         'COURSE_AUTHORING_MICROFRONTEND_URL',
         settings.COURSE_AUTHORING_MICROFRONTEND_URL
     )
 
 
-def get_pages_and_resources_url(course_module):
+def get_pages_and_resources_url(course_locator):
     """
     Gets course authoring microfrontend URL for Pages and Resources view.
     """
     pages_and_resources_url = None
-    if ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_module.id):
-        mfe_base_url = get_course_authoring_url(course_module)
+    if ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
         if mfe_base_url:
-            pages_and_resources_url = f'{mfe_base_url}/course/{course_module.id}/pages-and-resources'
+            pages_and_resources_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources'
     return pages_and_resources_url
 
 
-def get_proctored_exam_settings_url(course_module):
+def get_proctored_exam_settings_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for links to proctored exam settings page
     """
-    course_authoring_microfrontend_url = ''
-    if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
-        course_authoring_microfrontend_url = get_course_authoring_url(course_module)
-    return course_authoring_microfrontend_url
+    proctored_exam_settings_url = ''
+    if exam_setting_view_enabled():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            proctored_exam_settings_url = f'{mfe_base_url}/course/{course_locator}/proctored-exam-settings'
+    return proctored_exam_settings_url
 
 
 def course_import_olx_validation_is_enabled():

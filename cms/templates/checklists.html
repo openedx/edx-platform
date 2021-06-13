@@ -67,7 +67,7 @@
                     "course_updates": ${utils.reverse_course_url('course_info_handler', course_key) | n, dump_js_escaped_json},
                     "grading_policy": ${utils.reverse_course_url('grading_handler', course_key) | n, dump_js_escaped_json},
                     "settings": ${utils.reverse_course_url('settings_handler', course_key) | n, dump_js_escaped_json},
-                    "proctored_exam_settings": ${proctored_exam_settings_url | n, dump_js_escaped_json}
+                    "proctored_exam_settings": ${mfe_proctored_exam_settings_url | n, dump_js_escaped_json}
                 }
             }
         </%static:studiofrontend>

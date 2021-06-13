@@ -2,13 +2,15 @@
 Exam Settings View Tests
 """
 
+from unittest.mock import patch
+
 import ddt
 import lxml
 from django.conf import settings
 from django.test.utils import override_settings
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url, reverse_course_url
 from common.djangoapps.util.testing import UrlResetMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -164,3 +166,26 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         parsed_html = lxml.html.fromstring(resp.content)
         alert_nodes = parsed_html.find_class('exam-settings-alert')
         assert len(alert_nodes) == 0
+
+    @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
+    @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
+    def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
+
+        """
+        Test to check proctored exam settings mfe url is rendering properly
+        """
+        mock_validate_proctoring_settings.return_value = [
+            {
+                'key': 'proctoring_provider',
+                'message': 'error message',
+                'model': {'display_name': 'proctoring_provider'}
+            },
+            {
+                'key': 'proctoring_provider',
+                'message': 'error message',
+                'model': {'display_name': 'proctoring_provider'}
+            }
+        ]
+        response = self.client.get_html(reverse_course_url('advanced_settings_handler', self.course.id))
+        proctored_exam_settings_url = get_proctored_exam_settings_url(self.course.id)
+        self.assertContains(response, proctored_exam_settings_url, 3)

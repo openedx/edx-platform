@@ -542,6 +542,7 @@ class SequenceBlock(
             'element_id': self.location.html_id(),
             'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
+            'is_proctored': self.is_proctored_enabled,
             'position': self.position,
             'tag': self.location.block_type,
             'next_url': context.get('next_url'),
@@ -894,7 +895,7 @@ class SequenceBlock(
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'is_integrity_signature_enabled': is_integrity_signature_enabled(),
+                'is_integrity_signature_enabled': is_integrity_signature_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments
