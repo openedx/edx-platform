@@ -575,6 +575,7 @@ def test_has_user_passed_given_courses(courses, percent_grades, letter_grades, p
             letter_grade=letter_grades[itr],
             passed=passed,
         )
+
     assert has_user_passed_given_courses(user, courses.values()) == expected_result
 
 
@@ -587,8 +588,8 @@ def test_get_users_with_active_enrollments_from_course_groups(prereq_course_grou
     users = UserFactory.create_batch(5)
     users_ids = [user.id for user in users]
 
-    multilingual_courses = prereq_course_groups[0].multilingual_courses.open_multilingual_courses()
-    CourseEnrollmentFactory(user=users[0], course=multilingual_courses[0].course)
+    open_multilingual_courses = prereq_course_groups[0].multilingual_courses.open_multilingual_courses()
+    CourseEnrollmentFactory(user=users[0], course=open_multilingual_courses[0].course)
 
     assert get_users_with_active_enrollments_from_course_groups(users_ids, prereq_course_groups) == [users[0]]
 

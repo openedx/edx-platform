@@ -15,7 +15,7 @@ from openedx.adg.lms.applications.tests.factories import ApplicationHubFactory
 @pytest.mark.django_db
 def test_command_update_is_prerequisite_courses_passed_with_no_prerequisites():
     """
-    Test to check if management command issues a system exits upon no prerequisites
+    Test to check if management command issues a system exit upon no prerequisites
     """
     with pytest.raises(SystemExit):
         call_command('update_is_prerequisite_courses_passed')
@@ -26,7 +26,7 @@ def test_command_update_is_prerequisite_courses_passed_with_no_prerequisites():
 @pytest.mark.usefixtures('prereq_course_groups')
 def test_command_update_is_prerequisite_courses_no_users_to_be_checked_for_update(mocker):
     """
-    Test to check if management command issues a system exits when given an empty list of users to be checked for update
+    Test to check if management command issues a system exit when given an empty list of users to be checked for update
     """
     mocker.patch(
         'openedx.adg.lms.applications.helpers.get_users_with_active_enrollments_from_course_groups',

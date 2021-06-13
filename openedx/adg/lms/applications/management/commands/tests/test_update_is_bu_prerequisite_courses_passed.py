@@ -18,7 +18,7 @@ from openedx.adg.lms.applications.tests.factories import ApplicationHubFactory, 
 @pytest.mark.django_db
 def test_command_update_is_bu_prerequisite_courses_passed_with_no_prerequisites():
     """
-    Test to check if management command issues a system exits upon no prerequisites
+    Test to check if management command issues a system exit upon no prerequisites
     """
     with pytest.raises(SystemExit):
         call_command('update_is_bu_prerequisite_courses_passed')
@@ -29,7 +29,7 @@ def test_command_update_is_bu_prerequisite_courses_passed_with_no_prerequisites(
 @pytest.mark.usefixtures('prereq_course_groups')
 def test_command_update_is_bu_prerequisite_courses_no_users_to_be_checked_for_update(mocker):
     """
-    Test to check if management command issues a system exits when given an empty list of users to be checked for update
+    Test to check if management command issues a system exit when given an empty list of users to be checked for update
     """
     mocker.patch(
         'openedx.adg.lms.applications.helpers.get_users_with_active_enrollments_from_course_groups',
@@ -50,8 +50,8 @@ def test_get_users_eligible_for_update(prereq_course_groups, eligible_users_coun
     """
     multilingual_courses = prereq_course_groups[0].multilingual_courses.open_multilingual_courses()
 
-    users_applications = UserApplicationFactory.create_batch(5)
-    users = [users_application.user for users_application in users_applications]
+    user_applications = UserApplicationFactory.create_batch(5)
+    users = [users_application.user for users_application in user_applications]
 
     for i in range(eligible_users_count):
         PersistentCourseGrade.update_or_create(
@@ -105,7 +105,7 @@ def test_get_user_ids_with_bu_pre_reqs_not_marked_as_passed(
 @pytest.mark.django_db
 def test_send_application_submission_emails(mocker):
     """
-    Assert that application submission email is send to given list of users
+    Assert that application submission email is sent to given list of users
     """
     users = UserFactory.create_batch(5)
     user_emails = [user.email for user in users]

@@ -78,4 +78,5 @@ def create_prerequisite_course_group(request):
         MultilingualCourseFactory(
             course__start_date=now - timedelta(days=2), course__end_date=now, multilingual_course_group=course_group
         )
+
     return course_groups
