@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -32,7 +32,7 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,9 +44,9 @@
 # fizdoonk, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2019
@@ -54,7 +54,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -69,7 +69,7 @@
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -82,9 +82,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
-"Last-Translator: Eka Y Saputra <ekajogja@ymail.com>\n"
+"POT-Creation-Date: 2021-06-06 20:42+0000\n"
+"PO-Revision-Date: 2021-02-28 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -2488,6 +2488,10 @@ msgid "Subject"
 msgstr "Judul"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Seting Account"
@@ -2517,28 +2521,12 @@ msgid "Financial Aid"
 msgstr "Bantuan Finansial"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr "Master"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "Verifikasi Foto"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr "Proctoring"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
-msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2596,18 +2584,6 @@ msgstr ""
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "Berikan detil untuk permintaan dukungan Anda."
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
-msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -3164,13 +3140,9 @@ msgstr "Heading"
 
 #: lms/static/js/ajax-error.js
 msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+"You have been logged out of your account. Click Okay to log in again now. "
+"Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
-"Anda telah keluar dari akun edX anda. Klik Okay untuk masuk kembali "
-"sekarang. Klik Batalkan untuk tetap di halaman ini (Anda harus masuk lagi "
-"untuk menyimpan pekerjaan Anda)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3237,10 +3209,6 @@ msgstr ""
 "tombol \"Invalidate Certificate\"."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr "File yang diupload bermasalah. Klik \"+\" untuk melihat."
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
 msgstr "pembelajar telah berhasil ditambahkan ke daftar exception"
 
@@ -3295,6 +3263,26 @@ msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
 "pembelajar tidak mengikuti kursus dan tidak ditambahkan ke daftar eksepsi"
 
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners already appear on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner already appears on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr "File yang diupload bermasalah. Klik \"+\" untuk melihat."
+
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "Certificate of <%= user %> has already been invalidated. Please check your "
@@ -3343,16 +3331,14 @@ msgstr ""
 " halaman ini dan coba kembali."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
-msgstr "<%= user %> telah berada dalam daftar eksepsi."
+msgid "<%- user %> already in exception list."
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
+"<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
-"<%= user %> telah berhasil ditambahkan dalam daftar eksepsi. Klik Buat "
-"Sertifikat Eksepsi di bawah untuk mengirim sertifikat."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3425,11 +3411,9 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
-"Batas waktu refund untuk kursus ini telah berakhir, sehingga Anda tidak "
-"dapat menerima refund."
 
 #: lms/static/js/dashboard/legacy.js
 #: lms/static/js/learner_dashboard/views/unenroll_view.js
@@ -3655,10 +3639,8 @@ msgid "Recent Activity"
 msgstr "Aktivitas Terbaru"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
-"Tidak ditemukan hasil pencarian untuk \"%(query_string)s\". Silakan coba "
-"cari kembali."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -3897,6 +3879,10 @@ msgid "Error getting issued certificates list."
 msgstr "Terjadi kesalahan dalam memperoleh daftar sertifikat."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
@@ -4106,10 +4092,6 @@ msgid "Reason field should not be left blank."
 msgstr "Kolom alasan tidak boleh kosong."
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr "Kolom peran harus dipilih."
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Kesalahan mendaftarkan/membatalkan pendaftaran pengguna"
 
@@ -4294,13 +4276,10 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Error menyetel ulang percobaan untuk masalah '<%= problem_id %>' dan siswa "
-"'<%- student_id %>'. Pastikan kode identifikasi masalah dan siswa lengkap "
-"dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4614,6 +4593,16 @@ msgid ""
 msgstr ""
 "Link dibuat berdasar permintaan dan akan usang dalam 5 menit mengacu kepada "
 "tingkat sensitif dari Informasi data siswa"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid ""
+"To access the courses available to you through {enterpriseName}, visit the "
+"{enterpriseName} dashboard."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "Go to dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -5980,7 +5969,7 @@ msgid "Please enter non-negative integer."
 msgstr "Mohon masukkan angka integer non-negatif."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -6428,8 +6417,8 @@ msgid "Highlights for {display_name}"
 msgstr "Sorotan untuk {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
-msgstr "Aktifkan Email Sorotan Mingguan"
+msgid "Enable Course Highlight Emails"
+msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -9740,7 +9729,7 @@ msgid "Copy Component Location"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
+msgid "Course Highlight Emails"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
@@ -10265,12 +10254,6 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "Hapus grup"
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""

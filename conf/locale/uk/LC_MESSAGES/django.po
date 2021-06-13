@@ -1,10 +1,10 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Alexey Yuriev <yurievac@gmail.com>, 2018
+# b5a5d5cd2b8c637d1ac79fd846147b59_26cb89a <0e9f93b943aec65fc66f0e9c041009ed_739049>, 2018
 # Anastasiia Bondarenko <anastasiia.bondarenko@raccoongang.com>, 2019
 # Andrey Kryachko, 2018
 # Andriy Havirko, 2017
@@ -32,7 +32,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -47,12 +47,12 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Alexey Shmalko <rasen.dubi@gmail.com>, 2015
-# Alexey Yuriev <yurievac@gmail.com>, 2018
+# b5a5d5cd2b8c637d1ac79fd846147b59_26cb89a <0e9f93b943aec65fc66f0e9c041009ed_739049>, 2018
 # Andrey Kryachko, 2018
 # Andrii Parkhomenko <andriy.parhomenko@gmail.com>, 2016
 # annburdyliak <annburdyliak@ya.ru>, 2014
@@ -79,7 +79,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -98,11 +98,11 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Alexey Yuriev <yurievac@gmail.com>, 2018
+# b5a5d5cd2b8c637d1ac79fd846147b59_26cb89a <0e9f93b943aec65fc66f0e9c041009ed_739049>, 2018
 # Andrey Kryachko, 2018
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
@@ -111,9 +111,9 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -123,7 +123,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"POT-Creation-Date: 2021-06-13 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -140,6 +140,7 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: openedx/features/lti_course_tab/tab.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -182,6 +183,16 @@ msgid "The following parameters are required: {missing}."
 msgstr "Наступні параметри э обов'язковими: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Виникла проблема з файлом транскрипту. Будь ласка спробуйте завантажити "
+"інший файл."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
@@ -192,16 +203,6 @@ msgstr "Транскрипти з кодом мови \"{language_code}\" вже
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Необхідний файл транскрипту. "
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Виникла проблема з файлом транскрипту. Будь ласка спробуйте завантажити "
-"інший файл."
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -311,7 +312,7 @@ msgstr "Професійна освіта"
 
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -433,7 +434,6 @@ msgstr "Аккаунт відновлено"
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Пароль"
@@ -464,7 +464,7 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
-msgid "Email doesn't have {domain_name} domain name."
+msgid "Email doesn't have {allowed_site_email_domain} domain name."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -1748,12 +1748,12 @@ msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Incorrect"
 msgstr "Неправильно"
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct"
 msgstr "Правильно"
 
@@ -2184,7 +2184,7 @@ msgid "XML data for the annotation"
 msgstr "XML-дані для анотації"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2203,20 +2203,20 @@ msgstr "Відображена назва для цього компоненту
 msgid "Annotation"
 msgstr "Анотація"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Звичайне завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Кількість спроб, використаних студентом при виконанні завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Максимальна кількість спроб"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -2224,22 +2224,22 @@ msgstr ""
 "Визначає, скільки разів студент може давати відповідь на завдання. Якщо "
 "значення не встановлено, надається необмежена кількість спроб."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Date that this problem is due by"
 msgstr "Термін здачі даного завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 "Час, протягом якого будуть прийматися відповіді після закінчення терміну "
 "здачі завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Показати результати"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -2247,24 +2247,24 @@ msgstr ""
 "Визначає коли показувати чи правильно відповів студент на це завдання. "
 "Налаштовано у підрозділі."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Always"
 msgstr "Завжди"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Never"
 msgstr "Ніколи"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Past Due"
 msgstr "Пройшов термін здачі"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Показати відповідь"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -2272,47 +2272,47 @@ msgstr ""
 "Визначає, коли відображати відповідь на завдання. У розширених налаштуваннях"
 " можна встановити значення за замовчуванням."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answered"
 msgstr "Надано відповідь"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Closed"
 msgstr "Зачинено"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Finished"
 msgstr "Закінчено"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct or Past Due"
 msgstr "Правильно або минув термін"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After Some Number of Attempts"
 msgstr "Після декількох спроб"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted"
 msgstr "Зроблено спробу"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Answer: Number of Attempts"
 msgstr "Показати відповідь: Кількість спроб"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
@@ -2320,15 +2320,15 @@ msgstr ""
 "Кількість разів, коли студент повинен спробувати відповісти на запитання, "
 "перш ніж з'явиться кнопка \"Показати відповідь\"."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Умови відображення кнопки \"Зберегти\" на сторінці"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Reset Button"
 msgstr "Показати кнопку скидання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -2337,12 +2337,12 @@ msgstr ""
 "можливість вiдрегулювати свою відповідь. Значення за замовчуванням можна "
 "встановити в Додаткові параметри"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Рандомізація"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -2351,56 +2351,56 @@ msgstr ""
 "відповідному скрипті Python. Для завдань, які не використовують випадкові "
 "значення, вкажіть \"Ніколи\"."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "On Reset"
 msgstr "При Скиданні"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Per Student"
 msgstr "Зі студента"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "XML data for the problem"
 msgstr "Дані, пов'язані із завданням, у форматі XML"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Словник, що визначає правильність поточних відповідей студентів"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Словник для збереження станів введених даних"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student responses"
 msgstr "Словник, що містить поточні відповіді студентів"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student score"
 msgstr "Довідник з поточним балом студента "
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr ""
 "Чи була збережена відповідь з момента останньої відправки на перевірку."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether the student has answered the problem"
 msgstr "Чи дав студент відповідь на завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Random seed for this student"
 msgstr "Ініціалізація випадкового значення для даного студента"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Last submission time"
 msgstr "Час останньої здачі завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Timer Between Attempts"
 msgstr "Час між спробами"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -2408,11 +2408,11 @@ msgstr ""
 "Кількість секунд, яка повинно пройти між спробами, для завдань, в яких "
 "передбачено кілька спроб."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Problem Weight"
 msgstr "Вага завдання"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -2420,27 +2420,27 @@ msgstr ""
 "Визначає кількість балів за кожне завдання. Якщо значення не вказано, кожне "
 "поле для відповіді в завданні буде оцінюватися в один бал."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Markdown source of this module"
 msgstr "Мarkdown код цього модуля"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 "Код завдань у форматі LaTeX і Word. Дана функція підтримується не повністю."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr "Дозволити використання шаблонів LaTeX?"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Ключ Matlab API"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -2455,195 +2455,6 @@ msgstr ""
 "Негайно повідомте MathWorks, якщо ви вважаєте, що ключ виявлено або "
 "піддається ризику. Щоб отримати ключ для вашого курсу або повідомити про "
 "проблему, будь ласка, зв'яжіться з moocsupport@mathworks.com"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-#: lms/templates/manage_user_standing.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: lms/templates/widgets/footer-language-selector.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "Надіслати"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Submitting"
-msgstr "Відправлення на перевірку"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Warning: The problem has been reset to its initial state!"
-msgstr "Попередження: Задача була перевантажена у початковий стан!"
-
-#. Translators: Following this message, there will be a bulleted list of
-#. items.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid ""
-"The problem's state was corrupted by an invalid submission. The submission "
-"consisted of:"
-msgstr ""
-"Стан задачі був пошкоджений через некоректне завантаження. Завантаження "
-"складається з:"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "If this error persists, please contact the course staff."
-msgstr ""
-"Якщо ця помилка повторюватиметься, будь ласка, зв'яжіться із персоналом "
-"курсу."
-
-#. Translators: {previous_hints} is the HTML of hints that have already been
-#. generated, {hint_number_prefix}
-#. is a header for this hint, and {hint_text} is the text of the hint itself.
-#. This string is being passed to translation only for possible reordering of
-#. the placeholders.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-
-#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
-#. hints.
-#. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Hint ({hint_num} of {hints_count}): "
-msgstr "Підказка ({hint_num} з {hints_count}):"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers were previously saved. Click '{button_name}' to grade them."
-msgstr ""
-"Ваші відповіді були збережені раніше. Натисніть '{button_name}', щоб оцінити"
-" їх."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Incorrect ({progress} point)"
-msgid_plural "Incorrect ({progress} points)"
-msgstr[0] "Невірно ({progress} бал)"
-msgstr[1] "Невірно ({progress} балів)"
-msgstr[2] "Невірно ({progress} балів)"
-msgstr[3] "Невірно ({progress} балів)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Correct ({progress} point)"
-msgid_plural "Correct ({progress} points)"
-msgstr[0] "Вірно ({progress} бал)"
-msgstr[1] "Вірно ({progress} балів)"
-msgstr[2] "Вірно ({progress} балів)"
-msgstr[3] "Вірно ({progress} балів)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Partially correct ({progress} point)"
-msgid_plural "Partially correct ({progress} points)"
-msgstr[0] "Частково вірно ({progress} бал)"
-msgstr[1] "Частково вірно ({progress} балів)"
-msgstr[2] "Частково вірно ({progress} балів)"
-msgstr[3] "Частково вірно ({progress} балів)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Partially Correct"
-msgstr "Частково правильно"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Answer submitted."
-msgstr "Відповідь відправлено."
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem is closed."
-msgstr "Задача закрита."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be submitted again."
-msgstr ""
-"Задача повинна бути скинута, перш ніж можна буде знову дати відповідь."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "You must wait at least {wait} seconds between submissions."
-msgstr "Ви повинні зачекати принаймні {wait} секунд між завантаженнями."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"You must wait at least {wait_secs} between submissions. {remaining_secs} "
-"remaining."
-msgstr ""
-"Зачекайте принаймні {wait_secs} між спробами. Залишилося {remaining_secs}."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_hour} hour"
-msgid_plural "{num_hour} hours"
-msgstr[0] "{num_hour} година"
-msgstr[1] "{num_hour} години"
-msgstr[2] "{num_hour} годин"
-msgstr[3] "{num_hour} годин"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_minute} minute"
-msgid_plural "{num_minute} minutes"
-msgstr[0] "{num_minute} хвилина"
-msgstr[1] "{num_minute} хвилини"
-msgstr[2] "{num_minute} хвилин"
-msgstr[3] "{num_minute} хвилин"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_second} second"
-msgid_plural "{num_second} seconds"
-msgstr[0] "{num_second} секунда"
-msgstr[1] "{num_second} секунди"
-msgstr[2] "{num_second} секунд"
-msgstr[3] "{num_second} секунд"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem needs to be reset prior to save."
-msgstr "Задача повинна бути перевантажена аби її зберегти."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Your answers have been saved."
-msgstr "Ваші відповіді були збережені."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers have been saved but not graded. Click '{button_name}' to grade "
-"them."
-msgstr ""
-"Ваші відповіді були збережені, але вони не оцінюються. Натисніть кнопку "
-"'{button_name}' для їх оцінки."
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You cannot select Reset for a problem that is closed."
-msgstr "Не можливо скинути відповідь, тому що задача закрита."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You must submit an answer before you can select Reset."
-msgstr "Ви повинні надіслати відповідь, перш ніж ви зможете зробити скидання."
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr "Визначення задачі не передбачає переоцінювання."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
-msgstr ""
-"Необхідно відповісти на задачу перед тим як вона може бути знову оціненою."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2672,6 +2483,195 @@ msgstr "Питання"
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct Answer"
 msgstr "Правильна відповідь"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "Надіслати"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Submitting"
+msgstr "Відправлення на перевірку"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr "Попередження: Задача була перевантажена у початковий стан!"
+
+#. Translators: Following this message, there will be a bulleted list of
+#. items.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+"Стан задачі був пошкоджений через некоректне завантаження. Завантаження "
+"складається з:"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "If this error persists, please contact the course staff."
+msgstr ""
+"Якщо ця помилка повторюватиметься, будь ласка, зв'яжіться із персоналом "
+"курсу."
+
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
+#. hints.
+#. This text is shown in bold before the accompanying hint text.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr "Підказка ({hint_num} з {hints_count}):"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
+"Ваші відповіді були збережені раніше. Натисніть '{button_name}', щоб оцінити"
+" їх."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] "Невірно ({progress} бал)"
+msgstr[1] "Невірно ({progress} балів)"
+msgstr[2] "Невірно ({progress} балів)"
+msgstr[3] "Невірно ({progress} балів)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] "Вірно ({progress} бал)"
+msgstr[1] "Вірно ({progress} балів)"
+msgstr[2] "Вірно ({progress} балів)"
+msgstr[3] "Вірно ({progress} балів)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] "Частково вірно ({progress} бал)"
+msgstr[1] "Частково вірно ({progress} балів)"
+msgstr[2] "Частково вірно ({progress} балів)"
+msgstr[3] "Частково вірно ({progress} балів)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Partially Correct"
+msgstr "Частково правильно"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer submitted."
+msgstr "Відповідь відправлено."
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem is closed."
+msgstr "Задача закрита."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be reset before it can be submitted again."
+msgstr ""
+"Задача повинна бути скинута, перш ніж можна буде знову дати відповідь."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr "Ви повинні зачекати принаймні {wait} секунд між завантаженнями."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+"Зачекайте принаймні {wait_secs} між спробами. Залишилося {remaining_secs}."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_hour} hour"
+msgid_plural "{num_hour} hours"
+msgstr[0] "{num_hour} година"
+msgstr[1] "{num_hour} години"
+msgstr[2] "{num_hour} годин"
+msgstr[3] "{num_hour} годин"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] "{num_minute} хвилина"
+msgstr[1] "{num_minute} хвилини"
+msgstr[2] "{num_minute} хвилин"
+msgstr[3] "{num_minute} хвилин"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_second} second"
+msgid_plural "{num_second} seconds"
+msgstr[0] "{num_second} секунда"
+msgstr[1] "{num_second} секунди"
+msgstr[2] "{num_second} секунд"
+msgstr[3] "{num_second} секунд"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem needs to be reset prior to save."
+msgstr "Задача повинна бути перевантажена аби її зберегти."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Your answers have been saved."
+msgstr "Ваші відповіді були збережені."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
+msgstr ""
+"Ваші відповіді були збережені, але вони не оцінюються. Натисніть кнопку "
+"'{button_name}' для їх оцінки."
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You cannot select Reset for a problem that is closed."
+msgstr "Не можливо скинути відповідь, тому що задача закрита."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You must submit an answer before you can select Reset."
+msgstr "Ви повинні надіслати відповідь, перш ніж ви зможете зробити скидання."
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem's definition does not support rescoring."
+msgstr "Визначення задачі не передбачає переоцінювання."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be answered before it can be graded again."
+msgstr ""
+"Необхідно відповісти на задачу перед тим як вона може бути знову оціненою."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -2751,15 +2751,6 @@ msgstr "Цей компонент ще не має налаштуваннь дж
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
 msgstr "Налаштувати перелік джерел"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"The selected proctoring provider, {proctoring_provider}, is not a valid "
-"provider. Please select from one of {available_providers}."
-msgstr ""
-"Вибраний постачальник контролювання {proctoring_provider}, не є дійсним "
-"постачальником. Будь ласка, оберіть одного з {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2857,11 +2848,8 @@ msgstr ""
 "буде доступний калькулятор на сторінці курсу."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
+msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
-"Введіть назву курсу, яка буде відображатися у списку курсів на головній "
-"сторінці сайту."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
@@ -2983,12 +2971,9 @@ msgstr "Новий курс"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"Enter true or false. If true, the course appears in the list of new courses,"
+" and a New! badge temporarily appears next to the course image."
 msgstr ""
-"Введіть \"true\" або \"false\". Якщо введено значення \"true\", курс "
-"відображатиметься у списку нових курсів на головній сторінці сайту, а поруч "
-"з емблемою курсу тимчасово з'являється помітка \"Новий!\""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -3421,11 +3406,9 @@ msgstr "Дозволити загальний доступ до Вікі"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
+"Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
-"Введіть true чи false. Якщо true, користувачі edX можуть переглядати вікі "
-"курсу, навіть якщо вони не зареєстровані на курс."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Invitation Only"
@@ -3795,6 +3778,13 @@ msgstr "{section_type} Середній = {percent:.0%}"
 #, python-brace-format
 msgid "{short_label} Avg"
 msgstr "{short_label} Середній"
+
+#: common/lib/xmodule/xmodule/hidden_module.py
+#, python-brace-format
+msgid ""
+"ERROR: \"{block_type}\" is an unknown component type. This component will be"
+" hidden in LMS."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
@@ -4440,6 +4430,14 @@ msgstr ""
 "Введіть true або false. При встановленні значення true, надіслані відповіді "
 "до модулів завдань будуть враховуватися в оціночному/відбірковому алгоритмі "
 "вступного випробування."
+
+#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
+msgid "Error while reading {}. Check file for XML errors."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
+msgid "Failed to import module: {} at location: {}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Enrollment Track Groups"
@@ -5147,7 +5145,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Account Activation"
+msgid "Account activation"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -5160,7 +5158,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Activate Your Account"
+msgid "Activate your account"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -5326,6 +5324,140 @@ msgstr ""
 "У нас зберігається реєстр старих електронних повідомлень, тому якщо цей "
 "запит був зроблений ненавмисно, ми можемо розглянути цю проблему."
 
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctoring requirements for %(course_name)s\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Hello %(full_name)s,\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You are enrolled in %(course_name)s at %(platform_name)s. This course contains proctored exams.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses %(proctoring_provider)s software for proctoring.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                Proctoring Instructions and Requirements\n"
+"            "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Before taking a graded proctored exam, you must have approved ID verification photos. \n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                        You can submit ID verification photos here.\n"
+"                    "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"You are enrolled in %(course_name)s at %(platform_name)s. This course "
+"contains proctored exams."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Proctored exams are timed exams that you take while proctoring software "
+"monitors your computer's desktop, webcam video, and audio. Your course uses "
+"%(proctoring_provider)s software for proctoring."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+msgid ""
+"Carefully review the system requirements as well as the steps to take a "
+"proctored exam in order to ensure that you are prepared."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"To view proctoring instructions and requirements, please visit: "
+"%(proctoring_requirements_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Before taking a graded proctored exam, you must have approved ID "
+"verification photos. You can submit ID verification photos here: "
+"%(id_verification_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"This email was automatically sent from %(platform_name)s to %(full_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/subject.txt
+#, python-format
+msgid "Proctoring requirements for %(course_name)s"
+msgstr ""
+
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr "Створіть електронну адресу для відновлення"
@@ -5459,8 +5591,8 @@ msgstr "Навчайтесь безкоштовно на онлайн-курса
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
-"their respective logos are registered trademarks of edX Inc."
+"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
+"and their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -5763,12 +5895,17 @@ msgstr "Курсу {course_key} не існує"
 
 #: lms/djangoapps/certificates/views/support.py
 #, python-brace-format
-msgid "User {username} is not enrolled in the course {course_key}"
-msgstr "Користувач {username} не зареєстрований на курс {course_key}"
+msgid "User {user_id} is not enrolled in the course {course_key}"
+msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "An unexpected error occurred while regenerating certificates."
 msgstr "Виникла непередбачена помилка при повторному створенні сертифікатів."
+
+#: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
+msgid "User {username} is not enrolled in the course {course_key}"
+msgstr "Користувач {username} не зареєстрований на курс {course_key}"
 
 #. Translators:  This text describes the 'Honor' course certificate type.
 #: lms/djangoapps/certificates/views/webview.py
@@ -5812,11 +5949,6 @@ msgid ""
 msgstr ""
 "{cert_type} сертифікат демонструє високий рівень досягнень за програмою "
 "навчання, і включає в себе перевірку особистості."
-
-#: lms/djangoapps/certificates/views/webview.py
-#, python-brace-format
-msgid "{month} {day}, {year}"
-msgstr "{day} {month} {year}"
 
 #. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
@@ -5961,7 +6093,7 @@ msgstr "Вакансії {platform_name}"
 msgid "Contact {platform_name}"
 msgstr "Контакти {platform_name}"
 
-#. Translators:  This text appears near the top of the certficate and
+#. Translators:  This text appears near the top of the certificate and
 #. describes the guarantee provided by edX
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -6094,6 +6226,30 @@ msgstr "Переглянути курс"
 msgid "Not sure yet"
 msgstr "Ще не впевен"
 
+#: lms/djangoapps/course_home_api/admin.py
+msgid ""
+"These define the context to disable the frontend-app-learning progress "
+"page.If no values are set, then the configuration applies globally. If a "
+"single value is set, then the configuration applies to all courses within "
+"that context. At most one value can be set at a time.<br>If multiple "
+"contexts apply to a course (for example, if configuration is specified for "
+"the course specifically, and for the org that the course is in, then the "
+"more specific context overrides the more general context."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/admin.py openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/models.py
+#: openedx/features/discounts/models.py
+msgid "Disabled"
+msgstr ""
+
 #: lms/djangoapps/course_home_api/outline/v1/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
@@ -6192,10 +6348,6 @@ msgid "Please view your course in the existing experience"
 msgstr ""
 
 #: lms/djangoapps/courseware/course_tools.py
-msgid "Upgrade to Verified"
-msgstr "Підвищити до рівня «Підтверджений сертифікат»"
-
-#: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
 msgstr ""
 
@@ -6249,8 +6401,8 @@ msgid "Enrollment Date"
 msgstr "Дата запису на курс"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course Starts"
-msgstr "Курс розпочнеться"
+msgid "Course starts"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Don't forget to add a calendar reminder!"
@@ -6267,19 +6419,21 @@ msgid "Course starts in {time_remaining_string} at {course_start_time}."
 msgstr "Початок курсу о {time_remaining_string} {course_start_time}."
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course End"
-msgstr "Курс завершиться"
+msgid "Course ends"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
-"To earn a certificate, you must complete all requirements before this date."
+"After this date, the course will be archived, which means you can review the"
+" course content but can no longer participate in graded assignments or work "
+"towards earning a certificate."
 msgstr ""
-"Для отримання сертифікату вам необхідно виконати всі вимоги до зазначеного "
-"терміну."
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "After this date, course content will be archived."
-msgstr "Після цієї дати курс буде архівовано."
+msgid ""
+"After the course ends, the course content will be archived and no longer "
+"active."
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6624,6 +6778,11 @@ msgid "You must be enrolled in the course to see course content."
 msgstr "Ви повинні записатися на курс аби бачити контент курсу."
 
 #: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/instructor/views/api.py
+msgid "User does not exist."
+msgstr "Користувач не існує."
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
 msgstr "Невірне місцезнаходження."
 
@@ -6711,188 +6870,6 @@ msgstr ""
 "Я дозволяю edX використовувати інформацію, надану в даній заяві (за винятком"
 " фінансової інформації) у своїх маркетингових цілях."
 
-#: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
-msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with"
-" GIT_REPO_DIR"
-msgstr ""
-"Шлях {0} не існує, будь ласка, виправте його або вкажіть інший шлях за "
-"допомогою GIT_REPO_DIR"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid ""
-"Non usable git url provided. Expecting something like: "
-"git@github.com:edx/edx4edx_lite.git"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to get git log"
-msgstr "Неможливо отримати журнал роботи git"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "git clone or pull failed!"
-msgstr "git clone або pull невдалі!"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to run import command."
-msgstr "Неможливо запустити команду імпортування."
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The underlying module store does not support import."
-msgstr "Нижчевказані модулі не підтримують імпортування."
-
-#. Translators: This is an error message when they ask for a
-#. particular version of a git repository and that version isn't
-#. available from the remote source they specified
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The specified remote branch is not available."
-msgstr "Зазначена віддалена гілка не доступна."
-
-#. Translators: Error message shown when they have asked for a git
-#. repository branch, a specific version within a repository, that
-#. doesn't exist, or there is a problem changing to it.
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to switch to specified branch. Please check your branch name."
-msgstr ""
-"Неможливо переключитися на вказану гілку. Будь ласка, перевірте ім'я вашої "
-"гілки."
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid ""
-"Import the specified git repository and optional branch into the modulestore"
-" and optionally specified directory."
-msgstr ""
-"Імпортувати вказаний git-репозиторій і вибіркову гілку у сховище модулів і "
-"опціонально зазначений розділ."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide username"
-msgstr "Необхідно вказати ім'я користувача"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide full name"
-msgstr "Необхідно вказати повне ім'я"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Password must be supplied"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "email address required (not username)"
-msgstr "необхідна адреса електронної пошти (не ім'я користувача)"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Oops, failed to create user {user}, {error}"
-msgstr "Не вдалося створити користувача {user}, {error}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "User {user} created successfully!"
-msgstr "Користувач {user} успішно створений!"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with email address {email_addr}"
-msgstr "Не вдалося знайти користувача з email {email_addr}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with username {username} - {error}"
-msgstr ""
-"Не вдалося знайти користувача з ім'ям користувача {username} - {error}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Deleted user {username}"
-msgstr "Користувач {username} видалений"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Statistic"
-msgstr "Статистика"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Value"
-msgstr "Значення"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Site statistics"
-msgstr "Статистика сайту"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Total number of users"
-msgstr "Загальна кількість користувачів"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Create User Results"
-msgstr "Результати створення користувача"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Delete User Results"
-msgstr "Видалити результати  користувача"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "The git repo location should end with '.git', and be a valid url"
-msgstr ""
-"Адреса сховища git повинна закінчуватись на '.git' та бути коректним URL"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Added Course"
-msgstr "Доданий курс"
-
-#: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course Name"
-msgstr "Назва курсу"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Directory/ID"
-msgstr "Директорія/ID"
-
-#. Translators: "Git Commit" is a computer command; see
-#. http://gitref.org/basic/#commit
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Git Commit"
-msgstr "Git Commit"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Change"
-msgstr "Остання зміна"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Editor"
-msgstr "Останнє редагування"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Information about all courses"
-msgstr "Інформація по всім курсам"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted"
-msgstr "Видалено"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "course_id"
-msgstr "курс_id"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# enrolled"
-msgstr "# записаних"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# staff"
-msgstr "# персонал"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "instructors"
-msgstr "Викладачі"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Enrollment information for all courses"
-msgstr "Інформація про запис на усі курси"
-
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
 msgstr "Заголовок не може бути пустим"
@@ -6921,8 +6898,8 @@ msgid "Good"
 msgstr "Добре"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to"
+#, python-format, python-brace-format
+msgid "%(comment_username)s replied to {start_tag}%(thread_title)s{end_tag}:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
@@ -6966,101 +6943,6 @@ msgstr "Сервіс нотаток EdxNotes не обслуговується."
 msgid "Notes"
 msgstr "Нотатки"
 
-#: lms/djangoapps/email_marketing/models.py
-msgid "API key for accessing Sailthru. "
-msgstr "API ключ для доступу Sailthru."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "API secret for accessing Sailthru. "
-msgstr "API  секретний ключ для доступу до Sailthru."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru list name to add new users to. "
-msgstr "Список імен Sailthru для додавання нових користувачів."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru connection retry interval (secs)."
-msgstr "Інтервал повторного з'єднання з Sailthru (сек)."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru maximum retries."
-msgstr "Максимальна кількість повторів з’єднань з Sailthru."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on welcome send."
-msgstr "Шаблон Sailthru для користування у вітальній формі"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
-msgstr ""
-"Шаблон Sailthru для користування нагадувань, кинутих у кошик.  Застарілий."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Sailthru minutes to wait before sending abandoned cart message. Deprecated."
-msgstr ""
-"Sailthru хвилини очiккування, перш ніж відправити відмовлення від кошика "
-"повідомленнь. Застарілий"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on enrolling for audit. "
-msgstr ""
-"Sailthru  шаблон відправляти для використання при реєстрації для аудиту."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on passed ID verification."
-msgstr "Sailthru вiдправляти шаблон для використання під час перевірки id"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on failed ID verification."
-msgstr ""
-"Sailthru відправляти шаблон для використання під час невдалої id перевірки"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on upgrading a course. Deprecated "
-msgstr "Sailthru надсилати шаблон для оновлення курсу. Застарілий"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
-msgstr ""
-"Відправити шаблони Sailthru  для використання при купівлі курсу. Застарілий"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Use the Sailthru content API to fetch course tags."
-msgstr "Використовуйте Sailthru API вмісту  для вибору тегів курсу."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Number of seconds to cache course content retrieved from Sailthru."
-msgstr "Кількість секунд для кешування контенту курсу, отриманого з Sailthru"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Cost in cents to report to Sailthru for enrolls."
-msgstr "Витрати в центах, щоб повідомити Sailthru про записування"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Optional lms url scheme + host used to construct urls for content library, "
-"e.g. https://courses.edx.org."
-msgstr ""
-"Необов'язкова схема lms url scheme + хост, що використовується для побудови "
-"URL-адреси для контенту бібліотеки , наприклад https://courses.edx.org."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Number of seconds to delay the sending of User Welcome email after user has "
-"been created"
-msgstr ""
-"Кількість секунд для затримки надсилання електронного листа для привітання "
-"користувача після його створення"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"The number of seconds to delay/timeout wait to get cookie values from "
-"sailthru."
-msgstr ""
-"Кількість секунд для затримки / перерва очікування для отримання значень "
-"cookie з sailthru."
-
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
 "Cannot override subsection grade: subsection is not available for target "
@@ -7093,10 +6975,6 @@ msgid ""
 msgstr ""
 "Звіт {report_type} створюється. Щоб переглянути стан звіту, перегляньте "
 "розділ \"Черга завдань\" нижче."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "User does not exist."
-msgstr "Користувач не існує."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7160,6 +7038,48 @@ msgstr ""
 "Помилка '{error}' при надсиланні листа новому користувачу (електронна пошта "
 "користувача={email}).  Без листа слухач не зможе увійти в систему. Будь "
 "ласка, зв'яжіться зі службою підтримки для додаткової інформації."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A usage key location for a section or a problem. If the location is a block "
+"that contains other blocks, (such as the course, section, subsection, or "
+"unit blocks) then all blocks under that block will be included in the "
+"report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "A list of usage keys for the blocks to include in the report. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A list of problem/block types to generate the report for. This field can be "
+"omitted if the report should include details of allblock types. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly text describing current status of report generation."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A unique id for the report generation task. It can be used to query the "
+"latest report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The provided parameters were invalid. Make sure you've provided at least one"
+" valid usage key for `problem_locations`."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user is not authenticated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user lacks access to the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7269,6 +7189,10 @@ msgid "Date Joined"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "External User Key"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Когорта"
 
@@ -7312,6 +7236,10 @@ msgstr "огляд"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
 msgstr "результати контрольованих іспитів"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Anonymized User IDs"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7376,9 +7304,86 @@ msgstr ""
 "Неможливо перезарахувати бали з all_students і unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Current status of task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Identifies the kind of task being performed, e.g. rescoring."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The celery ID for the task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The date and time when the task was created."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The input parameters for the task. The format and content of this data will "
+"depend on the kind of task being performed. For instanceit may contain the "
+"problem locations for a problem resources task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The username of the user who initiated this task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The last knows state of the celery task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Task duration information, if known"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly task status information, if available."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of instructor tasks."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requested course does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "URL from which report can be downloaded."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Name of report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "HTML anchor tag that contains the name and link."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of report downloads"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ID for the course whose reports need to be listed."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Filter results to only return details of for the report with the specified "
+"name."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "ORA data"
 msgstr "Дані ORA"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ORA summary"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Attachments archive is being created."
@@ -7453,6 +7458,20 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
+msgid ""
+"Student {user} is not enrolled in this course. Please check your spelling "
+"and retry."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Student {user} is already on the certificate invalidation list and cannot be"
+" added to the certificate exception list."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 "Слухач (username/email={user}) виключений із списку власників сертифікатів."
@@ -7460,11 +7479,9 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Certificate exception (user={user}) does not exist in certificate white "
-"list. Please refresh the page and try again."
+"Error occurred removing the allowlist entry for student {student}. Please "
+"refresh the page and try again"
 msgstr ""
-"(user={user}) не знайдено у списку виключень для випуску сертифікатів. Будь "
-"ласка, оновіть сторінку і спробуйте ще раз."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7492,21 +7509,12 @@ msgstr ""
 "введення і повторіть спробу."
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid ""
-"{user} is not enrolled in this course. Please check your spelling and retry."
-msgstr ""
-"{user} не записаний на цей курс. Будь ласка, перевірте правильність введення"
-" і повторіть спробу."
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, generate_for must be \"new\" or \"all\"."
 msgstr "Неприпустимі дані, generate_for повинно бути \"new\" або \"all\"."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Certificate generation started for white listed students."
+msgid "Certificate generation started for students on the allowlist."
 msgstr ""
-"Розпочата процедура випуску сертифікатів для слухачів зі списку винятків."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7517,6 +7525,14 @@ msgstr "користувач «{user}» в {row} рядку"
 #, python-brace-format
 msgid "user \"{username}\" in row# {row}"
 msgstr "ім’я користувача «{username}» в {row} рядку"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"The student {student} appears on the Certificate Exception list in course "
+"{course}. Please remove them from the Certificate Exception list before "
+"attempting to invalidate their certificate."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7708,7 +7724,7 @@ msgstr ""
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7834,6 +7850,14 @@ msgstr "створено сертифікатів"
 msgid "cohorted"
 msgstr "розподілено по групах"
 
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#. An example of such a message is: "Progress: {action} {succeeded} of
+#. {attempted} so far"
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "generate_anonymized_id"
+msgstr ""
+
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "compressed"
 msgstr ""
@@ -7878,14 +7902,16 @@ msgstr ""
 "Оброблену інформацію по task_input не знайдено для instructor_task {0}: {1}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {attempted} and {succeeded} are counts.
+#. {attempted} and {succeeded} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "Прогрес: на даний момент {action} {succeeded} з {attempted} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
@@ -7893,14 +7919,16 @@ msgstr ""
 "Не вдалося знайти завдання, яке має бути {action} студента '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "Задача не {action} для студента '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
@@ -7943,7 +7971,8 @@ msgid "Problem successfully {action} for {attempted} students"
 msgstr "Проблема успішно {action} для {attempted} студентiв"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
@@ -7970,14 +7999,16 @@ msgid "Message successfully {action} for {attempted} recipients"
 msgstr "Повідомлення успішно {action} для {attempted} отримувачів"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr "Повідомлення {action} для {succeeded} з {attempted} отримувачів"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
@@ -8372,10 +8403,6 @@ msgid "Missing required parameter face_image"
 msgstr "Відсутній обов'язковий атрибут face_image"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid course key"
-msgstr "Невірний ключ курсу"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr "Особисті дані користувача не знайдені"
 
@@ -8385,8 +8412,17 @@ msgid "Name must be at least {min_length} character long."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
+msgid "Image data is in an unsupported format."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
 msgstr "Дані зображення не дійсні ."
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID verification was approved!"
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -8884,23 +8920,14 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for one year, and it will expire "
+"Your approval status remains valid for two years, and it will expire "
 "%(expiration_datetime)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "Enjoy your studies,"
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "The %(platform_name)s Team "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -8955,15 +8982,6 @@ msgstr ""
 msgid "ID verification FAQ : %(help_center_link)s "
 msgstr ""
 
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr ""
-
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
@@ -8984,7 +9002,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 5-7 days."
+"We have received your photos and they will be reviewed within 3-5 days."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
@@ -9774,8 +9792,16 @@ msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 "Конфігурація не може бути вказана одночасно на більш ніж одному рівні."
 
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Error Status"
+msgstr ""
+
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Courses with Errors"
+msgstr ""
+
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
-msgid "Learning Sequences"
+msgid "Learning Sequences and Outlines"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -10076,6 +10102,53 @@ msgstr "Це тестове попередження"
 #: openedx/core/djangoapps/debug/views.py
 msgid "This is a test error"
 msgstr "Це тестова помилка"
+
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to allow, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Allow List"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to deny, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Deny List"
+msgstr ""
+
+#. Translators: A key specifying a course, library, program,
+#. website, or some other collection of content where learning
+#. happens.
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Learning Context Key"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated learning context/course will "
+"be disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The plugin configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Discussion provider"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion tool/provider's id"
+msgstr ""
 
 #: openedx/core/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -10543,6 +10616,7 @@ msgid "You are eligible to upgrade in these courses:"
 msgstr "Ви маєте право на оновлення в цих курсах:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Example of a verified certificate"
 msgstr "Приклад підтвердженого сертіфікату"
 
@@ -10607,6 +10681,10 @@ msgid "\"{email}\" is not a valid email address."
 msgstr "\"{email}\" не є дійсною електронною адресою.."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter a valid email address"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -10616,6 +10694,10 @@ msgstr ""
 "адресою."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this email address is already registered"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
@@ -10623,6 +10705,10 @@ msgid ""
 msgstr ""
 "Здається {username} вже використовується. Спробуйте ще раз з іншим іменем "
 "користувача."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this username is already taken"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -10895,8 +10981,8 @@ msgid "Your Account Has Been Queued For Deletion"
 msgstr "Ваш обліковий запис було внесено в чергу на видалення"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-msgid "Password Reset"
-msgstr "Скинути пароль"
+msgid "Password reset"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -10926,8 +11012,8 @@ msgstr ""
 " лист."
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr "Змінити мій пароль"
+msgid "Reset my password"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Please go to the following page and choose a new password:"
@@ -10939,7 +11025,7 @@ msgid "Password reset on %(platform_name)s"
 msgstr "Пароль скинуто на %(platform_name)s"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
-msgid "Password Reset Success"
+msgid "Password reset success"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
@@ -11012,13 +11098,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "Надто багато спроб входу. Спробуйте ще раз пізніше."
 
@@ -11029,14 +11108,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -11109,8 +11180,8 @@ msgstr ""
 " для входу"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "Some error occured during password change. Please try again"
-msgstr "Виникла помилка при скиданні паролю. Будь ласка, спробуйте ще"
+msgid "Some error occurred during password change. Please try again"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
@@ -11365,7 +11436,8 @@ msgid "This content is only accessible to enrolled learners. "
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
-msgid "The about me field must be at most {} characters long."
+#, python-brace-format
+msgid "The about me field must be at most {BIO_MAX_LENGTH} characters long."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -11593,10 +11665,6 @@ msgid "'course_key' is required."
 msgstr ""
 
 #: openedx/features/course_experience/api/v1/views.py
-msgid "Only 'course_key' is expected."
-msgstr ""
-
-#: openedx/features/course_experience/api/v1/views.py
 msgid "View all dates"
 msgstr ""
 
@@ -11678,14 +11746,6 @@ msgstr ""
 
 #: openedx/features/discounts/admin.py
 msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Disabled only if the org that it is in is Disabled."
-msgstr ""
-
-#: openedx/features/discounts/admin.py
-msgid ""
 "These define the context to configure the percentage for the first purchase "
 "discount.If multiple contexts apply to a course (for example, if "
 "configuration is specified for the course specifically, and for the org that"
@@ -11693,23 +11753,11 @@ msgid ""
 " context."
 msgstr ""
 
-#: openedx/features/discounts/models.py
-msgid "Disabled"
-msgstr ""
-
 #: openedx/features/discounts/utils.py
 #, python-brace-format
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
-msgstr ""
-
-#: openedx/features/discounts/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
-"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/admin/forms.py
@@ -11732,9 +11780,9 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid ""
-"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
-"custom dashboard for learning. {link_start}Click here{link_end} to continue "
-"in that experience."
+"You have access to the {bold_start}{enterprise_name}{bold_end} dashboard. To"
+" access the courses available to you through {enterprise_name}, "
+"{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11801,6 +11849,29 @@ msgid ""
 "won’t lose any of your progress."
 msgstr ""
 
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "Try again ({attempts} attempt remaining)"
+msgid_plural "Try again ({attempts} attempts remaining)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of {max_attempts} attempts for this problem."
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid "Try again (unlimited attempts)"
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of unlimited attempts for this problem."
+msgstr ""
+
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -11822,6 +11893,24 @@ msgstr ""
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
 msgstr "Користувач команди курсу не існує"
+
+#: cms/djangoapps/contentstore/admin.py
+#, python-brace-format
+msgid ""
+"Number of course outline regenerations successfully requested: {regenerates}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "Regenerate selected course outlines"
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "All course outline regenerations successfully requested."
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "Regenerate *all* course outlines"
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -11872,6 +11961,61 @@ msgstr "Виникла неочікувана помилка індексаці�
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
 msgstr "(Без імені)"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import because a course with this id: {} already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied. You do not have write access to this course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Could not find the {0} file in the package."
+msgstr "Неможливо знайти файл {0} у пакеті."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Uploaded Tar file not found. Try again."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "We only support uploading a .tar.gz file."
+msgstr "Ми підтримуємо вивантаження тільки файлів .tar.gz."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import since a library with this id already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Course olx validation failed. Please check your email."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied"
+msgstr "Заборонено"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unknown error while importing course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "An Unknown error occurred during the unpacking step."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Unknown User ID: {0}"
+msgstr "Невідоме ID користувача: {0}"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unsafe tar file. Aborting import."
+msgstr "Небезпечний файл . Скасування імпорту."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "User permission denied."
+msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 #, python-brace-format
@@ -11942,33 +12086,6 @@ msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Unknown User ID: {0}"
-msgstr "Невідоме ID користувача: {0}"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Permission denied"
-msgstr "Заборонено"
-
-#: cms/djangoapps/contentstore/tasks.py
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr "Ми підтримуємо вивантаження тільки файлів .tar.gz."
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Tar file not found"
-msgstr "Файл формату tar не знайдено"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Unsafe tar file. Aborting import."
-msgstr "Небезпечний файл . Скасування імпорту."
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Could not find the {0} file in the package."
-msgstr "Неможливо знайти файл {0} у пакеті."
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "Deleted Group"
@@ -12075,8 +12192,16 @@ msgid "HTML"
 msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Open Response"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Порожній"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank Open Response Assessment"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -12179,9 +12304,12 @@ msgid "Subsection"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
+msgid "Some chunks missed during file upload. Please try again"
 msgstr ""
-"Під час вивантаження файлу сталась помилка. Будь ласка, спробуйте ще раз."
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload failed. Please try again"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 #, python-brace-format
@@ -12292,6 +12420,11 @@ msgid ""
 msgstr ""
 "Бібліотека для цієї організації з таким кодом вже існує. Будь ласка, змініть"
 " код вашої бібліотеки, щоб він був унікальним в межах вашої організації."
+
+#: cms/djangoapps/contentstore/views/library.py
+#, python-brace-format
+msgid "'{organization_key}' is not a valid organization identifier."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
@@ -12636,6 +12769,11 @@ msgid "Loading"
 msgstr "Завантаження"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course Name"
+msgstr "Назва курсу"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Номер Курсу"
@@ -12676,8 +12814,6 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Курси"
@@ -12710,16 +12846,6 @@ msgstr "Показати"
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
 msgstr "Зберегти"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "previous"
-msgstr "попередня"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "next"
-msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html
@@ -13038,6 +13164,21 @@ msgstr ""
 msgid "Account Status Info"
 msgstr ""
 
+#: lms/templates/dashboard.html
+msgid "Activate your account so you can log back in"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid ""
+"We sent an email to {strong_start}{email}{strong_end} with a link to "
+"activate your account. Can’t find it? Check your spam folder or "
+"{link_start}resend the email{link_end}."
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Continue to {platform_name}"
+msgstr ""
+
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "Налаштування електронної пошти для  {course_number}"
@@ -13211,6 +13352,10 @@ msgstr ""
 
 #: lms/templates/footer.html
 msgid "organization logo"
+msgstr ""
+
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
 msgstr ""
 
 #: lms/templates/forgot_password_modal.html
@@ -13746,8 +13891,12 @@ msgid "Submission History Viewer"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
-msgid "User:"
-msgstr "Користувач:"
+msgid "Learner's {platform_name} email address or username:"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Enter the learner email address or username"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
@@ -13773,117 +13922,6 @@ msgstr "Попередня сторінка"
 
 #: lms/templates/staticbook.html
 msgid "Next page"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Sysadmin Dashboard"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Users"
-msgstr "Користувачі"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Staffing and Enrollment"
-msgstr ""
-
-#. Translators: refers to http://git-scm.com/docs/git-log
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Logs"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "User Management"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Email or username"
-msgstr "Електронна пошта або ім'я користувача"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete user"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Create user"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid ""
-"Go to each individual course's Instructor dashboard to manage course "
-"enrollment."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Administer Courses"
-msgstr ""
-
-#. Translators: Repo is short for git repository or source of
-#. courseware; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Location"
-msgstr ""
-
-#. Translators: Repo is short for git repository (http://git-scm.com/about) or
-#. source of
-#. courseware and branch is a specific version within that repository
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Branch (optional)"
-msgstr ""
-
-#. Translators: GitHub is a popular website for hosting code
-#: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from GitHub"
-msgstr "Завантажити новий курс з GitHub"
-
-#. Translators: 'dir' is short for 'directory'
-#: lms/templates/sysadmin_dashboard.html
-msgid "Course ID or dir"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete course from site"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Page {current_page} of {total_pages}"
-msgstr "Сторінка {current_page} з {total_pages}"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for {course_id}"
-msgstr ""
-
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Date"
-msgstr "Дата"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Action"
-msgstr ""
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded."
-msgstr "Git імпорт логів не зафіксовано."
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded for this course."
-msgstr "Git імпорт логів не зафіксовано на цьому курсі."
-
-#: lms/templates/text-me-the-app.html
-msgid "Text Me The App"
 msgstr ""
 
 #: lms/templates/tracking_log.html
@@ -13965,6 +14003,10 @@ msgstr ""
 
 #: lms/templates/vert_module.html
 msgid "Due {date}"
+msgstr ""
+
+#: lms/templates/vert_module.html
+msgid "Past due"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14939,6 +14981,11 @@ msgstr ""
 #: lms/templates/ccx/schedule.html
 msgid "Date format four digit year dash two digit month dash two digit day"
 msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Date"
+msgstr "Дата"
 
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
@@ -15915,6 +15962,7 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "The {platform_name} Team"
 msgstr ""
 
@@ -15925,15 +15973,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your certificate will be available on or before {date}"
+msgid "Your grade and certificate will be ready after {date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final grade:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Grades will be finalized on {cert_available_date}"
+msgid "Congratulations! Your certificate is ready."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -15982,7 +16026,7 @@ msgid "This link will open the certificate web view"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "View {cert_name_short}"
+msgid "View my {cert_name_short}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -16083,10 +16127,6 @@ msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr ""
 
@@ -16126,6 +16166,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr "Налаштування електронної пошти"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "View Archived Course"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
@@ -16198,15 +16242,14 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
-"this course."
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
+"access to the course material, unlock both graded and non-graded "
+"assignments, and earn a {link_start}verified certificate{link_end} to "
+"showcase on your resume."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"It's official. It's easily shareable. It's a proven motivator to complete "
-"the course. {line_break}{link_start}Learn more about the verified "
-"{cert_name_long}{link_end}."
+msgid "Upgrade"
 msgstr ""
 
 #. Translators: provider_name is the name of a credit provider or university
@@ -16294,20 +16337,20 @@ msgid "View Consent"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Approved"
+msgid "Current ID Verification Status: Approved"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
+"Your edX ID verification has been approved. Your ID verification is "
+"effective for two years after submission."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}. Please be aware "
-"photo verification can take up to three days once initiated and you will not"
-" be able to earn a certificate or take a proctored exam until approved."
+"Your photo ID verification expires on {verification_expiry}. Please be aware"
+" photo verification can take up to three days once initiated and you will "
+"not be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16315,39 +16358,39 @@ msgid "Resubmit Verification"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Pending"
+msgid "Current ID Verification Status: Pending"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your verification information has been "
-"submitted and will be reviewed shortly."
+"Your edX ID verification is pending. Your ID verification information has "
+"been submitted and will be reviewed shortly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Denied"
+msgid "Current ID Verification Status: Denied"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification submission was not accepted. To receive a verified "
+"Your ID verification submission was not accepted. To receive a verified "
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification was denied for the following reasons:"
+msgid "Your ID verification was denied for the following reasons:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Expired"
+msgid "Current ID Verification Status: Expired"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification has expired. To receive a verified certificate, you must "
-"submit a new photo of yourself and your government-issued photo ID before "
-"the verification deadline for your course."
+"Your ID verification has expired. To receive a verified certificate, you "
+"must submit a new photo of yourself and your government-issued photo ID "
+"before the verification deadline for your course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16803,7 +16846,6 @@ msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
@@ -16820,17 +16862,17 @@ msgid "Your order number is: {order_number}"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Hi {full_name}"
+msgid "Hello {full_name},"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
+msgid "Your {platform_name} ID verification photos have been approved."
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your approval status remains valid for two years, and it will expire "
+"{expiration_datetime}."
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -17019,13 +17061,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
-
-#. Translators: This is short for "System administration".
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-msgid "Sysadmin"
-msgstr "Системний адміністратор"
 
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
@@ -17306,15 +17341,6 @@ msgstr "Кількість розділів:"
 msgid "Grade Cutoffs:"
 msgstr "Шкала оцінок:"
 
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"View detailed Git import logs for this course {link_start}by clicking "
-"here{link_end}."
-msgstr ""
-"Щоб переглянути детальні протоколи імпорту з GIT за цей курс {link_start}, "
-"натисніть тут {link_end}."
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
 msgstr ""
@@ -17336,13 +17362,9 @@ msgid "Grading Configuration"
 msgstr "Конфігурація оцінювання"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Click to download a CSV of anonymized student IDs:"
-msgstr ""
-"Натисніть, щоб завантажити список анонімних ідентифікаторів студентів у "
-"форматі CSV:"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Get Student Anonymized IDs CSV"
+msgid ""
+"The CSV of anonymized student IDs download has been relocated to the Reports"
+" section below."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -17391,6 +17413,16 @@ msgstr ""
 msgid "Download a CSV of learners who can enroll"
 msgstr ""
 "Завантажити CSV-файл зі списком студентів, які можуть записатися на курс"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to download a CSV of anonymized student IDs:"
+msgstr ""
+"Натисніть, щоб завантажити список анонімних ідентифікаторів студентів у "
+"форматі CSV:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Get Student Anonymized IDs CSV"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -17471,6 +17503,10 @@ msgstr "Створити звіт успішності по завданням, 
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Summary Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -17785,10 +17821,6 @@ msgid ""
 msgstr ""
 "Ви не отримаєте повідомлення на електронну пошту про відхилені листи, тому, "
 "будь ласка, двічі перевірте правильність написання."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Role of the users being enrolled."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -18161,6 +18193,10 @@ msgid "Allowance Section"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Onboarding Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
 msgstr ""
 
@@ -18469,22 +18505,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Мої курси"
 
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Get the {platform_name} Mobile App!"
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "We'll send you a one time SMS with a link to download the app."
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Mobile phone number"
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Send me a text with the link"
-msgstr ""
-
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Змінити бажану мову"
@@ -18707,6 +18727,14 @@ msgstr ""
 msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} ."
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Too Many Requests"
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Your request has been rate-limited. Please try again later."
 msgstr ""
 
 #: lms/templates/static_templates/about.html
@@ -19067,6 +19095,12 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Pursue a verified certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid ""
+"Sample verified certificate with your name, the course title, the logo of "
+"the institution and the signatures of the instructors for this course."
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
@@ -20198,6 +20232,10 @@ msgstr "Сторінки"
 #: cms/templates/edit-tabs.html
 msgid "New Page"
 msgstr "Нова сторінка"
+
+#: cms/templates/edit-tabs.html
+msgid "View new Pages and Resources Experience"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -22594,6 +22632,18 @@ msgid ""
 " to view the details of your task or download any files created."
 msgstr ""
 
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Here are some validations we found with your course content."
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Errors: "
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Warnings: "
+msgstr ""
+
 #: cms/templates/emails/user_task_complete_email_subject.txt
 msgid "{platform_name} {studio_name}: Task Status Update"
 msgstr "{platform_name} {studio_name}: Оновлення статусів задачі"
@@ -22616,6 +22666,14 @@ msgstr ""
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "Create New"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "previous"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "next"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
