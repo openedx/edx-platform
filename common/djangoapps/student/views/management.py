@@ -52,6 +52,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate  # lint-amnesty, pylint: disable=line-too-long
@@ -582,22 +583,33 @@ def activate_account(request, key):
                 extra_tags='account-activation aa-icon',
             )
 
-    # If a (safe) `next` parameter is provided in the request
+    # If a safe `next` parameter is provided in the request
     # and it's not the same as the dashboard, redirect there.
     # The `get_next_url_for_login_page()` function will only return a safe redirect URL.
     # If the provided `next` URL is not safe, that function will fill `redirect_to`
     # with a value of `reverse('dashboard')`.
+    redirect_url = None
     if request.GET.get('next'):
-        redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
-        if redirect_to != reverse('dashboard'):
-            redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-            return redirect(redirect_url)
+        redirect_to, root_login_url = get_next_url_for_login_page(request, include_host=True)
+
+        # Don't automatically redirect authenticated users to the redirect_url
+        # if the `next` value is either:
+        # 1. "/dashboard" or
+        # 2. "https://{LMS_ROOT_URL}/dashboard" (which we might provide as a value from the AuthN MFE)
+        if redirect_to not in (
+            root_login_url + reverse('dashboard'),
+            reverse('dashboard')
+        ):
+            redirect_url = get_redirect_url_with_host(root_login_url, redirect_to)
 
     if should_redirect_to_authn_microfrontend() and not request.user.is_authenticated:
-        url_path = f'/login?account_activation_status={activation_message_type}'
+        params = {'account_activation_status': activation_message_type}
+        if redirect_url:
+            params['next'] = redirect_url
+        url_path = '/login?{}'.format(urllib.parse.urlencode(params))
         return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
 
-    return redirect('dashboard')
+    return redirect(redirect_url) if redirect_url and is_enterprise_learner(request.user) else redirect('dashboard')
 
 
 @ensure_csrf_cookie
