@@ -160,12 +160,12 @@ ${HTML(fragment.foot_html())}
         // at the top of the page. Unique ids and names are required for
         // proper scrolling.
         window.addEventListener('message', function (event) {
-          if (event.data.id) {
-            var targetId = event.data.id;
-            var targetName = event.data.id.slice(1);
+          if (event.data.hashName) {
+            var targetId = event.data.hashName;
+            var targetName = event.data.hashName.slice(1);
             // Checks if the target uses an id or name to focus and gets offset.
             var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
-            window.parent.postMessage({"offset": targetOffset.top}, document.referrer);
+            window.parent.postMessage({ 'offset': targetOffset.top }, document.referrer);
           }
         })
 
