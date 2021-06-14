@@ -3539,7 +3539,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_learner_redirect(self):
         # learners will be redirected when the waffle flag is set
-        lms_url, mfe_url, preview_url = self._get_urls() # lint-amnesty, pylint: disable=unused-variable
+        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         assert self.client.get(lms_url).url == mfe_url
 
