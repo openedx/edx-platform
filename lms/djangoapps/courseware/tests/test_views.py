@@ -472,6 +472,24 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
 
+    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self.lms_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(self.course_key),
+                'chapter': str(self.chapter.location.block_id),
+                'section': str(self.section2.location.block_id),
+            }
+        )
+        self.mfe_url = '{}/course/{}/{}'.format(
+            settings.LEARNING_MICROFRONTEND_URL,
+            self.course_key,
+            self.section2.location
+        )
+        self.preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + self.lms_url
+
+        return self.lms_url, self.mfe_url, self.preview_url
+
 
 @ddt.ddt
 @_set_mfe_flag(activate_mfe=False)
@@ -3519,30 +3537,14 @@ class TestShowCoursewareMFE(TestCase):
 class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        lms_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course_key),
-                'chapter': str(self.chapter.location.block_id),
-                'section': str(self.section2.location.block_id),
-            }
-        )
-        mfe_url = '{}/course/{}/{}'.format(
-            settings.LEARNING_MICROFRONTEND_URL,
-            self.course_key,
-            self.section2.location
-        )
-        return lms_url, mfe_url
-
     def test_learner_redirect(self):
         # learners will be redirected when the waffle flag is set
-        lms_url, mfe_url = self._get_urls()
+        lms_url, mfe_url, preview_url = self._get_urls()
 
         assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
-        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
@@ -3565,7 +3567,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         assert self.client.get(lms_url).status_code == 200
 
@@ -3576,21 +3578,8 @@ class PreviewRedirectTests(BaseViewsTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        lms_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course_key),
-                'chapter': str(self.chapter.location.block_id),
-                'section': str(self.section2.location.block_id),
-            }
-        )
-        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
-
-        return lms_url, preview_url
-
     def test_staff_no_redirect(self):
-        lms_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
@@ -3612,7 +3601,7 @@ class PreviewRedirectTests(BaseViewsTestCase):
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         assert self.client.get(preview_url).status_code == 200
 
