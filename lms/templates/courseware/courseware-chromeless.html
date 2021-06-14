@@ -139,14 +139,7 @@ ${HTML(fragment.foot_html())}
             // allow the page to scroll to the location of the focus element so
             // that it is at the top of the page. Unique ids and names are
             // required for proper scrolling.
-            // console.log(window.top.location.href);
-            // var url_curr = (window.location != window.parent.location)? document.referrer : document.location.href
-            // console.log(url_curr);
             $('a').on("click", function(event){
-              var anchor = $(this).attr('href')
-              if (anchor.includes('/jump_to_id')) {
-                console.log('jumping');
-              }
               if (anchor[0] === "#") {
                 event.preventDefault();
                 var targetId = $(this).attr('href');
