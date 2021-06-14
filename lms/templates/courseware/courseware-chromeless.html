@@ -131,7 +131,6 @@ ${HTML(fragment.foot_html())}
         var eventType = event.type || 'mutate';
         var newHeight = contentElement.offsetHeight;
         var newWidth = contentElement.offsetWidth;
-
         if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
             // it is referencing an element's id or name (not an external website). If
@@ -140,9 +139,15 @@ ${HTML(fragment.foot_html())}
             // allow the page to scroll to the location of the focus element so
             // that it is at the top of the page. Unique ids and names are
             // required for proper scrolling.
-
+            // console.log(window.top.location.href);
+            // var url_curr = (window.location != window.parent.location)? document.referrer : document.location.href
+            // console.log(url_curr);
             $('a').on("click", function(event){
-              if ($(this).attr('href')[0] === "#") {
+              var anchor = $(this).attr('href')
+              if (anchor.includes('/jump_to_id')) {
+                console.log('jumping');
+              }
+              if (anchor[0] === "#") {
                 event.preventDefault();
                 var targetId = $(this).attr('href');
                 var targetName = $(this).attr('href').slice(1);
