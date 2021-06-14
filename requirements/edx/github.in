@@ -98,5 +98,5 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xbloc
 # Third Party XBlocks
 
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6
-git+https://github.com/PakistanX/xblock-drag-and-drop-v2@v2.3.4.1#egg=xblock-drag-and-drop-v2==v2.3.4.1
+git+https://github.com/PakistanX/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-drag-and-drop-v2==v2.3.5
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
