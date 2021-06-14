@@ -473,7 +473,7 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
 
     def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        self.lms_url = reverse(
+        self.lms_url = reverse(  # pylint: disable=attribute-defined-outside-init
             'courseware_section',
             kwargs={
                 'course_id': str(self.course_key),
@@ -481,12 +481,12 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
                 'section': str(self.section2.location.block_id),
             }
         )
-        self.mfe_url = '{}/course/{}/{}'.format(
+        self.mfe_url = '{}/course/{}/{}'.format(  # pylint: disable=attribute-defined-outside-init
             settings.LEARNING_MICROFRONTEND_URL,
             self.course_key,
             self.section2.location
         )
-        self.preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + self.lms_url
+        self.preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + self.lms_url  # pylint: disable=attribute-defined-outside-init
 
         return self.lms_url, self.mfe_url, self.preview_url
 
@@ -3539,7 +3539,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_learner_redirect(self):
         # learners will be redirected when the waffle flag is set
-        lms_url, mfe_url, preview_url = self._get_urls()
+        lms_url, mfe_url, preview_url = self._get_urls() # lint-amnesty, pylint: disable=unused-variable
 
         assert self.client.get(lms_url).url == mfe_url
 
@@ -3573,9 +3573,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
 
 @ddt.ddt
-class PreviewRedirectTests(BaseViewsTestCase):
-    """docstring for PreviewRedirectTests."""
-
+class PreviewRedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_staff_no_redirect(self):
