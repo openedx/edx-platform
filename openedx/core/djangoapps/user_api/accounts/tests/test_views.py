@@ -377,19 +377,28 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self._verify_full_account_response(response)
 
     def test_search_emails(self):
-        client = self.login_client('client', 'user')
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {'emails': [self.user.email]}
         response = self.post_search_api(client, json_data=json_data)
         assert response.data == [{'email': self.user.email, 'id': self.user.id, 'username': self.user.username}]
 
-    def test_search_emails_with_non_existing_email(self):
+    def test_search_emails_with_non_staff_user(self):
         client = self.login_client('client', 'user')
+        json_data = {'emails': [self.user.email]}
+        response = self.post_search_api(client, json_data=json_data, expected_status=404)
+        assert response.data == {
+            'developer_message': "not_found",
+            'user_message': "Not Found"
+        }
+
+    def test_search_emails_with_non_existing_email(self):
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {"emails": ['non_existant_email@example.com']}
         response = self.post_search_api(client, json_data=json_data)
         assert response.data == []
 
     def test_search_emails_with_invalid_param(self):
-        client = self.login_client('client', 'user')
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {'invalid_key': [self.user.email]}
         response = self.post_search_api(client, json_data=json_data, expected_status=400)
         assert response.data == {
