@@ -37,6 +37,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
@@ -439,6 +440,15 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     """
     Tests for GET of /api/mobile/v<version_number>/users/<user_name>/course_status_info/{course_id}
     """
+
+    def setUp(self):
+        """
+        Creates a basic course structure for our course
+        """
+        super().setUp()
+        self.user = UserFactory.create(username='course-status-user')
+        self.username = self.user.username
+
     def test_success_v0(self):
         self.login_and_enroll()
 
