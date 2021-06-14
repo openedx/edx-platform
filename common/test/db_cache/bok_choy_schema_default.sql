@@ -3078,7 +3078,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=877 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=878 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3711,6 +3711,7 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `pgp_encryption_key` longtext,
   `uuid` char(32) NOT NULL,
   `include_date` tinyint(1) NOT NULL,
+  `enable_compression` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_enterprisecus_uuid_9df3c307_uniq` (`uuid`),
   KEY `enterprise_enterprisecustom_enterprise_customer_id_d5b55543` (`enterprise_customer_id`),

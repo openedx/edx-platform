@@ -134,8 +134,8 @@ class AccountViewSet(ViewSet):
         **Example Requests**
 
             GET /api/user/v1/me[?view=shared]
-            GET /api/user/v1/accounts?usernames={username1},{username2}[?view=shared]
-            GET /api/user/v1/accounts?email={user_email1},{user_email2}
+            GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
+            GET /api/user/v1/accounts?email={user_email}
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
@@ -299,20 +299,22 @@ class AccountViewSet(ViewSet):
 
     def list(self, request):
         """
-        GET /api/user/v1/accounts?username={username1},{username2}
-        GET /api/user/v1/accounts?email={user_email1},{user_email2}
+        GET /api/user/v1/accounts?username={username1,username2}
+        GET /api/user/v1/accounts?email={user_email}
         """
         usernames = request.GET.get('username')
-        user_emails = request.GET.get('email')
+        user_email = request.GET.get('email')
         search_usernames = []
 
         if usernames:
             search_usernames = usernames.strip(',').split(',')
-        elif user_emails:
-            user_emails = user_emails.strip(',').split(',')
-            search_usernames = User.objects.filter(email__in=user_emails).values_list('username')
-            if not search_usernames:
+        elif user_email:
+            user_email = user_email.strip('')
+            try:
+                user = User.objects.get(email=user_email)
+            except (UserNotFound, User.DoesNotExist):
                 return Response(status=status.HTTP_404_NOT_FOUND)
+            search_usernames = [user.username]
         try:
             account_settings = get_account_settings(
                 request, search_usernames, view=request.query_params.get('view'))
