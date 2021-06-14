@@ -132,6 +132,12 @@ class CertificateAllowlist(TimeStampedModel):
     allowlist = models.BooleanField(default=0)
     notes = models.TextField(default=None, null=True)
 
+    # This is necessary because CMS does not install the certificates app, but it
+    # imports this model's code. Simple History will attempt to connect to the installed
+    # model in the certificates app, which will fail.
+    if 'certificates' in apps.app_configs:
+        history = HistoricalRecords()
+
     @classmethod
     def get_certificate_allowlist(cls, course_id, student=None):
         """
