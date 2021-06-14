@@ -2,8 +2,6 @@
 Django storage backends for Open edX.
 """
 
-import beeline
-
 from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
@@ -74,7 +72,6 @@ class ProductionS3Storage(ProductionMixin, S3Boto3Storage):  # pylint: disable=a
 
         static_files_cache = caches['staticfiles']
         cache_entry_name = 'ProductionS3Storage.staticfiles_cache.{}'.format(name)
-        beeline.add_context_field('ProductionS3Storage.staticfiles_cache', cache_entry_name)
 
         url = static_files_cache.get(cache_entry_name)
         if not url:
