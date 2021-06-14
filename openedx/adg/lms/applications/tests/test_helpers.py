@@ -1,6 +1,7 @@
 """
 All tests for applications helpers functions
 """
+import logging
 from datetime import date
 from unittest.mock import Mock, patch
 
@@ -9,6 +10,7 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.adg.lms.applications import helpers
 from openedx.adg.lms.applications.constants import (
     APPLICATION_SUBMISSION_CONGRATS,
@@ -37,6 +39,7 @@ from openedx.adg.lms.applications.constants import (
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
+    bulk_update_application_hub_flag,
     check_validations_for_current_record,
     check_validations_for_past_record,
     get_application_hub_instructions,
@@ -44,11 +47,13 @@ from openedx.adg.lms.applications.helpers import (
     get_courses_from_course_groups,
     get_duration,
     get_extra_context_for_application_review_page,
+    get_users_with_active_enrollments_from_course_groups,
     has_admin_permissions,
+    has_user_passed_given_courses,
     is_user_qualified_for_bu_prereq_courses,
     max_year_value_validator,
     min_year_value_validator,
-    send_application_submission_confirmation_email,
+    send_application_submission_confirmation_emails,
     validate_file_size,
     validate_logo_size,
     validate_word_limit
@@ -62,7 +67,7 @@ from openedx.adg.lms.applications.tests.factories import (
     UserApplicationFactory
 )
 
-from .constants import EMAIL, TEST_TEXT_INPUT
+from .constants import EMAILS, PROGRAM_PRE_REQ, TEST_TEXT_INPUT
 from .factories import ApplicationHubFactory
 
 DATE_COMPLETED_MONTH = 5
@@ -92,11 +97,11 @@ def test_validate_logo_size_with_invalid_size():
 
 
 @patch('openedx.adg.lms.applications.helpers.task_send_mandrill_email')
-def test_send_application_submission_confirmation_email(mocked_task_send_mandrill_email):
+def test_send_application_submission_confirmation_emails(mocked_task_send_mandrill_email):
     """
-    Check if the email is being sent correctly
+    Check if the emails are being sent correctly
     """
-    send_application_submission_confirmation_email(EMAIL)
+    send_application_submission_confirmation_emails(EMAILS)
     assert mocked_task_send_mandrill_email.delay.called
 
 
@@ -547,3 +552,65 @@ def test_get_course_card_information_of_a_course_with_prerequisite(
     }]
     assert not is_any_course_started
     assert is_locked == is_course_locked
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'percent_grades, letter_grades, passed, expected_result',
+    [
+        ([80, 80], ['A', 'A'], [True, True], True),
+        ([80, 0], ['A', ''], [True, False], False),
+    ]
+)
+def test_has_user_passed_given_courses(courses, percent_grades, letter_grades, passed, expected_result):
+    """
+    Assert that for a given course group of courses True is returned only if user has passed all courses
+    """
+    user = UserFactory()
+    for itr, course in enumerate(courses.values()):
+        PersistentCourseGrade.update_or_create(
+            user_id=user.id,
+            course_id=course.id,
+            percent_grade=percent_grades[itr],
+            letter_grade=letter_grades[itr],
+            passed=passed,
+        )
+
+    assert has_user_passed_given_courses(user, courses.values()) == expected_result
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('prereq_course_groups', [(1, PROGRAM_PRE_REQ)], indirect=True)
+def test_get_users_with_active_enrollments_from_course_groups(prereq_course_groups):
+    """
+    Assert that only users that are enrolled in multilingual courses are returned.
+    """
+    users = UserFactory.create_batch(5)
+    users_ids = [user.id for user in users]
+
+    open_multilingual_courses = prereq_course_groups[0].multilingual_courses.open_multilingual_courses()
+    CourseEnrollmentFactory(user=users[0], course=open_multilingual_courses[0].course)
+
+    assert get_users_with_active_enrollments_from_course_groups(users_ids, prereq_course_groups) == [users[0]]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('flag', ('is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'))
+def test_bulk_update_application_hub_flag(flag, caplog):
+    """
+    Assert that flag is successfully updated in application hub model
+    """
+    application_hubs = ApplicationHubFactory.create_batch(2)
+    users = [application_hub.user for application_hub in application_hubs]
+
+    caplog.set_level(logging.INFO)
+    bulk_update_application_hub_flag(flag, users)
+
+    for application_hub in application_hubs:
+        application_hub.refresh_from_db()
+        if flag == 'is_prerequisite_courses_passed':
+            assert application_hub.is_prerequisite_courses_passed
+        else:
+            assert application_hub.is_bu_prerequisite_courses_passed
+
+    assert f'`{flag}` flag is updated' in caplog.messages[0]

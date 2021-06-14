@@ -39,7 +39,7 @@ class MultilingualCourseGroupManager(Manager):
         """
         return self.get_queryset().filter(is_program_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
-    def business_line_and_common_business_line_prereq_course_groups_for_user(self, user):
+    def business_line_and_common_business_line_prereq_course_groups(self, user=None):
         """
         Returns prerequisite course groups for the selected business line and common prerequisite course groups
         for all business lines.
@@ -50,9 +50,13 @@ class MultilingualCourseGroupManager(Manager):
         Returns:
             list: List of business line prerequisite course groups for a user
         """
-        return self.get_queryset().filter(
-            Q(is_common_business_line_prerequisite=True) | Q(business_line_prerequisite=user.application.business_line)
-        )
+        prereq_course_filter = Q(is_common_business_line_prerequisite=True)
+        if user:
+            prereq_course_filter.add(Q(business_line_prerequisite=user.application.business_line), Q.OR)
+        else:
+            prereq_course_filter.add(Q(business_line_prerequisite__isnull=False), Q.OR)
+
+        return self.get_queryset().filter(prereq_course_filter)
 
     def get_user_business_line_and_common_business_line_prereq_courses(self, user):
         """
@@ -67,7 +71,7 @@ class MultilingualCourseGroupManager(Manager):
             and common courses for all the business lines
         """
         return get_courses_from_course_groups(
-            self.business_line_and_common_business_line_prereq_course_groups_for_user(user), user
+            self.business_line_and_common_business_line_prereq_course_groups(user), user
         )
 
     def get_user_program_prereq_courses(self, user):
