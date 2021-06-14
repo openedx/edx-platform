@@ -412,7 +412,9 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         Creates a basic course structure for our course
         """
         super().setUp()
+        self.add_course_content()
 
+    def add_course_content(self):
         self.section = ItemFactory.create(
             parent=self.course,
             category='chapter',
@@ -446,8 +448,15 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         Creates a basic course structure for our course
         """
         super().setUp()
+        self.course = CourseFactory.create(
+            mobile_available=True,
+            static_asset_path="needed_for_split",
+            end=datetime.datetime.now(pytz.UTC),
+            certificate_available_date=datetime.datetime.now(pytz.UTC)
+        )
         self.user = UserFactory.create(username='course-status-user')
         self.username = self.user.username
+        self.add_course_content()
 
     def test_success_v0(self):
         self.login_and_enroll()
