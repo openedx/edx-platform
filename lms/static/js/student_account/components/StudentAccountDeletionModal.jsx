@@ -32,8 +32,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
     removeLoggedInCookies();
     // Appsembler: Changed this from edx.org to the customer's site.
-    redirect_fallback = location.protocol + '//' + location.host + '/';
-    window.location.href = this.props.mktgRootLink || redirect_fallback;
+    let redirect_fallback = location.protocol + '//' + location.host + '/logout';
+    window.location.href = redirect_fallback;
+    // window.location.href = this.props.mktgRootLink || redirect_fallback;
   }
 
   deleteAccount() {
