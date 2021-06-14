@@ -4,6 +4,7 @@ Tests for certificate app views used by the support team.
 
 
 import json
+from unittest import mock
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -24,6 +25,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_v2_certificate'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
@@ -48,7 +50,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     CERT_GRADE = 0.89
     CERT_STATUS = CertificateStatuses.downloadable
     CERT_MODE = "verified"
-    CERT_DOWNLOAD_URL = "http://www.example.com/cert.pdf"
+    CERT_DOWNLOAD_URL = "https://www.example.com/cert.pdf"
 
     def setUp(self):
         """
@@ -349,6 +351,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         )
         assert response.status_code == 400
 
+    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
         GeneratedCertificate.eligible_certificates.all().delete()
@@ -364,12 +367,13 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         assert num_certs == 1
 
+    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
     def test_regenerate_cert_with_invalidated_record(self):
         """ If the certificate is marked as invalid, regenerate the certificate. """
 
         # mark certificate as invalid
         self._invalidate_certificate(self.cert)
-        self.assertInvalidatedCertExists()
+        self.assertCertInvalidationExists()
         # after invalidation certificate status become un-available.
         self.assertGeneratedCertExists(
             user=self.student, status=CertificateStatuses.unavailable
@@ -381,7 +385,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             username=self.STUDENT_USERNAME
         )
         assert response.status_code == 200
-        self.assertInvalidatedCertExists()
+        self.assertCertInvalidationExists()
 
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
@@ -414,7 +418,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         certificate.invalidate()
         assert not certificate.is_valid()
 
-    def assertInvalidatedCertExists(self):
+    def assertCertInvalidationExists(self):
         """ Dry method to check certificate invalidated entry exists. """
         assert CertificateInvalidation.objects.filter(generated_certificate__user=self.student, active=True).exists()
 
@@ -514,6 +518,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         )
         assert response.status_code == 400
 
+    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
     def test_generate_user_has_no_certificate(self):
         # Delete the user's certificate
         GeneratedCertificate.eligible_certificates.all().delete()
