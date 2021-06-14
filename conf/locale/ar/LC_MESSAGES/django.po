@@ -28,7 +28,6 @@
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
 # Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
-# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -62,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-10 11:29+0000\n"
+"POT-Creation-Date: 2021-06-11 06:47+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -25410,25 +25409,3 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "أُنقر على زر \"بدء الامتحان المراقب\" في الأسفل للمتابعة."
-
-#~ msgid "Grade: "
-#~ msgstr "جرى التقييم"
-
-#~ msgid "Submitted Application"
-#~ msgstr "إعادة تقديم التحقّق"
-
-#~ msgid "Omnipreneurship Courses"
-#~ msgstr "إدارة المساقات"
-
-#~ msgid "Post Submission"
-#~ msgstr "تاريخ التقديمات"
-
-#~ msgid ""
-#~ "You must complete the {link_start}{prc_display}{link_end} course before you "
-#~ "can enroll in this course!"
-#~ msgstr ""
-#~ "يجب أن تستكمل {link_start}{prc_display}{link_end} بنجاح قبل أن تبدأ بهذا "
-#~ "المساق."
-
-#~ msgid "{business_line} Courses"
-#~ msgstr "محتويات المساق {course_number}"
