@@ -9,6 +9,7 @@ from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.track import segment
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
@@ -26,9 +27,9 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
                                  a learner.
     - `edx.certificate.shared` - Emit when a learner shares their course certificate to social media (LinkedIn,
                                  Facebook, or Twitter).
-    - `edx.certificate.evidence_visisted` - Emit when a user (other than the learner who owns a certificate) views a
-                                            course certificate (e.g., someone views a course certificate shared on a
-                                            LinkedIn profile).
+    - `edx.certificate.evidence_visited` - Emit when a user (other than the learner who owns a certificate) views a
+                                           course certificate (e.g., someone views a course certificate shared on a
+                                           LinkedIn profile).
 
     Args:
         event_name (String) - Text describing the action/event that we are tracking. Examples include `revoked`,
@@ -59,6 +60,23 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
 
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, event_data)
+
+
+def emit_segment_event(user_id, course_id):
+    """
+    Track a successful certificate generation event in segment.
+
+    Arguments:
+        user_id (str): The ID of the user associated with the certificate.
+        course_id (CourseKey): Identifier for the course.
+    Returns:
+        None
+    """
+    event_name = 'edx.bi.user.certificate.generate'
+    segment.track(user_id, event_name, {
+        'category': 'certificates',
+        'label': str(course_id)
+    })
 
 
 def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
