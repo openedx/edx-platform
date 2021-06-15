@@ -88,7 +88,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   symmath
-tqdm==4.61.0
+tqdm==4.61.1
     # via nltk
 
 # The following packages are considered to be unsafe in a requirements file:
