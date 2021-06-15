@@ -34,7 +34,6 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     // Appsembler: Changed this from edx.org to the customer's site.
     let redirect_fallback = location.protocol + '//' + location.host + '/logout';
     window.location.href = redirect_fallback;
-    // window.location.href = this.props.mktgRootLink || redirect_fallback;
   }
 
   deleteAccount() {
