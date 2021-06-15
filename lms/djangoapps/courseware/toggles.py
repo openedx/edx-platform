@@ -127,6 +127,7 @@ COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
 )
 
+PREVIEW_BASE = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
 
 def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
@@ -137,7 +138,7 @@ def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     if course_key.deprecated:
         return False
     # DENY: Course preview doesn't work in the MFE
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
@@ -152,7 +153,7 @@ def mfe_proctored_exams_is_active(course_key: CourseKey) -> bool:
     if course_key.deprecated:
         return False
     # DENY: Course preview doesn't work in the MFE
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS.is_enabled(course_key)
@@ -172,7 +173,7 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     if COURSEWARE_USE_LEGACY_FRONTEND.is_enabled(course_key):
         return False
     # NO: Course preview doesn't work in the MFE
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return False
     # OTHERWISE: MFE courseware experience is active by default.
     return True
@@ -191,7 +192,7 @@ def courseware_mfe_is_visible(
     if course_key.deprecated:
         return False
     # DENY: Course preview doesn't work in the MFE
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return False
     # ALLOW: Where techincally possible, global staff may always see the MFE.
     if is_global_staff:
@@ -222,7 +223,7 @@ def courseware_mfe_is_advertised(
     if course_key.deprecated:
         return False
     # DENY: Course preview doesn't work in the MFE
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return False
     # ALLOW: Both global and course staff can see the MFE link if the course team
     #        preview is enabled.
@@ -248,7 +249,7 @@ def courseware_legacy_is_visible(
     if is_global_staff:
         return True
     # ALLOW: All course previews will be shown in Legacy experience
-    if hostname and hostname == settings.FEATURES.get('PREVIEW_LMS_BASE', None):
+    if PREVIEW_BASE and hostname == PREVIEW_BASE:
         return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,
