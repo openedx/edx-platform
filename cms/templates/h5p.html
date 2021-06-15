@@ -1,0 +1,38 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "h5p content" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+%>
+
+<%block name="title">${_("h5p content")}</%block>
+<%block name="bodyclass">is-signedin course view-h5p</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+<!--    <header class="mast has-actions has-subtitle">-->
+<!--        <h1 class="page-header">-->
+<!--            <span class="sr">&gt; </span>${_("H5P")}-->
+<!--        </h1>-->
+<!--    </header>-->
+
+    <div class="mast has-actions has-subtitle">
+        <div class="container">
+            <div class="teams-wrapper">
+                <main id="main" aria-label="Content" tabindex="-1">
+                    <section class="teams-content">
+                        <iframe id="h5p-frame" src="${url_h5p}/h5p?course=${course_key}" width="1280" height="1000" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
+<!--                        <iframe id="your-frame-id" src="http://localhost:12000/h5p" width="1280" height="1000" frameborder="0" allowfullscreen="allowfullscreen"></iframe>-->
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+
+</%block>

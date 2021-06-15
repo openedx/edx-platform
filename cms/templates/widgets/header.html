@@ -42,6 +42,7 @@
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            h5p = reverse('h5p_handler', kwargs={'course_key_string': six.text_type(course_key)})
 
       %>
       <h2 class="info-course">
@@ -75,6 +76,9 @@
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
+                  </li>
+                  <li class="nav-item nav-course-courseware-h5p">
+                    <a href="${h5p}">H5P</a>
                   </li>
                   % if context_course.video_pipeline_configured:
                   <li class="nav-item nav-course-courseware-videos">

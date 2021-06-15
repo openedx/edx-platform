@@ -11,6 +11,7 @@ import random
 import re
 import string
 from collections import defaultdict
+import urllib
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -126,7 +127,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'advanced_settings_handler',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
-           'group_configurations_list_handler', 'group_configurations_detail_handler']
+           'group_configurations_list_handler', 'group_configurations_detail_handler',
+           'h5p_handler']
 
 WAFFLE_NAMESPACE = 'studio_home'
 
@@ -1863,3 +1865,20 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
+def h5p_handler(request, course_key_string):
+
+    course_key = CourseKey.from_string(course_key_string)
+    course = get_course_and_check_access(course_key, request.user)
+    url_course_key = urllib.parse.quote(str(course_key))
+    url_h5p = settings.FEATURES.get('H5P_HOST', '')
+    context = {
+        "context_course": course,
+        "course_key": url_course_key,
+        "url_h5p": url_h5p,
+    }
+
+    return render_to_response("h5p.html", context)

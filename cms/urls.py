@@ -180,6 +180,8 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
     url(r'^accessibility$', contentstore_views.accessibility, name='accessibility'),
+    url(r'^h5p/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.h5p_handler,
+            name='h5p_handler'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
