@@ -45,6 +45,7 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.course_experience.utils import set_up_plan_release
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -133,6 +134,11 @@ class CoursewareIndex(View):
                     check_if_enrolled=True,
                     check_if_authenticated=True
                 )
+                if self.course.plan_release in (2, 1) and self.course.self_paced == True:
+                    last = set_up_plan_release(self.course_key, self.request.user, self.course.plan_release)
+                    if last <= len(self.course.children):
+                        self.course.children = self.course.children[:last]
+                        
                 self.course_overview = CourseOverview.get_from_id(self.course.id)
                 self.is_staff = has_access(request.user, 'staff', self.course)
 

@@ -66,6 +66,7 @@ class CourseDetails:
         self.video_thumbnail_image_name = ""
         self.video_thumbnail_image_asset_path = ""
         self.pre_requisite_courses = []  # pre-requisite courses
+        self.plan_release = None  # plan release course
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
         self.entrance_exam_minimum_score_pct = settings.FEATURES.get(
@@ -120,6 +121,7 @@ class CourseDetails:
         course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
         course_details.language = course_descriptor.language
         course_details.self_paced = course_descriptor.self_paced
+        course_details.plan_release = course_descriptor.plan_release
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
 
@@ -282,6 +284,11 @@ class CourseDetails:
                 and 'self_paced' in jsondict
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']
+            dirty = True
+
+        if ('plan_release' in jsondict
+                and jsondict['plan_release'] != descriptor.plan_release):
+            descriptor.plan_release = jsondict['plan_release']
             dirty = True
 
         if dirty:

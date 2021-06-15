@@ -1,6 +1,7 @@
 """
 Common utilities for the course experience, including course outline.
 """
+import math
 
 
 from django.utils import timezone
@@ -230,3 +231,23 @@ def is_block_structure_complete_for_assignments(block_data, block_key):
     scored = has_score and (weight is None or weight > 0)
 
     return complete or not graded or not scored
+
+
+def set_up_plan_release(course_key, user, plan_release):
+    current_date = timezone.now().date()
+    # current_date = current_date + datetime.timedelta(days=4)
+    course_user_enroll =  CourseEnrollment.objects.filter(user=user, course_id = course_key)
+    date_last_user_enroll = CourseEnrollment.get_date_last_enrollment_for_user(course_user_enroll[0])
+    # if current_date.year == date_last_user_enroll.year:
+    #     last = current_date.month - date_last_user_enroll.month + 1
+    # else:
+    #     last = (current_date.year - date_last_user_enroll.year)*12 + current_date.month - date_last_user_enroll.month
+
+    if plan_release == 2:
+        # weekly here
+        last = math.ceil(((current_date - date_last_user_enroll).days + 1 + date_last_user_enroll.weekday())/7)
+    else:
+        # monthly here
+        last = (current_date - date_last_user_enroll).days + 1
+
+    return last

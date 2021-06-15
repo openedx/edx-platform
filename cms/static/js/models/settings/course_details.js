@@ -31,6 +31,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 video_thumbnail_image_name: '',
                 video_thumbnail_image_asset_path: '',
                 pre_requisite_courses: [],
+                plan_release: null,
                 entrance_exam_enabled: '',
                 entrance_exam_minimum_score_pct: '50',
                 learning_info: [],

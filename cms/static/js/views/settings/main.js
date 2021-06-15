@@ -151,6 +151,20 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
                    }
 
+                   var fullReleaseButton = this.$('#course-release-full-release'),
+                   monthlyReleaseButton = this.$('#course-release-monthly-release'),
+                   weeklyReleaseButton = this.$('#course-release-weekly-release');
+
+                   if (this.model.get('plan_release') == 0) {
+                       fullReleaseButton.attr('checked', true);
+                   }
+                   else if (this.model.get('plan_release') == 1) {
+                       monthlyReleaseButton.attr('checked', true);
+                   }
+                   else if (this.model.get('plan_release') == 2) {
+                       weeklyReleaseButton.attr('checked', true);
+                   }
+
                    this.licenseView.render();
                    this.learning_info_view.render();
                    this.instructor_info_view.render();
@@ -301,6 +315,11 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
             // Fallthrough to handle both radio buttons
                    case 'course-pace-instructor-paced':
                        this.model.set('self_paced', JSON.parse(event.currentTarget.value));
+                       break;
+                   case 'course-release-full-release':
+                   case 'course-release-monthly-release':
+                   case 'course-release-weekly-release':
+                       this.model.set('plan_release', JSON.parse(event.currentTarget.value));
                        break;
                    case 'course-language':
                    case 'course-effort':

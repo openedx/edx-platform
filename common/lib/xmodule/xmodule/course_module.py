@@ -923,6 +923,15 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings
     )
 
+    plan_release = Integer(
+        display_name=_("Plan Release"),
+        help=_(
+            "Plan release course"
+        ),
+        default=0,
+        scope=Scope.settings
+    )
+
     enable_subsection_gating = Boolean(
         display_name=_("Enable Subsection Prerequisites"),
         help=_(

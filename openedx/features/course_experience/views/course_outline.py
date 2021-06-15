@@ -5,7 +5,7 @@ Views to show a course outline.
 
 import datetime
 import re
-import six  # lint-amnesty, pylint: disable=unused-import
+import logging
 
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -37,7 +37,7 @@ from common.djangoapps.util.milestones_helpers import get_course_content_milesto
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 
-from ..utils import get_course_outline_block_tree, get_resume_block
+from ..utils import get_course_outline_block_tree, get_resume_block, set_up_plan_release
 
 DEFAULT_COMPLETION_TRACKING_START = datetime.datetime(2018, 1, 24, tzinfo=UTC)
 
@@ -63,6 +63,15 @@ class CourseOutlineFragmentView(EdxFragmentView):
         course_block_tree = get_course_outline_block_tree(
             request, course_id, request.user if user_is_enrolled else None
         )
+        course_block_tree_length = len(course_block_tree['children'])
+
+        if course.plan_release in (2, 1) and course.self_paced == True:
+            logging.info("Course %s has release", course_key)
+            last = set_up_plan_release(course_key, request.user, course.plan_release)
+            logging.info(last)
+            if last <= course_block_tree_length:
+                course_block_tree['children'] = course_block_tree['children'][:last]
+
         if not course_block_tree:
             return None
 
