@@ -13,7 +13,9 @@ from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
+from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.djangoapps.discussions.config.waffle import OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
@@ -140,6 +142,13 @@ class CourseMetadata:
         # an available proctoring backend.
         if not settings.PROCTORING_BACKENDS or settings.PROCTORING_BACKENDS.get('proctortrack') is None:
             exclude_list.append('proctoring_escalation_email')
+
+        if (ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_key) and
+                not OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG.is_enabled(course_key)):
+            exclude_list.append('discussion_blackouts')
+            exclude_list.append('allow_anonymous')
+            exclude_list.append('allow_anonymous_to_peers')
+            exclude_list.append('discussion_topics')
 
         return exclude_list
 

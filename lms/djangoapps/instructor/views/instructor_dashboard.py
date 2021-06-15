@@ -27,6 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
@@ -133,13 +134,16 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     sections = []
     if access['staff']:
-        sections.extend([
+        sections_content = [
             _section_course_info(course, access),
             _section_membership(course, access),
             _section_cohort_management(course, access),
-            _section_discussions_management(course, access),
             _section_student_admin(course, access),
-        ])
+        ]
+        if not ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_key):
+            sections_content.append(_section_discussions_management(course, access))
+        sections.extend(sections_content)
+
     if access['data_researcher']:
         sections.append(_section_data_download(course, access))
 
