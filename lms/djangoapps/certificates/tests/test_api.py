@@ -133,16 +133,24 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             certificate_available_date=datetime.now(pytz.UTC) - timedelta(days=2)
         )
 
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
         self.request_factory = RequestFactory()
 
     def test_cert_status_with_generating(self):
+        cert_user = UserFactory()
         GeneratedCertificateFactory.create(
-            user=self.student,
+            user=cert_user,
             course_id=self.course.id,
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        assert certificate_downloadable_status(self.student, self.course.id) ==\
+        assert certificate_downloadable_status(cert_user, self.course.id) ==\
                {'is_downloadable': False,
                 'is_generating': True,
                 'is_unverified': False,
@@ -150,14 +158,15 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'uuid': None}
 
     def test_cert_status_with_error(self):
+        cert_user = UserFactory()
         GeneratedCertificateFactory.create(
-            user=self.student,
+            user=cert_user,
             course_id=self.course.id,
             status=CertificateStatuses.error,
             mode='verified'
         )
 
-        assert certificate_downloadable_status(self.student, self.course.id) ==\
+        assert certificate_downloadable_status(cert_user, self.course.id) ==\
                {'is_downloadable': False,
                 'is_generating': True,
                 'is_unverified': False,
@@ -177,15 +186,16 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         Verifies certificate_downloadable_status returns the
         correct response for PDF certificates.
         """
+        cert_user = UserFactory()
         cert = GeneratedCertificateFactory.create(
-            user=self.student,
+            user=cert_user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
             mode='verified',
             download_url='www.google.com',
         )
 
-        assert certificate_downloadable_status(self.student, self.course.id) ==\
+        assert certificate_downloadable_status(cert_user, self.course.id) ==\
                {'is_downloadable': True,
                 'is_generating': False,
                 'is_unverified': False,

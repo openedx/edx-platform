@@ -319,10 +319,11 @@ class CertificateTests(ModuleStoreTestCase):
         """
         Test handling of an invalid user/course run combo
         """
-        assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-        assert not can_generate_certificate_task(self.user, self.course_run_key)
-        assert not generate_certificate_task(self.user, self.course_run_key)
-        assert not generate_regular_certificate_task(self.user, self.course_run_key)
+        other_user = UserFactory()
+        assert not _can_generate_v2_certificate(other_user, self.course_run_key)
+        assert not can_generate_certificate_task(other_user, self.course_run_key)
+        assert not generate_certificate_task(other_user, self.course_run_key)
+        assert not generate_regular_certificate_task(other_user, self.course_run_key)
 
     def test_is_using_updated_true(self):
         """
