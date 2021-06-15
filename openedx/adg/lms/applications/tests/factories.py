@@ -98,6 +98,7 @@ class MultilingualCourseGroupFactory(factory.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'Course group #%s' % n)
     is_program_prerequisite = True
+    is_common_business_line_prerequisite = False
 
     class Meta:
         model = MultilingualCourseGroup

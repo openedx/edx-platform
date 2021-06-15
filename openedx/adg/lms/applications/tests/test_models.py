@@ -2,11 +2,10 @@
 Tests for all the models in applications app.
 """
 import factory
-import mock
 import pytest
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.adg.lms.applications.constants import CourseScore
 from openedx.adg.lms.applications.models import (
     BusinessLine,
@@ -141,28 +140,70 @@ def test_is_work_experience_not_completed(user_application):
 
 @pytest.mark.parametrize('percent', [0.9250, 0.7649])
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.models.CourseGradeFactory.read')
-def test_prereq_course_scores(mock_read, user_application, percent, courses):
+def test_program_prereq_course_scores(user_application, percent, courses):
     """
-    Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
-    the applicant in those courses, in the correct format.
+    Test that the `program_prereq_course_scores` property returns the correct program prerequisite course names
+    and respective scores of the applicant in those courses, in the correct format.
     """
     test_course_1 = courses['test_course1']
     test_course_2 = courses['test_course2']
+
+    for course in courses.values():
+        PersistentCourseGrade.update_or_create(
+            user_id=user_application.user_id,
+            course_id=course.id,
+            percent_grade=percent,
+            passed=True
+        )
+
     MultilingualCourseFactory(course=test_course_1)
-    MultilingualCourseFactory(course=test_course_2)
+    bu_prereq_course = MultilingualCourseGroupFactory(
+        is_program_prerequisite=False, is_common_business_line_prerequisite=True
+    )
+    MultilingualCourseFactory(course=test_course_2, multilingual_course_group=bu_prereq_course)
 
-    course_grade = CourseGradeFactory()
-    course_grade.percent = percent
+    score = int(round_away_from_zero(percent * 100))
+    course_score_1 = CourseScore(test_course_1.display_name, score)
 
-    mock_read.return_value = course_grade
+    expected_prereq_course_scores = [course_score_1]
+    actual_prereq_course_scores = user_application.program_prereq_course_scores
 
-    score = int(round_away_from_zero(course_grade.percent * 100))
+    assert expected_prereq_course_scores == actual_prereq_course_scores
+
+
+@pytest.mark.parametrize('percent', [0.9250, 0.7649])
+@pytest.mark.django_db
+def test_bu_prereq_course_scores(user_application, percent, courses):
+    """
+    Test that the `bu_prereq_course_scores` property returns the correct BU prerequisite course names and respective
+    scores of the applicant in those courses, in the correct format.
+    """
+    test_course_1 = courses['test_course1']
+    test_course_2 = courses['test_course2']
+
+    for course in courses.values():
+        PersistentCourseGrade.update_or_create(
+            user_id=user_application.user_id,
+            course_id=course.id,
+            percent_grade=percent,
+            passed=True,
+        )
+
+    common_prereq_course_group = MultilingualCourseGroupFactory(
+        is_program_prerequisite=False, is_common_business_line_prerequisite=True
+    )
+    MultilingualCourseFactory(course=test_course_1, multilingual_course_group=common_prereq_course_group)
+
+    business_line_prereq_course_group = MultilingualCourseGroupFactory(
+        is_program_prerequisite=False, business_line_prerequisite=user_application.business_line
+    )
+    MultilingualCourseFactory(course=test_course_2, multilingual_course_group=business_line_prereq_course_group)
+
+    score = int(round_away_from_zero(percent * 100))
     course_score_1 = CourseScore(test_course_1.display_name, score)
     course_score_2 = CourseScore(test_course_2.display_name, score)
-
     expected_prereq_course_scores = [course_score_1, course_score_2]
-    actual_prereq_course_scores = user_application.prereq_course_scores
+    actual_prereq_course_scores = user_application.bu_prereq_course_scores
 
     assert expected_prereq_course_scores == actual_prereq_course_scores
 

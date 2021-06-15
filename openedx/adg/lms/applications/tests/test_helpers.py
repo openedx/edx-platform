@@ -8,17 +8,19 @@ from unittest.mock import Mock, patch
 import mock
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils.html import format_html
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.adg.lms.applications import helpers
 from openedx.adg.lms.applications.constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
+    BACKGROUND_QUESTION_TITLE,
     COMPLETED,
     FILE_MAX_SIZE,
     IN_PROGRESS,
-    INTEREST,
     LOCKED,
     LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
@@ -35,18 +37,21 @@ from openedx.adg.lms.applications.constants import (
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    WRITTEN_APPLICATION_COMPLETION_MSG
+    WRITTEN_APPLICATION_COMPLETION_MSG,
+    CourseScore
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
     bulk_update_application_hub_flag,
     check_validations_for_current_record,
     check_validations_for_past_record,
+    create_html_string_for_course_scores_in_admin_review,
     get_application_hub_instructions,
     get_course_card_information,
     get_courses_from_course_groups,
     get_duration,
     get_extra_context_for_application_review_page,
+    get_user_scores_for_courses,
     get_users_with_active_enrollments_from_course_groups,
     has_admin_permissions,
     has_user_passed_given_courses,
@@ -66,6 +71,7 @@ from openedx.adg.lms.applications.tests.factories import (
     MultilingualCourseGroupFactory,
     UserApplicationFactory
 )
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import EMAILS, PROGRAM_PRE_REQ, TEST_TEXT_INPUT
 from .factories import ApplicationHubFactory
@@ -320,7 +326,7 @@ def test_get_extra_context_for_application_review_page(mock_get_application_revi
         'reviewer': 'reviewed_by',
         'review_date': 'review_date',
         'SCORES': SCORES,
-        'INTEREST': INTEREST,
+        'BACKGROUND_QUESTION': BACKGROUND_QUESTION_TITLE,
     }
     actual_context = get_extra_context_for_application_review_page(user_application)
 
@@ -614,3 +620,71 @@ def test_bulk_update_application_hub_flag(flag, caplog):
             assert application_hub.is_bu_prerequisite_courses_passed
 
     assert f'`{flag}` flag is updated' in caplog.messages[0]
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.helpers.CourseGradeFactory.read')
+def test_get_user_scores_for_courses(mock_read, courses):
+    """
+    Tests that the `get_user_scores_for_courses` returns the course scores for the given
+    courses
+    """
+    user = UserFactory()
+    test_course_1 = courses['test_course1']
+    test_course_2 = courses['test_course2']
+    percent = 0.78
+
+    course_grade = CourseGradeFactory()
+    course_grade.percent = percent
+    mock_read.return_value = course_grade
+
+    score = int(round_away_from_zero(course_grade.percent * 100))
+    course_score_1 = CourseScore(test_course_1.display_name, score)
+    course_score_2 = CourseScore(test_course_2.display_name, score)
+
+    expected_scores = [course_score_1, course_score_2]
+    actual_scores = get_user_scores_for_courses(user, [test_course_1, test_course_2])
+
+    assert actual_scores == expected_scores
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'program_prereq_scores, bu_prereq_scores',
+    [
+        (False, False),
+        (True, False),
+        (False, True),
+        (True, True)
+    ]
+)
+def test_create_html_string_for_course_scores_in_admin_review(program_prereq_scores, bu_prereq_scores, courses):
+    """
+    Tests that a correct html string is genereated containing the right course scores and
+    their names along with the section heading
+    """
+    user_application = Mock()
+    test_course_1 = courses['test_course1']
+    test_course_2 = courses['test_course2']
+    percentage = 0.78
+    course_percentage = int(round_away_from_zero(percentage * 100))
+    html_for_score = '<p>{course_name}: <b>{score}%</b></p>'
+
+    expected_html = ''
+    if program_prereq_scores:
+        user_application.program_prereq_course_scores = [CourseScore(test_course_1.display_name, course_percentage)]
+        expected_html += '<br><strong>Program Prerequisite Courses:</strong>'
+        expected_html += html_for_score.format(course_name=test_course_1.display_name, score=course_percentage)
+    else:
+        user_application.program_prereq_course_scores = []
+
+    if bu_prereq_scores:
+        user_application.bu_prereq_course_scores = [CourseScore(test_course_2.display_name, course_percentage)]
+        expected_html += '<br><strong>Business Unit Prerequisite Courses:</strong>'
+        expected_html += html_for_score.format(course_name=test_course_2.display_name, score=course_percentage)
+    else:
+        user_application.bu_prereq_course_scores = []
+
+    expected_result = format_html(expected_html)
+    actual_result = create_html_string_for_course_scores_in_admin_review(user_application)
+    assert expected_result == actual_result

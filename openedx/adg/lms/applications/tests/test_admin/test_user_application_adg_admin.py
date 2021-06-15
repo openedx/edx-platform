@@ -17,12 +17,15 @@ from openedx.adg.lms.applications.constants import (
     ALL_APPLICATIONS_TITLE,
     APPLICANT_INFO,
     APPLYING_TO,
+    BACKGROUND_QUESTION,
+    BACKGROUND_QUESTION_TITLE,
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
     EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
+    HEAR_ABOUT_OMNI,
     INTEREST,
     INTEREST_IN_BUSINESS,
     IS_SAUDI_NATIONAL,
@@ -35,8 +38,7 @@ from openedx.adg.lms.applications.constants import (
     PREREQUISITES,
     SCORES,
     STATUS_PARAM,
-    WAITLISTED_APPLICATIONS_TITLE,
-    CourseScore
+    WAITLISTED_APPLICATIONS_TITLE
 )
 from openedx.adg.lms.applications.models import ApplicationHub, UserApplication
 from openedx.adg.lms.applications.tests.constants import (
@@ -46,6 +48,8 @@ from openedx.adg.lms.applications.tests.constants import (
     FORMSET,
     LINKED_IN_URL,
     NOTE,
+    TEST_BACKGROUND_QUESTION,
+    TEST_HEAR_ABOUT_OMNI,
     TEST_INTEREST_IN_BUSINESS,
     TEST_MESSAGE_FOR_APPLICANT,
     TITLE_BUSINESS_LINE_1,
@@ -406,29 +410,42 @@ def test_applying_to(user_application):
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.UserApplication.prereq_course_scores', new_callable=mock.PropertyMock)
-def test_prerequisites(mock_prereq_course_scores, user_application):
+def test_hear_about_omni(user_application):
+    """
+    Test that the `hear_about_omni` field method returns the added text in the field, if
+    any, for the applicant
+    """
+    extended_profile = ExtendedUserProfileFactory()
+    extended_profile.user = user_application.user
+    extended_profile.hear_about_omni = TEST_HEAR_ABOUT_OMNI
+    actual_hear_about_omni_value = UserApplicationADGAdmin.hear_about_omni('self', user_application)
+
+    assert TEST_HEAR_ABOUT_OMNI == actual_hear_about_omni_value
+
+
+@pytest.mark.django_db
+def test_prerequisites(user_application, mocker):
     """
     Test that the `prerequisites` field method returns safe and correct HTML for scores of applicant in prereq courses.
     """
-    course_score_1 = CourseScore('Test Course 101', 75)
-    course_score_2 = CourseScore('Test Course 102', 90)
-    mock_prereq_course_scores.return_value = [course_score_1, course_score_2]
-
-    expected_html = '<p>Test Course 101: <b>75%</b></p>' + '<p>Test Course 102: <b>90%</b></p>'
-    expected_result = format_html(expected_html)
+    dummy_html = 'Dummy html string'
+    mocker.patch(
+        'openedx.adg.lms.applications.admin.create_html_string_for_course_scores_in_admin_review',
+        return_value=dummy_html
+    )
     actual_result = UserApplicationADGAdmin.prerequisites('self', user_application)
-
-    assert expected_result == actual_result
+    assert actual_result == dummy_html
 
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_scores')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_interest')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_applicant_info_fieldset')
+@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_background_question')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_preliminary_info_fieldset')
 def test_get_fieldsets(
     mock_get_preliminary_info_fieldset,
+    mock_get_fieldset_for_background_question,
     mock_get_applicant_info_fieldset,
     mock_get_fieldset_for_interest,
     mock_get_fieldset_for_scores,
@@ -438,15 +455,17 @@ def test_get_fieldsets(
 ):
     """
     Test that the `get_fieldsets` method gets the fieldsets for: preliminary info, applicant info,
-    interest, and scores of applicant.
+    background_question, interest, and scores of applicant.
 
     """
     mock_get_preliminary_info_fieldset.return_value = ALL_FIELDSETS[0]
     mock_get_applicant_info_fieldset.return_value = ALL_FIELDSETS[1]
-    mock_get_fieldset_for_interest.return_value = ALL_FIELDSETS[2]
-    mock_get_fieldset_for_scores.return_value = ALL_FIELDSETS[3]
+    mock_get_fieldset_for_interest.return_value = ALL_FIELDSETS[3]
+    mock_get_fieldset_for_scores.return_value = ALL_FIELDSETS[4]
+    mock_get_fieldset_for_background_question.return_value = ALL_FIELDSETS[2]
 
     user_application.interest_in_business = TEST_INTEREST_IN_BUSINESS
+    user_application.background_question = TEST_BACKGROUND_QUESTION
 
     actual_fieldsets = UserApplicationADGAdmin.get_fieldsets(
         user_application_adg_admin_instance, request, user_application
@@ -492,7 +511,7 @@ def test_get_applicant_info_fieldset(user_application, organization):
     if organization:
         expected_fields.append(ORGANIZATION)
 
-    expected_fields.append(APPLYING_TO)
+    expected_fields.extend([APPLYING_TO, HEAR_ABOUT_OMNI])
 
     expected_fieldset = (APPLICANT_INFO, {'fields': tuple(expected_fields)})
     actual_fieldset = UserApplicationADGAdmin._get_applicant_info_fieldset('self', user_application)
@@ -510,6 +529,20 @@ def test_get_fieldset_for_interest(user_application, user_application_adg_admin_
     actual_fieldset = UserApplicationADGAdmin._get_fieldset_for_interest(user_application_adg_admin_instance)
 
     expected_fieldset = (INTEREST, {'fields': (INTEREST_IN_BUSINESS,)})
+
+    assert actual_fieldset == expected_fieldset
+
+
+@pytest.mark.django_db
+def test_get_fieldset_for_background_question(user_application, user_application_adg_admin_instance):
+    """
+    Test that the `_get_fieldset_for_background_question` method returns the correct fieldset.
+    """
+    user_application.background_question = TEST_BACKGROUND_QUESTION
+
+    actual_fieldset = UserApplicationADGAdmin._get_fieldset_for_background_question(user_application_adg_admin_instance)
+
+    expected_fieldset = (BACKGROUND_QUESTION_TITLE, {'fields': (BACKGROUND_QUESTION,)})
 
     assert actual_fieldset == expected_fieldset
 

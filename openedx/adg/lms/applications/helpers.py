@@ -24,9 +24,9 @@ from xmodule.modulestore.django import modulestore
 from .constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
+    BACKGROUND_QUESTION_TITLE,
     COMPLETED,
     IN_PROGRESS,
-    INTEREST,
     LOCKED,
     LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
@@ -43,7 +43,8 @@ from .constants import (
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    WRITTEN_APPLICATION_COMPLETION_MSG
+    WRITTEN_APPLICATION_COMPLETION_MSG,
+    CourseScore
 )
 from .rules import is_adg_admin
 
@@ -283,7 +284,7 @@ def get_extra_context_for_application_review_page(application):
         'reviewer': reviewed_by,
         'review_date': review_date,
         'SCORES': SCORES,
-        'INTEREST': INTEREST,
+        'BACKGROUND_QUESTION': BACKGROUND_QUESTION_TITLE,
     }
 
     return extra_context
@@ -583,9 +584,68 @@ def bulk_update_application_hub_flag(flag, users):
     Returns:
         None
     """
-    from .models import ApplicationHub
+    from openedx.adg.lms.applications.models import ApplicationHub
 
     user_application_hubs = ApplicationHub.objects.filter(user__in=users)
     user_application_hubs.update(**{flag: True})
 
     logger.info(f'`{flag}` flag is updated for all pending users')
+
+
+def get_user_scores_for_courses(user, courses):
+    """
+    Given a list of courses, return the scores achieved in every single
+    course by the given user
+
+    Arguments:
+        user (User): User to find the course grades for
+        courses (list): List of courses (CourseOverview) for which to find the course grades
+
+    Returns:
+         list: list of scores (CourseScore) in the courses
+    """
+    scores_in_courses = []
+    for course_overview in courses:
+        course_name = course_overview.display_name
+        course_grade = CourseGradeFactory().read(user, course_key=course_overview.id)
+        course_percentage = int(round_away_from_zero(course_grade.percent * 100))
+
+        course_score = CourseScore(course_name, course_percentage)
+        scores_in_courses.append(course_score)
+
+    return scores_in_courses
+
+
+def create_html_string_for_course_scores_in_admin_review(user_application):
+    """
+    Given a user_application, return the course scores for all the prereq courses i.e
+    Business Unit and Program prereq courses, in a formatted html that can be rendered
+    in the application review page
+
+    Arguments:
+        user_application (UserApplication): user application under review
+
+    Returns:
+        str: An html format string containing all the course scores with respective headings
+    """
+    final_html = ''
+    html_for_score = '<p>{course_name}: <b>{course_percentage}%</b></p>'
+
+    program_prereq_scores = user_application.program_prereq_course_scores
+    bu_prereq_scores = user_application.bu_prereq_course_scores
+    prereq_scores_container_with_course_type = [
+        (program_prereq_scores, '<strong>Program Prerequisite Courses:</strong>'),
+        (bu_prereq_scores, '<strong>Business Unit Prerequisite Courses:</strong>'),
+    ]
+
+    for prereq_scores, courses_type in prereq_scores_container_with_course_type:
+        section_heading = '<br>' + courses_type
+        final_html += section_heading if prereq_scores else ''
+
+        for prereq_score in prereq_scores:
+            final_html += html_for_score.format(
+                course_name=prereq_score.course_name,
+                course_percentage=prereq_score.course_percentage
+            )
+
+    return final_html

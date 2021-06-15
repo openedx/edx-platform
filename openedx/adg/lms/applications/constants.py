@@ -21,6 +21,8 @@ FILE_MAX_SIZE = 4 * 1024 * 1024
 
 APPLICANT_INFO = _('APPLICANT INFORMATION')
 
+BACKGROUND_QUESTION_TITLE = _('BACKGROUND QUESTION')
+
 INTEREST = _('INTEREST IN BUSINESS LINE')
 
 SCORES = _('SCORES')
@@ -38,6 +40,8 @@ ORGANIZATION = 'organization'
 APPLYING_TO = 'applying_to'
 INTEREST_IN_BUSINESS = 'interest_in_business'
 PREREQUISITES = 'prerequisites'
+HEAR_ABOUT_OMNI = 'hear_about_omni'
+BACKGROUND_QUESTION = 'background_question'
 
 # Application listing page titles
 

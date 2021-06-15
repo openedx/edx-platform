@@ -22,12 +22,15 @@ from .constants import (
     ALL_APPLICATIONS_TITLE,
     APPLICANT_INFO,
     APPLYING_TO,
+    BACKGROUND_QUESTION,
+    BACKGROUND_QUESTION_TITLE,
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
     EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
+    HEAR_ABOUT_OMNI,
     INTEREST,
     INTEREST_IN_BUSINESS,
     IS_SAUDI_NATIONAL,
@@ -43,7 +46,11 @@ from .constants import (
     WAITLISTED_APPLICATIONS_TITLE
 )
 from .forms import MultilingualCourseGroupForm, UserApplicationAdminForm
-from .helpers import get_duration, get_extra_context_for_application_review_page
+from .helpers import (
+    create_html_string_for_course_scores_in_admin_review,
+    get_duration,
+    get_extra_context_for_application_review_page
+)
 from .models import (
     ApplicationHub,
     BusinessLine,
@@ -309,6 +316,16 @@ class WorkExperienceInline(ApplicationReviewInline):
     responsibilities.short_description = _('Responsibilities')
 
 
+class ReferencesInline(ApplicationReviewInline):
+    """
+    InlineModelAdmin for References model
+    """
+
+    model = Reference
+    fields = ('name', 'position', 'relationship', 'phone_number', 'email')
+    readonly_fields = fields
+
+
 class UserApplicationADGAdmin(admin.ModelAdmin):
     """
     Django admin class for UserApplication
@@ -317,11 +334,13 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     form = UserApplicationAdminForm
 
     readonly_fields = (
+        BACKGROUND_QUESTION,
         EMAIL,
         LOCATION,
         LINKED_IN_PROFILE,
         IS_SAUDI_NATIONAL,
         GENDER,
+        HEAR_ABOUT_OMNI,
         PHONE_NUMBER,
         DATE_OF_BIRTH,
         ORGANIZATION,
@@ -330,9 +349,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         INTEREST_IN_BUSINESS
     )
 
-    inlines = [
-        EducationInline, WorkExperienceInline
-    ]
+    inlines = [EducationInline, WorkExperienceInline, ReferencesInline]
 
     list_display = ('applicant_name', 'date_received', 'status')
     list_filter = ('status',)
@@ -416,7 +433,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         extra_context['note'] = note
 
         application_hub = ApplicationHub.objects.get(user=application.user)
-        disable_admin_evaluation = '' if application_hub.is_prerequisite_courses_passed else 'disabled'
+        disable_admin_evaluation = '' if application_hub.are_program_and_bu_prereq_courses_completed else 'disabled'
         extra_context['disable_admin_evaluation'] = disable_admin_evaluation
 
         return super(UserApplicationADGAdmin, self).changeform_view(
@@ -513,9 +530,14 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     applying_to.short_description = _('Applying to')
 
+    def hear_about_omni(self, obj):
+        return obj.user.extended_profile.hear_about_omni
+
+    hear_about_omni.short_description = _('How did you hear about us?')
+
     def prerequisites(self, obj):
         """
-        Get scores of the applicant in prerequisite courses of the franchise program.
+        Gets scores of the applicant in prerequisite courses of the franchise program.
 
         Arguments:
             obj (UserApplication): Application under review
@@ -524,16 +546,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             SafeText: HTML containing course name of all prereq courses and applicant's respective scores in those
             courses
         """
-        html_for_score = '<p>{course_name}: <b>{course_percentage}%</b></p>'
-        final_html = ''
-        prereq_scores = obj.prereq_course_scores
-        for prereq_score in prereq_scores:
-            final_html += html_for_score.format(
-                course_name=prereq_score.course_name,
-                course_percentage=prereq_score.course_percentage
-            )
-
-        return format_html(final_html)
+        user_course_scores_html = create_html_string_for_course_scores_in_admin_review(obj)
+        return format_html(user_course_scores_html)
 
     prerequisites.short_description = _('Prerequisites')
 
@@ -557,6 +571,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         applicant_info_fieldset = self._get_applicant_info_fieldset(obj)
         fieldsets.append(applicant_info_fieldset)
+
+        fieldset_for_background_question = self._get_fieldset_for_background_question()
+        fieldsets.append(fieldset_for_background_question)
 
         fieldset_for_interest = self._get_fieldset_for_interest()
         fieldsets.append(fieldset_for_interest)
@@ -602,7 +619,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         if application.organization:
             applicant_info_fields.append(ORGANIZATION)
 
-        applicant_info_fields.append(APPLYING_TO)
+        applicant_info_fields.extend([APPLYING_TO, HEAR_ABOUT_OMNI])
 
         fieldset = (APPLICANT_INFO, {'fields': tuple(applicant_info_fields)})
 
@@ -616,6 +633,17 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             tuple: Fieldset containing both fieldset title and a child tuple for `interest in business` field
         """
         fieldset = (INTEREST, {'fields': (INTEREST_IN_BUSINESS,)})
+        return fieldset
+
+    def _get_fieldset_for_background_question(self):
+        """
+        Prepare and return fieldset for the background_question field in the education &
+        experience step i.e Step 2 of the application
+
+        Returns:
+             tuple: Fieldset containing the title and a child tuple for background_question field
+        """
+        fieldset = (BACKGROUND_QUESTION_TITLE, {'fields': (BACKGROUND_QUESTION,)})
         return fieldset
 
     def _get_fieldset_for_scores(self):
