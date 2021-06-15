@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from openedx.adg.lms.webinars.models import Webinar
 
+from .constants import UTC_TIMEZONE_HELP_TEXT
 from .helpers import validate_email_list
 
 
@@ -13,6 +14,7 @@ class WebinarForm(forms.ModelForm):
     """
     Webinar Form to create/edit a webinar from admin side
     """
+
     invites_by_email_address = forms.CharField(
         required=False,
         widget=forms.Textarea,
@@ -29,6 +31,10 @@ class WebinarForm(forms.ModelForm):
     class Meta:
         model = Webinar
         fields = '__all__'
+        help_texts = {
+            'start_time': UTC_TIMEZONE_HELP_TEXT,
+            'end_time': UTC_TIMEZONE_HELP_TEXT,
+        }
 
     def clean_invites_by_email_address(self):
         """
