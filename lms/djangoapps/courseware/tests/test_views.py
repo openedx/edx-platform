@@ -3544,7 +3544,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
-        lms_url, mfe_url, __ = self._get_urls()
+        lms_url, __, __ = self._get_urls()
 
         # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
@@ -3567,7 +3567,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, mfe_url, __ = self._get_urls()
+        lms_url, __, __ = self._get_urls()
 
         assert self.client.get(lms_url).status_code == 200
 
@@ -3577,7 +3577,7 @@ class PreviewRedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_staff_no_redirect(self):
-        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        __, __, preview_url = self._get_urls()
 
         # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
@@ -3599,7 +3599,7 @@ class PreviewRedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, mfe_url, preview_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        __, __, preview_url = self._get_urls()
 
         assert self.client.get(preview_url).status_code == 200
 
