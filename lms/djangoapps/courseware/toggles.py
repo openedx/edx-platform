@@ -129,6 +129,7 @@ COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
 
 PREVIEW_BASE = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
 
+
 def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
