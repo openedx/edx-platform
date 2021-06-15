@@ -499,6 +499,7 @@ def login_user(request, api_version='v1'):
         return HttpResponseForbidden(
             "Third party authentication is required to login. Username and password were received instead."
         )
+    possibly_authenticated_user = None
     try:
         if third_party_auth_requested and not first_party_auth_requested:
             # The user has already authenticated via third-party auth and has not
@@ -576,8 +577,11 @@ def login_user(request, api_version='v1'):
         error_code = response_content.get('error_code')
         if error_code:
             set_custom_attribute('login_error_code', error_code)
-
-        response_content['email'] = request.POST.get('email', None)
+        email_or_username_key = 'email' if api_version == API_V1 else 'email_or_username'
+        email_or_username = request.POST.get(email_or_username_key, None)
+        email_or_username = possibly_authenticated_user.email \
+            if possibly_authenticated_user else email_or_username
+        response_content['email'] = email_or_username
         response = JsonResponse(response_content, status=400)
         set_custom_attribute('login_user_auth_failed_error', True)
         set_custom_attribute('login_user_response_status', response.status_code)
