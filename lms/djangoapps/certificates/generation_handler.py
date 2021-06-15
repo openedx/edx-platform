@@ -342,11 +342,14 @@ def _can_set_cert_status_common(user, course_key):
     return True
 
 
-def is_using_v2_course_certificates(course_key):
+def is_using_v2_course_certificates(course_key):    # pylint: disable=unused-argument
     """
     Return True if the course run is using v2 course certificates
+
+    Note: this currently always returns True. This is an interim step as we roll out the feature to all course runs,
+    and the method will be removed entirely in MICROBA-1083.
     """
-    return CERTIFICATES_USE_UPDATED.is_enabled(course_key)
+    return True
 
 
 def is_on_certificate_allowlist(user, course_key):
