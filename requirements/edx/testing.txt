@@ -47,8 +47,6 @@ aniso8601==9.0.1
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
     #   tincan
-apipkg==1.5
-    # via execnet
 appdirs==1.4.4
     # via
     #   -r requirements/edx/base.txt
@@ -218,7 +216,9 @@ django-cache-memoize==0.1.9
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 django-celery-results==2.0.1
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 django-classy-tags==2.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -461,7 +461,7 @@ edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.4.0
     # via -r requirements/edx/base.txt
-edx-bulk-grades==0.8.10
+edx-bulk-grades==0.8.11
     # via
     #   -r requirements/edx/base.txt
     #   staff-graded-xblock
@@ -589,11 +589,11 @@ event-tracking==1.0.4
     #   edx-event-routing-backends
     #   edx-proctoring
     #   edx-search
-execnet==1.8.1
+execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==8.6.0
+faker==8.8.0
     # via factory-boy
 filelock==3.0.12
     # via
@@ -839,7 +839,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.6.2
+ora2==3.6.3
     # via -r requirements/edx/base.txt
 packaging==20.9
     # via
@@ -1277,7 +1277,7 @@ tox==3.23.1
     # via
     #   -r requirements/edx/testing.in
     #   tox-battery
-tqdm==4.61.0
+tqdm==4.61.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
