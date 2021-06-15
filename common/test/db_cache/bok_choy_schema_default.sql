@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3064 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3076 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3090,7 +3090,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=867 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=870 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3101,7 +3101,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=879 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=880 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3548,6 +3548,63 @@ CREATE TABLE `embargo_restrictedcourse` (
   `disable_access_check` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_key` (`course_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_adminnotification`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_adminnotification` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `text` varchar(255) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `start_date` date NOT NULL,
+  `expiration_date` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_adminnotification_admin_notification_filter`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_adminnotification_admin_notification_filter` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `adminnotification_id` int(11) NOT NULL,
+  `adminnotificationfilter_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_adminnotifica_adminnotification_id_adm_d4f4da63_uniq` (`adminnotification_id`,`adminnotificationfilter_id`),
+  KEY `enterprise_adminnoti_adminnotificationfil_276acc56_fk_enterpris` (`adminnotificationfilter_id`),
+  CONSTRAINT `enterprise_adminnoti_adminnotification_id_6ab95bff_fk_enterpris` FOREIGN KEY (`adminnotification_id`) REFERENCES `enterprise_adminnotification` (`id`),
+  CONSTRAINT `enterprise_adminnoti_adminnotificationfil_276acc56_fk_enterpris` FOREIGN KEY (`adminnotificationfilter_id`) REFERENCES `enterprise_adminnotificationfilter` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_adminnotificationfilter`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_adminnotificationfilter` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `filter` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `filter` (`filter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_adminnotificationread`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_adminnotificationread` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `is_read` tinyint(1) NOT NULL,
+  `admin_notification_id` int(11) NOT NULL,
+  `enterprise_customer_user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_adminnotifica_enterprise_customer_user_767d1bcc_uniq` (`enterprise_customer_user_id`,`admin_notification_id`),
+  KEY `enterprise_adminnoti_admin_notification_i_77267771_fk_enterpris` (`admin_notification_id`),
+  CONSTRAINT `enterprise_adminnoti_admin_notification_i_77267771_fk_enterpris` FOREIGN KEY (`admin_notification_id`) REFERENCES `enterprise_adminnotification` (`id`),
+  CONSTRAINT `enterprise_adminnoti_enterprise_customer__4a67a03f_fk_enterpris` FOREIGN KEY (`enterprise_customer_user_id`) REFERENCES `enterprise_enterprisecustomeruser` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enrollmentnotificationemailtemplate`;
