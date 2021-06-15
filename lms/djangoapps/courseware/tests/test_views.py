@@ -1484,8 +1484,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.store.update_item(self.course, self.user.id)
 
             resp = self._get_progress_page()
-            self.assertNotContains(resp, "View Your Certificate")
-            self.assertNotContains(resp, "You can now view your certificate")
+            self.assertNotContains(resp, "View my Certificate")
+            self.assertNotContains(resp, "You can now View my Certificate")
             self.assertContains(resp, "Your certificate is available")
             self.assertContains(resp, "earned a certificate for this course.")
 
@@ -1875,8 +1875,8 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(resp, 'Request Certificate')
         self.assertContains(resp, 'Your certificate has been invalidated')
         self.assertContains(resp, 'Please contact your course team if you have any questions.')
-        self.assertNotContains(resp, 'View Your Certificate')
-        self.assertNotContains(resp, 'Download Your Certificate')
+        self.assertNotContains(resp, 'View my Certificate')
+        self.assertNotContains(resp, 'Download my Certificate')
 
     def generate_certificate(self, url, mode):
         """ Dry method to generate certificate. """
