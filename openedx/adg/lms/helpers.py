@@ -21,7 +21,7 @@ def convert_date_time_zone_and_format(date_time_object, time_zone, time_format):
     """
     Change time zone of datetime object and return a formatted string
     Args:
-        date_time_object (datetime): datetime object
+        date_time_object (datetime.datetime): datetime object
         time_zone (string): a time zone string
         time_format (string): a time format string
     Returns:

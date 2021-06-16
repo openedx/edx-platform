@@ -14,6 +14,7 @@ from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.applications.helpers import validate_file_size
 from openedx.adg.lms.helpers import convert_date_time_zone_and_format
+from openedx.adg.lms.webinars.constants import WEBINARS_TIME_FORMAT
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .constants import (
@@ -124,7 +125,7 @@ class Webinar(TimeStampedModel):
             'webinar_id': self.id,
             'webinar_title': self.title,
             'webinar_description': self.description,
-            'webinar_start_time': self.start_date_time_AST,
+            'webinar_start_time': self.start_time.strftime(WEBINARS_TIME_FORMAT),
             'webinar_meeting_link': self.meeting_link,
         }
 

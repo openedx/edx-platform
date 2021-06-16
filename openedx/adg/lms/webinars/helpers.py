@@ -12,9 +12,16 @@ from django.urls import reverse
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
+from openedx.adg.lms.helpers import convert_date_time_zone_and_format
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINAR_DATE_TIME_FORMAT
+from .constants import (
+    ONE_WEEK_REMINDER_ID_FIELD_NAME,
+    STARTING_SOON_REMINDER_ID_FIELD_NAME,
+    WEBINAR_DATE_TIME_FORMAT,
+    WEBINAR_DEFAULT_TIME_ZONE,
+    WEBINARS_TIME_FORMAT
+)
 
 
 def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
@@ -134,7 +141,10 @@ def schedule_webinar_reminders(user_emails, email_context):
     Returns:
         None
     """
-    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINAR_DATE_TIME_FORMAT)
+    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINARS_TIME_FORMAT)
+    email_context['webinar_start_time'] = convert_date_time_zone_and_format(
+        webinar_start_time, WEBINAR_DEFAULT_TIME_ZONE, WEBINAR_DATE_TIME_FORMAT
+    )
 
     task_send_mandrill_email.delay(
         MandrillClient.WEBINAR_TWO_HOURS_REMINDER,
