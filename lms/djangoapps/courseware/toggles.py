@@ -7,7 +7,6 @@ from opaque_keys.edx.keys import CourseKey
 from django.conf import settings
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from xmodule.util.xmodule_django import get_current_request_hostname
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
