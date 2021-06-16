@@ -3,7 +3,7 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 
-
+import logging
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy
 
@@ -11,6 +11,8 @@ from .models import OAuth2ProviderConfig
 from .pipeline import AUTH_ENTRY_CUSTOM
 from .pipeline import get as get_pipeline_from_request
 from .provider import Registry
+
+log = logging.getLogger(__name__)
 
 
 class ConfigurationModelStrategy(DjangoStrategy):
@@ -57,4 +59,35 @@ class ConfigurationModelStrategy(DjangoStrategy):
 
         # At this point, we know 'name' is not set in a [OAuth2|LTI|SAML]ProviderConfig row.
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
-        return super().setting(name, default, backend)
+        return super(ConfigurationModelStrategy, self).setting(name, default, backend)
+
+    def request_host(self):
+        """
+        Host in use for this request
+        """
+        # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
+        # https://github.com/omab/python-social-auth/pull/741
+        forwarded_host = self.request.META.get('HTTP_X_FORWARDED_HOST')
+        if forwarded_host:
+            return forwarded_host
+
+        return super(ConfigurationModelStrategy, self).request_host()
+
+    def request_port(self):
+        """
+        Port in use for this request
+        """
+        # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
+        # https://github.com/omab/python-social-auth/pull/741
+        forwarded_port = self.request.META.get('HTTP_X_FORWARDED_PORT')
+        is_secure = self.request.META.get('HTTP_X_FORWARDED_PROTO')
+        log.info(
+            u"Is secure: %s\n Forward port: %s\n", is_secure, forwarded_port
+        )
+        if forwarded_port != '80':
+            return forwarded_port
+
+        if is_secure == 'https':
+            return 443
+
+        return super(ConfigurationModelStrategy, self).request_port()
