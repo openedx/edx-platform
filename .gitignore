@@ -96,6 +96,7 @@ common/test/data/badges/*.png
 .vagrant/
 node_modules
 bin/
+edxapp_media_dir/
 
 ### Static assets pipeline artifacts
 *.scssc
