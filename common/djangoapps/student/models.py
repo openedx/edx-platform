@@ -1816,6 +1816,11 @@ class CourseEnrollment(models.Model):
 
         return status_hash
 
+    @staticmethod
+    def get_date_last_enrollment_for_user(enroll):
+        history_last = enroll.history.all().first().history_date
+        return history_last.date()
+
     def is_paid_course(self):
         """
         Returns True, if course is paid
