@@ -13,8 +13,8 @@ disable+ =
     no-else-break,
     no-else-continue,
     useless-object-inheritance,
-    C0114, # missing-module-docstring
-    C0116, # missing-function-docstring
+    missing-module-docstring,
+    missing-function-docstring,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
