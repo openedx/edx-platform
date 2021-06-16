@@ -125,7 +125,7 @@ class CourseOverview(TimeStampedModel):
     self_paced = BooleanField(default=False)
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
-    plan_release = IntegerField(null=False, default=0)
+    plan_release = IntegerField(default=0)
 
     # Course highlight info, used to guide course update emails
     has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
