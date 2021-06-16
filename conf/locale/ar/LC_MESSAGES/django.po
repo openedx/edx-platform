@@ -8,6 +8,7 @@
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
 # Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
 # Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
+# Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
@@ -61,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-16 07:32+0000\n"
+"POT-Creation-Date: 2021-06-16 10:34+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9563,18 +9564,18 @@ msgstr ""
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Congratulations! You have completed the written application."
-msgstr "تهانينا! أنت الآن مسجَّل في المساق {course_name}"
+msgstr "تهانينا! لقد أكملت الطلب المكتوب."
 
 #: openedx/adg/lms/applications/constants.py
 msgid ""
 "Get started on the Omnipreneurship Courses in order to move forward with "
 "your application."
-msgstr ""
+msgstr "ابدأ في دورات ريادة الأعمال الشاملة من أجل المضي قدمًا في طلبك."
 
 #: openedx/adg/lms/applications/constants.py
 msgid ""
 "Finish up the Omnipreneurship Courses in order to complete your application."
-msgstr ""
+msgstr "أنهِ دورات ريادة الأعمال الشاملة لإكمال طلبك."
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Congratulations! You have completed the Omnipreneurship Courses!"
