@@ -84,7 +84,7 @@ class AllowlistTests(ModuleStoreTestCase):
             is_active=True,
             mode="verified",
         )
-        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=u, whitelist=False)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=u, allowlist=False)
         assert not is_on_certificate_allowlist(u, self.course_run_key)
 
     @ddt.data(

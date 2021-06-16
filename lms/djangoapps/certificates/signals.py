@@ -18,9 +18,9 @@ from lms.djangoapps.certificates.generation_handler import (
     is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.models import (
+    CertificateAllowlist,
     CertificateGenerationCourseSetting,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
@@ -52,7 +52,7 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
     ))
 
 
-@receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_allowlist")
+@receiver(post_save, sender=CertificateAllowlist, dispatch_uid="append_certificate_allowlist")
 def _listen_for_certificate_allowlist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Listen for a user being added to or modified on the allowlist

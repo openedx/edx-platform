@@ -3025,7 +3025,7 @@ def add_certificate_exception(course_key, student, certificate_exception):
         'user_name': student.username,
         'user_id': student.id,
         'certificate_generated': generated_certificate and generated_certificate.created_date.strftime("%B %d, %Y"),
-        'created': certificate_allowlist_entry.created.strftime("%A, %B %d, %Y"),
+        'created': certificate_allowlist_entry.created.strftime("%B %d, %Y"),
     })
 
     return exception

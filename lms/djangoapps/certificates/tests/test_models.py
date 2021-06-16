@@ -9,7 +9,6 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.paginator import Paginator
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseKey, CourseLocator
@@ -23,22 +22,18 @@ from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
     CertificateStatuses,
     CertificateTemplateAsset,
-    CertificateWhitelist,
     ExampleCertificate,
     ExampleCertificateSet,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tests.factories import (
-    CertificateAllowlistFactory
-)
-from lms.djangoapps.certificates.tests.factories import (
     CertificateInvalidationFactory,
     GeneratedCertificateFactory,
-    TemporaryCertificateAllowlistFactory,
+    CertificateAllowlistFactory,
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
@@ -482,15 +477,15 @@ class CertificateAllowlistTest(SharedModuleStoreTestCase):
         assert len(ret) == 0
 
     def test_get_allowlist_multiple_users(self):
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
 
         ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key)
         assert len(ret) == 2
 
     def test_get_allowlist_no_cert(self):
-        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+        allowlist_item = CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
 
         ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
         assert len(ret) == 1
@@ -506,7 +501,7 @@ class CertificateAllowlistTest(SharedModuleStoreTestCase):
         assert item['notes'] == allowlist_item.notes
 
     def test_get_allowlist_cert(self):
-        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        allowlist_item = CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
@@ -519,114 +514,3 @@ class CertificateAllowlistTest(SharedModuleStoreTestCase):
         item = ret[0]
         assert item['id'] == allowlist_item.id
         assert item['certificate_generated'] == cert.created_date.strftime("%B %d, %Y")
-
-
-class TemporaryMigrationTests(ModuleStoreTestCase):
-    """
-    Temporary tests for the allowlist data migration
-    """
-
-    def setUp(self):
-        super().setUp()
-
-        self.course = CourseFactory.create(
-            org='edx',
-            number='verified',
-            display_name='Verified Course'
-        )
-        self.key = self.course.id
-
-        self.u1 = UserFactory.create()
-        self.u2 = UserFactory.create()
-        self.u3 = UserFactory.create()
-
-    def _migrate(self):
-        """
-        Migrate the data
-        """
-        whitelisted = CertificateWhitelist.objects.all().order_by('id')
-        paginator = Paginator(whitelisted, 1)
-
-        for page_num in paginator.page_range:
-            page = paginator.page(page_num)
-
-            for w in page.object_list:
-                CertificateAllowlist.objects.update_or_create(
-                    user_id=w.user_id,
-                    course_id=w.course_id,
-                    defaults={
-                        'allowlist': w.whitelist,
-                        'notes': w.notes,
-                        'created': w.created,
-                    }
-                )
-
-    def test_migration(self):
-        """
-        Temporary test for the allowlist data migration
-        """
-        TemporaryCertificateAllowlistFactory.create(
-            user=self.u1,
-            course_id=self.key,
-        )
-
-        CertificateAllowlistFactory.create(
-            user=self.u1,
-            course_id=self.key,
-            whitelist=False,
-            notes='nope'
-        )
-        CertificateAllowlistFactory.create(
-            user=self.u2,
-            course_id=self.key,
-        )
-
-        self._migrate()
-
-        whitelisted = CertificateWhitelist.objects.all()
-        allowlisted = CertificateAllowlist.objects.all()
-        assert len(whitelisted) == len(allowlisted)
-
-        a = CertificateAllowlist.objects.get(user_id=self.u1.id)
-        assert a.allowlist is False
-        assert a.notes == 'nope'
-
-        a = CertificateAllowlist.objects.get(user_id=self.u2.id)
-        assert a.allowlist is True
-
-    def test_migration_empty(self):
-        """
-        Temporary test for the allowlist data migration when the allowlist is empty
-        """
-        CertificateAllowlistFactory.create(
-            user=self.u1,
-            course_id=self.key,
-            whitelist=False
-        )
-        CertificateAllowlistFactory.create(
-            user=self.u2,
-            course_id=self.key,
-        )
-        CertificateAllowlistFactory.create(
-            user=self.u3,
-            course_id=self.key,
-        )
-
-        self._migrate()
-
-        whitelisted = CertificateWhitelist.objects.all()
-        allowlisted = CertificateAllowlist.objects.all()
-        assert len(whitelisted) == len(allowlisted)
-
-    def test_migration_both_empty(self):
-        """
-        Temporary test for the allowlist data migration when both models are empty
-        """
-        whitelisted = CertificateWhitelist.objects.all()
-        assert len(whitelisted) == 0
-
-        self._migrate()
-
-        whitelisted = CertificateWhitelist.objects.all()
-        allowlisted = CertificateAllowlist.objects.all()
-        assert len(whitelisted) == len(allowlisted)

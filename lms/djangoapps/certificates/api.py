@@ -38,7 +38,6 @@ from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
     CertificateTemplate,
     CertificateTemplateAsset,
-    CertificateWhitelist,
     ExampleCertificateSet,
     GeneratedCertificate,
     certificate_status_for_student
@@ -113,7 +112,7 @@ def get_certificates_for_user(username):
             "course_key": CourseLocator('edX', 'DemoX', 'Demo_Course', None, None),
             "type": "verified",
             "status": "downloadable",
-            "download_url": "http://www.example.com/cert.pdf",
+            "download_url": "https://www.example.com/cert.pdf",
             "grade": "0.98",
             "created": 2015-07-31T00:00:00Z,
             "modified": 2015-07-31T00:00:00Z
@@ -411,7 +410,7 @@ def example_certificates_status(course_key):
             {
                 'description': 'honor',
                 'status': 'success',
-                'download_url': 'http://www.example.com/abcd/honor_cert.pdf'
+                'download_url': 'https://www.example.com/abcd/honor_cert.pdf'
             },
             {
                 'description': 'verified',
@@ -613,23 +612,14 @@ def get_allowlisted_users(course_key):
     """
     Return the users who are on the allowlist for this course run
     """
-    return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
+    return User.objects.filter(certificateallowlist__course_id=course_key, certificateallowlist__allowlist=True)
 
 
 def create_or_update_certificate_allowlist_entry(user, course_key, notes, enabled=True):
     """
     Update-or-create an allowlist entry for a student in a given course-run.
     """
-    certificate_allowlist, created = CertificateWhitelist.objects.update_or_create(
-        user=user,
-        course_id=course_key,
-        defaults={
-            'whitelist': enabled,
-            'notes': notes,
-        }
-    )
-
-    __, __ = CertificateAllowlist.objects.update_or_create(
+    certificate_allowlist, created = CertificateAllowlist.objects.update_or_create(
         user=user,
         course_id=course_key,
         defaults={
@@ -664,12 +654,6 @@ def remove_allowlist_entry(user, course_key):
         allowlist_entry.delete()
         deleted = True
 
-    new_model_entry = _get_allowlist_entry_from_new_model(user, course_key)
-    if new_model_entry:
-        log.info(f"Allowlist entry exists in the new allowlist model for student {user.id} in course {course_key}, "
-                 f"and will be removed.")
-        new_model_entry.delete()
-
     return deleted
 
 
@@ -679,23 +663,9 @@ def get_allowlist_entry(user, course_key):
     """
     log.info(f"Attempting to retrieve an allowlist entry for student {user.id} in course {course_key}.")
     try:
-        allowlist_entry = CertificateWhitelist.objects.get(user=user, course_id=course_key)
-    except ObjectDoesNotExist:
-        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
-        return None
-
-    return allowlist_entry
-
-
-def _get_allowlist_entry_from_new_model(user, course_key):
-    """
-    Retrieves and returns an allowlist entry from the allowlist model.
-
-    This is temporary code until we switch completely from the CertificateWhitelist to the CertificateAllowlist.
-    """
-    try:
         allowlist_entry = CertificateAllowlist.objects.get(user=user, course_id=course_key)
     except ObjectDoesNotExist:
+        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
         return None
 
     return allowlist_entry
@@ -772,7 +742,7 @@ def get_allowlist(course_key):
     """
     Return the certificate allowlist for the given course run
     """
-    return CertificateWhitelist.get_certificate_white_list(course_key)
+    return CertificateAllowlist.get_certificate_allowlist(course_key)
 
 
 def get_enrolled_allowlisted_users(course_key):
@@ -783,8 +753,8 @@ def get_enrolled_allowlisted_users(course_key):
     """
     users = CourseEnrollment.objects.users_enrolled_in(course_key)
     return users.filter(
-        certificatewhitelist__course_id=course_key,
-        certificatewhitelist__whitelist=True
+        certificateallowlist__course_id=course_key,
+        certificateallowlist__allowlist=True
     )
 
 

@@ -13,7 +13,6 @@ from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 
@@ -36,21 +35,6 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 class CertificateAllowlistFactory(DjangoModelFactory):
     """
     Certificate allowlist factory
-    """
-
-    class Meta:
-        model = CertificateWhitelist
-
-    course_id = None
-    whitelist = True
-    notes = 'Test Notes'
-
-
-class TemporaryCertificateAllowlistFactory(DjangoModelFactory):
-    """
-    Temporary certificate allowlist factory.
-
-    This will be removed once the CertificateAllowlistFactory uses the CertificateAllowlist as its model.
     """
 
     class Meta:
