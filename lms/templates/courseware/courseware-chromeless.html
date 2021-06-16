@@ -153,7 +153,21 @@ ${HTML(fragment.foot_html())}
             })
           return;
         }
-
+        // Monitor for messages and checks if the message contains an id. If
+        // there is an id, then the location of the selected focus element
+        // is sent through its offset attribute. The offset will allow the
+        // page to scroll to the location of the focus element so that it is
+        // at the top of the page. Unique ids and names are required for
+        // proper scrolling.
+        window.addEventListener('message', function (event) {
+          if (event.data.hashName) {
+            var targetId = event.data.hashName;
+            var targetName = event.data.hashName.slice(1);
+            // Checks if the target uses an id or name to focus and gets offset.
+            var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
+            window.parent.postMessage({ 'offset': targetOffset.top }, document.referrer);
+          }
+        })
 
         window.parent.postMessage({
             type: 'plugin.resize',
