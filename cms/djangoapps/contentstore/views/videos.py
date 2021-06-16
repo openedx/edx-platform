@@ -61,14 +61,16 @@ from ..models import VideoUploadConfig
 from ..utils import reverse_course_url
 from ..video_utils import validate_video_image
 from .course import get_course_and_check_access
+#### EOL ####
 from django.db import IntegrityError, transaction
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 try:
     from eol_vimeo.vimeo_task import task_process_data
+    from eol_vimeo.vimeo_utils import update_create_vimeo_model
     ENABLE_EOL_VIMEO = True
 except ImportError:
     ENABLE_EOL_VIMEO = False
-
+#### END EOL ####
 __all__ = [
     'videos_handler',
     'video_encodings_download',
@@ -163,6 +165,7 @@ class StatusDisplayStrings(object):
         "ingest": _IN_PROGRESS,
         "transcode_queue": _IN_PROGRESS,
         "transcode_active": _IN_PROGRESS,
+        "vimeo_encoding":_IN_PROGRESS,
         "file_delivered": _COMPLETE,
         "file_complete": _COMPLETE,
         "upload_completed": _UPLOAD_COMPLETED,
@@ -223,6 +226,7 @@ def videos_handler(request, course_key_string, edx_video_id=None):
         return JsonResponse()
     else:
         if is_status_update_request(request.json):
+            #### EOL ####
             if ENABLE_EOL_VIMEO:
                 upload_completed_videos = []
                 for video in request.json:
@@ -231,6 +235,7 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                         upload_completed_videos.append(video)
                         status = 'upload'
                     update_video_status(video.get('edxVideoId'), status)
+                    update_create_vimeo_model(video.get('edxVideoId'), request.user.id, status, video.get('message'), course_key_string)
                     LOGGER.info(
                         u'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
                         video.get('edxVideoId'),
@@ -242,13 +247,14 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                 return JsonResponse()
             else:
                 LOGGER.info('EolVimeo is not installed')
+                #### END EOL ####
                 return send_video_status_update(request.json)
         elif _is_pagination_context_update_request(request):
             return _update_pagination_context(request)
 
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
-
+#### EOL ####
 def vimeo_task(request, course_id, data):
     try:
         task = task_process_data(request, course_id, data)
@@ -256,7 +262,7 @@ def vimeo_task(request, course_id, data):
     except AlreadyRunningError:
         LOGGER.error("EolVimeo - Task Already Running Error, user: {}, course_id: {}".format(request.user, course_id))
         return False
-
+#### END EOL ####
 @api_view(['POST'])
 @view_auth_classes()
 @expect_json
@@ -786,12 +792,14 @@ def videos_post(course, request):
 
         edx_video_id = six.text_type(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
+        #### EOL ####
         if ENABLE_EOL_VIMEO:
             upload_url = key.generate_url(
                 KEY_EXPIRATION_IN_SECONDS,
                 'PUT'
             )
         else:
+            #### END EOL ####
             metadata_list = [
                 ('client_video_id', file_name),
                 ('course_key', six.text_type(course.id)),
@@ -836,6 +844,9 @@ def videos_post(course, request):
 def storage_service_bucket():
     """
     Returns an S3 bucket for video upload.
+    #### EOL ####
+        'host': settings.AWS_S3_ENDPOINT_DOMAIN
+    #### EOL ####
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
         params = {
