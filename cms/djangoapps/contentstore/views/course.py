@@ -96,6 +96,7 @@ from ..toggles import split_library_view_on_dashboard
 from ..utils import (
     add_instructor,
     get_lms_link_for_item,
+    get_pages_and_resources_url,
     get_proctored_exam_settings_url,
     initialize_permissions,
     remove_all_instructors,
@@ -727,6 +728,7 @@ def course_index(request, course_key):
             'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
             'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id),
             'proctoring_errors': proctoring_errors,
+            'pages_and_resources_mfe_link': get_pages_and_resources_url(course_module.id),
         })
 
 
@@ -1163,6 +1165,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'pages_and_resources_mfe_link': get_pages_and_resources_url(course_module.id),
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1283,6 +1286,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'pages_and_resources_mfe_link': get_pages_and_resources_url(course_module.id),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1388,6 +1392,7 @@ def advanced_settings_handler(request, course_key_string):
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'pages_and_resources_mfe_link': get_pages_and_resources_url(course_module.id),
                 'proctoring_errors': proctoring_errors,
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
@@ -1740,6 +1745,7 @@ def group_configurations_list_handler(request, course_key_string):
                 'all_group_configurations': displayable_partitions,
                 'should_show_enrollment_track': should_show_enrollment_track,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
+                'pages_and_resources_mfe_link': get_pages_and_resources_url(course.id),
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':

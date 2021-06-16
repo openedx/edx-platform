@@ -81,6 +81,11 @@
                     <a href="${videos_url}">${_("Video Uploads")}</a>
                   </li>
                   % endif
+                  % if pages_and_resources_mfe_link:
+                  <li class="nav-item nav-course-courseware-pages-resources">
+                    <a href="${pages_and_resources_mfe_link}" rel="external">${_("Pages & Resources")}</a>
+                  </li>
+                  % endif
                 </ul>
               </div>
             </div>
