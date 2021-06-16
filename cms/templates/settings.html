@@ -210,6 +210,31 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
           </fieldset>
         </div>
 
+        <div class="group-settings pacing">
+          <fieldset role="radiogroup">
+            <legend>
+              <header>
+                <h2 class="title-2">${_("Course Plan Release")}</h2>
+                <span class="tip">${_("Set the plan release for this course")}</span>
+              </header>
+            </legend>
+            <span class="msg" id="plan-release-toggle-tip"></span>
+
+            <ol class="list-input">
+                <li class="field">
+                  <input type="radio" class="field-radio" name="plan-release" id="course-release-full-release" value="false" aria-labelledby="course-release-full-release-label" />
+                  <label id="course-release-full-release-label" class="course-pace-label" for="course-release-full-release">${_("Full release")}</label>
+                  <span class="tip">${_("Course's section will be release as normal.")}</span>
+                </li>
+                <li class="field">
+                  <input type="radio" class="field-radio" name="plan-release" id="course-release-plan-release" value="true" aria-labelledby="course-release-plan-release-label"/>
+                  <label id="course-release-plan-release-label" class="course-pace-label" for="course-release-plan-release">${_("Plan release")}</label>
+                  <span class="tip">${_("Course's section will be release as plan, the second section will be release in the beginning of second month, the third section will be release in the beginning of third month and so on ...")}</span>
+                </li>
+            </ol>
+          </fieldset>
+        </div>
+
         <hr class="divide" />
 
         <div id="schedule" class="group-settings schedule">
