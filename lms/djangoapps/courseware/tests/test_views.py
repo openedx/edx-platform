@@ -473,7 +473,7 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
 
     def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        self.lms_url = reverse(  # pylint: disable=attribute-defined-outside-init
+        lms_url = reverse(
             'courseware_section',
             kwargs={
                 'course_id': str(self.course_key),
@@ -481,14 +481,14 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
                 'section': str(self.section2.location.block_id),
             }
         )
-        self.mfe_url = '{}/course/{}/{}'.format(  # pylint: disable=attribute-defined-outside-init
+        mfe_url = '{}/course/{}/{}'.format(
             settings.LEARNING_MICROFRONTEND_URL,
             self.course_key,
             self.section2.location
         )
-        self.preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + self.lms_url  # pylint: disable=attribute-defined-outside-init
+        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
 
-        return self.lms_url, self.mfe_url, self.preview_url
+        return lms_url, mfe_url, preview_url
 
 
 @ddt.ddt
@@ -3573,7 +3573,16 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
 
 @ddt.ddt
-class PreviewRedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class PreviewRedirectTests(BaseViewsTestCase):
+    """
+    Make sure we're redirecting to the Legacy view for course previews.
+
+    The user should always be redirected to the Legacy view as long as they are
+    part of the two following groups:
+
+    * user is global staff member
+    * user is member of the course team
+    """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_staff_no_redirect(self):
