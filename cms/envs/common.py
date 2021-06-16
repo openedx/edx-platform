@@ -1587,9 +1587,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
-    'openedx.core.djangoapps.content_libraries',
-    'openedx.core.djangoapps.bookmarks',
-    'openedx.core.djangoapps.theming',
+    # 'openedx.core.djangoapps.content_libraries',
+    # 'openedx.core.djangoapps.bookmarks',
+    # 'openedx.core.djangoapps.theming',
 ]
 
 

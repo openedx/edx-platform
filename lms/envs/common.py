@@ -3091,9 +3091,10 @@ INSTALLED_APPS = [
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
 
-    'openedx.core.djangoapps.content_libraries',
-    'openedx.core.djangoapps.bookmarks',
-    'openedx.core.djangoapps.theming',
+
+    # 'openedx.core.djangoapps.content_libraries',
+    # 'openedx.core.djangoapps.bookmarks',
+    # 'openedx.core.djangoapps.theming',
 
 ]
 
