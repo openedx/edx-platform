@@ -86,6 +86,9 @@ social-auth-core<4.0.0  # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
 # celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
 click<8.0.0
 
+# https://openedx.atlassian.net/servicedesk/customer/portal/9/CR-3776
+edx-proctoring==3.13.2
+
 # constraints present due to Python35 support. Need to be tested and removed independently.
 
 celery<5.0              # celery 5.0 has dropped python3.5 support.
