@@ -21,3 +21,6 @@ rules.add_perm('applications.view_workexperience', rules.is_staff)
 
 # Business Line
 rules.add_perm('applications.view_businessline', rules.is_staff)
+
+# References
+rules.add_perm('applications.view_reference', rules.is_staff)

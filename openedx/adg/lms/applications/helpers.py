@@ -25,6 +25,7 @@ from .constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
     BACKGROUND_QUESTION_TITLE,
+    BU_PREREQ_COURSES_TITLE,
     COMPLETED,
     IN_PROGRESS,
     LOCKED,
@@ -38,6 +39,7 @@ from .constants import (
     PREREQUISITE_COURSES_COMPLETION_CONGRATS,
     PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
     PREREQUISITE_COURSES_COMPLETION_MSG,
+    PROGRAM_PREREQ_COURSES_TITLE,
     RETAKE,
     RETAKE_COURSE_MESSAGE,
     SCORES,
@@ -634,8 +636,8 @@ def create_html_string_for_course_scores_in_admin_review(user_application):
     program_prereq_scores = user_application.program_prereq_course_scores
     bu_prereq_scores = user_application.bu_prereq_course_scores
     prereq_scores_container_with_course_type = [
-        (program_prereq_scores, '<strong>Program Prerequisite Courses:</strong>'),
-        (bu_prereq_scores, '<strong>Business Unit Prerequisite Courses:</strong>'),
+        (program_prereq_scores, PROGRAM_PREREQ_COURSES_TITLE),
+        (bu_prereq_scores, BU_PREREQ_COURSES_TITLE),
     ]
 
     for prereq_scores, courses_type in prereq_scores_container_with_course_type:

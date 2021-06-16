@@ -18,6 +18,7 @@ from openedx.adg.lms.applications.constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
     BACKGROUND_QUESTION_TITLE,
+    BU_PREREQ_COURSES_TITLE,
     COMPLETED,
     FILE_MAX_SIZE,
     IN_PROGRESS,
@@ -32,6 +33,7 @@ from openedx.adg.lms.applications.constants import (
     PREREQUISITE_COURSES_COMPLETION_CONGRATS,
     PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
     PREREQUISITE_COURSES_COMPLETION_MSG,
+    PROGRAM_PREREQ_COURSES_TITLE,
     RETAKE,
     RETAKE_COURSE_MESSAGE,
     SCORES,
@@ -673,14 +675,14 @@ def test_create_html_string_for_course_scores_in_admin_review(program_prereq_sco
     expected_html = ''
     if program_prereq_scores:
         user_application.program_prereq_course_scores = [CourseScore(test_course_1.display_name, course_percentage)]
-        expected_html += '<br><strong>Program Prerequisite Courses:</strong>'
+        expected_html += f'<br>{PROGRAM_PREREQ_COURSES_TITLE}'
         expected_html += html_for_score.format(course_name=test_course_1.display_name, score=course_percentage)
     else:
         user_application.program_prereq_course_scores = []
 
     if bu_prereq_scores:
         user_application.bu_prereq_course_scores = [CourseScore(test_course_2.display_name, course_percentage)]
-        expected_html += '<br><strong>Business Unit Prerequisite Courses:</strong>'
+        expected_html += f'<br>{BU_PREREQ_COURSES_TITLE}'
         expected_html += html_for_score.format(course_name=test_course_2.display_name, score=course_percentage)
     else:
         user_application.bu_prereq_course_scores = []

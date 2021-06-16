@@ -342,8 +342,7 @@ def test_is_saudi_national(user_application, saudi_national, expected_answer):
     """
     Test that if the applicant is a Saudi national, `is_saudi_national` field method should return 'Yes'; 'No' otherwise
     """
-    extended_profile = ExtendedUserProfileFactory()
-    extended_profile.user = user_application.user
+    extended_profile = ExtendedUserProfileFactory(user=user_application.user)
     extended_profile.saudi_national = saudi_national
 
     actual_answer = UserApplicationADGAdmin.is_saudi_national('self', user_application)
@@ -388,8 +387,7 @@ def test_date_of_birth(user_application, current_date):
     """
     Test the the `date_of_birth` field method returns the birth date of the applicant in the correct format.
     """
-    extended_profile = ExtendedUserProfileFactory()
-    extended_profile.user = user_application.user
+    extended_profile = ExtendedUserProfileFactory(user=user_application.user)
     extended_profile.birth_date = current_date
 
     expected_date_of_birth = extended_profile.birth_date.strftime(DAY_MONTH_YEAR_FORMAT)
@@ -415,8 +413,7 @@ def test_hear_about_omni(user_application):
     Test that the `hear_about_omni` field method returns the added text in the field, if
     any, for the applicant
     """
-    extended_profile = ExtendedUserProfileFactory()
-    extended_profile.user = user_application.user
+    extended_profile = ExtendedUserProfileFactory(user=user_application.user)
     extended_profile.hear_about_omni = TEST_HEAR_ABOUT_OMNI
     actual_hear_about_omni_value = UserApplicationADGAdmin.hear_about_omni('self', user_application)
 

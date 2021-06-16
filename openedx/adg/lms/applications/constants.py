@@ -115,3 +115,6 @@ NOT_STARTED = _('Not Started')
 IN_PROGRESS = _('In Progress')
 RETAKE = _('Re-Take Course')
 COMPLETED = _('Completed')
+
+PROGRAM_PREREQ_COURSES_TITLE = f'<strong>{_("Program Prerequisite Courses:")}</strong>'
+BU_PREREQ_COURSES_TITLE = f'<strong>{_("Business Unit Prerequisite Courses:")}</strong>'
