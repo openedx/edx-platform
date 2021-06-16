@@ -533,7 +533,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     def hear_about_omni(self, obj):
         return obj.user.extended_profile.hear_about_omni
 
-    hear_about_omni.short_description = _('How did you hear about us?')
+    hear_about_omni.short_description = _('How did you hear about this program?')
 
     def prerequisites(self, obj):
         """
