@@ -16,10 +16,11 @@ from django.test import RequestFactory, override_settings, TestCase
 from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -37,7 +38,6 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from common.djangoapps.student.tests.factories import UserFactory
 
 from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
@@ -412,9 +412,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         Creates a basic course structure for our course
         """
         super().setUp()
-        self.add_course_content()
 
-    def add_course_content(self):
         self.section = ItemFactory.create(
             parent=self.course,
             category='chapter',
@@ -448,15 +446,6 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         Creates a basic course structure for our course
         """
         super().setUp()
-        self.course = CourseFactory.create(
-            mobile_available=True,
-            static_asset_path="needed_for_split",
-            end=datetime.datetime.now(pytz.UTC),
-            certificate_available_date=datetime.datetime.now(pytz.UTC)
-        )
-        self.user = UserFactory.create(username='course-status-user')
-        self.username = self.user.username
-        self.add_course_content()
 
     def test_success_v0(self):
         self.login_and_enroll()
@@ -473,23 +462,47 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response(api_version=API_V1)
         assert response.data['last_visited_block_id'] == str(self.unit.location)
 
-    # By inheriting from ModuleStoreTestCase and APITestCase this class is atomic by default
-    # By overriding following methods we are making this class non atomic since CourseStatusGET get is non atomic.
-    @classmethod
-    def setUpClass(cls):
-        super(TestCase, cls).setUpClass()  # pylint: disable=bad-super-call
-        cls.start_cache_isolation()  # call this from CacheIsolationMixin
+    def api_error_response(self, reverse_args=None, data=None, **kwargs):
+        url = self.reverse_url(reverse_args, **kwargs)
+        try:
+            self.url_method(url, data=data, **kwargs)
+            assert False
+        except Exception:
+            assert True
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.end_cache_isolation()  # call this from CacheIsolationMixin
-        super(TestCase, cls).tearDownClass()  # pylint: disable=bad-super-call
+    def test_invalid_user(self):
+        self.login_and_enroll()
+        self.api_error_response(username='no_user')
 
-    def _fixture_setup(self):
-        return super(TestCase, self)._fixture_setup()  # pylint: disable=bad-super-call
+    def test_other_user(self):
+        # login and enroll as the test user
+        self.login_and_enroll()
+        self.logout()
 
-    def _fixture_teardown(self):
-        return super(TestCase, self)._fixture_teardown()  # pylint: disable=bad-super-call
+        # login and enroll as another user
+        other = UserFactory.create()
+        self.client.login(username=other.username, password='test')
+        self.enroll()
+        self.logout()
+
+        # now login and call the API as the test user
+        self.login()
+        self.api_error_response(username=other.username)
+
+    def test_course_not_found(self):
+        non_existent_course_id = CourseKey.from_string('a/b/c')
+        self.init_course_access(course_id=non_existent_course_id)
+
+        self.api_error_response(course_id=non_existent_course_id)
+
+    def test_unenrolled_user(self):
+        self.login()
+        self.unenroll()
+        self.api_error_response(expected_response_code=None)
+
+    def test_no_auth(self):
+        self.logout()
+        self.api_error_response()
 
 
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
