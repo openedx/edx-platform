@@ -21,6 +21,8 @@ FILE_MAX_SIZE = 4 * 1024 * 1024
 
 APPLICANT_INFO = _('APPLICANT INFORMATION')
 
+BACKGROUND_QUESTION_TITLE = _('BACKGROUND QUESTION')
+
 INTEREST = _('INTEREST IN BUSINESS LINE')
 
 SCORES = _('SCORES')
@@ -38,6 +40,8 @@ ORGANIZATION = 'organization'
 APPLYING_TO = 'applying_to'
 INTEREST_IN_BUSINESS = 'interest_in_business'
 PREREQUISITES = 'prerequisites'
+HEAR_ABOUT_OMNI = 'hear_about_omni'
+BACKGROUND_QUESTION = 'background_question'
 
 # Application listing page titles
 
@@ -111,3 +115,6 @@ NOT_STARTED = _('Not Started')
 IN_PROGRESS = _('In Progress')
 RETAKE = _('Re-Take Course')
 COMPLETED = _('Completed')
+
+PROGRAM_PREREQ_COURSES_TITLE = f'<strong>{_("Program Prerequisite Courses:")}</strong>'
+BU_PREREQ_COURSES_TITLE = f'<strong>{_("Business Unit Prerequisite Courses:")}</strong>'

@@ -20,11 +20,15 @@ NOTE = 'Test note'
 LINKED_IN_URL = 'Test LinkedIn URL'
 
 ALL_FIELDSETS = (
-    'preliminary_info_fieldset', 'applicant_info_fieldset', 'interest_fieldset', 'scores_fieldset'
+    'preliminary_info_fieldset',
+    'applicant_info_fieldset',
+    'background_question_fieldset',
+    'interest_fieldset',
+    'scores_fieldset',
 )
 
 TEST_INTEREST_IN_BUSINESS = 'Test Interest in Business'
-
+TEST_HEAR_ABOUT_OMNI = 'Test Hear about Omni'
 TEST_BACKGROUND_QUESTION = 'Test background question'
 
 TEST_TEXT_INPUT = 'Test '

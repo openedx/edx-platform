@@ -10,13 +10,11 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from common.djangoapps.student.models import UserProfile
-from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.grade_utils import round_away_from_zero
 
-from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
-from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
+from .constants import ALLOWED_LOGO_EXTENSIONS
+from .helpers import get_user_scores_for_courses, max_year_value_validator, min_year_value_validator, validate_logo_size
 from .managers import MultilingualCourseGroupManager, MultilingualCourseManager, SubmittedApplicationsManager
 
 
@@ -97,8 +95,18 @@ class ApplicationHub(TimeStampedModel):
         """
         return hasattr(self.user, 'application')
 
+    @property
+    def are_program_and_bu_prereq_courses_completed(self):
+        """
+        Checks if both the program and the business unit prerequisite courses have been completed
+
+        Returns:
+             Boolean: True if prereq courses are passed and False otherwise
+        """
+        return self.is_prerequisite_courses_passed and self.is_bu_prerequisite_courses_passed
+
     def __str__(self):
-        return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
+        return 'User {user_id}, application status id={id}'.format(user_id=self.user_id, id=self.id)
 
 
 class BusinessLine(TimeStampedModel):
@@ -187,25 +195,31 @@ class UserApplication(TimeStampedModel):
         return '{}'.format(self.user.profile.name)  # pylint: disable=E1101
 
     @property
-    def prereq_course_scores(self):
+    def program_prereq_course_scores(self):
         """
         Fetch and return applicant scores in the pre-requisite courses of the franchise program.
 
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = MultilingualCourseGroup.objects.get_user_program_prereq_courses(self.user)
-        scores_in_prereq_courses = []
+        program_prereq_course_overviews = MultilingualCourseGroup.objects.get_user_program_prereq_courses(self.user)
+        scores_in_program_prereq_courses = get_user_scores_for_courses(self.user, program_prereq_course_overviews)
+        return scores_in_program_prereq_courses
 
-        for course_overview in prereq_course_overviews:
-            course_name = course_overview.display_name
-            course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
-            course_percentage = int(round_away_from_zero(course_grade.percent * 100))
+    @property
+    def bu_prereq_course_scores(self):
+        """
+        Fetch and return applicant scores in the business unit pre-requisite courses. This
+        includes both common and business line specific prereq courses
 
-            course_score = CourseScore(course_name, course_percentage)
-            scores_in_prereq_courses.append(course_score)
+        Returns:
+            list: Prereq course name and score pairs
+        """
+        bu_prereq_course_overviews = MultilingualCourseGroup.objects. \
+            get_user_business_line_and_common_business_line_prereq_courses(self.user)
 
-        return scores_in_prereq_courses
+        scores_in_bu_prereq_courses = get_user_scores_for_courses(self.user, bu_prereq_course_overviews)
+        return scores_in_bu_prereq_courses
 
     @property
     def has_work_experience(self):
