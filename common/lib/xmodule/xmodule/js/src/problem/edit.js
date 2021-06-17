@@ -403,7 +403,7 @@
                         if (line.length > 0) {
                             textHint = extractHint(line, true);
                             if (!textHint.nothint) {
-                                throw new Error(gettext("One of the provided options doesn't have a valid text value"));
+                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
                             }
                             correctstr = ' correct="' + (textHint.parens ? 'True' : 'False') + '"';
                             hintstr = '';
@@ -438,7 +438,7 @@
                         if (options[i].length > 0) {
                             value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
                             if (!value) {
-                                throw new Error(gettext("One of the provided options doesn't have a valid text value"));
+                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
                             }
                             inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
                             correct = /x/i.test(inparens);
@@ -501,7 +501,7 @@
 
                             value = options[i].split(/^\s*\[.?\]\s*/)[1];
                             if (!value) {
-                                throw new Error(gettext("One of the provided options doesn't have a valid text value"));
+                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
                             }
                             correct = /^\s*\[x\]/i.test(options[i]);
                             hints = '';

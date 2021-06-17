@@ -177,7 +177,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                     data = editorView.getXBlockFieldData();
                 } catch (e) {
                     ViewUtils.showErrorMeassage(
-                        gettext("Studio's having trouble while parsing the problem content"),
+                        gettext("Studio's having trouble parsing the problem component's content"),
                         e.message,
                         10000
                     );

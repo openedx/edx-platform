@@ -1055,7 +1055,7 @@ third
 [ ] Finnish\
 `
       expect(function(){ MarkdownEditingDescriptor.markdownToXml(problemContent); }).toThrow(
-        new Error(gettext("One of the provided options doesn't have a valid text value"))
+        new Error(gettext("An answer option has been left blank. Please review and edit the component."))
       );
 
       problemContent = `\
@@ -1065,7 +1065,7 @@ third
 ( ) Finnish\
 `
       expect(function(){ MarkdownEditingDescriptor.markdownToXml(problemContent); }).toThrow(
-        new Error(gettext("One of the provided options doesn't have a valid text value"))
+        new Error(gettext("An answer option has been left blank. Please review and edit the component."))
       );
     });
   });
