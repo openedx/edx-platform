@@ -2,6 +2,7 @@
 
 
 import logging
+from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
@@ -115,4 +116,12 @@ def get_course_final_price(user, sku, course_price):
         user.username,
         price_details.get('total_incl_tax')
     )
-    return price_details.get('total_incl_tax', course_price)
+    result = price_details.get('total_incl_tax', course_price)
+
+    # When ecommerce price has zero cents, 'result' gets 149.0
+    # As per REV-2260: if zero cents, then only show dollars
+    cents = Decimal(result) % 1
+    if cents == 0:
+        result = int(result)
+
+    return result
