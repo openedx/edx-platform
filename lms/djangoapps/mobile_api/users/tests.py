@@ -11,6 +11,7 @@ import ddt
 import pytz
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
+from django.db import transaction
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings, TestCase
 from django.utils import timezone
@@ -462,12 +463,14 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response(api_version=API_V1)
         assert response.data['last_visited_block_id'] == str(self.unit.location)
 
+    # Since we are testing an non atomic view in atomic test case, therefore we are expecting error on failures
     def api_error_response(self, reverse_args=None, data=None, **kwargs):
         url = self.reverse_url(reverse_args, **kwargs)
         try:
-            self.url_method(url, data=data, **kwargs)
-            assert False
-        except Exception:
+            with transaction.atomic():
+                self.url_method(url, data=data, **kwargs)
+                assert False
+        except transaction.TransactionManagementError:
             assert True
 
     def test_invalid_user(self):
