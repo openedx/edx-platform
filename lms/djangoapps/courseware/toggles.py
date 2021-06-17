@@ -4,7 +4,6 @@ Toggles for courseware in-course experience.
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace, SettingToggle
 from opaque_keys.edx.keys import CourseKey
-from django.conf import settings
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -125,8 +124,6 @@ COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS = CourseWaffleFlag(
 COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
 )
-
-PREVIEW_BASE = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
 
 
 def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
