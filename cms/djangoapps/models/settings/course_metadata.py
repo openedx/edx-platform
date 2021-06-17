@@ -13,9 +13,9 @@ from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from openedx.core.djangoapps.discussions.config.waffle import OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
+from openedx.core.djangoapps.discussions.config.waffle import OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, \
+    ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore

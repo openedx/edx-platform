@@ -14,11 +14,11 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
