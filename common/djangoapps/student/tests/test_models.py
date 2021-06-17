@@ -262,7 +262,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.request = mock.Mock()
+        self.request = mock.MagicMock()
         self.request.user = self.user
         CourseEnrollmentFactory(course_id=self.course_key)
         UserCelebration.STREAK_LENGTHS_TO_CELEBRATE = [3]
