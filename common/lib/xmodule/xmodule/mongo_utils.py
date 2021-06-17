@@ -3,7 +3,6 @@ Common MongoDB connection functions.
 """
 
 
-import ssl
 import logging
 
 import pymongo
@@ -73,7 +72,6 @@ def connect_to_mongodb(
             port=port,
             tz_aware=tz_aware,
             document_class=dict,
-            tlsAllowInvalidCertificates=True,
             **kwargs
         ),
         db
@@ -84,7 +82,6 @@ def connect_to_mongodb(
             mongo_conn,
             wait_time=retry_wait_time
         )
-
     # If credentials were provided, authenticate the user.
     if user is not None and password is not None:
         mongo_conn.authenticate(user, password, source=auth_source)
