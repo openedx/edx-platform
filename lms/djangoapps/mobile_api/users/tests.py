@@ -13,7 +13,7 @@ from completion.test_utils import CompletionWaffleTestMixin, submit_completions_
 from django.conf import settings
 from django.db import transaction
 from django.template import defaultfilters
-from django.test import RequestFactory, override_settings, TestCase
+from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -442,12 +442,6 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     Tests for GET of /api/mobile/v<version_number>/users/<user_name>/course_status_info/{course_id}
     """
 
-    def setUp(self):
-        """
-        Creates a basic course structure for our course
-        """
-        super().setUp()
-
     def test_success_v0(self):
         self.login_and_enroll()
 
@@ -465,6 +459,9 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
     # Since we are testing an non atomic view in atomic test case, therefore we are expecting error on failures
     def api_error_response(self, reverse_args=None, data=None, **kwargs):
+        """
+            Same as api response from MobileAPITestCase but handle views which throw errors
+        """
         url = self.reverse_url(reverse_args, **kwargs)
         try:
             with transaction.atomic():
