@@ -13,6 +13,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
             CreateUtilsFactory.call(this, selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors);
 
             this.setupOrgAutocomplete = function() {
+                $(selectors.org).find('option:not(:first)').remove();
                 $.getJSON('/organizations', function(data) {
                     $.each(data, function(i, item) {
                     $(selectors.org).append(
