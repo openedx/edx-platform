@@ -264,13 +264,13 @@ class DjangoStorageReportStore(ReportStore):
             getattr(settings, config_name).get('STORAGE_KWARGS'),
         )
 
-    def store(self, course_id, filename, buff):
+    def store(self, course_id, filename, buff, parent_dir=''):
         """
         Store the contents of `buff` in a directory determined by hashing
         `course_id`, and name the file `filename`. `buff` can be any file-like
         object, ready to be read from the beginning.
         """
-        path = self.path_to(course_id, filename)
+        path = self.path_to(course_id, filename, parent_dir)
         # See https://github.com/boto/boto/issues/2868
         # Boto doesn't play nice with unicode in python3
         buff_contents = buff.read()
@@ -282,7 +282,7 @@ class DjangoStorageReportStore(ReportStore):
 
         self.storage.save(path, buff)
 
-    def store_rows(self, course_id, filename, rows):
+    def store_rows(self, course_id, filename, rows, parent_dir=''):
         """
         Given a course_id, filename, and rows (each row is an iterable of
         strings), write the rows to the storage backend in csv format.
@@ -291,7 +291,7 @@ class DjangoStorageReportStore(ReportStore):
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
-        self.store(course_id, filename, output_buffer)
+        self.store(course_id, filename, output_buffer, parent_dir)
 
     def links_for(self, course_id):
         """
@@ -321,9 +321,10 @@ class DjangoStorageReportStore(ReportStore):
             for filename, full_path in files
         ]
 
-    def path_to(self, course_id, filename=''):
+    def path_to(self, course_id, filename='', parent_dir=''):
         """
         Return the full path to a given file for a given course.
         """
         hashed_course_id = hashlib.sha1(str(course_id).encode('utf-8')).hexdigest()
-        return os.path.join(hashed_course_id, filename)
+        directory = parent_dir if bool(parent_dir) else hashed_course_id
+        return os.path.join(directory, filename)

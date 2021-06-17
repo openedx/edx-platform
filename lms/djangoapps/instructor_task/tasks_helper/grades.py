@@ -184,9 +184,9 @@ class GradeReportBase:
         Creates and uploads a CSV for the given headers and rows.
         """
         date = datetime.now(UTC)
-        upload_csv_to_report_store(success_rows, context.file_name, context.course_id, date)
+        upload_csv_to_report_store(success_rows, context.upload_filename, context.course_id, date)
         if len(error_rows) > 1:
-            upload_csv_to_report_store(error_rows, context.file_name + '_err', context.course_id, date)
+            upload_csv_to_report_store(error_rows, context.upload_filename + '_err', context.course_id, date)
 
     def log_additional_info_for_testing(self, context, message):
         """
@@ -221,6 +221,8 @@ class _CourseGradeReportContext:
         self.course_id = course_id
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
         self.report_for_verified_only = course_grade_report_verified_only(self.course_id)
+        self.upload_parent_dir = _task_input.get('upload_parent_dir', '')
+        self.upload_filename = _task_input.get('filename', 'grade_report')
 
     @lazy
     def course(self):
@@ -314,7 +316,8 @@ class _ProblemGradeReportContext:
         self.course_id = course_id
         self.report_for_verified_only = problem_grade_report_verified_only(self.course_id)
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
-        self.file_name = 'problem_grade_report'
+        self.upload_filename = _task_input.get('filename', 'problem_grade_report')
+        self.upload_dir = _task_input.get('upload_parent_dir', '')
 
     @lazy
     def course(self):
@@ -482,10 +485,21 @@ class CourseGradeReport:
         Creates and uploads a CSV for the given headers and rows.
         """
         date = datetime.now(UTC)
-        upload_csv_to_report_store([success_headers] + success_rows, 'grade_report', context.course_id, date)
+        upload_csv_to_report_store(
+            [success_headers] + success_rows,
+            context.upload_filename,
+            context.course_id,
+            date,
+            parent_dir=context.upload_parent_dir
+        )
         if len(error_rows) > 0:
-            error_rows = [error_headers] + error_rows
-            upload_csv_to_report_store(error_rows, 'grade_report_err', context.course_id, date)
+            upload_csv_to_report_store(
+                [error_headers] + error_rows,
+                '{}_err'.format(context.upload_filename),
+                context.course_id,
+                date,
+                parent_dir=context.upload_parent_dir
+            )
 
     def _grades_header(self, context):
         """
