@@ -52,7 +52,8 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
-from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, \
+    OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -140,7 +141,12 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             _section_cohort_management(course, access),
             _section_student_admin(course, access),
         ]
-        if not ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_key):
+
+        discussion_section_visible = bool((ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_key) and
+                                          OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG.is_enabled(course_key)) or not
+                                          ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(course_key))
+
+        if discussion_section_visible:
             sections_content.append(_section_discussions_management(course, access))
         sections.extend(sections_content)
 

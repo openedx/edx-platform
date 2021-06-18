@@ -2,7 +2,6 @@
 Unit tests for instructor_dashboard.py.
 """
 
-
 import datetime
 import re
 from unittest.mock import patch
@@ -30,6 +29,9 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, \
+    OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
@@ -104,6 +106,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Verify that the instructor tab appears for staff only.
         """
+
         def has_instructor_tab(user, course):
             """Returns true if the "Instructor" tab is shown."""
             tabs = get_course_tab_list(user, course)
@@ -136,6 +139,33 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         assert has_instructor_tab(org_researcher, self.course)
 
     @ddt.data(
+        ('staff', False, False, True),
+        ('staff', True, False, False),
+        ('staff', True, True, True),
+    )
+    @ddt.unpack
+    def test_discussion_tab(self, access_role, is_pages_and_resources_enabled, is_legacy_discussion_setting_enabled,
+                            is_discussion_tab_available):
+        """
+        Verify that the Discussion tab only shows up when Pages & Resources flag is off for course
+        """
+        discussion_section = '<li class="nav-item"><button type="button" class="btn-link discussions_management" ' \
+                             'data-section="discussions_management">Discussions</button></li>'
+
+        with override_waffle_flag(ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, is_pages_and_resources_enabled):
+            with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
+                CourseAccessRoleFactory(
+                    course_id=self.course.id,
+                    user=self.user,
+                    role=access_role,
+                    org=self.course.id.org
+                )
+                set_course_cohorted(self.course.id, True)
+                self.client.login(username=self.user.username, password='test')
+                response = self.client.get(self.url).content.decode('utf-8')
+                self.assertEqual(discussion_section in response, is_discussion_tab_available)
+
+    @ddt.data(
         ('staff', False, False),
         ('instructor', False, False),
         ('data_researcher', True, False),
@@ -154,7 +184,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             download_section = '<li class="nav-item"><button type="button" class="btn-link data_download" ' \
                                'data-section="data_download">Data Download</button></li>'
             if waffle_status:
-                download_section = '<li class="nav-item"><button type="button" class="btn-link data_download_2" '\
+                download_section = '<li class="nav-item"><button type="button" class="btn-link data_download_2" ' \
                                    'data-section="data_download_2">Data Download</button></li>'
             user = UserFactory.create(is_staff=access_role == 'global_staff')
             CourseAccessRoleFactory(
@@ -438,7 +468,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     )
     @ddt.unpack
     def test_ccx_coaches_option_on_admin_list_management_instructor(
-            self, ccx_feature_flag, enable_ccx, expected_result
+        self, ccx_feature_flag, enable_ccx, expected_result
     ):
         """
         Test whether the "CCX Coaches" option is visible or hidden depending on the value of course.enable_ccx.
