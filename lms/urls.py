@@ -960,10 +960,15 @@ urlpatterns += [
 ]
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
+    # pylint: disable=import-error
     import debug_toolbar
-
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
+
+if 'silk' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^silk/', include('silk.urls', namespace='silk'))
     ]
 
 if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):

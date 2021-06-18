@@ -270,8 +270,14 @@ if settings.DEBUG:
     )
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
+    # pylint: disable=import-error
     import debug_toolbar
     urlpatterns.append(url(r'^__debug__/', include(debug_toolbar.urls)))
+
+if 'silk' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^silk/', include('silk.urls', namespace='silk'))
+    ]
 
 # UX reference templates
 urlpatterns.append(url(r'^template/(?P<template>.+)$', openedx.core.djangoapps.debug.views.show_reference_template,
@@ -291,5 +297,6 @@ if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
         url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
     ]
 
+# pylint: disable=wrong-import-position
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))

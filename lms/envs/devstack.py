@@ -1,3 +1,4 @@
+# pylint: disable=E266
 """
 Specific overrides to the base prod settings to make development easier.
 """
@@ -80,6 +81,11 @@ MIDDLEWARE += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+################################ DJANGO SILK ################################
+if DEBUG:
+    INSTALLED_APPS += ['silk']
+    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
 INTERNAL_IPS = ('127.0.0.1',)
 
