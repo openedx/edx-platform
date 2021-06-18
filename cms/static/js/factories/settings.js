@@ -34,7 +34,8 @@ define([
                 editor.useV2CertDisplaySettings = useV2CertDisplaySettings;
                 editor.render();
             },
-            reset: true
+            reset: true,
+            cache: false
         });
     };
 });
