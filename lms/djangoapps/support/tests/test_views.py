@@ -24,6 +24,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_ENROLLED,
     CourseEnrollment,
     CourseEnrollmentAttribute,
     ManualEnrollmentAudit
@@ -329,7 +330,34 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
-    def test_change_enrollment(self, search_string_type):
+    def test_create_new_enrollment(self, search_string_type):
+        """
+        Assert that a new enrollment is created through post request endpoint.
+        """
+        test_user = UserFactory.create(username='newStudent', email='test2@example.com', password='test')
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(test_user.email) is None
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(test_user, search_string_type)}
+        )
+        response = self.client.post(url, data={
+            'course_id': str(self.course.id),
+            'mode': CourseMode.AUDIT,
+            'reason': 'Financial Assistance'
+        })
+        assert response.status_code == 200
+        manual_enrollment = ManualEnrollmentAudit.get_manual_enrollment_by_email(test_user.email)
+        assert manual_enrollment is not None
+        assert manual_enrollment.reason == response.json()['reason']
+        assert manual_enrollment.enrolled_email == 'test2@example.com'
+        assert manual_enrollment.state_transition == UNENROLLED_TO_ENROLLED
+
+    @disable_signal(signals, 'post_save')
+    @ddt.data('username', 'email')
+    def test_create_existing_enrollment(self, search_string_type):
+        """
+        Assert that a new enrollment is not created when an enrollment already exist for that course.
+        """
         assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
         url = reverse(
             'support:enrollment_list',
@@ -337,10 +365,29 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.post(url, data={
             'course_id': str(self.course.id),
+            'mode': CourseMode.AUDIT,
+            'reason': 'Financial Assistance'
+        })
+        assert response.status_code == 400
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
+
+    @disable_signal(signals, 'post_save')
+    @ddt.data('username', 'email')
+    def test_change_enrollment(self, search_string_type):
+        """
+        Assert changing mode for an enrollment.
+        """
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.patch(url, data={
+            'course_id': str(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
-        })
+        }, content_type='application/json')
         assert response.status_code == 200
         assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
         self.assert_enrollment(CourseMode.VERIFIED)
@@ -365,12 +412,12 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
-        response = self.client.post(url, data={
+        response = self.client.patch(url, data={
             'course_id': str(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
-        })
+        }, content_type='application/json')
         entitlement.refresh_from_db()
         assert response.status_code == 200
         assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
@@ -406,7 +453,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
             data['course_id'] = str(self.course.id)
-        response = self.client.post(self.url, data)
+        response = self.client.patch(self.url, data, content_type='application/json')
 
         assert response.status_code == 400
         assert re.match(error_message, response.content.decode('utf-8').replace("'", '').replace('"', '')) is not None
@@ -485,12 +532,12 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 ['Arizona State University'], 'You are now eligible for credit from Arizona State University'
             )
             mock_method.return_value = credit_provider
-            response = self.client.post(url, data={
+            response = self.client.patch(url, data={
                 'course_id': str(self.course.id),
                 'old_mode': CourseMode.AUDIT,
                 'new_mode': new_mode,
                 'reason': 'Financial Assistance'
-            })
+            }, content_type='application/json')
 
         assert response.status_code == 200
         assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
