@@ -1,18 +1,25 @@
-from django.contrib.auth.models import User
+"""
+Views for Admin Panel API
+"""
+from django.contrib.auth.models import Group, User
+from django.db.models import F, Prefetch
 from django.db.models.query_utils import Q
-from django.db.models import F
-from rest_framework import viewsets, status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from organizations.models import Organization
+from rest_framework import status, viewsets
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from .constants import GROUP_TRAINING_MANAGERS, ADMIN, STAFF, TRAINING_MANAGER, LEARNER
-from .permissions import CanAccessPakXAdminPanel
+from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
 from .pagination import PakxAdminAppPagination
+from .permissions import CanAccessPakXAdminPanel
 from .serializers import UserSerializer
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    User view-set for user listing/create/update/active/de-active
+    """
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
     pagination_class = PakxAdminAppPagination
@@ -55,12 +62,21 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             queryset = User.objects.all()
         else:
+            org = Organization.objects.get(user_profiles__user=self.request.user)
             queryset = User.objects.filter(
-                attributes__name="org",
-                attributes__value=self.request.user.attributes.filter(name="org").first().value
+                profile__organization=org
             )
 
-        return queryset.annotate(employee_id=F('profile__employee_id'), name=F('first_name')).order_by(*self.ordering)
+        group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN])
+        return queryset.select_related(
+            'profile'
+        ).prefetch_related(
+            Prefetch('groups', to_attr='staff_groups', queryset=group_qs),
+        ).annotate(
+            employee_id=F('profile__employee_id'), name=F('first_name')
+        ).order_by(
+            *self.ordering
+        )
 
     def activate_users(self, request, *args, **kwargs):
         return self.change_activation_status(True, request.data["ids"])
@@ -69,21 +85,31 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return self.change_activation_status(False, request.data["ids"])
 
     def get_roles_q_filters(self, roles):
+        """
+        return Q filter to be used for filter user queryset
+        :param roles: request params to filter roles
+        :return: Q filters
+        """
         qs = Q()
 
         for role in roles:
-            if int(role) == ADMIN:
-                qs |= Q(is_superuser=True)
-            elif int(role) == STAFF:
-                qs |= Q(is_staff=True)
+            if int(role) == ORG_ADMIN:
+                qs |= Q(groups__name=GROUP_ORGANIZATION_ADMIN)
             elif int(role) == LEARNER:
-                qs |= ~Q(Q(is_superuser=True) | Q(is_staff=True) | Q(groups__name=GROUP_TRAINING_MANAGERS))
+                qs |= ~Q(Q(is_superuser=True) | Q(is_staff=True) | Q(
+                    groups__name__in=[GROUP_TRAINING_MANAGERS, GROUP_TRAINING_MANAGERS]))
             elif int(role) == TRAINING_MANAGER:
                 qs |= Q(groups__name=GROUP_TRAINING_MANAGERS)
 
         return qs
 
     def change_activation_status(self, activation_status, ids):
+        """
+        method to change user activation status for given user IDs
+        :param activation_status: new boolean active status
+        :param ids: user IDs to be updated
+        :return: response with respective status
+        """
         if ids == "all":
             self.get_queryset().all().update(is_active=activation_status)
             return Response(status=status.HTTP_200_OK)

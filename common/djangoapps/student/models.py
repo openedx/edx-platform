@@ -55,6 +55,7 @@ from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
+from organizations.models import Organization
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
@@ -449,6 +450,9 @@ class UserProfile(models.Model):
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
     employee_id = models.CharField(blank=True, max_length=12, db_index=True)
+    organization = models.ForeignKey(
+        Organization, db_index=True, related_name='user_profiles', on_delete=models.CASCADE, null=True, blank=True
+    )
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default=u'course.xml')
