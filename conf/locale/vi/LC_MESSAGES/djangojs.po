@@ -2580,7 +2580,7 @@ msgstr "Đăng nhập vào {platform} để chúng tôi có thể hỗ trợ b�
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "Bạn có cần trợ giúp đăng nhập không?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -8630,11 +8630,11 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
-msgstr ""
+msgstr "Lần đầu tiên bạn ghé thăm trang này?"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
-msgstr ""
+msgstr "Tạo một tài khoản"
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"

@@ -26,7 +26,7 @@ module.exports = _.values(Merge.smart(commonConfig, {
         module: {
             rules: [
                 {
-                    test: /.scss$/,
+                    test: /(.scss|.css)$/,
                     include: [
                         /paragon/,
                         /font-awesome/

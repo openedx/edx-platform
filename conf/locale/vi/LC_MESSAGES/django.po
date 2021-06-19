@@ -456,6 +456,30 @@ msgstr ""
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "First time here"
+msgstr "Bạn chưa có tài khoản"
+
+msgid "Create an Account"
+msgstr "Taọ một tài khoản"
+
+msgid "First time here?"
+msgstr "Bạn chưa có tài khoản??"
+
+msgid "Create an Account."
+msgstr "Tạo một tài khoản.."
+
+msgid "Sign In"
+msgstr "Đăng nhập"
+
+msgid "Need help signing in"
+msgstr "Cần trợ giúp đăng nhập"
+
+msgid "Need help signing in?"
+msgstr "Cần trợ giúp đăng nhập??"
+
+msgid "Sign in with your company or school"
+msgstr "Đăng nhập với tài khoản của cơ quan hoặc trường học"
+
 msgid "Password"
 msgstr "Mật khẩu"
 
@@ -8467,8 +8491,8 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr ""
+# msgid "Sign In"
+# msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html

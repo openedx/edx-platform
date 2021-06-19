@@ -20,6 +20,15 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
+    "First time here?": "Lan dau ban ghe tham trang nay",
+    "Create an Account.": "Tao mot tai khoan",
+    "Sign In": "Dang nhap",
+    "Need help signing in?": "Ban can tro giup dang nhap",
+    "Need help logging in?": "Ban co can su tro giup dang nhap khong",
+    "First time here": "Lan dau ban ghe tham trang nay",
+    "Create an Account": "Tao mot tai khoan",
+    "Need help signing in": "Ban can tro giup dang nhap",
+    "Need help logging in": "Ban co can su tro giup dang nhap khong",
     " and ": "v\u00e0",
     " learner does not exist in LMS and not added to the exception list": " h\u1ecdc vi\u00ean kh\u00f4ng t\u1ed3n t\u1ea1i trong LMS v\u00e0 kh\u00f4ng \u0111\u01b0\u1ee3c th\u00eam v\u00e0o danh s\u00e1ch kh\u00f4ng h\u1ee3p l\u1ec7",
     " learner is already white listed and not added to the exception list": "\u00a0h\u1ecdc vi\u00ean \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u01b0a v\u00e0o danh s\u00e1ch tr\u1eafng v\u00e0 kh\u00f4ng \u0111\u01b0\u1ee3c th\u00eam v\u00e0o danh s\u00e1ch kh\u00f4ng h\u1ee3p l\u1ec7",
