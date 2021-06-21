@@ -354,7 +354,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_hide_learning_sequences(self):
         """
         Check that Learning Sequences filters out sequences.
