@@ -141,9 +141,9 @@ class RolesTestCase(TestCase):
         role.remove_users(self.student)
         assert not role.has_user(self.student)
 
-    def test_uupdate_org_role(self):
+    def test_update_org_role(self):
         """
-        Test uupdate_org_role
+        Test update_org_role
         """
         role = OrgContentCreatorRole()
         role.update_org_role(self.student, self.orgs)
