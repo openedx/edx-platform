@@ -4,7 +4,6 @@ Tests for Progress Tab API in the Course Home API
 
 import dateutil
 import ddt
-import mock
 from datetime import datetime, timedelta
 from pytz import UTC
 from unittest.mock import patch
@@ -18,15 +17,13 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.factories import ItemFactory
-
-CREDIT_SUPPORT_URL = 'https://support.edx.org/hc/en-us/sections/115004154688-Purchasing-Academic-Credit'
 
 
 @ddt.ddt
@@ -159,3 +156,30 @@ class ProgressTabTestViews(BaseCourseHomeTests):
 
         response = self.client.get(self.url)
         assert response.status_code == 404
+
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_learner_has_access(self):
+        chapter = ItemFactory(parent=self.course, category='chapter')
+        gated = ItemFactory(parent=chapter, category='sequential')
+        ItemFactory.create(parent=gated, category='problem', graded=True, has_score=True)
+        ungated = ItemFactory(parent=chapter, category='sequential')
+        ItemFactory.create(parent=ungated, category='problem', graded=True, has_score=True,
+                           group_access={
+                               CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access'],
+                                                             CONTENT_TYPE_GATE_GROUP_IDS['limited_access']],
+                           })
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        sections = response.data['section_scores']
+        ungraded_score = sections[0]['subsections'][0]  # default sequence that parent class gives us
+        gated_score = sections[1]['subsections'][0]
+        ungated_score = sections[1]['subsections'][1]
+        assert ungraded_score['learner_has_access']
+        assert not gated_score['learner_has_access']
+        assert ungated_score['learner_has_access']

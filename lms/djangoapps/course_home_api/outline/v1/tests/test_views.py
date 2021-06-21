@@ -17,7 +17,6 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
 from openedx.core.djangoapps.content.learning_sequences.toggles import USE_FOR_OUTLINES
@@ -354,7 +353,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_hide_learning_sequences(self):
         """
         Check that Learning Sequences filters out sequences.

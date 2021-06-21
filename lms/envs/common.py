@@ -2790,9 +2790,14 @@ YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
 ################################### APPS ######################################
 
-# The order of INSTALLED_APPS is important, when adding new apps here
-# remember to check that you are not creating new
+# The order of INSTALLED_APPS is important, when adding new apps here remember to check that you are not creating new
 # RemovedInDjango19Warnings in the test logs.
+#
+# If you want to add a new djangoapp that isn't suitable for everyone, you have some options:
+# - Add it to OPTIONAL_APPS below (registered if importable)
+# - Add it to the ADDL_INSTALLED_APPS configuration variable (acts like EXTRA_APPS in other IDAs)
+# - Make it a plugin (which are auto-registered) and add it to the EDXAPP_PRIVATE_REQUIREMENTS configuration variable
+#   (See https://github.com/edx/edx-django-utils/tree/master/edx_django_utils/plugins)
 INSTALLED_APPS = [
     # Standard ones that are always installed...
     'django.contrib.auth',
