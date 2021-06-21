@@ -48,13 +48,20 @@ class CourseCreatorForm(forms.ModelForm):
         all_orgs = self.cleaned_data.get("all_organizations")
         orgs = self.cleaned_data.get("organizations").exists()
         state = self.cleaned_data.get("state")
-        is_all_org_role_set = (orgs and all_orgs) or (not orgs and not all_orgs)
+        is_all_org_selected_with_orgs = (orgs and all_orgs)
+        is_orgs_added_with_all_orgs_selected = (not orgs and not all_orgs)
         is_state_granted = state == CourseCreator.GRANTED
-        if is_all_org_role_set and is_state_granted:
-            raise ValidationError(
-                "The role can be granted either to all organizations or to "
-                "specific organizations but not both."
-            )
+        if is_state_granted:
+            if is_all_org_selected_with_orgs:
+                raise ValidationError(
+                    "The role can be granted either to ALL Organizations or to "
+                    "specific organizations but not both."
+                )
+            if is_orgs_added_with_all_orgs_selected:
+                raise ValidationError(
+                    "Specific organizations needs to be selected to grant this role,"
+                    "if it is not granted to all organiztions"
+                )
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
@@ -116,7 +123,7 @@ admin.site.register(CourseCreator, CourseCreatorAdmin)
 
 
 @receiver(update_creator_state, sender=CourseCreator)
-def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def update_creator_group_callback(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Callback for when the model's creator status has changed.
     """
@@ -128,7 +135,7 @@ def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: di
 
 
 @receiver(send_user_notification, sender=CourseCreator)
-def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def send_user_notification_callback(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Callback for notifying user about course creator status change.
     """
@@ -156,7 +163,7 @@ def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: 
 
 
 @receiver(send_admin_notification, sender=CourseCreator)
-def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def send_admin_notification_callback(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Callback for notifying admin of a user in the 'pending' state.
     """
@@ -182,7 +189,7 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
 
 
 @receiver(m2m_changed, sender=CourseCreator.organizations.through)
-def course_creator_organizations_changed_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def course_creator_organizations_changed_callback(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Callback for addition and removal of orgs field.
     """
