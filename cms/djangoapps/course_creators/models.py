@@ -9,10 +9,10 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
-from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
+from organizations.models import Organization
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "state", "orgs"])
+update_creator_state = Signal(providing_args=["caller", "user", "state", "organizations"])
 
 # A signal that will be sent when admin should be notified of a pending user request
 send_admin_notification = Signal(providing_args=["user"])
@@ -47,11 +47,11 @@ class CourseCreator(models.Model):
                              help_text=_("Current course creator state"))
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
-    orgs = models.ManyToManyField(Organization, blank=True,
-                                  help_text=_("Organizations under which the user is allowed to create courses"))
+    organizations = models.ManyToManyField(Organization, blank=True,
+                                  help_text=_("Organizations under which the user is allowed to create courses."))
     all_organizations = models.BooleanField(default=True,
                                             help_text=_("Grant the user the permission to create courses "
-                                                        "in all organizations"))
+                                                        "in ALL organizations"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"
@@ -75,7 +75,7 @@ def post_save_callback(sender, **kwargs):
     instance = kwargs['instance']
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
-    # We need to keep track of all_organization switch if this switch is changed we are going to remove the
+    # We need to keep track of all_organization switch. If this switch is changed we are going to remove the
     # Course Creator group.
     if instance.state != instance.orig_state or instance.all_organizations != instance.orig_all_organizations:
         granted_state_change = instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED

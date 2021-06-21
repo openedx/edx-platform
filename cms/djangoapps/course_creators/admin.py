@@ -43,10 +43,10 @@ class CourseCreatorForm(forms.ModelForm):
 
     def clean(self):
         """
-        Validate the 'state', 'orgs' and 'all_orgs' field before saving.
+        Validate the 'state', 'organizations' and 'all_orgs' field before saving.
         """
         all_orgs = self.cleaned_data.get("all_organizations")
-        orgs = self.cleaned_data.get("orgs").exists()
+        orgs = self.cleaned_data.get("organizations").exists()
         state = self.cleaned_data.get("state")
         is_all_org_role_set = (orgs and all_orgs) or (not orgs and not all_orgs)
         is_state_granted = state == CourseCreator.GRANTED
@@ -64,7 +64,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
 
     # Fields to display on the overview page.
     list_display = ['username', get_email, 'state', 'state_changed', 'note', 'all_organizations']
-    filter_horizontal = ('orgs',)
+    filter_horizontal = ('organizations',)
     readonly_fields = ['username', 'state_changed']
     # Controls the order on the edit form (without this, read-only fields appear at the end).
     fieldsets = (
@@ -109,7 +109,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
         super().save_related(request, form, formsets, change)
         state = form.instance.state
         if state != CourseCreator.GRANTED:
-            form.instance.orgs.clear()
+            form.instance.organizations.clear()
 
 
 admin.site.register(CourseCreator, CourseCreatorAdmin)
@@ -181,14 +181,14 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
         log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
 
 
-@receiver(m2m_changed, sender=CourseCreator.orgs.through)
+@receiver(m2m_changed, sender=CourseCreator.organizations.through)
 def course_creator_organizations_changed_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Callback for addition and removal of orgs field.
     """
     instance = kwargs["instance"]
     action = kwargs["action"]
-    orgs = list(instance.orgs.all().values_list('short_name', flat=True))
+    orgs = list(instance.organizations.all().values_list('short_name', flat=True))
     updated_state = instance.state
     is_granted = updated_state == CourseCreator.GRANTED
     should_update_role = (
