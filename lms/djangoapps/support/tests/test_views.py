@@ -15,6 +15,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db.models import signals
 from django.http import HttpResponse
 from django.urls import reverse
+from django.test.utils import override_settings
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
 from social_django.models import UserSocialAuth
@@ -64,11 +65,14 @@ class SupportViewManageUserTests(SupportViewTestCase):
     Base class for support view tests.
     """
 
+    ZENDESK_URL = 'http://zendesk.example.com/'
+
     def setUp(self):
         """Make the user support staff"""
         super().setUp()
         SupportStaffRole().add_users(self.user)
 
+    @override_settings(ZENDESK_URL=ZENDESK_URL)
     def test_get_contact_us(self):
         """
         Tests Support View contact us Page
@@ -76,6 +80,14 @@ class SupportViewManageUserTests(SupportViewTestCase):
         url = reverse('support:contact_us')
         response = self.client.get(url)
         assert response.status_code == 200
+
+    def test_get_contact_us_redirect_if_undefined_zendesk_url(self):
+        """
+        Tests the Support contact us Page redirects if ZENDESK_URL setting is not defined
+        """
+        url = reverse('support:contact_us')
+        response = self.client.get(url)
+        assert response.status_code == 302
 
     def test_get_password_assistance(self):
         """
