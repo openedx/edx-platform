@@ -17,8 +17,8 @@ WAFFLE_NAMESPACE = LegacyWaffleFlagNamespace(name='discussions')
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-06-15
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warnings: Discussion settings will be visible when this flag is enabled with Pages & Resources flag enabled.
-# .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-8389
+# .. toggle_warnings: When the flag is ON, the discussion settings will be available on legacy experience.
+# .. toggle_tickets: TNL-8389
 OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG = CourseWaffleFlag(
     waffle_namespace=WAFFLE_NAMESPACE,
     flag_name='override_discussion_legacy_settings',
@@ -33,8 +33,8 @@ OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-05-24
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warnings: Also set settings.COURSE_AUTHORING_MICROFRONTEND_URL.
-# .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7791
+# .. toggle_warnings: When the flag is ON, the new experience for Pages and Resources will be enabled.
+# .. toggle_tickets: TNL-7791
 ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND = CourseWaffleFlag(
     waffle_namespace=WAFFLE_NAMESPACE,
     flag_name='pages_and_resources_mfe',
