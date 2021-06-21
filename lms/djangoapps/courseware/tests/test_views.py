@@ -51,7 +51,7 @@ from lms.djangoapps.certificates.tests.factories import (
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware import access_utils
-from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, get_current_request_hostname
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
