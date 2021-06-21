@@ -47,7 +47,7 @@ push_translations: ## push source strings to Transifex for translation
 
 pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
-	i18n_tool transifex pull
+	i18n_tool transifex pull_all
 	i18n_tool extract
 	i18n_tool dummy
 	i18n_tool generate
