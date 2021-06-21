@@ -4,16 +4,21 @@ Views for Admin Panel API
 from django.contrib.auth.models import Group, User
 from django.db.models import F, Prefetch
 from django.db.models.query_utils import Q
-from organizations.models import Organization
-from rest_framework import status, viewsets
+from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from six import text_type
+
+from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.features.pakx.lms.overrides.utils import get_course_progress_percentage
+from student.models import CourseEnrollment
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
 from .pagination import PakxAdminAppPagination
 from .permissions import CanAccessPakXAdminPanel
-from .serializers import UserSerializer
+from .serializers import LearnersSerializer, UserSerializer
+from .utils import get_learners_filter, get_user_org_filter
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -62,10 +67,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             queryset = User.objects.all()
         else:
-            org = Organization.objects.get(user_profiles__user=self.request.user)
-            queryset = User.objects.filter(
-                profile__organization=org
-            )
+            queryset = User.objects.filter(get_user_org_filter(self.request.user))
 
         group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN])
         return queryset.select_related(
@@ -118,3 +120,55 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class AnalyticsStats(views.APIView):
+    """
+    API view for organization level analytics stats
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [CanAccessPakXAdminPanel]
+
+    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        get analytics quick stats about learner and their assigned courses
+        """
+        user_qs = User.objects.filter(get_learners_filter())
+
+        if not self.request.user.is_superuser:
+            user_qs = user_qs.filter(get_user_org_filter(self.request.user))
+
+        user_ids = user_qs.values_list('id', flat=True)
+        data = {'learner_count': len(user_ids), 'course_assignment_count': 0, 'completed_course_count': 0}
+
+        for c_enrollment in CourseEnrollment.objects.filter(user_id__in=user_ids):
+            # todo: move to figure's data for course completion once it's integrated
+            grades = CourseGradeFactory().read(c_enrollment.user, course_key=c_enrollment.course.id)
+            progress = get_course_progress_percentage(self.request, text_type(c_enrollment.course.id))
+            if grades.passed and progress >= 100:
+                data['completed_course_count'] += 1
+
+            data['course_assignment_count'] += 1
+
+        data['course_in_progress'] = data['course_assignment_count'] - data['completed_course_count']
+        return Response(status=status.HTTP_200_OK, data=data)
+
+
+class LearnerListAPI(generics.ListAPIView):
+    """
+    API view for learners list
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [CanAccessPakXAdminPanel]
+    pagination_class = PakxAdminAppPagination
+    serializer_class = LearnersSerializer
+
+    def get_queryset(self):
+        user_qs = User.objects.filter(get_learners_filter())
+        if not self.request.user.is_superuser:
+            user_qs = user_qs.filter(get_user_org_filter(self.request.user))
+
+        active_enrollments = CourseEnrollment.objects.filter(is_active=True)
+        return user_qs.prefetch_related(
+            Prefetch('courseenrollment_set', to_attr='enrollments', queryset=active_enrollments)
+        )
