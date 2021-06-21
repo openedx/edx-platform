@@ -2,6 +2,8 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
+import pytest
+
 from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -61,6 +63,7 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
     Tests the accessibility of the course home page
     """
 
+    @pytest.mark.skip(reason='This test fails when using the new coursehome MFE.')
     def test_course_home_a11y(self):
         """
         Test the accessibility of the course home page with course outline.

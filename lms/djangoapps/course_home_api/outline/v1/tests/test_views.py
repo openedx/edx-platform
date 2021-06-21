@@ -16,7 +16,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
@@ -46,7 +46,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.url = reverse('course-home-outline-tab', args=[self.course.id])
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
@@ -78,7 +77,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         if resume_course_url:
             assert 'http://' in resume_course_url
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @ddt.data(True, False)
     def test_get_authenticated_user_not_enrolled(self, has_previously_enrolled):
         if has_previously_enrolled:
@@ -100,7 +98,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert all((block.get('title') != '') for block in date_blocks)
         assert all(block.get('date') for block in date_blocks)
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -117,7 +114,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         date_blocks = dates_widget.get('course_date_blocks')
         assert len(date_blocks) == 0
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_masquerade(self):
         user = UserFactory()
         set_user_preference(user, 'time_zone', 'Asia/Tokyo')
@@ -132,7 +128,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_masquerade(username=user.username)
         assert self.client.get(self.url).data['dates_widget']['user_timezone'] == 'Asia/Tokyo'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_course_staff_can_see_non_user_specific_content_in_masquerade(self):
         """
         Test that course staff can see the outline and other non-user-specific content when masquerading as a learner
@@ -154,27 +149,24 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.data['course_blocks'] is not None
         assert response.data['handouts_html'] is not None
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     def test_handouts(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.store.create_item(self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Hi</p>'})
         assert self.client.get(self.url).data['handouts_html'] == '<p>Hi</p>'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_get_unknown_course(self):
         url = reverse('course-home-outline-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=False)
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
-    def test_waffle_flag_disabled(self, enrollment_mode):
+    def test_legacy_view_enabled(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
         assert response.status_code == 404
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @ddt.data(True, False)
     def test_welcome_message(self, welcome_message_is_dismissed):
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -200,7 +192,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         assert welcome_message_html == (None if welcome_message_is_dismissed else '<p>Welcome</p>')
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_offer(self):
         CourseEnrollment.enroll(self.user, self.course.id)
 
@@ -213,7 +204,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             # Just a quick spot check that the dictionary looks like what we expect
             assert response.data['offer']['code'] == 'EDXWELCOME'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_access_expiration(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -229,7 +219,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.data['access_expiration']['expiration_date'] == deadline
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_post_course_goal(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
@@ -248,7 +237,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert selected_goal is not None
         assert selected_goal['key'] == 'certify'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
     @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
     def test_proctored_exam(self, mock_summary):
@@ -291,7 +279,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert exam_data['due'] is not None
         assert exam_data['icon'] == 'fa-foo-bar'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_assignment(self):
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
@@ -317,7 +304,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert ungraded_data['display_name'] == 'Ungraded'
         assert ungraded_data['icon'] is None
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_data', new=Mock(return_value={'a': 1}))
     @patch('lms.djangoapps.course_home_api.outline.v1.views.get_access_expiration_data', new=Mock(return_value={'b': 1}))
@@ -355,14 +341,12 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert (data['access_expiration'] is not None) == show_enrolled
         assert (data['resume_course']['url'] is not None) == show_enrolled
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @ddt.data(True, False)
     def test_can_show_upgrade_sock(self, sock_enabled):
         with override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=sock_enabled):
             response = self.client.get(self.url)
             assert response.data['can_show_upgrade_sock'] == sock_enabled
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     def test_verified_mode(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))

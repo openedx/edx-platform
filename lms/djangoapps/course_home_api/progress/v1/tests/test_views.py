@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -29,7 +29,6 @@ from xmodule.modulestore.tests.factories import ItemFactory
 CREDIT_SUPPORT_URL = 'https://support.edx.org/hc/en-us/sections/115004154688-Purchasing-Academic-Credit'
 
 
-@override_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
 @ddt.ddt
 class ProgressTabTestViews(BaseCourseHomeTests):
     """
@@ -39,7 +38,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         super().setUp()
         self.url = reverse('course-home-progress-tab', args=[self.course.id])
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
@@ -61,7 +59,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         elif enrollment_mode == CourseMode.AUDIT:
             assert response.data['certificate_data']['cert_status'] == 'audit_passing'
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     @ddt.data(True, False)
     def test_get_authenticated_user_not_enrolled(self, has_previously_enrolled):
@@ -72,21 +69,18 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 401
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
         assert response.status_code == 401
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_get_unknown_course(self):
         url = reverse('course-home-progress-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=False)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_waffle_flag_disabled(self, enrollment_mode):
@@ -94,7 +88,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 404
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_masquerade(self):
         # Enroll a verified user
@@ -114,7 +107,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert self.client.get(self.url).data.get('enrollment_mode') == 'verified'
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_has_scheduled_content_data(self):
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -124,7 +116,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.json()['has_scheduled_content']
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_end(self):
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -136,7 +127,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=UTC)
         assert end.date() == future.date()
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -146,7 +136,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.json()['user_has_passing_grade']
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_verified_mode(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
@@ -158,7 +147,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
                                                   'currency': 'USD', 'currency_symbol': '$', 'price': 149,
                                                   'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
 
-    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_page_respects_stacked_config(self):
         CourseEnrollment.enroll(self.user, self.course.id)
