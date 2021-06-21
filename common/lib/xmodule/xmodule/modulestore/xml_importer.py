@@ -1051,7 +1051,7 @@ def allowed_metadata_by_category(category):
     return {
         'vertical': [],
         'chapter': ['start'],
-        'sequential': ['due', 'format', 'start', 'graded']
+        'sequential': ['due', 'due_num_weeks', 'format', 'start', 'graded']
     }.get(category, ['*'])
 
 

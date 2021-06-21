@@ -294,7 +294,7 @@ describe('CourseOutlinePage', function() {
         TemplateHelpers.installTemplates([
             'course-outline', 'xblock-string-field-editor', 'modal-button',
             'basic-modal', 'course-outline-modal', 'release-date-editor',
-            'due-date-editor', 'grading-editor', 'publish-editor',
+            'due-date-editor', 'self-paced-due-date-editor', 'grading-editor', 'publish-editor',
             'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
