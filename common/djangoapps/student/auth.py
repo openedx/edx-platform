@@ -176,7 +176,13 @@ def update_org_role(caller, role, user, *orgs):
     :param orgs: List of organization names to update the org role
     """
     _check_caller_authority(caller, role)
-    role.update_org_role(user, *orgs)
+    existing_org_roles = set(role().get_org_for_user(user))
+    orgs_roles_to_create = list(set(*orgs) - existing_org_roles)
+    org_roles_to_delete = list(existing_org_roles - set(*orgs))
+    for org in orgs_roles_to_create:
+        role(org=org).add_users(user)
+    for org in org_roles_to_delete:
+        role(org=org).remove_users(user)
 
 
 def _check_caller_authority(caller, role):

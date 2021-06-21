@@ -57,7 +57,7 @@ def update_org_content_creator_role(caller, user, orgs):
 
     Caller must have staff permissions.
     """
-    auth.update_org_role(caller, OrgContentCreatorRole(), user, orgs)
+    auth.update_org_role(caller, OrgContentCreatorRole, user, orgs)
 
 
 def get_course_creator_status(user):

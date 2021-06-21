@@ -920,9 +920,12 @@ def _create_or_rerun_course(request):
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=str(error))}
         )
     except PermissionDenied as error:
-        log.exception(
+        log.info(
             "User does not have the permission to create course in this organization."
-            "User: {} Org: {} Course: {}".format(request.user.id, org, course)
+            "User: '%s' Org: '%s' Course #: '%s'.",
+            request.user.id,
+            org,
+            course,
         )
         return JsonResponse({
             'error': _('User does not have the permission to create courses in this organization '
