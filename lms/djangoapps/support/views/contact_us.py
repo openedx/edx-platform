@@ -5,6 +5,7 @@ Signle support contact view
 
 from django.conf import settings
 from django.http import Http404
+from django.shortcuts import redirect
 from django.views.generic import View
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -19,6 +20,11 @@ class ContactUsView(View):
     """
 
     def get(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+        # If ZENDESK_URL is not defined, then it will redirect to the static contact page
+        # to avoid 500 error that arises due to missing Zendesk configuration
+        if not settings.ZENDESK_URL:
+            return redirect('contact')
+
         if not configuration_helpers.get_value('CONTACT_US_PAGE', True):
             raise Http404
 
