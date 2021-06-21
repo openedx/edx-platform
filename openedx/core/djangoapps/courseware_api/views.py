@@ -40,6 +40,7 @@ from lms.djangoapps.courseware.toggles import (
     course_exit_page_is_active,
     mfe_special_exams_is_active,
     mfe_proctored_exams_is_active,
+    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -120,6 +121,20 @@ class CoursewareMeta:
             is_global_staff=self.original_user_is_global_staff,
             is_course_staff=self.original_user_is_staff
         )
+
+    @property
+    def is_learning_sequences_api_enabled(self):
+        """
+        Should the Learning Sequences API be used to load course structure data?
+
+        Courseware views in the Learning MFE need to load course structure data
+        from the backend to display feaures like breadcrumbs, the smart "Next"
+        button, etc. This has been done so far using the Course Blocks API.
+        We are switching the views to instead use the Learning Sequences API,
+        which we expect to be significantly faster. We are putting the transition
+        behind a flag, for now, to allow incremental rollout and comparison testing.
+        """
+        return COURSEWARE_USE_LEARNING_SEQUENCES_API.is_enabled(self.course_key)
 
     @property
     def is_mfe_special_exams_enabled(self):

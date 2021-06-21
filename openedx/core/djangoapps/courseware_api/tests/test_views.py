@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
+    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
@@ -293,6 +294,17 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             assert response.data['can_load_courseware']['has_access']
         else:
             assert not response.data['can_load_courseware']['has_access']
+
+    @ddt.data(True, False)
+    def test_is_learning_sequences_api_enabled(self, enable_new_api):
+        """
+        Test that the Courseware API exposes the Learning Sequences API flag.
+        """
+        with override_waffle_flag(COURSEWARE_USE_LEARNING_SEQUENCES_API, active=enable_new_api):
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+            courseware_data = response.json()
+            assert courseware_data['is_learning_sequences_api_enabled'] is enable_new_api
 
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
