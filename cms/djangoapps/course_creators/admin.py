@@ -76,13 +76,13 @@ class CourseCreatorAdmin(admin.ModelAdmin):
     # Controls the order on the edit form (without this, read-only fields appear at the end).
     fieldsets = (
         (None, {
-            'fields': ['username', 'state', 'state_changed', 'note', 'all_organizations', 'orgs']
+            'fields': ['username', 'state', 'state_changed', 'note', 'all_organizations', 'organizations']
         }),
     )
     # Fields that filtering support
     list_filter = ['state', 'state_changed']
     # Fields that search supports.
-    search_fields = ['user__username', 'user__email', 'state', 'note', 'orgs']
+    search_fields = ['user__username', 'user__email', 'state', 'note', 'organizations']
     # Turn off the action bar (we have no bulk actions)
     actions = None
     form = CourseCreatorForm
