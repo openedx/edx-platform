@@ -3564,7 +3564,6 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         assert self.client.get(lms_url).status_code == 200
 
 
-@ddt.ddt
 class PreviewRedirectTests(BaseViewsTestCase):
     """
     Make sure we're redirecting to the Legacy view for course previews.
@@ -3579,10 +3578,10 @@ class PreviewRedirectTests(BaseViewsTestCase):
 
     def test_staff_no_redirect(self):
         __, __, preview_url = self._get_urls()
-        with patch.object(access_utils, 'get_current_request_hostname', return_value=settings.FEATURES.get('PREVIEW_LMS_BASE', None)):
-            get_current_request_hostname()
+        with patch.object(access_utils, 'get_current_request_hostname',
+                          return_value=settings.FEATURES.get('PREVIEW_LMS_BASE', None)):
 
-            # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
+            # Previews will not redirect to the mfe,, for the time being.
             course_staff = UserFactory.create(is_staff=False)
             CourseStaffRole(self.course_key).add_users(course_staff)
             self.client.login(username=course_staff.username, password='test')
