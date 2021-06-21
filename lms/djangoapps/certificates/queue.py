@@ -27,7 +27,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 LOGGER = logging.getLogger(__name__)
 
@@ -401,7 +401,10 @@ class XQueueCertInterface:
         sends a request to XQueue.
         """
         course_id = str(cert.course_id)
-        course_overview = get_course_overview(course_id)
+        course_overview = get_course_overview_or_none(course_id)
+        if not course_overview:
+            LOGGER.warning(f"Skipping cert generation for {student.id} due to missing course overview for {course_id}")
+            return cert
 
         key = make_hashkey(random.random())
         cert.key = key

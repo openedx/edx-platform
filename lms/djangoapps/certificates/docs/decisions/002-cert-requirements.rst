@@ -30,7 +30,3 @@ be true at the time the certificate is generated:
 * The user must have passed the course run
 * The user must not be a beta tester in the course run
 * The course run must not be a CCX (custom edX course)
-
-Note: the above requirements were written for V2 of course certificates, which
-assumes the CourseWaffleFlag *certificates_revamp.use_updated* has been enabled
-for the course run. If it has not been enabled, the prior logic will apply.

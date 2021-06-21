@@ -139,6 +139,8 @@ class BlockListGetForm(Form):
             return self._verify_anonymous_user(requested_username, course_key, all_blocks)
 
         if all_blocks:
+            if requesting_user.has_perm('instructor.research', course_key):
+                return requesting_user
             return self._verify_all_blocks(requesting_user, course_key)
         elif requesting_user.username.lower() == requested_username.lower():
             return self._verify_requesting_user(requesting_user, course_key)

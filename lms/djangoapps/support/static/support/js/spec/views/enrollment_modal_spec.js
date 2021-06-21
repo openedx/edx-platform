@@ -73,7 +73,7 @@ define([
             $('.enrollment-new-mode').val('verified');
             $('.enrollment-reason').val('Financial Assistance');
             $('.enrollment-change-submit').click();
-            AjaxHelpers.expectJsonRequest(requests, 'POST', '/support/enrollment/test-user', {
+            AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/support/enrollment/test-user', {
                 course_id: EnrollmentHelpers.TEST_COURSE,
                 new_mode: 'verified',
                 old_mode: 'audit',

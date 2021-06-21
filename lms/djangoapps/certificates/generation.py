@@ -16,10 +16,14 @@ from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import (
+    emit_certificate_event,
+    emit_segment_event,
+    has_html_certificates_enabled
+)
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
 
@@ -50,6 +54,7 @@ def generate_course_certificate(user, course_key, generation_mode):
             'generation_mode': generation_mode
         }
         emit_certificate_event(event_name='created', user=user, course_id=course_key, event_data=event_data)
+        emit_segment_event(user_id=user.id, course_id=course_key)
 
     return cert
 
@@ -132,7 +137,12 @@ def generate_user_certificates(student, course_key, insecure=False, generation_m
     if insecure:
         xqueue.use_https = False
 
-    course_overview = get_course_overview(course_key)
+    course_overview = get_course_overview_or_none(course_key)
+    if not course_overview:
+        log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key} due to a missing course"
+                 f"overview.")
+        return
+
     generate_pdf = not has_html_certificates_enabled(course_overview)
 
     cert = xqueue.add_cert(

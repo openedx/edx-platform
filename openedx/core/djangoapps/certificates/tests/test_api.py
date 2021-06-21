@@ -1,3 +1,6 @@
+"""
+API tests for the openedx certificates app
+"""
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -63,14 +66,20 @@ class MockGeneratedCertificate:
 
 @contextmanager
 def configure_waffle_namespace(feature_enabled):
+    """
+    Context manager to configure the certs flags
+    """
     namespace = certs_waffle.waffle()
-    auto_certificate_generation_switch = LegacyWaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)
+    auto_certificate_generation_switch = LegacyWaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)  # pylint: disable=toggle-missing-annotation
     with override_waffle_switch(auto_certificate_generation_switch, active=feature_enabled):
         yield
 
 
 @ddt.ddt
 class CertificatesApiTestCase(TestCase):
+    """
+    API tests
+    """
     def setUp(self):
         super().setUp()
         self.course = CourseOverviewFactory.create(

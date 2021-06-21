@@ -41,7 +41,6 @@ from lms.djangoapps.certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory
 )
 from lms.djangoapps.certificates.utils import get_certificate_url
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.tests.test_util import (
@@ -99,7 +98,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             user=self.user,
             course_id=self.course_id,
             download_uuid=uuid4().hex,
-            download_url="http://www.example.com/certificates/download",
+            download_url="https://www.example.com/certificates/download",
             grade="0.95",
             key='the_key',
             distinction=True,
@@ -458,7 +457,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             platform_name='My Platform Site',
             SITE_NAME='test_site.localhost',
             urls=dict(
-                ABOUT='http://www.test-site.org/about-us',
+                ABOUT='https://www.test-site.org/about-us',
             ),
         ),
     )
@@ -522,7 +521,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # Test item from badge info
         self.assertContains(response, "Add to Mozilla Backpack")
         # Test item from site configuration
-        self.assertContains(response, "http://www.test-site.org/about-us")
+        self.assertContains(response, "https://www.test-site.org/about-us")
         # Test course overrides
         self.assertContains(response, "/static/certificates/images/course_override_logo.png")
 
@@ -959,28 +958,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(response, "Invalid Certificate")
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
-    def test_request_certificate_without_passing(self):
+    def test_request_certificate_without_html_certs(self):
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
         request_certificate_url = reverse('request_certificate')
         response = self.client.post(request_certificate_url, {'course_id': str(self.course.id)})
         assert response.status_code == 200
         response_json = json.loads(response.content.decode('utf-8'))
-        assert CertificateStatuses.notpassing == response_json['add_status']
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
-    @override_settings(CERT_QUEUE='test-queue')
-    def test_request_certificate_after_passing(self):
-        self.cert.status = CertificateStatuses.unavailable
-        self.cert.save()
-        request_certificate_url = reverse('request_certificate')
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-            mock_queue.return_value = (0, "Successfully queued")
-            with mock_passing_grade():
-                response = self.client.post(request_certificate_url, {'course_id': str(self.course.id)})
-                assert response.status_code == 200
-                response_json = json.loads(response.content.decode('utf-8'))
-                assert CertificateStatuses.generating == response_json['add_status']
+        assert CertificateStatuses.unavailable == response_json['add_status']
 
     # TEMPLATES WITHOUT LANGUAGE TESTS
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
@@ -1590,10 +1575,10 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
         assertion = BadgeAssertionFactory.create(
             user=self.user, badge_class=badge_class,
             backend='DummyBackend',
-            image_url='http://www.example.com/image.png',
-            assertion_url='http://www.example.com/assertion.json',
+            image_url='https://www.example.com/image.png',
+            assertion_url='https://www.example.com/assertion.json',
             data={
-                'issuer': 'http://www.example.com/issuer.json',
+                'issuer': 'https://www.example.com/issuer.json',
             }
         )
         response = self.client.get(test_url)
@@ -1615,10 +1600,10 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
                     'badge_name': 'refundable course',
                     'issuing_component': '',
                     'badge_slug': 'testorgrun1refundable_course_honor_432f164',
-                    'assertion_json_url': 'http://www.example.com/assertion.json',
-                    'assertion_image_url': 'http://www.example.com/image.png',
+                    'assertion_json_url': 'https://www.example.com/assertion.json',
+                    'assertion_image_url': 'https://www.example.com/image.png',
                     'user_id': self.user.id,
-                    'issuer': 'http://www.example.com/issuer.json',
+                    'issuer': 'https://www.example.com/issuer.json',
                     'enrollment_mode': 'honor',
                 },
             },

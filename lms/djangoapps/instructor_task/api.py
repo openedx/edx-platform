@@ -345,31 +345,31 @@ def submit_calculate_problem_responses_csv(
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_grades_csv(request, course_key):
+def submit_calculate_grades_csv(request, course_key, **task_kwargs):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
     task_type = 'grade_course'
     task_class = calculate_grades_csv
-    task_input = {}
+    task_input = task_kwargs
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_problem_grade_report(request, course_key):
+def submit_problem_grade_report(request, course_key, **task_kwargs):
     """
     Submits a task to generate a CSV grade report containing problem
     values.
     """
     task_type = 'grade_problems'
     task_class = calculate_problem_grade_report
-    task_input = {}
+    task_input = task_kwargs
     task_key = ""
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_students_features_csv(request, course_key, features):
+def submit_calculate_students_features_csv(request, course_key, features, **task_kwargs):
     """
     Submits a task to generate a CSV containing student profile info.
 
@@ -377,7 +377,7 @@ def submit_calculate_students_features_csv(request, course_key, features):
     """
     task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
-    task_input = features
+    task_input = dict(features=features, **task_kwargs)
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

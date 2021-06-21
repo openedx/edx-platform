@@ -17,7 +17,7 @@ from pytz import utc
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
@@ -34,7 +34,6 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
@@ -83,6 +82,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertNotContains(response, 'date-summary', status_code=302)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_course_home_logged_out(self):
         course = create_course_run()
         url = reverse('openedx.course_experience.course_home', args=(course.id,))
@@ -428,6 +428,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
@@ -450,6 +451,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
@@ -480,6 +482,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
@@ -498,6 +501,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
@@ -720,7 +724,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.unpack
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
-    def test_dates_tab_link_render(self, url_name, mfe_active):
+    def test_dates_tab_link_render(self, url_name, legacy_active):
         """ The dates tab link should only show for enrolled or staff users """
         course = create_course_run()
         html_elements = [
@@ -728,21 +732,21 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             'View all course dates</a>',
         ]
         # The url should change based on the mfe being active.
-        if mfe_active:
-            html_elements.append('/course/' + str(course.id) + '/dates')
-        else:
+        if legacy_active:
             html_elements.append('/courses/' + str(course.id) + '/dates')
+        else:
+            html_elements.append('/course/' + str(course.id) + '/dates')
         url = reverse(url_name, args=(course.id,))
 
         def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=mfe_active):
+            with override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=legacy_active):
                 response = self.client.get(url, follow=True)
-            if mfe_active and not user.is_staff:
-                assert 404 == response.status_code
-            else:
+            if legacy_active or user.is_staff:
                 for html in html_elements:
                     assert_function(response, html)
+            else:
+                assert 404 == response.status_code
             self.client.logout()
 
         with freeze_time('2015-01-02'):
