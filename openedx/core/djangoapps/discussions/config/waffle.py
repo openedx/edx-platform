@@ -29,12 +29,12 @@ OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG = CourseWaffleFlag(
 # .. toggle_name: discussions.pages_and_resources_mfe
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to link existing studio views to the new Pages and Resources experience.
+# .. toggle_description: Waffle flag to enable new Pages and Resources experience for course.
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-05-24
 # .. toggle_target_removal_date: 2021-12-31
 # .. toggle_warnings: Also set settings.COURSE_AUTHORING_MICROFRONTEND_URL.
-# .. toggle_tickets: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7791
 ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND = CourseWaffleFlag(
     waffle_namespace=WAFFLE_NAMESPACE,
     flag_name='pages_and_resources_mfe',

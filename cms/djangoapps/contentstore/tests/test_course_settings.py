@@ -34,8 +34,10 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, \
+from openedx.core.djangoapps.discussions.config.waffle import (
+    ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
+)
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -125,7 +127,8 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     @ddt.data(
         (False, False, True),
         (True, False, False),
-        (True, True, True)
+        (True, True, True),
+        (False, True, True)
     )
     @ddt.unpack
     def test_discussion_fields_available(self, is_pages_and_resources_enabled,
