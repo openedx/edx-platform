@@ -131,7 +131,6 @@ ${HTML(fragment.foot_html())}
         var eventType = event.type || 'mutate';
         var newHeight = contentElement.offsetHeight;
         var newWidth = contentElement.offsetWidth;
-
         if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
             // it is referencing an element's id or name (not an external website). If
@@ -140,7 +139,6 @@ ${HTML(fragment.foot_html())}
             // allow the page to scroll to the location of the focus element so
             // that it is at the top of the page. Unique ids and names are
             // required for proper scrolling.
-
             $('a').on("click", function(event){
               if ($(this).attr('href')[0] === "#") {
                 event.preventDefault();

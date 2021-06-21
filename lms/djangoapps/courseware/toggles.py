@@ -7,7 +7,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
-
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 
@@ -131,8 +130,13 @@ def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
@@ -142,8 +146,13 @@ def mfe_proctored_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS.is_enabled(course_key)
@@ -153,6 +162,8 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     """
     Should we serve the Learning MFE as the canonical courseware experience?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # NO: Old Mongo courses are always served in the Legacy frontend,
     #     regardless of configuration.
     if course_key.deprecated:
@@ -160,6 +171,9 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     # NO: MFE courseware can be disabled for users/courses/globally via this
     #     Waffle flag.
     if COURSEWARE_USE_LEGACY_FRONTEND.is_enabled(course_key):
+        return False
+    # NO: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: MFE courseware experience is active by default.
     return True
@@ -173,8 +187,13 @@ def courseware_mfe_is_visible(
     """
     Can we see a course run's content in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # ALLOW: Where techincally possible, global staff may always see the MFE.
     if is_global_staff:
@@ -200,8 +219,13 @@ def courseware_mfe_is_advertised(
     but we do not shove the New Experience in their face if the preview isn't
     enabled.
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # ALLOW: Both global and course staff can see the MFE link if the course team
     #        preview is enabled.
@@ -222,8 +246,13 @@ def courseware_legacy_is_visible(
     Note: This function will always return True for Old Mongo courses,
     since `courseware_mfe_is_active` will always return False for them.
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # ALLOW: Global staff may always see the Legacy experience.
     if is_global_staff:
+        return True
+    # ALLOW: All course previews will be shown in Legacy experience
+    if in_preview_mode():
         return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,
