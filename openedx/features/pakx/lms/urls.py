@@ -30,5 +30,5 @@ pakx_url_patterns = [
     ),
 
     # URL for pakx_admin_app
-    url(r'', include('openedx.features.pakx.lms.pakx_admin_app.urls')),
+    url(r'^adminpanel/', include('openedx.features.pakx.lms.pakx_admin_app.urls')),
 ]

@@ -15,10 +15,35 @@ from openedx.features.pakx.lms.overrides.utils import get_course_progress_percen
 from student.models import CourseEnrollment
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
-from .pagination import PakxAdminAppPagination
+from .pagination import CourseEnrollmentPagination, PakxAdminAppPagination
 from .permissions import CanAccessPakXAdminPanel
-from .serializers import LearnersSerializer, UserSerializer
+from .serializers import LearnersSerializer, UserCourseEnrollmentSerializer, UserSerializer
 from .utils import get_learners_filter, get_user_org_filter
+
+
+class UserCourseEnrollmentsListAPI(generics.ListAPIView):
+    """
+    List API of user course enrollment
+    """
+    serializer_class = UserCourseEnrollmentSerializer
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [CanAccessPakXAdminPanel]
+    pagination_class = CourseEnrollmentPagination
+    model = CourseEnrollment
+
+    def get_queryset(self):
+        return CourseEnrollment.objects.filter(
+            user_id=self.kwargs['user_id'], is_active=True
+        ).select_related(
+            'course'
+        ).order_by(
+            '-id'
+        )
+
+    def get_serializer_context(self):
+        context = super(UserCourseEnrollmentsListAPI, self).get_serializer_context()
+        context.update({'request': self.request})
+        return context
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
