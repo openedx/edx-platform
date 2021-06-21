@@ -50,7 +50,8 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware import access_utils
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, get_current_request_hostname
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
@@ -3587,21 +3588,23 @@ class PreviewRedirectTests(BaseViewsTestCase):
 
     def test_staff_no_redirect(self):
         __, __, preview_url = self._get_urls()
+        with patch.object(access_utils, 'get_current_request_hostname', return_value=settings.FEATURES.get('PREVIEW_LMS_BASE', None)):
+            get_current_request_hostname()
 
-        # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
-        course_staff = UserFactory.create(is_staff=False)
-        CourseStaffRole(self.course_key).add_users(course_staff)
-        self.client.login(username=course_staff.username, password='test')
+            # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
+            course_staff = UserFactory.create(is_staff=False)
+            CourseStaffRole(self.course_key).add_users(course_staff)
+            self.client.login(username=course_staff.username, password='test')
 
-        with _set_mfe_flag(activate_mfe=False):
+            with _set_mfe_flag(activate_mfe=False):
+                assert self.client.get(preview_url).status_code == 200
             assert self.client.get(preview_url).status_code == 200
-        assert self.client.get(preview_url).status_code == 302
 
-        # global staff will never be redirected
-        self._create_global_staff_user()
-        with _set_mfe_flag(activate_mfe=False):
+            # global staff will never be redirected
+            self._create_global_staff_user()
+            with _set_mfe_flag(activate_mfe=False):
+                assert self.client.get(preview_url).status_code == 200
             assert self.client.get(preview_url).status_code == 200
-        assert self.client.get(preview_url).status_code == 200
 
     def test_exam_no_redirect(self):
         # exams will not redirect to the mfe, for the time being
