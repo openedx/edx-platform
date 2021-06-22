@@ -73,7 +73,7 @@ random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
 regex==2021.4.4
     # via nltk
-scipy==1.6.3
+scipy==1.7.0
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
