@@ -3,7 +3,7 @@ Course Apps plugin base class and plugin manager.
 """
 from typing import Dict, Iterator, Optional
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from edx_django_utils.plugins import PluginManager
 from opaque_keys.edx.keys import CourseKey
 
@@ -25,12 +25,13 @@ class CourseApp(ABC):
     description: str = ""
 
     @classmethod
+    @abstractmethod
     def is_available(cls, course_key: CourseKey) -> bool:
         """
-        Returns a boolean indicating whether or not this course app is available for a given course.
+        Returns a boolean indicating this course app's availability for a given course.
 
-        If an app is not available, it will not show up in the UI at all for that
-        course and it will not be possible to enable/disable/configure it.
+        If an app is not available, it will not show up in the UI at all for that course,
+        and it will not be possible to enable/disable/configure it.
 
         Args:
             course_key (CourseKey): Course key for course whose availability is being checked.
@@ -38,9 +39,9 @@ class CourseApp(ABC):
         Returns:
             bool: Availability status of app.
         """
-        raise NotImplementedError()
 
     @classmethod
+    @abstractmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:
         """
         Return if this course app is enabled for the provided course.
@@ -52,9 +53,9 @@ class CourseApp(ABC):
         Returns:
             bool: The status of the course app for the specified course.
         """
-        raise NotImplementedError()
 
     @classmethod
+    @abstractmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
         """
         Update the status of this app for the provided course and return the new status.
@@ -67,9 +68,9 @@ class CourseApp(ABC):
         Returns:
             bool: The new status of the course app.
         """
-        raise NotImplementedError()
 
     @classmethod
+    @abstractmethod
     def get_allowed_operations(cls, course_key: CourseKey, user: Optional['User'] = None) -> Dict[str, bool]:
         """
         Returns a dictionary of available operations for this app.
@@ -86,7 +87,6 @@ class CourseApp(ABC):
             A dictionary that has keys like 'enable', 'configure' etc
             with values indicating whether those operations are allowed.
         """
-        raise NotImplementedError()
 
 
 class CourseAppsPluginManager(PluginManager):

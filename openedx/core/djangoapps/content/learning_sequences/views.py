@@ -14,7 +14,6 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.lib.api.permissions import IsStaff
 from openedx.core.lib.api.view_utils import validate_course_key
 from .api import get_user_course_outline_details
 from .api.permissions import can_call_public_api

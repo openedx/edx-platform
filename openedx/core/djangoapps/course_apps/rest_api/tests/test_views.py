@@ -22,7 +22,8 @@ from ...tests.utils import make_test_course_app
 @ddt.ddt
 class CourseAppsRestApiTest(SharedModuleStoreTestCase):
     """
-    Tests for the rest api for course apps."""
+    Tests for the rest api for course apps.
+    """
 
     def setUp(self):
         super().setUp()
@@ -38,7 +39,8 @@ class CourseAppsRestApiTest(SharedModuleStoreTestCase):
     @contextlib.contextmanager
     def _setup_plugin_mock(self):
         """
-        Context manager that patches get_available_plugins to return test plugins"""
+        Context manager that patches get_available_plugins to return test plugins.
+        """
         patcher = mock.patch("openedx.core.djangoapps.course_apps.plugins.PluginManager.get_available_plugins")
         mock_get_available_plugins = patcher.start()
         mock_get_available_plugins.return_value = {
@@ -52,18 +54,20 @@ class CourseAppsRestApiTest(SharedModuleStoreTestCase):
 
     def test_only_show_available_apps(self):
         """
-        Tests that only available apps show up in the API response."""
+        Tests that only available apps show up in the API response.
+        """
         with self._setup_plugin_mock():
             response = self.client.get(self.url)
         data = json.loads(response.content.decode("utf-8"))
-        # Make sure that "app3" doesn't show up since it isn't enabled.
+        # Make sure that "app3" doesn't show up since it isn't available.
         assert len(data) == 3
         assert all(app["id"] != "app3" for app in data)
 
     @ddt.data(True, False)
-    def test_update_success(self, enabled):
+    def test_update_status_success(self, enabled):
         """
-        Tests successful update response"""
+        Tests successful update response
+        """
         with self._setup_plugin_mock():
             response = self.client.patch(self.url, {"id": "app1", "enabled": enabled}, content_type="application/json")
         data = json.loads(response.content.decode("utf-8"))
@@ -73,7 +77,8 @@ class CourseAppsRestApiTest(SharedModuleStoreTestCase):
 
     def test_update_invalid_enabled(self):
         """
-        Tests that an invalid or missing enabled value raises an error response"""
+        Tests that an invalid or missing enabled value raises an error response.
+        """
         with self._setup_plugin_mock():
             response = self.client.patch(self.url, {"id": "app1"}, content_type="application/json")
         assert response.status_code == 400

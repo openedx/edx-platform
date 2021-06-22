@@ -27,7 +27,7 @@ class CourseAppsPythonAPITest(TestCase):
     @ddt.data(True, False)
     def test_plugin_enabled(self, enabled, get_plugin):
         """
-        Test that the is_enabled value is used in case that method exists.
+        Test that the is_enabled value is used.
         """
         CourseApp = make_test_course_app(is_available=True)
         get_plugin.return_value = CourseApp
@@ -41,7 +41,7 @@ class CourseAppsPythonAPITest(TestCase):
     @ddt.data(True, False)
     def test_set_plugin_enabled(self, enabled, get_plugin):
         """
-        Test the behaviour of set_course_app_enabled .
+        Test the behaviour of set_course_app_enabled.
         """
         CourseApp = make_test_course_app(is_available=True)
         get_plugin.return_value = CourseApp

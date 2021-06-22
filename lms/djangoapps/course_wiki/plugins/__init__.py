@@ -7,10 +7,9 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
 
-# Importing the User model here can cause because it is imported before the
-# django machinery is ready. Here we add it in under TYPE_CHECKING, so that
-# type checkers (including IDEs), know what the type is, without actually
-# importing it at run time.
+# Import the User model only for type checking since importing it at runtime
+# will prevent the app from starting since the model is imported before
+# Django's machinery is ready.
 if TYPE_CHECKING:
     from django.contrib.auth import get_user_model
     User = get_user_model()

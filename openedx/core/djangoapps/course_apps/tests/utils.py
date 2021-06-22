@@ -40,7 +40,6 @@ def make_test_course_app(
             return {
                 "enable": True,
                 "configure": True,
-                "custom": False,
             }
 
         @classmethod
