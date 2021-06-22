@@ -7,7 +7,7 @@ from six import text_type
 
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.features.pakx.lms.overrides.utils import get_course_progress_percentage
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, UserProfile
 
 from .constants import GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
 
@@ -50,13 +50,26 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'employee_id', 'language', 'is_active', 'role')
+        fields = ('username', 'id', 'email', 'name', 'employee_id', 'language', 'is_active', 'role',
+                  'date_joined', 'last_login')
 
     def get_role(self, obj):
         if obj.staff_groups:
             return TRAINING_MANAGER if obj.staff_groups[0].name == GROUP_TRAINING_MANAGERS else ORG_ADMIN
 
         return LEARNER
+
+
+class BasicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('user', 'employee_id', 'language', 'organization')
 
 
 class LearnersSerializer(serializers.ModelSerializer):

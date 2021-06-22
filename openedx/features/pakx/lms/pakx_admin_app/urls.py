@@ -8,9 +8,7 @@ from rest_framework.routers import DefaultRouter
 from .views import AnalyticsStats, LearnerListAPI, UserCourseEnrollmentsListAPI, UserProfileViewSet
 
 router = DefaultRouter()
-
 router.register('users', UserProfileViewSet, basename='users')
-
 
 urlpatterns = [
     url(r'^users/activate/$', UserProfileViewSet.as_view({"post": "activate_users"})),

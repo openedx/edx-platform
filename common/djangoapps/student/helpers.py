@@ -635,13 +635,12 @@ def do_create_account(form, custom_form=None):
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
             )
-        elif email_exists_or_retired(user.email):
+        if email_exists_or_retired(user.email):
             raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )
-        else:
-            raise
+        raise
 
     registration.register(user)
 
