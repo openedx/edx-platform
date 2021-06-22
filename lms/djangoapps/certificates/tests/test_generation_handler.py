@@ -323,6 +323,36 @@ class CertificateTests(ModuleStoreTestCase):
         assert not generate_certificate_task(other_user, self.course_run_key)
         assert not generate_regular_certificate_task(other_user, self.course_run_key)
 
+    def test_handle_audit_status(self):
+        """
+        Test handling of a user who is not passing and is enrolled in audit mode
+        """
+        different_user = UserFactory()
+        CourseEnrollmentFactory(
+            user=different_user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=GeneratedCertificate.MODES.audit,
+        )
+
+        assert _set_v2_cert_status(different_user, self.course_run_key) is None
+        assert not generate_regular_certificate_task(different_user, self.course_run_key)
+
+    def test_handle_verified_status(self):
+        """
+        Test handling of a user who is not passing and is enrolled in verified mode
+        """
+        different_user = UserFactory()
+        CourseEnrollmentFactory(
+            user=different_user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=GeneratedCertificate.MODES.verified,
+        )
+
+        assert _set_v2_cert_status(different_user, self.course_run_key) == 'notpassing'
+        assert generate_regular_certificate_task(different_user, self.course_run_key)
+
     def test_is_using_updated_true(self):
         """
         Test the updated flag

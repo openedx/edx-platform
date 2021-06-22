@@ -95,9 +95,9 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     if _can_generate_allowlist_certificate(user, course_key):
         return _generate_certificate_task(user, course_key, generation_mode)
 
-    status = _set_allowlist_cert_status(user, course_key)
-    if status is not None:
-        return True
+#    status = _set_allowlist_cert_status(user, course_key)
+#    if status is not None:
+#        return True
 
     return False
 
@@ -110,9 +110,9 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     if _can_generate_v2_certificate(user, course_key):
         return _generate_certificate_task(user, course_key, generation_mode)
 
-    status = _set_v2_cert_status(user, course_key)
-    if status is not None:
-        return True
+#    status = _set_v2_cert_status(user, course_key)
+#    if status is not None:
+#        return True
 
     return False
 
