@@ -29,6 +29,7 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 
 
 class ProgressTabView(RetrieveAPIView):
@@ -69,6 +70,7 @@ class ProgressTabView(RetrieveAPIView):
                 block_key: (str) the key of the given subsection block
                 display_name: (str) a str of what the name of the Subsection is for displaying on the site
                 has_graded_assignment: (bool) whether or not the Subsection is a graded assignment
+                learner_has_access: (bool) whether the learner has access to the subsection (could be FBE gated)
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
                 num_points_possible: (int) the total amount of points possible for the given subsection
                 percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
@@ -144,7 +146,7 @@ class ProgressTabView(RetrieveAPIView):
 
         # Get has_scheduled_content data
         transformers = BlockStructureTransformers()
-        transformers += [start_date.StartDateTransformer()]
+        transformers += [start_date.StartDateTransformer(), ContentTypeGateTransformer()]
         usage_key = collected_block_structure.root_block_usage_key
         course_blocks = get_course_blocks(
             request.user,
@@ -190,6 +192,7 @@ class ProgressTabView(RetrieveAPIView):
         }
         context = self.get_serializer_context()
         context['staff_access'] = is_staff
+        context['course_blocks'] = course_blocks
         context['course_key'] = course_key
         # course_overview and enrollment will be used by VerifiedModeSerializerMixin
         context['course_overview'] = course_overview
