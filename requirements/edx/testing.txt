@@ -535,6 +535,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.txt
 edx-proctoring==3.13.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
 edx-rbac==1.4.2
@@ -573,7 +574,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.txt
-elasticsearch==7.13.1
+elasticsearch==7.13.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-search
@@ -593,7 +594,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==8.8.0
+faker==8.8.1
     # via factory-boy
 filelock==3.0.12
     # via
@@ -627,7 +628,7 @@ geoip2==3.0.0
     #   -r requirements/edx/base.txt
 gitdb==4.0.7
     # via gitpython
-gitpython==3.1.17
+gitpython==3.1.18
     # via transifex-client
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -839,9 +840,8 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.6.4
-    # via
-    #   -r requirements/edx/base.txt
+ora2==3.6.5
+    # via -r requirements/edx/base.txt
 packaging==20.9
     # via
     #   -r requirements/edx/base.txt
@@ -985,7 +985,7 @@ pytest-django==4.4.0
     # via -r requirements/edx/testing.in
 pytest-forked==1.3.0
     # via pytest-xdist
-pytest-json-report==1.3.0
+pytest-json-report==1.4.0
     # via -r requirements/edx/testing.in
 pytest-metadata==1.8.0
     # via
@@ -993,7 +993,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.8.0
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==2.2.1
+pytest-xdist[psutil]==2.3.0
     # via -r requirements/edx/testing.in
 pytest==6.2.4
     # via
@@ -1137,7 +1137,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.6.3
+scipy==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   chem

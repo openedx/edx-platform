@@ -459,6 +459,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
 edx-proctoring==3.13.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
 edx-rbac==1.4.2
@@ -493,7 +494,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.in
-elasticsearch==7.13.1
+elasticsearch==7.13.2
     # via edx-search
 enmerkar-underscore==2.0.0
     # via -r requirements/edx/base.in
@@ -675,9 +676,8 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.4
-    # via
-    #   -r requirements/edx/base.in
+ora2==3.6.5
+    # via -r requirements/edx/base.in
 packaging==20.9
     # via
     #   bleach
@@ -879,7 +879,7 @@ s3transfer==0.1.13
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.6.3
+scipy==1.7.0
     # via
     #   chem
     #   openedx-calc
