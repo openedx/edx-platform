@@ -22,3 +22,5 @@ WEBINARS_TIME_FORMAT = '%B %d, %Y %I:%M %p %Z'
 
 SEND_UPDATE_EMAILS_FIELD = 'send_update_emails'
 UTC_TIMEZONE_HELP_TEXT = _('Please add the time in UTC timezone.')
+
+WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP = 'Delete Webinar Registrations'
