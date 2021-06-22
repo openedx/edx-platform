@@ -357,6 +357,10 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+
+    # Prevent ModuleI18nService from falling back to itself infinitly
+    _fallback = None
+
     def __init__(self, block=None):
         """
         Attempt to load an XBlock-specific GNU gettext translator using the XBlock's own domain
