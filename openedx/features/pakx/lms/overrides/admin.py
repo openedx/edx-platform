@@ -1,7 +1,9 @@
-from django.contrib import admin
+"""Admin panel for Completion API and Progress Stats"""
 
 from completion.models import BlockCompletion
-from openedx.features.pakx.lms.overrides.models import CourseProgressEmailModel
+from django.contrib import admin
+
+from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 
 
 class BlockCompletionAdmin(admin.ModelAdmin):
@@ -21,12 +23,12 @@ class BlockCompletionAdmin(admin.ModelAdmin):
 admin.site.register(BlockCompletion, BlockCompletionAdmin)
 
 
-@admin.register(CourseProgressEmailModel)
-class CourseProgressEmailModelAdmin(admin.ModelAdmin):
+@admin.register(CourseProgressStats)
+class CourseProgressStatsAdmin(admin.ModelAdmin):
     """
-    Admin interface for CourseProgressEmailModel object
+    Admin interface for CourseProgressStats object
     """
 
-    list_display = ['user', 'course_id', 'status']
-    search_fields = ['status', 'course_id']
-    list_filter = ['status', 'course_id']
+    list_display = ['user', 'course_id', 'email_reminder_status', 'progress', 'grade', 'completion_date']
+    search_fields = ['email_reminder_status', 'course_id', 'progress']
+    list_filter = ['email_reminder_status', 'course_id', 'progress']

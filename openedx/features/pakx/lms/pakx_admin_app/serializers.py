@@ -53,7 +53,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'id', 'email', 'name', 'employee_id', 'language', 'is_active', 'role',
                   'date_joined', 'last_login')
 
-    def get_role(self, obj):
+    @staticmethod
+    def get_role(obj):
         if obj.staff_groups:
             return TRAINING_MANAGER if obj.staff_groups[0].name == GROUP_TRAINING_MANAGERS else ORG_ADMIN
 
@@ -85,13 +86,14 @@ class LearnersSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'name', 'email', 'last_login', 'assigned_courses', 'incomplete_courses', 'completed_courses')
 
-    def get_assigned_courses(self, obj):
-        return len(obj.enrollments)
+    @staticmethod
+    def get_assigned_courses(obj):
+        return len(obj.course_stats)
 
-    def get_incomplete_courses(self, obj):
-        # todo: placeholder data, use figure's data for course completion once it's integrated
-        return obj.id
+    @staticmethod
+    def get_incomplete_courses(obj):
+        return len([stat for stat in obj.course_stats if stat.progress < 100])
 
-    def get_completed_courses(self, obj):
-        # todo: placeholder data, use figure's data for course completion once it's integrated
-        return obj.id
+    @staticmethod
+    def get_completed_courses(obj):
+        return len([stat for stat in obj.course_stats if stat.progress == 100])

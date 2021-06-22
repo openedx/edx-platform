@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from six import text_type
 
 from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from openedx.features.pakx.lms.overrides.utils import get_course_progress_percentage
 from student.models import CourseEnrollment
 
@@ -216,7 +217,35 @@ class AnalyticsStats(views.APIView):
 class LearnerListAPI(generics.ListAPIView):
     """
     API view for learners list
+
+    :returns:
+    {
+        "count": 4,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": 5,
+                "name": "",
+                "email": "honor@example.com",
+                "last_login": "2021-06-22T05:39:30.818097Z",
+                "assigned_courses": 2,
+                "incomplete_courses": 1,
+                "completed_courses": 1
+            },
+            {
+                "id": 7,
+                "name": "",
+                "email": "verified@example.com",
+                "last_login": null,
+                "assigned_courses": 1,
+                "incomplete_courses": 1,
+                "completed_courses": 0
+            }
+        ]
+    }
     """
+
     authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
     pagination_class = PakxAdminAppPagination
@@ -227,7 +256,7 @@ class LearnerListAPI(generics.ListAPIView):
         if not self.request.user.is_superuser:
             user_qs = user_qs.filter(get_user_org_filter(self.request.user))
 
-        active_enrollments = CourseEnrollment.objects.filter(is_active=True)
+        course_stats = CourseProgressStats.objects.all()
         return user_qs.prefetch_related(
-            Prefetch('courseenrollment_set', to_attr='enrollments', queryset=active_enrollments)
+            Prefetch('courseprogressstats_set', to_attr='course_stats', queryset=course_stats)
         )

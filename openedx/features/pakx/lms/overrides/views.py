@@ -1,3 +1,5 @@
+""" Overridden views from core """
+
 import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -9,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from course_modes.models import CourseMode, get_course_prices
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from edxmako.shortcuts import marketing_link, render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_utils import check_public_access
@@ -22,7 +24,6 @@ from lms.djangoapps.courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
-
 from lms.djangoapps.courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.views.index import render_accordion
 from lms.djangoapps.courseware.views.views import _course_home_redirect_enabled, registered_for_course
@@ -130,7 +131,7 @@ def overview_tab_view(request, course_id=None):
     )
     course_overview_content = CourseOverviewContent.objects.filter(course_id=course_key).first()
     context = {
-        'course_overview':  course_overview_content.body_html if course_overview_content else None,
+        'course_overview': course_overview_content.body_html if course_overview_content else None,
         'user': request.user,
         'course': course,
         'accordion': render_accordion(request, course, course_block_tree, '', '')
@@ -203,7 +204,7 @@ def course_about(request, category, course_id):
             if single_paid_mode and single_paid_mode.bulk_sku:
                 ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
-        registration_price, course_price = get_course_prices(course)
+        _, course_price = get_course_prices(course)
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))

@@ -1,7 +1,10 @@
+"""Management command to update course progress stats"""
+
 from logging import getLogger
+
 from django.core.management.base import BaseCommand
 
-from openedx.features.pakx.lms.overrides.tasks import check_and_send_email_to_course_learners
+from openedx.features.pakx.lms.overrides.tasks import update_course_progress_stats
 
 log = getLogger(__name__)
 
@@ -16,4 +19,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log.info("Staring command to check active course progress")
-        check_and_send_email_to_course_learners.delay()
+        update_course_progress_stats.delay()
