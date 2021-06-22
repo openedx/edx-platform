@@ -1,4 +1,4 @@
-// Backbone.js Application Model: CertificateWhitelist
+// Backbone.js Application Model: CertificateAllowlist
 /* global define, RequireJS */
 
 (function(define) {

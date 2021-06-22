@@ -1,4 +1,4 @@
-// Backbone.js Application Collection: CertificateWhiteList
+// Backbone.js Application Collection: CertificateAllowlist
 /* global define, RequireJS */
 
 (function(define) {
@@ -10,7 +10,7 @@
     ],
 
         function(Backbone, gettext, CertificateExceptionModel) {
-            var CertificateWhiteList = Backbone.Collection.extend({
+            var CertificateAllowlist = Backbone.Collection.extend({
                 model: CertificateExceptionModel,
 
                 initialize: function(attrs, options) {
@@ -42,7 +42,7 @@
                     var url = this.generate_certificates_url + appended_url;
                     Backbone.sync(
                         'create',
-                        new CertificateWhiteList(filtered, {url: url, generate_certificates_url: url}),
+                        new CertificateAllowlist(filtered, {url: url, generate_certificates_url: url}),
                         options
                     );
                 },
@@ -56,7 +56,7 @@
                 }
             });
 
-            return CertificateWhiteList;
+            return CertificateAllowlist;
         }
     );
 }).call(this, define || RequireJS.define);

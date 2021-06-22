@@ -3152,26 +3152,32 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 @require_POST
 def generate_bulk_certificate_exceptions(request, course_id):
     """
-    Add Students to certificate allowlist from the uploaded csv file.
-    :return response in dict format.
-    {
-        general_errors: [errors related to csv file e.g. csv uploading, csv attachment, content reading etc. ],
-        row_errors: {
-            data_format_error: [users/data in csv file that are not well formatted],
-            user_not_exist: [csv with none exiting users in LMS system],
-            user_already_white_listed: [users that are already allowlisted],
-            user_not_enrolled: [rows with not enrolled users in the given course],
-            user_on_certificate_invalidation_list: [users that are currently have an active blocklist entry]
-        },
-        success: [list of successfully added users to the certificate allowlist model]
-    }
+    Adds students to the certificate allowlist using data from the uploaded CSV file.
+
+    Arguments:
+        request (WSGIRequest): Django HTTP request object.
+        course_id (string): Course-Run key
+    Returns:
+        dict:
+        {
+            general_errors: [errors related to csv file e.g. csv uploading, csv attachment, content reading, etc. ],
+            row_errors: {
+                data_format_error: [users/data in csv file that are not well formatted],
+                user_not_exist: [users that cannot be found in the LMS],
+                user_already_allowlisted: [users that already appear on the allowlist of this course-run],
+                user_not_enrolled: [users that are not currently enrolled in this course-run],
+                user_on_certificate_invalidation_list: [users that have an active certificate invalidation in this
+                                                    course-run]
+            },
+            success: [list of users sucessfully added to the certificate allowlist]
+        }
     """
     user_index = 0
     notes_index = 1
     row_errors_key = [
         'data_format_error',
         'user_not_exist',
-        'user_already_white_listed',
+        'user_already_allowlisted',
         'user_not_enrolled',
         'user_on_certificate_invalidation_list'
     ]
@@ -3216,14 +3222,14 @@ def generate_bulk_certificate_exceptions(request, course_id):
                 build_row_errors('user_not_exist', user, row_num)
                 log.info(f'Student {user} does not exist')
             else:
-                # make sure learner isn't on the blocklist
+                # make sure learner doesn't have an active certificate invalidation
                 if certs_api.is_certificate_invalidated(user, course_key):
                     build_row_errors('user_on_certificate_invalidation_list', user, row_num)
                     log.warning(f'Student {user.id} is blocked from receiving a Certificate in Course {course_key}')
-                # make sure user isn't already on the exception list
+                # make sure learner isn't already on the allowlist
                 elif certs_api.is_on_allowlist(user, course_key):
-                    build_row_errors('user_already_white_listed', user, row_num)
-                    log.warning(f'Student {user.id} already on exception list in Course {course_key}.')
+                    build_row_errors('user_already_allowlisted', user, row_num)
+                    log.warning(f'Student {user.id} already appears on the allowlist in Course {course_key}.')
                 # make sure user is enrolled in course
                 elif not is_user_enrolled_in_course(user, course_key):
                     build_row_errors('user_not_enrolled', user, row_num)

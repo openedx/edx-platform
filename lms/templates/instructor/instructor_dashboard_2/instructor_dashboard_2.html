@@ -80,7 +80,7 @@ from openedx.core.djangolib.markup import HTML
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "discussions", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "divided-discussions-inline", "divided-discussions-course-wide", "cohort-discussions-category", "cohort-discussions-subcategory", "certificate-white-list", "certificate-white-list-editor", "certificate-bulk-white-list", "certificate-invalidation", "membership-list-widget"]:
+% for template_name in ["cohorts", "discussions", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "divided-discussions-inline", "divided-discussions-course-wide", "cohort-discussions-category", "cohort-discussions-subcategory", "certificate-allowlist", "certificate-allowlist-editor", "certificate-bulk-allowlist", "certificate-invalidation", "membership-list-widget"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
