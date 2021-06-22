@@ -141,27 +141,17 @@ class RolesTestCase(TestCase):
         role.remove_users(self.student)
         assert not role.has_user(self.student)
 
-    def test_update_org_role(self):
+    def test_get_org_for_user(self):
         """
-        Test update_org_role
+        Test get_org_for_user
         """
-        role = OrgContentCreatorRole()
-        role.update_org_role(self.student, self.orgs)
-        # Check both roles got created
-        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) > 0
-        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) > 0
-
-        # Check if the org list is updated
-        role.update_org_role(self.student, ["Edx"])
-        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
-        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
-        assert len(OrgContentCreatorRole("Edx").users_with_role()) == 1
-
-        # Check removing all orgs
-        role.update_org_role(self.student, [])
-        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
-        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
-        assert len(OrgContentCreatorRole("Edx").users_with_role()) == 0
+        role = OrgContentCreatorRole(org=self.orgs[0])
+        assert len(list(role.get_org_for_user(self.student))) == 0
+        role.add_users(self.student)
+        assert len(list(role.get_org_for_user(self.student))) == 1
+        role_second_org = OrgContentCreatorRole(org=self.orgs[1])
+        role_second_org.add_users(self.student)
+        assert len(list(role.get_org_for_user(self.student))) == 2
 
 
 @ddt.ddt

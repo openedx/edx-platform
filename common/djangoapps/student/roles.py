@@ -220,7 +220,7 @@ class RoleBase(AccessRole):
 
     def get_org_for_user(self, user):
         """
-        Returns a list of org short name for the user with given role.
+        Returns a list of org short names for the user with given role.
         """
         return CourseAccessRole.objects.filter(user=user, role=self._role_name).values_list('org', flat=True)
 

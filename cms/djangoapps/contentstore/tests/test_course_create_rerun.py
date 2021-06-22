@@ -225,7 +225,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'short_name': self.source_course_key.org,
             'description': 'Testing Organization Description',
         })
-        update_org_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.source_course_key.org])
+        update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.source_course_key.org])
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': self.source_course_key.org,
