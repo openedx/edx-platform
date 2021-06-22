@@ -41,7 +41,7 @@ def test_webinar_registration_view_register_user_with_no_prior_registration(acti
     """
     Test webinar registration and cancellation if webinar was not previously registered by user
     """
-    mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.api_views.send_webinar_registration_email')
+    mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.api.views.send_webinar_registration_email')
     user, client = user_client
 
     response = client.post(reverse('webinars_api:webinar_registration', kwargs={'pk': webinar.id, 'action': action}))
@@ -60,7 +60,7 @@ def test_webinar_registration_view_register_user_with_prior_registration(action,
     """
     Test webinar registration and cancellation if webinar was previously registered or canceled by user
     """
-    mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.api_views.send_webinar_registration_email')
+    mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.api.views.send_webinar_registration_email')
     user, client = user_client
     registration = WebinarRegistrationFactory(user=user, is_registered=is_registered)
 

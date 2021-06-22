@@ -8,7 +8,32 @@ from openedx.adg.lms.applications.helpers import check_validations_for_current_r
 from openedx.adg.lms.applications.models import Education, Reference, WorkExperience
 
 
-class EducationSerializer(serializers.ModelSerializer):
+class ApplicationRequirementsSerializer(serializers.ModelSerializer):
+    """
+    Base serializer to add `user_application` while validating the data for Education, Work Experience and References
+    while creating and updating objects.
+    """
+
+    def validate(self, attrs):
+        """
+        Adds `user_application` to the data using the `request.user`.
+
+        Args:
+            attrs (dict): Dict containing data to be validated
+
+        Returns:
+            dict: Validated data
+        """
+        user = self.context['request'].user
+
+        if hasattr(user, 'application'):
+            attrs['user_application'] = user.application
+        else:
+            raise serializers.ValidationError('User has no written application')
+        return super(ApplicationRequirementsSerializer, self).validate(attrs)
+
+
+class EducationSerializer(ApplicationRequirementsSerializer):
     """
     Serializer for the `Education` model
     """
@@ -52,11 +77,11 @@ class EducationSerializer(serializers.ModelSerializer):
         model = Education
         fields = '__all__'
         read_only_fields = (
-            'id', 'created', 'modified',
+            'id', 'created', 'modified', 'user_application',
         )
 
 
-class WorkExperienceSerializer(serializers.ModelSerializer):
+class WorkExperienceSerializer(ApplicationRequirementsSerializer):
     """
     Serializer for the `WorkExperience` model
     """
@@ -88,29 +113,32 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
         model = WorkExperience
         fields = '__all__'
         read_only_fields = (
-            'id', 'created', 'modified',
+            'id', 'created', 'modified', 'user_application',
         )
 
 
-class ReferenceSerializer(serializers.ModelSerializer):
+class ReferenceSerializer(ApplicationRequirementsSerializer):
     """
     Serializer for the `Reference` model
     """
 
-    def validate_user_application(self, value):
+    def validate(self, attrs):
         """
         Validate that max reference limit against a user application is not exceeded in case of a create request
         """
+        super().validate(attrs)
+
         is_update_request = bool(self.instance)
         if is_update_request:
-            return value
+            return attrs
 
-        max_limit_reached = Reference.objects.filter(user_application=value).count() == MAX_NUMBER_OF_REFERENCES
-        if max_limit_reached:
-            raise serializers.ValidationError(MAX_REFERENCE_ERROR_MSG)
+        existing_reference_count = Reference.objects.filter(user_application=attrs['user_application']).count()
+        if existing_reference_count == MAX_NUMBER_OF_REFERENCES:
+            raise serializers.ValidationError({'user_application': MAX_REFERENCE_ERROR_MSG})
 
-        return value
+        return attrs
 
     class Meta:
         model = Reference
         fields = ['id', 'name', 'position', 'relationship', 'phone_number', 'email', 'user_application']
+        read_only_fields = ('user_application',)

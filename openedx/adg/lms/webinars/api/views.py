@@ -9,10 +9,13 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 
+from openedx.adg.lms.webinars.helpers import (
+    cancel_all_reminders,
+    schedule_webinar_reminders,
+    send_webinar_registration_email
+)
+from openedx.adg.lms.webinars.models import Webinar, WebinarRegistration
 from openedx.core.lib.api.view_utils import view_auth_classes
-
-from .helpers import cancel_all_reminders, schedule_webinar_reminders, send_webinar_registration_email
-from .models import Webinar, WebinarRegistration
 
 
 @view_auth_classes(is_authenticated=True)
