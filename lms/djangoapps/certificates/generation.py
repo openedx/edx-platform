@@ -28,7 +28,7 @@ from openedx.core.djangoapps.content.course_overviews.api import get_course_over
 log = logging.getLogger(__name__)
 
 
-def generate_course_certificate(user, course_key, generation_mode):
+def generate_course_certificate(user, course_key, status, generation_mode):
     """
     Generate a course certificate for this user, in this course run. If the certificate has a passing status, also emit
     a certificate event.
@@ -39,10 +39,11 @@ def generate_course_certificate(user, course_key, generation_mode):
     Args:
         user: user for whom to generate a certificate
         course_key: course run key for which to generate a certificate
+        status: certificate status (value from the CertificateStatuses model)
         generation_mode: Used when emitting an events. Options are "self" (implying the user generated the cert
             themself) and "batch" for everything else.
     """
-    cert = _generate_certificate(user, course_key)
+    cert = _generate_certificate(user, course_key, status)
 
     if CertificateStatuses.is_passing_status(cert.status):
         # Emit a certificate event
@@ -56,10 +57,13 @@ def generate_course_certificate(user, course_key, generation_mode):
         emit_certificate_event(event_name='created', user=user, course_id=course_key, event_data=event_data)
         emit_segment_event(user_id=user.id, course_id=course_key)
 
+    elif CertificateStatuses.unverified == cert.status:
+        cert.mark_unverified(source='certificate_generation')
+
     return cert
 
 
-def _generate_certificate(user, course_key):
+def _generate_certificate(user, course_key, status):
     """
     Generate a certificate for this user, in this course run.
     """
@@ -87,7 +91,7 @@ def _generate_certificate(user, course_key):
             'course_id': course_key,
             'mode': enrollment_mode,
             'name': profile_name,
-            'status': CertificateStatuses.downloadable,
+            'status': status,
             'grade': course_grade.percent,
             'download_url': '',
             'key': '',

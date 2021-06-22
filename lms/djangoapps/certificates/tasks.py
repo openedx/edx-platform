@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation import (
     generate_course_certificate,
     generate_user_certificates
@@ -45,10 +46,11 @@ def generate_certificate(self, **kwargs):
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     expected_verification_status = kwargs.pop('expected_verification_status', None)
     v2_certificate = kwargs.pop('v2_certificate', False)
+    status = kwargs.pop('status', CertificateStatuses.downloadable)
     generation_mode = kwargs.pop('generation_mode', 'batch')
 
     if v2_certificate:
-        generate_course_certificate(user=student, course_key=course_key, generation_mode=generation_mode)
+        generate_course_certificate(user=student, course_key=course_key, status=status, generation_mode=generation_mode)
         return
 
     if expected_verification_status:
