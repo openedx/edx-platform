@@ -17,6 +17,7 @@ def plugin_settings(settings):
         'hijack',
         'hijack_admin',
 
+        'openedx.core.djangoapps.appsembler.i18n',
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
