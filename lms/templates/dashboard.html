@@ -319,7 +319,7 @@ from common.djangoapps.student.models import CourseEnrollment
 </main>
 
 %if show_account_activation_popup:
-    <div id="activate-account-modal" class="modal activate-account-modal" aria-hidden="true">
+    <div id="activate-account-modal" class="modal activate-account-modal" aria-hidden="true" tabindex=0 >
       <div class="inner-wrapper" role="dialog" aria-labelledby="activate-account-modal-title" aria-live="polite">
           <h3>
              ${_("Activate your account so you can log back in")}
