@@ -69,6 +69,26 @@ def compose_and_send_adg_password_reset_email(user, request):
     task_send_mandrill_email(MandrillClient.PASSWORD_RESET, [user.email], context)
 
 
+def send_adg_password_reset_success_email(user, request):
+    """
+    Sends edx default email if the environment is testing. Otherwise, sends adg password reset
+    success email
+    """
+    from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_success_email
+
+    if is_testing_environment():
+        send_password_reset_success_email(user, request)
+        return
+
+    root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    context = {
+        'first_name': get_user_first_name(user),
+        'signin_link': '{}/login'.format(root_url),
+    }
+
+    task_send_mandrill_email(MandrillClient.PASSWORD_RESET_SUCCESS, [user.email], context)
+
+
 def compose_and_send_adg_update_email_verification(new_email, use_https, confirm_link):
     """
     Prepare and send email for change email verification

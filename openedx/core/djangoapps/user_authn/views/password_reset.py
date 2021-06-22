@@ -28,7 +28,10 @@ from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from openedx.adg.lms.student.helpers import compose_and_send_adg_password_reset_email
+from openedx.adg.lms.student.helpers import (
+    compose_and_send_adg_password_reset_email,
+    send_adg_password_reset_success_email
+)
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -516,7 +519,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         if password_reset_successful and is_account_recovery:
             self._handle_password_creation(request, updated_user)
 
-        send_password_reset_success_email(updated_user, request)
+        send_adg_password_reset_success_email(updated_user, request)
         return response
 
     def dispatch(self, *args, **kwargs):
@@ -741,7 +744,8 @@ def password_reset_logistration(request, **kwargs):
                         }
                     )
                     user.save()
-                    send_password_reset_success_email(user, request)
+                    send_adg_password_reset_success_email(user, request)
+
                 except ObjectDoesNotExist:
                     log.error('Account recovery process initiated without AccountRecovery instance for user {username}'
                               .format(username=user.username))
