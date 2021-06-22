@@ -676,7 +676,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.5
+ora2==3.6.6
     # via -r requirements/edx/base.in
 packaging==20.9
     # via
