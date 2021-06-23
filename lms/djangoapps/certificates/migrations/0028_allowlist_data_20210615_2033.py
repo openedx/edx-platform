@@ -5,34 +5,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    """
-    Copy data from the CertificateWhitelist to the CertificateAllowlist
-    """
-    def copy_to_allowlist(apps, schema_editor):
-        CertificateWhitelist = apps.get_model('certificates', 'CertificateWhitelist')
-        CertificateAllowlist = apps.get_model('certificates', 'CertificateAllowlist')
-
-        whitelisted = CertificateWhitelist.objects.all().order_by('id')
-        paginator = Paginator(whitelisted, 1000)
-
-        for page_num in paginator.page_range:
-            page = paginator.page(page_num)
-
-            for w in page.object_list:
-                CertificateAllowlist.objects.update_or_create(
-                    user_id=w.user_id,
-                    course_id=w.course_id,
-                    defaults={
-                        'allowlist': w.whitelist,
-                        'notes': w.notes,
-                    }
-                )
 
     dependencies = [
         ('certificates', '0027_historicalcertificateallowlist'),
     ]
 
     operations = [
-        migrations.RunPython(copy_to_allowlist, reverse_code=migrations.RunPython.noop)
+        # Note: this migration has been superseded by 0029 and is a no-op
+        migrations.RunPython(migrations.RunPython.noop, reverse_code=migrations.RunPython.noop)
     ]
 
