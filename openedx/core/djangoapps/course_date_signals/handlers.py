@@ -1,19 +1,18 @@
 """Signal handlers for writing course dates into edx_when."""
 
 
-from datetime import timedelta, datetime
-import datetime
+from datetime import timedelta
 import logging
 
-from cms.djangoapps.contentstore.config.waffle import custom_pls_is_active
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
+from xblock.fields import Scope
 
-from xmodule.util.misc import is_xblock_an_assignment
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
-from xblock.fields import Scope  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
+from xmodule.util.misc import is_xblock_an_assignment
 
 from .models import SelfPacedRelativeDatesConfig
 from .utils import spaced_out_sections
@@ -30,11 +29,6 @@ def _field_values(fields, xblock):
         if field_name not in xblock.fields:
             continue
         field = xblock.fields[field_name]
-        if field_name == 'due':
-            print("THIS IS THE FIELD ", field)
-            print(xblock)
-            result[field.name] = field.read_from(xblock)
-            continue
         if field.scope == Scope.settings and field.is_set_on(xblock):
             try:
                 result[field.name] = field.read_from(xblock)
@@ -86,39 +80,27 @@ def _gather_graded_items(root, due):  # lint-amnesty, pylint: disable=missing-fu
     return []
 
 
+def _get_custom_pacing_children(subsection, num_weeks):
+    """
+    Return relative date items for the subsection and its children
+    """
+    items = [subsection]
+    section_date_items = []
+    while items:
+        next_item = items.pop()
+        # Open response assessment problems have their own due dates
+        if next_item.category != 'openassessment':
+            section_date_items.append((next_item.location, {'due': timedelta(weeks=num_weeks)}))
+            items.extend(next_item.get_children())
+    return section_date_items
+
+
 def extract_dates_from_course(course):
     """
     Extract all dates from the supplied course.
     """
     log.info('Extracting course dates for %s', course.id)
-
-    if course.self_paced and custom_pls_is_active(course.id):
-        print("This is self paced ")
-        date_items = []
-        store = modulestore()
-        with store.branch_setting(ModuleStoreEnum.Branch.published_only, course.id):
-            items = store.get_items(course.id)
-        log.info('Extracting dates from %d items in %s', len(items), course.id)
-        print("B4 the items sections")
-        # new_fields_to_extract = FIELDS_TO_EXTRACT + ('due_num_weeks',)
-        # print("THe new fields to extract ", new_fields_to_extract)
-        for item in items:
-            metadata = _field_values(FIELDS_TO_EXTRACT, item)
-            print("THIS IS THE METADATA ", metadata)
-            metadata['due'] = datetime.datetime.now() - metadata['due']
-            
-            # print("TYPE OF DATES: ", metadata)
-            # print("RIGHT NOW, ", datetime.datetime.now())
-            # print(metadata['due'])
-            # metadata['due'] = datetime.datetime.now() - metadata['due']
-            # print('metadata due: ', metadata['due'])
-            metadata.pop('due_num_weeks',None)
-            # print("THIS IS THE DUE DATE: ", metadata['due'])
-            date_items.append((item.location, metadata))
-            # date_items.append((item.location, _field_values(FIELDS_TO_EXTRACT, item)))
-        print("Here are the date items: ", date_items)
-
-    elif course.self_paced and not custom_pls_is_active(course.id):
+    if course.self_paced:
         metadata = _field_values(FIELDS_TO_EXTRACT, course)
         # self-paced courses may accidentally have a course due date
         metadata.pop('due', None)
@@ -129,11 +111,18 @@ def extract_dates_from_course(course):
             # unless that item already has a relative date set
             for _, section, weeks_to_complete in spaced_out_sections(course):
                 section_date_items = []
-                print("THESE IS THE WEEKS TO COMPLETE ,", weeks_to_complete)
                 for subsection in section.get_children():
-                    section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
-
-                if section_date_items and section.graded:
+                    # If custom pacing is set on a subsection, apply the set relative
+                    # date to all the content inside the subsection. Otherwise
+                    # apply the default Personalized Learner Schedules (PLS)
+                    # logic for self paced courses.
+                    due_num_weeks = subsection.fields['due_num_weeks'].read_from(subsection)
+                    if (CUSTOM_PLS.is_enabled(course.id) and due_num_weeks):
+                        section_date_items.extend(_get_custom_pacing_children(subsection, due_num_weeks))
+                    else:
+                        section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
+                # if custom pls is active, we will allow due dates to be set for ungraded items as well
+                if section_date_items and (section.graded or CUSTOM_PLS.is_enabled(course.id)):
                     date_items.append((section.location, weeks_to_complete))
                 date_items.extend(section_date_items)
     else:
@@ -144,7 +133,6 @@ def extract_dates_from_course(course):
         log.info('Extracting dates from %d items in %s', len(items), course.id)
         for item in items:
             date_items.append((item.location, _field_values(FIELDS_TO_EXTRACT, item)))
-
     return date_items
 
 

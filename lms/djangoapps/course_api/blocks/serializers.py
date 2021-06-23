@@ -51,7 +51,6 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('format'),
     SupportedFieldType('start'),
     SupportedFieldType('due'),
-    SupportedFieldType('due_num_weeks'),
     SupportedFieldType('contains_gated_content'),
     SupportedFieldType('has_score'),
     SupportedFieldType('has_scheduled_content'),
