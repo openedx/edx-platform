@@ -9,13 +9,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from openedx.core.lib.api.view_utils import validate_course_key
 from .api import get_user_course_outline_details
 from .api.permissions import can_call_public_api
 from .data import CourseOutlineData
@@ -156,7 +155,7 @@ class CourseOutlineView(APIView):
         """
         # Translate input params and do course key validation (will cause HTTP
         # 400 error if an invalid CourseKey was entered, instead of 404).
-        course_key = self._validate_course_key(course_key_str)
+        course_key = validate_course_key(course_key_str)
         at_time = datetime.now(timezone.utc)
 
         if not can_call_public_api(request.user, course_key):
@@ -171,16 +170,6 @@ class CourseOutlineView(APIView):
 
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
-
-    def _validate_course_key(self, course_key_str):
-        """Validate the Course Key and raise a ValidationError if it fails."""
-        try:
-            course_key = CourseKey.from_string(course_key_str)
-        except InvalidKeyError as err:
-            raise serializers.ValidationError(f"{course_key_str} is not a valid CourseKey") from err
-        if course_key.deprecated:
-            raise serializers.ValidationError("Deprecated CourseKeys (Org/Course/Run) are not supported.")
-        return course_key
 
     def _determine_user(self, request):
         """

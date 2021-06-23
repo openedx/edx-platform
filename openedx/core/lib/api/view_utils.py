@@ -12,7 +12,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.exceptions import APIException, ErrorDetail
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
@@ -401,33 +401,60 @@ def get_course_key(request, course_id=None):
     return CourseKey.from_string(course_id)
 
 
-def verify_course_exists(view_func):
+def verify_course_exists(missing_course_error_message=None):
     """
     A decorator to wrap a view function that takes `course_key` as a parameter.
 
     Raises:
         An API error if the `course_key` is invalid, or if no `CourseOverview` exists for the given key.
     """
-    @wraps(view_func)
-    def wrapped_function(self, request, **kwargs):
-        """
-        Wraps the given view_function.
-        """
-        try:
-            course_key = get_course_key(request, kwargs.get('course_id'))
-        except InvalidKeyError:
-            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message='The provided course key cannot be parsed.',
-                error_code='invalid_course_key'
-            )
 
-        if not CourseOverview.course_exists(course_key):
-            raise self.api_error(
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message=f"Requested grade for unknown course {str(course_key)}",
-                error_code='course_does_not_exist'
-            )
+    if not missing_course_error_message:
+        missing_course_error_message = "Unknown course {course}"
 
-        return view_func(self, request, **kwargs)
-    return wrapped_function
+    def _verify_course_exists(view_func):
+        @wraps(view_func)
+        def wrapped_function(self, request, **kwargs):
+            """
+            Wraps the given view_function.
+            """
+            try:
+                course_key = get_course_key(request, kwargs.get('course_id'))
+            except InvalidKeyError as error:
+                raise self.api_error(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    developer_message='The provided course key cannot be parsed.',
+                    error_code='invalid_course_key'
+                ) from error
+            if not CourseOverview.course_exists(course_key):
+                raise self.api_error(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    developer_message=missing_course_error_message.format(course=str(course_key)),
+                    error_code='course_does_not_exist'
+                )
+
+            return view_func(self, request, **kwargs)
+        return wrapped_function
+    return _verify_course_exists
+
+
+def validate_course_key(course_key_string: str) -> CourseKey:
+    """
+    Validate and parse a course_key string, if supported.
+
+    Args:
+        course_key_string (str): string course key to validate
+
+    Returns:
+        CourseKey: validated course key
+
+    Raises:
+        ValidationError: DRF Validation error in case the course key is invalid
+    """
+    try:
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError as error:
+        raise serializers.ValidationError(f"{course_key_string} is not a valid CourseKey") from error
+    if course_key.deprecated:
+        raise serializers.ValidationError("Deprecated CourseKeys (Org/Course/Run) are not supported.")
+    return course_key
