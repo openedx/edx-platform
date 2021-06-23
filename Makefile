@@ -123,6 +123,9 @@ docker_tag: docker_build
 	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
 	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
 
+docker_build_test:
+	docker-compose -f Test.docker-compose.yml up --abort-on-container-exit
+
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 

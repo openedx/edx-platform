@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: Docker
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        node-version: [ 12 ]
+        python-version: [ 3.8 ]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create Docker Image & Run Tests
+      run: |
+        make docker_build_test
