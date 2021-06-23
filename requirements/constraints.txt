@@ -8,6 +8,12 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
+# kombu needs additional functionality to support multi-tenant redis
+# This branch backports the following PRs to kombu 4.6.11, because celery 4.4.7 has requirement kombu<4.7,>=4.6.10
+# https://github.com/celery/kombu/pull/1351
+# https://github.com/celery/kombu/pull/1349
+# https://github.com/celery/kombu/pull/1376
+git+https://github.com/open-craft/kombu.git@gabor/FAL-2030-4.6.11#egg=kombu==4.6.11.1
 
 # This file contains all common constraints for edx-repos
 -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt

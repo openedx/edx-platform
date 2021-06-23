@@ -21,6 +21,8 @@ jinja2-pluralize==0.3.0
 markupsafe==2.0.1
     # via jinja2
 pluggy==0.13.1
-    # via diff-cover
+    # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   diff-cover
 pygments==2.10.0
     # via diff-cover
