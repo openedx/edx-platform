@@ -48,7 +48,7 @@ nltk==3.6.2
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
-numpy==1.20.3
+numpy==1.21.0
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem

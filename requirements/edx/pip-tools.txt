@@ -10,10 +10,13 @@ click==7.1.2
     #   pip-tools
 pep517==0.10.0
     # via pip-tools
-pip-tools==6.1.0
+pip-tools==6.2.0
     # via -r requirements/edx/pip-tools.in
 toml==0.10.2
     # via pep517
+wheel==0.36.2
+    # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
+# setuptools
