@@ -11,5 +11,5 @@ def test_prevent_recursion_error_in_module_i18n_service():
 
     See RED-2263 and https://github.com/appsembler/edx-platform/pull/953 for more details.
     """
-    assert '_fallback' in ModuleI18nService, 'ModuleI18nService should have explicit fallback'
+    assert '_fallback' in ModuleI18nService.__dict__, 'ModuleI18nService should have explicit fallback'
     assert ModuleI18nService._fallback is None, 'Fix RecursionError in certain XBlocks'
