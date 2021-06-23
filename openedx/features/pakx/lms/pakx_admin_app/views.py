@@ -5,10 +5,10 @@ import uuid
 
 from django.contrib.auth.models import Group, User
 from django.db import transaction
-from django.db.models import F, Prefetch
+from django.db.models import F, Prefetch, Q
 from organizations.models import Organization
 from rest_framework import generics, status, views, viewsets
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from six import text_type
@@ -66,7 +66,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
     User view-set for user listing/create/update/active/de-active
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
     pagination_class = PakxAdminAppPagination
     serializer_class = UserSerializer
@@ -132,6 +132,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
         if languages:
             self.queryset = self.queryset.filter(profile__language__in=languages)
+
+        search = self.request.query_params.get('search', '').strip()
+        for s_text in search.split():
+            self.queryset = self.queryset.filter(
+                Q(first_name__contains=s_text) | Q(last_name__contains=s_text) | Q(email__contains=s_text)
+            )
 
         page = self.paginate_queryset(self.queryset)
         if page is not None:
