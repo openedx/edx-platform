@@ -1,20 +1,22 @@
-from re import search
-from logging import getLogger
+""" Overrides app util functions """
+
 from datetime import datetime
+from logging import getLogger
+from re import search
+
 from completion.models import BlockCompletion
 from django.db.models import Case, IntegerField, Sum, When
 from django.db.models.functions import Coalesce
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from student.models import CourseEnrollment
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
-
 from openedx.core.lib.request_utils import get_request_or_stub
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
+from student.models import CourseEnrollment
 
 log = getLogger(__name__)
 
