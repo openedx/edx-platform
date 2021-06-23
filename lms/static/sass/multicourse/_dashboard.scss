@@ -1067,6 +1067,10 @@
         }
       }
 
+      &.course-status-processing {
+        color: $danger-500;
+      }
+
       &.course-status-earned-not-available,
       &.course-status-certavailable {
         color: #0d7d4d;
