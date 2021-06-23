@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -111,19 +111,22 @@ def extract_dates_from_course(course):
             # unless that item already has a relative date set
             for _, section, weeks_to_complete in spaced_out_sections(course):
                 section_date_items = []
+                # section_due_date will end up being the max of all due dates of its subsections
+                section_due_date = timedelta(weeks=1)
                 for subsection in section.get_children():
                     # If custom pacing is set on a subsection, apply the set relative
                     # date to all the content inside the subsection. Otherwise
                     # apply the default Personalized Learner Schedules (PLS)
                     # logic for self paced courses.
-                    due_num_weeks = subsection.fields['due_num_weeks'].read_from(subsection)
-                    if (CUSTOM_PLS.is_enabled(course.id) and due_num_weeks):
-                        section_date_items.extend(_get_custom_pacing_children(subsection, due_num_weeks))
+                    relative_weeks_due = subsection.fields['relative_weeks_due'].read_from(subsection)
+                    if (CUSTOM_RELATIVE_DATES.is_enabled(course.id) and relative_weeks_due):
+                        section_due_date = max(section_due_date, timedelta(weeks=relative_weeks_due))
+                        section_date_items.extend(_get_custom_pacing_children(subsection, relative_weeks_due))
                     else:
+                        section_due_date = max(section_due_date, weeks_to_complete)
                         section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
-                # if custom pls is active, we will allow due dates to be set for ungraded items as well
-                if section_date_items and (section.graded or CUSTOM_PLS.is_enabled(course.id)):
-                    date_items.append((section.location, weeks_to_complete))
+                if section_date_items and (section.graded or CUSTOM_RELATIVE_DATES.is_enabled(course.id)):
+                    date_items.append((section.location, {'due': section_due_date}))
                 date_items.extend(section_date_items)
     else:
         date_items = []

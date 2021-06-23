@@ -2,7 +2,7 @@
 from datetime import timedelta
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
-from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.course_date_signals.handlers import (
     _gather_graded_items,
@@ -125,11 +125,11 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
     def test_get_custom_pacing_children(self):
         """
         _get_custom_pacing_items should return a list of (block item location, field metadata dictionary)
-        where the due dates are set from due_num_weeks
+        where the due dates are set from relative_weeks_due
         """
         # A subsection with multiple units but no problems. Units should inherit due date.
         with self.store.bulk_operations(self.course.id):
-            sequence = ItemFactory(parent=self.course, category='sequential', due_num_weeks=2)
+            sequence = ItemFactory(parent=self.course, category='sequential', relative_weeks_due=2)
             vertical1 = ItemFactory(parent=sequence, category='vertical')
             vertical2 = ItemFactory(parent=sequence, category='vertical')
             vertical3 = ItemFactory(parent=sequence, category='vertical')
@@ -175,7 +175,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(self_paced=True)
         self.chapter = ItemFactory.create(category='chapter', parent=self.course)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_inheritance(self):
         """
         extract_dates_from_course should return a list of (block item location, field metadata dictionary)
@@ -183,12 +183,12 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         (ex. If a subsection is assigned a due date, its children should also have the same due date)
         """
         with self.store.bulk_operations(self.course.id):
-            sequential = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
+            sequential = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=3)
             vertical = ItemFactory.create(category='vertical', parent=sequential)
             problem = ItemFactory.create(category='problem', parent=vertical)
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, timedelta(days=28)),
+                (self.chapter.location, {'due': timedelta(days=21)}),
                 (sequential.location, {'due': timedelta(days=21)}),
                 (vertical.location, {'due': timedelta(days=21)}),
                 (problem.location, {'due': timedelta(days=21)})
@@ -196,38 +196,38 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_one_subsection(self):
         """
-        due_num_weeks in one of the subsections. Only one of them should have a set due date.
+        relative_weeks_due in one of the subsections. Only one of them should have a set due date.
         The other subsections do not have due dates because they are not graded
         and default PLS do not assign due dates to non graded assignments.
         If custom PLS is not set, the subsection will fall back to the default
         PLS logic of evenly spaced sections.
         """
         with self.store.bulk_operations(self.course.id):
-            sequential = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
+            sequential = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=3)
             ItemFactory.create(category='sequential', parent=self.chapter)
             ItemFactory.create(category='sequential', parent=self.chapter)
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, timedelta(days=28)),
+                (self.chapter.location, {'due': timedelta(days=28)}),
                 (sequential.location, {'due': timedelta(days=21)})
             ]
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_one_subsection_graded(self):
         """
-        A section with a subsection that has due_num_weeks and
-        a subsection without due_num_weeks that has graded content.
-        Default PLS should apply for the subsection without due_num_weeks that has graded content.
+        A section with a subsection that has relative_weeks_due and
+        a subsection without relative_weeks_due that has graded content.
+        Default PLS should apply for the subsection without relative_weeks_due that has graded content.
         If custom PLS is not set, the subsection will fall back to the default
         PLS logic of evenly spaced sections.
         """
         with self.store.bulk_operations(self.course.id):
-            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=2)
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=2)
             vertical1 = ItemFactory.create(category='vertical', parent=sequential1)
             problem1 = ItemFactory.create(category='problem', parent=vertical1)
 
@@ -238,11 +238,11 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
 
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, timedelta(days=21)),
+                (self.chapter.location, {'due': timedelta(days=14)}),
                 (sequential1.location, {'due': timedelta(days=14)}),
                 (vertical1.location, {'due': timedelta(days=14)}),
                 (problem1.location, {'due': timedelta(days=14)}),
-                (chapter2.location, timedelta(days=42)),
+                (chapter2.location, {'due': timedelta(days=42)}),
                 (sequential2.location, {'due': timedelta(days=42)}),
                 (vertical2.location, {'due': timedelta(days=42)}),
                 (problem2.location, {'due': timedelta(days=42)})
@@ -251,23 +251,23 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=6)):
             self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_multiple_subsections_graded(self):
         """
-        A section with a subsection that has due_num_weeks and multiple sections without
-        due_num_weeks that has graded content. Default PLS should apply for the subsections
-        without due_num_weeks that has graded content.
+        A section with a subsection that has relative_weeks_due and multiple sections without
+        relative_weeks_due that has graded content. Default PLS should apply for the subsections
+        without relative_weeks_due that has graded content.
         If custom PLS is not set, the subsection will fall back to the default
         PLS logic of evenly spaced sections.
         """
         with self.store.bulk_operations(self.course.id):
-            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=4)
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=4)
             vertical1 = ItemFactory.create(category='vertical', parent=sequential1)
             problem1 = ItemFactory.create(category='problem', parent=vertical1)
 
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, timedelta(days=14)),
+                (self.chapter.location, {'due': timedelta(days=28)}),
                 (sequential1.location, {'due': timedelta(days=28)}),
                 (vertical1.location, {'due': timedelta(days=28)}),
                 (problem1.location, {'due': timedelta(days=28)})
@@ -280,7 +280,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
                 problem = ItemFactory.create(category='problem', parent=vertical)
                 num_days = i * 14 + 28
                 expected_dates.extend([
-                    (chapter.location, timedelta(days=num_days)),
+                    (chapter.location, {'due': timedelta(days=num_days)}),
                     (sequential.location, {'due': timedelta(days=num_days)}),
                     (vertical.location, {'due': timedelta(days=num_days)}),
                     (problem.location, {'due': timedelta(days=num_days)}),
@@ -289,19 +289,19 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=8)):
             self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_all_subsections(self):
         """
-        With due_num_weeks on all subsections. All subsections should
+        With relative_weeks_due on all subsections. All subsections should
         have their corresponding due dates.
         """
         with self.store.bulk_operations(self.course.id):
-            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
-            sequential2 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=4)
-            sequential3 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=5)
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=3)
+            sequential2 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=4)
+            sequential3 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=5)
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, timedelta(days=28)),
+                (self.chapter.location, {'due': timedelta(days=35)}),
                 (sequential1.location, {'due': timedelta(days=21)}),
                 (sequential2.location, {'due': timedelta(days=28)}),
                 (sequential3.location, {'due': timedelta(days=35)})
@@ -309,10 +309,10 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_PLS, active=True)
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_no_subsections(self):
         """
-        Without due_num_weeks on all subsections. None of the subsections should
+        Without relative_weeks_due on all subsections. None of the subsections should
         have due dates.
         """
         with self.store.bulk_operations(self.course.id):
