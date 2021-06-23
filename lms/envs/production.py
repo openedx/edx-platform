@@ -519,6 +519,7 @@ BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 BROKER_TRANSPORT_OPTIONS = {
     'fanout_patterns': True,
     'fanout_prefix': True,
+    **ENV_TOKENS.get('CELERY_BROKER_TRANSPORT_OPTIONS', {})
 }
 
 # Block Structures
