@@ -557,6 +557,7 @@ class TemporaryMigrationTests(ModuleStoreTestCase):
                     defaults={
                         'allowlist': w.whitelist,
                         'notes': w.notes,
+                        'created': w.created,
                     }
                 )
 
