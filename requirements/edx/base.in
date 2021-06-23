@@ -123,7 +123,6 @@ openedx-calc                        # Library supporting mathematical calculatio
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-PyContracts
 pycountry
 pycryptodomex
 pygments                            # Used to support colors in paver command output

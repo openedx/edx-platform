@@ -25,7 +25,7 @@ ASSET_SETTINGS_HELP = (
 
 
 def run_server(
-        system, fast=False, settings=None, asset_settings=None, port=None, contracts=False
+        system, fast=False, settings=None, asset_settings=None, port=None
 ):
     """Start the server for LMS or Studio.
 
@@ -35,7 +35,6 @@ def run_server(
         settings (str): The Django settings module to use; if not provided, use the default.
         asset_settings (str) The settings to use when generating assets. If not provided, assets are not generated.
         port (str): The port number to run the server on. If not provided, uses the default port for the system.
-        contracts (bool) If true then PyContracts is enabled (defaults to False).
     """
     if system not in ['lms', 'studio']:
         print("System must be either lms or studio", file=sys.stderr)
@@ -57,9 +56,6 @@ def run_server(
         port = DEFAULT_PORT[system]
 
     args = [settings, 'runserver', '--traceback', '--pythonpath=.', f'0.0.0.0:{port}']
-
-    if contracts:
-        args.append("--contracts")
 
     run_process(django_cmd(system, *args))
 
@@ -127,12 +123,6 @@ def devstack(args):
     parser.add_argument('--optimized', action='store_true', default=False, help="Run with optimized assets")
     parser.add_argument('--settings', type=str, default=DEFAULT_SETTINGS, help="Settings file")
     parser.add_argument('--asset-settings', type=str, default=None, help=ASSET_SETTINGS_HELP)
-    parser.add_argument(
-        '--no-contracts',
-        action='store_true',
-        default=False,
-        help="Disable contracts. By default, they're enabled in devstack."
-    )
     args = parser.parse_args(args)
     settings = args.settings
     asset_settings = args.asset_settings if args.asset_settings else settings
@@ -145,7 +135,6 @@ def devstack(args):
         fast=args.fast,
         settings=settings,
         asset_settings=asset_settings,
-        contracts=not args.no_contracts,
     )
 
 
