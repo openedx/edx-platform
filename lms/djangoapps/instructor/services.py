@@ -12,10 +12,11 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from common.djangoapps.student import auth
+from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import CourseStaffRole
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.instructor.views.tools import get_student_from_identifier
+from lms.djangoapps.instructor.tasks import complete_student_attempt_task
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -44,15 +45,12 @@ class InstructorService:
         course_id = CourseKey.from_string(course_id)
 
         try:
-            student = get_student_from_identifier(student_identifier)
+            student = get_user_by_username_or_email(student_identifier)
         except ObjectDoesNotExist:
             err_msg = (
                 'Error occurred while attempting to reset student attempts for user '
-                '{student_identifier} for content_id {content_id}. '
-                'User does not exist!'.format(
-                    student_identifier=student_identifier,
-                    content_id=content_id
-                )
+                f'{student_identifier} for content_id {content_id}. '
+                'User does not exist!'
             )
             log.error(err_msg)
             return
@@ -78,12 +76,25 @@ class InstructorService:
             except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
                 err_msg = (
                     'Error occurred while attempting to reset student attempts for user '
-                    '{student_identifier} for content_id {content_id}.'.format(
-                        student_identifier=student_identifier,
-                        content_id=content_id
-                    )
+                    f'{student_identifier} for content_id {content_id}.'
                 )
                 log.error(err_msg)
+
+    def complete_student_attempt(self, user_identifier: str, content_id: str) -> None:
+        """
+        Calls the complete_student_attempt_task
+
+        The task submits all completable xblocks inside of the content_id block to the
+        Completion Service to mark them as complete. One use case of this function is
+        for special exams (timed/proctored) where regardless of submission status on
+        individual problems, we want to mark the entire exam as complete when the exam
+        is finished.
+
+        params:
+            user_identifier (str): username or email of a user
+            content_id (str): the block key for a piece of content
+        """
+        complete_student_attempt_task.apply_async((user_identifier, content_id))
 
     def is_course_staff(self, user, course_id):
         """
