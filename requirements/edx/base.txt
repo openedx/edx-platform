@@ -142,6 +142,7 @@ cryptography==3.4.8
     #   -r requirements/edx/base.in
     #   django-fernet-fields
     #   edx-enterprise
+    #   jwcrypto
     #   pyjwt
     #   social-auth-core
 cssutils==2.3.0
@@ -159,6 +160,8 @@ defusedxml==0.7.1
     #   python3-saml
     #   safe-lxml
     #   social-auth-core
+deprecated==1.2.12
+    # via jwcrypto
 django==2.2.24
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
@@ -595,6 +598,8 @@ jsonfield2==3.0.3
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
+jwcrypto==0.9.1
+    # via pylti1p3
 kombu==4.6.11
     # via celery
 laboratory==1.0.2
@@ -768,9 +773,12 @@ pyjwt[crypto]==1.7.1
     #   edx-auth-backends
     #   edx-proctoring
     #   edx-rest-api-client
+    #   pylti1p3
     #   social-auth-core
 pylatexenc==2.10
     # via olxcleaner
+pylti1p3==1.9.1
+    # via -r requirements/edx/base.in
 pymongo==3.10.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -878,6 +886,7 @@ requests==2.26.0
     #   geoip2
     #   mailsnake
     #   pyjwkest
+    #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
     #   sailthru-client
@@ -944,6 +953,7 @@ six==1.16.0
     #   html5lib
     #   interchange
     #   isodate
+    #   jwcrypto
     #   libsass
     #   pansi
     #   paver

@@ -176,6 +176,7 @@ class ContentLibraryMetadata:
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
     has_unpublished_deletes = attr.ib(False)
+    allow_lti = attr.ib(False)
     # Allow any user (even unregistered users) to view and interact directly
     # with this library's content in the LMS
     allow_public_learning = attr.ib(False)
@@ -392,6 +393,7 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=bundle_metadata.latest_version,
         last_published=last_published,
+        allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,

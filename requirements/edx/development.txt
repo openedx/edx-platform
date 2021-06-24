@@ -201,6 +201,7 @@ cryptography==3.4.8
     #   -r requirements/edx/testing.txt
     #   django-fernet-fields
     #   edx-enterprise
+    #   jwcrypto
     #   pyjwt
     #   social-auth-core
 cssselect==1.1.0
@@ -225,6 +226,10 @@ defusedxml==0.7.1
     #   python3-saml
     #   safe-lxml
     #   social-auth-core
+deprecated==1.2.12
+    # via
+    #   -r requirements/edx/testing.txt
+    #   jwcrypto
 diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -787,6 +792,10 @@ jsonfield2==3.0.3
     #   ora2
 jsonschema==3.2.0
     # via sphinxcontrib-openapi
+jwcrypto==0.9.1
+    # via
+    #   -r requirements/edx/testing.txt
+    #   pylti1p3
 kombu==4.6.11
     # via
     #   -r requirements/edx/testing.txt
@@ -1037,6 +1046,7 @@ pyjwt[crypto]==1.7.1
     #   edx-auth-backends
     #   edx-proctoring
     #   edx-rest-api-client
+    #   pylti1p3
     #   social-auth-core
 pylatexenc==2.10
     # via
@@ -1065,6 +1075,8 @@ pylint-plugin-utils==0.6
     #   pylint-celery
     #   pylint-django
 pylint-pytest==0.3.0
+    # via -r requirements/edx/testing.txt
+pylti1p3==1.9.1
     # via -r requirements/edx/testing.txt
 pymongo==3.10.1
     # via
@@ -1221,6 +1233,7 @@ requests==2.26.0
     #   mailsnake
     #   pact-python
     #   pyjwkest
+    #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
     #   sailthru-client
@@ -1311,6 +1324,7 @@ six==1.16.0
     #   interchange
     #   isodate
     #   jsonschema
+    #   jwcrypto
     #   libsass
     #   pact-python
     #   pansi

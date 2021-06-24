@@ -258,6 +258,16 @@ FEATURES = {
     # only supported in courses using split mongo.
     'ENABLE_CONTENT_LIBRARIES': True,
 
+    # .. toggle_name: FEATURES['ENABLE_CONTENT_LIBRARIES_LTI_TOOL']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True, Content Libraries in
+    #    Studio can be used as an LTI 1.3 tool by external LTI platforms.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-08-17
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27411
+    'ENABLE_CONTENT_LIBRARIES_LTI_TOOL': False,
+
     # Milestones application flag
     'MILESTONES_APP': False,
 
@@ -617,6 +627,7 @@ EDX_ROOT_URL = ''
 AUTHENTICATION_BACKENDS = [
     'auth_backends.backends.EdXOAuth2',
     'rules.permissions.ObjectPermissionBackend',
+    'openedx.core.djangoapps.content_libraries.auth.LtiAuthenticationBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
@@ -1629,6 +1640,9 @@ INSTALLED_APPS = [
 
     # Allow Studio to use LMS for SSO
     'social_django',
+
+    # Content Library LTI 1.3 Support.
+    'pylti1p3.contrib.django.lti1p3_tool_config',
 ]
 
 
