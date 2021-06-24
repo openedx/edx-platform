@@ -36,8 +36,8 @@ a candidate for being bundled as a Course App.
 
 To be able to show these Course Apps to course admins, they will need to provide
 some bits of metadata, such as a name, a description etc. Additionally we will
-need a common interface for such assps so they can be enabled/disabled
-uniformly.
+need a common interface for such apps so they can be enabled/disabled using
+a standard common interface.
 
 To do this we can follow the example of existing plugins, [such as Course
 Tabs](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/common/lib/xmodule/xmodule/tabs.py#L24-L243),
@@ -46,14 +46,13 @@ implement. The required metadata and features, can be implemented as class
 attributes, and methods on this class.
 
 We can then discover the installed apps using the existing tooling for plugins
-using a subclas of PluginManager designed for this purpose. Here is an example
+using a subclass of PluginManager designed for this purpose. Here is an example
 for [Course
 Tabs](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/openedx/core/lib/course_tabs.py#L13-L47)
 
 It might not always make sense for an app installed in this way to be
 automatically show up for use on all courses. So each app will expose a method
-to check if it should be available for a particular course. For all new apps
-this should be done via a CourseWaffleFlag.
+to check if it should be available for a particular course.
 
 Once an app has been marked as available for a course, it will show up in the
 API, where the next step is to mark it as enabled.
@@ -70,21 +69,21 @@ enabled globally. In the case of an external plugin, you consider it installed
 if it is `pip install`ed in the same environment in which edx-platform is
 running.
 
-To make the feature available for use, you need to now [enable a feature
+To make the feature *available* for use, you need to now [enable a feature
 flag](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/lms/envs/common.py#L531-L543).
 Until this is set course authors/admins will [not even see the option of
 enabling this for their
 course](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/cms/djangoapps/models/settings/course_metadata.py#L91-L93).
 For course apps this is where the availability check comes in.
 
-Finally, once `edxnotes` has been enabled via the feature flag, an option will
-now show up in the advanced settings page of studio that allows you to enable
-it for a particular course. If this value is true, then edxnotes will be enabled
-for the course.
+In the case of `edxnotes`, after setting the above feature flag, an option will
+show up in the advanced settings page of studio that allows you to *enable*
+the `edxnotes` for a particular course. If this value is true, then edxnotes
+will be enabled for the course.
 
 In the case of Course Apps, the standard plugin API will automatically discover
-all installed apps. We will then filter out all apps that return a false value
-in their availability check.
+all installed apps. Inactive apps will be filtered out during the availability
+check.
 
 Course App Plugin Class
 -----------------------
@@ -185,10 +184,19 @@ The is also the structure that will form the basis of the API's response:
 
 This API can be hosted at: ``/course_apps/v1/apps/{course_id}/``
 
+    GET ``/course_apps/v1/apps/{course_id}/``
+
 A ``GET`` request to this API will return an array of objects with the above
-structure. A ``PATCH`` request to the same endpoint with just the ``id`` and the
-`enabled` attribute can be used to enable/disable the app if it's possible to do
-so.
+structure.
+
+    PATCH ``/course_apps/v1/apps/{course_id}/`` {
+        "id": "wiki",
+        "enabled": true
+    }
+
+A ``PATCH`` request to the same endpoint with just the ``id`` of the application
+and the ``enabled`` attribute can be used to enable/disable the app if it's
+possible to do so.
 
 Note that it may not always be possible to enable/disable an app. Similar to
 disabling an XBlock from a course that's in use, some apps might break the
