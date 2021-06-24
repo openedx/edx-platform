@@ -26484,21 +26484,6 @@ msgstr ""
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "أُنقر على زر \"بدء الامتحان المراقب\" أدناه للمتابعة."
 
-#~ msgid ""
-#~ "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-#~ " We do, and we’re glad to have you! Come see what everyone is learning."
-#~ msgstr ""
-#~ "هل تذكر عندما قمت بالتسجيل في %(course_name)s  وغيرها من المساقات على "
-#~ "edX.org؟ نحن لم ننسى وإننا لسعداء بوجودك معنا! تعال وشاهد ما  يتعلمه "
-#~ "الآخرون."
-
-#~ msgid ""
-#~ "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-#~ "glad to have you! Come see what everyone is learning."
-#~ msgstr ""
-#~ "هل تذكر عندما قمت بالتسجيل في %(course_name)s على edX.org؟ نحن لم ننسى وإننا"
-#~ " لسعداء بوجودك معنا! تعال وشاهد ما  يتعلمه الآخرون."
-
 #~ msgid "example: username@domain.com"
 #~ msgstr "مثال:  username@domain.com "
 
