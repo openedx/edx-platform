@@ -161,6 +161,35 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         assert outline.sections[0].sequences[2].title == "Seq_1_2"
         assert len(outline.sections[1].sequences) == 0
 
+    def test_duplicate_children(self):
+        with self.store.bulk_operations(self.course_key):
+            section_1 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section",
+            )
+            ItemFactory.create(
+                parent_location=section_1.location,
+                category='sequential',
+                display_name="standard_seq"
+            )
+
+            # This should work fine
+            section_2 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section 2",
+            )
+
+            persisted_sequence = section_1.children[0]
+            section_2.children = [persisted_sequence]
+
+        print('TEST FILE')
+        print(section_1.children)
+        print(section_2.children)
+        self.store.update_item(section_2, self.user.id)
+        outline, _errs = get_outline_from_modulestore(self.course_key)
+
     def test_unit_in_section(self):
         """
         Test when the structure is Course -> Section -> Unit.

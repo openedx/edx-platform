@@ -305,9 +305,22 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         # Pull course with depth=3 so we prefetch Section -> Sequence -> Unit
         course = store.get_course(course_key, depth=3)
+        print('PYTHON FILE')
         sections_data = []
-        for section in course.get_children():
-            section_data, section_errors = _make_section_data(section)
+        sections = course.get_children()
+        # for section in course.get_children():
+        for i in range(0,len(sections)):
+            for j in range(i+1,len(sections)):
+                if i == j:
+                    break
+                section_1_children = sections[i].children
+                section_2_children = sections[j].children
+                print(section_1_children)
+                print(section_2_children)
+                for child in section_1_children:
+                    if child in section_2_children:
+                        print('acyclical graph found')
+            section_data, section_errors = _make_section_data(sections[i])
             if section_data:
                 sections_data.append(section_data)
             content_errors.extend(section_errors)
