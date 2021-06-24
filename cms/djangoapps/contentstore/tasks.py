@@ -685,7 +685,7 @@ def update_all_outlines_from_modulestore_task():
                     ),
                     course_key_str
                 )
-                return
+                continue
 
             update_outline_from_modulestore_task.delay(course_key_str)
         except Exception:  # pylint: disable=broad-except
