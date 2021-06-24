@@ -17,7 +17,7 @@ from student.models import CourseEnrollment
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, ORG_ADMIN, TRAINING_MANAGER
 from .pagination import CourseEnrollmentPagination, PakxAdminAppPagination
-from .permissions import CanAccessPakXAdminPanel
+from .permissions import CanAccessPakXAdminPanel, IsSameOrganization
 from .serializers import (
     BasicUserSerializer,
     LearnersSerializer,
@@ -41,14 +41,13 @@ class UserCourseEnrollmentsListAPI(generics.ListAPIView):
     """
     serializer_class = UserCourseEnrollmentSerializer
     authentication_classes = [SessionAuthentication]
-    permission_classes = [CanAccessPakXAdminPanel]
+    permission_classes = [CanAccessPakXAdminPanel, IsSameOrganization]
     pagination_class = CourseEnrollmentPagination
     model = CourseEnrollment
 
     def get_queryset(self):
         return CourseEnrollment.objects.filter(
-            user_id=self.kwargs['user_id'], is_active=True,
-            user__profile=self.request.user.profile.organization_id
+            user_id=self.kwargs['user_id'], is_active=True
         ).select_related(
             'course'
         ).prefetch_related(
@@ -178,6 +177,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         else:
             queryset = User.objects.filter(**get_user_org_filter(self.request.user))
 
+        queryset = queryset.exclude(id=self.request.user.id)
         group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN]).order_by('name')
         return queryset.select_related(
             'profile'
