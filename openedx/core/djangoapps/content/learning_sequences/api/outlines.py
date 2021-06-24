@@ -139,11 +139,11 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     # represented (so query CourseSection explicitly instead of relying only on
     # select_related from CourseSectionSequence).
     section_models = CourseSection.objects \
-        .prefetch_related('user_partition_groups') \
+        .prefetch_related('new_user_partition_groups') \
         .filter(course_context=course_context) \
         .order_by('ordering')
     section_sequence_models = CourseSectionSequence.objects \
-        .prefetch_related('user_partition_groups') \
+        .prefetch_related('new_user_partition_groups') \
         .filter(course_context=course_context) \
         .order_by('ordering') \
         .select_related('sequence', 'exam')
@@ -173,7 +173,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
             ),
             exam=exam_data,
             user_partition_groups=_get_user_partition_groups_from_qset(
-                sec_seq_model.user_partition_groups.all()
+                sec_seq_model.new_user_partition_groups.all()
             ),
         )
         sec_ids_to_sequence_list[sec_seq_model.section_id].append(sequence_data)
@@ -188,7 +188,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
                 visible_to_staff_only=section_model.visible_to_staff_only,
             ),
             user_partition_groups=_get_user_partition_groups_from_qset(
-                section_model.user_partition_groups.all()
+                section_model.new_user_partition_groups.all()
             ),
         )
         for section_model in section_models
@@ -552,17 +552,6 @@ def _update_user_partition_groups(upg_data: Dict[int, FrozenSet[int]],
     """
     Replace UserPartitionGroups associated with this content with `upg_data`.
     """
-    model_obj.user_partition_groups.all().delete()
-    if upg_data:
-        for partition_id, group_ids in upg_data.items():
-            for group_id in group_ids:
-                upg, _ = UserPartitionGroup.objects.get_or_create(
-                    partition_id=partition_id, group_id=group_id
-                )
-                model_obj.user_partition_groups.add(upg)
-
-    # Temporarily fill-in the new and old user_partition_group fields.
-    # Switchover to the new field will occur after all models have been repopulated.
     model_obj.new_user_partition_groups.all().delete()
     if upg_data:
         for partition_id, group_ids in upg_data.items():
