@@ -87,7 +87,7 @@ jobs:
 
       - name: Commit changed translation files
         id: commit-and-push-generated-files
-        uses: EndBug/add-and-commit@v6
+        uses: EndBug/add-and-commit@v7
         with:
           message: 'Add changed translation files'
           add: "['conf/locale/ar/LC_MESSAGES/django.mo',
@@ -96,6 +96,7 @@ jobs:
                  'conf/locale/ar/LC_MESSAGES/djangojs.mo',
                  'lms/static/js/i18n/ar/djangojs.js']"
           push: true
+          pull_strategy: 'NO-PULL'
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
 
@@ -103,4 +104,4 @@ jobs:
         id: push-generated-translations
         env:
           TX_TOKEN: ${{ secrets.TX_TOKEN }}
-        run: tx push -s -t
+        run: tx push -s -t --skip
