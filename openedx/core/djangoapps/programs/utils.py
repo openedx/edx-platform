@@ -25,6 +25,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
@@ -328,7 +329,7 @@ class ProgramProgressMeter:
                 modes_match = course_run_mode == certificate_mode
 
                 # Grab the available date and keep it if it's the earliest one for this catalog course.
-                if modes_match and certificate_api.is_passing_status(certificate.status):
+                if modes_match and CertificateStatuses.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
                     available_date = available_date_for_certificate(course_overview, certificate)
                     earliest_course_run_date = min(
@@ -447,7 +448,7 @@ class ProgramProgressMeter:
             except CourseOverview.DoesNotExist:
                 may_certify = True
             if (
-                certificate_api.is_passing_status(certificate['status'])
+                CertificateStatuses.is_passing_status(certificate['status'])
                 and may_certify
             ):
                 completed_runs.append(course_data)

@@ -44,6 +44,7 @@ from lms.djangoapps.certificates.api import (
     get_allowlisted_users,
     get_certificate_footer_context,
     get_certificate_for_user,
+    get_certificate_for_user_id,
     get_certificate_header_context,
     get_certificate_invalidation_entry,
     get_certificate_url,
@@ -428,6 +429,18 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert cert['grade'] == '0.88'
         assert cert['is_passing'] is True
         assert cert['download_url'] == 'www.google.com'
+
+    def test_get_certificate_for_user_id(self):
+        """
+        Test to get a certificate for a user id for a specific course.
+        """
+        cert = get_certificate_for_user_id(self.student, self.web_cert_course.id)
+
+        assert cert is not None
+        assert cert.course_id == self.web_cert_course.id
+        assert cert.mode == CourseMode.VERIFIED
+        assert cert.status == CertificateStatuses.downloadable
+        assert cert.grade == '0.88'
 
     def test_get_certificates_for_user(self):
         """

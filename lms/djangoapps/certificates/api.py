@@ -54,15 +54,6 @@ User = get_user_model()
 MODES = GeneratedCertificate.MODES
 
 
-def is_passing_status(cert_status):
-    """
-    Given the status of a certificate, return a boolean indicating whether
-    the student passed the course.  This just proxies to the classmethod
-    defined in models.py
-    """
-    return CertificateStatuses.is_passing_status(cert_status)
-
-
 def _format_certificate_for_user(username, cert):
     """
     Helper function to serialize an user certificate.
@@ -82,7 +73,7 @@ def _format_certificate_for_user(username, cert):
             "grade": cert.grade,
             "created": cert.created_date,
             "modified": cert.modified_date,
-            "is_passing": is_passing_status(cert.status),
+            "is_passing": CertificateStatuses.is_passing_status(cert.status),
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
                 cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
@@ -152,6 +143,19 @@ def get_certificate_for_user(username, course_key, format_results=True):
         return _format_certificate_for_user(username, cert)
     else:
         return cert
+
+
+def get_certificate_for_user_id(user, course_id):
+    """
+    Retrieve certificate information for a user in a specific course.
+
+    Arguments:
+        user (User): A Django User.
+        course_id (CourseKey): Course ID
+    Returns:
+        A GeneratedCertificate object.
+    """
+    return GeneratedCertificate.certificate_for_student(user, course_id)
 
 
 def get_certificates_for_user_by_course_keys(user, course_keys):
