@@ -102,6 +102,3 @@ maxminddb<2.0.0         # maxminddb 2.0.0 has dropped support for Python 3.5
 path<13.2.0             # path 13.2.0 drops support for Python 3.5
 zipp==1.0.0             # zipp 2.0.0 requires Python >= 3.6
 geoip2<4.0.1            # geoip2 requires Python 3.6
-
-# There are corresponding changes in edx-platform that need to be made before we can update.
-lti-consumer-xblock<2.11.0
