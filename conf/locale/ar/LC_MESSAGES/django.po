@@ -6,6 +6,8 @@
 #
 # Translators:
 # Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
+# Munam Mubashir <munam.mubashir@arbisoft.com>, 2021
+# Anas Usman <anas.usman@arbisoft.com>, 2021
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
@@ -24,6 +26,8 @@
 #
 # Translators:
 # Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
+# Anas Usman <anas.usman@arbisoft.com>, 2021
+# Munam Mubashir <munam.mubashir@arbisoft.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -33,6 +37,8 @@
 #
 # Translators:
 # Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
+# Anas Usman <anas.usman@arbisoft.com>, 2021
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -56,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-24 09:09+0000\n"
+"POT-Creation-Date: 2021-06-24 15:20+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -3713,8 +3719,8 @@ msgid ""
 "\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 "أي معلومات إضافية حول المساق التي يحتاجها النظام الأساسي أو تسمح بالتكامل مع"
-" الأنظمة الخارجية مثل برنامج CRM. أدخل قاموس القيم بتنسيق JSON ، مثل "
-"{\"my_custom_setting\": \"value\"، \"other_setting\": \"value\"}"
+" الأنظمة الخارجية مثل برنامج CRM. أدخل قاموس القيم بتنسيق JSON ، مثل { "
+"\"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -5440,7 +5446,6 @@ msgid ""
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
 #. See http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py
@@ -5451,8 +5456,7 @@ msgstr "تُديره Open edX"
 msgid "Blog"
 msgstr "المدوّنة"
 
-#: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
-#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+#: lms/djangoapps/branding/api.py
 msgid "Contact Us"
 msgstr "اتصل بنا"
 
@@ -12104,7 +12108,7 @@ msgstr "رمز الدخول ’access_token‘ غير صحيح. "
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Full Name cannot contain the following characters: < >"
-msgstr "لا يمكن أن يحتوي الاسم الكامل على الأحرف التالية: <>"
+msgstr "لا يمكن أن يحتوي الاسم الكامل على الأحرف التالية: < >"
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
@@ -14282,7 +14286,7 @@ msgstr "مرحباً بك في  {platform_name} "
 #. untranslated. See https://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "إنها تعمل! بإدارة Open edX{علامة تجارية مسجلة}"
+msgstr "إنها تعمل! بإدارة Open edX{registered_trademark}"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14626,7 +14630,7 @@ msgstr " مثلًا، اسمك (كما سيظهر على الشهادات)"
 
 #: lms/templates/signup_modal.html
 msgid "{start_li}Welcome{end_li} {name}"
-msgstr "{بداية_li}مرحبا{نهاية_li}{اسم}"
+msgstr "{start_li}مرحبا{end_li}{name}"
 
 #: lms/templates/signup_modal.html
 msgid "Enter a public username:"
@@ -15904,7 +15908,7 @@ msgstr "إلغاء الاشتراك"
 
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 msgid "confirm unsubscribe from {org} {course} emails."
-msgstr "تأكيد إلغاء الاشتراك في رسائل البريد الإلكتروني ل {org}{دورة}."
+msgstr "تأكيد إلغاء الاشتراك في رسائل البريد الإلكتروني ل {org}{course}."
 
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
@@ -15920,15 +15924,16 @@ msgstr ""
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "You have successfully unsubscribed from {org} {course} emails."
-msgstr "لقد تم إلغاء اشتراكك بنجاح في رسائل البريد الإلكتروني ل {org}{دورة}."
+msgstr ""
+"لقد تم إلغاء اشتراكك بنجاح في رسائل البريد الإلكتروني ل {org}{course}."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "You have not been unsubscribed from {org} {course} emails."
-msgstr "لم يتم إلغاء اشتراكك في رسائل البريد الإلكتروني ل {org}{دورة}."
+msgstr "لم يتم إلغاء اشتراكك في رسائل البريد الإلكتروني ل {org}{course}."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "{link_start}Return to edX.org{link_end}"
-msgstr "{بداية عنوان الرابط}العودة إلى edX.org{نهاية عنوان الرابط} "
+msgstr "{link_start}العودة إلى edX.org{link_end} "
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -17065,7 +17070,7 @@ msgstr "استعراض عملية التقييم في استوديو"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for '{username}' ({email})"
-msgstr "مستوى التقدم في المساق ل '{اسم المستخدم}' ({عنوان البريد الالكتروني})"
+msgstr "مستوى التقدم في المساق ل '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
@@ -17200,8 +17205,8 @@ msgid ""
 "{providers} for successfully completing your {platform_name} course! "
 "{link_start}Purchase credit now.{link_end}"
 msgstr ""
-"تهانينا! أنت الآن مؤهل لتلقي رصيد المساق من {Provider} لأنك أكملت المساق على"
-" {platform_name} بنجاح! {link_start} شراء رصيد الآن. {link_end}"
+"تهانينا! أنت الآن مؤهل لتلقي رصيد المساق من {providers} لأنك أكملت المساق "
+"على {platform_name} بنجاح! {link_start} شراء رصيد الآن. {link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -17419,7 +17424,7 @@ msgstr "يبدأ  - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
-msgstr "ل {اسم_عرض_الدورة}"
+msgstr "ل {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
@@ -18479,7 +18484,7 @@ msgstr ""
 
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
-msgstr "{اسم} لوحة المعلومات"
+msgstr "{name} لوحة المعلومات"
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
@@ -20903,6 +20908,12 @@ msgid ""
 "program will provide you with the training you need to become a successful "
 "business owner and live a life of meaning."
 msgstr ""
+"أكاديمية Omnipreneurship عبارة عن برنامج تنموي فريد من نوعه ، تم بناؤه على "
+"النظام البيئي الحاكم لمجموعة الدباغ (ADG) ، الريادة الشاملة. إنها مساحة حيث "
+"لن تكون قادرًا فقط على المشاركة في دوراتنا التدريبية والتقدم لبرنامج Omni in"
+" a Box ؛ سيكون عليك أن تجعل أحلامك حقيقة ، مع الحد الأدنى من المخاطر وعدم "
+"وجود استثمارات ضرورية. سيوفر لك هذا البرنامج التدريب الذي تحتاجه لتصبح صاحب "
+"عمل ناجحًا وتعيش حياة ذات معنى."
 
 #: themes/edx-platform/adg/lms/templates/index.html
 msgid "Training that will transform you from a job seeker to a"
@@ -21842,30 +21853,13 @@ msgstr ""
 msgid "P.O Box 1039, Jeddah 21431 Saudi Arabia"
 msgstr ""
 
-#: cms/templates/widgets/sock.html
-msgid "Looking for help with {studio_name}?"
-msgstr "هل تحتاج إلى مساعدة في استخدام {studio_name}؟"
-
-#: cms/templates/widgets/sock.html
-msgid "Hide {studio_name} Help"
-msgstr "إخفاء المساعدة الخاصة بـ {studio_name}"
-
-#: cms/templates/widgets/sock.html
-msgid "{studio_name} Documentation"
-msgstr "توثيق {studio_name}"
-
-#: wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
-msgid "Log in"
-msgstr "تسجيل الدخول"
-
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
 msgstr "عذراً، لم توجد الصفحة التي كنت تبحث عنها."
 
 #: cms/templates/404.html
 msgid "Go back to the {homepage}."
-msgstr "العودة إلى {الصفحة الرئيسية}."
+msgstr "العودة إلى {homepage}."
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -22617,7 +22611,7 @@ msgid ""
 "try this request again."
 msgstr ""
 "نأسف! حدثت مشكلة في الخادم أثناء محاولة معالجة طلبك الأخير. قد ترغب في "
-"العودة إلى لوحة المعلومات {studio name} أو محاولة إعادة هذا الطلب مرة  أخرى."
+"العودة إلى لوحة المعلومات {studio_name} أو محاولة إعادة هذا الطلب مرة  أخرى."
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
@@ -24016,6 +24010,10 @@ msgstr "المعلومات الخاصة بالعضو الجديد في الفر�
 msgid "User's Email Address"
 msgstr "عنوان البريد الإلكتروني الخاص بالمستخدم"
 
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+msgid "example: username@domain.com"
+msgstr ""
+
 #: cms/templates/manage_users.html
 msgid "Provide the email address of the user you want to add as Staff"
 msgstr ""
@@ -25168,7 +25166,7 @@ msgstr "ستتم إزالة الدعم في الإصدار القادم."
 
 #: cms/templates/widgets/deprecated-course-key-warning.html
 msgid "Support will be removed on {expiration_date}."
-msgstr "ستتم إزالة الدعم في {تاريخ انتهاء الصلاحية}."
+msgstr "ستتم إزالة الدعم في {expiration_date}."
 
 #: cms/templates/widgets/deprecated-course-key-warning.html
 msgid "This course uses a legacy storage format."
@@ -25193,6 +25191,14 @@ msgstr "طلب تسهيلات الوصول"
 #: cms/templates/widgets/footer.html
 msgid "LMS"
 msgstr "نظام إدارة التعليم"
+
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
+#. not translate any of these trademarks and company names.
+#: cms/templates/widgets/footer.html
+msgid ""
+"edX, Open edX, and the edX and Open edX logos are registered trademarks of "
+"{link_start}edX Inc.{link_end}"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
@@ -25290,6 +25296,26 @@ msgstr "تعليمات ماركداون"
 msgid "Label"
 msgstr "ملصق "
 
+#: cms/templates/widgets/sock.html
+msgid "Looking for help with {studio_name}?"
+msgstr "البدء باستخدام {studio_name}"
+
+#: cms/templates/widgets/sock.html
+msgid "Hide {studio_name} Help"
+msgstr "الصفحة الرئيسية لاستوديو {studio_name}"
+
+#: cms/templates/widgets/sock.html
+msgid "{studio_name} Documentation"
+msgstr "الصفحة الرئيسية لاستوديو {studio_name}"
+
+#: cms/templates/widgets/sock_links.html
+msgid "Access documentation on http://docs.edx.org"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "edX Documentation"
+msgstr ""
+
 #: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
 msgstr "إدخل إلى بوابة edX الإلكترونية المفتوحة"
@@ -25297,6 +25323,26 @@ msgstr "إدخل إلى بوابة edX الإلكترونية المفتوحة"
 #: cms/templates/widgets/sock_links.html
 msgid "Open edX Portal"
 msgstr "بوابة edX الإلكترونية المفتوحة"
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in edX101"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in StudioX"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Send an email to {email}"
+msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
@@ -26188,6 +26234,11 @@ msgstr "بحث..."
 
 #: wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
+msgid "Log in"
+msgstr "تسجيل الدخول"
+
+#: wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
 msgid "Sign up"
 msgstr "التسجيل "
 
@@ -26483,367 +26534,3 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "أُنقر على زر \"بدء الامتحان المراقب\" أدناه للمتابعة."
-
-#~ msgid "example: username@domain.com"
-#~ msgstr "مثال:  username@domain.com "
-
-#~ msgid ""
-#~ "edX, Open edX, and the edX and Open edX logos are registered trademarks of "
-#~ "{link_start}edX Inc.{link_end}"
-#~ msgstr ""
-#~ "إنّ edX وOpen edX وشعارَي edX وOpen edX هي علامات تجارية مسجَّلة أو علامات "
-#~ "تجارية لمؤسّسة {link_start}edX Inc.{link_end}"
-
-#~ msgid "Access documentation on http://docs.edx.org"
-#~ msgstr "يمكنك الاطلاع على التوثيق بزيارة http://docs.edx.org"
-
-#~ msgid "edX Documentation"
-#~ msgstr "توثيق edX"
-
-#~ msgid "Enroll in edX101: Overview of Creating an edX Course"
-#~ msgstr "سجّل في edX101: نبذة حول إنشاء مساق edX"
-
-#~ msgid "Enroll in edX101"
-#~ msgstr "التسجيل في مساق edX101 "
-
-#~ msgid "Enroll in StudioX: Creating a Course with edX Studio"
-#~ msgstr "سجّل في StudioX: أنشئ مساق باستخدام استوديو edX"
-
-#~ msgid "Enroll in StudioX"
-#~ msgstr "سجّل في StudioX"
-
-#~ msgid "Send an email to {email}"
-#~ msgstr "أرسل رسالةً إلكترونية إلى {email}"
-
-#~ msgid ""
-#~ "Access Course Staff Support on the Partner Portal to submit or review "
-#~ "support tickets"
-#~ msgstr ""
-#~ "إدخل إلى قسم فريق دعم المساق  الموجود على البوابة الإلكترونية للشريك لتقديم "
-#~ "أو مراجعة تذاكر طلب الدعم."
-
-#~ msgid "edX Partner Portal"
-#~ msgstr "البوابة الإلكترونية لشريك edX"
-
-#~ msgid ""
-#~ "Browse recently launched courses and see what's new in your favorite "
-#~ "subjects."
-#~ msgstr "تصفح الدورات التدريبية الحالية وتعرَّف على الذي يناسب اهتماماتك منها."
-
-#~ msgid "Take advantage of free coaching!"
-#~ msgstr "استفد من التدريب المجاني!"
-
-#~ msgid "Get Started"
-#~ msgstr "البدء"
-
-#~ msgid "Page Footer"
-#~ msgstr "ذيل الصفحة"
-
-#~ msgid "edX Home Page"
-#~ msgstr "الصفحة الرئيسية لـ edX"
-
-#~ msgid "Connect"
-#~ msgstr "الاتصال"
-
-#~ msgid "© {year} edX Inc. All rights reserved."
-#~ msgstr "© {year} edX Inc. جميع الحقوق محفوظة."
-
-#~ msgid "About edX Verified Certificates"
-#~ msgstr "حول  شهادات edX الموثّقة"
-
-#~ msgid ""
-#~ "An edX Verified Certificate signifies that the learner has agreed to abide "
-#~ "by the edX honor code and completed all of the required tasks of this course"
-#~ " under its guidelines, as well as having their photo ID checked to verify "
-#~ "their identity."
-#~ msgstr ""
-#~ "شهادة edX الموثّقة تعني أن المتعلم قد وافق على الالتزام برمز الشرف في edX "
-#~ "وأكمل جميع المهام المطلوبة من هذه الدورة وفقا لتوجيهاتها، وكذلك تم التحقق من"
-#~ " هويته."
-
-#~ msgid "About edX"
-#~ msgstr "لمحة عن edX"
-
-#~ msgid ""
-#~ "{link_start}edX{link_end} offers interactive online classes and MOOCs from "
-#~ "the world's best universities, including MIT, Harvard, Berkeley, University "
-#~ "of Texas, and many others. edX is a non-profit online initiative created by "
-#~ "founding partners Harvard and MIT."
-#~ msgstr ""
-#~ "تقدّم {link_start}edX{link_end} دروسًا تفاعلية ومساقات مكثّفة متاحة عبر "
-#~ "الإنترنت من أفضل الجامعات في العالم، بما فيها معهد ماساتشوستس للتكنولوجيا "
-#~ "وجامعة هارفارد وجامعة بيركلي وجامعة تكساس. وتمثّل edX مبادرة إلكترونية غير "
-#~ "ربحية أسّسَتها جامعة هارفارد بالاشتراك مع معهد ماساتشوستس للتكنولوجيا."
-
-#~ msgid "Congratulations, {user_name}!"
-#~ msgstr "تهانينا {user_name}!"
-
-#~ msgid ""
-#~ "You worked hard to earn your certificate from "
-#~ "{accomplishment_copy_course_org} {dash} share it with colleagues, friends, "
-#~ "and family to get the word out about what you mastered in "
-#~ "{accomplishment_course_title}."
-#~ msgstr ""
-#~ "لقد عملت بجد للحصول على شهادتك من {accomplishment_copy_course_org} {dash}  "
-#~ "شاركها مع الزملاء والأصدقاء والعائلة للتعرف على مهارتك في "
-#~ "{accomplishment_course_title}."
-
-#~ msgid "Share this certificate on Facebook (opens a new tab/window)"
-#~ msgstr "مشاركة هذه الشهادة في الفيسبوك (يفتح تبويب / نافذة جديدة)"
-
-#~ msgid "Tweet this certificate (opens a new tab/window)"
-#~ msgstr "غرّد حول هذه الشهادة في تويتر (يفتح تبويب / نافذة جديدة)"
-
-#~ msgid "Add this certificate to your LinkedIn profile (opens a new tab/window)"
-#~ msgstr ""
-#~ "أضف هذه الشهادة إلى ملفك الشخصي في لينكيدإن (يفتح تبويب / نافذة جديدة)"
-
-#~ msgid "Print"
-#~ msgstr "طباعة"
-
-#~ msgid "Print this certificate"
-#~ msgstr "اطبع هذه الشهادة"
-
-#~ msgid "edX Inc."
-#~ msgstr "edX Inc."
-
-#~ msgid ""
-#~ "All rights reserved except where noted. edX, Open edX and the edX and Open "
-#~ "edX logos are registered trademarks of edX Inc."
-#~ msgstr ""
-#~ "جميع الحقوق محفوظة باستثناء الحالات المشار إليها. إن edX و Open edX وشعارات "
-#~ "edX و Open edX هي علامات تجارية مسجلة لشركة .edX Inc"
-
-#~ msgid ""
-#~ "{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
-#~ "certificates to help fund affordable education to everyone globally."
-#~ msgstr ""
-#~ "{b_start} ادعم مهمتنا: {b_end}EdX مشروع غير ربحي، يعتمد على مجموعة من "
-#~ "الشهادات الموثّقة بهدف دعم تمويل تعليم ميسور التكلفة للجميع حول العالم."
-
-#~ msgid ""
-#~ "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
-#~ "certificates to help fund free education for everyone globally"
-#~ msgstr ""
-#~ "{b_start} ادعم مهمتنا: {b_end} EdX مشروع غير ربحي، يعتمد على مجموعة من "
-#~ "الشهادات الموثّقة بهدف دعم تمويل التعليم المجاني للجميع، حول العالم."
-
-#~ msgid "Find Courses"
-#~ msgstr "إيجاد المساقات"
-
-#~ msgid "Schools & Partners"
-#~ msgstr "المدارس والشركاء"
-
-#~ msgid ""
-#~ "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-#~ "Code{honor_link_end}"
-#~ msgstr ""
-#~ "{tos_link_start}شروط الخدمة{tos_link_end} و{honor_link_start}ميثاق "
-#~ "الشرف{honor_link_end}"
-
-#~ msgid "Copyright"
-#~ msgstr "حقوق الطبع والنشر "
-
-#~ msgid "Copyright {year}. All rights reserved."
-#~ msgstr "جميع حقوق النشر والطبع محفوظة {year}"
-
-#~ msgid "For anyone, anywhere, anytime"
-#~ msgstr "لأي شخص، في أي مكان، و في أي وقت"
-
-#~ msgid ""
-#~ "We're sorry, but this version of your browser is not supported. Try again "
-#~ "using a different browser or a newer version of your browser."
-#~ msgstr ""
-#~ "عذرًا، هذه الإصدارة من متصفّحك غير مدعومة. نرجو منك إعادة المحاولة مرّة أخرى"
-#~ " إما باستخدام متصفّح آخر أو بتحديث إصدارة متصفّحك الحالي."
-
-#~ msgid "The following errors occurred while processing your registration:"
-#~ msgstr "حدثت الأخطاء التالية أثناء معالجة عملية تسجيلك:"
-
-#~ msgid "Sign up with {provider_name}"
-#~ msgstr "تسجيل العضوية باستخدام {provider_name}"
-
-#~ msgid "Create your own {platform_name} account below"
-#~ msgstr "أنشِئ حسابك الخاص بك لدى {platform_name} أدناه"
-
-#~ msgid ""
-#~ "Required fields are noted by <strong class=\"indicator\">bold text and an "
-#~ "asterisk (*)</strong>."
-#~ msgstr ""
-#~ "يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
-#~ "وعلامة النجمة (*)</strong>. "
-
-#~ msgid "You've successfully signed in with {selected_provider}."
-#~ msgstr "نجحت بتسجيل دخولك باستخدام {selected_provider}."
-
-#~ msgid ""
-#~ "We just need a little more information before you start learning with "
-#~ "{platform_name}."
-#~ msgstr ""
-#~ "نحتاج فقط إلى القليل من المعلومات الإضافية قبل أن تبدأ التعلّم مع "
-#~ "{platform_name}."
-
-#~ msgid "Please complete the following fields to register for an account. "
-#~ msgstr "يُرجى إكمال الحقول التالية للتسجيل وإنشاء حساب."
-
-#~ msgid "example: Jane Doe"
-#~ msgstr "مثال: عبد الحليم حافظ"
-
-#~ msgid "Your legal name, used for any certificates you earn."
-#~ msgstr "اسمك القانوني، مستخدم في جميع الشهادات التي ستحصل عليها."
-
-#~ msgid "example: JaneDoe"
-#~ msgstr "مثال: فاطمة_الفهري"
-
-#~ msgid "Will be shown in any discussions or forums you participate in"
-#~ msgstr "سيظهر في أي نقاشات أو منتديات تشارك فيها"
-
-#~ msgid "cannot be changed later"
-#~ msgstr "لا يمكن التغيير لاحقًا  "
-
-#~ msgid "Welcome {username}"
-#~ msgstr "مرحبًا بك {username} "
-
-#~ msgid "Enter a Public Display Name:"
-#~ msgstr "يُرجى إدخال اسم عرض علني:"
-
-#~ msgid "Public Display Name"
-#~ msgstr "الاسم العلني"
-
-#~ msgid "Additional Personal Information"
-#~ msgstr "معلومات شخصية إضافية"
-
-#~ msgid "example: New York"
-#~ msgstr "مثال: نيويورك"
-
-#~ msgid "Highest Level of Education Completed"
-#~ msgstr "أعلى مستوى تعليمي وصلت إليه"
-
-#~ msgid "Year of Birth"
-#~ msgstr "سنة الميلاد"
-
-#~ msgid "Please share with us your reasons for registering with {platform_name}"
-#~ msgstr "يُرجى منك مشاركتنا الأسباب التي دفعتك للتسجيل في {platform_name} "
-
-#~ msgid "Account Acknowledgements"
-#~ msgstr "الإقرارات الخاصة بالحساب"
-
-#~ msgid "Preferences for {platform_name}"
-#~ msgstr "التفضيلات بالنسبة لمنصّة {platform_name}"
-
-#~ msgid "Update my {platform_name} Account"
-#~ msgstr "تحديث حسابي لدى {platform_name}"
-
-#~ msgid "Processing your account information"
-#~ msgstr "جاري معالجة معلومات حسابك"
-
-#~ msgid "Welcome {username}!  Please set your preferences below"
-#~ msgstr "مرحبًا بك {username}! يُرجى منك تحديد تفضيلاتك أدناه"
-
-#~ msgid ""
-#~ "Required fields are noted by {strong_indicator}bold text and an asterisk "
-#~ "(*).{strong_close}"
-#~ msgstr ""
-#~ "الحقول المطلوبة مشار إليها بـ {strong_indicator} نص عريض وعلامة نجمة (*). "
-#~ "{strong_close}"
-
-#~ msgid "Update My Account"
-#~ msgstr "تحديث حسابي "
-
-#~ msgid "Registration Help"
-#~ msgstr "المساعدة في عملية التسجيل"
-
-#~ msgid "Already registered?"
-#~ msgstr "هل أنت مسجَّل مسبقًا؟"
-
-#~ msgid "Next Steps"
-#~ msgstr "الخطوات التالية"
-
-#~ msgid ""
-#~ "You will receive an activation email.  You must click on the activation link"
-#~ " to complete the process.  Don't see the email?  Check your spam folder and "
-#~ "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
-#~ "able to receive email from your courses."
-#~ msgstr ""
-#~ "ستصلك رسالة تفعيل عبر البريد الإلكتروني، ثمّ يجب الضغط على رابط التفعيل "
-#~ "لاستكمال عملية التسجيل. وإذا لم تجد هذه الرسالة، يُرجى التحقّق من صندوق "
-#~ "السبام، أي الرسائل غير المرغوبة، وتحديد الرسائل الواردة من "
-#~ "class.stanford.edu على أنّها ’ليست رسائل غير مرغوبة‘ لتتمكّن بعدئذٍ من "
-#~ "استلام الرسائل من مساقاتك."
-
-#~ msgid "Need Help?"
-#~ msgstr "هل تحتاج إلى مساعدة؟"
-
-#~ msgid "Need help in registering with {platform_name}?"
-#~ msgstr "هل تحتاج إلى المساعدة على التسجيل في {platform_name}؟"
-
-#~ msgid "View our FAQs for answers to commonly asked questions."
-#~ msgstr ""
-#~ "يُرجى زيارة صفحة الأسئلة الشائعة لتجد الإجابات على بعض الأسئلة الأكثر "
-#~ "شيوعًا."
-
-#~ msgid ""
-#~ "Once registered, most questions can be answered in the course specific "
-#~ "discussion forums or through the FAQs."
-#~ msgstr ""
-#~ "لدى الانتهاء من التسجيل، يمكن الإجابة على معظم الأسئلة في منتديات النقاشات "
-#~ "الخاصة بالمساق أو من خلال صفحة الأسئلة الشائعة."
-
-#~ msgid "Thank you for signing up for {platform_name}."
-#~ msgstr "شكرًا على تسجيلك في {platform_name}."
-
-#~ msgid ""
-#~ "Change your life and start learning today by activating your {platform_name}"
-#~ " account. Click on the link below or copy and paste it into your browser's "
-#~ "address bar."
-#~ msgstr ""
-#~ "غيّر حياتك وابدأ التعلم اليوم عبر تفعيل حسابك على {platform_name}. انقر على "
-#~ "الرابط أدناه أو انسخه إلى شريط العنوان في متصفحك."
-
-#~ msgid ""
-#~ "If you didn't request this, you don't need to do anything; you won't receive"
-#~ " any more email from us. Please do not reply to this e-mail; if you require "
-#~ "assistance, check the about section of the {platform_name} Courses web site."
-#~ msgstr ""
-#~ "إذا لم تكن قد تقدّمت بهذا الطّلب، فلا تحتاج إلى فعل أي شيء؛ ولن تتلقى منّا "
-#~ "أي رسائل أخرى. يُرجى عدم الرد على هذه الرسالة؛ وإذا احتجت إلى المساعدة، "
-#~ "يمكنك مراجعة قسم اللمحة في موقع مساقات {platform_name}."
-
-#~ msgid ""
-#~ "This is to confirm that you changed the e-mail associated with "
-#~ "{platform_name} from {old_email} to {new_email}. If you did not make this "
-#~ "request, please contact us at"
-#~ msgstr ""
-#~ "هذه الرسالة للتأكيد على قيامك بتغيير البريد الإلكتروني المرتبط بالمنصة "
-#~ "{platform_name} من {old_email} إلى {new_email}. في حال لم تكن قد طلبت هذا "
-#~ "التغيير الرجاء الاتصال بنا على  "
-
-#~ msgid ""
-#~ "We received a request to change the e-mail associated with your "
-#~ "{platform_name} account from {old_email} to {new_email}. If this is correct,"
-#~ " please confirm your new e-mail address by visiting:"
-#~ msgstr ""
-#~ "لقد تلقينا طلباً يفيد رغبتك بتغيير البريد الإلكتروني المرتبط بالمنصة "
-#~ "{platform_name} من {old_email} إلى {new_email}. إذا كان هذا الأمر صحيحاً، "
-#~ "الرجاء تأكيد عنوان بريدك الإلكتروني الجديد عبر زيارة:"
-
-#~ msgid ""
-#~ "We are sorry. Our course staff did not approve your request to change your "
-#~ "name from {old_name} to {new_name}. If you need further assistance, please "
-#~ "e-mail the tech support at {email}"
-#~ msgstr ""
-#~ "نعتذر. لم يوافق طاقم المساق لدينا على طلبك تغيير اسمك من {old_name} إلى "
-#~ "{new_name}. إذا كنت بحاجة للمزيد من المساعدة، الرجاء مراسلة فريق الدعم الفني"
-#~ " على البريد الإلكتروني {email}"
-
-#~ msgid "Put your Terms of Service here!"
-#~ msgstr "ضع شروط الخدمة الخاصة بك هنا!"
-
-#~ msgid "Put your Privacy Policy here!"
-#~ msgstr "ضع سياسة الخصوصية الخاصة بك هنا!"
-
-#~ msgid "Put your Honor Code here!"
-#~ msgstr "ضع ميثاق الشرف الخاص بك هنا!"
-
-#~ msgid "Put your Copyright Text here!"
-#~ msgstr "ضع نصّ حقوق النشر والطبع الخاصة بك هنا!"
