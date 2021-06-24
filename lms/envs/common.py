@@ -3150,7 +3150,10 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.agreements',
 
     # User and group management via edx-django-utils
-    'edx_django_utils.user'
+    'edx_django_utils.user',
+
+    # Content Library LTI 1.3 Support.
+    'pylti1p3.contrib.django.lti1p3_tool_config',
 ]
 
 ######################### CSRF #########################################

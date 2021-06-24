@@ -41,6 +41,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    allow_lti = serializers.BooleanField(default=False, read_only=True)
     allow_public_learning = serializers.BooleanField(default=False)
     allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)

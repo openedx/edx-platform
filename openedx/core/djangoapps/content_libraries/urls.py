@@ -51,6 +51,8 @@ urlpatterns = [
         url(r'^blocks/(?P<usage_key_str>[^/]+)/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
             url(r'^$', views.LibraryBlockView.as_view()),
+            # Get the LTI URL of a specific XBlock
+            url(r'^lti/$', views.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
             url(r'^olx/$', views.LibraryBlockOlxView.as_view()),
             # CRUD for static asset files associated with a block in the library:
@@ -58,6 +60,11 @@ urlpatterns = [
             url(r'^assets/(?P<file_path>.+)$', views.LibraryBlockAssetView.as_view()),
             # Future: publish/discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
+        ])),
+        url(r'^lti/1.3/', include([
+            url(r'^login/$', views.LtiToolLoginView.as_view(), name='lti-login'),
+            url(r'^launch/$', views.LtiToolLaunchView.as_view(), name='lti-launch'),
+            url(r'^pub/jwks/$', views.LtiToolJwksView.as_view(), name='lti-pub-jwks'),
         ])),
     ])),
 ]
