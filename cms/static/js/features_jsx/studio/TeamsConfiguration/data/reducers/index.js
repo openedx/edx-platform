@@ -1,25 +1,7 @@
 import { combineReducers } from 'redux';
-import { dataUpdateActions, saveActions, teamSetActions } from '../actions/constants';
+import { actions } from '../actions/actions';
 import _ from 'underscore';
 
-/**
-*
-dataUpdateActions = {
-  UPDATE_TEAMSET_FIELD: 'UPDATE_TEAMSET',
-  UPDATE_COURSE_MAX_TEAMS_SIZE: 'UPDATE_COURSE_MAX_TEAM_SIZE'
-};
-
-export const saveActions = {
-  SAVE_CONFIG_CLICKED: 'SAVE_CONFIG_CLICKED',
-  SAVE_CONFIG_SUCCESS: 'SAVE_CONFIG_SUCCESS',
-  SAVE_CONFIG_FAILURE: 'SAVE_CONFIG_FAILURE',
-};
-
-export const teamSetActions = {
-  ADD_TEAM_SET: 'ADD_TEAM_SET',
-  DELETE_TEAM_SET: 'DELETE_TEAM_SET'
-};
-*/
 
 function parseMaxTeamSize(maxSize) {
   const numberMaxSize = parseInt(maxSize, 10);
@@ -29,78 +11,121 @@ function parseMaxTeamSize(maxSize) {
   return numberMaxSize;
 }
 
+function getNewTeamsetFieldValue({ teamSetFieldName, newValue }) {
+  let result = newValue;
+  if (teamSetFieldName === 'maxSize') {
+    result = parseMaxTeamSize(newValue);
+  }
+  return result;
+}
+
 const newBlankEmptyTeamSet = { type: 'open' };
 
-export const teamSets = (state = {}, action) => {
-  const newState = { ...state };
-  switch (action.type) {
-    case dataUpdateActions.INITIALIZE_VALUES:
-      return action.teamSets;
-    case dataUpdateActions.UPDATE_TEAMSET_FIELD:
-      const targetTeamSet = newState[action.uniqueTeamSetId];
-      if (action.teamSetFieldName === 'maxSize') {
-        targetTeamSet[action.teamSetFieldName] = parseMaxTeamSize(action.newValue);
-      } else {
-        targetTeamSet[action.teamSetFieldName] = action.newValue;
-      }
-      return newState;
-    case teamSetActions.ADD_TEAM_SET:
+export const teamSets = (state = {}, { type, payload }) => {
+  switch (type) {
+    case actions.teamsConfig.load.success.toString():
+      // TODO: this
+      return {
+        ...state,
+      };
+    case actions.updateTeamSetField.toString():
+      return {
+        ...state,
+        [payload.uniqueTeamSetId]: {
+          ...state[payload.uniqueTeamSetId],
+          [payload.teamSetFieldName]: getNewTeamsetFieldValue(payload),
+        },
+      };
+    case actions.teamSets.add.toString(): {
       const uniqueTeamSetId = _.uniqueId('team_set');
-      newState[uniqueTeamSetId] = _.clone(newBlankEmptyTeamSet);
+      return {
+        ...state,
+        [uniqueTeamSetId]: _.clone(newBlankEmptyTeamSet),
+      };
+    }
+    case actions.teamSets.delete.toString(): {
+      const newState = {
+        ...state,
+      };
+      delete newState[payload];
       return newState;
-    case teamSetActions.DELETE_TEAM_SET:
-      delete newState[action.uniqueTeamSetId];
-      return newState;
+    }
     default:
       return state;
   }
 };
 
-export const courseMaxTeamSize = (state = 0, action) => {
-  switch (action.type) {
-    case dataUpdateActions.UPDATE_COURSE_MAX_TEAMS_SIZE:
-    case dataUpdateActions.INITIALIZE_VALUES:
-      return parseMaxTeamSize(action.courseMaxTeamSize);
+export const courseMaxTeamSize = (state = 0, { type, payload }) => {
+  switch (type) {
+    case actions.updateCourseMaxTeamSize.toString():
+      return parseMaxTeamSize(payload.courseMaxTeamSize);
     default:
       return state;
   }
 };
 
-export const saveState = (state = {}, action) => {
-  switch (action.type) {
-    case saveActions.SAVE_CONFIG_CLICKED:
+const initialAppState = {
+  teamsConfigURL: null,
+  submitting: false,
+  submitSuccess: false,
+  submitFailure: false,
+  loading: false,
+  loadSuccess: false,
+  loadFailure: false,
+  errors: [],
+};
+
+export const app = (state = initialAppState, { type, payload }) => {
+  switch (type) {
+    case actions.setTeamsConfigUrl.toString():
+      return {
+        ...state,
+        teamsConfigURL: payload,
+      };
+    case actions.teamsConfig.save.started.toString():
       return {
         ...state,
         submitting: true,
         errors: [],
       };
-    case saveActions.SAVE_CONFIG_SUCCESS:
+    case actions.teamsConfig.save.success.toString():
       return {
         ...state,
         submitting: false,
-        submit_success: true,
+        submitSuccess: true,
         errors: [],
       };
-    case saveActions.SAVE_CONFIG_FAILURE:
+    case actions.teamsConfig.save.failure.toString():
       return {
         ...state,
         submitting: false,
-        submit_failure: true,
-        errors: [action.error],
+        submitFailure: true,
+        errors: [payload.error],
+      };
+    case actions.teamsConfig.load.started.toString():
+      return {
+        ...state,
+        loading: true,
+      };
+    case actions.teamsConfig.load.success.toString():
+      return {
+        ...state,
+        loading: false,
+        loadSuccess: true,
+      };
+    case actions.teamsConfig.load.failure.toString():
+      return {
+        ...state,
+        loading: false,
+        loadFailure: true,
       };
     default:
-      return {
-        ...state,
-        submitting: false,
-        submit_success: false,
-        submit_failure: false,
-        errors: [],
-      };
+      return state;
   }
 };
 
 export default combineReducers({
   teamSets,
   courseMaxTeamSize,
-  saveState,
+  app,
 });

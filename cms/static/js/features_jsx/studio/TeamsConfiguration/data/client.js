@@ -27,6 +27,13 @@ const convertTeamSetToRequestFormat = function (teamSet) {
   return result;
 };
 
+export function requestLoadTeamsConfig(teamsConfigStudioURL) {
+  return fetch(teamsConfigStudioURL, {
+    method: 'GET',
+    headers: HEADERS,
+  });
+}
+
 export function requestSaveTeamsConfig(teamsConfigStudioURL, teamSets, courseMaxTeamSize) {
   const updateData = {};
   if (courseMaxTeamSize) {

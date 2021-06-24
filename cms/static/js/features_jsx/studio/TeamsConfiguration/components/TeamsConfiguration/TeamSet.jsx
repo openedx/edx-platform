@@ -3,6 +3,7 @@ import { Button, Icon, InputText, InputSelect } from '@edx/paragon';
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'underscore';
+import actions from '../../data/actions/actions';
 
 const typeValues = [
   { value: 'open', label: 'Open' },
@@ -37,7 +38,11 @@ const TeamSet = ({
   handleTeamSetChange,
   handleDeleteTeamSet,
 }) => {
-  const handleChange = (value, name) => handleTeamSetChange(value, name, uniqueTeamSetId);
+  const handleChange = (value, name) => {
+    handleTeamSetFieldChange({
+      value, name, uniqueTeamSetId
+  })};
+  
   return (
     <div className="teamset field">
       <InputText
@@ -84,6 +89,7 @@ const TeamSet = ({
     </div>
   );
 };
+
 TeamSet.propTypes = {
   uniqueTeamSetId: PropTypes.string.isRequired,
   teamSetId: PropTypes.string,
@@ -91,7 +97,7 @@ TeamSet.propTypes = {
   description: PropTypes.string,
   type: PropTypes.string,
   maxSize: PropTypes.number,
-  handleTeamSetChange: PropTypes.func.isRequired,
+  handleTeamSetFieldChange: PropTypes.func.isRequired,
   handleDeleteTeamSet: PropTypes.func.isRequired,
 };
 
@@ -104,4 +110,17 @@ TeamSet.defaultProps = {
   maxSize: 0,
 };
 
-export default TeamSet;
+const mapStateToProps = (state, {uniqueTeamSetId}) => ({
+  teamSetId: state.teamSets[uniqueTeamSetId].teamSetId || '',
+  displayName: state.teamSets[uniqueTeamSetId].displayName || '',
+  description: state.teamSets[uniqueTeamSetId].description || '',
+  type: state.teamSets[uniqueTeamSetId].type || '',
+  maxSize: state.teamSets[uniqueTeamSetId].maxSize || 0,
+});
+
+const mapDispatchToProps = {
+  handleTeamSetFieldChange = actions.teamSet.update,
+  handleDeleteTeamSet = actions.teamSet.delete
+}
+
+export default connect(mapStateToProps)(TeamSet);

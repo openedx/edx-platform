@@ -1,63 +1,31 @@
-import { dataUpdateActions, saveActions, teamSetActions } from './constants';
-import { requestSaveTeamsConfig } from '../client';
+import { createAction } from '@reduxjs/toolkit';
 
-const updateTeamSetField = (newValue, teamSetFieldName, uniqueTeamSetId) => ({
-  type: dataUpdateActions.UPDATE_TEAMSET_FIELD,
-  uniqueTeamSetId,
-  teamSetFieldName,
-  newValue,
-});
+const updateCourseMaxTeamSize = createAction('updateCourseMaxTeamSize');
 
-const updateCourseMaxTeamSize = courseMaxTeamSize => ({
-  type: dataUpdateActions.UPDATE_COURSE_MAX_TEAMS_SIZE,
-  courseMaxTeamSize,
-});
-
-const saveTeamsConfigStarted = () => ({
-  type: saveActions.SAVE_CONFIG_STARTED,
-});
-
-const saveTeamsConfigSuccess = () => ({
-  type: saveActions.SAVE_CONFIG_SUCCESS,
-});
-
-const saveTeamsConfigFailure = error => ({
-  type: saveActions.SAVE_CONFIG_FAILURE,
-  error,
-});
-
-const saveTeamsConfig = (teamsConfigURL, teamSets, courseMaxTeamSize) => (dispatch) => {
-  dispatch(saveTeamsConfigStarted());
-  return requestSaveTeamsConfig(teamsConfigURL, teamSets, courseMaxTeamSize)
-    .then(
-      () => dispatch(saveTeamsConfigSuccess()),
-      error => dispatch(saveTeamsConfigFailure(error)),
-    );
+const teamsConfig = {
+  save: {
+    started: createAction('teamsConfig/save/started'),
+    success: createAction('teamsConfig/save/success'),
+    failure: createAction('teamsConfig/save/failure'),
+  },
+  load: {
+    started: createAction('teamsConfig/load/started'),
+    success: createAction('teamsConfig/load/success'),
+    failure: createAction('teamsConfig/load/failure'),
+  },
 };
 
-const addTeamSet = () => ({
-  type: teamSetActions.ADD_TEAM_SET,
-});
+const teamSet = {
+  add: createAction('teamSet/add'),
+  delete: createAction('teamSet/delete'),
+  updateField: createAction('teamSet/update'),
+};
 
-const deleteTeamSet = uniqueTeamSetId => ({
-  type: teamSetActions.DELETE_TEAM_SET,
-  uniqueTeamSetId,
-});
+const setTeamsConfigURL = createAction('setTeamsConfigURL');
 
-const initializeValues = (teamSets, courseMaxTeamSize) => ({
-  type: dataUpdateActions.INITIALIZE_VALUES,
-  teamSets,
-  courseMaxTeamSize,
-});
-
-
-export {
-  updateTeamSetField,
+export default {
   updateCourseMaxTeamSize,
-  saveTeamsConfig,
-  saveTeamsConfigSuccess,
-  saveTeamsConfigFailure,
-  addTeamSet,
-  deleteTeamSet,
-  initializeValues,
+  teamsConfig,
+  teamSet,
+  setTeamsConfigURL,
 };
