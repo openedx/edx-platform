@@ -122,8 +122,10 @@ def update_course_progress_stats():
     A task that checks all the current progress models & sends course completion or reminder emails
     """
 
-    progress_models = CourseProgressStats.objects.filter(Q(email_reminder_status__in=[0, 1])
-                                                         | Q(progress__lt=100))
+    email_status_to_filter = [CourseProgressStats.NO_EMAIL_SENT, CourseProgressStats.REMINDER_SENT]
+    progress_models = CourseProgressStats.objects.filter(
+        Q(email_reminder_status__in=email_status_to_filter) | Q(progress__lt=100)
+    )
     log.info("Fetching records, found {} active models".format(len(progress_models)))
     for item in progress_models:
         course_progress = float(
@@ -145,14 +147,14 @@ def update_course_progress_stats():
                 'status_message': "Completed" if completed else "Pending",
                 'course_progress': course_progress}
 
-        if data["completed"] and item.email_reminder_status != 2:
+        if data["completed"] and item.email_reminder_status != CourseProgressStats.COURSE_COMPLETED:
             send_reminder_email.delay(data, text_type(item.course_id))
-            item.email_reminder_status = 2
+            item.email_reminder_status = CourseProgressStats.COURSE_COMPLETED
             fields_list.append('email_reminder_status')
         elif course_overview.end_date:
             remaining_days = get_date_diff_in_days(course_overview.end_date)
             if remaining_days <= settings.COURSE_PROGRESS_REMINDER_EMAIL_DAYS and item.email_reminder_status == 0:
                 send_reminder_email.delay(data, text_type(item.course_id))
-                item.email_reminder_status = 1
+                item.email_reminder_status = CourseProgressStats.REMINDER_SENT
                 fields_list.append('email_reminder_status')
         item.save(update_fields=fields_list)

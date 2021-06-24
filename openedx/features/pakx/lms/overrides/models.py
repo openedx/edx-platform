@@ -4,18 +4,18 @@ from django.contrib.auth.models import User
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
 
-# Create your models here.
-
 
 class CourseProgressStats(models.Model):
     """
     Model to store the records of stats related to course progress and emails to learners
     """
-
+    NO_EMAIL_SENT = 0
+    REMINDER_SENT = 1
+    COURSE_COMPLETED = 2
     REMINDER_STATES = (
-        (0, 'No email sent'),
-        (1, 'Reminder email sent'),
-        (2, 'Course completion email sent')
+        (NO_EMAIL_SENT, 'No email sent'),
+        (REMINDER_SENT, 'Reminder email sent'),
+        (COURSE_COMPLETED, 'Course completion email sent')
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(db_index=True, max_length=255)
@@ -23,7 +23,7 @@ class CourseProgressStats(models.Model):
     progress = models.FloatField(default=0.0)
     grade = models.CharField(max_length=4, default=None)
     email_reminder_status = models.PositiveSmallIntegerField(db_index=True, choices=REMINDER_STATES,
-                                                             default=0)
+                                                             default=NO_EMAIL_SENT)
 
     class Meta:
         verbose_name_plural = 'Course Progress Stats'

@@ -3,10 +3,7 @@ Serializer for Admin Panel APIs
 """
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from six import text_type
 
-from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.features.pakx.lms.overrides.utils import get_course_progress_percentage
 from student.models import CourseEnrollment, UserProfile
 
 from .constants import GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
@@ -19,24 +16,58 @@ class UserCourseEnrollmentSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(source='course.display_name')
     enrollment_status = serializers.CharField(source='mode')
     enrollment_date = serializers.SerializerMethodField()
+    completion_date = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     grades = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseEnrollment
-        fields = ('display_name', 'enrollment_status', 'enrollment_date', 'progress', 'grades')
+        fields = ('display_name', 'enrollment_status', 'enrollment_date', 'progress', 'completion_date', 'grades')
 
     @staticmethod
     def get_enrollment_date(obj):
         return obj.created.strftime('%Y-%m-%d')
 
-    def get_progress(self, obj):
-        return get_course_progress_percentage(self.context['request'], text_type(obj.course.id))
+    @staticmethod
+    def get_progress(obj):
+        # todo: refactor this by refactoring courseprogressstats relation with user/organization
+        course_stats = [c for c in obj.user.courseprogressstats_set.all() if c.course_id == obj.course_id]
+        return course_stats[0].progress if course_stats else None
+
+    @staticmethod
+    def get_completion_date(obj):
+        # todo: refactor this by refactoring courseprogressstats relation with user/organization
+        course_stats = [c for c in obj.user.courseprogressstats_set.all() if c.course_id == obj.course_id]
+        return course_stats[0].completion_date if course_stats else None
 
     @staticmethod
     def get_grades(obj):
-        grades = CourseGradeFactory().read(obj.user, course_key=obj.course.id)
-        return {'passed': grades.passed, 'score': grades.percent}
+        # todo: refactor this by refactoring courseprogressstats relation with user/organization
+        course_stats = [c for c in obj.user.courseprogressstats_set.all() if c.course_id == obj.course_id]
+        return course_stats[0].grade if course_stats else None
+
+
+class UserDetailViewSerializer(serializers.ModelSerializer):
+    """
+    Serializer User's object retrieve view
+    """
+    employee_id = serializers.CharField(source='profile.employee_id')
+    name = serializers.CharField(source='get_full_name')
+    course_enrolled = serializers.SerializerMethodField()
+    completed_courses = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'name', 'employee_id', 'is_active', 'date_joined', 'last_login', 'course_enrolled',
+                  'completed_courses')
+
+    @staticmethod
+    def get_course_enrolled(obj):
+        return len(obj.courseprogressstats_set.all())
+
+    @staticmethod
+    def get_completed_courses(obj):
+        return len([stat for stat in obj.courseprogressstats_set.all() if stat.progress == 100])
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,8 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'id', 'email', 'name', 'employee_id', 'language', 'is_active', 'role',
-                  'date_joined', 'last_login')
+        fields = ('username', 'id', 'email', 'name', 'employee_id', 'language', 'is_active', 'role')
 
     @staticmethod
     def get_role(obj):

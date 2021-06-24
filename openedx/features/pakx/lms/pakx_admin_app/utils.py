@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from organizations.models import Organization
 
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -20,8 +19,7 @@ from .message_types import RegistrationNotification
 
 
 def get_user_org_filter(user):
-    organization = Organization.objects.get(user_profiles__user=user)
-    return {'profile__organization': organization}
+    return {'profile__organization_id': user.profile.organization_id}
 
 
 def get_learners_filter():
