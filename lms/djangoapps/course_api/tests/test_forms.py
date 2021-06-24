@@ -69,6 +69,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
             'mobile': None,
             'search_term': '',
             'filter_': None,
+            'permissions': set(),
         }
 
     def test_basic(self):

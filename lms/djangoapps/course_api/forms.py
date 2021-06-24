@@ -10,7 +10,10 @@ from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField
+from openedx.core.djangoapps.util.forms import (
+    ExtendedNullBooleanField,
+    MultiValueField
+)
 
 
 class UsernameValidatorMixin:
@@ -59,6 +62,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         filter_type(param_name='mobile', field_name='mobile_available'),
     ]
     mobile = ExtendedNullBooleanField(required=False)
+    permissions = MultiValueField(required=False)
 
     def clean(self):
         """

@@ -201,6 +201,36 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             response = self.verify_response(params=params)
             assert {course['course_id'] for course in response.data['results']} == {str(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
 
+    def test_get_when_no_permission_then_filters_correctly(self):
+        """
+        Given a user that is instructor in a course
+        And another course he is not an instructor
+        When get
+        Then only the first course is returned
+        """
+
+        # Create a second course to be filtered out of queries.
+        self.create_course(course='should-be-hidden-course')
+
+        # Create instructor (non-staff), and enroll him in the course.
+        instructor_user = self.create_user('the-instructor', is_staff=False)
+        self.setup_user(instructor_user)
+        self.create_enrollment(user=instructor_user, course_id=self.course.id)
+        self.create_courseaccessrole(
+            user=instructor_user,
+            course_id=self.course.id,
+            role='instructor',
+            org='edX',
+        )
+
+        params = {'permissions': 'instructor',
+                  'username': instructor_user.username}
+        response = self.verify_response(params=params)
+
+        self.assertEqual(response.status_code, 200)
+        ids = {c['course_id'] for c in response.json()['results']}
+        self.assertEqual(ids, {str(self.course.id)})
+
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
