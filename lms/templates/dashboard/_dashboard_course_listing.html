@@ -366,7 +366,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
             % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
               <div class="verification-reminder">
                 % if verification_status['days_until_deadline'] is not None:
-                  <h4 class="message-title">${_('Verification not yet complete.')}</h4>
+                  <h4 class="message-title">${_('To earn a certificate, you must verify your ID')}</h4>
                   <p class="message-copy">${ungettext(
                     'You only have {days} day left to verify for this course.',
                     'You only have {days} days left to verify for this course.',
