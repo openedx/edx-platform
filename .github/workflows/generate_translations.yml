@@ -104,4 +104,4 @@ jobs:
         id: push-generated-translations
         env:
           TX_TOKEN: ${{ secrets.TX_TOKEN }}
-        run: tx push -s -t
+        run: tx push -s -t --skip
