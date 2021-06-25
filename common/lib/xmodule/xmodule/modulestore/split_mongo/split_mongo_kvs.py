@@ -3,8 +3,6 @@
 import copy
 from collections import namedtuple
 
-from contracts import contract, new_contract
-from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlockAside
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope
@@ -15,7 +13,6 @@ from .definition_lazy_loader import DefinitionLazyLoader
 
 # id is a BlockUsageLocator, def_id is the definition's guid
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
-new_contract('BlockUsageLocator', BlockUsageLocator)
 
 
 class SplitMongoKVS(InheritanceKeyValueStore):
@@ -26,7 +23,6 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
     VALID_SCOPES = (Scope.parent, Scope.children, Scope.settings, Scope.content)
 
-    @contract(parent="BlockUsageLocator | None")
     def __init__(self, definition, initial_values, default_values, parent, aside_fields=None, field_decorator=None):
         """
 

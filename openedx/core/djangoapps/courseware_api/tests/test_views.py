@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
+    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
@@ -136,8 +137,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
             if not logged_in:
                 self.client.logout()
-            if enrollment_mode:
-                CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
             if enrollment_mode == 'verified':
                 cert = GeneratedCertificateFactory.create(
                     user=self.user,
@@ -145,6 +144,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                     status='downloadable',
                     mode='verified',
                 )
+            if enrollment_mode:
+                CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
 
             response = self.client.get(self.url)
             assert response.status_code == 200
@@ -294,6 +295,17 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         else:
             assert not response.data['can_load_courseware']['has_access']
 
+    @ddt.data(True, False)
+    def test_is_learning_sequences_api_enabled(self, enable_new_api):
+        """
+        Test that the Courseware API exposes the Learning Sequences API flag.
+        """
+        with override_waffle_flag(COURSEWARE_USE_LEARNING_SEQUENCES_API, active=enable_new_api):
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+            courseware_data = response.json()
+            assert courseware_data['is_learning_sequences_api_enabled'] is enable_new_api
+
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
@@ -311,15 +323,15 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         (True, True),
     )
     @ddt.unpack
-    def test_special_exams_enabled_for_course(self, is_globaly_enabled, is_waffle_enabled):
+    def test_special_exams_enabled_for_course(self, is_globally_enabled, is_waffle_enabled):
         """ Ensure that special exams flag present in courseware meta data with expected value """
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': is_globaly_enabled}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': is_globally_enabled}):
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS, active=is_waffle_enabled):
                 response = self.client.get(self.url)
                 assert response.status_code == 200
                 courseware_data = response.json()
                 assert 'is_mfe_special_exams_enabled' in courseware_data
-                assert courseware_data['is_mfe_special_exams_enabled'] == (is_globaly_enabled and is_waffle_enabled)
+                assert courseware_data['is_mfe_special_exams_enabled'] == (is_globally_enabled and is_waffle_enabled)
 
     @ddt.data(
         (None, False, False, False),
@@ -358,15 +370,15 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         (True, True),
     )
     @ddt.unpack
-    def test_proctored_exams_enabled_for_course(self, is_globaly_enabled, is_waffle_enabled):
+    def test_proctored_exams_enabled_for_course(self, is_globally_enabled, is_waffle_enabled):
         """ Ensure that proctored exams flag present in courseware meta data with expected value """
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': is_globaly_enabled}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': is_globally_enabled}):
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS, active=is_waffle_enabled):
                 response = self.client.get(self.url)
                 assert response.status_code == 200
                 courseware_data = response.json()
                 assert 'is_mfe_proctored_exams_enabled' in courseware_data
-                assert courseware_data['is_mfe_proctored_exams_enabled'] == (is_globaly_enabled and is_waffle_enabled)
+                assert courseware_data['is_mfe_proctored_exams_enabled'] == (is_globally_enabled and is_waffle_enabled)
 
 
 class SequenceApiTestViews(BaseCoursewareTests):

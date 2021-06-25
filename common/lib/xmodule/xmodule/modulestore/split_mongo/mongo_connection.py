@@ -14,7 +14,6 @@ from time import time
 
 import pymongo
 import pytz
-from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
@@ -29,7 +28,6 @@ try:
 except ImportError:
     DJANGO_AVAILABLE = False
 
-new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
 
 
@@ -156,12 +154,6 @@ def structure_from_mongo(structure, course_context=None):
     with TIMER.timer('structure_from_mongo', course_context) as tagger:
         tagger.measure('blocks', len(structure['blocks']))
 
-        check('seq[2]', structure['root'])
-        check('list(dict)', structure['blocks'])
-        for block in structure['blocks']:
-            if 'children' in block['fields']:
-                check('list(list[2])', block['fields']['children'])
-
         structure['root'] = BlockKey(*structure['root'])
         new_blocks = {}
         for block in structure['blocks']:
@@ -183,12 +175,6 @@ def structure_to_mongo(structure, course_context=None):
     """
     with TIMER.timer('structure_to_mongo', course_context) as tagger:
         tagger.measure('blocks', len(structure['blocks']))
-
-        check('BlockKey', structure['root'])
-        check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in structure['blocks'].values():
-            if 'children' in block.fields:
-                check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []

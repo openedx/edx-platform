@@ -23,8 +23,9 @@ class SubsectionScoresSerializer(serializers.Serializer):
     display_name = serializers.CharField()
     block_key = serializers.SerializerMethodField()
     has_graded_assignment = serializers.BooleanField(source='graded')
-    num_points_earned = serializers.IntegerField(source='graded_total.earned')
-    num_points_possible = serializers.IntegerField(source='graded_total.possible')
+    learner_has_access = serializers.SerializerMethodField()
+    num_points_earned = serializers.FloatField(source='graded_total.earned')
+    num_points_possible = serializers.FloatField(source='graded_total.possible')
     percent_graded = serializers.FloatField()
     show_correctness = serializers.CharField()
     show_grades = serializers.SerializerMethodField()
@@ -40,6 +41,10 @@ class SubsectionScoresSerializer(serializers.Serializer):
 
     def get_show_grades(self, subsection):
         return subsection.show_grades(self.context['staff_access'])
+
+    def get_learner_has_access(self, subsection):
+        course_blocks = self.context['course_blocks']
+        return not course_blocks.get_xblock_field(subsection.location, 'contains_gated_content', False)
 
 
 class SectionScoresSerializer(serializers.Serializer):

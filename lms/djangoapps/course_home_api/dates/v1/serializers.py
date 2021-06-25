@@ -27,10 +27,12 @@ class DateSummarySerializer(serializers.Serializer):
     first_component_block_id = serializers.SerializerMethodField()
 
     def get_learner_has_access(self, block):
-        learner_is_full_access = self.context.get('learner_is_full_access', False)
-        block_is_verified = (getattr(block, 'contains_gated_content', False) or
-                             isinstance(block, VerificationDeadlineDate))
-        return (not block_is_verified) or learner_is_full_access
+        """Whether the learner is blocked (gated) from this content or not"""
+        if isinstance(block, VerificationDeadlineDate):
+            # This date block isn't an assignment, so doesn't have contains_gated_content set for it
+            return self.context.get('learner_is_full_access', False)
+
+        return not getattr(block, 'contains_gated_content', False)
 
     def get_link(self, block):
         if block.link:

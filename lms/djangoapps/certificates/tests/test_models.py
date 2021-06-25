@@ -4,8 +4,8 @@
 import json
 from unittest.mock import patch
 
-import pytest
 import ddt
+import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -29,7 +29,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import (
     CertificateInvalidationFactory,
     GeneratedCertificateFactory,
-    TemporaryCertificateAllowlistFactory,
+    CertificateAllowlistFactory,
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -477,15 +477,15 @@ class CertificateAllowlistTest(SharedModuleStoreTestCase):
         assert len(ret) == 0
 
     def test_get_allowlist_multiple_users(self):
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
 
         ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key)
         assert len(ret) == 2
 
     def test_get_allowlist_no_cert(self):
-        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
-        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+        allowlist_item = CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
 
         ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
         assert len(ret) == 1
@@ -501,7 +501,7 @@ class CertificateAllowlistTest(SharedModuleStoreTestCase):
         assert item['notes'] == allowlist_item.notes
 
     def test_get_allowlist_cert(self):
-        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        allowlist_item = CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,

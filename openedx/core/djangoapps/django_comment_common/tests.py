@@ -2,7 +2,6 @@
 
 
 import pytest
-from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
@@ -13,8 +12,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-new_contract('basestring', str)
 
 
 class RoleAssignmentTest(TestCase):

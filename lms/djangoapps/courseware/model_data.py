@@ -27,7 +27,6 @@ import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict, namedtuple
 
-from contracts import contract, new_contract
 from django.db import DatabaseError, IntegrityError, transaction
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from opaque_keys.edx.block_types import BlockTypeKeyV1
@@ -149,10 +148,6 @@ class DjangoKeyValueStore(KeyValueStore):
             raise InvalidScopeError(key, self._allowed_scopes)
 
 
-new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
-new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
-
-
 class DjangoOrmFieldCache(metaclass=ABCMeta):
     """
     Baseclass for Scope-specific field cache objects that are based on
@@ -175,7 +170,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
         for field_object in self._read_objects(fields, xblocks, aside_types):
             self._cache[self._cache_key_for_field_object(field_object)] = field_object
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
         """
         Return the django model object specified by `kvs_key` from
@@ -194,7 +188,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
 
         return json.loads(field_object.value)
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
         """
         Set the specified `kvs_key` to the field value `value`.
@@ -205,7 +198,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
         """
         self.set_many({kvs_key: value})
 
-    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
         """
         Set the specified fields to the supplied values.
@@ -241,7 +233,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
             finally:
                 saved_fields.append(kvs_key.field_name)
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
         """
         Delete the value specified by `kvs_key`.
@@ -260,7 +251,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
         field_object.delete()
         del self._cache[cache_key]
 
-    @contract(kvs_key=DjangoKeyValueStore.Key, returns=bool)
     def has(self, kvs_key):
         """
         Return whether the specified `kvs_key` is set.
@@ -272,7 +262,6 @@ class DjangoOrmFieldCache(metaclass=ABCMeta):
         """
         return self._cache_key_for_kvs_key(kvs_key) in self._cache
 
-    @contract(kvs_key=DjangoKeyValueStore.Key, returns="datetime|None")
     def last_modified(self, kvs_key):
         """
         Return when the supplied field was changed.
@@ -368,7 +357,6 @@ class UserStateCache:
         for user_state in block_field_state:
             self._cache[user_state.block_key] = user_state.state
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
         """
         Set the specified `kvs_key` to the field value `value`.
@@ -379,7 +367,6 @@ class UserStateCache:
         """
         self.set_many({kvs_key: value})
 
-    @contract(kvs_key=DjangoKeyValueStore.Key, returns="datetime|None")
     def last_modified(self, kvs_key):
         """
         Return when the supplied field was changed.
@@ -398,7 +385,6 @@ class UserStateCache:
         except self._client.DoesNotExist:
             return None
 
-    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
         """
         Set the specified fields to the supplied values.
@@ -424,7 +410,6 @@ class UserStateCache:
         finally:
             self._cache.update(pending_updates)
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
         """
         Return the django model object specified by `kvs_key` from
@@ -441,7 +426,6 @@ class UserStateCache:
 
         return self._cache[cache_key][kvs_key.field_name]
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
         """
         Delete the value specified by `kvs_key`.
@@ -463,7 +447,6 @@ class UserStateCache:
         self._client.delete(self.user.username, cache_key, fields=[kvs_key.field_name])
         del field_state[kvs_key.field_name]
 
-    @contract(kvs_key=DjangoKeyValueStore.Key, returns=bool)
     def has(self, kvs_key):
         """
         Return whether the specified `kvs_key` is set.
@@ -803,7 +786,6 @@ class FieldDataCache:
                 scope_map[field.scope].add(field)
         return scope_map
 
-    @contract(key=DjangoKeyValueStore.Key)
     def get(self, key):
         """
         Load the field value specified by `key`.
@@ -825,7 +807,6 @@ class FieldDataCache:
 
         return self.cache[key.scope].get(key)
 
-    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
         """
         Set all of the fields specified by the keys of `kv_dict` to the values
@@ -862,7 +843,6 @@ class FieldDataCache:
                 log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
                 raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)  # lint-amnesty, pylint: disable=raise-missing-from
 
-    @contract(key=DjangoKeyValueStore.Key)
     def delete(self, key):
         """
         Delete the value specified by `key`.
@@ -885,7 +865,6 @@ class FieldDataCache:
 
         self.cache[key.scope].delete(key)
 
-    @contract(key=DjangoKeyValueStore.Key, returns=bool)
     def has(self, key):
         """
         Return whether the specified `key` is set.
@@ -906,7 +885,6 @@ class FieldDataCache:
 
         return self.cache[key.scope].has(key)
 
-    @contract(key=DjangoKeyValueStore.Key, returns="datetime|None")
     def last_modified(self, key):
         """
         Return when the supplied field was changed.
@@ -989,7 +967,6 @@ class ScoresClient:
         return client
 
 
-# @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
 def set_score(user_id, usage_key, score, max_score):
     """
     Set the score and max_score for the specified user and xblock usage.

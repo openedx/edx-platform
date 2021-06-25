@@ -97,6 +97,7 @@ def enrolled_students_features(course_key, features):
     """
     include_cohort_column = 'cohort' in features
     include_team_column = 'team' in features
+    include_city_column = 'city' in features
     include_enrollment_mode = 'enrollment_mode' in features
     include_verification_status = 'verification_status' in features
     include_program_enrollments = 'external_user_key' in features
@@ -151,6 +152,13 @@ def enrolled_students_features(course_key, features):
             meta_dict = json.loads(profile.meta) if profile.meta else {}
             for meta_feature, meta_key in meta_features:
                 student_dict[meta_feature] = meta_dict.get(meta_key)
+
+            # There are two separate places where the city value can be stored,
+            # one used by account settings and the other used by the registration form.
+            # If the account settings value (meta.city) is set, it takes precedence.
+            meta_city = meta_dict.get('city')
+            if include_city_column and meta_city:
+                student_dict['city'] = meta_city
 
         if include_cohort_column:
             # Note that we use student.course_groups.all() here instead of

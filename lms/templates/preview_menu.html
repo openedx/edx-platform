@@ -107,7 +107,7 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                 </a>
                 <script type="text/javascript">
                   $(function () {
-                      $('.wrapper-preview-menu a.view-in-studio').click(function (event) {
+                      $('.wrapper-preview-menu a.view-in-studio').focus(function (event) {
                           /*
                           When we start rendering this template, we
                           don't yet have a vertical in the context
@@ -115,9 +115,11 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                           if this is even on a unit-level page),
                           so we dynamically lookup the vertical element in
                           the DOM and use its data-* attributes to
-                          construct a Studio link directly to this unit.
-                          If no vertical is present, the link behaves as
-                          normal.
+                          construct a Studio link directly to this unit
+                          and replace the href attribute with it. If no
+                          vertical is present, the link directs to the
+                          course outline page in Studio.
+
                           */
                           var verticals = $('.xblock-student_view-vertical');
                           if (verticals.length > 0) {
@@ -127,12 +129,8 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                                 'container',
                                 blockId,
                               ].join('/');
-                              window.location.href = url;
-                              return false;
+                              $(this).attr("href", url);
                           }
-                          // There's no vertical, so let the event
-                          // bubble up, ie, work like a normal link.
-                          return true;
                       });
                     });
                   </script>

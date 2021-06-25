@@ -9,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from xblock.completable import XBlockCompletionMode
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from common.djangoapps.student import auth
@@ -17,8 +16,8 @@ from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import CourseStaffRole
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.instructor.tasks import complete_student_attempt_task
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -81,56 +80,21 @@ class InstructorService:
                 )
                 log.error(err_msg)
 
-    def complete_student_attempt(self, user_identifier, content_id):
+    def complete_student_attempt(self, user_identifier: str, content_id: str) -> None:
         """
-        Submits all completable xblocks inside of the content_id block to the
+        Calls the complete_student_attempt_task
+
+        The task submits all completable xblocks inside of the content_id block to the
         Completion Service to mark them as complete. One use case of this function is
         for special exams (timed/proctored) where regardless of submission status on
         individual problems, we want to mark the entire exam as complete when the exam
         is finished.
 
         params:
-            user_identifier (String): username or email of a user
-            content_id (String): the block key for a piece of content
+            user_identifier (str): username or email of a user
+            content_id (str): the block key for a piece of content
         """
-        err_msg_prefix = (
-            'Error occurred while attempting to complete student attempt for user '
-            f'{user_identifier} for content_id {content_id}. '
-        )
-        err_msg = None
-        try:
-            user = get_user_by_username_or_email(user_identifier)
-            block_key = UsageKey.from_string(content_id)
-            root_block = modulestore().get_item(block_key)
-        except ObjectDoesNotExist:
-            err_msg = err_msg_prefix + 'User does not exist!'
-        except InvalidKeyError:
-            err_msg = err_msg_prefix + 'Invalid content_id!'
-        except ItemNotFoundError:
-            err_msg = err_msg_prefix + 'Block not found in the modulestore!'
-        if err_msg:
-            log.error(err_msg)
-            return
-
-        def _submit_completions(block, user):
-            """
-            Recursively submits the children for completion to the Completion Service
-            """
-            mode = XBlockCompletionMode.get_mode(block)
-            if mode == XBlockCompletionMode.COMPLETABLE:
-                block.runtime.publish(block, 'completion', {'completion': 1.0, 'user_id': user.id})
-            elif mode == XBlockCompletionMode.AGGREGATOR:
-                # I know this looks weird, but at the time of writing at least, there isn't a good
-                # single way to get the children assigned for a partcular user. Some blocks define the
-                # child descriptors method, but others don't and with blocks like Randomized Content
-                # (Library Content), the get_children method returns all children and not just assigned
-                # children. So this is our way around situations like that.
-                block_children = ((hasattr(block, 'get_child_descriptors') and block.get_child_descriptors())
-                                  or (hasattr(block, 'get_children') and block.get_children()))
-                for child in block_children:
-                    _submit_completions(child, user)
-
-        _submit_completions(root_block, user)
+        complete_student_attempt_task.apply_async((user_identifier, content_id))
 
     def is_course_staff(self, user, course_id):
         """

@@ -7,7 +7,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
-
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 
@@ -24,6 +23,23 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 # .. toggle_tickets: DEPR-109
 COURSEWARE_USE_LEGACY_FRONTEND = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'use_legacy_frontend', __name__
+)
+
+# .. toggle_name: courseware.use_learning_sequences_api
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: When enbled, frontend-app-learning's courseware pages should use the
+#   new Learning Sequences API (from ``openedx.core.djangoapps.content.learning_sequences``)
+#   instead of the Course Blocks API (from ``lms.djangoapps.course_api.blocks``)
+#   in order to load course structure data.
+# .. toggle_warnings: As of 2021-06-25, the frontend-app-learning changes necessary to honor this
+#   flag's value have not yet been implemented. We expect that they will be implemented in
+#   the coming weeks.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-06-25
+# .. toggle_target_removal_date: 2021-09-01
+COURSEWARE_USE_LEARNING_SEQUENCES_API = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'use_learning_sequences_api', __name__
 )
 
 # .. toggle_name: courseware.microfrontend_course_team_preview
@@ -131,8 +147,13 @@ def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
@@ -142,8 +163,13 @@ def mfe_proctored_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS.is_enabled(course_key)
@@ -153,6 +179,8 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     """
     Should we serve the Learning MFE as the canonical courseware experience?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # NO: Old Mongo courses are always served in the Legacy frontend,
     #     regardless of configuration.
     if course_key.deprecated:
@@ -160,6 +188,9 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     # NO: MFE courseware can be disabled for users/courses/globally via this
     #     Waffle flag.
     if COURSEWARE_USE_LEGACY_FRONTEND.is_enabled(course_key):
+        return False
+    # NO: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # OTHERWISE: MFE courseware experience is active by default.
     return True
@@ -173,8 +204,13 @@ def courseware_mfe_is_visible(
     """
     Can we see a course run's content in the Learning MFE?
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # ALLOW: Where techincally possible, global staff may always see the MFE.
     if is_global_staff:
@@ -200,8 +236,13 @@ def courseware_mfe_is_advertised(
     but we do not shove the New Experience in their face if the preview isn't
     enabled.
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # DENY: Course preview doesn't work in the MFE
+    if in_preview_mode():
         return False
     # ALLOW: Both global and course staff can see the MFE link if the course team
     #        preview is enabled.
@@ -222,8 +263,13 @@ def courseware_legacy_is_visible(
     Note: This function will always return True for Old Mongo courses,
     since `courseware_mfe_is_active` will always return False for them.
     """
+    #Avoid circular imports.
+    from lms.djangoapps.courseware.access_utils import in_preview_mode
     # ALLOW: Global staff may always see the Legacy experience.
     if is_global_staff:
+        return True
+    # ALLOW: All course previews will be shown in Legacy experience
+    if in_preview_mode():
         return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,

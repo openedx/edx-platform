@@ -81,7 +81,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         Inspect the dashboard to see if a certificate can be downloaded.
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, 'Download Your ID Verified')
+        self.assertContains(response, 'Download my')
         self.assertContains(response, self.DOWNLOAD_URL)
 
     def _check_can_download_certificate_no_id(self):
@@ -91,7 +91,6 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, 'Download')
-        self.assertContains(response, '(PDF)')
         self.assertContains(response, self.DOWNLOAD_URL)
 
     def _check_can_not_download_certificate(self):
@@ -100,8 +99,8 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, 'View Test_Certificate')
-        self.assertNotContains(response, 'Download Your Test_Certificate (PDF)')
-        self.assertNotContains(response, 'Download Test_Certificate (PDF)')
+        self.assertNotContains(response, 'Download my Test_Certificate')
+        self.assertNotContains(response, 'Download my Test_Certificate')
         self.assertNotContains(response, self.DOWNLOAD_URL)
 
 

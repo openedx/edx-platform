@@ -2,7 +2,7 @@ Status: Maintenance
 
 Responsibilities
 ================
-The Certificates app is responsible for creating and managing Course-Run certificates, including any relevant data models for invalidating and white-listing users' certificate eligibilities.
+The Certificates app is responsible for creating and managing course run certificates, including relevant data models for invalidating certificates and managing the allowlist.
 
 Direction: Move and Extract
 ===========================

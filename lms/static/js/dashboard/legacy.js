@@ -234,17 +234,20 @@
                  url: urls.sendAccountActivationEmail,
                  data: $(this).serializeArray(),
                  success: function() {
-                     $('#activate-account-modal p svg').remove();
-                      // xss-lint: disable=javascript-jquery-append
-                     $('#activate-account-modal p').append(
-                       // xss-lint: disable=javascript-concat-html
-                       '<svg  style="vertical-align:bottom" width="20" height="20"' +
-                       // xss-lint: disable=javascript-concat-html
-                       'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
-                       // xss-lint: disable=javascript-concat-html
-                       '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
-                       '</svg>'
-                     );
+                     setTimeout(
+                       function(){
+                         $('#activate-account-modal p svg').remove();
+                         // xss-lint: disable=javascript-jquery-append
+                         $('#activate-account-modal p').append(
+                         // xss-lint: disable=javascript-concat-html
+                         '<svg  style="vertical-align:bottom" width="20" height="20"' +
+                         // xss-lint: disable=javascript-concat-html
+                         'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+                         // xss-lint: disable=javascript-concat-html
+                         '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
+                         '</svg>'
+                         );
+                       }, 500); // adding timeout to make spinner animation longer
                  }
              });
              e.preventDefault();
@@ -252,7 +255,7 @@
              // xss-lint: disable=javascript-jquery-append
              $('#activate-account-modal p').append(
                // xss-lint: disable=javascript-concat-html
-               '<svg  class="fa-pulse" style="vertical-align:bottom" width="24" height="24"' +
+               '<svg  class="fa-pulse" style="vertical-align:bottom" width="20" height="20"' +
                // xss-lint: disable=javascript-concat-html
                'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
                // xss-lint: disable=javascript-concat-html
@@ -270,6 +273,7 @@
                  display: 'block',
                  'z-index': 0
              });
+             $('#activate-account-modal').focus()
          }
 
          $('.action-email-settings').each(function(index) {

@@ -3,7 +3,6 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
 
-from contracts import contract
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
 
 from xmodule.exceptions import InvalidVersionError
@@ -612,7 +611,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             xblock._published_by = published_block.edit_info.edited_by
             xblock._published_on = published_block.edit_info.edited_on
 
-    @contract(asset_key='AssetKey')
     def find_asset_metadata(self, asset_key, **kwargs):
         return super().find_asset_metadata(
             self._map_revision_to_branch(asset_key), **kwargs

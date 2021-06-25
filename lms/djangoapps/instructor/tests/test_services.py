@@ -5,7 +5,9 @@ import json
 from unittest import mock
 
 import pytest
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.core.exceptions import ObjectDoesNotExist
+from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys import InvalidKeyError
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -16,6 +18,7 @@ from lms.djangoapps.instructor.services import InstructorService
 from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class InstructorServiceTests(SharedModuleStoreTestCase):
@@ -115,14 +118,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         )
         assert result is None
 
-    # So technically, this mock publish is different than what is hit when running this code
-    # in production (lms.djangoapps.courseware.module_render.get_module_system_for_user.publish).
-    # I tried to figure out why or a way to force it to be more production like and was unsuccessful,
-    # so if anyone figures it out at any point, it would be greatly appreciated if you could update this.
-    # I thought it was acceptable because I'm still able to confirm correct behavior of the function
-    # and the attempted call, it is just going to the wrong publish spot ¯\_(ツ)_/¯
-    @mock.patch('xmodule.x_module.DescriptorSystem.publish')
-    def test_complete_student_attempt_success(self, mock_publish):
+    @mock.patch('completion.handlers.BlockCompletion.objects.submit_completion')
+    def test_complete_student_attempt_success(self, mock_submit):
         """
         Assert complete_student_attempt correctly publishes completion for all
         completable children of the given content_id
@@ -140,25 +137,62 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         # Not a completable block
         ItemFactory.create(parent=unit, category='discussion')
 
-        self.service.complete_student_attempt(self.student.username, str(subsection.location))
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
+            self.service.complete_student_attempt(self.student.username, str(subsection.location))
+
         # Only Completable leaf blocks should have completion published
-        assert mock_publish.call_count == 2
+        assert mock_submit.call_count == 2
+        mock_submit.assert_any_call(user=self.student, block_key=video.location, completion=1.0)
+        mock_submit.assert_any_call(user=self.student, block_key=problem.location, completion=1.0)
 
-        # The calls take the form of (xblock, publish_event, publish_data), which in our case
-        # will look like (xblock, 'completion', {'completion': 1.0, 'user_id': 1}).
-        # I'd prefer to be able to just assert all fields at once, but for some reason the value
-        # of the xblock in the mock call and the object above are different (even with a refetch)
-        # so I'm settling for just ensuring the location (block_key) of both are identical
-        video_call = mock_publish.call_args_list[0][0]
-        assert video_call[0].location == video.location
-        assert video_call[1] == 'completion'
-        assert video_call[2] == {'completion': 1.0, 'user_id': self.student.id}
-        problem_call = mock_publish.call_args_list[1][0]
-        assert problem_call[0].location == problem.location
-        assert problem_call[1] == 'completion'
-        assert problem_call[2] == {'completion': 1.0, 'user_id': self.student.id}
+    @mock.patch('completion.handlers.BlockCompletion.objects.submit_completion')
+    def test_complete_student_attempt_split_test(self, mock_submit):
+        """
+        Asserts complete_student_attempt correctly publishes completion when a split test is involved
 
-    @mock.patch('lms.djangoapps.instructor.services.log.error')
+        This test case exists because we ran into a bug about the user_service not existing
+        when a split_test existed inside of a subsection. Associated with this change was adding
+        in the user state into the module before attempting completion and this ensures that is
+        working properly.
+        """
+        partition = UserPartition(
+            0,
+            'first_partition',
+            'First Partition',
+            [
+                Group(0, 'alpha'),
+                Group(1, 'beta')
+            ]
+        )
+        course = CourseFactory.create(user_partitions=[partition])
+        section = ItemFactory.create(parent=course, category='chapter')
+        subsection = ItemFactory.create(parent=section, category='sequential')
+
+        c0_url = course.id.make_usage_key('vertical', 'split_test_cond0')
+        c1_url = course.id.make_usage_key('vertical', 'split_test_cond1')
+        split_test = ItemFactory.create(
+            parent=subsection,
+            category='split_test',
+            user_partition_id=0,
+            group_id_to_child={'0': c0_url, '1': c1_url},
+        )
+
+        cond0vert = ItemFactory.create(parent=split_test, category='vertical', location=c0_url)
+        ItemFactory.create(parent=cond0vert, category='video')
+        ItemFactory.create(parent=cond0vert, category='problem')
+
+        cond1vert = ItemFactory.create(parent=split_test, category='vertical', location=c1_url)
+        ItemFactory.create(parent=cond1vert, category='video')
+        ItemFactory.create(parent=cond1vert, category='html')
+
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
+            self.service.complete_student_attempt(self.student.username, str(subsection.location))
+
+        # Only the group the user was assigned to should have completion published.
+        # Either cond0vert's children or cond1vert's children
+        assert mock_submit.call_count == 2
+
+    @mock.patch('lms.djangoapps.instructor.tasks.log.error')
     def test_complete_student_attempt_bad_user(self, mock_logger):
         """
         Assert complete_student_attempt with a bad user raises error and returns None
@@ -169,7 +203,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.complete_error_prefix.format(user=username, content_id=self.problem_urlname) + 'User does not exist!'
         )
 
-    @mock.patch('lms.djangoapps.instructor.services.log.error')
+    @mock.patch('lms.djangoapps.instructor.tasks.log.error')
     def test_complete_student_attempt_bad_content_id(self, mock_logger):
         """
         Assert complete_student_attempt with a bad content_id raises error and returns None
@@ -180,7 +214,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.complete_error_prefix.format(user=username, content_id='foo/bar/baz') + 'Invalid content_id!'
         )
 
-    @mock.patch('lms.djangoapps.instructor.services.log.error')
+    @mock.patch('lms.djangoapps.instructor.tasks.log.error')
     def test_complete_student_attempt_nonexisting_item(self, mock_logger):
         """
         Assert complete_student_attempt with nonexisting item in the modulestore
@@ -191,6 +225,19 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         self.service.complete_student_attempt(username, block)
         mock_logger.assert_called_once_with(
             self.complete_error_prefix.format(user=username, content_id=block) + 'Block not found in the modulestore!'
+        )
+
+    @mock.patch('lms.djangoapps.instructor.tasks.log.error')
+    def test_complete_student_attempt_failed_module(self, mock_logger):
+        """
+        Assert complete_student_attempt with failed get_module raises error and returns None
+        """
+        username = self.student.username
+        with mock.patch('lms.djangoapps.instructor.tasks.get_module_for_descriptor', return_value=None):
+            self.service.complete_student_attempt(username, str(self.course.location))
+        mock_logger.assert_called_once_with(
+            self.complete_error_prefix.format(user=username, content_id=self.course.location) +
+            'Module unable to be created from descriptor!'
         )
 
     def test_is_user_staff(self):

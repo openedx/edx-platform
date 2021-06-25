@@ -17,6 +17,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_ENROLLED,
     CourseEnrollment,
     CourseEnrollmentAttribute,
     ManualEnrollmentAudit
@@ -84,6 +85,58 @@ class EnrollmentSupportListView(GenericAPIView):
 
     @method_decorator(require_support_permission)
     def post(self, request, username_or_email):
+        """
+        Allows support staff to create a user's enrollment.
+        """
+        try:
+            course_id = request.data['course_id']
+            course_key = CourseKey.from_string(course_id)
+            mode = request.data['mode']
+            reason = request.data['reason']
+            user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
+        except KeyError as err:
+            return HttpResponseBadRequest(f'The field {str(err)} is required.')
+        except InvalidKeyError:
+            return HttpResponseBadRequest('Could not parse course key.')
+        except User.DoesNotExist:
+            return HttpResponseBadRequest(
+                'Could not find user {username}.'.format(
+                    username=username_or_email
+                )
+            )
+
+        enrollment = CourseEnrollment.get_enrollment(user=user, course_key=course_key)
+        if enrollment is not None:
+            return HttpResponseBadRequest(
+                f'The user {str(username_or_email)} is already enrolled in {str(course_id)}.'
+            )
+
+        enrollment_modes = [
+            enrollment_mode['slug']
+            for enrollment_mode in self.get_course_modes(course_key)
+        ]
+        if mode not in enrollment_modes:
+            return HttpResponseBadRequest(
+                f'{str(mode)} is not a valid mode for {str(course_id)}. '
+                f'Possible valid modes are {str(enrollment_modes)}'
+            )
+
+        enrollment = CourseEnrollment.enroll(user=user, course_key=course_key, mode=mode)
+
+        # Wrapped in a transaction so that we can be sure the
+        # ManualEnrollmentAudit record is always created correctly.
+        with transaction.atomic():
+            manual_enrollment = ManualEnrollmentAudit.create_manual_enrollment_audit(
+                request.user,
+                enrollment.user.email,
+                UNENROLLED_TO_ENROLLED,
+                reason=reason,
+                enrollment=enrollment
+            )
+            return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
+
+    @method_decorator(require_support_permission)
+    def patch(self, request, username_or_email):
         """Allows support staff to alter a user's enrollment."""
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))

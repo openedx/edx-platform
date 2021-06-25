@@ -11,15 +11,17 @@ import ddt
 import pytz
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
+from django.db import transaction
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -439,6 +441,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     """
     Tests for GET of /api/mobile/v<version_number>/users/<user_name>/course_status_info/{course_id}
     """
+
     def test_success_v0(self):
         self.login_and_enroll()
 
@@ -453,6 +456,53 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         submit_completions_for_testing(self.user, [self.unit.location])
         response = self.api_response(api_version=API_V1)
         assert response.data['last_visited_block_id'] == str(self.unit.location)
+
+    # Since we are testing an non atomic view in atomic test case, therefore we are expecting error on failures
+    def api_error_response(self, reverse_args=None, data=None, **kwargs):
+        """
+            Same as api response from MobileAPITestCase but handle views which throw errors
+        """
+        url = self.reverse_url(reverse_args, **kwargs)
+        try:
+            with transaction.atomic():
+                self.url_method(url, data=data, **kwargs)
+                assert False
+        except transaction.TransactionManagementError:
+            assert True
+
+    def test_invalid_user(self):
+        self.login_and_enroll()
+        self.api_error_response(username='no_user')
+
+    def test_other_user(self):
+        # login and enroll as the test user
+        self.login_and_enroll()
+        self.logout()
+
+        # login and enroll as another user
+        other = UserFactory.create()
+        self.client.login(username=other.username, password='test')
+        self.enroll()
+        self.logout()
+
+        # now login and call the API as the test user
+        self.login()
+        self.api_error_response(username=other.username)
+
+    def test_course_not_found(self):
+        non_existent_course_id = CourseKey.from_string('a/b/c')
+        self.init_course_access(course_id=non_existent_course_id)
+
+        self.api_error_response(course_id=non_existent_course_id)
+
+    def test_unenrolled_user(self):
+        self.login()
+        self.unenroll()
+        self.api_error_response(expected_response_code=None)
+
+    def test_no_auth(self):
+        self.logout()
+        self.api_error_response()
 
 
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,

@@ -1,4 +1,4 @@
-// Backbone Application View: CertificateWhitelist View
+// Backbone Application View: CertificateAllowlist View
 /* global define, RequireJS */
 
 (function(define) {
@@ -14,8 +14,8 @@
 
         function($, _, gettext, Backbone, HtmlUtils) {
             return Backbone.View.extend({
-                el: '#white-listed-students',
-                message_div: 'div.white-listed-students > div.message',
+                el: '#allowlisted-students',
+                message_div: 'div.allowlisted-students > div.message',
                 generate_exception_certificates_radio:
                     'input:radio[name=generate-exception-certificates-radio]:checked',
 
@@ -25,14 +25,14 @@
                 },
 
                 initialize: function(options) {
-                    this.certificateWhiteListEditorView = options.certificateWhiteListEditorView;
+                    this.certificateAllowlistEditorView = options.certificateAllowlistEditorView;
                     this.active_certificate = options.active_certificate;
                     // Re-render the view when an item is added to the collection
                     this.listenTo(this.collection, 'change add remove', this.render);
                 },
 
                 render: function() {
-                    var template = this.loadTemplate('certificate-white-list');
+                    var template = this.loadTemplate('certificate-allowlist');
                     this.$el.html(HtmlUtils.HTML(template({certificates: this.collection.models})).toString());
                     if (!this.active_certificate || this.collection.isEmpty()) {
                         this.$('#generate-exception-certificates').attr('disabled', 'disabled');
@@ -56,7 +56,7 @@
                             {
                                 success: function() {
                                     self.escapeAndShowMessage(
-                                        gettext('Student Removed from certificate white list successfully.')
+                                        gettext('Student Removed from certificate allowlist successfully.')
                                     );
                                 },
                                 error: this.showError(this),
@@ -66,7 +66,7 @@
                         );
                     } else {
                         this.escapeAndShowMessage(
-                            gettext('Could not find Certificate Exception in white list. Please refresh the page and try again')  // eslint-disable-line max-len
+                            gettext('Could not find Certificate Exception in the allowlist. Please refresh the page and try again')  // eslint-disable-line max-len
                         );
                     }
                 },

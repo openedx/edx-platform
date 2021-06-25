@@ -238,7 +238,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message,
-        'certificate_white_list': certificate_allowlist,
+        'certificate_allowlist': certificate_allowlist,
         'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,

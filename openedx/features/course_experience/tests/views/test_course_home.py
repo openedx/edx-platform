@@ -28,6 +28,7 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, get_course_goal
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -158,6 +159,7 @@ class CourseHomePageTestCase(BaseCourseUpdatesTestCase):
 
 
 class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_welcome_message_when_unified(self):
         # Create a welcome message
         self.create_course_update(TEST_WELCOME_MESSAGE)
@@ -166,6 +168,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
         response = self.client.get(url)
         self.assertContains(response, TEST_WELCOME_MESSAGE, status_code=200)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_welcome_message_when_not_unified(self):
         # Create a welcome message
@@ -175,6 +178,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
         response = self.client.get(url)
         self.assertNotContains(response, TEST_WELCOME_MESSAGE, status_code=200)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_updates_tool_visibility(self):
         """
         Verify that the updates course tool is visible only when the course
@@ -189,6 +193,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
@@ -270,6 +275,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True, True],
     )
     @ddt.unpack
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_home_page(
             self, enable_unenrolled_access, course_visibility, user_type,
             expected_enroll_message, expected_course_outline,
@@ -320,6 +326,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                     self.assertContains(private_response,
                                         'You must be enrolled in the course to see course content.')
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @ddt.data(
         [CourseUserType.ANONYMOUS, 'To see course content'],
@@ -356,6 +363,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         if expected_message:
             self.assertContains(response, expected_message)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_sign_in_button(self):
         """
         Verify that the sign in button will return to this page.
@@ -603,6 +611,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         assert response.status_code == 404
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     def test_masters_course_message(self):
         enroll_button_html = "<button class=\"enroll-btn btn-link\">Enroll now</button>"
@@ -632,6 +641,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, expected_message)
         self.assertNotContains(response, enroll_button_html)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     def test_course_messaging(self):
         """
@@ -700,6 +710,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_course_messaging_for_staff(self):
         """
         Staff users will not see the expiration banner when course duration limits

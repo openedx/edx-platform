@@ -2920,8 +2920,7 @@ input[name="subject"] {
     width: 400px;
   }
 
-
-  #certificate-white-list-editor {
+  #certificate-allowlist-editor {
     padding-top: 5px;
 
     .certificate-exception-inputs {
@@ -2935,7 +2934,7 @@ input[name="subject"] {
     }
   }
 
-  .white-listed-students,
+  .allowlisted-students,
   .invalidation-history {
     margin-top: 10px;
     padding-top: 5px;
@@ -3022,11 +3021,11 @@ input[name="subject"] {
     }
   }
 
-  .bulk-white-list-exception {
+  .bulk-allowlist-exception {
     margin-top: 10px;
     padding-top: 5px;
 
-    .white-list-csv {
+    .allowlist-csv {
       .bulk-exception-results {
         margin-top: 10px;
         background-color: $gray-l4;

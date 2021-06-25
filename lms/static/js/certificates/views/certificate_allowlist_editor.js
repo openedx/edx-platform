@@ -1,4 +1,4 @@
-// Backbone Application View: CertificateWhiteList Editor View
+// Backbone Application View: CertificateAllowlist Editor View
 /* global define, RequireJS */
 
 (function(define) {
@@ -13,7 +13,7 @@
     ],
         function($, _, gettext, Backbone, CertificateExceptionModel, HtmlUtils) {
             return Backbone.View.extend({
-                el: '#certificate-white-list-editor',
+                el: '#certificate-allowlist-editor',
                 message_div: '.message',
 
                 events: {
@@ -21,7 +21,7 @@
                 },
 
                 render: function() {
-                    var template = this.loadTemplate('certificate-white-list-editor');
+                    var template = this.loadTemplate('certificate-allowlist-editor');
                     this.$el.html(HtmlUtils.HTML(template()).toString());
                 },
 

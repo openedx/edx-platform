@@ -20,7 +20,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
@@ -90,10 +90,10 @@ def reset_course_deadlines(request):
             })
             tracker.emit('edx.ui.lms.reset_deadlines.clicked', research_event_data)
 
-        if course_home_mfe_is_active(course_key):
-            body_link = get_learning_mfe_home_url(course_key=str(course_key), view_name='dates')
-        else:
+        if course_home_legacy_is_active(course_key):
             body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[str(course_key)]))
+        else:
+            body_link = get_learning_mfe_home_url(course_key=str(course_key), view_name='dates')
 
         return Response({
             'body': format_html('<a href="{}">{}</a>', body_link, _('View all dates')),

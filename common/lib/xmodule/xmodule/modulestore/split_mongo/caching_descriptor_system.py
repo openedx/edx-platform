@@ -3,11 +3,9 @@
 import logging
 import sys
 
-from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, DefinitionLocator, LibraryLocator, LocalId
-from xblock.core import XBlock
+from opaque_keys.edx.locator import BlockUsageLocator, DefinitionLocator, LocalId
 from xblock.fields import ScopeIds
 from xblock.runtime import KeyValueStore, KvsFieldData
 
@@ -15,7 +13,6 @@ from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data
@@ -27,14 +24,6 @@ from xmodule.x_module import XModuleMixin
 
 log = logging.getLogger(__name__)
 
-new_contract('BlockUsageLocator', BlockUsageLocator)
-new_contract('CourseLocator', CourseLocator)
-new_contract('LibraryLocator', LibraryLocator)
-new_contract('BlockKey', BlockKey)
-new_contract('BlockData', BlockData)
-new_contract('CourseEnvelope', CourseEnvelope)
-new_contract('XBlock', XBlock)
-
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
@@ -43,7 +32,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
 
     Computes the settings (nee 'metadata') inheritance upon creation.
     """
-    @contract(course_entry=CourseEnvelope)
     def __init__(self, modulestore, course_entry, default_class, module_data, lazy, **kwargs):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Computes the settings inheritance and sets up the cache.
@@ -87,7 +75,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
 
     @lazy
-    @contract(returns="dict(BlockKey: BlockKey)")
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         parent_map = {}
         for block_key, block in self.course_entry.structure['blocks'].items():
@@ -95,7 +82,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 parent_map[child] = block_key
         return parent_map
 
-    @contract(usage_key="BlockUsageLocator | BlockKey", course_entry_override="CourseEnvelope | None")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
         """
         Instantiate the xblock fetching it either from the cache or from the structure
@@ -143,7 +129,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.modulestore.cache_block(course_key, version_guid, block_key, block)
         return block
 
-    @contract(block_key=BlockKey, course_key="CourseLocator | LibraryLocator")
     def get_module_data(self, block_key, course_key):
         """
         Get block from module_data adding it to module_data if it's not already there but is in the structure
@@ -172,7 +157,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
-    @contract(block_key="BlockKey | None")
     def xblock_from_json(self, class_, course_key, block_key, block_data, course_entry_override=None, **kwargs):
         """
         Load and return block info.
@@ -299,7 +283,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         """
         return xblock._edited_on  # lint-amnesty, pylint: disable=protected-access
 
-    @contract(xblock='XBlock')
     def get_subtree_edited_by(self, xblock):
         """
         See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
@@ -315,7 +298,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
 
         return xblock._subtree_edited_by
 
-    @contract(xblock='XBlock')
     def get_subtree_edited_on(self, xblock):
         """
         See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
@@ -349,7 +331,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
 
         return getattr(xblock, '_published_on', None)
 
-    @contract(block_data='BlockData')
     def _compute_subtree_edited_internal(self, block_data, course_key):
         """
         Recurse the subtree finding the max edited_on date and its corresponding edited_by. Cache it.

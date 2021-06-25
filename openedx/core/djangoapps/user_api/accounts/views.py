@@ -344,6 +344,15 @@ class AccountViewSet(ViewSet):
             }
         ]
         """
+        if not request.user.is_staff:
+            return Response(
+                {
+                    'developer_message': 'not_found',
+                    'user_message': 'Not Found'
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         try:
             user_emails = request.data['emails']
         except KeyError as error:

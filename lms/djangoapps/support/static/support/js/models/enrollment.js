@@ -5,7 +5,7 @@
             updateEnrollment: function(new_mode, reason) {
                 return $.ajax({
                     url: this.url(),
-                    type: 'POST',
+                    type: 'PATCH',
                     contentType: 'application/json',
                     data: JSON.stringify({
                         course_id: this.get('course_id'),

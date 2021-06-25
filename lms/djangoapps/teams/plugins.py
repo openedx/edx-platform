@@ -1,13 +1,20 @@
 """
 Definition of the course team feature.
 """
+from typing import Dict, Optional
 
-
-from django.utils.translation import ugettext_noop
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils.translation import ugettext_noop as _
+from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.tabs import EnrolledTab
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from . import is_feature_enabled
+
+
+User = get_user_model()
 
 
 class TeamsTab(EnrolledTab):
@@ -16,7 +23,7 @@ class TeamsTab(EnrolledTab):
     """
 
     type = "teams"
-    title = ugettext_noop("Teams")
+    title = _("Teams")
     view_name = "teams_dashboard"
 
     @classmethod
@@ -31,3 +38,38 @@ class TeamsTab(EnrolledTab):
             return False
 
         return is_feature_enabled(course)
+
+
+class TeamsCourseApp(CourseApp):
+    """
+    Course app for teams.
+    """
+
+    app_id = "teams"
+    name = _("Teams")
+    description = _("Leverage teams to allow learners to connect by topic of interest.")
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:
+        """
+        The teams app is currently available globally based on a feature setting.
+        """
+        return settings.FEATURES.get("ENABLE_TEAMS", False)
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:
+        return CourseOverview.get_from_id(course_key).teams_enabled
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: User) -> bool:
+        raise ValueError("Teams cannot be enabled/disabled via this API.")
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Return allowed operations for teams app.
+        """
+        return {
+            "enable": False,
+            "configure": True,
+        }

@@ -20,14 +20,14 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.data import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
-    CertificateWhitelist,
+    CertificateAllowlist,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 LOGGER = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ class XQueueCertInterface:
             settings.XQUEUE_INTERFACE['django_auth'],
             requests_auth,
         )
-        self.allowlist = CertificateWhitelist.objects.all()
+        self.allowlist = CertificateAllowlist.objects.all()
         self.use_https = True
 
     def regen_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
@@ -259,7 +259,7 @@ class XQueueCertInterface:
         self.request.user = student
         self.request.session = {}
 
-        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, whitelist=True).exists()
+        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, allowlist=True).exists()
         course_grade = CourseGradeFactory().read(student, course_key=course_id)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
@@ -401,7 +401,10 @@ class XQueueCertInterface:
         sends a request to XQueue.
         """
         course_id = str(cert.course_id)
-        course_overview = get_course_overview(course_id)
+        course_overview = get_course_overview_or_none(course_id)
+        if not course_overview:
+            LOGGER.warning(f"Skipping cert generation for {student.id} due to missing course overview for {course_id}")
+            return cert
 
         key = make_hashkey(random.random())
         cert.key = key

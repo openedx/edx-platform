@@ -505,7 +505,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
         return user_entry
 
-    @verify_course_exists
+    @verify_course_exists("Requested grade for unknown course {course}")
     @verify_writable_gradebook_enabled
     @course_author_access_required
     def get(self, request, course_key):  # lint-amnesty, pylint: disable=too-many-statements
@@ -790,7 +790,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         ]
     """
 
-    @verify_course_exists
+    @verify_course_exists("Requested grade for unknown course {course}")
     @verify_writable_gradebook_enabled
     @course_author_access_required
     def post(self, request, course_key):

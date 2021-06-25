@@ -69,51 +69,6 @@ class CertificateWhitelist(models.Model):
     created = AutoCreatedField(_('created'))
     notes = models.TextField(default=None, null=True)
 
-    @classmethod
-    def get_certificate_white_list(cls, course_id, student=None):
-        """
-        Return certificate white list for the given course as dict object,
-        returned dictionary will have the following key-value pairs
-
-        [{
-            id:         'id (pk) of CertificateWhitelist item'
-            user_id:    'User Id of the student'
-            user_name:  'name of the student'
-            user_email: 'email of the student'
-            course_id:  'Course key of the course to whom certificate exception belongs'
-            created:    'Creation date of the certificate exception'
-            notes:      'Additional notes for the certificate exception'
-        }, {...}, ...]
-
-        """
-        white_list = cls.objects.filter(course_id=course_id, whitelist=True)
-        if student:
-            white_list = white_list.filter(user=student)
-        result = []
-        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
-            course_id=course_id,
-            user__in=[exception.user for exception in white_list],
-            status=CertificateStatuses.downloadable
-        )
-        generated_certificates = {
-            certificate['user']: certificate['created_date']
-            for certificate in generated_certificates.values('user', 'created_date')
-        }
-
-        for item in white_list:
-            certificate_generated = generated_certificates.get(item.user.id, '')
-            result.append({
-                'id': item.id,
-                'user_id': item.user.id,
-                'user_name': str(item.user.username),
-                'user_email': str(item.user.email),
-                'course_id': str(item.course_id),
-                'created': item.created.strftime("%B %d, %Y"),
-                'certificate_generated': certificate_generated and certificate_generated.strftime("%B %d, %Y"),
-                'notes': str(item.notes or ''),
-            })
-        return result
-
 
 class CertificateAllowlist(TimeStampedModel):
     """
@@ -131,6 +86,12 @@ class CertificateAllowlist(TimeStampedModel):
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     allowlist = models.BooleanField(default=0)
     notes = models.TextField(default=None, null=True)
+
+    # This is necessary because CMS does not install the certificates app, but it
+    # imports this model's code. Simple History will attempt to connect to the installed
+    # model in the certificates app, which will fail.
+    if 'certificates' in apps.app_configs:
+        history = HistoricalRecords()
 
     @classmethod
     def get_certificate_allowlist(cls, course_id, student=None):

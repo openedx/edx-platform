@@ -1,4 +1,4 @@
-// Backbone Application View: CertificateBulkWhitelist View
+// Backbone Application View: CertificateBulkAllowlist View
 /* global define, RequireJS */
 
 (function(define) {
@@ -13,10 +13,10 @@
 
         function($, _, gettext, Backbone) {
             var DOM_SELECTORS = {
-                bulk_exception: '.bulk-white-list-exception',
+                bulk_exception: '.bulk-allowlist-exception',
                 upload_csv_button: '.upload-csv-button',
                 browse_file: '.browse-file',
-                bulk_white_list_exception_form: 'form#bulk-white-list-exception-form'
+                bulk_allowlist_exception_form: 'form#bulk-allowlist-exception-form'
             };
 
             var MESSAGE_GROUP = {
@@ -24,7 +24,7 @@
                 general_errors: 'general-errors',
                 data_format_error: 'data-format-error',
                 user_not_exist: 'user-not-exist',
-                user_already_white_listed: 'user-already-white-listed',
+                user_already_allowlisted: 'user-already-allowlisted',
                 user_not_enrolled: 'user-not-enrolled',
                 user_on_certificate_invalidation_list: 'user-on-certificate-invalidation-list'
             };
@@ -43,7 +43,7 @@
                 },
 
                 render: function() {
-                    var template = this.loadTemplate('certificate-bulk-white-list');
+                    var template = this.loadTemplate('certificate-bulk-allowlist');
                     this.$el.html(template()); // xss-lint: disable=javascript-jquery-html
                 },
 
@@ -54,7 +54,7 @@
                 },
 
                 uploadCSV: function() {
-                    var form = this.$el.find(DOM_SELECTORS.bulk_white_list_exception_form);
+                    var form = this.$el.find(DOM_SELECTORS.bulk_allowlist_exception_form);
                     var self = this;
                     form.unbind('submit').submit(function(e) {
                         var data = new FormData(e.currentTarget);
@@ -103,46 +103,46 @@
                         switch (group) {
                         case MESSAGE_GROUP.successfully_added:
                             text = qty > 1 ?
-                                gettext(qty + ' learners are successfully added to exception list') :
-                                gettext(qty + ' learner is successfully added to the exception list');
+                                gettext(qty + ' learners were successfully added to exception list') :
+                                gettext(qty + ' learner was successfully added to the exception list');
                             break;
 
                         case MESSAGE_GROUP.data_format_error:
                             text = qty > 1 ?
-                                gettext(qty + ' records are not in correct format and not added to' +
+                                gettext(qty + ' records are not in the correct format and have not been added to' +
                                     ' the exception list') :
-                                gettext(qty + ' record is not in correct format and not added to the exception' +
-                                    ' list');
+                                gettext(qty + ' record is not in the correct format and has not been added to the' +
+                                    ' exception list');
                             break;
 
                         case MESSAGE_GROUP.user_not_exist:
                             text = qty > 1 ?
-                                gettext(qty + ' learners do not exist in LMS and not added to the' +
-                                    ' exception list') :
-                                gettext(qty + ' learner does not exist in LMS and not added to the exception' +
-                                    ' list');
+                                gettext(qty + ' learner accounts cannot be found and have not been added to the ' +
+                                    'exception list') :
+                                gettext(qty + ' learner account cannot be found and has not been added to the' +
+                                    ' exception list');
                             break;
 
-                        case MESSAGE_GROUP.user_already_white_listed:
+                        case MESSAGE_GROUP.user_already_allowlisted:
                             text = qty > 1 ?
-                                gettext(qty + ' learners are already white listed and not added to' +
-                                    ' the exception list') :
-                                gettext(qty + ' learner is already white listed and not added to the exception' +
-                                    ' list');
+                                gettext(qty + ' learners already appear on the exception list in this course') :
+                                gettext(qty + ' learner already appears on the exception list in this course');
                             break;
 
                         case MESSAGE_GROUP.user_not_enrolled:
                             text = qty > 1 ?
-                                gettext(qty + ' learners are not enrolled in course and not added to' +
-                                    ' the exception list') :
-                                gettext(qty + ' learner is not enrolled in course and not added to the exception' +
-                                    ' list');
+                                gettext(qty + ' learners are not enrolled in this course and have not added to the' +
+                                    ' exception list') :
+                                gettext(qty + ' learner is not enrolled in this course and has not been added to the' +
+                                    ' exception list');
                             break;
 
                         case MESSAGE_GROUP.user_on_certificate_invalidation_list:
                             text = qty > 1 ?
-                                gettext(qty + ' learners already appear on the certificate invalidation list') :
-                                gettext(qty + ' learner already appears on the certificate invalidation list');
+                                gettext(qty + ' learners have an active certificate invalidation in this course and' +
+                                    ' have not been added to the exception list') :
+                                gettext(qty + ' learner has an active certificate invalidation in this course and has' +
+                                    ' not been added to the exception list');
                             break;
 
                         default:
@@ -195,15 +195,15 @@
                                 user_not_exist
                             );
                         }
-                        if (row_errors.user_already_white_listed.length) {
-                            var user_already_white_listed = row_errors.user_already_white_listed;
+                        if (row_errors.user_already_allowlisted.length) {
+                            var user_already_allowlisted = row_errors.user_already_allowlisted;
                             generateDiv(
-                                MESSAGE_GROUP.user_already_white_listed,
+                                MESSAGE_GROUP.user_already_allowlisted,
                                 getDisplayText(
-                                    user_already_white_listed.length,
-                                    MESSAGE_GROUP.user_already_white_listed
+                                    user_already_allowlisted.length,
+                                    MESSAGE_GROUP.user_already_allowlisted
                                 ),
-                                user_already_white_listed
+                                user_already_allowlisted
                             );
                         }
                         if (row_errors.user_not_enrolled.length) {

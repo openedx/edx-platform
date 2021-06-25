@@ -3,16 +3,13 @@ Handle view-logic for the djangoapp
 """
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import serializers
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-
+from openedx.core.lib.api.view_utils import validate_course_key
 from .models import DiscussionsConfiguration
 from .serializers import DiscussionsConfigurationSerializer
 
@@ -33,7 +30,7 @@ class IsStaff(BasePermission):
         if user.is_staff:
             return True
         course_key_string = view.kwargs.get('course_key_string')
-        course_key = _validate_course_key(course_key_string)
+        course_key = validate_course_key(course_key_string)
         return CourseStaffRole(
             course_key,
         ).has_user(request.user)
@@ -55,7 +52,7 @@ class DiscussionsConfigurationView(APIView):
         """
         Handle HTTP/GET requests
         """
-        course_key = _validate_course_key(course_key_string)
+        course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = DiscussionsConfigurationSerializer(configuration)
         return Response(serializer.data)
@@ -64,7 +61,7 @@ class DiscussionsConfigurationView(APIView):
         """
         Handle HTTP/POST requests
         """
-        course_key = _validate_course_key(course_key_string)
+        course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = DiscussionsConfigurationSerializer(
             configuration,
@@ -77,20 +74,3 @@ class DiscussionsConfigurationView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data)
-
-
-def _validate_course_key(course_key_string: str) -> CourseKey:
-    """
-    Validate and parse a course_key string, if supported
-    """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError as error:
-        raise serializers.ValidationError(
-            f"{course_key_string} is not a valid CourseKey"
-        ) from error
-    if course_key.deprecated:
-        raise serializers.ValidationError(
-            'Deprecated CourseKeys (Org/Course/Run) are not supported.'
-        )
-    return course_key

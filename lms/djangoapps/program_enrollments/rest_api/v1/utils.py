@@ -156,7 +156,7 @@ def verify_course_exists_and_in_program(view_func):
     """
     @wraps(view_func)
     @verify_program_exists
-    @verify_course_exists
+    @verify_course_exists()
     def wrapped_function(self, *args, **kwargs):
         """
         Wraps view function

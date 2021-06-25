@@ -13,13 +13,7 @@ Note: Hotfix (PLAT-734) No asset calls find_asset_metadata, and directly accesse
 
 """
 
-
-from contracts import contract, new_contract
-from opaque_keys.edx.keys import AssetKey
-
 from xmodule.contentstore.django import contentstore
-
-new_contract('AssetKey', AssetKey)
 
 
 class AssetException(Exception):
@@ -48,7 +42,6 @@ class AssetManager:
     Manager for saving/loading course assets.
     """
     @staticmethod
-    @contract(asset_key='AssetKey', throw_on_not_found='bool', as_stream='bool')
     def find(asset_key, throw_on_not_found=True, as_stream=False):
         """
         Finds course asset in the deprecated contentstore.
