@@ -80,7 +80,7 @@ def _error_for_not_sequence(section, not_sequence):
 
 def _error_for_duplicate_child(section, duplicate_child):
     """
-    ContentErrorData when we run into a child of Section that's defined in a 
+    ContentErrorData when we run into a child of Section that's defined in a
     previous section.
 
     Has to be phrased in a way that makes sense to course teams.
@@ -324,10 +324,8 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         # Pull course with depth=3 so we prefetch Section -> Sequence -> Unit
         course = store.get_course(course_key, depth=3)
-        print('PYTHON FILE')
         sections_data = []
         sections = course.get_children()
-        # for section in course.get_children():
         for i, section in enumerate(sections):
             for j in range(i + 1, len(sections)):
                 if i == j:
@@ -337,7 +335,6 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
                 for index, child in enumerate(section_2_children):
                     if child in section_1_children:
                         acyclical_errors = _error_for_duplicate_child(sections[j], sections[j].get_children()[index])
-                        print('acyclical graph found')
                         content_errors.append(acyclical_errors)
                         section_2_children.remove(child)
             section_data, section_errors = _make_section_data(sections[i])
