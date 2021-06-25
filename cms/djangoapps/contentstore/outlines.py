@@ -330,14 +330,14 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
             for j in range(i + 1, len(sections)):
                 if i == j:
                     break
-                section_1_children = sections[i].children
+                section_1_children = section.children
                 section_2_children = sections[j].children
                 for index, child in enumerate(section_2_children):
                     if child in section_1_children:
                         acyclical_errors = _error_for_duplicate_child(sections[j], sections[j].get_children()[index])
                         content_errors.append(acyclical_errors)
                         section_2_children.remove(child)
-            section_data, section_errors = _make_section_data(sections[i])
+            section_data, section_errors = _make_section_data(section)
             if section_data:
                 sections_data.append(section_data)
             content_errors.extend(section_errors)
