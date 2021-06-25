@@ -173,28 +173,36 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 category='sequential',
                 display_name="standard_seq"
             )
-
-            # This should work fine
             section_2 = ItemFactory.create(
                 parent_location=self.draft_course.location,
                 category='chapter',
                 display_name="Section 2",
                 children=[seq.location]
             )
+            section_3 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section 3",
+                children =[seq.location]
+            )
 
         self.store.update_item(section_2, self.user.id)
+        self.store.update_item(section_3, self.user.id)
         assert section_1.children == section_2.children
+        assert section_1.children == section_3.children
 
         outline, errs = get_outline_from_modulestore(self.course_key)
-        assert len(outline.sections) == 2
+        assert len(outline.sections) == 3
         assert len(outline.sections[0].sequences) == 1
         assert len(outline.sections[1].sequences) == 0
+        assert len(outline.sections[2].sequences) == 0
         assert len(outline.sequences) == 1
-        assert len(errs) == 1
+        assert len(errs) == 2
 
         # Version-less usage keys
         seq_loc = self.course_key.make_usage_key('sequential', 'standard_seq')
         assert errs[0].usage_key == seq_loc
+        assert errs[1].usage_key == seq_loc
 
     def test_unit_in_section(self):
         """
