@@ -80,7 +80,8 @@ def _error_for_not_sequence(section, not_sequence):
 
 def _error_for_duplicate_child(section, duplicate_child):
     """
-    ContentErrorData when we run into a child of Section that's not a Sequence.
+    ContentErrorData when we run into a child of Section that's defined in a 
+    previous section.
 
     Has to be phrased in a way that makes sense to course teams.
     """
