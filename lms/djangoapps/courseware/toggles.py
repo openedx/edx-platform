@@ -25,6 +25,23 @@ COURSEWARE_USE_LEGACY_FRONTEND = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'use_legacy_frontend', __name__
 )
 
+# .. toggle_name: courseware.use_learning_sequences_api
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: When enbled, frontend-app-learning's courseware pages should use the
+#   new Learning Sequences API (from ``openedx.core.djangoapps.content.learning_sequences``)
+#   instead of the Course Blocks API (from ``lms.djangoapps.course_api.blocks``)
+#   in order to load course structure data.
+# .. toggle_warnings: As of 2021-06-25, the frontend-app-learning changes necessary to honor this
+#   flag's value have not yet been implemented. We expect that they will be implemented in
+#   the coming weeks.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-06-25
+# .. toggle_target_removal_date: 2021-09-01
+COURSEWARE_USE_LEARNING_SEQUENCES_API = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'use_learning_sequences_api', __name__
+)
+
 # .. toggle_name: courseware.microfrontend_course_team_preview
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
