@@ -209,7 +209,7 @@ def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_i
     )
 
 
-def _make_section_data(section):
+def _make_section_data(section, unique_sequences):
     """
     Return a (CourseSectionData, List[ContentDataError]) from a SectionBlock.
 
@@ -251,7 +251,15 @@ def _make_section_data(section):
         if sequence.location.block_type not in valid_sequence_tags:
             section_errors.append(_error_for_not_sequence(section, sequence))
             continue
-
+        # We need to check if there are duplicate sequences. If there are
+        # duplicate sequences the course outline generation will fail. We skip
+        # ignore the duplicated sequences, so they will not be sent to
+        # learning_sequences.
+        if sequence.location in unique_sequences:
+            section_errors.append(_error_for_duplicate_child(section, sequence))
+            continue
+        else:
+            unique_sequences[sequence.location] = section.location
         seq_user_partition_groups, error = _make_user_partition_groups(
             sequence.location, sequence.group_access
         )
@@ -307,7 +315,7 @@ def _make_section_data(section):
         ),
         user_partition_groups=section_user_partition_groups,
     )
-    return section_data, section_errors
+    return section_data, section_errors, unique_sequences
 
 
 @function_trace('get_outline_from_modulestore')
@@ -327,19 +335,9 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
         # Pull course with depth=3 so we prefetch Section -> Sequence -> Unit
         course = store.get_course(course_key, depth=3)
         sections_data = []
-        sections = course.get_children()
-        for i, section in enumerate(sections):
-            for j in range(i + 1, len(sections)):
-                if i == j:
-                    break
-                section_1_children = section.children
-                section_2_children = sections[j].children
-                for index, child in enumerate(section_2_children):
-                    if child in section_1_children:
-                        acyclical_errors = _error_for_duplicate_child(sections[j], sections[j].get_children()[index])
-                        content_errors.append(acyclical_errors)
-                        section_2_children.remove(child)
-            section_data, section_errors = _make_section_data(section)
+        unique_sequences = {}
+        for section in course.get_children():
+            section_data, section_errors, unique_sequences = _make_section_data(section, unique_sequences)
             if section_data:
                 sections_data.append(section_data)
             content_errors.extend(section_errors)
