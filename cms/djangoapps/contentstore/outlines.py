@@ -78,6 +78,7 @@ def _error_for_not_sequence(section, not_sequence):
         usage_key=_remove_version_info(not_sequence.location),
     )
 
+
 def _error_for_duplicate_child(section, duplicate_child):
     """
     ContentErrorData when we run into a child of Section that's defined in a
@@ -97,6 +98,7 @@ def _error_for_duplicate_child(section, duplicate_child):
         ),
         usage_key=_remove_version_info(duplicate_child.location),
     )
+
 
 def _bubbled_up_groups_from_units(group_access_from_units):
     """
