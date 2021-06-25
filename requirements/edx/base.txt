@@ -492,7 +492,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.in
-elasticsearch==7.13.2
+elasticsearch==7.13.1
     # via edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
@@ -858,7 +858,7 @@ rest-condition==1.0.3
     # via
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
-ruamel.yaml==0.17.9
+ruamel.yaml==0.17.10
     # via drf-yasg
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml

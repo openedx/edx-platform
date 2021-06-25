@@ -586,7 +586,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/testing.txt
-elasticsearch==7.13.2
+elasticsearch==7.13.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-search
@@ -1169,7 +1169,7 @@ rest-condition==1.0.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
-ruamel.yaml==0.17.9
+ruamel.yaml==0.17.10
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
