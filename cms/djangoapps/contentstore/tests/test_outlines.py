@@ -168,7 +168,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 category='chapter',
                 display_name="Section",
             )
-            ItemFactory.create(
+            seq = ItemFactory.create(
                 parent_location=section_1.location,
                 category='sequential',
                 display_name="standard_seq"
@@ -179,16 +179,22 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 parent_location=self.draft_course.location,
                 category='chapter',
                 display_name="Section 2",
+                children=[seq.location]
             )
 
-            persisted_sequence = section_1.children[0]
-            section_2.children = [persisted_sequence]
-
-        print('TEST FILE')
-        print(section_1.children)
-        print(section_2.children)
         self.store.update_item(section_2, self.user.id)
-        outline, _errs = get_outline_from_modulestore(self.course_key)
+        assert section_1.children == section_2.children
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        assert len(outline.sections) == 2
+        assert len(outline.sections[0].sequences) == 1
+        assert len(outline.sections[1].sequences) == 0
+        assert len(outline.sequences) == 1
+        assert len(errs) == 1
+
+        # Version-less usage keys
+        seq_loc = self.course_key.make_usage_key('sequential', 'standard_seq')
+        assert errs[0].usage_key == seq_loc
 
     def test_unit_in_section(self):
         """
