@@ -78,6 +78,24 @@ def _error_for_not_sequence(section, not_sequence):
         usage_key=_remove_version_info(not_sequence.location),
     )
 
+def _error_for_duplicate_child(section, duplicate_child):
+    """
+    ContentErrorData when we run into a child of Section that's not a Sequence.
+
+    Has to be phrased in a way that makes sense to course teams.
+    """
+    return ContentErrorData(
+        message=(
+            f'<chapter> with url_name="{section.location.block_id}" and '
+            f'display_name="{section.display_name}" contains a '
+            f'<{duplicate_child.location.block_type}> tag with '
+            f'url_name="{duplicate_child.location.block_id}" and '
+            f'display_name="{getattr(duplicate_child, "display_name", "")}" '
+            f'that is defined in another section. Expected a unique '
+            f'<sequential> tag instead.'
+        ),
+        usage_key=_remove_version_info(duplicate_child.location),
+    )
 
 def _bubbled_up_groups_from_units(group_access_from_units):
     """
@@ -309,17 +327,18 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
         sections_data = []
         sections = course.get_children()
         # for section in course.get_children():
-        for i in range(0,len(sections)):
-            for j in range(i+1,len(sections)):
+        for i, section in enumerate(sections):
+            for j in range(i + 1, len(sections)):
                 if i == j:
                     break
                 section_1_children = sections[i].children
                 section_2_children = sections[j].children
-                print(section_1_children)
-                print(section_2_children)
-                for child in section_1_children:
-                    if child in section_2_children:
+                for index, child in enumerate(section_2_children):
+                    if child in section_1_children:
+                        acyclical_errors = _error_for_duplicate_child(sections[j], sections[j].get_children()[index])
                         print('acyclical graph found')
+                        content_errors.append(acyclical_errors)
+                        section_2_children.remove(child)
             section_data, section_errors = _make_section_data(sections[i])
             if section_data:
                 sections_data.append(section_data)
