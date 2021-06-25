@@ -127,12 +127,15 @@ class CoursewareMeta:
         """
         Should the Learning Sequences API be used to load course structure data?
 
-        Courseware views in the Learning MFE need to load course structure data
+        Courseware views in frontend-app-learning need to load course structure data
         from the backend to display feaures like breadcrumbs, the smart "Next"
         button, etc. This has been done so far using the Course Blocks API.
-        We are switching the views to instead use the Learning Sequences API,
-        which we expect to be significantly faster. We are putting the transition
-        behind a flag, for now, to allow incremental rollout and comparison testing.
+
+        Over the next few weeks (starting 2021-06-25), we will be incrementally
+        transitioning said views to instead use the Learning Sequences API,
+        which we expect to be significantly faster. Once the transition is in
+        progress, this function will surface to frontend-app-learning whether
+        the old Course Blocks API or Learning Sequences API should be used.
         """
         return COURSEWARE_USE_LEARNING_SEQUENCES_API.is_enabled(self.course_key)
 
