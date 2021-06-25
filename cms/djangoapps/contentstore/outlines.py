@@ -73,13 +73,13 @@ def _error_for_not_sequence(section, not_sequence):
             f'<{not_sequence.location.block_type}> tag with '
             f'url_name="{not_sequence.location.block_id}" and '
             f'display_name="{getattr(not_sequence, "display_name", "")}". '
-            f'Expected a <sequential> tag instead.'
+            f'Expected a <sequential> tag.'
         ),
         usage_key=_remove_version_info(not_sequence.location),
     )
 
 
-def _error_for_duplicate_child(section, duplicate_child):
+def _error_for_duplicate_child(section, duplicate_child, original_section):
     """
     ContentErrorData when we run into a child of Section that's defined in a
     previous section.
@@ -93,8 +93,11 @@ def _error_for_duplicate_child(section, duplicate_child):
             f'<{duplicate_child.location.block_type}> tag with '
             f'url_name="{duplicate_child.location.block_id}" and '
             f'display_name="{getattr(duplicate_child, "display_name", "")}" '
-            f'that is defined in another section. Expected a unique '
-            f'<sequential> tag instead.'
+            f'that is defined in another section with '
+            f'url_name="{original_section.location.block_id}" and '
+            f'display_name="{original_section.display_name}". Expected a '
+            f'unique <sequential> tag instead.'
+
         ),
         usage_key=_remove_version_info(duplicate_child.location),
     )
@@ -233,7 +236,7 @@ def _make_section_data(section, unique_sequences):
     # First check if it's not a section at all, and short circuit if it isn't.
     if section.location.block_type != 'chapter':
         section_errors.append(_error_for_not_section(section))
-        return (None, section_errors)
+        return (None, section_errors, unique_sequences)
 
     section_user_partition_groups, error = _make_user_partition_groups(
         section.location, section.group_access
@@ -256,10 +259,11 @@ def _make_section_data(section, unique_sequences):
         # ignore the duplicated sequences, so they will not be sent to
         # learning_sequences.
         if sequence.location in unique_sequences:
-            section_errors.append(_error_for_duplicate_child(section, sequence))
+            original_section = unique_sequences[sequence.location]
+            section_errors.append(_error_for_duplicate_child(section, sequence, original_section))
             continue
         else:
-            unique_sequences[sequence.location] = section.location
+            unique_sequences[sequence.location] = section
         seq_user_partition_groups, error = _make_user_partition_groups(
             sequence.location, sequence.group_access
         )
