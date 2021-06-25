@@ -12,9 +12,11 @@ This doc covers requirements for allowlist course certificates.
 Users can earn a course certificate in a particular course run (the certificate
 is stored in the *GeneratedCertificate* model). If a user has not earned a certificate
 but the course staff would like them to have a certificate anyway, the user can
-be added to the certificate allowlist for the course run. The allowlist is currently
-stored in the *CertificateWhitelist* model, and was previously referred to as the
-certificate whitelist.
+be added to the certificate allowlist for the course run.
+
+The allowlist is stored in the *CertificateAllowlist* model. It was previously
+referred to as the certificate whitelist, and was previously stored in the
+*CertificateWhitelist* model.
 
 Requirements
 ------------
@@ -32,4 +34,4 @@ the time the certificate is generated:
 * The user must have an approved, unexpired, ID verification
 * The user must not have an invalidated certificate for the course run (see the *CertificateInvalidation* model)
 * HTML (web) certificates must be globally enabled, and also enabled for the course run
-* The user must be on the allowlist for the course run (see the *CertificateWhitelist* model)
+* The user must be on the allowlist for the course run (see the *CertificateAllowlist* model)

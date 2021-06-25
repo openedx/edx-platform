@@ -14,8 +14,8 @@ from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
+    CertificateAllowlist,
     CertificateInvalidation,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
@@ -356,7 +356,7 @@ def is_on_certificate_allowlist(user, course_key):
     """
     Check if the user is on the allowlist, and is enabled for the allowlist, for this course run
     """
-    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
+    return CertificateAllowlist.objects.filter(user=user, course_id=course_key, allowlist=True).exists()
 
 
 def _can_generate_certificate_for_status(user, course_key):
