@@ -27,7 +27,8 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.config.waffle import PREVENT_STAFF_STRUCTURE_DELETION, SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.permissions import DELETE_COURSE_CONTENT
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
@@ -1328,6 +1329,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 )
             else:
                 xblock_info['staff_only_message'] = False
+
+            xblock_info['show_delete_button'] = True
+            if user is not None and PREVENT_STAFF_STRUCTURE_DELETION.is_enabled():
+                xblock_info['show_delete_button'] = user.has_perm(DELETE_COURSE_CONTENT, xblock)
 
             xblock_info['has_partition_group_components'] = has_children_visible_to_specific_partition_groups(
                 xblock

@@ -31,6 +31,7 @@ from xblock.validation import ValidationMessage
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -3390,3 +3391,37 @@ class TestXBlockPublishingInfo(ItemTest):
         # Check that in self paced course content has live state now
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
+
+    def test_staff_show_delte_button(self):
+        """
+        Test delete button is *not visible* to user with CourseStaffRole
+        """
+        # add user as course staff
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertFalse(xblock_info['show_delete_button'])
+
+    def test_instructor_show_delete_button(self):
+        """
+        Test delete button is *visible* to user with CourseCreatorRole only
+        """
+        # add user as course instructor
+        CourseInstructorRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])

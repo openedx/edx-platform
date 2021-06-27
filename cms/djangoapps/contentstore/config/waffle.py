@@ -67,3 +67,15 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
     flag_name='library_authoring_mfe',
     module_name=__name__,
 )
+
+# .. toggle_name: studio.prevent_staff_structure_deletion
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Prevents staff from deleting course structures
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-06-25
+PREVENT_STAFF_STRUCTURE_DELETION = WaffleFlag(
+    waffle_flags(),
+    'prevent_staff_structure_deletion',
+    module_name=__name__,
+)
