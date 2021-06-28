@@ -36,31 +36,32 @@ class Features(Enum):
     """
     Features to be used/mapped in discussion providers
     """
-    ADVANCED_IN_CONTEXT_DISCUSSION = 'advanced-in-context-discussion'
     ANONYMOUS_POSTING = 'anonymous-posting'
     AUTOMATIC_LEARNER_ENROLLMENT = 'automatic-learner-enrollment'
     BLACKOUT_DISCUSSION_DATES = 'blackout-discussion-dates'
     COMMUNITY_TA_SUPPORT = 'community-ta-support'
     COURSE_COHORT_SUPPORT = 'course-cohort-support'
-    DIRECT_MESSAGES_FROM_INSTRUCTORS = 'direct-messages-from-instructors'
     DISCUSSION_PAGE = 'discussion-page'
+    INTERNATIONALIZATION_SUPPORT = 'internationalization-support'
+    PRIMARY_DISCUSSION_APP_EXPERIENCE = 'primary-discussion-app-experience'
+    QUESTION_DISCUSSION_SUPPORT = 'question-discussion-support'
+    REPORT_FLAG_CONTENT_TO_MODERATORS = 'report/flag-content-to-moderators'
+    RESEARCH_DATA_EVENTS = 'research-data-events'
+    WCAG_2_0_SUPPORT = 'wcag-2.0-support'
+    WCAG_2_1 = 'wcag-2.1'
+    ADVANCED_IN_CONTEXT_DISCUSSION = 'advanced-in-context-discussion'
+    DIRECT_MESSAGES_FROM_INSTRUCTORS = 'direct-messages-from-instructors'
     DISCUSSION_CONTENT_PROMPTS = 'discussion-content-prompts'
     EMAIL_NOTIFICATIONS = 'email-notifications'
     EMBEDDED_COURSE_SECTIONS = 'embedded-course-sections'
     GRADED_DISCUSSIONS = 'graded-discussions'
     IN_PLATFORM_NOTIFICATIONS = 'in-platform-notifications'
-    INTERNATIONALIZATION_SUPPORT = 'internationalization-support'
-    LTI = 'lti'
     LTI_ADVANCED_SHARING_MODE = 'lti-advanced-sharing-mode'
     LTI_BASIC_CONFIGURATION = 'lti-basic-configuration'
-    PRIMARY_DISCUSSION_APP_EXPERIENCE = 'primary-discussion-app-experience'
-    QUESTION_DISCUSSION_SUPPORT = 'question-discussion-support'
-    REPORT_FLAG_CONTENT_TO_MODERATORS = 'report/flag-content-to-moderators'
-    RESEARCH_DATA_EVENTS = 'research-data-events'
+    LTI = 'lti'
     SIMPLIFIED_IN_CONTEXT_DISCUSSION = 'simplified-in-context-discussion'
     USER_MENTIONS = 'user-mentions'
-    WCAG_2_1 = 'wcag-2.1'
-    WCAG_2_0_SUPPORT = 'wcag-2.0-support'
+
 
 AVAILABLE_PROVIDER_MAP = {
     'legacy': {
