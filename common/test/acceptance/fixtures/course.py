@@ -14,6 +14,7 @@ from path import Path
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
 from common.test.acceptance.fixtures.base import FixtureError, XBlockContainerFixture
+from xmodule.contentstore.utils import course_location_from_key
 
 
 class XBlockFixtureDesc:
@@ -252,11 +253,7 @@ class CourseFixture(XBlockContainerFixture):
         Return the locator string for the course.
         """
         course_key = CourseKey.from_string(self._course_key)
-        if getattr(course_key, 'deprecated', False):
-            block_id = self._course_dict['run']
-        else:
-            block_id = 'course'
-        return str(course_key.make_usage_key('course', block_id))
+        return str(course_location_from_key(course_key))
 
     @property
     def _assets_url(self):

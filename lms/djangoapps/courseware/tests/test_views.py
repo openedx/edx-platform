@@ -186,15 +186,22 @@ class TestJumpTo(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_jump_to_invalid_location(self, activate_mfe, store_type):
+        """Confirm that invalid locations redirect back to a general course URL"""
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}'
+        ) if activate_mfe else (
+            f'/courses/{course.id}/courseware?' + urlencode({'activate_block_id': str(course.location)})
+        )
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
         jumpto_url = f'/courses/{course.id}/jump_to/{location}'
         with _set_mfe_flag(activate_mfe):
             response = self.client.get(jumpto_url)
-        assert response.status_code == 404
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
     @_set_mfe_flag(activate_mfe=False)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)

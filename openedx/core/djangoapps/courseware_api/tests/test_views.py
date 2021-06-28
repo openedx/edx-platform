@@ -427,6 +427,16 @@ class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
         assert response.data['unit_id'] == str(self.unit.location)
         assert response.data['section_id'] == str(self.sequence.location)
 
+    def test_resume_invalid_key(self):
+        """A resume key that does not exist should return null IDs (i.e. "redirect to first section")"""
+        self.override_waffle_switch(True)
+        submit_completions_for_testing(self.user, [self.course.id.make_usage_key('html', 'doesnotexist')])
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] is None
+        assert response.data['unit_id'] is None
+        assert response.data['section_id'] is None
+
 
 @ddt.ddt
 class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
