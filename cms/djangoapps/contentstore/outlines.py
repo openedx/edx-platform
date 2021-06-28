@@ -255,8 +255,8 @@ def _make_section_data(section, unique_sequences):
             section_errors.append(_error_for_not_sequence(section, sequence))
             continue
         # We need to check if there are duplicate sequences. If there are
-        # duplicate sequences the course outline generation will fail. We skip
-        # ignore the duplicated sequences, so they will not be sent to
+        # duplicate sequences the course outline generation will fail. We ignore
+        # the duplicated sequences, so they will not be sent to
         # learning_sequences.
         if sequence.location in unique_sequences:
             original_section = unique_sequences[sequence.location]
