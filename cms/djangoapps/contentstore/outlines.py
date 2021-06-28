@@ -73,9 +73,33 @@ def _error_for_not_sequence(section, not_sequence):
             f'<{not_sequence.location.block_type}> tag with '
             f'url_name="{not_sequence.location.block_id}" and '
             f'display_name="{getattr(not_sequence, "display_name", "")}". '
-            f'Expected a <sequential> tag instead.'
+            f'Expected a <sequential> tag.'
         ),
         usage_key=_remove_version_info(not_sequence.location),
+    )
+
+
+def _error_for_duplicate_child(section, duplicate_child, original_section):
+    """
+    ContentErrorData when we run into a child of Section that's defined in a
+    previous section.
+
+    Has to be phrased in a way that makes sense to course teams.
+    """
+    return ContentErrorData(
+        message=(
+            f'<chapter> with url_name="{section.location.block_id}" and '
+            f'display_name="{section.display_name}" contains a '
+            f'<{duplicate_child.location.block_type}> tag with '
+            f'url_name="{duplicate_child.location.block_id}" and '
+            f'display_name="{getattr(duplicate_child, "display_name", "")}" '
+            f'that is defined in another section with '
+            f'url_name="{original_section.location.block_id}" and '
+            f'display_name="{original_section.display_name}". Expected a '
+            f'unique <sequential> tag instead.'
+
+        ),
+        usage_key=_remove_version_info(duplicate_child.location),
     )
 
 
@@ -188,7 +212,7 @@ def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_i
     )
 
 
-def _make_section_data(section):
+def _make_section_data(section, unique_sequences):
     """
     Return a (CourseSectionData, List[ContentDataError]) from a SectionBlock.
 
@@ -212,7 +236,7 @@ def _make_section_data(section):
     # First check if it's not a section at all, and short circuit if it isn't.
     if section.location.block_type != 'chapter':
         section_errors.append(_error_for_not_section(section))
-        return (None, section_errors)
+        return (None, section_errors, unique_sequences)
 
     section_user_partition_groups, error = _make_user_partition_groups(
         section.location, section.group_access
@@ -230,7 +254,16 @@ def _make_section_data(section):
         if sequence.location.block_type not in valid_sequence_tags:
             section_errors.append(_error_for_not_sequence(section, sequence))
             continue
-
+        # We need to check if there are duplicate sequences. If there are
+        # duplicate sequences the course outline generation will fail. We ignore
+        # the duplicated sequences, so they will not be sent to
+        # learning_sequences.
+        if sequence.location in unique_sequences:
+            original_section = unique_sequences[sequence.location]
+            section_errors.append(_error_for_duplicate_child(section, sequence, original_section))
+            continue
+        else:
+            unique_sequences[sequence.location] = section
         seq_user_partition_groups, error = _make_user_partition_groups(
             sequence.location, sequence.group_access
         )
@@ -286,7 +319,7 @@ def _make_section_data(section):
         ),
         user_partition_groups=section_user_partition_groups,
     )
-    return section_data, section_errors
+    return section_data, section_errors, unique_sequences
 
 
 @function_trace('get_outline_from_modulestore')
@@ -306,8 +339,9 @@ def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[Co
         # Pull course with depth=3 so we prefetch Section -> Sequence -> Unit
         course = store.get_course(course_key, depth=3)
         sections_data = []
+        unique_sequences = {}
         for section in course.get_children():
-            section_data, section_errors = _make_section_data(section)
+            section_data, section_errors, unique_sequences = _make_section_data(section, unique_sequences)
             if section_data:
                 sections_data.append(section_data)
             content_errors.extend(section_errors)
