@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
@@ -16,7 +17,7 @@ from rest_framework.views import APIView
 
 from openedx.core.lib.api.view_utils import validate_course_key
 from .api import get_user_course_outline_details
-from .api.permissions import can_call_public_api
+from .api.permissions import can_call_public_api, can_see_user_course_outline
 from .data import CourseOutlineData
 
 User = get_user_model()
@@ -163,7 +164,7 @@ class CourseOutlineView(APIView):
 
         try:
             # Grab the user's outline and send our response...
-            outline_user = self._determine_user(request)
+            outline_user = self._determine_user(request, course_key)
             user_course_outline_details = get_user_course_outline_details(course_key, outline_user, at_time)
         except CourseOutlineData.DoesNotExist as does_not_exist_err:
             raise NotFound() from does_not_exist_err
@@ -171,27 +172,27 @@ class CourseOutlineView(APIView):
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
-    def _determine_user(self, request):
+    def _determine_user(self, request, course_key: CourseKey) -> User:
         """
-        Requesting for a different user (easiest way to test for students)
-        while restricting access to only global staff. This is a placeholder
-        until we have more full fledged permissions/masquerading.
+        For which user should we get an outline?
+
+        Ensure requesting user has permission to view course outline of target user.
         """
-        requested_username = request.GET.get("user")
-
-        # Simple case: No username passed in, so it's just the request.user
-        if not requested_username:
-            return request.user
-
-        # If we're here, then the requesting user is asking for someone else's
-        # course outline. Right now, only global staff is allowed to do that.
-        if request.user.is_staff:
+        target_username = request.GET.get("user")
+        if not target_username:
+            target_user = request.user
+        elif target_username.lower() == request.user.username.lower():
+            target_user = request.user
+        else:
             try:
-                user = User.objects.get(username=requested_username)
-                return user
+                target_user = User.objects.get(username=target_username)
             except User.DoesNotExist as err:
                 raise NotFound("User {requested_username} does not exist.") from err
-
-        raise PermissionDenied(
-            "User {request.user.username} does not have permission to view course outline as {requested_username}"
-        )
+        if can_see_user_course_outline(
+            requesting_user=request.user, target_user=target_user, course_key=course_key
+        ):
+            return target_user
+        else:
+            raise PermissionDenied(
+                "User {request.user.username} does not have permission to view course outline as {requested_username}"
+            )
