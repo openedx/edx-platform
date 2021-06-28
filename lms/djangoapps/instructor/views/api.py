@@ -75,6 +75,7 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateStatuses
 )
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
@@ -115,6 +116,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
     dump_module_extensions,
     dump_student_extensions,
@@ -1593,7 +1595,12 @@ def get_student_progress_url(request, course_id):
     course_id = CourseKey.from_string(course_id)
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
-    progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
+    if course_home_mfe_progress_tab_is_active(course_id):
+        progress_url = get_learning_mfe_home_url(course_id, 'progress')
+        if user is not None:
+            progress_url += '/{}/'.format(user.id)
+    else:
+        progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
 
     response_payload = {
         'course_id': str(course_id),
