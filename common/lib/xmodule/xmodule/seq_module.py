@@ -360,9 +360,10 @@ class SequenceBlock(
             return json.dumps(self._get_completion(data))
         raise NotFoundError('Unexpected dispatch type')
 
-    def get_metadata(self, view=STUDENT_VIEW):
+    def get_metadata(self, view=STUDENT_VIEW, context=None):
         """Returns a dict of some common block properties"""
-        context = {'exclude_units': True}
+        context = context or {}
+        context['exclude_units'] = True
         prereq_met = True
         prereq_meta_info = {}
         banner_text = None
@@ -537,6 +538,8 @@ class SequenceBlock(
 
         items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
 
+        make_legacy_web_url = context.get('make_legacy_web_url', lambda _: None)
+
         params = {
             'items': items,
             'element_id': self.location.html_id(),
@@ -553,7 +556,8 @@ class SequenceBlock(
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
             'sequence_name': self.display_name,
             'exclude_units': context.get('exclude_units', False),
-            'gated_sequence_paywall': self.gated_sequence_paywall
+            'gated_sequence_paywall': self.gated_sequence_paywall,
+            'legacy_web_url': make_legacy_web_url(self.scope_ids.usage_id),
         }
 
         return params
@@ -764,6 +768,9 @@ class SequenceBlock(
                 contains_content_type_gated_content = content_type_gating_service.check_children_for_content_type_gating_paywall(  # pylint:disable=line-too-long
                     item, self.course_id
                 ) is not None
+
+            make_legacy_web_url = context.get('make_legacy_web_url', lambda _: None)
+
             iteminfo = {
                 'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
@@ -773,6 +780,7 @@ class SequenceBlock(
                 'path': " > ".join(display_names + [item.display_name_with_default]),
                 'graded': item.graded,
                 'contains_content_type_gated_content': contains_content_type_gated_content,
+                'legacy_web_url': make_legacy_web_url(item.scope_ids.usage_id),
             }
             if not render_items:
                 # The item url format can be defined in the template context like so:

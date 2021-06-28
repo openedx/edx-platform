@@ -15,6 +15,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -544,6 +545,23 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
+        def _make_legacy_web_url(block_usage_key):
+            """
+            Given a block usage key, return a URL that will try to jump the user to
+            that block in the legacy courseware frontend.
+
+            Can be removed once legacy courseware is removed (DEPR-109).
+            """
+            jump_to_url = reverse(
+                "jump_to",
+                kwargs={
+                    "course_id": str(block_usage_key.course_key),
+                    "location": str(block_usage_key),
+                },
+                request=request,
+            )
+            return f"{jump_to_url}?experience=legacy"
+
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
@@ -567,7 +585,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
 
-        return Response(sequence.get_metadata(view=view))
+        metadata_context = {"make_legacy_web_url": _make_legacy_web_url}
+        return Response(sequence.get_metadata(view=view, context=metadata_context))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):
