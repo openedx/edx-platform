@@ -66,7 +66,7 @@ from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_T
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from common.djangoapps.util.query import use_read_replica_if_available
-from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
@@ -1835,7 +1835,7 @@ class CourseEnrollment(models.Model):
         """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
         self.update_enrollment(mode=mode)
 
-    def refundable(self, user_already_has_certs_for=None):
+    def refundable(self):
         """
         For paid/verified certificates, students may always receive a refund if
         this CourseEnrollment's `can_refund` attribute is not `None` (that
@@ -1847,11 +1847,6 @@ class CourseEnrollment(models.Model):
             * The user does not have a certificate issued for this course.
             * We are not past the refund cutoff date
             * There exists a 'verified' CourseMode for this course.
-
-        Arguments:
-            `user_already_has_certs_for` (set of `CourseKey`):
-                 An optional param that is a set of `CourseKeys` that the user
-                 has already been issued certificates in.
 
         Returns:
             bool: Whether is CourseEnrollment can be refunded.
@@ -1865,13 +1860,16 @@ class CourseEnrollment(models.Model):
         if getattr(self, 'can_refund', None) is not None:
             return True
 
-        # If the student has already been given a certificate they should not be refunded
-        if user_already_has_certs_for is not None:
-            if self.course_id in user_already_has_certs_for:
-                return False
-        else:
-            if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
-                return False
+        # Due to circular import issues this import was placed close to usage. To move this to the
+        # top of the file would require a large scale refactor of the refund code.
+        import lms.djangoapps.certificates.api
+        # If the student has already been given a certificate in a non refundable status they should not be refunded
+        certificate = lms.djangoapps.certificates.api.get_certificate_for_user_id(
+            self.user,
+            self.course_id
+        )
+        if certificate and not CertificateStatuses.is_refundable_status(certificate.status):
+            return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()

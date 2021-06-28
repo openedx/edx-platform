@@ -11,6 +11,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.verify_student.models import IDVerificationAttempt
 
@@ -104,6 +105,7 @@ class GenerateUserCertificateTest(TestCase):
             mock_generate_cert.assert_called_with(
                 user=self.user,
                 course_key=CourseKey.from_string(course_key),
+                status=CertificateStatuses.downloadable,
                 generation_mode='batch'
             )
 
@@ -129,5 +131,6 @@ class GenerateUserCertificateTest(TestCase):
             mock_generate_cert.assert_called_with(
                 user=self.user,
                 course_key=CourseKey.from_string(course_key),
+                status=CertificateStatuses.downloadable,
                 generation_mode=gen_mode
             )

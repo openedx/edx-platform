@@ -95,9 +95,9 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     if _can_generate_allowlist_certificate(user, course_key):
         return _generate_certificate_task(user, course_key, generation_mode)
 
-#    status = _set_allowlist_cert_status(user, course_key)
-#    if status is not None:
-#        return True
+    status = _set_allowlist_cert_status(user, course_key)
+    if status is not None:
+        return True
 
     return False
 
@@ -110,14 +110,14 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     if _can_generate_v2_certificate(user, course_key):
         return _generate_certificate_task(user, course_key, generation_mode)
 
-#    status = _set_v2_cert_status(user, course_key)
-#    if status is not None:
-#        return True
+    status = _set_v2_cert_status(user, course_key)
+    if status is not None:
+        return True
 
     return False
 
 
-def _generate_certificate_task(user, course_key, generation_mode=None):
+def _generate_certificate_task(user, course_key, status=None, generation_mode=None):
     """
     Create a task to generate a certificate
     """
@@ -128,6 +128,8 @@ def _generate_certificate_task(user, course_key, generation_mode=None):
         'course_key': str(course_key),
         'v2_certificate': True
     }
+    if status is not None:
+        kwargs['status'] = status
     if generation_mode is not None:
         kwargs['generation_mode'] = generation_mode
 
@@ -257,11 +259,9 @@ def _set_v2_cert_status(user, course_key):
     if status is not None:
         return status
 
-    course_grade = _get_course_grade(user, course_key)
-    if not course_grade.passed:
-        if cert is None:
-            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+    if IDVerificationService.user_is_verified(user) and not _has_passing_grade(user, course_key) and cert is not None:
         if cert.status != CertificateStatuses.notpassing:
+            course_grade = _get_course_grade(user, course_key)
             cert.mark_notpassing(course_grade.percent, source='certificate_generation')
         return CertificateStatuses.notpassing
 
@@ -275,17 +275,16 @@ def _get_cert_status_common(user, course_key, cert):
     This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
     be generated.
     """
-    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
-        if cert is None:
-            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key) and cert is not None:
         if cert.status != CertificateStatuses.unavailable:
             cert.invalidate(source='certificate_generation')
         return CertificateStatuses.unavailable
 
-    if not IDVerificationService.user_is_verified(user):
+    if not IDVerificationService.user_is_verified(user) and _has_passing_grade_or_is_allowlisted(user, course_key):
         if cert is None:
-            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
-        if cert.status != CertificateStatuses.unverified:
+            _generate_certificate_task(user=user, course_key=course_key, generation_mode='batch',
+                                       status=CertificateStatuses.unverified)
+        elif cert.status != CertificateStatuses.unverified:
             cert.mark_unverified(source='certificate_generation')
         return CertificateStatuses.unverified
 
@@ -390,6 +389,17 @@ def _is_ccx_course(course_key):
     Check if the course is a CCX (custom edX course)
     """
     return hasattr(course_key, 'ccx')
+
+
+def _has_passing_grade_or_is_allowlisted(user, course_key):
+    """
+    Check if the user has a passing grade in this course run, or is on the allowlist and so is exempt from needing
+    a passing grade.
+    """
+    if is_on_certificate_allowlist(user, course_key):
+        return True
+
+    return _has_passing_grade(user, course_key)
 
 
 def _has_passing_grade(user, course_key):
