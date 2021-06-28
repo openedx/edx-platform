@@ -6,7 +6,6 @@ from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.db import IntegrityError
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -88,10 +87,11 @@ def add_enrollment_record(user_id, course_id):
     :param course_id: (CourseKeyField) course key
     """
 
-    try:
-        CourseProgressStats.objects.create(user_id=user_id, course_id=course_id, grade=0)
-    except IntegrityError:
-        log.info("Enrollment record for {} & User:{} already registered".format(course_id, user_id))
+    enrollment = CourseEnrollment.objects.filter(user_id=user_id, course_id=course_id).first()
+    if enrollment:
+        _, created = CourseProgressStats.objects.get_or_create(enrollment=enrollment, grade=None)
+        if not created:
+            log.info("Enrollment record for {} & User:{} already registered".format(course_id, user_id))
 
 
 @task(name='remove_enrollment_record')
@@ -102,18 +102,20 @@ def remove_enrollment_record(user_id, course_id):
     :param course_id: (CourseKeyField) course key
     """
 
-    CourseProgressStats.objects.filter(user_id=user_id, course_id=course_id).delete()
+    CourseEnrollment.objects.filter(user_id=user_id, course_id=course_id).delete()
 
 
+# TODO: Remove this method when deployed on prod & enrollments are copied to stats
 @task(name='copy_active_course_enrollments')
 def copy_active_course_enrollments():
     """
     A task that copies active enrollments to CourseProgressStats model
     """
+
     active_enrollments = CourseEnrollment.objects.filter(is_active=True)
     log.info("Found {} active enrollment records, ".format(len(active_enrollments)))
     for enrollment in active_enrollments:
-        add_enrollment_record(enrollment.user.id, enrollment.course.id)
+        CourseProgressStats.objects.get_or_create(enrollment=enrollment, grade=None)
 
 
 @task(name='update_course_progress_stats')
@@ -125,14 +127,17 @@ def update_course_progress_stats():
     email_status_to_filter = [CourseProgressStats.NO_EMAIL_SENT, CourseProgressStats.REMINDER_SENT]
     progress_models = CourseProgressStats.objects.filter(
         Q(email_reminder_status__in=email_status_to_filter) | Q(progress__lt=100)
-    )
+    ).select_related('enrollment', 'enrollment__user')
     log.info("Fetching records, found {} active models".format(len(progress_models)))
+
     for item in progress_models:
+        user = item.enrollment.user
+        course_id = item.enrollment.course_id
         course_progress = float(
-            get_course_progress_percentage(create_dummy_request(Site.objects.get_current(), item.user),
-                                           text_type(item.course_id)))
-        course_overview = CourseOverview.get_from_id(item.course_id)
-        grades = CourseGradeFactory().read(user=item.user, course_key=item.course_id)
+            get_course_progress_percentage(create_dummy_request(Site.objects.get_current(), user),
+                                           text_type(course_id)))
+        course_overview = CourseOverview.get_from_id(course_id)
+        grades = CourseGradeFactory().read(user=user, course_key=course_id)
         completed = grades.passed and course_progress >= 100
         fields_list = ['progress', 'grade']
         if course_progress >= 100:
@@ -141,20 +146,22 @@ def update_course_progress_stats():
         item.progress = course_progress
         item.grade = grades.letter_grade
 
-        data = {'course_name': course_overview.display_name, 'username': item.user.username, 'email': item.user.email,
-                'language': get_user_preference(item.user, LANGUAGE_KEY),
+        data = {'course_name': course_overview.display_name, 'username': user.username,
+                'email': user.email,
+                'language': get_user_preference(user, LANGUAGE_KEY),
                 'completed': completed,
                 'status_message': "Completed" if completed else "Pending",
                 'course_progress': course_progress}
 
         if data["completed"] and item.email_reminder_status != CourseProgressStats.COURSE_COMPLETED:
-            send_reminder_email.delay(data, text_type(item.course_id))
+            # TODO: Un-comment send_reminder_email call when Email templates are finalized
+            # send_reminder_email.delay(data, text_type(course_id))
             item.email_reminder_status = CourseProgressStats.COURSE_COMPLETED
             fields_list.append('email_reminder_status')
         elif course_overview.end_date:
             remaining_days = get_date_diff_in_days(course_overview.end_date)
             if remaining_days <= settings.COURSE_PROGRESS_REMINDER_EMAIL_DAYS and item.email_reminder_status == 0:
-                send_reminder_email.delay(data, text_type(item.course_id))
+                # send_reminder_email.delay(data, text_type(course_id))
                 item.email_reminder_status = CourseProgressStats.REMINDER_SENT
                 fields_list.append('email_reminder_status')
         item.save(update_fields=fields_list)

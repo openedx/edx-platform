@@ -361,6 +361,7 @@ disable =
 	no-else-break,
 	no-else-continue,
 	useless-object-inheritance,
+    missing-class-docstring,
     missing-module-docstring,
     missing-function-docstring,
 
