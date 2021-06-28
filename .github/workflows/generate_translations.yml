@@ -44,15 +44,14 @@ jobs:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.ADG_THEME_ACCESS_TOKEN }}
 
-      - name: Add comment if cloning fails
-        uses: mshick/add-pr-comment@v1
+      - name: Checkout master as feature branch does not exist
+        uses: actions/checkout@v2
+        continue-on-error: true
         with:
-          message: |
-            Cloning failed. :x:
-            No branch ref `${{ github.head_ref }}` found on adg-edx-theme repo.
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
-          allow-repeats: true
+          repository: OmnipreneurshipAcademy/adg-edx-theme
+          path: ./themes
+          ref: master
+          token: ${{ secrets.ADG_THEME_ACCESS_TOKEN }}
         if: steps.clone-theme-repo.outcome == 'failure'
 
       - name: Pull latest translations
@@ -97,7 +96,7 @@ jobs:
                  'lms/static/js/i18n/ar/djangojs.js']"
           push: true
           pull_strategy: 'NO-PULL'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
 
       - name: Push generated translation strings
