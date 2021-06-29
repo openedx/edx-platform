@@ -18,7 +18,7 @@ def remove_embargo_countries(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('embargo', '0001_initial'),
+        ('embargo', '00'),
     ]
 
     operations = [

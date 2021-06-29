@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('commerce', '0005_commerceconfiguration_enable_automatic_refund_approval'),
+        ('commerce', '123'),
     ]
 
     operations = [
