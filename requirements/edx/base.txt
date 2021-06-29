@@ -120,7 +120,7 @@ code-annotations==1.1.2
     # via
     #   edx-enterprise
     #   edx-toggles
-contextlib2==0.6.0.post1
+contextlib2==21.6.0
     # via -r requirements/edx/base.in
 coreapi==2.3.3
     # via drf-yasg
@@ -226,7 +226,7 @@ django-celery-results==2.0.1
     #   -r requirements/edx/base.in
 django-classy-tags==2.0.0
     # via django-sekizai
-django-config-models==2.1.1
+django-config-models==2.1.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -454,7 +454,7 @@ edx-opaque-keys[django]==2.2.1
     #   xmodule
 edx-organizations==6.9.0
     # via -r requirements/edx/base.in
-edx-proctoring==3.14.0
+edx-proctoring==3.17.1
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -673,7 +673,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.7
+ora2==3.6.8
     # via -r requirements/edx/base.in
 packaging==20.9
     # via
@@ -860,7 +860,7 @@ rest-condition==1.0.3
     #   edx-drf-extensions
 ruamel.yaml==0.17.10
     # via drf-yasg
-ruamel.yaml.clib==0.2.2
+ruamel.yaml.clib==0.2.4
     # via ruamel.yaml
 rules==3.0
     # via
@@ -980,7 +980,7 @@ uritemplate==3.0.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.5
+urllib3==1.26.6
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -994,7 +994,7 @@ vine==1.3.0
     #   celery
 voluptuous==0.12.1
     # via ora2
-watchdog==2.1.2
+watchdog==2.1.3
     # via -r requirements/edx/paver.txt
 web-fragments==1.0.0
     # via
