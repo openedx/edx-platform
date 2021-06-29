@@ -2,8 +2,6 @@
 Course API Views
 """
 
-import json  # lint-amnesty, pylint: disable=unused-import
-
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -62,6 +60,7 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -623,8 +622,8 @@ class Resume(DeveloperErrorViewMixin, APIView):
             resp['unit_id'] = str(path[3])
             resp['block_id'] = str(block_key)
 
-        except UnavailableCompletionData:
-            pass
+        except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
+            pass  # leaving all the IDs as None indicates a redirect to the first unit in the course, as a backup
 
         return Response(resp)
 
