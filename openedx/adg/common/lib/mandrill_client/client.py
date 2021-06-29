@@ -24,6 +24,7 @@ class MandrillClient(object):
     COURSE_ENROLLMENT_INVITATION = 'adg-invitation-course'
     ENROLLMENT_CONFIRMATION = 'adg-enrollment-confirmation'
     PASSWORD_RESET = 'adg-password-reset'
+    PASSWORD_RESET_SUCCESS = 'reset-password-success'
     USER_ACCOUNT_ACTIVATION = 'adg-user-activation-email'
     VERIFY_CHANGE_USER_EMAIL = 'adg-verify-email-address-change-step-2'
     APPLICATION_SUBMISSION_CONFIRMATION = 'adg-application-submission-confirmation-1'

@@ -7,6 +7,7 @@ from django.test.client import RequestFactory
 from mock import patch
 
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from openedx.adg.lms.helpers import get_user_first_name
 from openedx.adg.lms.student import helpers as student_helpers
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -149,6 +150,29 @@ def test_send_account_activation_email(user_with_profile, mocker):
     student_helpers.send_account_activation_email(user_with_profile, user_with_profile.profile)
 
     mock_compose_and_send_adg_activation_email.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_compose_and_send_password_reset_success_email(
+    user_with_profile, request, mocker, mock_mandrill_client, mock_task_send_mandrill_email
+):
+    mock_is_test_env = mocker.patch('openedx.adg.lms.student.helpers.is_testing_environment')
+    mock_is_test_env.return_value = False
+
+    mock_get_configuration_value = mocker.patch.object(student_helpers.configuration_helpers, 'get_value')
+    mock_get_configuration_value.return_value = settings.LMS_ROOT_URL
+
+    root_url = mock_get_configuration_value.return_value
+
+    expected_context = {
+        'first_name': get_user_first_name(user_with_profile),
+        'signin_link': '{}/login'.format(root_url),
+    }
+
+    student_helpers.send_adg_password_reset_success_email(user_with_profile, request)
+    mock_task_send_mandrill_email.assert_called_once_with(
+        mock_mandrill_client.PASSWORD_RESET_SUCCESS, [user_with_profile.email], expected_context
+    )
 
 
 # pylint: disable=no-member
