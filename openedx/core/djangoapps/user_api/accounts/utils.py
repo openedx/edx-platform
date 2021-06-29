@@ -17,7 +17,6 @@ from common.djangoapps.student.models import AccountRecovery, Registration, get_
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
-from openedx.core.djangoapps.user_api.config.waffle import ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -190,16 +189,6 @@ def is_secondary_email_feature_enabled():
         Boolean value representing switch status
     """
     return waffle.switch_is_active(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH)
-
-
-def is_multiple_user_enterprises_feature_enabled():
-    """
-    Checks to see if the django-waffle switch for enabling the multiple user enterprises feature is active
-
-    Returns:
-        Boolean value representing switch status
-    """
-    return ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE.is_enabled()
 
 
 def create_retirement_request_and_deactivate_account(user):

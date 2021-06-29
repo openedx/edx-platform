@@ -81,8 +81,6 @@
                     this.enterpriseSlugLoginURL = options.enterprise_slug_login_url || '';
                     this.isEnterpriseEnable = options.is_enterprise_enable || false;
                     this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
-                    this.isMultipleUserEnterprisesFeatureEnabled =
-                        options.is_multiple_user_enterprises_feature_enabled || false;
                     this.is_require_third_party_auth_enabled = options.is_require_third_party_auth_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
@@ -173,7 +171,7 @@
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                        if (this.isMultipleUserEnterprisesFeatureEnabled === true && !isTpaSaml) {
+                        if (!isTpaSaml) {
                             this.listenTo(this.subview.login, 'auth-complete', this.loginComplete);
                         } else {
                             this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
