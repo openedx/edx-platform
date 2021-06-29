@@ -3,7 +3,7 @@ All api urls for webinars app
 """
 from django.urls import re_path
 
-from .api_views import WebinarRegistrationView
+from openedx.adg.lms.webinars.api.views import WebinarRegistrationView
 
 urlpatterns = [
     re_path(

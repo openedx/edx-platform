@@ -21,6 +21,7 @@ class ApplicationRequirementsViewSet(viewsets.ModelViewSet):
     """
     Base class for user application's requirements(Education and Work Experience) apis
     """
+
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     http_method_names = ['get', 'post', 'head', 'put', 'patch', 'delete']
@@ -41,7 +42,7 @@ class EducationViewSet(ApplicationRequirementsViewSet):
         Return a single education record that matches requested id.
 
     **Example Requests**
-    GET /api/applications/education/<id>/
+    GET /api/applications/education/{id}/
 
     list:
         Return all education records belong to the requested user.
@@ -66,13 +67,13 @@ class EducationViewSet(ApplicationRequirementsViewSet):
         Remove an existing education record.
 
     **Example Requests**
-    DELETE /api/applications/education/<id>/
+    DELETE /api/applications/education/{id}/
 
     update:
         Update an existing education record.
 
     **Example Requests**
-    PUT /api/applications/education/<id>/
+    PUT /api/applications/education/{id}/
     """
 
     queryset = Education.objects.all()
@@ -87,7 +88,7 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
         Return a single work experience record that matches requested id.
 
     **Example Requests**
-    GET /api/applications/work_experience/<id>/
+    GET /api/applications/work_experience/{id}/
 
     list:
         Return all work experience records belong to the requested user.
@@ -111,13 +112,13 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
         Remove an existing work experience record.
 
     **Example Requests**
-    DELETE /api/applications/work_experience/<id>/
+    DELETE /api/applications/work_experience/{id}/
 
     update:
         Update an existing work experience record.
 
     **Example Requests**
-    PUT /api/applications/work_experience/<id>/
+    PUT /api/applications/work_experience/{id}/
 
     partial_update:
         Update user work_experience is not applicable
@@ -154,7 +155,7 @@ class ReferenceViewSet(ApplicationRequirementsViewSet):
         Return a single reference record that matches requested id.
 
     **Example Requests**
-    GET /api/applications/reference/<id>/
+    GET /api/applications/reference/{id}/
 
     list:
         Return all reference records belong to the requested user.
@@ -176,13 +177,13 @@ class ReferenceViewSet(ApplicationRequirementsViewSet):
         Remove an existing reference record.
 
     **Example Requests**
-    DELETE /api/applications/reference/<id>/
+    DELETE /api/applications/reference/{id}/
 
     update:
         Update an existing reference record.
 
     **Example Requests**
-    PUT /api/applications/reference/<id>/
+    PUT /api/applications/reference/{id}/
     """
 
     queryset = Reference.objects.all()

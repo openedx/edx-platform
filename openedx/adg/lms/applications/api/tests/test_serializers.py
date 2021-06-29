@@ -93,14 +93,15 @@ def test_education_serializer_with_invalid_data(education_data):
 
 
 @pytest.mark.django_db
-def test_education_serializer_with_valid_data(education_data):
+def test_education_serializer_with_valid_data(education_data, user_application, request):
     """
     Verify the education serializer behavior for valid data.
     """
     education_data['is_in_progress'] = False
     education_data['area_of_study'] = 'Computer Sciences'
+    request.user = user_application.user
 
-    serializer = EducationSerializer(data=education_data)
+    serializer = EducationSerializer(data=education_data, context={'request': request})
 
     assert serializer.is_valid()
     assert not serializer.errors
@@ -114,15 +115,23 @@ def test_education_serializer_with_valid_data(education_data):
     ]
 )
 @pytest.mark.django_db
-def test_education_serializer_with_valid_degree_data(degree, area_of_study, expected_area_of_study, education_data):
+def test_education_serializer_with_valid_degree_data(
+    degree,
+    area_of_study,
+    expected_area_of_study,
+    education_data,
+    request,
+    user_application
+):
     """
     Verify the education serializer behavior for different degree values
     """
     education_data['is_in_progress'] = False
     education_data['area_of_study'] = area_of_study
     education_data['degree'] = degree
+    request.user = user_application.user
 
-    serializer = EducationSerializer(data=education_data)
+    serializer = EducationSerializer(data=education_data, context={'request': request})
 
     assert serializer.is_valid()
     assert not serializer.errors
@@ -149,12 +158,14 @@ def test_work_experience_serializer_with_invalid_data(work_experience_data):
 
 
 @pytest.mark.django_db
-def test_work_experience_serializer_with_valid_data(work_experience_data):
+def test_work_experience_serializer_with_valid_data(work_experience_data, request, user_application):
     """
     Verify the work experience serializer behavior for valid data.
     """
     work_experience_data['is_current_position'] = False
-    serializer = WorkExperienceSerializer(data=work_experience_data)
+    request.user = user_application.user
+
+    serializer = WorkExperienceSerializer(data=work_experience_data, context={'request': request})
 
     assert serializer.is_valid()
     assert not serializer.errors
@@ -167,7 +178,7 @@ def test_work_experience_serializer_with_valid_data(work_experience_data):
     ],
 )
 @pytest.mark.django_db
-def test_reference_serializer_validate_user_application_create(is_valid, expected_errors, user_application):
+def test_reference_serializer_validate_user_application_create(is_valid, expected_errors, user_application, request):
     """
     Test `validate_user_application` method of `ReferenceSerializer` in case of creation
 
@@ -180,14 +191,16 @@ def test_reference_serializer_validate_user_application_create(is_valid, expecte
         ReferenceFactory.create_batch(MAX_NUMBER_OF_REFERENCES, user_application=user_application)
 
     reference_data = get_reference_data(user_application)
+    request.user = user_application.user
 
-    serializer = ReferenceSerializer(data=reference_data)
+    serializer = ReferenceSerializer(data=reference_data, context={'request': request})
+
     assert serializer.is_valid() == is_valid
     assert serializer.errors == expected_errors
 
 
 @pytest.mark.django_db
-def test_reference_serializer_validate_user_application_update(user_application):
+def test_reference_serializer_validate_user_application_update(user_application, request):
     """
     Test `validate_user_application` method of `ReferenceSerializer` in case of updation
 
@@ -198,7 +211,9 @@ def test_reference_serializer_validate_user_application_update(user_application)
     reference = ReferenceFactory(user_application=user_application)
 
     reference_data = get_reference_data(user_application)
+    request.user = user_application.user
 
-    serializer = ReferenceSerializer(instance=reference, data=reference_data)
+    serializer = ReferenceSerializer(instance=reference, data=reference_data, context={'request': request})
+
     assert serializer.is_valid()
     assert not serializer.errors
