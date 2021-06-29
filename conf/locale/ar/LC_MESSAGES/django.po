@@ -27,7 +27,6 @@
 # Translators:
 # Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
 # Anas Usman <anas.usman@arbisoft.com>, 2021
-# Munam Mubashir <munam.mubashir@arbisoft.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -62,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-24 15:20+0000\n"
+"POT-Creation-Date: 2021-06-28 07:56+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9517,7 +9516,7 @@ msgid "APPLICANT INFORMATION"
 msgstr ""
 
 #: openedx/adg/lms/applications/constants.py
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/background_question.html
 msgid "BACKGROUND QUESTION"
 msgstr ""
 
@@ -10262,11 +10261,11 @@ msgstr "لا"
 msgid "Webinar Status"
 msgstr ""
 
-#: openedx/adg/lms/webinars/api_views.py
+#: openedx/adg/lms/webinars/api/views.py
 msgid "Webinar not found"
 msgstr ""
 
-#: openedx/adg/lms/webinars/api_views.py
+#: openedx/adg/lms/webinars/api/views.py
 msgid "Webinar has been cancelled"
 msgstr ""
 
@@ -20908,12 +20907,6 @@ msgid ""
 "program will provide you with the training you need to become a successful "
 "business owner and live a life of meaning."
 msgstr ""
-"أكاديمية Omnipreneurship عبارة عن برنامج تنموي فريد من نوعه ، تم بناؤه على "
-"النظام البيئي الحاكم لمجموعة الدباغ (ADG) ، الريادة الشاملة. إنها مساحة حيث "
-"لن تكون قادرًا فقط على المشاركة في دوراتنا التدريبية والتقدم لبرنامج Omni in"
-" a Box ؛ سيكون عليك أن تجعل أحلامك حقيقة ، مع الحد الأدنى من المخاطر وعدم "
-"وجود استثمارات ضرورية. سيوفر لك هذا البرنامج التدريب الذي تحتاجه لتصبح صاحب "
-"عمل ناجحًا وتعيش حياة ذات معنى."
 
 #: themes/edx-platform/adg/lms/templates/index.html
 msgid "Training that will transform you from a job seeker to a"
@@ -21075,6 +21068,13 @@ msgstr ""
 msgid "You must hold a high school diploma or equivalent"
 msgstr ""
 
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/background_question.html
+msgid ""
+"Briefly tell us about yourself and your background. We want you to describe "
+"your educational or professional experience and goals. Please limit your "
+"response to 200 words."
+msgstr ""
+
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/business_line_interest.html
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
 msgid "Select a business"
@@ -21163,13 +21163,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "ADD EXPERIENCE"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
-msgid ""
-"Briefly tell us about yourself and your background. We want you to describe "
-"your educational or professional experience and goals. Please limit your "
-"response to 200 words."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
@@ -21419,24 +21412,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/reference_form.html
 msgid "Remove Reference"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
-msgid "Congratulations"
-msgstr ""
-
-#: wiki/templates/wiki/article/create_root.html
-msgid "Congratulations!"
-msgstr "تهانينا!"
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
-msgid "You submitted the Omni in a Box application on {}."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
-msgid ""
-"The next step is to complete the prerequisite Omnipreneurship courses in "
-"order to complete your application and fulfill the requirements."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
@@ -26351,6 +26326,10 @@ msgstr "قم بتسجيلي ..."
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root article"
 msgstr "إنشاء مقال رئيسي"
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr "تهانينا!"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
