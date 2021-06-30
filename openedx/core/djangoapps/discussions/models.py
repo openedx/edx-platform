@@ -78,6 +78,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.BLACKOUT_DISCUSSION_DATES.value,
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
         ],
         'external_links': ProviderExternalLinks(
             '',
@@ -109,32 +110,6 @@ AVAILABLE_PROVIDER_MAP = {
             'https://piazza.com/product/accessibility',
             'team@piazza.com',
         )._asdict()
-    },
-    'edx-next': {
-        'features': [
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
-            Features.WCAG_2_0_SUPPORT.value,
-            Features.INTERNATIONALIZATION_SUPPORT.value,
-            Features.ANONYMOUS_POSTING.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
-            Features.COMMUNITY_TA_SUPPORT.value,
-            Features.EMAIL_NOTIFICATIONS.value,
-            Features.BLACKOUT_DISCUSSION_DATES.value,
-            Features.SIMPLIFIED_IN_CONTEXT_DISCUSSION.value,
-            Features.ADVANCED_IN_CONTEXT_DISCUSSION.value,
-            Features.COURSE_COHORT_SUPPORT.value,
-            Features.RESEARCH_DATA_EVENTS.value,
-            Features.DISCUSSION_CONTENT_PROMPTS.value,
-            Features.GRADED_DISCUSSIONS.value,
-        ],
-        'external_links': ProviderExternalLinks(
-            '',
-            '',
-            '',
-            '',
-            '',
-        )._asdict(),
     },
     'yellowdig': {
         'features': [
