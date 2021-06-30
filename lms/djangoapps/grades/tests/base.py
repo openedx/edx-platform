@@ -2,7 +2,6 @@
 Base file for Grades tests
 """
 
-
 from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -99,7 +98,14 @@ class GradeTestBase(SharedModuleStoreTestCase):
                     "min_count": 1,
                     "drop_count": 0,
                     "short_label": "HW",
-                    "weight": 1.0,
+                    "weight": 0.5,
+                },
+                {
+                    "type": "FinalExam",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "FE",
+                    "weight": 0.5,
                 },
                 {
                     "type": "NoCredit",
