@@ -19,6 +19,7 @@ from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
 
 from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx_events.learning.data import StudentData, RegistrationData, UserProfileData
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
@@ -2445,4 +2446,53 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         self.assertValidationDecision(
             {'username': 'user', 'email': 'user@email.com', 'is_authn_mfe': True, 'form_field_key': 'email'},
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
+        )
+
+
+@skip_unless_lms
+class RegistrationEventTest(UserAPITestCase):
+    """Tests for the events associated with the registration process through the user API."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super().setUp()
+        self.url = reverse("user_api_registration")
+        self.user_info = {
+            "email": "bob@example.com",
+            "name": "Bob Smith",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        }
+
+
+    @mock.patch("common.djangoapps.student.helpers.Registration")
+    @mock.patch("openedx.core.djangoapps.user_authn.views.register.STUDENT_REGISTRATION_COMPLETED")
+    def test_send_registration_event(self, registration_event, registration_mock):
+        """
+        Test whether the student registration event is sent during the user's
+        registration process.
+
+        Expected result:
+            - STUDENT_REGISTRATION_COMPLETED is sent via send_event.
+            - The arguments match the event definition.
+        """
+        registration_mock.return_value.activation_key = "user_activation_key"
+
+        self.client.post(self.url, self.user_info)
+
+        registration_event.send_event.assert_called_once_with(
+            user=StudentData(
+                username="bob",
+                email="bob@example.com",
+                first_name="",
+                last_name="",
+                is_active=False,
+                profile=UserProfileData(
+                    meta="",
+                    name="Bob Smith",
+                )
+            ),
+            registration=RegistrationData(
+                activation_key="user_activation_key",
+            )
         )
