@@ -38,6 +38,15 @@ setup(
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
         ],
+        "openedx.course_app": [
+            "calculator = lms.djangoapps.courseware.plugins:CalculatorCourseApp",
+            "discussion = openedx.core.djangoapps.discussions.plugins:DiscussionCourseApp",
+            "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseApp",
+            "progress = lms.djangoapps.courseware.plugins:ProgressCourseApp",
+            "teams = lms.djangoapps.teams.plugins:TeamsCourseApp",
+            "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",
+            "wiki = lms.djangoapps.course_wiki.plugins:WikiCourseApp",
+        ],
         "openedx.course_tool": [
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
@@ -92,6 +101,7 @@ setup(
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
             "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
+            "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
         ],
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
@@ -111,6 +121,7 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+            "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',

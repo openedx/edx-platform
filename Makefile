@@ -84,8 +84,8 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/doc \
 	requirements/edx/paver \
-	requirements/edx-sandbox/shared \
 	requirements/edx-sandbox/py35 \
+	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
@@ -97,8 +97,8 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
@@ -110,6 +110,9 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 
 upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
+
+check-types: ## run static type-checking tests
+	mypy
 
 # These make targets currently only build LMS images.
 docker_build:

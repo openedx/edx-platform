@@ -58,13 +58,13 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
     @unpack
     @data(
-        {'whitelisted': False, 'grade': None, 'output': ['N', 'N', 'N/A']},
-        {'whitelisted': True, 'grade': None, 'output': ['Y', 'N', 'N/A']},
-        {'whitelisted': False, 'grade': 0.9, 'output': ['N', 'N', 'N/A']},
-        {'whitelisted': True, 'grade': 0.8, 'output': ['Y', 'N', 'N/A']},
-        {'whitelisted': None, 'grade': 0.8, 'output': ['N', 'N', 'N/A']}
+        {'allowlisted': False, 'grade': None, 'output': ['N', 'N', 'N/A']},
+        {'allowlisted': True, 'grade': None, 'output': ['Y', 'N', 'N/A']},
+        {'allowlisted': False, 'grade': 0.9, 'output': ['N', 'N', 'N/A']},
+        {'allowlisted': True, 'grade': 0.8, 'output': ['Y', 'N', 'N/A']},
+        {'allowlisted': None, 'grade': 0.8, 'output': ['N', 'N', 'N/A']}
     )
-    def test_certificate_info_for_user(self, whitelisted, grade, output):
+    def test_certificate_info_for_user(self, allowlisted, grade, output):
         """
         Verify that certificate_info_for_user works.
         """
@@ -73,28 +73,28 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         # for instructor paced course
         certificate_info = certificate_info_for_user(
             student, self.instructor_paced_course.id, grade,
-            whitelisted, user_certificate=None
+            allowlisted, user_certificate=None
         )
         assert certificate_info == output
 
         # for self paced course
         certificate_info = certificate_info_for_user(
             student, self.self_paced_course.id, grade,
-            whitelisted, user_certificate=None
+            allowlisted, user_certificate=None
         )
         assert certificate_info == output
 
     @unpack
     @data(
-        {'whitelisted': False, 'grade': None, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': False, 'grade': 0.9, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': True, 'grade': 0.8, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': None, 'grade': 0.8, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': None, 'grade': None, 'output': ['Y', 'Y', 'honor']},
-        {'whitelisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']}
+        {'allowlisted': False, 'grade': None, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': False, 'grade': 0.9, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': True, 'grade': 0.8, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': None, 'grade': 0.8, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': None, 'grade': None, 'output': ['Y', 'Y', 'honor']},
+        {'allowlisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']}
     )
-    def test_certificate_info_for_user_when_grade_changes(self, whitelisted, grade, output):
+    def test_certificate_info_for_user_when_grade_changes(self, allowlisted, grade, output):
         """
         Verify that certificate_info_for_user works as expect in scenario when grading of problems
         changes after certificates already generated. In such scenario `Certificate delivered` should not depend
@@ -120,24 +120,24 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         # for instructor paced course
         certificate_info = certificate_info_for_user(
             student, self.instructor_paced_course.id, grade,
-            whitelisted, certificate1
+            allowlisted, certificate1
         )
         assert certificate_info == output
 
         # for self paced course
         certificate_info = certificate_info_for_user(
             student, self.self_paced_course.id, grade,
-            whitelisted, certificate2
+            allowlisted, certificate2
         )
         assert certificate_info == output
 
     @unpack
     @data(
-        {'whitelisted': False, 'grade': 0.8, 'mode': 'audit', 'output': ['N', 'N', 'N/A']},
-        {'whitelisted': True, 'grade': 0.8, 'mode': 'audit', 'output': ['Y', 'N', 'N/A']},
-        {'whitelisted': False, 'grade': 0.8, 'mode': 'verified', 'output': ['Y', 'N', 'N/A']}
+        {'allowlisted': False, 'grade': 0.8, 'mode': 'audit', 'output': ['N', 'N', 'N/A']},
+        {'allowlisted': True, 'grade': 0.8, 'mode': 'audit', 'output': ['Y', 'N', 'N/A']},
+        {'allowlisted': False, 'grade': 0.8, 'mode': 'verified', 'output': ['Y', 'N', 'N/A']}
     )
-    def test_certificate_info_for_user_with_course_modes(self, whitelisted, grade, mode, output):
+    def test_certificate_info_for_user_with_course_modes(self, allowlisted, grade, mode, output):
         """
         Verify that certificate_info_for_user works with course modes.
         """
@@ -146,7 +146,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         _ = CourseEnrollment.enroll(user, self.instructor_paced_course.id, mode)
         certificate_info = certificate_info_for_user(
             user, self.instructor_paced_course.id, grade,
-            whitelisted, user_certificate=None
+            allowlisted, user_certificate=None
         )
         assert certificate_info == output
 

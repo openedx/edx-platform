@@ -20,6 +20,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
+from lti_consumer.models import CourseEditLTIFieldsEnabledFlag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
@@ -29,7 +30,6 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls

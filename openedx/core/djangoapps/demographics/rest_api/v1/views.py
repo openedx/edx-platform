@@ -21,7 +21,10 @@ class DemographicsStatusView(APIView):
     authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 
-    def _response_context(self, user, user_demographics=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _response_context(self, user, user_demographics=None):
+        """
+        Determine whether the user should be shown demographics collection fields and the demographics call to action.
+        """
         if user_demographics:
             show_call_to_action = user_demographics.show_call_to_action
         else:

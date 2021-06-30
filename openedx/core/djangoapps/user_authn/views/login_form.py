@@ -19,7 +19,6 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import (
-    is_multiple_user_enterprises_feature_enabled,
     is_secondary_email_feature_enabled
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
@@ -260,7 +259,6 @@ def login_and_registration_form(request, initial_mode="login"):
             'account_creation_allowed': configuration_helpers.get_value(
                 'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
-            'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled(),
             'enterprise_slug_login_url': get_enterprise_slug_login_url(),
             'is_enterprise_enable': enterprise_enabled(),
             'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),

@@ -1,5 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.contentstore.content import StaticContent
 
 from .django import contentstore
@@ -45,3 +46,12 @@ def restore_asset_from_trashcan(location):
             store.save(thumbnail_content)
         except Exception:  # lint-amnesty, pylint: disable=broad-except
             pass  # OK if this is left dangling
+
+
+def course_location_from_key(course_key: CourseKey) -> UsageKey:
+    """Creates a usage key for the toplevel course item, handling differences between mongo and newer keys"""
+    if getattr(course_key, 'deprecated', False):
+        block_id = course_key.run
+    else:
+        block_id = 'course'
+    return course_key.make_usage_key('course', block_id)

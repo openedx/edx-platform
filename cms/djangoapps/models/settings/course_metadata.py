@@ -14,6 +14,7 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
@@ -140,6 +141,12 @@ class CourseMetadata:
         # an available proctoring backend.
         if not settings.PROCTORING_BACKENDS or settings.PROCTORING_BACKENDS.get('proctortrack') is None:
             exclude_list.append('proctoring_escalation_email')
+
+        if not legacy_discussion_experience_enabled(course_key):
+            exclude_list.append('discussion_blackouts')
+            exclude_list.append('allow_anonymous')
+            exclude_list.append('allow_anonymous_to_peers')
+            exclude_list.append('discussion_topics')
 
         return exclude_list
 

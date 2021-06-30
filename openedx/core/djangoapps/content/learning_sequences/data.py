@@ -26,10 +26,9 @@ from enum import Enum
 from typing import Dict, FrozenSet, List, Optional
 
 import attr
-from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core import types
 
-User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -211,7 +210,7 @@ class CourseOutlineData:
     # derived from what you pass into `sections`. Do not set this directly.
     sequences = attr.ib(type=Dict[UsageKey, CourseLearningSequenceData], init=False)
 
-    course_visibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
+    course_visibility: CourseVisibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
 
     # Entrance Exam ID
     entrance_exam_id = attr.ib(type=str)
@@ -339,7 +338,7 @@ class UserCourseOutlineData(CourseOutlineData):
 
     # Django User representing who we've customized this outline for. This may
     # be the AnonymousUser.
-    user: User
+    user: types.User
 
     # UTC TZ time representing the time for which this user course outline was
     # created. It is possible to create UserCourseOutlineData for a time in the

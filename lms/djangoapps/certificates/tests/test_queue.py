@@ -112,7 +112,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     @ddt.data((True, CertificateStatuses.audit_passing), (False, CertificateStatuses.generating))
     @ddt.unpack
     @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
-    def test_ineligible_cert_whitelisted(self, disable_audit_cert, status):
+    def test_ineligible_cert_allowlisted(self, disable_audit_cert, status):
         """
         Test that audit mode students receive a certificate if DISABLE_AUDIT_CERTIFICATES
         feature is set to false
@@ -124,7 +124,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        # Whitelist student
+        # Add student to the allowlist
         CertificateAllowlistFactory(course_id=self.course.id, user=self.user_2)
 
         features = settings.FEATURES

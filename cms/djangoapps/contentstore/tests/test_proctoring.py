@@ -13,7 +13,7 @@ from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from common.djangoapps.student.tests.factories import UserFactory
-from common.lib.xmodule.xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

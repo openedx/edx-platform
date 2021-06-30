@@ -109,10 +109,9 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
 
         # We need to enroll with a request, because our specific experiment code expects it
         self.addCleanup(crum.set_current_request, None)
-        request = RequestFactory()
+        request = RequestFactory().get(self.site)
         request.user = user
         crum.set_current_request(request)
-
         enrollment1 = CourseEnrollment.enroll(user, overview1.id)
         with override_experiment_waffle_flag(_EXTERNAL_COURSE_UPDATES_FLAG, bucket=bucket):
             enrollment2 = CourseEnrollment.enroll(user, overview2.id)

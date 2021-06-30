@@ -244,16 +244,14 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        assert 14 == len(data)
+        assert 12 == len(data)
 
-        # public fields (5)
+        # public fields (3)
         assert account_privacy == data['account_privacy']
         self._verify_profile_image_data(data, True)
         assert self.user.username == data['username']
-        assert self.user.id == data['id']
-        assert self.user.email == data['email']
 
-        # additional shareable fields (9)
+        # additional shareable fields (8)
         assert TEST_BIO_VALUE == data['bio']
         assert 'US' == data['country']
         assert data['date_joined'] is not None
@@ -262,19 +260,16 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         assert data['social_links'] is not None
         assert data['time_zone'] is None
         assert badges_enabled == data['accomplishments_shared']
-        assert 'course_certificates' in data
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
-        assert 5 == len(data)
+        assert 3 == len(data)
         assert PRIVATE_VISIBILITY == data['account_privacy']
         self._verify_profile_image_data(data, not requires_parental_consent)
         assert self.user.username == data['username']
-        assert self.user.id == data['id']
-        assert self.user.email == data['email']
 
     def _verify_full_account_response(self, response, requires_parental_consent=False, year_of_birth=2000):
         """
@@ -382,19 +377,28 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self._verify_full_account_response(response)
 
     def test_search_emails(self):
-        client = self.login_client('client', 'user')
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {'emails': [self.user.email]}
         response = self.post_search_api(client, json_data=json_data)
         assert response.data == [{'email': self.user.email, 'id': self.user.id, 'username': self.user.username}]
 
-    def test_search_emails_with_non_existing_email(self):
+    def test_search_emails_with_non_staff_user(self):
         client = self.login_client('client', 'user')
+        json_data = {'emails': [self.user.email]}
+        response = self.post_search_api(client, json_data=json_data, expected_status=404)
+        assert response.data == {
+            'developer_message': "not_found",
+            'user_message': "Not Found"
+        }
+
+    def test_search_emails_with_non_existing_email(self):
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {"emails": ['non_existant_email@example.com']}
         response = self.post_search_api(client, json_data=json_data)
         assert response.data == []
 
     def test_search_emails_with_invalid_param(self):
-        client = self.login_client('client', 'user')
+        client = self.login_client('staff_client', 'staff_user')
         json_data = {'invalid_key': [self.user.email]}
         response = self.post_search_api(client, json_data=json_data, expected_status=400)
         assert response.data == {
@@ -495,12 +499,10 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # verify response
         if requesting_username == "different_user":
             data = response.data
-            assert 8 == len(data)
+            assert 6 == len(data)
 
             # public fields
             assert self.user.username == data['username']
-            assert self.user.id == data['id']
-            assert self.user.email == data['email']
             assert UserPreference.get_value(self.user, 'account_privacy') == data['account_privacy']
             self._verify_profile_image_data(data, has_profile_image=True)
 

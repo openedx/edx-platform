@@ -6,7 +6,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
-from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
+from cms.djangoapps.contentstore.utils import get_pages_and_resources_url, get_proctored_exam_settings_url
 from xmodule.modulestore.django import modulestore
 
 __all__ = ['checklists_handler']
@@ -28,17 +28,9 @@ def checklists_handler(request, course_key_string=None):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
-
-    course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
-    proctored_exam_settings_url = (
-        '{course_authoring_microfrontend_url}/proctored-exam-settings/{course_key_string}'.format(
-            course_authoring_microfrontend_url=course_authoring_microfrontend_url,
-            course_key_string=course_key_string,
-        )
-    )
-
     return render_to_response('checklists.html', {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_module,
-        'proctored_exam_settings_url': proctored_exam_settings_url,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+        'pages_and_resources_mfe_link': get_pages_and_resources_url(course_module.id),
     })

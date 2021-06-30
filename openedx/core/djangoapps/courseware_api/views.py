@@ -2,8 +2,6 @@
 Course API Views
 """
 
-import json  # lint-amnesty, pylint: disable=unused-import
-
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -39,6 +37,8 @@ from lms.djangoapps.courseware.toggles import (
     courseware_mfe_is_visible,
     course_exit_page_is_active,
     mfe_special_exams_is_active,
+    mfe_proctored_exams_is_active,
+    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -60,6 +60,7 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -121,8 +122,29 @@ class CoursewareMeta:
         )
 
     @property
+    def is_learning_sequences_api_enabled(self):
+        """
+        Should the Learning Sequences API be used to load course structure data?
+
+        Courseware views in frontend-app-learning need to load course structure data
+        from the backend to display feaures like breadcrumbs, the smart "Next"
+        button, etc. This has been done so far using the Course Blocks API.
+
+        Over the next few weeks (starting 2021-06-25), we will be incrementally
+        transitioning said views to instead use the Learning Sequences API,
+        which we expect to be significantly faster. Once the transition is in
+        progress, this function will surface to frontend-app-learning whether
+        the old Course Blocks API or Learning Sequences API should be used.
+        """
+        return COURSEWARE_USE_LEARNING_SEQUENCES_API.is_enabled(self.course_key)
+
+    @property
     def is_mfe_special_exams_enabled(self):
         return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_special_exams_is_active(self.course_key)
+
+    @property
+    def is_mfe_proctored_exams_enabled(self):
+        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_proctored_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
@@ -300,10 +322,10 @@ class CoursewareMeta:
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
         if (
-            not self.is_staff
+            is_integrity_signature_enabled(self.course_key)
+            and not self.is_staff
             and self.enrollment_object
             and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
-            and is_integrity_signature_enabled()
         ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
@@ -600,8 +622,8 @@ class Resume(DeveloperErrorViewMixin, APIView):
             resp['unit_id'] = str(path[3])
             resp['block_id'] = str(block_key)
 
-        except UnavailableCompletionData:
-            pass
+        except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
+            pass  # leaving all the IDs as None indicates a redirect to the first unit in the course, as a backup
 
         return Response(resp)
 

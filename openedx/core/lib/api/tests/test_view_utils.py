@@ -20,7 +20,7 @@ class MockAPIView(DeveloperErrorViewMixin, APIView):
     Mock API view for testing.
     """
 
-    @verify_course_exists
+    @verify_course_exists()
     def get(self, request, course_id):
         """
         Mock GET handler for testing.

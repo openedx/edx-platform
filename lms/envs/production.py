@@ -630,6 +630,9 @@ SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = AUTH_TOKENS.get("SESSION_INACTIVITY_TIME
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEADLINES",
                                                    TIME_ZONE_DISPLAYED_FOR_DEADLINES)
 
+#### PROCTORED EXAM SETTINGS ####
+PROCTORED_EXAM_VIEWABLE_PAST_DUE = ENV_TOKENS.get('PROCTORED_EXAM_VIEWABLE_PAST_DUE', False)
+
 ##### Third-party auth options ################################################
 ENABLE_REQUIRE_THIRD_PARTY_AUTH = ENV_TOKENS.get('ENABLE_REQUIRE_THIRD_PARTY_AUTH', False)
 
@@ -1034,13 +1037,13 @@ EXPLICIT_QUEUES = {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3': {
         'queue': RECALCULATE_GRADES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.award_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.update_certificate_visible_date_on_course_update': {
+    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate': {
+    'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
@@ -1057,3 +1060,6 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
     'COURSE_OLX_VALIDATION_IGNORE_LIST',
     COURSE_OLX_VALIDATION_IGNORE_LIST
 )
+
+################# show account activate cta after register ########################
+SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)

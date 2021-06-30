@@ -11,12 +11,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.lib.xmodule.xmodule.modulestore.tests.django_utils import CourseUserType
-from common.lib.xmodule.xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import CourseUserType
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..models import PROVIDER_FEATURE_MAP
+from ..models import AVAILABLE_PROVIDER_MAP
 
 
 DATA_LEGACY_COHORTS = {
@@ -143,7 +143,7 @@ class DataTest(AuthorizedApiTest):
         assert response.status_code == self.expected_response_code
         assert not data['enabled']
         assert data['provider_type'] == 'legacy'
-        assert data['providers']['available']['legacy'] == PROVIDER_FEATURE_MAP['legacy']
+        assert data['providers']['available']['legacy'] == AVAILABLE_PROVIDER_MAP['legacy']
         assert data['lti_configuration'] == {}
         assert data['plugin_configuration'] == {
             'allow_anonymous': True,
@@ -188,7 +188,7 @@ class DataTest(AuthorizedApiTest):
         data = self._setup_lti()
         assert data['enabled']
         assert data['provider_type'] == 'piazza'
-        assert data['providers']['available']['piazza'] == PROVIDER_FEATURE_MAP['piazza']
+        assert data['providers']['available']['piazza'] == AVAILABLE_PROVIDER_MAP['piazza']
         assert data['lti_configuration'] == DATA_LTI_CONFIGURATION
         assert len(data['plugin_configuration']) == 0
         assert len(data['lti_configuration']) > 0

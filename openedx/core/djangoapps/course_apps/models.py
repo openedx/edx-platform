@@ -1,0 +1,3 @@
+"""
+Models for course apps.
+"""

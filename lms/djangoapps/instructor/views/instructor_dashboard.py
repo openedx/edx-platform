@@ -39,11 +39,11 @@ from common.djangoapps.student.roles import (
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,
-    CertificateStatuses,
     GeneratedCertificate
 )
 from lms.djangoapps.courseware.access import has_access
@@ -52,6 +52,7 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -133,13 +134,17 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     sections = []
     if access['staff']:
-        sections.extend([
+        sections_content = [
             _section_course_info(course, access),
             _section_membership(course, access),
             _section_cohort_management(course, access),
-            _section_discussions_management(course, access),
             _section_student_admin(course, access),
-        ])
+        ]
+
+        if legacy_discussion_experience_enabled(course_key):
+            sections_content.append(_section_discussions_management(course, access))
+        sections.extend(sections_content)
+
     if access['data_researcher']:
         sections.append(_section_data_download(course, access))
 
@@ -238,7 +243,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message,
-        'certificate_white_list': certificate_allowlist,
+        'certificate_allowlist': certificate_allowlist,
         'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,

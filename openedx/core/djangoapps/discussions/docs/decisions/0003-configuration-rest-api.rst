@@ -76,7 +76,7 @@ The payload is expected to be shaped like this (key names subject to change):
             'active': configuration.provider_type or '',
             'available': {
                 provider: {
-                    'features': PROVIDER_FEATURE_MAP.get(provider) or [],
+                    'features': AVAILABLE_PROVIDER_MAP.get(provider).get('features') or [],
                 }
                 for provider in configuration.available_providers
             },

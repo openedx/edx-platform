@@ -2,8 +2,6 @@
 """
 Common comment client utility functions.
 """
-from contracts import new_contract
-
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -12,8 +10,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-
-new_contract('basestring', str)
 
 
 class ThreadContext:

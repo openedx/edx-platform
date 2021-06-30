@@ -373,7 +373,7 @@ class XBlockRuntimeSystem:
 
     def __init__(
         self,
-        handler_url,  # type: (Callable[[UsageKey, str, Union[int, ANONYMOUS_USER]], str]
+        handler_url,  # type: Callable[[UsageKey, str, Union[int, ANONYMOUS_USER]], str]
         student_data_mode,  # type: Union[STUDENT_DATA_EPHEMERAL, STUDENT_DATA_PERSISTED]
         runtime_class,  # type: XBlockRuntime
     ):

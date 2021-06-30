@@ -101,7 +101,7 @@ class CourseGradesView(GradeViewMixin, PaginatedAPIView):
 
     required_scopes = ['grades:read']
 
-    @verify_course_exists
+    @verify_course_exists("Requested grade for unknown course {course}")
     def get(self, request, course_id=None):
         """
         Gets a course progress status.

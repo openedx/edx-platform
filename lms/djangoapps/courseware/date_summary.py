@@ -333,8 +333,9 @@ class CourseEndDate(DateSummary):
         if self.date and self.current_time <= self.date:
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
             if is_active and CourseMode.is_eligible_for_certificate(mode):
-                return _('This course will be archived, which means you can review the course content '
-                         'but can no longer participate in graded assignments or earn a certificate.')
+                return _('After this date, the course will be archived, which means you can review the '
+                         'course content but can no longer participate in graded assignments or work towards earning '
+                         'a certificate.')
             else:
                 return _('After the course ends, the course content will be archived and no longer active.')
         elif self.date:

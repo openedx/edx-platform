@@ -8,7 +8,7 @@ from datetime import datetime
 from pytz import UTC
 
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.certificates.config import waffle
 from common.djangoapps.student.models import CourseEnrollment
 

@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from opaque_keys import OpaqueKey
 import attr
 
+from openedx.core import types
 from .api import get_content_errors, get_course_outline
 from .models import CourseContext, CourseSectionSequence
 
@@ -82,33 +83,29 @@ class CourseSectionSequenceInline(admin.TabularInline):
         qs = qs.select_related('section', 'sequence')
         return qs
 
+    @types.admin_display(description="Title")
     def title(self, cs_seq):
         return cs_seq.sequence.title
-    title.short_description = "Title"
 
+    @types.admin_display(boolean=True)
     def accessible_after_due(self, cs_seq):
         return not cs_seq.inaccessible_after_due
-    accessible_after_due.boolean = True
 
+    @types.admin_display(boolean=True, description="Staff Only")
     def visible_to_staff_only(self, cs_seq):
         return not cs_seq.visible_to_staff_only
-    visible_to_staff_only.boolean = True
-    visible_to_staff_only.short_description = "Staff Only"
 
+    @types.admin_display(boolean=True, description="Timed Exam")
     def is_time_limited(self, cs_seq):
         return cs_seq.exam.is_time_limited
-    is_time_limited.boolean = True
-    is_time_limited.short_description = "Timed Exam"
 
+    @types.admin_display(boolean=True, description="Proctored Exam")
     def is_proctored_enabled(self, cs_seq):
         return cs_seq.exam.is_proctored_enabled
-    is_proctored_enabled.boolean = True
-    is_proctored_enabled.short_description = "Proctored Exam"
 
+    @types.admin_display(boolean=True, description="Practice Exam")
     def is_practice_exam(self, cs_seq):
         return cs_seq.exam.is_practice_exam
-    is_practice_exam.boolean = True
-    is_practice_exam.short_description = "Practice Exam"
 
 
 class CourseContextAdmin(admin.ModelAdmin):
@@ -199,13 +196,13 @@ class CourseContextAdmin(admin.ModelAdmin):
         qs = qs.prefetch_related('section_sequences')
         return qs
 
+    @types.admin_display(description="Record Created")
     def created(self, course_context):
         return course_context.learning_context.created
-    created.short_description = "Record Created"
 
+    @types.admin_display(description="Record Modified")
     def modified(self, course_context):
         return course_context.learning_context.modified
-    modified.short_description = "Record Modified"
 
     def course_key(self, course_context):
         return course_context.learning_context.context_key
@@ -213,10 +210,10 @@ class CourseContextAdmin(admin.ModelAdmin):
     def title(self, course_context):
         return course_context.learning_context.title
 
+    @types.admin_display(description="Published at (UTC)")
     def published_at(self, course_context):
         published_at_dt = course_context.learning_context.published_at
         return published_at_dt.strftime("%B %-d, %Y, %-I:%M %p")
-    published_at.short_description = "Published at (UTC)"
 
     def published_version(self, course_context):
         return course_context.learning_context.published_version
@@ -227,17 +224,17 @@ class CourseContextAdmin(admin.ModelAdmin):
             return None
         return getattr(learning_context.publish_report, attr_name)
 
+    @types.admin_display(description="Errors")
     def num_errors(self, course_context):
         return self._publish_report_attr(course_context, 'num_errors')
-    num_errors.short_description = "Errors"
 
+    @types.admin_display(description="Sections")
     def num_sections(self, course_context):
         return self._publish_report_attr(course_context, 'num_sections')
-    num_sections.short_description = "Sections"
 
+    @types.admin_display(description="Sequences")
     def num_sequences(self, course_context):
         return self._publish_report_attr(course_context, 'num_sequences')
-    num_sequences.short_description = "Sequences"
 
     def raw_outline(self, obj):
         """

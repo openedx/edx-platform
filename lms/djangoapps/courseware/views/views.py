@@ -52,10 +52,10 @@ from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_respon
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_home_api.toggles import (
-    course_home_mfe_dates_tab_is_active,
+    course_home_legacy_is_active,
     course_home_mfe_progress_tab_is_active
 )
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
@@ -129,6 +129,7 @@ from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
 from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
+from xmodule.contentstore.utils import course_location_from_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -413,8 +414,8 @@ def jump_to(request, course_id, location):
     try:
         course_key = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
-    except InvalidKeyError:
-        raise Http404("Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
+    except InvalidKeyError as exc:
+        raise Http404("Invalid course_key or usage_key") from exc
 
     experience_param = request.GET.get("experience", "").lower()
     if experience_param == "new":
@@ -430,10 +431,16 @@ def jump_to(request, course_id, location):
             request=request,
             experience=experience,
         )
-    except ItemNotFoundError:
-        raise Http404(f"No data at this location: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
-    except NoPathToItem:
-        raise Http404(f"This location is not in any class: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
+    except (ItemNotFoundError, NoPathToItem):
+        # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
+        # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
+        # course changed out from under the user). So instead, let's just redirect to the beginning of the course,
+        # as it is at least a valid page the user can interact with...
+        redirect_url = get_courseware_url(
+            usage_key=course_location_from_key(course_key),
+            request=request,
+            experience=experience,
+        )
 
     return redirect(redirect_url)
 
@@ -1048,7 +1055,7 @@ def dates(request, course_id):
     from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
 
     course_key = CourseKey.from_string(course_id)
-    if course_home_mfe_dates_tab_is_active(course_key) and not request.user.is_staff:
+    if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
         microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
         raise Redirect(microfrontend_url)
 
@@ -1580,15 +1587,13 @@ def is_course_passed(student, course, course_grade=None):
 @transaction.non_atomic_requests
 @require_POST
 def generate_user_cert(request, course_id):
-    """Start generating a new certificate for the user.
-    Certificate generation is allowed if:
-    * The user has passed the course, and
-    * The user does not already have a pending/completed certificate.
-    Note that if an error occurs during certificate generation
-    (for example, if the queue is down), then we simply mark the
-    certificate generation task status as "error" and re-run
-    the task with a management command.  To students, the certificate
-    will appear to be "generating" until it is re-run.
+    """
+    Request that a course certificate be generated for the user.
+
+    In addition to requesting generation, this method also checks for and returns the certificate status. Note that
+    because generation is an asynchronous process, the certificate may not have been generated when its status is
+    retrieved.
+
     Args:
         request (HttpRequest): The POST request to this view.
         course_id (unicode): The identifier for the course.
@@ -1606,6 +1611,7 @@ def generate_user_cert(request, course_id):
 
     student = request.user
     course_key = CourseKey.from_string(course_id)
+    use_v1_certs = True
 
     course = modulestore().get_course(course_key, depth=2)
     if not course:
@@ -1614,8 +1620,8 @@ def generate_user_cert(request, course_id):
     if certs_api.can_generate_certificate_task(student, course_key):
         log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'user {student.id}.')
+        use_v1_certs = False
         certs_api.generate_certificate_task(student, course_key, 'self')
-        return HttpResponse()
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)
@@ -1635,7 +1641,7 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Certificate has already been created."))
     elif certificate_status["is_generating"]:
         return HttpResponseBadRequest(_("Certificate is being created."))
-    else:
+    elif use_v1_certs:
         # If the certificate is not already in-process or completed,
         # then create a new certificate generation task.
         # If the certificate cannot be added to the queue, this will
@@ -1644,7 +1650,8 @@ def generate_user_cert(request, course_id):
         # it will appear that the certificate task was submitted successfully.
         certs_api.generate_user_certificates(student, course.id, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
-        return HttpResponse()
+
+    return HttpResponse()
 
 
 def _track_successful_certificate_generation(user_id, course_id):

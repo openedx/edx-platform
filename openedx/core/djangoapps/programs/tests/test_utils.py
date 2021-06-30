@@ -598,7 +598,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
             ProgressFactory(
                 uuid=program_uuid,
                 completed=2,
-                in_progress=1,
+                not_started=1,
             )
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
@@ -618,6 +618,32 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
         assert meter.completed_programs_with_available_dates[program_uuid].date() == today.date()
+
+    def test_old_course_runs(self, mock_get_programs):
+        """
+        Test that old course runs may exist for a program which do not exist in LMS.
+        In that case, continue considering the course run to've been failed by the learner
+        """
+        course_run = CourseRunFactory.create()
+        course = CourseFactory.create(course_runs=[course_run])
+        program_data = ProgramFactory(courses=[course])
+
+        data = [program_data]
+        mock_get_programs.return_value = data
+
+        course_run_key = str(course_run['key'])
+        self._create_enrollments(course_run_key)
+        self._create_certificates(course_run_key, mode=MODES.verified)
+
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._assert_progress(
+            meter,
+            ProgressFactory(
+                uuid=program_data['uuid'],
+                not_started=1
+            )
+        )
 
     def test_nonverified_course_run_completion(self, mock_get_programs):
         """

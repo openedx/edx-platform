@@ -14,7 +14,7 @@ from opaque_keys.edx.locator import CourseLocator
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.certificates.api import is_passing_status
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -171,7 +171,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert.save()
 
         # Ensure that this test is actually using both passing and non-passing certs.
-        assert is_passing_status(cert.status) == is_passed_status
+        assert CertificateStatuses.is_passing_status(cert.status) == is_passed_status
 
         response = self.client.get(f'/u/{self.user.username}')
 

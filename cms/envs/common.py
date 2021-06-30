@@ -1757,7 +1757,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 UPLOAD_CHUNK_SIZE_IN_MB = 10
 
 ### Max size of asset uploads to GridFS
-MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
+MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 20
 
 # FAQ url to direct users to if they upload
 # a file that exceeds the above size
@@ -2419,3 +2419,7 @@ DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
 ############## Settings for course import olx validation ############################
 COURSE_OLX_VALIDATION_STAGE = 1
 COURSE_OLX_VALIDATION_IGNORE_LIST = None
+
+################# show account activate cta after register ########################
+SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
+SHOW_ACCOUNT_ACTIVATION_CTA = False

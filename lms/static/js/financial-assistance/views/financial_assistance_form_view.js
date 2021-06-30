@@ -139,7 +139,7 @@
                          $countryLabel.addClass('error');
                          this.renderErrors(this.defaultFormErrorsTitle, [HtmlUtils.joinHtml(
                             HtmlUtils.HTML('<li>'),
-                            msg,
+                            HtmlUtils.HTML(msg),
                             HtmlUtils.HTML('</li>')
                          ).toString()]);
                          this.toggleDisableButton(true);

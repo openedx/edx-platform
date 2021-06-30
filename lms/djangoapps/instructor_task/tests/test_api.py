@@ -11,7 +11,8 @@ from celery.states import FAILURE
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
 from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,

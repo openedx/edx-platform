@@ -5,10 +5,9 @@ of adding new logic that manipulates the Course Outline for a given student.
 import logging
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
+from openedx.core import types
 
-User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -33,7 +32,8 @@ class OutlineProcessor:
     additional methods to return specific metadata to feed into
     UserCourseOutlineDetailsData.
     """
-    def __init__(self, course_key: CourseKey, user: User, at_time: datetime):
+
+    def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         """
         Basic initialization.
 
