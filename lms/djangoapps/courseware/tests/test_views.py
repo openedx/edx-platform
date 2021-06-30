@@ -2281,23 +2281,15 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         )
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', return_value=True)
-    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
+    @override_settings(CERT_QUEUE='certificates')
     def test_user_with_passing_grade(self, mock_is_course_passed):  # lint-amnesty, pylint: disable=unused-argument
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        # mocking xqueue and Segment analytics
-
-        analytics_patcher = patch('lms.djangoapps.courseware.views.views.segment')
-        mock_tracker = analytics_patcher.start()
-        self.addCleanup(analytics_patcher.stop)
-
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             resp = self.client.post(self.url)
             assert resp.status_code == 200
-
-            mock_tracker.reset_mock()
 
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
@@ -2316,7 +2308,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             resp = self.client.post(self.url)
             self.assertContains(resp, "Certificate is being created.", status_code=HttpResponseBadRequest.status_code)
 
-    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
+    @override_settings(CERT_QUEUE='certificates')
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
         # then json will return cert generating message with bad request code
