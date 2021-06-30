@@ -1,7 +1,7 @@
 """
 Discussion API serializers
 """
-
+from typing import Dict
 from urllib.parse import urlencode, urlunparse
 
 from django.contrib.auth import get_user_model
@@ -84,6 +84,24 @@ def validate_not_blank(value):
     """
     if not value.strip():
         raise ValidationError("This field may not be blank.")
+
+
+def _validate_privileged_access(context: Dict) -> bool:
+    """
+    Return the field specified by ``field_name`` if requesting user is privileged.
+
+    Checks that the course exists in the context, and that the user has privileged
+    access.
+
+    Args:
+        context (Dict): The serializer context.
+
+    Returns:
+        bool: Course exists and the user has privileged access.
+    """
+    course = context.get('course', None)
+    is_requester_privileged = context.get('is_requester_privileged')
+    return course and is_requester_privileged
 
 
 class _ContentSerializer(serializers.Serializer):
@@ -237,9 +255,7 @@ class ThreadSerializer(_ContentSerializer):
         """
         Returns the number of users that flagged content as abusive only if user has staff permissions
         """
-        course = self.context.get('course', None)
-        is_requester_privileged = self.context.get('is_requester_privileged')
-        if course and is_requester_privileged:
+        if _validate_privileged_access(self.context):
             return obj.get("abuse_flagged_count")
 
     def get_pinned(self, obj):
@@ -408,10 +424,7 @@ class CommentSerializer(_ContentSerializer):
         Returns a boolean indicating whether any user has flagged the
         content as abusive.
         """
-        course = self.context.get('course', None)
-        is_requester_privileged = self.context.get('is_requester_privileged')
-
-        if course and is_requester_privileged:
+        if _validate_privileged_access(self.context):
             return len(obj.get("abuse_flaggers", [])) > 0
 
     def validate(self, attrs):

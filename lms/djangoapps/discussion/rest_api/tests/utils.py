@@ -358,7 +358,7 @@ class CommentsServiceMockMixin:
         """
         actual_params = dict(httpretty_request.querystring)
         actual_params.pop("request_id")  # request_id is random
-        assert actual_params == expected_params, f"""[\n\t{actual_params} \n\t{expected_params}\n]"""
+        assert actual_params == expected_params
 
     def assert_last_query_params(self, expected_params):
         """
