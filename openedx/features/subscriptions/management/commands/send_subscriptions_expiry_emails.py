@@ -45,7 +45,7 @@ class Command(BaseCommand):
         message_context = self._get_message_context(site)
         for subscription_id, user in context_values:
             if ace_message_class == ExpiredNotification:
-                subscription_renew_url = get_subscription_renew_url(subscription_id)
+                subscription_renew_url = get_subscription_renew_url(subscription_id, user)
                 message_context.update({
                     'subscription_renew_url': subscription_renew_url,
                     'subscription_id': subscription_id,
