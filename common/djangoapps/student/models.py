@@ -55,6 +55,13 @@ from simple_history.models import HistoricalRecords
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
+from openedx_events.learning.data import (
+    CourseData,
+    CourseEnrollmentData,
+    UserData,
+    UserPersonalData,
+)
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
@@ -1569,9 +1576,16 @@ class CourseEnrollment(models.Model):
         # All the server-side checks for whether a user is allowed to enroll.
         try:
             course = CourseOverview.get_from_id(course_key)
+            course_data = CourseData(
+                course_key=course.id,
+                display_name=course.display_name,
+            )
         except CourseOverview.DoesNotExist:
             # This is here to preserve legacy behavior which allowed enrollment in courses
             # announced before the start of content creation.
+            course_data = CourseData(
+                course_key=course_key,
+            )
             if check_access:
                 log.warning("User %s failed to enroll in non-existent course %s", user.username, str(course_key))
                 raise NonExistentCourseError  # lint-amnesty, pylint: disable=raise-missing-from
@@ -1606,6 +1620,25 @@ class CourseEnrollment(models.Model):
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
         enrollment.send_signal(EnrollStatusChange.enroll)
+
+        # Announce user's enrollment
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=CourseEnrollmentData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.profile.name,
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
+                course=course_data,
+                mode=enrollment.mode,
+                is_active=enrollment.is_active,
+                creation_date=enrollment.created,
+            )
+        )
 
         return enrollment
 

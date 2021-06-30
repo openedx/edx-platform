@@ -10,9 +10,20 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from common.djangoapps.student.models import CourseEnrollmentAllowed
-from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
+
+from openedx_events.learning.data import (
+    CourseData,
+    CourseEnrollmentData,
+    UserData,
+    UserPersonalData,
+)
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -179,3 +190,58 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         # CEAs shouldn't have been affected
         assert CourseEnrollmentAllowed.objects.count() == 1
         assert CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count() == 1
+
+
+@skip_unless_lms
+class EnrollmentEventsTest(SharedModuleStoreTestCase):
+    """
+    Tests for the Open edX Events associated with the enrollment process through the user API.
+
+    This class guarantees that the following events are sent during the user's enrollment, with
+    the exact Data Attributes as the event definition stated:
+
+        - COURSE_ENROLLMENT_CREATED: sent after the user's enrollment.
+    """
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(
+            username="test",
+            email="test@example.com",
+            password="password",
+        )
+        self.user_profile = UserProfileFactory.create(user=self.user, name="Test Example")
+
+    @mock.patch("common.djangoapps.student.models.COURSE_ENROLLMENT_CREATED")
+    def test_enrollment_created_event_emitted(self, enrollment_event):
+        """
+        Test whether the student enrollment event is sent after the user's
+        enrollment process.
+
+        Expected result:
+            - COURSE_ENROLLMENT_CREATED is sent via send_event.
+            - The arguments match the event definition.
+        """
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+
+        enrollment_event.send_event.assert_called_once_with(
+            enrollment=CourseEnrollmentData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
+                    ),
+                    id=self.user.id,
+                    is_active=self.user.is_active,
+                ),
+                course=CourseData(
+                    course_key=self.course.id,
+                    display_name=self.course.display_name,
+                ),
+                mode='audit',
+                is_active=True,
+                creation_date=enrollment.created,
+            )
+        )
