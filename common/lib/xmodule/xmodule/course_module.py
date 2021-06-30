@@ -912,6 +912,8 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings,
     )
 
+    # Hi!
+
     self_paced = Boolean(
         display_name=_("Self Paced"),
         help=_(
