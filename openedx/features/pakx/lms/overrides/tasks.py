@@ -89,7 +89,7 @@ def add_enrollment_record(user_id, course_id):
 
     enrollment = CourseEnrollment.objects.filter(user_id=user_id, course_id=course_id).first()
     if enrollment:
-        _, created = CourseProgressStats.objects.get_or_create(enrollment=enrollment, grade=None)
+        _, created = CourseProgressStats.objects.get_or_create(enrollment=enrollment)
         if not created:
             log.info("Enrollment record for {} & User:{} already registered".format(course_id, user_id))
 
@@ -115,7 +115,7 @@ def copy_active_course_enrollments():
     active_enrollments = CourseEnrollment.objects.filter(is_active=True)
     log.info("Found {} active enrollment records, ".format(len(active_enrollments)))
     for enrollment in active_enrollments:
-        CourseProgressStats.objects.get_or_create(enrollment=enrollment, grade=None)
+        CourseProgressStats.objects.get_or_create(enrollment=enrollment)
 
 
 @task(name='update_course_progress_stats')

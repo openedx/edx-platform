@@ -21,7 +21,7 @@ class CourseProgressStats(models.Model):
                                       related_name='enrollment_stats', null=True, blank=True)
     completion_date = models.DateTimeField(blank=True, default=None, null=True)
     progress = models.FloatField(default=0.0)
-    grade = models.CharField(max_length=4, default=None)
+    grade = models.CharField(max_length=4, default=None, null=True)
     email_reminder_status = models.PositiveSmallIntegerField(db_index=True, choices=REMINDER_STATES,
                                                              default=NO_EMAIL_SENT)
 
