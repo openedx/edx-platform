@@ -13,7 +13,7 @@ class UserCourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializer for list API of user course enrollment
     """
-
+    course_id = serializers.CharField(source='course.id')
     display_name = serializers.CharField(source='course.display_name')
     enrollment_status = serializers.CharField(source='mode')
     enrollment_date = serializers.SerializerMethodField()
@@ -23,8 +23,10 @@ class UserCourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseEnrollment
-        fields = ('display_name', 'enrollment_status', 'enrollment_date', 'progress',
-                  'completion_date', 'grades')
+        fields = (
+            'course_id', 'display_name', 'enrollment_status', 'enrollment_date',
+            'progress', 'completion_date', 'grades'
+        )
 
     @staticmethod
     def get_enrollment_date(obj):
@@ -48,7 +50,7 @@ class UserDetailViewSerializer(serializers.ModelSerializer):
     Serializer User's object retrieve view
     """
     employee_id = serializers.CharField(source='profile.employee_id')
-    name = serializers.CharField(source='get_full_name')
+    name = serializers.CharField(source='profile.name')
     course_enrolled = serializers.SerializerMethodField()
     completed_courses = serializers.SerializerMethodField()
 
@@ -72,7 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     employee_id = serializers.CharField(source='profile.employee_id')
     language = serializers.CharField(source='profile.language')
-    name = serializers.CharField(source='get_full_name')
+    name = serializers.CharField(source='profile.name')
     role = serializers.SerializerMethodField()
 
     class Meta:
@@ -103,7 +105,7 @@ class LearnersSerializer(serializers.ModelSerializer):
     """
     Serializer Learner list view for analytics view list view
     """
-    name = serializers.CharField(source='get_full_name')
+    name = serializers.CharField(source='profile.name')
     assigned_courses = serializers.SerializerMethodField()
     incomplete_courses = serializers.SerializerMethodField()
     completed_courses = serializers.SerializerMethodField()

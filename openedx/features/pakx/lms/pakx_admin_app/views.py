@@ -7,11 +7,14 @@ from django.contrib.auth.models import Group, User
 from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
+from django.middleware import csrf
+from django.utils.decorators import method_decorator
 from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from student.models import CourseEnrollment
 
@@ -224,7 +227,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             employee_id=F('profile__employee_id'), name=F('first_name')
         ).order_by(
             *self.ordering
-        )
+        ).distinct()
 
     def activate_users(self, request, *args, **kwargs):
         return self.change_activation_status(True, request.data["ids"])
@@ -342,6 +345,7 @@ class UserInfo(views.APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
 
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         get user's basic info
@@ -350,6 +354,7 @@ class UserInfo(views.APIView):
             'name': self.request.user.get_full_name(),
             'username': self.request.user.username,
             'is_superuser': self.request.user.is_superuser,
+            'csrf_token': csrf.get_token(self.request),
             'role': None
         }
         user_groups = Group.objects.filter(

@@ -11,7 +11,7 @@ class CanAccessPakXAdminPanel(BasePermission):
     """
     permission to access the PakX admin panel
     """
-    message = 'User does not have the permission for for Admin Panel'
+    message = 'User does not have the permission for Admin Panel'
 
     def has_permission(self, request, view):
         return request.user.is_superuser or User.objects.filter(
