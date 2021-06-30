@@ -1,3 +1,4 @@
+"""App config for PakX Overrides"""
 from django.apps import AppConfig
 
 
@@ -9,4 +10,4 @@ class PakxOverrides(AppConfig):
         """
         Connect signal handlers.
         """
-        import openedx.features.pakx.lms.overrides.signals.handlers
+        import openedx.features.pakx.lms.overrides.signals.handlers  # pylint: disable=unused-import

@@ -1,8 +1,8 @@
 """Django models for overrides app"""
 
-from django.contrib.auth.models import User
 from django.db import models
-from opaque_keys.edx.django.models import CourseKeyField
+
+from student.models import CourseEnrollment
 
 
 class CourseProgressStats(models.Model):
@@ -17,8 +17,8 @@ class CourseProgressStats(models.Model):
         (REMINDER_SENT, 'Reminder email sent'),
         (COURSE_COMPLETED, 'Course completion email sent')
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course_id = CourseKeyField(db_index=True, max_length=255)
+    enrollment = models.OneToOneField(CourseEnrollment, on_delete=models.CASCADE,
+                                      related_name='enrollment_stats', null=True, blank=True)
     completion_date = models.DateTimeField(blank=True, default=None, null=True)
     progress = models.FloatField(default=0.0)
     grade = models.CharField(max_length=4, default=None)
@@ -27,8 +27,3 @@ class CourseProgressStats(models.Model):
 
     class Meta:
         verbose_name_plural = 'Course Progress Stats'
-        unique_together = ('user', 'course_id',)
-
-    def __str__(self):
-        return "{} email_status:{} progress:{}".format(self.user.email, self.email_reminder_status,
-                                                       self.progress)

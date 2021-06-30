@@ -5,7 +5,7 @@ import uuid
 
 from django.contrib.auth.models import Group, User
 from django.db import transaction
-from django.db.models import F, Prefetch, Q
+from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
 from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -34,10 +34,43 @@ from .utils import (
     specify_user_role
 )
 
+COMPLETED_COURSE_COUNT = Count("courseenrollment", filter=Q(
+    courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED))
+IN_PROGRESS_COURSE_COUNT = Count("courseenrollment", filter=Q(
+    courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED))
+
 
 class UserCourseEnrollmentsListAPI(generics.ListAPIView):
     """
     List API of user course enrollment
+    <lms>/adminpanel/user-course-enrollments/<user_id>/
+
+    :returns:
+        {
+            "count": 3,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "display_name": "Rohan's Practice Course",
+                    "enrollment_status": "honor",
+                    "enrollment_date": "2021-06-10",
+                    "progress": 33.0,
+                    "completion_date": null,
+                    "grades": ""
+                },
+                {
+                    "display_name": "کام کی جگہ کے آداب",
+                    "enrollment_status": "honor",
+                    "enrollment_date": "2021-06-09",
+                    "progress": 33.0,
+                    "completion_date": null,
+                    "grades": ""
+                }
+            ],
+            "total_pages": 1
+        }
+
     """
     serializer_class = UserCourseEnrollmentSerializer
     authentication_classes = [SessionAuthentication]
@@ -49,9 +82,8 @@ class UserCourseEnrollmentsListAPI(generics.ListAPIView):
         return CourseEnrollment.objects.filter(
             user_id=self.kwargs['user_id'], is_active=True
         ).select_related(
+            'enrollment_stats',
             'course'
-        ).prefetch_related(
-            'user__courseprogressstats_set'
         ).order_by(
             '-id'
         )
@@ -75,13 +107,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     ordering = ['-id']
 
     def get_object(self):
+        group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN]).order_by('name')
         user_obj = User.objects.filter(
             id=self.kwargs['pk']
         ).select_related(
             'profile'
         ).prefetch_related(
-            'courseprogressstats_set'
-        ).first()
+            'courseenrollment_set'
+        ).prefetch_related(
+            Prefetch('groups', to_attr='staff_groups', queryset=group_qs),
+        ).annotate(
+            completed=COMPLETED_COURSE_COUNT,
+            in_prog=IN_PROGRESS_COURSE_COUNT).first()
 
         if user_obj:
             return user_obj
@@ -215,6 +252,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class AnalyticsStats(views.APIView):
     """
     API view for organization level analytics stats
+    <lms>/adminpanel/analytics/stats/
+
+    :return:
+        {
+            "completed_course_count": 1,
+            "course_assignment_count": 7,
+            "course_in_progress": 6,
+            "learner_count": 4
+        }
     """
     authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
@@ -229,21 +275,21 @@ class AnalyticsStats(views.APIView):
             user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
 
         user_ids = user_qs.values_list('id', flat=True)
-        data = {'learner_count': len(user_ids), 'course_assignment_count': 0, 'completed_course_count': 0}
+        course_stats = user_qs.annotate(passed=ExpressionWrapper(COMPLETED_COURSE_COUNT,
+                                        output_field=IntegerField()), in_progress=ExpressionWrapper(
+            IN_PROGRESS_COURSE_COUNT, output_field=IntegerField())).aggregate(
+            completions=Sum(F('passed')), pending=Sum(F('in_progress')))
+        data = {'learner_count': len(user_ids), 'course_in_progress': course_stats.get('pending', 0),
+                'completed_course_count': course_stats.get('completions', 0)}
 
-        for course_stats in CourseProgressStats.objects.filter(user_id__in=user_ids):
-            if course_stats.email_reminder_status == CourseProgressStats.COURSE_COMPLETED:
-                data['completed_course_count'] += 1
-
-            data['course_assignment_count'] += 1
-
-        data['course_in_progress'] = data['course_assignment_count'] - data['completed_course_count']
+        data['course_assignment_count'] = data['course_in_progress'] + data['completed_course_count']
         return Response(status=status.HTTP_200_OK, data=data)
 
 
 class LearnerListAPI(generics.ListAPIView):
     """
     API view for learners list
+    <lms>/adminpanel/analytics/learners/
 
     :returns:
     {
@@ -283,9 +329,9 @@ class LearnerListAPI(generics.ListAPIView):
         if not self.request.user.is_superuser:
             user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
 
-        course_stats = CourseProgressStats.objects.all()
+        enrollments = CourseEnrollment.objects.filter(is_active=True).select_related('enrollment_stats')
         return user_qs.prefetch_related(
-            Prefetch('courseprogressstats_set', to_attr='course_stats', queryset=course_stats)
+            Prefetch('courseenrollment_set', to_attr='enrollment', queryset=enrollments)
         )
 
 

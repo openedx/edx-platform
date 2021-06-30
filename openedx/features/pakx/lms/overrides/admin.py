@@ -29,6 +29,19 @@ class CourseProgressStatsAdmin(admin.ModelAdmin):
     Admin interface for CourseProgressStats object
     """
 
-    list_display = ['user', 'course_id', 'email_reminder_status', 'progress', 'grade', 'completion_date']
-    search_fields = ['email_reminder_status', 'course_id', 'progress']
-    list_filter = ['email_reminder_status', 'course_id', 'progress']
+    list_display = ['username', 'get_course_name', 'email_reminder_status',
+                    'progress', 'grade', 'completion_date']
+    search_fields = ['email_reminder_status', 'progress']
+    list_filter = ['email_reminder_status', 'progress']
+
+    @staticmethod
+    def username(obj):
+        """user name"""
+        return obj.enrollment.user.username
+
+    @staticmethod
+    def get_course_name(obj):
+        """ course name """
+        return obj.enrollment.course.display_name
+
+    get_course_name.short_description = 'Course Title'
