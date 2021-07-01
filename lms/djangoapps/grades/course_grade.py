@@ -14,6 +14,7 @@ from lazy import lazy
 
 from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule import block_metadata_utils
+from lms.djangoapps.courseware.access import has_access
 
 from .config import assume_zero_if_absent
 from .scores import compute_percent
@@ -69,12 +70,13 @@ class CourseGradeBase(object):
         Returns grades for the subsections in the course in
         a dict keyed by subsection format types.
         """
+        staff_access = bool(has_access(self.user, 'staff', self.course_data.course))
         subsections_by_format = defaultdict(OrderedDict)
         for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
-                    if graded_total.possible > 0:
+                    if graded_total.possible > 0 and subsection_grade.show_grades(staff_access):
                         subsections_by_format[subsection_grade.format][subsection_grade.location] = subsection_grade
         return subsections_by_format
 
