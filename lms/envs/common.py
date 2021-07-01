@@ -2663,6 +2663,7 @@ HEARTBEAT_EXTENDED_CHECKS = (
 
 HEARTBEAT_CELERY_TIMEOUT = 5
 
+
 def _high_priority_queue(settings):
     """
     HIGH_PRIORITY_QUEUE is defined differently in *.envs.production
