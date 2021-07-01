@@ -191,27 +191,40 @@ def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_remind
         registration.save()
 
 
-def validate_email_list(emails):
+def extract_emails_from_string(emails_string):
     """
-    Validate list of comma separated email addresses
+    Get a list of emails from a string with comma separated emails
 
     Arguments:
-         emails (str): string of comma separated emails
+        emails_string (str): string of comma separated emails
+
+    Returns:
+        list: List of emails
+    """
+    emails = [email.strip() for email in emails_string.split(',') if email.strip()]
+    return emails
+
+
+def validate_email_list(emails):
+    """
+    Validate a list of email addresses
+
+    Arguments:
+         emails (str): String containing emails to validate
 
     Returns:
         error (boolean): True if error is found, False otherwise
-        emails (list): list of parsed emails
     """
 
-    emails = [email.strip() for email in emails.split(',') if email.strip()]
+    emails = extract_emails_from_string(emails)
 
     for email in emails:
         try:
             validate_email(email)
         except ValidationError:
-            return True, emails
+            return True
 
-    return False, emails
+    return False
 
 
 def webinar_emails_for_panelists_co_hosts_and_presenter(webinar):
@@ -322,7 +335,8 @@ def get_webinar_invitees_emails(webinar_form):
     Returns:
         list: Webinar invitees' emails
     """
-    webinar_invitees_emails = webinar_form.cleaned_data.get('invites_by_email_address', [])
+    comma_seperated_emails = webinar_form.cleaned_data.get('invites_by_email_address')
+    webinar_invitees_emails = extract_emails_from_string(comma_seperated_emails)
     if webinar_form.cleaned_data.get('invite_all_platform_users'):
         webinar_invitees_emails += list(
             User.objects.exclude(email='').values_list('email', flat=True)

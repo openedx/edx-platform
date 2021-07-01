@@ -18,6 +18,11 @@ def webinar():
 
 
 @pytest.fixture
+def draft_webinar():
+    return WebinarFactory(is_published=False)
+
+
+@pytest.fixture
 def delivered_webinar():
     return WebinarFactory(end_time=now() - timedelta(hours=1))
 

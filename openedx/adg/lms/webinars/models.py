@@ -23,6 +23,7 @@ from .constants import (
     WEBINAR_DATE_FORMAT,
     WEBINAR_DATE_TIME_FORMAT,
     WEBINAR_DEFAULT_TIME_ZONE,
+    WEBINAR_PUBLISHED_HELPTEXT,
     WEBINAR_TIME_FORMAT
 )
 from .helpers import (
@@ -54,7 +55,7 @@ class WebinarQuerySet(models.QuerySet):
         """
         Filter queryset to display upcoming webinars
         """
-        return self.filter(is_cancelled=False, end_time__gte=now())
+        return self.filter(is_cancelled=False, is_published=True, end_time__gte=now())
 
     def delivered_webinars(self):
         """
@@ -90,12 +91,24 @@ class Webinar(TimeStampedModel):
     panelists = models.ManyToManyField(
         User, verbose_name=_('Panelists'), blank=True, related_name='webinar_panelists',
     )
+    invites_by_email_address = models.TextField(
+        blank=True,
+        verbose_name=_('Add guests by email address'),
+        help_text=_('Add comma separated emails e.g. example1@domain.com,example2@domain.com')
+    )
 
     UPCOMING = 'upcoming'
     DELIVERED = 'delivered'
     CANCELLED = 'cancelled'
+    DRAFT = 'draft'
 
     is_cancelled = models.BooleanField(default=False, verbose_name=_('Is Event Cancelled'), )
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name=_('Publish Webinar'),
+        help_text=WEBINAR_PUBLISHED_HELPTEXT
+    )
+
     created_by = models.ForeignKey(
         User, verbose_name=_('Created By'), on_delete=models.CASCADE, blank=True, related_name='webinar_created_by',
     )
@@ -118,7 +131,11 @@ class Webinar(TimeStampedModel):
 
     @property
     def is_upcoming_webinar(self):
-        return self.end_time > now() and not self.is_cancelled
+        return self.end_time > now() and self.is_published and not self.is_cancelled
+
+    @property
+    def is_delivered_webinar(self):
+        return self.end_time < now() and self.is_published and not self.is_cancelled
 
     def to_dict(self):
         return {

@@ -14,6 +14,7 @@ from .constants import (
     WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP,
     WEBINAR_STATUS_CANCELLED,
     WEBINAR_STATUS_DELIVERED,
+    WEBINAR_STATUS_DRAFT,
     WEBINAR_STATUS_UPCOMING
 )
 from .forms import WebinarForm
@@ -63,17 +64,21 @@ class WebinarAdminBase(admin.ModelAdmin):
             webinar (Webinar): Current webinar object
 
         Returns:
-            string: Webinar status either `Upcoming` or `Delivered`
+            string: Webinar status either `Upcoming`, `Delivered`, `Cancelled` or `Draft`
         """
+        is_published = getattr(webinar, 'is_published', False)
+        if not is_published:
+            return WEBINAR_STATUS_DRAFT
+
         if webinar.is_cancelled:
             return WEBINAR_STATUS_CANCELLED
-        elif not webinar.id or webinar.is_upcoming_webinar:
+        elif webinar and webinar.is_upcoming_webinar:
             return WEBINAR_STATUS_UPCOMING
         return WEBINAR_STATUS_DELIVERED
 
     save_as = True
     exclude = ('is_cancelled',)
-    list_display = ('title', 'start_time', 'presenter', 'webinar_status',)
+    list_display = ('title', 'start_time', 'presenter', 'is_published', 'webinar_status',)
     raw_id_fields = ('presenter', 'co_hosts', 'panelists')
     search_fields = ('title',)
     filter_horizontal = ('co_hosts', 'panelists',)
@@ -84,8 +89,7 @@ class WebinarAdmin(WebinarAdminBase):
     Admin for upcoming and delivered webinars
     """
 
-    list_filter = ('start_time', 'language', ActiveWebinarStatusFilter)
-    readonly_fields = ('created_by', 'modified_by', 'webinar_status',)
+    list_filter = ('start_time', 'language', 'is_published', ActiveWebinarStatusFilter)
 
     form = WebinarForm
 
@@ -120,11 +124,13 @@ class WebinarAdmin(WebinarAdminBase):
 
     def save_related(self, request, form, formsets, change):
         """
-        Extension of `save_related` for webinar to send emails when webinar is created or modified.
+        Extension of `save_related` for webinar to send emails when a published webinar is created or modified.
         """
         new_members = []
         removed_members = []
-        if change and any(field in form.changed_data for field in ['co_hosts', 'presenter', 'panelists']):
+
+        if (change and any(field in form.changed_data for field in ['co_hosts', 'presenter', 'panelists'])
+                and form.instance.is_published):
             # The below method `get_newly_added_and_removed_team_members` must be called before
             # `super().save_related(...)` for correct results.
             new_members, removed_members = get_newly_added_and_removed_team_members(form, self.old_webinar)
@@ -132,10 +138,22 @@ class WebinarAdmin(WebinarAdminBase):
         super().save_related(request, form, formsets, change)
 
         webinar = form.instance
+        if not webinar.is_published:
+            return
 
         webinar_invitees_emails = get_webinar_invitees_emails(form)
 
-        if change:
+        is_previously_published = getattr(self.old_webinar, 'is_published', False)
+        is_published_first_time = form.instance.is_published and not is_previously_published
+
+        if is_published_first_time:
+            webinar_team_emails = webinar_emails_for_panelists_co_hosts_and_presenter(webinar)
+            webinar_invitees_emails += webinar_team_emails
+
+            webinar.create_team_registrations(User.objects.filter(email__in=webinar_team_emails))
+            schedule_webinar_reminders(webinar_team_emails, webinar.to_dict())
+
+        if change and not is_published_first_time:
             if removed_members:
                 webinar.remove_team_registrations_and_cancel_reminders(removed_members)
 
@@ -168,15 +186,6 @@ class WebinarAdmin(WebinarAdminBase):
                 webinar_invitees_emails, webinar_update_recipients_emails
             )
 
-        else:
-            # The below method `webinar_emails_for_panelists_co_hosts_and_presenter` must be called after
-            # `super().save_related(...)` has been called for updated results.
-            webinar_team_emails = webinar_emails_for_panelists_co_hosts_and_presenter(webinar)
-            webinar_invitees_emails += webinar_team_emails
-
-            webinar.create_team_registrations(User.objects.filter(email__in=webinar_team_emails))
-            schedule_webinar_reminders(webinar_team_emails, webinar.to_dict())
-
         if webinar_invitees_emails:
             send_webinar_emails(
                 MandrillClient.WEBINAR_CREATED,
@@ -207,6 +216,18 @@ class WebinarAdmin(WebinarAdminBase):
         deleted_objects, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
 
         return deleted_objects, model_count, set(), protected
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Get all the read-only fields for the admin
+        """
+        readonly_fields = ['created_by', 'modified_by', 'webinar_status', ]
+
+        is_webinar_published = getattr(obj, 'is_published', False)
+        if is_webinar_published:
+            readonly_fields.append('is_published')
+
+        return readonly_fields
 
 
 class CancelledWebinarAdmin(WebinarAdminBase):
