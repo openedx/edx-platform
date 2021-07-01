@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from xblock.completable import XBlockCompletionMode
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.courseware.model_data import FieldDataCache
@@ -20,6 +21,7 @@ log = logging.getLogger(__name__)
 
 
 @shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def complete_student_attempt_task(user_identifier: str, content_id: str) -> None:
     """
     Marks all completable children of content_id as complete for the user

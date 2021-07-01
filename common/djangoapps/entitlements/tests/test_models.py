@@ -189,14 +189,14 @@ class TestModels(TestCase):
 
     def test_is_entitlement_regainable(self):
         """
-        Test that the entitlement is not expired when created now, and is expired when created20 days
+        Test that the entitlement is not expired when created now, and is expired when created 20 days
         ago with a policy that sets the expiration period to 14 days
         """
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         assert entitlement.is_entitlement_regainable() is True
 
         # Create and associate a GeneratedCertificate for a user and course and make sure it isn't regainable
-        GeneratedCertificateFactory(
+        certificate = GeneratedCertificateFactory(
             user=entitlement.user,
             course_id=entitlement.enrollment_course_run.course_id,
             mode=MODES.verified,
@@ -204,6 +204,11 @@ class TestModels(TestCase):
         )
 
         assert entitlement.is_entitlement_regainable() is False
+
+        certificate.status = CertificateStatuses.notpassing
+        certificate.save()
+
+        assert entitlement.is_entitlement_regainable() is True
 
         # Create a date 20 days in the past (greater than the policy expire period of 14 days)
         # and apply it to both the entitlement and the course

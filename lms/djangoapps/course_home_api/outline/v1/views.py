@@ -310,7 +310,7 @@ class OutlineTabView(RetrieveAPIView):
                         # another type, just skip it (don't filter it out).
                         seq_data['type'] != 'sequential'
                     )
-                ]
+                ] if 'children' in chapter_data else []
 
         data = {
             'access_expiration': access_expiration,

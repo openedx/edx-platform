@@ -112,6 +112,48 @@ from openedx.features.course_experience import course_home_page_title, DISABLE_C
       </script>
   % endif
 
+  <script type="text/javascript">
+    /* Helper function isInViewport checks whether
+    the given element is in viewport vertically or not */
+    function isInViewport(el) {
+      const scroll = window.scrollY || window.pageYOffset
+      const elementTop = el.getBoundingClientRect().top + scroll
+      const viewport = {
+        top: scroll,
+        bottom: scroll + window.innerHeight,
+      }
+      const elementMid = elementTop + el.clientHeight/2
+      // Returns true if the middle of the element is in the viewport.
+      return elementMid >= viewport.top && elementMid <= viewport.bottom
+    }
+
+    /* Add a jQuery plugin to override the focus behavior.
+    When focused, if the element in not in the viewport then
+    the element will be scrolled to the bottom of the viewport.
+    */
+    (function ($) {
+      $.fn.extend({
+        focus: (function(orig) {
+          return function(delay, fn) {
+            orig.apply(this, arguments);
+            this.each(function(){
+              var elem = this;
+              // Scroll only when the element is not in the viewport and it contains the notification-btn.
+              if (elem.classList.contains('notification-btn') && !isInViewport(elem)) {
+                this.scrollIntoView({
+                  behaviour: 'auto',
+                  block: 'end',
+                })
+              }
+            })
+            return this;
+          }
+        })($.fn.focus),
+
+      })
+    })(jQuery)
+  </script>
+
 ${HTML(fragment.foot_html())}
 
 </%block>

@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
+    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
@@ -294,6 +295,17 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         else:
             assert not response.data['can_load_courseware']['has_access']
 
+    @ddt.data(True, False)
+    def test_is_learning_sequences_api_enabled(self, enable_new_api):
+        """
+        Test that the Courseware API exposes the Learning Sequences API flag.
+        """
+        with override_waffle_flag(COURSEWARE_USE_LEARNING_SEQUENCES_API, active=enable_new_api):
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+            courseware_data = response.json()
+            assert courseware_data['is_learning_sequences_api_enabled'] is enable_new_api
+
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
@@ -414,6 +426,16 @@ class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
         assert response.data['block_id'] == str(self.unit.location)
         assert response.data['unit_id'] == str(self.unit.location)
         assert response.data['section_id'] == str(self.sequence.location)
+
+    def test_resume_invalid_key(self):
+        """A resume key that does not exist should return null IDs (i.e. "redirect to first section")"""
+        self.override_waffle_switch(True)
+        submit_completions_for_testing(self.user, [self.course.id.make_usage_key('html', 'doesnotexist')])
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] is None
+        assert response.data['unit_id'] is None
+        assert response.data['section_id'] is None
 
 
 @ddt.ddt

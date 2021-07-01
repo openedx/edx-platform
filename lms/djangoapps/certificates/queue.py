@@ -20,7 +20,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.data import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
-    CertificateWhitelist,
+    CertificateAllowlist,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
@@ -103,7 +103,7 @@ class XQueueCertInterface:
             settings.XQUEUE_INTERFACE['django_auth'],
             requests_auth,
         )
-        self.allowlist = CertificateWhitelist.objects.all()
+        self.allowlist = CertificateAllowlist.objects.all()
         self.use_https = True
 
     def regen_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
@@ -259,7 +259,7 @@ class XQueueCertInterface:
         self.request.user = student
         self.request.session = {}
 
-        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, whitelist=True).exists()
+        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, allowlist=True).exists()
         course_grade = CourseGradeFactory().read(student, course_key=course_id)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES

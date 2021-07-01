@@ -129,6 +129,7 @@ from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
 from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
+from xmodule.contentstore.utils import course_location_from_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -413,8 +414,8 @@ def jump_to(request, course_id, location):
     try:
         course_key = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
-    except InvalidKeyError:
-        raise Http404("Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
+    except InvalidKeyError as exc:
+        raise Http404("Invalid course_key or usage_key") from exc
 
     experience_param = request.GET.get("experience", "").lower()
     if experience_param == "new":
@@ -430,10 +431,16 @@ def jump_to(request, course_id, location):
             request=request,
             experience=experience,
         )
-    except ItemNotFoundError:
-        raise Http404(f"No data at this location: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
-    except NoPathToItem:
-        raise Http404(f"This location is not in any class: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
+    except (ItemNotFoundError, NoPathToItem):
+        # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
+        # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
+        # course changed out from under the user). So instead, let's just redirect to the beginning of the course,
+        # as it is at least a valid page the user can interact with...
+        redirect_url = get_courseware_url(
+            usage_key=course_location_from_key(course_key),
+            request=request,
+            experience=experience,
+        )
 
     return redirect(redirect_url)
 

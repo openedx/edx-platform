@@ -32,7 +32,6 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import (
-    _get_allowlist_entry_from_new_model,
     can_be_added_to_allowlist,
     cert_generation_enabled,
     certificate_downloadable_status,
@@ -45,6 +44,7 @@ from lms.djangoapps.certificates.api import (
     get_allowlisted_users,
     get_certificate_footer_context,
     get_certificate_for_user,
+    get_certificate_for_user_id,
     get_certificate_header_context,
     get_certificate_invalidation_entry,
     get_certificate_url,
@@ -430,6 +430,18 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert cert['is_passing'] is True
         assert cert['download_url'] == 'www.google.com'
 
+    def test_get_certificate_for_user_id(self):
+        """
+        Test to get a certificate for a user id for a specific course.
+        """
+        cert = get_certificate_for_user_id(self.student, self.web_cert_course.id)
+
+        assert cert is not None
+        assert cert.course_id == self.web_cert_course.id
+        assert cert.mode == CourseMode.VERIFIED
+        assert cert.status == CertificateStatuses.downloadable
+        assert cert.grade == '0.88'
+
     def test_get_certificates_for_user(self):
         """
         Test to get all the certificates for a user
@@ -790,7 +802,7 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
         result, __ = create_or_update_certificate_allowlist_entry(self.user, self.course_run_key, "New test", False)
 
         assert result.notes == "New test"
-        assert not result.whitelist
+        assert not result.allowlist
 
     def test_remove_allowlist_entry(self):
         """
@@ -879,7 +891,7 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
         """
         Test to verify that we will return False when the allowlist entry if it is disabled.
         """
-        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user, whitelist=False)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user, allowlist=False)
 
         result = is_on_allowlist(self.user, self.course_run_key)
         assert not result
@@ -970,8 +982,8 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
 
         # Add user to the allowlist
         CertificateAllowlistFactory.create(course_id=key1, user=u1)
-        # Add user to the allowlist, but set whitelist to false
-        CertificateAllowlistFactory.create(course_id=key1, user=u2, whitelist=False)
+        # Add user to the allowlist, but set allowlist to false
+        CertificateAllowlistFactory.create(course_id=key1, user=u2, allowlist=False)
         # Add user to the allowlist in the other course
         CertificateAllowlistFactory.create(course_id=key2, user=u4)
 
@@ -994,25 +1006,19 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
         notes = 'blah'
 
         # Check before adding user
-        old_entry = get_allowlist_entry(u1, self.course_run_key)
-        assert old_entry is None
-        new_entry = _get_allowlist_entry_from_new_model(u1, self.course_run_key)
-        assert new_entry is None
+        entry = get_allowlist_entry(u1, self.course_run_key)
+        assert entry is None
 
         # Add user
         create_or_update_certificate_allowlist_entry(u1, self.course_run_key, notes)
-        old_entry = get_allowlist_entry(u1, self.course_run_key)
-        assert old_entry.notes == notes
-        new_entry = _get_allowlist_entry_from_new_model(u1, self.course_run_key)
-        assert new_entry.notes == notes
+        entry = get_allowlist_entry(u1, self.course_run_key)
+        assert entry.notes == notes
 
         # Update user
         new_notes = 'really useful info'
         create_or_update_certificate_allowlist_entry(u1, self.course_run_key, new_notes)
-        old_entry = get_allowlist_entry(u1, self.course_run_key)
-        assert old_entry.notes == new_notes
-        new_entry = _get_allowlist_entry_from_new_model(u1, self.course_run_key)
-        assert new_entry.notes == new_notes
+        entry = get_allowlist_entry(u1, self.course_run_key)
+        assert entry.notes == new_notes
 
     def test_remove(self):
         """
@@ -1023,17 +1029,13 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
 
         # Add user
         create_or_update_certificate_allowlist_entry(u1, self.course_run_key, notes)
-        old_entry = get_allowlist_entry(u1, self.course_run_key)
-        assert old_entry.notes == notes
-        new_entry = _get_allowlist_entry_from_new_model(u1, self.course_run_key)
-        assert new_entry.notes == notes
+        entry = get_allowlist_entry(u1, self.course_run_key)
+        assert entry.notes == notes
 
         # Remove user
         remove_allowlist_entry(u1, self.course_run_key)
-        old_entry = get_allowlist_entry(u1, self.course_run_key)
-        assert old_entry is None
-        new_entry = _get_allowlist_entry_from_new_model(u1, self.course_run_key)
-        assert new_entry is None
+        entry = get_allowlist_entry(u1, self.course_run_key)
+        assert entry is None
 
 
 class CertificateInvalidationTests(ModuleStoreTestCase):

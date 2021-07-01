@@ -2593,6 +2593,12 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+CELERY_IMPORTS = (
+    # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
+    # by celery workers, its tasks will not get auto-discovered:
+    'poll.tasks',
+)
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
