@@ -124,7 +124,6 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
-from common.djangoapps.track import segment
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
@@ -1649,25 +1648,8 @@ def generate_user_cert(request, course_id):
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
         certs_api.generate_user_certificates(student, course.id, generation_mode='self')
-        _track_successful_certificate_generation(student.id, course.id)
 
     return HttpResponse()
-
-
-def _track_successful_certificate_generation(user_id, course_id):
-    """
-    Track a successful certificate generation event.
-    Arguments:
-        user_id (str): The ID of the user generating the certificate.
-        course_id (CourseKey): Identifier for the course.
-    Returns:
-        None
-    """
-    event_name = 'edx.bi.user.certificate.generate'
-    segment.track(user_id, event_name, {
-        'category': 'certificates',
-        'label': str(course_id)
-    })
 
 
 def enclosing_sequence_for_gating_checks(block):

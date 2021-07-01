@@ -2,7 +2,6 @@
 Tests for certificate generation
 """
 import logging
-from unittest.mock import patch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
@@ -58,27 +57,6 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             certificate_url='',
             generation_mode=self.gen_mode
         )
-
-    def test_segment_event(self):
-        """
-        Test that a segment event is created
-        """
-        analytics_patcher = patch('lms.djangoapps.certificates.utils.segment')
-        mock_tracker = analytics_patcher.start()
-        self.addCleanup(analytics_patcher.stop)
-
-        generated_cert = generate_course_certificate(self.u, self.key, CertificateStatuses.downloadable, self.gen_mode)
-        assert generated_cert.status, CertificateStatuses.downloadable
-
-        mock_tracker.track.assert_called_once_with(
-            self.u.id,
-            'edx.bi.user.certificate.generate',
-            {
-                'category': 'certificates',
-                'label': str(self.key)
-            },
-        )
-        mock_tracker.reset_mock()
 
     def test_generation_existing(self):
         """
