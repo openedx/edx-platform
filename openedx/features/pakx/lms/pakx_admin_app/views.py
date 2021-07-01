@@ -29,8 +29,10 @@ from .serializers import (
     UserProfileSerializer,
     UserSerializer
 )
+from .tasks import enroll_users
 from .utils import (
     get_learners_filter,
+    get_org_users_qs,
     get_roles_q_filters,
     get_user_org_filter,
     send_registration_email,
@@ -87,6 +89,8 @@ class UserCourseEnrollmentsListAPI(generics.ListAPIView):
         ).select_related(
             'enrollment_stats',
             'course'
+        ).prefetch_related(
+            'user__courseprogressstats_set'
         ).order_by(
             '-id'
         )
@@ -250,6 +254,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class CourseEnrolmentViewSet(viewsets.ModelViewSet):
+    """
+    Course view-set for bulk enrolment task
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [CanAccessPakXAdminPanel]
+
+    def enroll_users(self, request, *args, **kwargs):
+        user_qs = get_org_users_qs(request.user).filter(id__in=request.data["user_ids"]).values_list('id', flat=True)
+        if request.data.get("user_ids") and request.data.get("course_keys"):
+            if len(request.data["user_ids"]) == len(user_qs):
+                enroll_users.delay(self.request.user.id, request.data["user_ids"], request.data["course_keys"])
+                return Response(status=status.HTTP_200_OK)
+            return Response(
+                {"User(s) not found!": list(set(request.data["user_ids"]) - set(list(user_qs)))},
+                status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class AnalyticsStats(views.APIView):

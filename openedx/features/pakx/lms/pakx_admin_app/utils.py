@@ -2,7 +2,7 @@
 helpers functions for Admin Panel API
 """
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.db.models.query_utils import Q
@@ -55,7 +55,7 @@ def specify_user_role(user, role):
         user.groups.add(Group.objects.get(name=GROUP_TRAINING_MANAGERS))
 
 
-def get_email_message_context(user, user_profile, protocol):
+def get_registration_email_message_context(user, user_profile, protocol):
     """
     return context for registration notification email body
     """
@@ -83,6 +83,20 @@ def get_email_message_context(user, user_profile, protocol):
     return message_context
 
 
+def get_org_users_qs(user):
+    """
+    return users from the same organization as of the request.user
+    """
+    if user.is_superuser:
+        queryset = User.objects.all()
+    else:
+        queryset = User.objects.filter(**get_user_org_filter(user))
+
+    return queryset.select_related(
+        'profile'
+    )
+
+
 def send_registration_email(user, user_profile, protocol):
     """
     send a registration notification via email
@@ -90,6 +104,6 @@ def send_registration_email(user, user_profile, protocol):
     message = RegistrationNotification().personalize(
         recipient=Recipient(user.username, user.email),
         language=user_profile.language,
-        user_context=get_email_message_context(user, user_profile, protocol),
+        user_context=get_registration_email_message_context(user, user_profile, protocol),
     )
     ace.send(message)
