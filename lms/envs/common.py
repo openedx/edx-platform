@@ -2662,7 +2662,15 @@ HEARTBEAT_EXTENDED_CHECKS = (
 )
 
 HEARTBEAT_CELERY_TIMEOUT = 5
-HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+def _high_priority_queue(settings):
+    """
+    HIGH_PRIORITY_QUEUE is defined differently in *.envs.production
+    """
+    return settings.HIGH_PRIORITY_QUEUE
+
+HEARTBEAT_CELERY_ROUTING_KEY = _high_priority_queue
+derived('HEARTBEAT_CELERY_ROUTING_KEY')
 
 ################################ Block Structures ###################################
 

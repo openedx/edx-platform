@@ -6,6 +6,7 @@ Test the heartbeat
 import json
 from unittest.mock import patch
 
+from django.conf import settings
 from django.db.utils import DatabaseError
 from django.test.client import Client
 from django.urls import reverse
@@ -23,6 +24,10 @@ class HeartbeatTestCase(ModuleStoreTestCase):
         self.client = Client()
         self.heartbeat_url = reverse('heartbeat')
         return super().setUp()
+
+    def test_settings(self):
+        assert settings.HEARTBEAT_CELERY_ROUTING_KEY == settings.HIGH_PRIORITY_QUEUE
+        assert settings.HEARTBEAT_CELERY_ROUTING_KEY in settings.CELERY_QUEUES
 
     def test_success(self):
         response = self.client.get(self.heartbeat_url + '?extended')
