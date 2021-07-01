@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-28 07:56+0000\n"
+"POT-Creation-Date: 2021-06-29 06:49+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -1401,6 +1401,7 @@ msgstr[1] "يجب أن ينتهي الملف بأحد الامتدادات ال�
 msgstr[2] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
 msgstr[3] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
 msgstr[4] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[5] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -2502,21 +2503,23 @@ msgstr "لقد تم حفظ إجاباتك سابقاً. يُرجى الضغط ع
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
-msgstr[0] " ({progress} نقاط) غير صحيحة"
-msgstr[1] "  ({progress} نقاط) غير صحيحة"
+msgstr[0] "({progress} نقاط) غير صحيحة"
+msgstr[1] " ({progress} نقاط) غير صحيحة"
 msgstr[2] "  ({progress} نقاط) غير صحيحة"
 msgstr[3] "  ({progress} نقاط) غير صحيحة"
-msgstr[4] "    ({progress} نقاط) غير صحيح"
+msgstr[4] "  ({progress} نقاط) غير صحيحة"
+msgstr[5] "    ({progress} نقاط) غير صحيح"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "({progress} نقاط) صحيحة"
-msgstr[1] "   ({progress} نقاط) صحيحة"
-msgstr[2] "    ({progress} نقاط) صحيحة"
-msgstr[3] "   ({progress} نقاط) صحيحة"
-msgstr[4] "   ({progress} نقاط) صحيح"
+msgstr[1] "({progress} نقاط) صحيحة"
+msgstr[2] "   ({progress} نقاط) صحيحة"
+msgstr[3] "    ({progress} نقاط) صحيحة"
+msgstr[4] "   ({progress} نقاط) صحيحة"
+msgstr[5] "   ({progress} نقاط) صحيح"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2526,7 +2529,8 @@ msgstr[0] "({progress} نقاط) صحيحة جزئيًا"
 msgstr[1] "({progress} نقاط) صحيحة جزئيًا"
 msgstr[2] "({progress} نقاط) صحيحة جزئيًا"
 msgstr[3] "({progress} نقاط) صحيحة جزئيًا"
-msgstr[4] " ({progress} نقاط) صحيح جزئياً"
+msgstr[4] "({progress} نقاط) صحيحة جزئيًا"
+msgstr[5] " ({progress} نقاط) صحيح جزئياً"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
@@ -2569,26 +2573,29 @@ msgstr[1] "{num_hour} ساعات"
 msgstr[2] "{num_hour} ساعات"
 msgstr[3] "{num_hour} ساعات"
 msgstr[4] "{num_hour} ساعات"
+msgstr[5] "{num_hour} ساعات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} دقيقة"
-msgstr[1] "{num_minute} دقائق"
+msgstr[1] "{num_minute} دقيقة"
 msgstr[2] "{num_minute} دقائق"
 msgstr[3] "{num_minute} دقائق"
 msgstr[4] "{num_minute} دقائق"
+msgstr[5] "{num_minute} دقائق"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} ثانية"
-msgstr[1] "{num_second} ثوانٍ"
+msgstr[1] "{num_second} ثانية"
 msgstr[2] "{num_second} ثوانٍ"
 msgstr[3] "{num_second} ثوانٍ"
 msgstr[4] "{num_second} ثوانٍ"
+msgstr[5] "{num_second} ثوانٍ"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -3907,20 +3914,22 @@ msgstr "يُرجى اختيار نوع مسائل آخر."
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
 msgstr[0] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسألة"
-msgstr[1] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسائل،"
+msgstr[1] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسألة"
 msgstr[2] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسائل،"
 msgstr[3] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسائل،"
-msgstr[4] "ضُبِطت إعدادات المكتبات المحدّدة لجلب {count} مسائل،"
+msgstr[4] "ضُبِطت إعدادات المكتبات المحدّدة بحيث يمكن استخراج {count} مسائل،"
+msgstr[5] "ضُبِطت إعدادات المكتبات المحدّدة لجلب {count} مسائل،"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
-msgstr[0] "لكنّه لا يوجد سوى {actual} مسـألة مطابِقة."
-msgstr[1] "لكنّه لا يوجد سوى {actual} مسائل مطابِقة."
+msgstr[0] "لكنّه لا يوجد سوى {actual} مسألة مطابِقة."
+msgstr[1] "لكنّه لا يوجد سوى {actual} مسـألة مطابِقة."
 msgstr[2] "لكنّه لا يوجد سوى {actual} مسائل مطابِقة."
 msgstr[3] "لكنّه لا يوجد سوى {actual} مسائل مطابِقة."
 msgstr[4] "لكنّه لا يوجد سوى {actual} مسائل مطابِقة."
+msgstr[5] "لكنّه لا يوجد سوى {actual} مسائل مطابِقة."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit the library configuration."
@@ -4732,11 +4741,12 @@ msgstr "أساسي"
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
 "There are no transcript files associated with the {lang} languages."
-msgstr[0] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
+msgstr[0] "لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
 msgstr[1] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
 msgstr[2] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
 msgstr[3] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
 msgstr[4] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
+msgstr[5] " لا يوجد ملفات نصوص مرتبطة باللغات {lang}"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -7638,21 +7648,24 @@ msgstr "جرى إرسال 0 "
 #, python-brace-format
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] "جرى إرسال  {num_emails} رسالة بريد إلكتروني."
+msgstr[0] "لم يجري إرسال أي رسالة بريد إلكتروني - {num_emails} رسالة."
 msgstr[1] "جرى إرسال  {num_emails} رسالة بريد إلكتروني."
-msgstr[2] "جرى إرسال  {num_emails} رسائل بريد إلكتروني."
+msgstr[2] "جرى إرسال  {num_emails} رسالة بريد إلكتروني."
 msgstr[3] "جرى إرسال  {num_emails} رسائل بريد إلكتروني."
 msgstr[4] "جرى إرسال  {num_emails} رسائل بريد إلكتروني."
+msgstr[5] "جرى إرسال  {num_emails} رسائل بريد إلكتروني."
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 #, python-brace-format
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
-msgstr[0] "لم ينجح إرسال {num_emails} رسالة بريد إلكتروني"
-msgstr[1] "لم ينجح إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[0] ""
+"نجح إرسال جميع رسائل البريد الإلكتروني -  {num_emails} رسالأ متبقيّة"
+msgstr[1] "لم ينجح إرسال {num_emails} رسالة بريد إلكتروني"
 msgstr[2] "لم ينجح إرسال {num_emails} رسائل بريد إلكتروني"
 msgstr[3] "لم ينجح إرسال {num_emails} رسائل بريد إلكتروني"
 msgstr[4] "لم ينجح إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[5] "لم ينجح إرسال {num_emails} رسائل بريد إلكتروني"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
@@ -13890,7 +13903,8 @@ msgstr[0] "بدأ %s نقاش"
 msgstr[1] "بدأ %s نقاش"
 msgstr[2] "بدأ %s نقاش"
 msgstr[3] "بدأ %s نقاش"
-msgstr[4] "%s نقاشات بدأت "
+msgstr[4] "بدأ %s نقاش"
+msgstr[5] "%s نقاشات بدأت "
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -13899,9 +13913,10 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s تعليق"
 msgstr[1] "%s تعليق"
-msgstr[2] "%s تعليقات"
+msgstr[2] "%s تعليق"
 msgstr[3] "%s تعليقات"
-msgstr[4] "%s تعليقات "
+msgstr[4] "%s تعليقات"
+msgstr[5] "%s تعليقات "
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
@@ -14322,17 +14337,20 @@ msgid_plural ""
 "list."
 msgstr[0] ""
 "عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّب يُختار عشوائيًا من هذه القائمة."
+"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
 msgstr[1] ""
 "عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّب تُختار عشوائيًا من هذه القائمة."
+"طالب {max_count} مركّب يُختار عشوائيًا من هذه القائمة."
 msgstr[2] ""
 "عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
+"طالب {max_count} مركّب تُختار عشوائيًا من هذه القائمة."
 msgstr[3] ""
 "عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
 "طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
 msgstr[4] ""
+"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
+"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
+msgstr[5] ""
 "عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
 "طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
 
@@ -14514,6 +14532,7 @@ msgstr[1] "لقد استخدمت {num_used} من إجمالي {num_total} محا
 msgstr[2] "لقد استخدمت {num_used} من إجمالي {num_total} محاولات"
 msgstr[3] "لقد استخدمت {num_used} من إجمالي {num_total} محاولات"
 msgstr[4] "لقد استخدمت {num_used} من إجمالي {num_total} محاولات"
+msgstr[5] "لقد استخدمت {num_used} من إجمالي {num_total} محاولات"
 
 #: lms/templates/problem.html
 msgid ""
@@ -17501,11 +17520,12 @@ msgstr "لم يكتمل التحقّق بعد."
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
-msgstr[0] "تبقى لديك يوم واحد {days} فقط لتثبيت هذا المساق."
-msgstr[1] "تبقى لديك يومان {days} فقط لتثبيت هذا المساق."
-msgstr[2] "تبقى لديك {days} أيام فقط لتثبيت هذا المساق."
+msgstr[0] "لم يتبقى لديك أي {days} يوم لتثبيت هذا المساق."
+msgstr[1] "تبقى لديك يوم واحد {days} فقط لتثبيت هذا المساق."
+msgstr[2] "تبقى لديك يومان {days} فقط لتثبيت هذا المساق."
 msgstr[3] "تبقى لديك {days} أيام فقط لتثبيت هذا المساق."
-msgstr[4] "تبقّى لديك {days} أيام فقط لتجري عملية التحقق لهذا المساق."
+msgstr[4] "تبقى لديك {days} أيام فقط لتثبيت هذا المساق."
+msgstr[5] "تبقّى لديك {days} أيام فقط لتجري عملية التحقق لهذا المساق."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
