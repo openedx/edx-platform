@@ -277,13 +277,9 @@ FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'django-cache'
 
-HIGH_PRIORITY_QUEUE = f'edx.test.core.high'
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
-CELERY_QUEUES = {
-    HIGH_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {},
-    HIGH_MEM_QUEUE: {},
-}
+HIGH_PRIORITY_QUEUE = 'edx.lms.core.high'
 
 ######################### MARKETING SITE ###############################
 

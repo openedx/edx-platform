@@ -27,12 +27,10 @@ from .common import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
-    CELERY_QUEUES,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
-    HIGH_PRIORITY_QUEUE,
     JWT_AUTH,
     LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
@@ -190,6 +188,8 @@ CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+HIGH_PRIORITY_QUEUE = 'edx.cms.core.high'
 
 # test_status_cancel in cms/cms_user_tasks/test.py is failing without this
 # @override_setting for BROKER_URL is not working in testcase, so updating here
