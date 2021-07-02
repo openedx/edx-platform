@@ -85,6 +85,7 @@ edx-drf-extensions
 edx-enterprise
 edx-event-routing-backends
 edx-milestones
+edx-name-affirmation>=0.1.2
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
