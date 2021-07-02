@@ -212,6 +212,70 @@ def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_i
     )
 
 
+def _make_sequence_data(sequence):
+    sequence_errors = []
+    seq_user_partition_groups, error = _make_user_partition_groups(
+        sequence.location, sequence.group_access
+    )
+    if error:
+        sequence_errors.append(error)
+
+    # Bubble up User Partition Group settings from Units if appropriate.
+    sequence_upg_from_units = _bubbled_up_groups_from_units(
+        [unit.group_access for unit in sequence.get_children()]
+    )
+    for user_partition_id, group_ids in sequence_upg_from_units.items():
+        # If there's an existing user partition ID set at the sequence
+        # level, we respect it, even if it seems nonsensical. The hack of
+        # bubbling things up from the Unit level is only done if there's
+        # no conflicting value set at the Sequence level.
+        if user_partition_id not in seq_user_partition_groups:
+            sequence_errors.append(
+                _make_bubbled_up_error(sequence.location, user_partition_id, group_ids)
+            )
+            seq_user_partition_groups[user_partition_id] = group_ids
+        else:
+            sequence_errors.append(
+                _make_not_bubbled_up_error(
+                    sequence.location, sequence.group_access, user_partition_id, group_ids
+                )
+            )
+
+    sequence_data = CourseLearningSequenceData(
+        usage_key=_remove_version_info(sequence.location),
+        title=sequence.display_name_with_default,
+        inaccessible_after_due=sequence.hide_after_due,
+        exam=ExamData(
+            is_practice_exam=sequence.is_practice_exam,
+            is_proctored_enabled=sequence.is_proctored_enabled,
+            is_time_limited=sequence.is_time_limited,
+        ),
+        visibility=VisibilityData(
+            hide_from_toc=sequence.hide_from_toc,
+            visible_to_staff_only=sequence.visible_to_staff_only,
+        ),
+        user_partition_groups=seq_user_partition_groups,
+    )
+    return sequence_data, sequence_errors
+
+
+def _make_split_test_data(split_test):
+    split_test_errors = []
+    sequences_data = []
+    for sequence in split_test.get_children():
+        for group_id in split_test.group_id_to_child:
+            if split_test.group_id_to_child[group_id] == sequence.location:
+                sequence.group_access = {split_test.user_partition_id: group_id}
+        sequence_data, sequence_errors = _make_sequence_data(sequence)
+
+        if sequence_data:
+            sequences_data.append(sequence_data)
+
+        split_test_errors.extend(sequence_errors)
+
+    return sequences_data, split_test_errors
+
+
 def _make_section_data(section, unique_sequences):
     """
     Return a (CourseSectionData, List[ContentDataError]) from a SectionBlock.
@@ -252,6 +316,12 @@ def _make_section_data(section, unique_sequences):
 
     for sequence in section.get_children():
         if sequence.location.block_type not in valid_sequence_tags:
+            if sequence.location.block_type == 'split_test':
+                split_sequences, split_test_errors = _make_split_test_data(sequence)
+                if split_sequences:
+                    sequences_data.extend(split_sequences)
+                section_errors.extend(split_test_errors)
+                continue
             section_errors.append(_error_for_not_sequence(section, sequence))
             continue
         # We need to check if there are duplicate sequences. If there are
@@ -264,50 +334,12 @@ def _make_section_data(section, unique_sequences):
             continue
         else:
             unique_sequences[sequence.location] = section
-        seq_user_partition_groups, error = _make_user_partition_groups(
-            sequence.location, sequence.group_access
-        )
-        if error:
-            section_errors.append(error)
 
-        # Bubble up User Partition Group settings from Units if appropriate.
-        sequence_upg_from_units = _bubbled_up_groups_from_units(
-            [unit.group_access for unit in sequence.get_children()]
-        )
-        for user_partition_id, group_ids in sequence_upg_from_units.items():
-            # If there's an existing user partition ID set at the sequence
-            # level, we respect it, even if it seems nonsensical. The hack of
-            # bubbling things up from the Unit level is only done if there's
-            # no conflicting value set at the Sequence level.
-            if user_partition_id not in seq_user_partition_groups:
-                section_errors.append(
-                    _make_bubbled_up_error(sequence.location, user_partition_id, group_ids)
-                )
-                seq_user_partition_groups[user_partition_id] = group_ids
-            else:
-                section_errors.append(
-                    _make_not_bubbled_up_error(
-                        sequence.location, sequence.group_access, user_partition_id, group_ids
-                    )
-                )
+        sequence_data, sequence_errors = _make_sequence_data(sequence)
 
-        sequences_data.append(
-            CourseLearningSequenceData(
-                usage_key=_remove_version_info(sequence.location),
-                title=sequence.display_name_with_default,
-                inaccessible_after_due=sequence.hide_after_due,
-                exam=ExamData(
-                    is_practice_exam=sequence.is_practice_exam,
-                    is_proctored_enabled=sequence.is_proctored_enabled,
-                    is_time_limited=sequence.is_time_limited,
-                ),
-                visibility=VisibilityData(
-                    hide_from_toc=sequence.hide_from_toc,
-                    visible_to_staff_only=sequence.visible_to_staff_only,
-                ),
-                user_partition_groups=seq_user_partition_groups,
-            )
-        )
+        if sequence_data:
+            sequences_data.append(sequence_data)
+        section_errors.extend(sequence_errors)
 
     section_data = CourseSectionData(
         usage_key=_remove_version_info(section.location),
