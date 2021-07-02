@@ -204,6 +204,44 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         assert errs[0].usage_key == seq_loc
         assert errs[1].usage_key == seq_loc
 
+    def test_split_test(self):
+        """
+        Test when the structure is Course -> Section -> Split Test -> Unit.
+        """
+
+        base_url_sequential = 'i4x://' + self.draft_course.org + '/' + self.course_key.course + '/sequential/'
+        # Course -> Section -> Unit (No Sequence)
+        with self.store.bulk_operations(self.course_key):
+            section_1 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section",
+            )
+            # This Unit should be skipped
+            split_test_1 = ItemFactory.create(
+                parent_location=section_1.location,
+                category='split_test',
+                display_name="st1",
+                user_partition_id='12',
+                group_id_to_child={"0": base_url_sequential + "split_test_cond0",
+                                   "1": base_url_sequential + "split_test_cond1"}
+            )
+            ItemFactory.create(
+                parent_location=split_test_1.location,
+                category='sequential',
+                display_name="split_test_cond0",
+            )
+            ItemFactory.create(
+                parent_location=split_test_1.location,
+                category='sequential',
+                display_name="split_test_cond1",
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        assert len(outline.sections) == 1
+        assert len(outline.sections[0].sequences) == 2
+        assert len(outline.sequences) == 2
+
     def test_unit_in_section(self):
         """
         Test when the structure is Course -> Section -> Unit.
