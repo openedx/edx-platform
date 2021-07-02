@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3088 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3096 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3090,7 +3090,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=873 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=875 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3101,7 +3101,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=888 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=889 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4026,6 +4026,30 @@ CREATE TABLE `enterprise_historicalenterprisecustomercatalog` (
   CONSTRAINT `enterprise_historica_history_user_id_31eab231_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_historicalenterprisecustomeruser`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_historicalenterprisecustomeruser` (
+  `id` int(11) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `linked` tinyint(1) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `enterprise_historica_history_user_id_22dafe08_fk_auth_user` (`history_user_id`),
+  KEY `enterprise_historicalenterprisecustomeruser_id_fa66f378` (`id`),
+  KEY `enterprise_historicalenterprisecustomeruser_user_id_6262547b` (`user_id`),
+  KEY `enterprise_historicalenterp_enterprise_customer_id_4b5807fa` (`enterprise_customer_id`),
+  CONSTRAINT `enterprise_historica_history_user_id_22dafe08_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_historicallicensedenterprisecourseenrollment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -4116,6 +4140,31 @@ CREATE TABLE `enterprise_historicalpendingenterprisecustomeruser` (
   KEY `enterprise_historicalpendingenterprisecustomeruser_id_3cf88198` (`id`),
   KEY `enterprise_historicalpendin_enterprise_customer_id_6c02ed95` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_historica_history_user_id_c491461b_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `enterprise_historicalsystemwideenterpriseuserroleassignment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `enterprise_historicalsystemwideenterpriseuserroleassignment` (
+  `id` int(11) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `enterprise_historica_history_user_id_628729af_fk_auth_user` (`history_user_id`),
+  KEY `enterprise_historicalsystem_id_56efe6ab` (`id`),
+  KEY `enterprise_historicalsystem_enterprise_customer_id_69fcca18` (`enterprise_customer_id`),
+  KEY `enterprise_historicalsystem_role_id_6931bef0` (`role_id`),
+  KEY `enterprise_historicalsystem_user_id_b184c15e` (`user_id`),
+  CONSTRAINT `enterprise_historica_history_user_id_628729af_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_licensedenterprisecourseenrollment`;
