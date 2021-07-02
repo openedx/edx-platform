@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from mock import Mock, call
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import GroupFactory, UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.applications.admin import adg_admin_site
 from openedx.adg.lms.webinars.admin import (
@@ -21,6 +21,7 @@ from openedx.adg.lms.webinars.admin import (
 )
 from openedx.adg.lms.webinars.constants import (
     SEND_UPDATE_EMAILS_FIELD,
+    WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP,
     WEBINAR_STATUS_CANCELLED,
     WEBINAR_STATUS_DELIVERED,
     WEBINAR_STATUS_UPCOMING
@@ -263,11 +264,18 @@ def test_save_model(webinar_admin_instance, request, webinar):
     assert Webinar.objects.get(id=webinar.id).title == 'Updated Title'
 
 
-def test_registration_webinar_admin_delete_permission():
+@pytest.mark.django_db
+def test_registration_webinar_admin_delete_permission(request):
     """
-    Test that admins do not have permission to delete webinar registrations
+    Test that only admins belonging to 'Delete Webinar Registrations' group have
+    permission to delete webinar registrations
     """
-    assert not WebinarRegistrationAdmin.has_delete_permission('self', Mock())
+    request.user = UserFactory()
+    assert not WebinarRegistrationAdmin.has_delete_permission('self', request)
+
+    webinar_delete_group = GroupFactory(name=WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP)
+    request.user.groups.add(webinar_delete_group)
+    assert WebinarRegistrationAdmin.has_delete_permission('self', request)
 
 
 @pytest.mark.django_db

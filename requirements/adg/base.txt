@@ -2,3 +2,4 @@ mailchimp3==3.0.14
 pytest-mock==3.3.1
 mandrill==1.0.59
 -e git+https://${PHILU_PAT}@github.com/philanthropy-u/edx-msp-assessment-xblock.git@${ADG_XBLOCKS_BRANCH}#egg=msp-assessment-xblock
+git+https://github.com/edx/AudioXBlock.git@f668a4e231c5cdc338eef6bd148e57a02b48200b#egg=audio-xblock
