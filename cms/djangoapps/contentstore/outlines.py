@@ -212,13 +212,17 @@ def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_i
     )
 
 
-def _make_sequence_data(sequence):
+def _make_sequence_data(sequence, sequence_group_access):
     sequence_errors = []
     seq_user_partition_groups, error = _make_user_partition_groups(
         sequence.location, sequence.group_access
     )
     if error:
         sequence_errors.append(error)
+
+    if sequence_group_access:
+        for part_id in sequence_group_access:
+            seq_user_partition_groups[part_id] = sequence_group_access[part_id]
 
     # Bubble up User Partition Group settings from Units if appropriate.
     sequence_upg_from_units = _bubbled_up_groups_from_units(
@@ -261,19 +265,19 @@ def _make_sequence_data(sequence):
 
 def _make_split_test_data(split_test):
     split_test_errors = []
-    sequences_data = []
+    split_test_data = []
+
     for sequence in split_test.get_children():
-        for group_id in split_test.group_id_to_child:
-            if split_test.group_id_to_child[group_id] == sequence.location:
-                sequence.group_access = {split_test.user_partition_id: group_id}
-        sequence_data, sequence_errors = _make_sequence_data(sequence)
-
+        sequence_group_access = {}
+        for group_id, child_loc_str in split_test.group_id_to_child.items():
+            if child_loc_str == sequence.location:
+                sequence_group_access[split_test.user_partition_id] = [int(group_id)]
+        sequence_data, sequence_errors = _make_sequence_data(sequence, sequence_group_access)
         if sequence_data:
-            sequences_data.append(sequence_data)
-
+            split_test_data.append(sequence_data)
         split_test_errors.extend(sequence_errors)
 
-    return sequences_data, split_test_errors
+    return split_test_data, split_test_errors
 
 
 def _make_section_data(section, unique_sequences):
@@ -317,9 +321,9 @@ def _make_section_data(section, unique_sequences):
     for sequence in section.get_children():
         if sequence.location.block_type not in valid_sequence_tags:
             if sequence.location.block_type == 'split_test':
-                split_sequences, split_test_errors = _make_split_test_data(sequence)
-                if split_sequences:
-                    sequences_data.extend(split_sequences)
+                split_test_sequences, split_test_errors = _make_split_test_data(sequence)
+                if split_test_sequences:
+                    sequences_data.extend(split_test_sequences)
                 section_errors.extend(split_test_errors)
                 continue
             section_errors.append(_error_for_not_sequence(section, sequence))
@@ -335,7 +339,7 @@ def _make_section_data(section, unique_sequences):
         else:
             unique_sequences[sequence.location] = section
 
-        sequence_data, sequence_errors = _make_sequence_data(sequence)
+        sequence_data, sequence_errors = _make_sequence_data(sequence, None)
 
         if sequence_data:
             sequences_data.append(sequence_data)
