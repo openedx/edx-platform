@@ -147,6 +147,10 @@ class DataTest(AuthorizedApiTest):
         assert not data['enabled']
         assert data['provider_type'] == 'legacy'
         assert data['providers']['available']['legacy'] == AVAILABLE_PROVIDER_MAP['legacy']
+        assert not [
+            name for name, spec in data['providers']['available'].items()
+            if "messages" not in spec
+        ], "Found available providers without messages field"
         assert data['lti_configuration'] == {}
         assert data['plugin_configuration'] == {
             'allow_anonymous': True,
