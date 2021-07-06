@@ -93,7 +93,7 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     Create a task to generate an allowlist certificate for this user in this course run.
     """
     if _can_generate_allowlist_certificate(user, course_key):
-        return _generate_certificate_task(user, course_key, generation_mode)
+        return _generate_certificate_task(user=user, course_key=course_key, generation_mode=generation_mode)
 
     status = _set_allowlist_cert_status(user, course_key)
     if status is not None:
@@ -108,7 +108,7 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     eligible and a certificate can be generated.
     """
     if _can_generate_v2_certificate(user, course_key):
-        return _generate_certificate_task(user, course_key, generation_mode)
+        return _generate_certificate_task(user=user, course_key=course_key, generation_mode=generation_mode)
 
     status = _set_v2_cert_status(user, course_key)
     if status is not None:

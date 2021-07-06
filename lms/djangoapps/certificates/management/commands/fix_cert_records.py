@@ -47,8 +47,8 @@ class Command(BaseCommand):
             course_id = cert.course_id
 
             _generate_certificate_task(
-                user,
-                course_id,
+                user=user,
+                course_key=course_id,
                 status=cert.status,
                 generation_mode='batch'
             )
