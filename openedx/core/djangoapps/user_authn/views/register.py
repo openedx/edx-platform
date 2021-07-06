@@ -13,7 +13,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
 from django.core.validators import ValidationError
 from django.db import transaction
-from django.dispatch import Signal
 from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -23,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
-from openedx_events.learning.data import StudentData, RegistrationData, UserProfileData
+from openedx_events.learning.data import StudentData, RegistrationFormData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from pytz import UTC
 from ratelimit.decorators import ratelimit
@@ -96,8 +95,6 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-# used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
 # .. toggle_name: registration.enable_failure_logging
@@ -254,16 +251,13 @@ def create_account_with_params(request, params):
         user=StudentData(
             username=user.username,
             email=user.email,
-            first_name=user.first_name,
-            last_name=user.last_name,
             is_active=user.is_active,
-            profile=UserProfileData(
-                meta=user.profile.meta,
-                name=user.profile.name,
-            )
+            meta=user.profile.meta,
+            name=user.profile.name,
         ),
-        registration=RegistrationData(
-            activation_key=registration.activation_key,
+        registration_form=RegistrationFormData(
+            account_form=form,
+            extension_form=custom_form,
         )
     )
 
