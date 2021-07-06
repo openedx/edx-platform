@@ -249,7 +249,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 parent_location=self.draft_course.location,
                 category='chapter',
                 display_name="Section_2",
-                children = [seq.location]
+                children=[seq.location]
             )
 
         self.store.update_item(section_2, self.user.id)
