@@ -1012,9 +1012,8 @@ pylint-plugin-utils==0.6
     #   pylint-django
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.txt
-pymongo==3.10.1
+pymongo==3.11.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
     #   event-tracking

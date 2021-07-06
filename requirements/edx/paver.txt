@@ -28,9 +28,8 @@ pbr==5.6.0
     # via stevedore
 psutil==5.8.0
     # via -r requirements/edx/paver.in
-pymongo==3.10.1
+pymongo==3.11.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
 python-memcached==1.59
