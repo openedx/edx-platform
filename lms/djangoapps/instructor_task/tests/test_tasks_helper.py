@@ -21,7 +21,6 @@ import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import UTC
 
@@ -30,7 +29,6 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
@@ -40,10 +38,7 @@ from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsec
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from lms.djangoapps.instructor_task.tasks_helper.certs import (
-    generate_students_certificates,
-    _invalidate_generated_certificates
-)
+from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import upload_may_enroll_csv, upload_students_csv
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
     ENROLLED_IN_COURSE,
@@ -2087,7 +2082,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(74):
+        with self.assertNumQueries(66):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
@@ -2485,28 +2480,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         }
 
         self.assertCertificatesGenerated(task_input, expected_results)
-
-    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
-    def test_invalidation_v2_certificates_enabled(self):
-        """
-        Test that ensures the bulk invalidation step (as part of bulk certificate regeneration) is skipped when the v2
-        certificates feature is enabled for a course run.
-        """
-        students = self._create_students(2)
-
-        for s in students:
-            GeneratedCertificateFactory.create(
-                user=s,
-                course_id=self.course.id,
-                status=CertificateStatuses.downloadable,
-                mode='verified'
-            )
-
-        _invalidate_generated_certificates(self.course.id, students, [CertificateStatuses.downloadable])
-
-        for s in students:
-            cert = GeneratedCertificate.objects.get(user=s, course_id=self.course.id)
-            assert cert.status == CertificateStatuses.downloadable
 
     def assertCertificatesGenerated(self, task_input, expected_results):
         """
