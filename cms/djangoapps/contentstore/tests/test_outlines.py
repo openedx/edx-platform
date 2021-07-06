@@ -229,7 +229,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 group_id_to_child={"0": base_url_sequential + "split_test_cond0",
                                    "1": base_url_sequential + "split_test_cond1"}
             )
-            ItemFactory.create(
+            seq = ItemFactory.create(
                 parent_location=split_test_1.location,
                 category='sequential',
                 display_name="split_test_cond0",
@@ -239,12 +239,33 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 category='sequential',
                 display_name="split_test_cond1",
             )
+            # This Unit should be skipped
+            ItemFactory.create(
+                parent_location=split_test_1.location,
+                category='vertical',
+                display_name="unit_1",
+            )
+            section_2 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section_2",
+                children = [seq.location]
+            )
+
+        self.store.update_item(section_2, self.user.id)
 
         outline, errs = get_outline_from_modulestore(self.course_key)
-        assert len(outline.sections) == 1
+        assert len(outline.sections) == 2
         assert len(outline.sections[0].sequences) == 2
+        assert len(outline.sections[1].sequences) == 0
         assert len(outline.sequences) == 2
-        assert len(errs) == 0
+        assert len(errs) == 2
+
+        # Version-less usage keys
+        unit_loc = self.course_key.make_usage_key('vertical', 'unit_1')
+        assert errs[0].usage_key == unit_loc
+        seq_loc = self.course_key.make_usage_key('sequential', 'split_test_cond0')
+        assert errs[1].usage_key == seq_loc
 
     def test_unit_in_section(self):
         """
