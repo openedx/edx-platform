@@ -272,7 +272,7 @@ def _make_sequence_data(sequence, sequence_group_access):
     return sequence_data, sequence_errors
 
 
-def _make_split_test_data(split_test):
+def _make_split_test_data(split_test, section, unique_sequences):
     """
     Return  a (SplitTestData, List[SplitTestErrorData]) from a SplitTestBlock.
 
@@ -281,8 +281,18 @@ def _make_split_test_data(split_test):
     """
     split_test_errors = []
     split_test_data = []
+    valid_sequence_tags = ['sequential', 'problemset', 'videosequence']
 
     for sequence in split_test.get_children():
+        if sequence.location.block_type not in valid_sequence_tags:
+            split_test_errors.append(_error_for_not_sequence(section, sequence))
+            continue
+        if sequence.location in unique_sequences:
+            original_section = unique_sequences[sequence.location]
+            split_test_errors.append(_error_for_duplicate_child(section, sequence, original_section))
+            continue
+        else:
+            unique_sequences[sequence.location] = section
         sequence_group_access = {}
         for group_id, child_loc_str in split_test.group_id_to_child.items():
             if child_loc_str == sequence.location:
@@ -340,7 +350,7 @@ def _make_section_data(section, unique_sequences):
             # return the sequences ans the sequences' children to add to the
             # other sequences.
             if sequence.location.block_type == 'split_test':
-                split_test_sequences, split_test_errors = _make_split_test_data(sequence)
+                split_test_sequences, split_test_errors = _make_split_test_data(sequence, section, unique_sequences)
                 if split_test_sequences:
                     sequences_data.extend(split_test_sequences)
                 section_errors.extend(split_test_errors)
