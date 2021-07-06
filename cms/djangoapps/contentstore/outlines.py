@@ -213,6 +213,15 @@ def _make_not_bubbled_up_error(seq_usage_key, seq_group_access, user_partition_i
 
 
 def _make_sequence_data(sequence, sequence_group_access):
+    """
+    Return  a (SequenceData, List[SequenceErrorData]) from a SequnceBlock.
+
+    This method formats SequenceBlocks so they can be added to CourseSectionData.
+    The SequenceData formats the data so that it  willbe more readable for
+    partner support and also attaches the units (children of sequences) to the
+    correct SequenceBlock.
+
+    """
     sequence_errors = []
     seq_user_partition_groups, error = _make_user_partition_groups(
         sequence.location, sequence.group_access
@@ -264,6 +273,12 @@ def _make_sequence_data(sequence, sequence_group_access):
 
 
 def _make_split_test_data(split_test):
+    """
+    Return  a (SplitTestData, List[SplitTestErrorData]) from a SplitTestBlock.
+
+    This method renders the SplitTestBlock into its subcomponents (SequenceBlocks)
+    so that it can be used added to CourseSectionData.
+    """
     split_test_errors = []
     split_test_data = []
 
@@ -320,6 +335,10 @@ def _make_section_data(section, unique_sequences):
 
     for sequence in section.get_children():
         if sequence.location.block_type not in valid_sequence_tags:
+            # We need to check if the current sequence is a Split Test block. If
+            # the sequence is a Split Test, the block will read through and will
+            # return the sequences ans the sequences' children to add to the
+            # other sequences.
             if sequence.location.block_type == 'split_test':
                 split_test_sequences, split_test_errors = _make_split_test_data(sequence)
                 if split_test_sequences:

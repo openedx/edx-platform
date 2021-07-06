@@ -206,18 +206,21 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
 
     def test_split_test(self):
         """
-        Test when the structure is Course -> Section -> Split Test -> Unit.
+        Test when the structure is Course -> Section -> Split Test -> Sequence.
+
+        Studio disallows this, but it's possible to craft with the older Course
+        Blocks API. This type of structure creates A/B testing and should be
+        split in the course outline.
         """
 
         base_url_sequential = 'i4x://' + self.draft_course.org + '/' + self.course_key.course + '/sequential/'
-        # Course -> Section -> Unit (No Sequence)
+        # Course -> Section -> SpliTest -> Sequence
         with self.store.bulk_operations(self.course_key):
             section_1 = ItemFactory.create(
                 parent_location=self.draft_course.location,
                 category='chapter',
                 display_name="Section",
             )
-            # This Unit should be skipped
             split_test_1 = ItemFactory.create(
                 parent_location=section_1.location,
                 category='split_test',
@@ -241,6 +244,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         assert len(outline.sections) == 1
         assert len(outline.sections[0].sequences) == 2
         assert len(outline.sequences) == 2
+        assert len(errs) == 0
 
     def test_unit_in_section(self):
         """
