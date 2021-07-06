@@ -36,6 +36,19 @@ def test_webinar_registration_view_cancelled_webinar(client, user_client):
     assert response.status_code == HTTP_500_INTERNAL_SERVER_ERROR
 
 
+def test_webinar_registration_view_not_published_webinar(client, user_client, draft_webinar):
+    """
+    Test webinar registration if webinar is not published
+    """
+    _, client = user_client
+
+    response = client.post(
+        reverse('webinars_api:webinar_registration', kwargs={'pk': draft_webinar.id, 'action': 'register'})
+    )
+
+    assert response.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+
+
 @pytest.mark.parametrize('action', ['register', 'cancel'])
 def test_webinar_registration_view_register_user_with_no_prior_registration(action, user_client, webinar, mocker):
     """

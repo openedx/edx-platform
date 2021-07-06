@@ -15,6 +15,7 @@ WEBINAR_TIME_FORMAT = '%I:%M %p AST'
 WEBINAR_DEFAULT_TIME_ZONE = 'Asia/Riyadh'
 
 WEBINAR_STATUS_CANCELLED = _('Cancelled')
+WEBINAR_STATUS_DRAFT = _('Draft')
 WEBINAR_STATUS_DELIVERED = _('Delivered')
 WEBINAR_STATUS_UPCOMING = _('Upcoming')
 
@@ -24,3 +25,8 @@ SEND_UPDATE_EMAILS_FIELD = 'send_update_emails'
 UTC_TIMEZONE_HELP_TEXT = _('Please add the time in UTC timezone.')
 
 WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP = 'Delete Webinar Registrations'
+
+WEBINAR_PUBLISHED_HELPTEXT = _(
+    'If you publish the webinar, email invitations will be sent to all the added recipients and learners will be '
+    'able to see the webinar and register themselves in it.'
+)

@@ -13,6 +13,7 @@ from openedx.adg.lms.webinars.constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, 
 from openedx.adg.lms.webinars.helpers import (
     cancel_all_reminders,
     cancel_reminders_for_given_webinars,
+    extract_emails_from_string,
     get_newly_added_and_removed_team_members,
     get_webinar_description_link,
     get_webinar_invitees_emails,
@@ -163,7 +164,7 @@ def test_validate_email_list(emails, expected_error):
     """
     Test if 'validate_email_list' returns error when emails are invalid
     """
-    assert validate_email_list(emails)[0] == expected_error
+    assert validate_email_list(emails) == expected_error
 
 
 @pytest.mark.django_db
@@ -277,6 +278,20 @@ def test_cancel_all_reminders(msg_id, msg_id_field_name, webinar_registration, m
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize('emails_string, expected_emails', [
+    ('', []),
+    ('  test1@email.com  ', ['test1@email.com']),
+    ('test1@email.com,test2@email.com', ['test1@email.com', 'test2@email.com'])
+], ids=['no_email_input', 'email_with_extra_spaces_input', 'multiple_emails_input'])
+def test_extract_emails_from_string(emails_string, expected_emails):
+    """
+    Tests that the `extract_emails_from_string` returns the email addresses in a list correctly
+    """
+    actual_emails = extract_emails_from_string(emails_string)
+    assert actual_emails == expected_emails
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize('invite_all_platform_users', [True, False])
 def test_get_webinar_invitees_emails(invite_all_platform_users, webinar):
     """
@@ -287,7 +302,7 @@ def test_get_webinar_invitees_emails(invite_all_platform_users, webinar):
     mock_webinar_form = Mock()
     mock_webinar_form.instance = webinar
     mock_webinar_form.cleaned_data = {
-        'invites_by_email_address': ['guest1@email.com', 'guest2@email.com'],
+        'invites_by_email_address': 'guest1@email.com, guest2@email.com',
         'invite_all_platform_users': invite_all_platform_users
     }
 

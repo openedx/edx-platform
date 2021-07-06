@@ -45,6 +45,9 @@ class WebinarRegistrationView(APIView):
         if webinar.is_cancelled:
             return HttpResponseServerError(_('Webinar has been cancelled'))
 
+        if not webinar.is_published:
+            return HttpResponseServerError(_('Webinar has not been published yet'))
+
         is_registering = action == 'register'
         user = request.user
 

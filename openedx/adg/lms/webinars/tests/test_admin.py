@@ -24,11 +24,12 @@ from openedx.adg.lms.webinars.constants import (
     WEBINAR_REGISTRATION_DELETE_PERMISSION_GROUP,
     WEBINAR_STATUS_CANCELLED,
     WEBINAR_STATUS_DELIVERED,
+    WEBINAR_STATUS_DRAFT,
     WEBINAR_STATUS_UPCOMING
 )
 from openedx.adg.lms.webinars.models import CancelledWebinar, Webinar, WebinarRegistration
 
-from .factories import WebinarFactory, WebinarRegistrationFactory
+from .factories import WebinarFactory
 
 
 @pytest.fixture(name='cancelled_webinar_admin')
@@ -116,13 +117,14 @@ def test_non_cancelled_webinar_admin_get_queryset(webinar_statuses, expected_web
 
 
 @pytest.mark.django_db
-def test_webinar_admin_webinar_status(webinar, delivered_webinar, cancelled_webinar, webinar_admin):
+def test_webinar_admin_webinar_status(webinar, delivered_webinar, cancelled_webinar, draft_webinar, webinar_admin):
     """
     Test if the WebinarAdmin has correct status
     """
     assert webinar_admin.webinar_status(webinar) == WEBINAR_STATUS_UPCOMING
     assert webinar_admin.webinar_status(delivered_webinar) == WEBINAR_STATUS_DELIVERED
     assert webinar_admin.webinar_status(cancelled_webinar) == WEBINAR_STATUS_CANCELLED
+    assert webinar_admin.webinar_status(draft_webinar) == WEBINAR_STATUS_DRAFT
 
 
 @pytest.mark.django_db
@@ -171,34 +173,69 @@ def test_send_update_emails_to_registrants_in_webinar_update(webinar_admin_insta
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('update', (True, False))
-def test_save_related_send_emails(request, webinar_admin_instance, webinar, mocker, update):
+@pytest.mark.parametrize('is_update, is_already_published, is_set_to_be_published', [
+    (False, False, False),
+    (False, False, True),
+    (True, False, True),
+    (True, True, True)
+])
+def test_save_related_send_emails(
+    request, webinar_admin_instance, mocker, is_update, is_already_published, is_set_to_be_published
+):
     """
-    Test that upon creating/updating webinar, emails for invites/updated invites are sent.
+    Test that when a webinar is created or updated, emails are only sent when a webinar is published.
+    No webinar email is sent for a non-published webinar.
     """
     mock_send_webinar_emails = mocker.patch('openedx.adg.lms.webinars.admin.send_webinar_emails')
     mock_form_class = mocker.patch('openedx.adg.lms.webinars.forms.WebinarForm')
-
     mock_get_webinar_invitees_emails = mocker.patch('openedx.adg.lms.webinars.admin.get_webinar_invitees_emails')
-    mock_get_webinar_invitees_emails.return_value = ['test@email.com']
+    mock_get_webinar_invitees_emails.return_value = []
 
     request.method = 'POST'
-    mock_form_class.instance = webinar
 
-    if update:
-        user = UserFactory()
-        WebinarRegistrationFactory(user=user, webinar=webinar)
-        WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
-        mock_send_webinar_emails.assert_has_calls([
-            call(MandrillClient.WEBINAR_UPDATED, webinar, [user.email]),
-            call(MandrillClient.WEBINAR_CREATED, webinar, ['test@email.com'])
-        ])
+    presenter = UserFactory()
+    old_webinar = WebinarFactory(is_published=is_already_published, presenter=presenter)
+    webinar_admin_instance.old_webinar = old_webinar
+
+    new_webinar = WebinarFactory(is_published=is_set_to_be_published, presenter=presenter)
+    mock_form_class.instance = new_webinar
+
+    if is_update and is_already_published:
+        mock_get_webinar_invitees_emails.return_value = ['test@email.com']
+
+    WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], is_update)
+
+    if is_update:
+        if is_set_to_be_published and is_already_published:
+            mock_send_webinar_emails.assert_has_calls([
+                call(MandrillClient.WEBINAR_CREATED, new_webinar, ['test@email.com'])
+            ])
+        else:
+            mock_send_webinar_emails.assert_has_calls([
+                call(MandrillClient.WEBINAR_CREATED, new_webinar, [presenter.email])
+            ])
     else:
-        WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
-        expected_invitee_emails = list({'test@email.com', webinar.presenter.email})
-        mock_send_webinar_emails.assert_called_once_with(
-            MandrillClient.WEBINAR_CREATED, webinar, expected_invitee_emails
-        )
+        if is_set_to_be_published:
+            mock_send_webinar_emails.assert_has_calls([
+                call(MandrillClient.WEBINAR_CREATED, new_webinar, [presenter.email])
+            ])
+        else:
+            mock_send_webinar_emails.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('is_published', (False, True))
+def test_is_published_flag_turns_readonly_after_being_set(request, webinar_admin, mocker, is_published):
+    """
+    Tests that the `is_published` flag, once set, becomes read-only
+    """
+    webinar = WebinarFactory(is_published=is_published)
+    readonly_fields = webinar_admin.get_readonly_fields(request, obj=webinar)
+
+    if is_published:
+        assert 'is_published' in readonly_fields
+    else:
+        assert 'is_published' not in readonly_fields
 
 
 def test_readonly_user_admin_change_permission(readonly_user_admin):

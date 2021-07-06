@@ -27,6 +27,7 @@ class WebinarFactory(factory.DjangoModelFactory):
     start_time = now() + timedelta(hours=1)
     end_time = now() + timedelta(hours=2)
     created_by = factory.SubFactory(UserFactory)
+    is_published = True
 
 
 class WebinarRegistrationFactory(factory.DjangoModelFactory):
