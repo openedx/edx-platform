@@ -8,6 +8,7 @@
 # Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021
 # Munam Mubashir <munam.mubashir@arbisoft.com>, 2021
 # Anas Usman <anas.usman@arbisoft.com>, 2021
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
@@ -61,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-07-05 08:24+0000\n"
+"POT-Creation-Date: 2021-07-06 08:12+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9914,6 +9915,10 @@ msgstr ""
 
 #: openedx/adg/lms/branding_extension/helpers.py
 msgid "Support"
+msgstr ""
+
+#: openedx/adg/lms/branding_extension/helpers.py
+msgid "FAQs"
 msgstr ""
 
 #: openedx/adg/lms/branding_extension/helpers.py
@@ -21100,7 +21105,7 @@ msgid "Currently only open to Saudi nationals"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/index.html
-msgid "You must be between the ages of 21 and 60"
+msgid "You must be between the ages of {minimum_age} and {maxmimum_age}"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/index.html
@@ -21251,7 +21256,7 @@ msgstr ""
 msgid ""
 "In order to be eligible for the program, you must be a Saudi National "
 "between the ages of {minimum_age} - {maxmimum_age} and have a high school "
-"diploma or GED."
+"diploma."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
@@ -21576,7 +21581,9 @@ msgid "Additional Learning"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/courses.html
-msgid "For more courses, check out our partner "
+msgid ""
+"If you are interested to take further courses to learn more about how to "
+"launch and run your own business, check out our partner "
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/courses.html
