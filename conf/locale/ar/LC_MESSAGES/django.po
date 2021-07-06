@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-06-29 06:49+0000\n"
+"POT-Creation-Date: 2021-07-05 08:24+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -10282,6 +10282,14 @@ msgstr ""
 msgid "Webinar has been cancelled"
 msgstr ""
 
+#: openedx/adg/lms/webinars/api/views.py
+msgid "Webinar has not been published yet"
+msgstr "لم يجرِ اختيار مكتبة معيّنة بعد."
+
+#: openedx/adg/lms/webinars/constants.py
+msgid "Draft"
+msgstr ""
+
 #: openedx/adg/lms/webinars/constants.py
 msgid "Delivered"
 msgstr ""
@@ -10294,13 +10302,11 @@ msgstr "قريبًا"
 msgid "Please add the time in UTC timezone."
 msgstr ""
 
-#: openedx/adg/lms/webinars/forms.py
-msgid "Add guests by email address"
-msgstr ""
-
-#: openedx/adg/lms/webinars/forms.py
+#: openedx/adg/lms/webinars/constants.py
 msgid ""
-"Add comma separated emails e.g. example1@domain.com,example2@domain.com"
+"If you publish the webinar, email invitations will be sent to all the added "
+"recipients and learners will be able to see the webinar and register "
+"themselves in it."
 msgstr ""
 
 #: openedx/adg/lms/webinars/forms.py
@@ -10350,8 +10356,21 @@ msgid "Panelists"
 msgstr ""
 
 #: openedx/adg/lms/webinars/models.py
+msgid "Add guests by email address"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid ""
+"Add comma separated emails e.g. example1@domain.com,example2@domain.com"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
 msgid "Is Event Cancelled"
 msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Publish Webinar"
+msgstr "اسم المستخدم"
 
 #: openedx/adg/lms/webinars/models.py
 msgid "Created By"
