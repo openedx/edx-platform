@@ -923,7 +923,7 @@ class CourseOverview(TimeStampedModel):
         certificates_display_behavior = course.certificates_display_behavior
         certificate_available_date = course.certificate_available_date
 
-        if certificates_display_behavior == "" and certificate_available_date:
+        if certificate_available_date:
             certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
 
         if not CertificatesDisplayBehaviors.includes_value(certificates_display_behavior):
