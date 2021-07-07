@@ -48,8 +48,6 @@ class CourseDetails:
         self.end_date = None  # 'end'
         self.enrollment_start = None
         self.enrollment_end = None
-        self.certificate_available_date = None
-        self.certificates_display_behavior = None
         self.syllabus = None  # a pdf file asset
         self.title = ""
         self.subtitle = ""
@@ -110,8 +108,7 @@ class CourseDetails:
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
         course_details.end_date = course_descriptor.end
-        course_details.certificate_available_date = course_descriptor.certificate_available_date
-        course_details.certificates_display_behavior = course_descriptor.certificates_display_behavior
+        course_details.certificate_available_date = course_descriptor.certificate_available_date  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
@@ -246,13 +243,6 @@ class CourseDetails:
         if converted != descriptor.certificate_available_date:
             dirty = True
             descriptor.certificate_available_date = converted
-
-        if (
-            'certificates_display_behavior' in jsondict
-            and jsondict['certificates_display_behavior'] != descriptor.certificates_display_behavior
-        ):
-            descriptor.certificates_display_behavior = jsondict['certificates_display_behavior']
-            dirty = True
 
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']

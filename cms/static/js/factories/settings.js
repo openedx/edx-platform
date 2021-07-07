@@ -13,12 +13,6 @@ define([
                 $('label').removeClass('is-focused');
             });
 
-        // Toggle collapsibles when trigger is clicked
-        $(".collapsible .collapsible-trigger").click(function() {
-            const contentId = this.id.replace("-trigger", "-content")
-            $(`#${contentId}`).toggleClass("collapsed")
-        })
-
         model = new CourseDetailsModel();
         model.urlRoot = detailsUrl;
         model.showCertificateAvailableDate = showCertificateAvailableDate;

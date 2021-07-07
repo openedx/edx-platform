@@ -14,8 +14,6 @@ from math import exp
 import dateutil.parser
 from pytz import utc
 
-from xmodule.data import CertificatesDisplayBehaviors
-
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
 
 """
@@ -158,18 +156,15 @@ def may_certify_for_course(
         self_paced (bool): Whether the course is self-paced.
     """
     show_early = (
-        certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO
+        certificates_display_behavior in ('early_with_info', 'early_no_info')
         or certificates_show_before_end
     )
     past_available_date = (
-        certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-        and certificate_available_date
+        certificate_available_date
         and certificate_available_date < datetime.now(utc)
     )
-    ended_without_available_date = (
-        certificates_display_behavior == CertificatesDisplayBehaviors.END
-        and has_ended
-    )
+    ended_without_available_date = (certificate_available_date is None) and has_ended
+
     return any((self_paced, show_early, past_available_date, ended_without_available_date))
 
 

@@ -21,8 +21,7 @@ define([
                 end_date: '2014-11-05T20:00:00Z',
                 enrollment_start: '2014-10-00T00:00:00Z',
                 enrollment_end: '2014-11-05T00:00:00Z',
-                certificates_display_behavior: 'end',
-                certificate_available_date: null,
+                certificate_available_date: '2014-11-05T20:00:00Z',
                 org: '',
                 course_id: '',
                 run: '',
@@ -352,8 +351,6 @@ define([
         });
         it('should disallow save with a certificate available date before end date', function() {
             this.model.showCertificateAvailableDate = true;
-            $('#certificates-display-behavior').val('end_with_date').trigger('change');
-            $('#certificate-available-date').val('01/01/2020').trigger('change');
             $('#course-end-date').val('01/01/2030').trigger('change');
             expect(this.view.$('.message-error')).toExist();
         });
