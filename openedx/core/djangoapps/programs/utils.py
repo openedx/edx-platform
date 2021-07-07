@@ -27,6 +27,7 @@ from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.api import should_certificate_be_visible
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.utils import (
@@ -455,7 +456,6 @@ class ProgramProgressMeter:
                     course_overview.certificate_available_date,
                     course_overview.self_paced
                 )
-
             if (
                 CertificateStatuses.is_passing_status(certificate['status'])
                 and may_certify

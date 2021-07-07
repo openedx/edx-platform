@@ -33,6 +33,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -572,7 +573,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         assert overviews_by_id[old_overview.id].id == old_overview.id
         assert overviews_by_id[non_existent_course_key] is None
         assert mock_load_from_modulestore.call_count == 3
-
 
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):

@@ -47,6 +47,7 @@ from lms.djangoapps.certificates.utils import (
     certificate_status_for_student as _certificate_status_for_student,
 )
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger("edx.certificate")
@@ -580,7 +581,22 @@ def get_certificate_footer_context():
 def certificates_viewable_for_course(course):
     """
     Returns True if certificates are viewable for any student enrolled in the course, False otherwise.
+
+    Arguments:
+        course (CourseOverview or course descriptor): The course to check if certificates are viewable
+
+    Returns:
+        boolean: whether the certificates are viewable or not
     """
+
+    # The CourseOverview contains validation logic on the certificates_display_behavior and certificate_available_date
+    # fields. Thus, we prefer to use the CourseOverview, but will fall back to the course in case the CourseOverview is
+    # not available.
+    if not isinstance(course, CourseOverview):
+        course_overview = get_course_overview_or_none(course.id)
+        if course_overview:
+            course = course_overview
+
     if course.self_paced:
         return True
     if (

@@ -144,7 +144,6 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         assert not self.future_show_certs_no_info.has_ended()
         assert not self.future_noshow_certs.has_ended()
 
-
 class CourseSummaryHasEnded(unittest.TestCase):
     """ Test for has_ended method when end date is missing timezone information. """
 
