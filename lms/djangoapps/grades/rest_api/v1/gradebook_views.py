@@ -282,11 +282,11 @@ class CourseGradingView(BaseCourseView):
                 'assignment_types': self._get_assignment_types(course),
                 'subsections': self._get_subsections(course, graded_only),
                 'grades_frozen': are_grades_frozen(course_key),
-                'can_see_bulk_management': self._can_see_bulk_management(course_key),
+                'can_see_bulk_management': self.can_see_bulk_management(course_key),
             }
             return Response(results)
 
-    def _can_see_bulk_management(self, course_key):
+    def can_see_bulk_management(self, course_key):
         """
         Whether or not to show bulk management for this course. Currently, if a course has a
         master's track or is enabled with the grades.bulk_management course waffle flag.
