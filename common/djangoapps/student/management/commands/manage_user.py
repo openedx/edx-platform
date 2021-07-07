@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from edx_django_utils.management.user.manage_user import manage_user
 
 # from django.db import transaction
-# from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
