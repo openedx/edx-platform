@@ -131,6 +131,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
 
         user_application_hub.is_prerequisite_courses_passed = are_pre_req_courses_completed
         user_application_hub.is_bu_prerequisite_courses_passed = are_bu_courses_completed
+        user_application_hub.save()
 
         messages = get_application_hub_instructions(
             user_application_hub,
