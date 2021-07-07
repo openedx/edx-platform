@@ -3145,7 +3145,10 @@ INSTALLED_APPS = [
     'lms.djangoapps.bulk_user_retirement',
 
     # Agreements
-    'openedx.core.djangoapps.agreements'
+    'openedx.core.djangoapps.agreements',
+
+    # edx-django-utils
+    'edx_django_utils'
 ]
 
 ######################### CSRF #########################################

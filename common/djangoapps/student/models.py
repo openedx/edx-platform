@@ -828,6 +828,15 @@ def user_post_save_callback(sender, **kwargs):
                         enrollment
                     )
 
+    # Ensure the user has a profile when run via management command
+    _called_by_management_command = getattr(user, '_called_by_management_command', None)
+    if _called_by_management_command and kwargs['created']:
+        try:
+            __ = user.profile
+        except UserProfile.DoesNotExist:
+            UserProfile.objects.create(user=user)
+            log.info('Created new profile for user: %s', user)
+
     # Because `emit_field_changed_events` removes the record of the fields that
     # were changed, wait to do that until after we've checked them as part of
     # the condition on whether we want to check for automatic enrollments.

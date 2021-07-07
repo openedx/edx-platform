@@ -12,6 +12,17 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.0.2#egg=django-wiki
     # via -r requirements/edx/github.in
+-e git+https://github.com/edx/edx-django-utils.git@64210a9a0b69388c6bf602f87906e779d15aba33#egg=edx-django-utils
+    # via
+    #   -r requirements/edx/github.in
+    #   django-config-models
+    #   edx-drf-extensions
+    #   edx-enterprise
+    #   edx-rest-api-client
+    #   edx-toggles
+    #   edx-when
+    #   ora2
+    #   super-csv
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
@@ -684,10 +695,8 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.11
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+ora2==3.6.14
+    # via -r requirements/edx/base.in
 packaging==21.0
     # via
     #   bleach

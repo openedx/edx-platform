@@ -1615,6 +1615,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # edx-django-utils
+    'edx_django_utils',
 ]
 
 
