@@ -50,6 +50,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -81,6 +82,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             number='run1',
             display_name='refundable course',
             certificate_available_date=datetime.datetime.today() - datetime.timedelta(days=1),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(

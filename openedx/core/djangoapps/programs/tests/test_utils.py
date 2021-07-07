@@ -51,6 +51,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
@@ -499,7 +500,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
             end=two_days_ago,
             self_paced=False,
             certificate_available_date=tomorrow,
-            certificates_display_behavior='end'
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         third_course_run_key = str(course3.id)
 
@@ -607,6 +608,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         # 3 certs, all available, program cert in the past/now
         course3_overview = CourseOverview.get_from_id(course3.id)
         course3_overview.certificate_available_date = yesterday
+        course3_overview.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
         course3_overview.save()
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
@@ -622,7 +624,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
     def test_old_course_runs(self, mock_get_programs):
         """
         Test that old course runs may exist for a program which do not exist in LMS.
-        In that case, continue considering the course run to've been failed by the learner
+        In that case, continue considering the course run to have been failed by the learner
         """
         course_run = CourseRunFactory.create()
         course = CourseFactory.create(course_runs=[course_run])

@@ -49,6 +49,7 @@ from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, v
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from xmodule.data import CertificatesDisplayBehaviors
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -511,14 +512,17 @@ def _cert_info(user, course_overview, cert_status):
     is_hidden_status = status in ('processing', 'generating', 'notpassing', 'auditing')
 
     if (
-        not certificates_viewable_for_course(course_overview) and
-        CertificateStatuses.is_passing_status(status) and
-        course_overview.certificate_available_date
+        not certificates_viewable_for_course(course_overview)
+        and CertificateStatuses.is_passing_status(status)
+        and course_overview.certificates_display_behavior in (
+            CertificatesDisplayBehaviors.END_WITH_DATE,
+            CertificatesDisplayBehaviors.END
+        )
     ):
         status = certificate_earned_but_not_available_status
 
     if (
-        course_overview.certificates_display_behavior == 'early_no_info' and
+        course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO and
         is_hidden_status
     ):
         return default_info
