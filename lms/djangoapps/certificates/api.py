@@ -47,7 +47,6 @@ from lms.djangoapps.certificates.utils import (
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -268,7 +267,6 @@ def certificate_downloadable_status(student, course_key):
     if (
         not certificates_viewable_for_course(course_overview) and
         CertificateStatuses.is_passing_status(current_status['status']) and
-        course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE and
         course_overview.certificate_available_date
     ):
         response_data['earned_but_not_available'] = True
@@ -596,18 +594,17 @@ def certificates_viewable_for_course(course):
     if course.self_paced:
         return True
     if (
-        course.certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO
+        course.certificates_display_behavior in ('early_with_info', 'early_no_info')
         or course.certificates_show_before_end
     ):
         return True
     if (
-        course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-        and course.certificate_available_date
+        course.certificate_available_date
         and course.certificate_available_date <= datetime.now(UTC)
     ):
         return True
     if (
-        course.certificates_display_behavior == CertificatesDisplayBehaviors.END
+        course.certificate_available_date is None
         and course.has_ended()
     ):
         return True

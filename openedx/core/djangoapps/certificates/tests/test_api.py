@@ -11,11 +11,10 @@ from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.certificates import api
 from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.data import CertificatesDisplayBehaviors
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 # TODO: Copied from lms.djangoapps.certificates.models,
@@ -168,7 +167,6 @@ class CertificatesApiTestCase(TestCase):
 
             # With an available date set in the past, both return the available date (if configured)
             self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
-            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
             assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)
             assert maybe_avail == api.display_date_for_certificate(self.course, self.certificate)

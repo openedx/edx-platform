@@ -22,7 +22,6 @@ from lms.djangoapps.certificates.tests.factories import (
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.data import CertificatesDisplayBehaviors
 
 # pylint: disable=no-member
 
@@ -41,7 +40,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory()
-        cls.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+        cls.course.certificates_display_behavior = "early_with_info"
 
         with cls.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, cls.course.id):
             cls.store.update_item(cls.course, cls.USERNAME)
@@ -117,54 +116,40 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+        cls.course.certificates_display_behavior = "end"
         cls.course.save()
         cls.store.update_item(cls.course, cls.USERNAME)
 
-    def _check_message(self, visible_date):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _check_message(self, certificate_available_date):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.client.get(reverse('dashboard'))
         test_message = 'Your grade and certificate will be ready after'
-
-        is_past = visible_date < datetime.datetime.now(UTC)
-
-        if is_past:
+        if certificate_available_date is None:
             self.assertNotContains(response, test_message)
             self.assertNotContains(response, "View Test_Certificate")
-            self._check_can_download_certificate()
-
-        else:
+        elif datetime.datetime.now(UTC) < certificate_available_date:
             self.assertContains(response, test_message)
             self.assertNotContains(response, "View Test_Certificate")
+        else:
+            self._check_can_download_certificate()
 
-    @ddt.data(
-        (CertificatesDisplayBehaviors.END, True),
-        (CertificatesDisplayBehaviors.END, False),
-        (CertificatesDisplayBehaviors.END_WITH_DATE, True),
-        (CertificatesDisplayBehaviors.END_WITH_DATE, False)
-    )
-    @ddt.unpack
-    def test_certificate_available_date(self, certificates_display_behavior, past_date):
+    @ddt.data(True, False, None)
+    def test_certificate_available_date(self, past_certificate_available_date):
         cert = self._create_certificate('verified')
         cert.status = CertificateStatuses.downloadable
         cert.save()
 
-        self.course.certificates_display_behavior = certificates_display_behavior
+        if past_certificate_available_date is None:
+            certificate_available_date = None
+        elif past_certificate_available_date:
+            certificate_available_date = PAST_DATE
+        elif not past_certificate_available_date:
+            certificate_available_date = FUTURE_DATE
 
-        if certificates_display_behavior == CertificatesDisplayBehaviors.END:
-            if past_date:
-                self.course.end = PAST_DATE
-            else:
-                self.course.end = FUTURE_DATE
-        if certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE:
-            if past_date:
-                self.course.certificate_available_date = PAST_DATE
-            else:
-                self.course.certificate_available_date = FUTURE_DATE
-
+        self.course.certificate_available_date = certificate_available_date
         self.course.save()
         self.store.update_item(self.course, self.USERNAME)
 
-        self._check_message(PAST_DATE if past_date else FUTURE_DATE)
+        self._check_message(certificate_available_date)
 
 
 @ddt.ddt

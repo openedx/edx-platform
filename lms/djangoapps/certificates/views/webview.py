@@ -50,7 +50,6 @@ from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
@@ -333,14 +332,8 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     if preview_mode:
         # certificate is being previewed from studio
         if request.user.has_perm(PREVIEW_CERTIFICATES, course):
-            if (
-                course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-                and course.certificate_available_date
-                and not course.self_paced
-            ):
+            if course.certificate_available_date and not course.self_paced:
                 modified_date = course.certificate_available_date
-            elif course.certificates_display_behavior == CertificatesDisplayBehaviors.END:
-                modified_date = course.end
             else:
                 modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
