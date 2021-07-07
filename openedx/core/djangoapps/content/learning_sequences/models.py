@@ -180,6 +180,9 @@ class UserPartitionGroup(models.Model):
     group_id = models.BigIntegerField(null=False)
 
     class Meta:
+        unique_together = [
+            ['partition_id', 'group_id'],
+        ]
         indexes = [
             models.Index(fields=['partition_id', 'group_id']),
         ]
