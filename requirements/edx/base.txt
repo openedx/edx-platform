@@ -158,7 +158,7 @@ defusedxml==0.7.1
     #   python3-saml
     #   safe-lxml
     #   social-auth-core
-django==2.2.24
+django==3.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
