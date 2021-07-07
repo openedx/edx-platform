@@ -12,12 +12,10 @@ from lms.djangoapps.certificates.generation_handler import (
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
     _can_generate_v2_certificate,
-    can_generate_certificate_task,
     generate_allowlist_certificate_task,
     generate_certificate_task,
     generate_regular_certificate_task,
     is_on_certificate_allowlist,
-    is_using_v2_course_certificates,
     _set_allowlist_cert_status,
     _set_v2_cert_status
 )
@@ -145,7 +143,6 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         Test handling of a valid user/course run combo for the general (non-allowlist) generation methods
         """
-        assert can_generate_certificate_task(self.user, self.course_run_key)
         assert generate_certificate_task(self.user, self.course_run_key)
 
     def test_can_generate_not_verified(self):
@@ -298,7 +295,6 @@ class CertificateTests(ModuleStoreTestCase):
         Test handling of a valid user/course run combo.
         """
         assert _can_generate_v2_certificate(self.user, self.course_run_key)
-        assert can_generate_certificate_task(self.user, self.course_run_key)
         assert generate_certificate_task(self.user, self.course_run_key)
 
     def test_handle_valid_task(self):
@@ -372,12 +368,6 @@ class CertificateTests(ModuleStoreTestCase):
             assert _set_v2_cert_status(different_user, self.course_run_key) == CertificateStatuses.notpassing
             assert generate_regular_certificate_task(different_user, self.course_run_key) is True
             assert not _can_generate_v2_certificate(different_user, self.course_run_key)
-
-    def test_is_using_updated_true(self):
-        """
-        Test the updated flag
-        """
-        assert is_using_v2_course_certificates(self.course_run_key)
 
     @ddt.data(
         (CertificateStatuses.deleted, True),

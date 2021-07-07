@@ -23,7 +23,6 @@ from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
-    can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
     is_on_certificate_allowlist as _is_on_certificate_allowlist,
@@ -207,17 +206,6 @@ def generate_user_certificates(student, course_key, insecure=False, generation_m
 
 def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
     return _regenerate_user_certificates(student, course_key, forced_grade, template_file, insecure)
-
-
-def can_generate_certificate_task(user, course_key):
-    """
-    Determine if we can create a task to generate a certificate for this user in this course run.
-
-    This will return True if either:
-    - the course run is using the allowlist and the user is on the allowlist, or
-    - the course run is using v2 course certificates
-    """
-    return _can_generate_certificate_task(user, course_key)
 
 
 def generate_certificate_task(user, course_key, generation_mode=None):
