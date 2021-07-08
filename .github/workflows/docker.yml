@@ -27,8 +27,8 @@ jobs:
             --file .github/build/Dockerfile \
             --target base \
             --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
-            --tag eoluchile/edx-platform:${GITHUB_SHA} \
-            --tag eoluchile/edx-platform:koa \
+            --tag ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA} \
+            --tag ghcr.io/eol-uchile/edx-platform:koa \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
             --output "type=docker,push=false"
@@ -39,7 +39,7 @@ jobs:
             --file .github/build/Dockerfile \
             --target testing \
             --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
-            --tag eoluchile/edx-platform:testing-koa \
+            --tag ghcr.io/eol-uchile/edx-platform:testing-koa \
             --cache-from "type=local,src=/tmp/.buildx-cache-new" \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --output "type=docker,push=false"
@@ -54,16 +54,19 @@ jobs:
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor/tests/ && docker-compose down -v
           docker-compose run cms /openedx/edx-platform/.github/test/tests_cms.sh cms/djangoapps/contentstore/views/tests/test_videos.py && docker-compose down -v
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: eolito
+          password: ${{ secrets.CR_PAT }}
+
       - name: Push to koa
         if: github.ref == 'refs/heads/eol/koa.master'
         run: |
-          echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
-          docker push eoluchile/edx-platform:${GITHUB_SHA}
-          docker push eoluchile/edx-platform:koa
-          docker push eoluchile/edx-platform:testing-koa
-        env:
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
+          docker push ghcr.io/eol-uchile/edx-platform:koa
+          docker push ghcr.io/eol-uchile/edx-platform:testing-koa
 
       - name: Move cache
         run: |
