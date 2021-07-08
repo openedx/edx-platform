@@ -47,6 +47,7 @@ class ThreadListGetForm(_PaginationForm):
         choices=[(choice, choice) for choice in ["discussion", "question"]],
         required=False,
     )
+    count_flagged = ExtendedNullBooleanField(required=False)
     flagged = ExtendedNullBooleanField(required=False)
     view = ChoiceField(
         choices=[(choice, choice) for choice in ["unread", "unanswered"]],

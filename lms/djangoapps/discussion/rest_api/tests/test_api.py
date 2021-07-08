@@ -936,13 +936,11 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.assert_last_query_params(expected_last_query_params)
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, True),
-        (FORUM_ROLE_MODERATOR, True),
-        (FORUM_ROLE_COMMUNITY_TA, True),
-        (FORUM_ROLE_STUDENT, False),
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
     )
-    @ddt.unpack
-    def test_flagged_count(self, role, is_count_flagged_flag_set):
+    def test_flagged_count(self, role):
         expected_result = make_paginated_api_response(
             results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
@@ -956,19 +954,38 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             self.course.id,
             page=1,
             page_size=10,
+            count_flagged=True,
         )
 
         expected_last_query_params = {
             "user_id": [str(self.user.id)],
             "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
+            "count_flagged": ["True"],
             "page": ["1"],
             "per_page": ["10"],
         }
-        if is_count_flagged_flag_set:
-            expected_last_query_params["count_flagged"] = ["True"]
 
         self.assert_last_query_params(expected_last_query_params)
+
+    def test_flagged_count_denied(self):
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": None})
+
+        _assign_role_to_user(self.user, self.course.id, role=FORUM_ROLE_STUDENT)
+
+        self.register_get_threads_response([], page=1, num_pages=0)
+
+        with pytest.raises(PermissionDenied):
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                count_flagged=True,
+            )
 
     def test_following(self):
         self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)

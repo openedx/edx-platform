@@ -184,6 +184,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * flagged: If True, only return threads that have been flagged (reported)
 
+        * count_flagged: If True, return the count of flagged comments for each thread.
+          (can only be used by moderators or above)
+
         * text_search: A search string to match. Any thread whose content
             (including the bodies of comments in the thread) matches the search
             string will be returned.
@@ -333,7 +336,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["view"],
             form.cleaned_data["order_by"],
             form.cleaned_data["order_direction"],
-            form.cleaned_data["requested_fields"]
+            form.cleaned_data["requested_fields"],
+            form.cleaned_data["count_flagged"],
         )
 
     def retrieve(self, request, thread_id=None):

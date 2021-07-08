@@ -63,6 +63,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             'course_id': CourseLocator.from_string('Foo/Bar/Baz'),
             'page': 2,
             'page_size': 13,
+            'count_flagged': None,
             'topic_id': set(),
             'text_search': '',
             'following': None,

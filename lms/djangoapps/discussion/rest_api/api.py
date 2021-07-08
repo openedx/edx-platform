@@ -540,6 +540,7 @@ def get_thread_list(
     order_by: ThreadOrderingType = "last_activity_at",
     order_direction: Literal["desc"] = "desc",
     requested_fields: Optional[List[Literal["profile_image"]]] = None,
+    count_flagged: bool = None,
 ):
     """
     Return the list of all discussion threads pertaining to the given course
@@ -550,6 +551,7 @@ def get_thread_list(
     course_key: The key of the course to get discussion threads for
     page: The page number (1-indexed) to retrieve
     page_size: The number of threads to retrieve per page
+    count_flagged: If true, fetch the count of flagged items in each thread
     topic_id_list: The list of topic_ids to get the discussion threads for
     text_search A text search query string to match
     following: If true, retrieve only threads the requester is following
@@ -575,6 +577,7 @@ def get_thread_list(
 
     Raises:
 
+    PermissionDenied: If count_flagged is set but the user isn't privileged
     ValidationError: if an invalid value is passed for a field.
     ValueError: if more than one of the mutually exclusive parameters is
       provided
@@ -611,6 +614,9 @@ def get_thread_list(
                 "text_search_rewrite": None,
             })
 
+    if count_flagged and not context["is_requester_privileged"]:
+        raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
+
     query_params = {
         "user_id": str(request.user.id),
         "group_id": (
@@ -624,7 +630,7 @@ def get_thread_list(
         "author_id": author_id,
         "flagged": flagged,
         "thread_type": thread_type,
-        "count_flagged": context["is_requester_privileged"] or None,
+        "count_flagged": count_flagged,
     }
 
     if view:
