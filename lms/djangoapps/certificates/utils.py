@@ -10,7 +10,7 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
     event_name = '.'.join(['edx', 'certificate', event_name])
 
     if not course_overview:
-        course_overview = get_course_overview(course_id)
+        course_overview = get_course_overview_or_none(course_id)
 
     context = {
         'org_id': course_overview.org,
@@ -67,7 +67,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificat
     """
     url = ''
 
-    course_overview = _course_from_key(course_id)
+    course_overview = get_course_overview_or_none(_safe_course_key(course_id))
     if not course_overview:
         return url
 
@@ -117,13 +117,6 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
         return user_certificate.download_url
 
     return ''
-
-
-def _course_from_key(course_key):
-    """
-    Returns the course overview
-    """
-    return get_course_overview(_safe_course_key(course_key))
 
 
 def _safe_course_key(course_key):

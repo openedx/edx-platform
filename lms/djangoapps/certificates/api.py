@@ -46,6 +46,7 @@ from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
@@ -55,7 +56,7 @@ MODES = GeneratedCertificate.MODES
 
 def _format_certificate_for_user(username, cert):
     """
-    Helper function to serialize an user certificate.
+    Helper function to serialize a user certificate.
 
     Arguments:
         username (unicode): The identifier of the user.
@@ -63,7 +64,8 @@ def _format_certificate_for_user(username, cert):
 
     Returns: dict
     """
-    try:
+    course_overview = get_course_overview_or_none(cert.course_id)
+    if cert.download_url or course_overview:
         return {
             "username": username,
             "course_key": cert.course_id,
@@ -81,8 +83,8 @@ def _format_certificate_for_user(username, cert):
                 else None
             ),
         }
-    except CourseOverview.DoesNotExist:
-        return None
+
+    return None
 
 
 def get_certificates_for_user(username):
