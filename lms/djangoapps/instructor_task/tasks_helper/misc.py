@@ -439,7 +439,10 @@ def upload_ora2_submission_files(
         submission_files_data = OraDownloadData.collect_ora2_submission_files(course_id)
 
     if submission_files_data is None:
+        TASK_LOG.info('%s, submission files data is None, aborting.', task_info_string)
         return UPDATE_STATUS_FAILED
+    else:
+        TASK_LOG.info('%s, submission files data generator initialized.', task_info_string)
 
     with TemporaryFile('rb+') as zip_file:
         compressed = None
@@ -451,7 +454,10 @@ def upload_ora2_submission_files(
             compressed = OraDownloadData.create_zip_with_attachments(zip_file, submission_files_data)
 
         if compressed is None:
+            TASK_LOG.info('%s, created empty zip file, aborting.', task_info_string)
             return UPDATE_STATUS_FAILED
+        else:
+            TASK_LOG.info('%s, Completed construction of zip file.', task_info_string)
 
         zip_filename = None
         with step_manager(
@@ -462,7 +468,10 @@ def upload_ora2_submission_files(
             zip_filename = upload_zip_to_report_store(zip_file, 'submission_files', course_id, start_date),  # lint-amnesty, pylint: disable=trailing-comma-tuple
 
         if not zip_filename:
+            TASK_LOG.info('%s, zip_filename is None, aborting.', task_info_string)
             return UPDATE_STATUS_FAILED
+        else:
+            TASK_LOG.info('%s, zip file uploaded to report store.', task_info_string)
 
     task_progress.succeeded = 1
     curr_step = {'step': 'Finalizing attachments extracting'}
