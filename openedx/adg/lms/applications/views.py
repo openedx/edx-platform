@@ -23,7 +23,8 @@ from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 from .helpers import (
     get_application_hub_instructions,
     get_course_cards_and_gross_details,
-    get_omnipreneurship_courses_instructions
+    get_omnipreneurship_courses_instructions,
+    update_application_hub_and_send_submission_email_if_applicable
 )
 from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
@@ -129,14 +130,12 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
                 )
             )
 
-        user_application_hub.is_prerequisite_courses_passed = are_pre_req_courses_completed
-        user_application_hub.is_bu_prerequisite_courses_passed = are_bu_courses_completed
-        user_application_hub.save()
+        update_application_hub_and_send_submission_email_if_applicable(
+            user_application_hub, are_pre_req_courses_completed, are_bu_courses_completed
+        )
 
         messages = get_application_hub_instructions(
-            user_application_hub,
-            is_any_prerequisite_started,
-            is_any_bu_course_started
+            user_application_hub, is_any_prerequisite_started, is_any_bu_course_started
         )
 
         instructions = get_omnipreneurship_courses_instructions(pre_req_courses)

@@ -589,6 +589,37 @@ def get_omnipreneurship_courses_instructions(course_cards):
     }
 
 
+def update_application_hub_and_send_submission_email_if_applicable(
+    user_application_hub, are_pre_req_courses_completed, are_bu_courses_completed
+):
+    """
+    Updates the application hub flags based on the values of `are_pre_req_courses_completed` and
+    `are_bu_courses_completed` and checks if all the steps for application have been completed, if so, sends
+    application submission confirmation email.
+
+    Arguments:
+        user_application_hub (ApplicationHub): ApplicationHub object for a user
+        are_pre_req_courses_completed (bool): indicating if all prerequisite courses have been passed
+        are_bu_courses_completed (bool): indicating if all business unit courses have been passed
+    """
+    if not user_application_hub.are_application_pre_reqs_completed():
+        is_any_flag_changed = False
+
+        if not user_application_hub.is_prerequisite_courses_passed and are_pre_req_courses_completed:
+            user_application_hub.is_prerequisite_courses_passed = True
+            is_any_flag_changed = True
+
+        if not user_application_hub.is_bu_prerequisite_courses_passed and are_bu_courses_completed:
+            user_application_hub.is_bu_prerequisite_courses_passed = True
+            is_any_flag_changed = True
+
+        if is_any_flag_changed:
+            user_application_hub.save()
+
+        if user_application_hub.are_application_pre_reqs_completed():
+            send_application_submission_confirmation_emails([user_application_hub.user.email])
+
+
 def replace_last_comma_occurrences(string):
     """
     Removes the trailing comma and replaces the last remaining comma (if any) with 'and'

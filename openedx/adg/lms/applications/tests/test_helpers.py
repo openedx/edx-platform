@@ -63,6 +63,7 @@ from openedx.adg.lms.applications.helpers import (
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_emails,
+    update_application_hub_and_send_submission_email_if_applicable,
     validate_file_size,
     validate_logo_size,
     validate_word_limit
@@ -621,6 +622,54 @@ def test_get_omnipreneurship_courses_instructions(is_open_course, is_locked_cour
     actual_instructions = get_omnipreneurship_courses_instructions(courses)
 
     assert actual_instructions == expected_instructions
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_pre_req_courses_passed, '
+    'is_bu_courses_passed, '
+    'are_pre_req_courses_completed, '
+    'are_bu_courses_completed, '
+    'expected_pre_req_flag, '
+    'expected_bu_flag',
+    [
+        (True, True, False, False, True, True),
+        (False, False, False, False, False, False),
+        (False, False, True, False, True, False),
+        (False, False, False, True, False, True),
+        (True, False, False, False, True, False),
+        (False, True, False, False, False, True),
+        (False, False, True, True, True, True)
+    ]
+)
+def test_update_application_hub_and_send_submission_email_if_applicable(
+    is_pre_req_courses_passed,
+    is_bu_courses_passed,
+    are_pre_req_courses_completed,
+    are_bu_courses_completed,
+    expected_pre_req_flag,
+    expected_bu_flag,
+    mocker
+):
+    """
+    Tests whether the `is_prerequisite_courses_passed` and `is_bu_prerequisite_courses_passed` flags of application hub
+    are updating correctly based on their initial value and the status of course completions of each category i.e.
+    prerequisite courses and business_unit_courses
+    """
+    mocker.patch('openedx.adg.lms.applications.helpers.send_application_submission_confirmation_emails')
+
+    application_hub = ApplicationHubFactory(
+        is_written_application_completed=True,
+        is_prerequisite_courses_passed=is_pre_req_courses_passed,
+        is_bu_prerequisite_courses_passed=is_bu_courses_passed
+    )
+
+    update_application_hub_and_send_submission_email_if_applicable(
+        application_hub, are_pre_req_courses_completed, are_bu_courses_completed
+    )
+
+    assert application_hub.is_prerequisite_courses_passed == expected_pre_req_flag
+    assert application_hub.is_bu_prerequisite_courses_passed == expected_bu_flag
 
 
 @pytest.mark.django_db

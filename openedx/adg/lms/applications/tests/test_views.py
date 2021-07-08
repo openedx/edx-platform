@@ -234,6 +234,7 @@ def test_get_initial_application_state_for_application_hub_view(application_hub_
     """
     mocker.patch('openedx.adg.lms.applications.views.get_application_hub_instructions', return_value={})
     mocker.patch('openedx.adg.lms.applications.views.get_omnipreneurship_courses_instructions', return_value={})
+    mocker.patch('openedx.adg.lms.applications.views.update_application_hub_and_send_submission_email_if_applicable')
     mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
 
     ApplicationHubFactory(user=application_hub_view_get_request.user)
@@ -272,6 +273,7 @@ def test_each_step_for_application_completion_application_hub_view(
         'openedx.adg.lms.applications.views.get_course_cards_and_gross_details',
         return_value=([], False, False)
     )
+    mocker.patch('openedx.adg.lms.applications.views.update_application_hub_and_send_submission_email_if_applicable')
     mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
 
     application_hub = ApplicationHubFactory(user=application_hub_view_get_request.user)
