@@ -138,7 +138,7 @@ def update_course_progress_stats():
                                            text_type(course_id)))
         course_overview = CourseOverview.get_from_id(course_id)
         grades = CourseGradeFactory().read(user=user, course_key=course_id)
-        completed = grades.passed and course_progress >= 100
+        completed = course_progress >= 100
         fields_list = ['progress', 'grade']
         if course_progress >= 100:
             item.completion_date = timezone.now()

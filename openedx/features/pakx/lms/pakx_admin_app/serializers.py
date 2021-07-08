@@ -34,15 +34,15 @@ class UserCourseEnrollmentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_progress(obj):
-        return obj.enrollment_stats.progress if obj.enrollment_stats else None
+        return obj.enrollment_stats.progress if hasattr(obj, 'enrollment_stats') else None
 
     @staticmethod
     def get_completion_date(obj):
-        return obj.enrollment_stats.completion_date if obj.enrollment_stats else None
+        return obj.enrollment_stats.completion_date if hasattr(obj, 'enrollment_stats') else None
 
     @staticmethod
     def get_grades(obj):
-        return obj.enrollment_stats.grade if obj.enrollment_stats else None
+        return obj.enrollment_stats.grade if hasattr(obj, 'enrollment_stats') else None
 
 
 class UserDetailViewSerializer(serializers.ModelSerializer):
