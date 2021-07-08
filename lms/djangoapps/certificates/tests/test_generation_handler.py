@@ -5,12 +5,10 @@ import logging
 from unittest import mock
 
 import ddt
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation_handler import (
-    CERTIFICATES_USE_UPDATED,
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
     _can_generate_v2_certificate,
@@ -271,7 +269,6 @@ class AllowlistTests(ModuleStoreTestCase):
         assert _set_allowlist_cert_status(u, key) is None
 
 
-@override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(CCX_COURSE_METHOD, mock.Mock(return_value=False))
 @mock.patch(PASSING_GRADE_METHOD, mock.Mock(return_value=True))
@@ -313,7 +310,6 @@ class CertificateTests(ModuleStoreTestCase):
         """
         assert generate_regular_certificate_task(self.user, self.course_run_key) is True
 
-    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
     def test_handle_invalid(self):
         """
         Test handling of an invalid user/course run combo
