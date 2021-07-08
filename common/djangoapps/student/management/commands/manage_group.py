@@ -4,9 +4,8 @@ and set their permissions by name.
 """
 
 
+from django.core.management.base import BaseCommand, CommandError
 from edx_django_utils.management.user.manage_group import manage_group
-from django.utils.translation import gettext as _
-
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Creates the specified group, if it does not exist, and sets its permissions.'
