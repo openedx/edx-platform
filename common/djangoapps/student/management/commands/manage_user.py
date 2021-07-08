@@ -13,20 +13,19 @@ from django.utils.translation import gettext as _
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Creates the specified user, if it does not exist, and sets its groups.'
 
-
-    def _maybe_update(self, user, attribute, new_value):
-        """
-        DRY helper.  If the specified attribute of the user differs from the
-        specified value, it will be updated.
-        """
-        old_value = getattr(user, attribute)
-        if new_value != old_value:
-            self.stderr.write(
-                _('Setting {attribute} for user "{username}" to "{new_value}"').format(
-                    attribute=attribute, username=user.username, new_value=new_value
-                )
-            )
-            setattr(user, attribute, new_value)
+    # def _maybe_update(self, user, attribute, new_value):
+    #     """
+    #     DRY helper.  If the specified attribute of the user differs from the
+    #     specified value, it will be updated.
+    #     """
+    #     old_value = getattr(user, attribute)
+    #     if new_value != old_value:
+    #         self.stderr.write(
+    #             _('Setting {attribute} for user "{username}" to "{new_value}"').format(
+    #                 attribute=attribute, username=user.username, new_value=new_value
+    #             )
+    #         )
+    #         setattr(user, attribute, new_value)
 
     def add_arguments(self, parser):
         parser.add_argument('username')
@@ -40,5 +39,5 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
     def handle(self, username, email, is_remove, is_staff, is_superuser, groups,  # lint-amnesty, pylint: disable=arguments-differ
                unusable_password, initial_password_hash, *args, **options):
-        manage_user(self, username, email, is_remove, is_staff, is_superuser, groups,  # lint-amnesty, pylint: disable=arguments-differ
+        manage_user(username, email, is_remove, is_staff, is_superuser, groups,  # lint-amnesty, pylint: disable=arguments-differ
             unusable_password, initial_password_hash, *args, **options)
