@@ -238,6 +238,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
                     'referer': '',
                     'client_id': None,
                     'course_id': 'foo/bar/baz',
+                    'enterprise_uuid': '',
                     'path': self.path_with_course,
                     'page': None
                 }
@@ -279,6 +280,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
                     'referer': '',
                     'client_id': '1033501218.1368477899',
                     'course_id': 'foo/bar/baz',
+                    'enterprise_uuid': '',
                     'path': self.path_with_course,
                     'page': None
                 }

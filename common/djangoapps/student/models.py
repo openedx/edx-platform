@@ -1377,7 +1377,7 @@ class CourseEnrollment(models.Model):
         from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
         return not user.has_perm(ENROLL_IN_COURSE, course)
 
-    def update_enrollment(self, mode=None, is_active=None, skip_refund=False):
+    def update_enrollment(self, mode=None, is_active=None, skip_refund=False, enterprise_uuid=None):
         """
         Updates an enrollment for a user in a class.  This includes options
         like changing the mode, toggling is_active True/False, etc.
@@ -1413,7 +1413,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed:
             if self.is_active:
-                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED, enterprise_uuid=enterprise_uuid)
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
@@ -1457,7 +1457,7 @@ class CourseEnrollment(models.Model):
                                   mode=mode, course_id=course_id,
                                   cost=cost, currency=currency)
 
-    def emit_event(self, event_name):
+    def emit_event(self, event_name, enterprise_uuid=None):
         """
         Emits an event to explicitly track course enrollment and unenrollment.
         """
@@ -1465,12 +1465,17 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+            if enterprise_uuid:
+                context["enterprise_uuid"] = enterprise_uuid
             assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
                 'course_id': str(self.course_id),
                 'mode': self.mode,
             }
+            if enterprise_uuid and 'username' not in context:
+                data['username'] = self.user.username
+
             segment_properties = {
                 'category': 'conversion',
                 'label': str(self.course_id),
@@ -1511,7 +1516,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False, enterprise_uuid=None):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1539,6 +1544,8 @@ class CourseEnrollment(models.Model):
                 if enrollment is closed. This is a special case for entitlements
                 while selecting a session. The default is set to False to avoid
                 breaking the orignal course enroll code.
+
+        enterprise_uuid (str): Add course enterprise uuid
 
         Exceptions that can be raised: NonExistentCourseError,
         EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
@@ -1590,7 +1597,7 @@ class CourseEnrollment(models.Model):
 
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
-        enrollment.update_enrollment(is_active=True, mode=mode)
+        enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         return enrollment
