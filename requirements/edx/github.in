@@ -68,6 +68,7 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
+-e git+https://github.com/edx/edx-django-utils.git@f870289aa49cc2ecf59f2a9bb150c2de69f7ebe7#egg=edx-django-utils
 
 # Third Party XBlocks
 
