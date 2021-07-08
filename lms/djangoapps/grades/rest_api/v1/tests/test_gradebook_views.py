@@ -245,8 +245,11 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
             expected_data['grades_frozen'] = True
             assert expected_data == resp.data
 
-    def test_can_see_bulk_management_non_masters(self):
+    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
+    def test_can_see_bulk_management_non_masters(self, mock_course_enrollment_details):
         # Given a course without a master's track
+        mock_course_enrollment_details.return_value = {'course_modes': [{'slug': 'not-masters'}]}
+
         # When getting course grading view
         self.client.login(username=self.staff.username, password=self.password)
         resp = self.client.get(self.get_url(self.course_key))
