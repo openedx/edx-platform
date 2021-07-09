@@ -150,6 +150,8 @@ For example, this command runs a single python unit test file::
 Note -
 edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments (especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
 
+NOTE: This doesn't seem to work. Setting ``--rootdir cms`` seems to change the root dir, but the pytest config is still picked up from setup.cfg, which points to the lms django settings.
+
     pytest test --rootdir <lms or cms>
 
 Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:

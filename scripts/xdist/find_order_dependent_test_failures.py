@@ -12,7 +12,11 @@ failure, and outputs the pytest command needed to replicate.
 
 Sample usage::
 
-    python scripts/xdist/find_dependent_test_failures.py --log-file console.txt --test-suite lms-unit
+    python scripts/xdist/find_order_dependent_test_failures.py --log-file console.txt --test-suite lms-unit
+
+For help, including other options and how to retrieve the log file::
+
+    python scripts/xdist/find_order_dependent_test_failures.py --help
 
 """
 
@@ -47,7 +51,8 @@ verbose_option = None
 )
 @click.option(
     '--fast/--slow',
-    help="Fast looks for issues in setup/teardown by running one test per class or file.",
+    help="Fast option looks for issues in setup/teardown by running one test per class or file. "
+         "Slow option will run all tests.",
     default=True
 )
 @click.option(
@@ -114,6 +119,8 @@ def _strip_console_for_tests_with_failure(log_file, test_suite):
                 if test_suite == "commonlib-unit":
                     if "pavelib" not in test and not test.startswith('scripts'):
                         test = f"common/lib/{test}"
+                if test.startswith('lms'):
+                    continue
                 if fast_option and pass_fail_string == 'PASSED':
                     # fast option will only take one test per class or module, in case
                     # the failure is a setup/teardown failure.
@@ -134,7 +141,10 @@ def _get_pytest_command(output_file_name):
     """
     Return the pytest command to run.
     """
-    return f"pytest -p 'no:randomly' `cat {output_file_name}`"
+    output_files = os.popen(f"cat {output_file_name}").read()
+    output_files = output_files.replace('\n', ' ')
+    return f"pytest -p 'no:randomly' {output_files} --ds=cms.envs.test"
+    # return f"pytest -p 'no:randomly' `cat {output_file_name}`"
 
 
 def _run_tests_and_check_for_failures(output_file_name):
@@ -143,9 +153,15 @@ def _run_tests_and_check_for_failures(output_file_name):
     """
     global verbose_option
     pytest_command = _get_pytest_command(output_file_name)
+    # if verbose_option:
+    print(pytest_command)
     test_output = os.popen(pytest_command).read()
     if verbose_option:
         print(test_output)
+    # errors_search = re.search(r'=== \d+ warnings, (\d+) errors', test_output)
+    # if bool(errors_search) and int(errors_search.group(1)) > 0:
+    #     print(f"There is a problem running tests. {int(errors_search.group(1))} errors found when running tests.")
+    #     exit(1)
     failures_search = re.search(r'=== (\d+) failed', test_output)
     return bool(failures_search) and int(failures_search.group(1)) > 0
 
@@ -179,7 +195,7 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
         print('- test failures found.')
         return _get_pytest_command(output_file_path)
 
-    os.remove(temp_file.name)
+    # os.remove(temp_file.name)
     print('- no failures found.')
     return None
 
