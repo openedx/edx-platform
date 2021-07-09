@@ -50,7 +50,9 @@ matplotlib==2.2.4
 mpmath==1.2.1
     # via sympy
 networkx==2.2
-    # via -r requirements/edx-sandbox/py35.in
+    # via
+    #   -c requirements/edx-sandbox/../constraints.txt
+    #   -r requirements/edx-sandbox/py35.in
 nltk==3.6.2
     # via
     #   -r requirements/edx-sandbox/py35.in

@@ -36,14 +36,16 @@ lxml==4.5.0
     #   -r requirements/edx-sandbox/py38.in
 markupsafe==2.0.1
     # via chem
-matplotlib==3.0.3
+matplotlib==3.3.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
 mpmath==1.2.1
     # via sympy
 networkx==2.5.1
-    # via -r requirements/edx-sandbox/py38.in
+    # via
+    #   -c requirements/edx-sandbox/../constraints.txt
+    #   -r requirements/edx-sandbox/py38.in
 nltk==3.6.2
     # via
     #   -r requirements/edx-sandbox/py38.in
@@ -57,6 +59,8 @@ numpy==1.21.0
     #   scipy
 openedx-calc==2.0.1
     # via -r requirements/edx-sandbox/py38.in
+pillow==8.3.1
+    # via matplotlib
 pycparser==2.20
     # via cffi
 pyparsing==2.4.7
