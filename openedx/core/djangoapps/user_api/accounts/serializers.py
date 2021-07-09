@@ -184,6 +184,16 @@ class UserReadOnlySerializer(serializers.Serializer):
                 }
             )
 
+        data.update(
+            {
+                "time_zone": user.preferences.model.get_value(
+                    user,
+                    'time_zone',
+                    ''
+                ),
+            }
+        )
+
         if is_secondary_email_feature_enabled():
             data.update(
                 {
