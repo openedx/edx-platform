@@ -27,7 +27,7 @@ from .reading import (
     get_program_course_enrollment,
     get_program_enrollment,
     get_provider_slug,
-    get_saml_provider_for_organization,
+    get_saml_providers_for_organization,
     get_users_by_external_keys,
     get_users_by_external_keys_and_org_key,
     is_course_staff_enrollment
