@@ -229,8 +229,11 @@ def compose_and_send_activation_email(user, profile, user_registration=None, red
     route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
 
     msg = compose_activation_email(user, user_registration, route_enabled, profile.name, redirect_url)
+    from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
+        configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    )
 
-    send_activation_email.delay(str(msg))
+    send_activation_email.delay(str(msg), from_address)
 
 
 @login_required
