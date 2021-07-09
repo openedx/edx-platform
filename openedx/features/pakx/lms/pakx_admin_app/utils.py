@@ -24,8 +24,7 @@ def get_user_org_filter(user):
 
 def get_learners_filter():
     return Q(
-        Q(is_superuser=False) & Q(is_staff=False) &
-        ~Q(groups__name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN])
+        Q(is_superuser=False) & Q(is_staff=False)
     )
 
 
@@ -87,10 +86,9 @@ def get_org_users_qs(user):
     """
     return users from the same organization as of the request.user
     """
-    if user.is_superuser:
-        queryset = User.objects.all()
-    else:
-        queryset = User.objects.filter(**get_user_org_filter(user))
+    queryset = User.objects.filter(is_superuser=False, is_staff=False)
+    if not user.is_superuser:
+        queryset = queryset.filter(**get_user_org_filter(user))
 
     return queryset.select_related(
         'profile'
