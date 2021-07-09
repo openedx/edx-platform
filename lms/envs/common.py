@@ -1625,6 +1625,9 @@ SESSION_COOKIE_NAME = 'sessionid'
 DCS_SESSION_COOKIE_SAMESITE = 'None'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = ""
+
 # CMS base
 CMS_BASE = 'localhost:18010'
 
