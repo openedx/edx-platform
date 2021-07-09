@@ -2,15 +2,16 @@
 Serializers for Discussion views.
 """
 
+from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.models import LtiConfiguration
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.discussion.rest_api.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-
-from .models import DEFAULT_PROVIDER_TYPE, AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features
+from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -20,6 +21,8 @@ class LtiSerializer(serializers.ModelSerializer):
     class Meta:
         model = LtiConfiguration
         fields = [
+            'pii_share_username',
+            'pii_share_email',
             'lti_1p1_client_key',
             'lti_1p1_client_secret',
             'lti_1p1_launch_url',
@@ -38,14 +41,26 @@ class LtiSerializer(serializers.ModelSerializer):
         }
         return payload
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not self.context.get('pii_sharing_allowed'):
+            representation.pop('pii_share_username')
+            representation.pop('pii_share_email')
+        return representation
+
     def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
         """
         Create/update a model-backed instance
         """
         instance = instance or LtiConfiguration()
         instance.config_store = LtiConfiguration.CONFIG_ON_DB
+        pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
         if validated_data:
             for key, value in validated_data.items():
+                if key.startswith('pii_') and not pii_sharing_allowed:
+                    raise serializers.ValidationError(
+                        "Cannot enable sending PII data until PII sharing for LTI is enabled for the course."
+                    )
                 if key in self.Meta.fields:
                     setattr(instance, key, value)
             instance.save()
@@ -185,16 +200,18 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         Serialize data into a dictionary, to be used as a response
         """
+        course_key = instance.context_key
         payload = super().to_representation(instance)
         lti_configuration_data = {}
         supports_lti = instance.supports('lti')
         if supports_lti:
-            lti_configuration = LtiSerializer(instance.lti_configuration)
+            lti_configuration = LtiSerializer(instance.lti_configuration, context={
+                'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
+            })
             lti_configuration_data = lti_configuration.data
         provider_type = instance.provider_type or DEFAULT_PROVIDER_TYPE
         plugin_configuration = instance.plugin_configuration
         if provider_type == 'legacy':
-            course_key = instance.context_key
             course = get_course_by_id(course_key)
             legacy_settings = LegacySettingsSerializer(
                 course,
@@ -224,12 +241,17 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                 setattr(instance, key, value)
         # _update_* helpers assume `enabled` and `provider_type`
         # have already been set
-        instance = self._update_lti(instance, validated_data)
+        instance = self._update_lti(instance, validated_data, instance.context_key)
         instance = self._update_plugin_configuration(instance, validated_data)
         instance.save()
         return instance
 
-    def _update_lti(self, instance: DiscussionsConfiguration, validated_data: dict) -> DiscussionsConfiguration:
+    def _update_lti(
+        self,
+        instance: DiscussionsConfiguration,
+        validated_data: dict,
+        course_key: CourseKey
+    ) -> DiscussionsConfiguration:
         """
         Update LtiConfiguration
         """
@@ -243,6 +265,9 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                 lti_configuration,
                 data=lti_configuration_data,
                 partial=True,
+                context={
+                    'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
+                }
             )
             if lti_serializer.is_valid(raise_exception=True):
                 lti_serializer.save()
