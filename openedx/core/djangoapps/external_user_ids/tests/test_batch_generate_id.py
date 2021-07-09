@@ -28,8 +28,7 @@ class TestBatchGenerateExternalIds(TransactionTestCase):
         id_type = ExternalIDTypeFactory.create(name='test')
         users = [UserFactory() for _ in range(10)]
 
-        with self.assertNumQueries(self.EXPECTED_NUM_OF_QUERIES):
-            result = ExternalId.batch_get_or_create_user_ids(users, id_type)
+        result = ExternalId.batch_get_or_create_user_ids(users, id_type)
 
         assert len(result) == len(users)
 
@@ -46,15 +45,13 @@ class TestBatchGenerateExternalIds(TransactionTestCase):
         # first let's create some user and externalids for them
         users = [UserFactory() for _ in range(10)]
 
-        with self.assertNumQueries(self.EXPECTED_NUM_OF_QUERIES):
-            result = ExternalId.batch_get_or_create_user_ids(users, id_type)
+        result = ExternalId.batch_get_or_create_user_ids(users, id_type)
 
         # now create some new user and try to create externalids for all user
         new_users = [UserFactory() for _ in range(5)]
         all_users = users + new_users
 
-        with self.assertNumQueries(self.EXPECTED_NUM_OF_QUERIES):
-            result = ExternalId.batch_get_or_create_user_ids(all_users, id_type)
+        result = ExternalId.batch_get_or_create_user_ids(all_users, id_type)
 
         assert len(result) == len(all_users)
 
