@@ -1,16 +1,18 @@
 """Signal handlers for writing course dates into edx_when."""
 
 
+from datetime import timedelta
 import logging
 
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
+from xblock.fields import Scope
 
-from xmodule.util.misc import is_xblock_an_assignment
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
-from xblock.fields import Scope  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
+from xmodule.util.misc import is_xblock_an_assignment
 
 from .models import SelfPacedRelativeDatesConfig
 from .utils import spaced_out_sections
@@ -78,6 +80,21 @@ def _gather_graded_items(root, due):  # lint-amnesty, pylint: disable=missing-fu
     return []
 
 
+def _get_custom_pacing_children(subsection, num_weeks):
+    """
+    Return relative date items for the subsection and its children
+    """
+    items = [subsection]
+    section_date_items = []
+    while items:
+        next_item = items.pop()
+        # Open response assessment problems have their own due dates
+        if next_item.category != 'openassessment':
+            section_date_items.append((next_item.location, {'due': timedelta(weeks=num_weeks)}))
+            items.extend(next_item.get_children())
+    return section_date_items
+
+
 def extract_dates_from_course(course):
     """
     Extract all dates from the supplied course.
@@ -95,9 +112,17 @@ def extract_dates_from_course(course):
             for _, section, weeks_to_complete in spaced_out_sections(course):
                 section_date_items = []
                 for subsection in section.get_children():
-                    section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
-
-                if section_date_items and section.graded:
+                    # If custom pacing is set on a subsection, apply the set relative
+                    # date to all the content inside the subsection. Otherwise
+                    # apply the default Personalized Learner Schedules (PLS)
+                    # logic for self paced courses.
+                    due_num_weeks = subsection.fields['due_num_weeks'].read_from(subsection)
+                    if (CUSTOM_PLS.is_enabled(course.id) and due_num_weeks):
+                        section_date_items.extend(_get_custom_pacing_children(subsection, due_num_weeks))
+                    else:
+                        section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
+                # if custom pls is active, we will allow due dates to be set for ungraded items as well
+                if section_date_items and (section.graded or CUSTOM_PLS.is_enabled(course.id)):
                     date_items.append((section.location, weeks_to_complete))
                 date_items.extend(section_date_items)
     else:
