@@ -256,7 +256,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
 
         # Course staff should not be shown bulk management controls
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.data['can_see_bulk_management'] == False
+        assert resp.data['can_see_bulk_management'] is False
 
     @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
     def test_can_see_bulk_management_masters(self, mock_course_enrollment_details):
@@ -269,7 +269,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
 
         # Course staff should be shown bulk management controls (default on for master's track courses)
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.data['can_see_bulk_management'] == True
+        assert resp.data['can_see_bulk_management'] is True
 
     @override_waffle_flag(waffle_flags()[BULK_MANAGEMENT], active=True)
     def test_can_see_bulk_management_force_enabled(self):
@@ -280,7 +280,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
 
         # # Course staff should be able to see bulk management
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.data['can_see_bulk_management'] == True
+        assert resp.data['can_see_bulk_management'] is True
 
 
 class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
