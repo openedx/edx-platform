@@ -267,7 +267,6 @@ django==2.2.24
     #   edx-i18n-tools
     #   edx-lint
     #   edx-milestones
-    #   edx-opaque-keys
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -459,9 +458,8 @@ docopt==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   xmodule
-docutils==0.16
+docutils==0.17.1
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
     #   m2r
@@ -681,7 +679,7 @@ idna==2.10
     #   yarl
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.6.0
+importlib-metadata==4.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-randomly
@@ -855,8 +853,6 @@ multidict==5.1.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy-extensions==0.4.3
-    # via mypy
 mypy==0.910
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
@@ -899,9 +895,8 @@ packaging==20.9
     #   pytest
     #   sphinx
     #   tox
-path==13.1.0
+path==16.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   path.py
 path.py==12.5.0
@@ -924,7 +919,7 @@ pep517==0.10.0
     #   pip-tools
 piexif==1.1.3
     # via -r requirements/edx/testing.txt
-pillow==8.2.0
+pillow==8.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -991,6 +986,7 @@ pylatexenc==2.10
     #   olxcleaner
 pylint==2.8.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
@@ -1296,7 +1292,7 @@ soupsieve==2.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==4.0.2
+sphinx==4.0.3
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain

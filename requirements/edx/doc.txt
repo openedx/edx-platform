@@ -18,10 +18,8 @@ click==7.1.2
     #   code-annotations
 code-annotations==1.1.2
     # via -r requirements/edx/doc.in
-docutils==0.16
-    # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   sphinx
+docutils==0.17.1
+    # via sphinx
 edx-sphinx-theme==2.1.0
     # via -r requirements/edx/doc.in
 gitdb==4.0.7
@@ -62,7 +60,7 @@ smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.0.2
+sphinx==4.0.3
     # via
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme
