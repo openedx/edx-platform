@@ -6,6 +6,7 @@ from unittest import mock
 
 import ddt
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation_handler import (
@@ -57,7 +58,7 @@ class AllowlistTests(ModuleStoreTestCase):
             user=self.user,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
 
         # Add user to the allowlist
@@ -78,7 +79,7 @@ class AllowlistTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=u, allowlist=False)
         assert not is_on_certificate_allowlist(u, self.course_run_key)
@@ -113,13 +114,62 @@ class AllowlistTests(ModuleStoreTestCase):
             status=status,
         )
 
-        assert _can_generate_certificate_for_status(u, key) == expected_response
+        assert _can_generate_certificate_for_status(u, key, CourseMode.VERIFIED) == expected_response
+
+    def test_generation_status_mode_changed_from_verified(self):
+        """
+        Test handling of certificate statuses when the mode has changed from verified to audit
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.verified,
+            status=CertificateStatuses.downloadable,
+        )
+
+        assert not _can_generate_certificate_for_status(u, key, CourseMode.AUDIT)
+
+    def test_generation_status_mode_changed_from_audit(self):
+        """
+        Test handling of certificate statuses when the mode has changed from audit to verified
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.audit,
+            status=CertificateStatuses.downloadable,
+        )
+
+        assert _can_generate_certificate_for_status(u, key, CourseMode.VERIFIED)
+
+    def test_generation_status_mode_changed_from_audit_not_downloadable(self):
+        """
+        Test handling of certificate statuses when the mode has changed from audit to verified but the cert is not
+        downloadable
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.audit,
+            status=CertificateStatuses.unverified,
+        )
+
+        assert _can_generate_certificate_for_status(u, key, CourseMode.VERIFIED)
 
     def test_generation_status_for_none(self):
         """
         Test handling of certificate statuses for a non-existent cert
         """
-        assert _can_generate_certificate_for_status(None, None)
+        assert _can_generate_certificate_for_status(None, None, None)
 
     def test_handle_invalid(self):
         """
@@ -193,7 +243,7 @@ class AllowlistTests(ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         assert not _can_generate_allowlist_certificate(u, key)
         assert _set_allowlist_cert_status(u, key) is None
@@ -209,7 +259,7 @@ class AllowlistTests(ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         cert = GeneratedCertificateFactory(
             user=u,
@@ -254,7 +304,7 @@ class AllowlistTests(ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
@@ -287,7 +337,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=self.user,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
 
     def test_handle_valid(self):
@@ -339,7 +389,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=different_user,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
 
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
@@ -355,7 +405,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=different_user,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=different_user,
@@ -399,13 +449,13 @@ class CertificateTests(ModuleStoreTestCase):
             status=status,
         )
 
-        assert _can_generate_certificate_for_status(u, key) == expected_response
+        assert _can_generate_certificate_for_status(u, key, CourseMode.VERIFIED) == expected_response
 
     def test_generation_status_for_none(self):
         """
         Test handling of certificate statuses for a non-existent cert
         """
-        assert _can_generate_certificate_for_status(None, None)
+        assert _can_generate_certificate_for_status(None, None, None)
 
     def test_can_generate_not_verified_cert(self):
         """
@@ -416,7 +466,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
@@ -438,7 +488,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
@@ -454,7 +504,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
@@ -477,7 +527,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
@@ -525,7 +575,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=self.course_run_key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
@@ -576,7 +626,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         cert = GeneratedCertificateFactory(
             user=u,
@@ -620,7 +670,7 @@ class CertificateTests(ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode=GeneratedCertificate.MODES.verified,
+            mode=CourseMode.VERIFIED,
         )
         GeneratedCertificateFactory(
             user=u,
