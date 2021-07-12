@@ -405,6 +405,8 @@ def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
     """
     saml_providers = get_saml_providers_by_org_key(org_key)
     found_users_by_external_keys = dict()
+    # if the same external id exists in multiple providers (for this organization)
+    # it is expected both providers return the same user
     for saml_provider in saml_providers:
         social_auth_uids = {
             saml_provider.get_social_auth_uid(external_user_key)
@@ -478,7 +480,10 @@ def get_external_key_by_user_and_course(user, course_key):
 
 def get_saml_providers_by_org_key(org_key):
     """
-    Returns a list of SAML providers associated with the provided org_key
+    Returns a list of SAML providers associated with the provided org_key.
+    In most cases an organization will only have one configured provider.
+    However, multiple may be returned during a migration between two active
+    providers.
 
     Arguments:
         org_key (str)
@@ -522,6 +527,9 @@ def get_org_key_for_program(program_uuid):
 def get_saml_providers_for_organization(organization):
     """
     Return currently configured SAML provider(s) for the given Organization.
+    In most cases an organization will only have one configured provider.
+    However, multiple may be returned during a migration between two active
+    providers.
 
     Arguments:
         organization: Organization
