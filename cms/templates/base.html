@@ -10,6 +10,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
 from lms.djangoapps.branding import api as branding_api
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.js_utils import (
@@ -155,7 +156,8 @@ from openedx.core.release import RELEASE_LINE
           num: "${context_course.location.course | n, js_escaped_string}",
           display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
           revision: "${context_course.location.branch | n, js_escaped_string}",
-          self_paced: ${ context_course.self_paced | n, dump_js_escaped_json }
+          self_paced: ${ context_course.self_paced | n, dump_js_escaped_json },
+          is_custom_pls_active: ${CUSTOM_PLS.is_enabled(context_course.id) | n, dump_js_escaped_json}
         });
       </script>
     % endif
