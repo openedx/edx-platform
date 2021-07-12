@@ -727,9 +727,8 @@ jmespath==0.10.0
     #   -r requirements/edx/testing.txt
     #   boto3
     #   botocore
-joblib==0.14.1
+joblib==1.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   nltk
 jsondiff==1.3.0
@@ -840,10 +839,6 @@ monotonic==1.6
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-more-itertools==8.8.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   zipp
 mpmath==1.2.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1491,9 +1486,8 @@ yarl==1.6.3
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
-zipp==1.0.0
+zipp==3.5.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   importlib-metadata
 
