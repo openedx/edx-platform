@@ -95,4 +95,3 @@ joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
 kiwisolver<1.2.0        # kiwisolver 1.2.0 requires Python 3.6+
 matplotlib<3.1          # Matplotlib 3.1 requires Python 3.6
-zipp==1.0.0             # zipp 2.0.0 requires Python >= 3.6
