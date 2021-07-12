@@ -2,6 +2,8 @@
 Settings for Appsembler on CMS in Production.
 """
 
+import sentry_sdk
+
 from openedx.core.djangoapps.appsembler.settings.settings import production_common
 
 
@@ -30,7 +32,7 @@ def plugin_settings(settings):
     }
 
     if settings.SENTRY_DSN:
-        settings.RAVEN_CONFIG['tags']['app'] = 'cms'
+        sentry_sdk.set_tag('app', 'cms')
 
     settings.SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
