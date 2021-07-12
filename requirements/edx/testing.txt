@@ -696,9 +696,8 @@ jmespath==0.10.0
     #   -r requirements/edx/base.txt
     #   boto3
     #   botocore
-joblib==0.14.1
+joblib==1.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   nltk
 jsondiff==1.3.0
