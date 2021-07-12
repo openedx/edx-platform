@@ -1,15 +1,10 @@
 """Tests for util.db module."""
 
 
-import threading
-import time
-import unittest
 from io import StringIO
 
 import ddt
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import call_command
-from django.db import IntegrityError, connection
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
@@ -22,83 +17,16 @@ def do_nothing():
     return
 
 
-@ddt.ddt
 class TransactionManagersTestCase(TransactionTestCase):
     """
     Tests outer_atomic.
-
-    Note: This TestCase only works with MySQL.
-
-    To test do: "./manage.py lms --settings=test_with_mysql test util.tests.test_db"
     """
-    DECORATORS = {
-        'outer_atomic': outer_atomic(),
-        'outer_atomic_read_committed': outer_atomic(read_committed=True),
-    }
-
-    @ddt.data(
-        ('outer_atomic', IntegrityError, None, True),
-        ('outer_atomic_read_committed', type(None), False, True),
-    )
-    @ddt.unpack
-    def test_concurrent_requests(self, transaction_decorator_name, exception_class, created_in_1, created_in_2):
-        """
-        Test that when isolation level is set to READ COMMITTED get_or_create()
-        for the same row in concurrent requests does not raise an IntegrityError.
-        """
-        transaction_decorator = self.DECORATORS[transaction_decorator_name]
-        if connection.vendor != 'mysql':
-            raise unittest.SkipTest('Only works on MySQL.')
-
-        class RequestThread(threading.Thread):
-            """ A thread which runs a dummy view."""
-            def __init__(self, delay, **kwargs):
-                super().__init__(**kwargs)
-                self.delay = delay
-                self.status = {}
-
-            @transaction_decorator
-            def run(self):
-                """A dummy view."""
-                try:
-                    try:
-                        User.objects.get(username='student', email='student@edx.org')
-                    except User.DoesNotExist:
-                        pass
-                    else:
-                        raise AssertionError('Did not raise User.DoesNotExist.')
-
-                    if self.delay > 0:
-                        time.sleep(self.delay)
-
-                    __, created = User.objects.get_or_create(username='student', email='student@edx.org')
-                except Exception as exception:  # pylint: disable=broad-except
-                    self.status['exception'] = exception
-                else:
-                    self.status['created'] = created
-
-        thread1 = RequestThread(delay=1)
-        thread2 = RequestThread(delay=0)
-
-        thread1.start()
-        thread2.start()
-        thread2.join()
-        thread1.join()
-
-        assert isinstance(thread1.status.get('exception'), exception_class)
-        assert thread1.status.get('created') == created_in_1
-
-        assert thread2.status.get('exception') is None
-        assert thread2.status.get('created') == created_in_2
 
     def test_outer_atomic_nesting(self):
         """
         Test that outer_atomic raises an error if it is nested inside
         another atomic.
         """
-        if connection.vendor != 'mysql':
-            raise unittest.SkipTest('Only works on MySQL.')
-
         outer_atomic()(do_nothing)()  # pylint: disable=not-callable
 
         with atomic():
@@ -120,9 +48,6 @@ class TransactionManagersTestCase(TransactionTestCase):
         Test that a named outer_atomic raises an error only if nested in
         enable_named_outer_atomic and inside another atomic.
         """
-        if connection.vendor != 'mysql':
-            raise unittest.SkipTest('Only works on MySQL.')
-
         outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
         with atomic():

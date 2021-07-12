@@ -209,7 +209,7 @@ def create_account_with_params(request, params):
     custom_form = get_registration_extension_form(data=params)
 
     # Perform operations within a transaction that are critical to account creation
-    with outer_atomic(read_committed=True):
+    with outer_atomic():
         # first, create the account
         (user, profile, registration) = do_create_account(form, custom_form)
 

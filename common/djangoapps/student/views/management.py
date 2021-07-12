@@ -278,7 +278,7 @@ def _update_email_opt_in(request, org):
 
 @transaction.non_atomic_requests
 @require_POST
-@outer_atomic(read_committed=True)
+@outer_atomic()
 def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.

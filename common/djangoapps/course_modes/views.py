@@ -268,7 +268,7 @@ class ChooseModeView(View):
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
-    @method_decorator(outer_atomic(read_committed=True))
+    @method_decorator(outer_atomic())
     def post(self, request, course_id):
         """Takes the form submission from the page and parses it.
 
