@@ -4,7 +4,6 @@
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from unittest import mock
 from unittest.mock import patch
 
 import ddt
@@ -39,7 +38,6 @@ from lms.djangoapps.certificates.api import (
     create_or_update_certificate_allowlist_entry,
     example_certificates_status,
     generate_example_certificates,
-    generate_user_certificates,
     get_allowlist_entry,
     get_allowlisted_users,
     get_certificate_footer_context,
@@ -68,7 +66,6 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     CertificateInvalidationFactory
 )
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
@@ -563,19 +560,6 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self.request_factory = RequestFactory()
-
-    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_new_cert_request_for_html_certificate(self):
-        """
-        Test generate_user_certificates with HTML certificates
-        """
-        self._setup_course_certificate()
-        with mock_passing_grade():
-            generate_user_certificates(self.student, self.course.id)
-
-        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
-        assert cert.status == CertificateStatuses.downloadable
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_url_empty_with_invalid_certificate(self):
