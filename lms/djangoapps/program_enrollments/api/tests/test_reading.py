@@ -603,11 +603,13 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         )
         self.create_social_auth_entry(self.user_0, provider_1, 'ext-user-0')
         self.create_social_auth_entry(self.user_1, provider_1, 'ext-user-1')
+        self.create_social_auth_entry(self.user_1, provider_2, 'ext-user-1')
         self.create_social_auth_entry(self.user_2, provider_2, 'ext-user-2')
         requested_keys = {'ext-user-1', 'ext-user-2', 'ext-user-3'}
         actual = get_users_by_external_keys(self.program_uuid, requested_keys)
         # ext-user-0 not requested, ext-user-3 doesn't exist,
         # ext-user-2 is authorized with secondary provider
+        # ext-user-1 has an entry in both providers
         expected = {
             'ext-user-1': self.user_1,
             'ext-user-2': self.user_2,
