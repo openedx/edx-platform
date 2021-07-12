@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-07-06 08:12+0000\n"
+"POT-Creation-Date: 2021-07-06 13:07+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -8815,8 +8815,10 @@ msgstr ""
 "إذا لم تتم إعادة توجيهك خلال ٥ ثوان، {start_anchor} انقر هنا للذهاب إلى "
 "الصفحة الرئيسية {end_anchor}."
 
-#: lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html themes/edx-platform/adg/lms/templates/main.html
+#: lms/templates/main_django.html
+#: themes/edx-platform/adg/lms/templates/main_django.html
+#: cms/templates/base.html lms/templates/main.html
+#: themes/edx-platform/adg/lms/templates/main.html
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 

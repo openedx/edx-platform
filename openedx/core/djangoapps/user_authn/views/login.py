@@ -142,7 +142,7 @@ def _generate_locked_out_error_message():
                                      'locked. Try again in {locked_out_period} minutes.\n'
                                      'To be on the safe side, you can reset your '
                                      'password {link_start}here{link_end} before you try again.\n')).format(
-            link_start=HTML('<a href="/reset" >'),
+            link_start=HTML('<a http="/login" class="form-toggle" data-type="password-reset">'),
             link_end=HTML('</a>'),
             locked_out_period=int(locked_out_period_in_sec / 60)))
 
@@ -255,7 +255,7 @@ def _handle_failed_authentication(user, authenticated_user):
                                                  ))
                                           .format(
                         quote=HTML("'"),
-                        link_start=HTML('<a href="/reset" >'),
+                        link_start=HTML('<a http="/login" class="form-toggle" data-type="password-reset">'),
                         link_end=HTML('</a>'),
                         remaining_attempts=remaining_attempts))
             else:
