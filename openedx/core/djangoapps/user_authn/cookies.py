@@ -78,7 +78,7 @@ def delete_logged_in_cookies(response):
         response.delete_cookie(
             cookie_name,
             path='/',
-            domain=settings.SESSION_COOKIE_DOMAIN
+            domain=settings.SHARED_COOKIE_DOMAIN
         )
 
     return response
@@ -88,7 +88,7 @@ def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
 
     cookie_settings = {
-        'domain': settings.SESSION_COOKIE_DOMAIN,
+        'domain': settings.SHARED_COOKIE_DOMAIN,
         'path': '/',
         'httponly': None,
     }
