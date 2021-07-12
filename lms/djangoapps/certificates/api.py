@@ -24,9 +24,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     generate_certificate_task as _generate_certificate_task,
-    generate_user_certificates as _generate_user_certificates,
-    is_on_certificate_allowlist as _is_on_certificate_allowlist,
-    regenerate_user_certificates as _regenerate_user_certificates
+    is_on_certificate_allowlist as _is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -198,14 +196,6 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
         cert_filter_args['user__id__in'] = user_ids
 
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
-
-
-def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
-    return _generate_user_certificates(student, course_key, insecure, generation_mode, forced_grade)
-
-
-def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
-    return _regenerate_user_certificates(student, course_key, forced_grade, template_file, insecure)
 
 
 def generate_certificate_task(user, course_key, generation_mode=None):
