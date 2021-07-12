@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3096 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3109,7 +3109,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=891 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=895 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5016,6 +5016,7 @@ CREATE TABLE `learning_sequences_userpartitiongroup` (
   `partition_id` bigint(20) NOT NULL,
   `group_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `learning_sequences_userp_partition_id_group_id_a152e36f_uniq` (`partition_id`,`group_id`),
   KEY `learning_se_partiti_6e2d28_idx` (`partition_id`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
