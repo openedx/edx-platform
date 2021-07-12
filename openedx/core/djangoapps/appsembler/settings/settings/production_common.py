@@ -3,6 +3,10 @@ Settings for Appsembler on production in both LMS and CMS.
 """
 
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -48,16 +52,13 @@ def plugin_settings(settings):
     # Sentry
     settings.SENTRY_DSN = settings.AUTH_TOKENS.get('SENTRY_DSN', False)
     if settings.SENTRY_DSN:
-        # Set your DSN value
-        settings.RAVEN_CONFIG = {
-            'environment': settings.FEATURES['ENVIRONMENT'],  # This should be moved somewhere more sensible
-            'tags': {
-                'app': 'edxapp',
-            },
-            'dsn': settings.SENTRY_DSN,
-        }
-
-        settings.INSTALLED_APPS += ['raven.contrib.django.raven_compat']
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            send_default_pii=True,
+            environment=settings.FEATURES['ENVIRONMENT'],
+        )
+        sentry_sdk.set_tag('app', 'edxapp')
 
     if settings.FEATURES.get('ENABLE_TIERS_APP', False):
         settings.TIERS_ORGANIZATION_MODEL = 'organizations.Organization'

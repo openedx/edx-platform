@@ -2,6 +2,8 @@
 Settings for Appsembler on LMS in Production.
 """
 
+import sentry_sdk
+
 from openedx.core.djangoapps.appsembler.settings.settings import production_common
 from ..helpers import get_tahoe_theme_static_dirs, get_tahoe_multitenant_auth_backends
 
@@ -90,7 +92,7 @@ def plugin_settings(settings):
         settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'] = total_seconds_in_year
 
     if settings.SENTRY_DSN:
-        settings.RAVEN_CONFIG['tags']['app'] = 'lms'
+        sentry_sdk.set_tag('app', 'lms')
 
     settings.ACCESS_CONTROL_BACKENDS = settings.ENV_TOKENS.get('ACCESS_CONTROL_BACKENDS', {})
     settings.LMS_SEGMENT_SITE = settings.AUTH_TOKENS.get('SEGMENT_SITE')
