@@ -327,4 +327,4 @@ class WebinarRegistration(TimeStampedModel):
         unique_together = ('webinar', 'user')
 
     def __str__(self):
-        return f'User {self.user}, Webinar {self.webinar}'
+        return f'User {self.user_id}, Webinar {self.webinar_id}'
