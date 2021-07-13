@@ -44,7 +44,6 @@ from lms.djangoapps.certificates.utils import (
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -243,7 +242,7 @@ def certificate_downloadable_status(student, course_key):
         'uuid': None,
     }
 
-    course_overview = CourseOverview.get_from_id(course_key)
+    course_overview = get_course_overview_or_none(course_key)
     if (
         not certificates_viewable_for_course(course_overview) and
         CertificateStatuses.is_passing_status(current_status['status']) and
