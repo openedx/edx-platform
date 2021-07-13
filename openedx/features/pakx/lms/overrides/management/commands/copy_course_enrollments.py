@@ -17,4 +17,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log.info("Copying enrollment record")
-        copy_active_course_enrollments.delay()
+        copy_active_course_enrollments()

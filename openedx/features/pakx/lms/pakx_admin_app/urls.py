@@ -8,6 +8,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AnalyticsStats,
     CourseEnrolmentViewSet,
+    CourseStatsListAPI,
     LearnerListAPI,
     UserCourseEnrollmentsListAPI,
     UserInfo,
@@ -25,5 +26,6 @@ urlpatterns = [
     url(r'^userinfo/$', UserInfo.as_view()),
     url(r'^analytics/stats/$', AnalyticsStats.as_view()),
     url(r'^analytics/learners/$', LearnerListAPI.as_view()),
+    url(r'^courses/stats/$', CourseStatsListAPI.as_view()),
     path('', include(router.urls)),
 ]

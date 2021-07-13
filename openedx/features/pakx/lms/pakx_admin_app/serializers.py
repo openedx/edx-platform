@@ -4,9 +4,40 @@ Serializer for Admin Panel APIs
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, UserProfile
 
 from .constants import GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
+
+
+class CourseStatsListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for list API for courses and its stats
+    """
+    completion_rate = serializers.SerializerMethodField()
+    in_progress = serializers.SerializerMethodField()
+    completed = serializers.SerializerMethodField()
+    enrolled = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseOverview
+        fields = ('display_name', 'enrolled', 'completed', 'in_progress', 'completion_rate')
+
+    @staticmethod
+    def get_enrolled(obj):
+        return obj.completed + obj.in_progress
+
+    @staticmethod
+    def get_completion_rate(obj):
+        return 0 if not obj.completed else (obj.completed / (obj.completed + obj.in_progress)) * 100
+
+    @staticmethod
+    def get_in_progress(obj):
+        return obj.in_progress
+
+    @staticmethod
+    def get_completed(obj):
+        return obj.completed
 
 
 class UserCourseEnrollmentSerializer(serializers.ModelSerializer):

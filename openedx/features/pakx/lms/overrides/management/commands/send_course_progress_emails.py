@@ -19,4 +19,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log.info("Staring command to check active course progress")
-        update_course_progress_stats.delay()
+        update_course_progress_stats()
