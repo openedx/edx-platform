@@ -22,3 +22,7 @@ class CourseAppsConfig(AppConfig):
             }
         },
     }
+
+    def ready(self):
+        # Connect signal handlers
+        from . import handlers  # pylint: disable=unused-import

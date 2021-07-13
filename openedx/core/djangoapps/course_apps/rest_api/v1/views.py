@@ -14,6 +14,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.djangoapps.student.auth import has_studio_write_access
+from openedx.core.djangoapps.course_apps.models import CourseAppStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, validate_course_key, verify_course_exists
 from ...api import is_course_app_enabled, set_course_app_enabled
@@ -60,9 +61,10 @@ class CourseAppSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     def to_representation(self, instance: CourseApp) -> Dict:
         course_key = self.context.get("course_key")
         request = self.context.get("request")
+        app_status = self.context.get("app_status")
         data = {
             "id": instance.app_id,
-            "enabled": is_course_app_enabled(course_key, instance.app_id),
+            "enabled": app_status.get(instance.app_id, is_course_app_enabled(course_key, instance.app_id)),
             "name": instance.name,
             "description": instance.description,
             "allowed_operations": instance.get_allowed_operations(course_key, request.user),
@@ -133,11 +135,13 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
         """
         course_key = CourseKey.from_string(course_id)
         course_apps = CourseAppsPluginManager.get_apps_available_for_course(course_key)
+        course_apps_status = CourseAppStatus.get_all_app_status_data_for_course(course_key)
         serializer = CourseAppSerializer(
             course_apps,
             many=True,
             context={
                 "course_key": course_key,
+                "app_status": course_apps_status,
                 "request": request,
             }
         )
@@ -192,12 +196,13 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
             course_app = None
         if not course_app or not course_app.is_available(course_key):
             raise ValidationError({"id": "Invalid app ID"})
-        set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
+        is_enabled = set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
         serializer = CourseAppSerializer(
             course_app,
             context={
                 "course_key": course_key,
                 "request": request,
-            }
+                "app_status": {app_id: is_enabled},
+            },
         )
         return Response(serializer.data)
