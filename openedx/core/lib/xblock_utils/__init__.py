@@ -5,6 +5,8 @@ Functions that can are used to modify XBlock fragments for use in the LMS and St
 
 import datetime
 import hashlib
+from importlib.metadata import version as package_version, PackageNotFoundError
+import inspect
 import json
 import logging
 import re
@@ -372,8 +374,23 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
             log.warning("Unable to read field in Staff Debug information", exc_info=True)
             field_contents.append((name, "WARNING: Unable to read field"))
 
+    # Retrieve the installed version of the package the XBlock belongs
+    # to, using inspect and importlib trickery. If this fails for any
+    # reason, don't error out with a 500, but instead show the XBlock
+    # version as None, and log a warning message.
+    block_version = None
+    try:
+        block_module = inspect.getmodule(block)
+        block_version = package_version(block_module.__package__)
+    except PackageNotFoundError:
+        log.warning("Unable to read package version for %s", block)
+    except Exception as e:  # pylint: disable=broad-except
+        log.warning("Unexpected error while trying "
+                    "to read package version for %s: %s", block, e)
+
     staff_context = {
         'fields': field_contents,
+        'block_version': block_version,
         'xml_attributes': getattr(block, 'xml_attributes', {}),
         'tags': block._class_tags,  # pylint: disable=protected-access
         'location': block.location,
