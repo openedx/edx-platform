@@ -38,7 +38,6 @@ from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses
@@ -2355,8 +2354,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             status_code=HttpResponseBadRequest.status_code,
         )
 
-    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
-    def test_v2_certificates_with_passing_grade(self):
+    def test_certificates_with_passing_grade(self):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_read_grade:
             course_grade = mock_read_grade.return_value
             course_grade.passed = True
@@ -2369,10 +2367,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                 mock_cert_task.assert_called_with(self.student, self.course.id, 'self')
                 assert resp.status_code == 200
 
-    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
-    def test_v2_certificates_not_passing(self):
+    def test_certificates_not_passing(self):
         """
-        Test v2 course certificates when the user is not passing the course
+        Test course certificates when the user is not passing the course
         """
         with patch(
             'lms.djangoapps.certificates.api.generate_certificate_task',
@@ -2386,10 +2383,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                 status_code=HttpResponseBadRequest.status_code,
             )
 
-    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
-    def test_v2_certificates_with_existing_downloadable_cert(self):
+    def test_certificates_with_existing_downloadable_cert(self):
         """
-        Test v2 course certificates when the user is passing the course and already has a cert
+        Test course certificates when the user is passing the course and already has a cert
         """
         GeneratedCertificateFactory.create(
             user=self.student,

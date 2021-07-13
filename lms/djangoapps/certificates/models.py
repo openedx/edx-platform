@@ -30,7 +30,7 @@ from lms.djangoapps.badges.events.course_complete import course_badge_check
 from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
@@ -657,7 +657,12 @@ def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_
     certificate_type = 'N/A'
     status = certificate_status(user_certificate)
     certificate_generated = status['status'] == CertificateStatuses.downloadable
-    can_have_certificate = CourseOverview.get_from_id(course_id).may_certify()
+
+    can_have_certificate = False
+    course_overview = get_course_overview_or_none(course_id)
+    if course_overview:
+        can_have_certificate = course_overview.may_certify()
+
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
     mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
     user_is_verified = grade is not None and mode_is_verified

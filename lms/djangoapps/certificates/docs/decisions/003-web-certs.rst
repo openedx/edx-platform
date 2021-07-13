@@ -3,7 +3,7 @@ Web (HTML) course certificates
 
 Status
 ------
-Proposed
+Accepted
 
 Background
 ----------

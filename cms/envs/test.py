@@ -21,7 +21,7 @@ from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
 
-from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.modulestore.modulestore_settings import update_module_store_settings  # pylint: disable=wrong-import-order
 
 from .common import *
 

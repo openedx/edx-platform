@@ -15,13 +15,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
-from lms.djangoapps.certificates.api import (
-    can_generate_certificate_task,
-    generate_certificate_task,
-    generate_user_certificates
-)
+from lms.djangoapps.certificates.api import generate_certificate_task
 from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
@@ -49,14 +44,9 @@ def request_certificate(request):
             course_key = CourseKey.from_string(request.POST.get('course_id'))
             status = certificate_status_for_student(student, course_key)['status']
 
-            if can_generate_certificate_task(student, course_key):
-                log.info(f'{course_key} is using V2 course certificates. Attempt will be made to generate a V2 '
-                         f'certificate for user {student.id}.')
-                generate_certificate_task(student, course_key)
-            elif status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                log_msg = 'Grading and certification requested for user %s in course %s via /request_certificate call'
-                log.info(log_msg, username, course_key)
-                status = generate_user_certificates(student, course_key)
+            log.info(f'{course_key} is using V2 course certificates. Attempt will be made to generate a V2 certificate '
+                     f'for user {student.id}.')
+            generate_certificate_task(student, course_key)
             return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
 
@@ -70,7 +60,6 @@ def update_certificate(request):
     This view should only ever be accessed by the xqueue server
     """
 
-    status = CertificateStatuses
     if request.method == "POST":
 
         xqueue_body = json.loads(request.POST.get('xqueue_body'))
@@ -99,55 +88,15 @@ def update_certificate(request):
             }), content_type='application/json')
 
         user = cert.user
-        if can_generate_certificate_task(user, course_key):
-            log.warning(f'{course_key} is using V2 certificates. Request to update the certificate for user {user.id} '
-                        f'will be ignored.')
-            return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-                json.dumps({
-                    'return_code': 1,
-                    'content': 'allowlist certificate'
-                }),
-                content_type='application/json'
-            )
-
-        if 'error' in xqueue_body:
-            cert.status = status.error
-            if 'error_reason' in xqueue_body:
-
-                # Hopefully we will record a meaningful error
-                # here if something bad happened during the
-                # certificate generation process
-                #
-                # example:
-                #  (aamorm BerkeleyX/CS169.1x/2012_Fall)
-                #  <class 'simples3.bucket.S3Error'>:
-                #  HTTP error (reason=error(32, 'Broken pipe'), filename=None) :
-                #  certificate_agent.py:175
-
-                cert.error_reason = xqueue_body['error_reason']
-        else:
-            if cert.status == status.generating:
-                cert.download_uuid = xqueue_body['download_uuid']
-                cert.verify_uuid = xqueue_body['verify_uuid']
-                cert.download_url = xqueue_body['url']
-                cert.status = status.downloadable
-            elif cert.status in [status.deleting]:
-                cert.status = status.deleted
-            else:
-                log.critical(
-                    'Invalid state for cert update: %s', cert.status
-                )
-                return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-                    json.dumps({
-                        'return_code': 1,
-                        'content': 'invalid cert status'
-                    }),
-                    content_type='application/json'
-                )
-
-        cert.save()
-        return HttpResponse(json.dumps({'return_code': 0}),  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-                            content_type='application/json')
+        log.warning(f'{course_key} is using V2 certificates. Request to update the certificate for user {user.id} will '
+                    f'be ignored.')
+        return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+            json.dumps({
+                'return_code': 1,
+                'content': 'allowlist certificate'
+            }),
+            content_type='application/json'
+        )
 
 
 @csrf_exempt

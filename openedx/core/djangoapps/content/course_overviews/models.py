@@ -63,7 +63,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 12  # this one goes to thirteen
+    VERSION = 15
 
     # Cache entry versioning.
     version = IntegerField()
@@ -131,6 +131,12 @@ class CourseOverview(TimeStampedModel):
 
     # Course highlight info, used to guide course update emails
     has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+
+    # Proctoring
+    enable_proctored_exams = BooleanField(default=False)
+    proctoring_provider = TextField(null=True)
+    proctoring_escalation_email = TextField(null=True)
+    allow_proctoring_opt_out = BooleanField(default=False)
 
     language = TextField(null=True)
 
@@ -233,6 +239,11 @@ class CourseOverview(TimeStampedModel):
         course_overview.self_paced = course.self_paced
 
         course_overview.has_highlights = cls._get_course_has_highlights(course)
+
+        course_overview.enable_proctored_exams = course.enable_proctored_exams
+        course_overview.proctoring_provider = course.proctoring_provider
+        course_overview.proctoring_escalation_email = course.proctoring_escalation_email
+        course_overview.allow_proctoring_opt_out = course.allow_proctoring_opt_out
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language

@@ -1,16 +1,21 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from datetime import timedelta
-import ddt
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
-from openedx.core.djangoapps.course_date_signals.handlers import _gather_graded_items, _has_assignment_blocks
-from xmodule.modulestore.django import modulestore
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_PLS
+from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx.core.djangoapps.course_date_signals.handlers import (
+    _gather_graded_items,
+    _get_custom_pacing_children,
+    _has_assignment_blocks,
+    extract_dates_from_course
+)
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from . import utils
 
 
-@ddt.ddt
 class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
@@ -49,10 +54,10 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         _has_assignment_blocks should return true if the argument block
         children leaf nodes include an assignment that is graded and scored
         """
-        with modulestore().bulk_operations(self.course.id):
+        with self.store.bulk_operations(self.course.id):
             sequence = ItemFactory(parent=self.course, category="sequential")
             vertical = ItemFactory(parent=sequence, category="vertical")
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             assert _has_assignment_blocks(sequence) is False
 
             # Ungraded problems do not count as assignment blocks
@@ -62,7 +67,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 graded=True,
                 weight=0,
             )
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             assert _has_assignment_blocks(sequence) is False
             ItemFactory.create(
                 parent=vertical,
@@ -70,7 +75,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 graded=False,
                 weight=1,
             )
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             assert _has_assignment_blocks(sequence) is False
 
             # Method will return true after adding a graded, scored assignment block
@@ -80,7 +85,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 graded=True,
                 weight=1,
             )
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             assert _has_assignment_blocks(sequence) is True
 
     def test_sequence_with_graded_and_ungraded_assignments(self):
@@ -88,10 +93,10 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         _gather_graded_items should set a due date of None on ungraded problem blocks
         even if the block has graded siblings in the sequence
         """
-        with modulestore().bulk_operations(self.course.id):
+        with self.store.bulk_operations(self.course.id):
             sequence = ItemFactory(parent=self.course, category="sequential")
             vertical = ItemFactory(parent=sequence, category="vertical")
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             ItemFactory.create(
                 parent=vertical,
                 category='problem',
@@ -114,5 +119,205 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 (ungraded_problem_2.location, {'due': None}),
                 (graded_problem_1.location, {'due': 5}),
             ]
-            sequence = modulestore().get_item(sequence.location)
+            sequence = self.store.get_item(sequence.location)
             self.assertCountEqual(_gather_graded_items(sequence, 5), expected_graded_items)
+
+    def test_get_custom_pacing_children(self):
+        """
+        _get_custom_pacing_items should return a list of (block item location, field metadata dictionary)
+        where the due dates are set from due_num_weeks
+        """
+        # A subsection with multiple units but no problems. Units should inherit due date.
+        with self.store.bulk_operations(self.course.id):
+            sequence = ItemFactory(parent=self.course, category='sequential', due_num_weeks=2)
+            vertical1 = ItemFactory(parent=sequence, category='vertical')
+            vertical2 = ItemFactory(parent=sequence, category='vertical')
+            vertical3 = ItemFactory(parent=sequence, category='vertical')
+            expected_dates = [
+                (sequence.location, {'due': timedelta(weeks=2)}),
+                (vertical1.location, {'due': timedelta(weeks=2)}),
+                (vertical2.location, {'due': timedelta(weeks=2)}),
+                (vertical3.location, {'due': timedelta(weeks=2)})
+            ]
+            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+
+            # A subsection with multiple units, each of which has a problem.
+            # Problems should also inherit due date.
+            problem1 = ItemFactory(parent=vertical1, category='problem')
+            problem2 = ItemFactory(parent=vertical2, category='problem')
+            expected_dates.extend([
+                (problem1.location, {'due': timedelta(weeks=2)}),
+                (problem2.location, {'due': timedelta(weeks=2)})
+            ])
+            sequence = self.store.get_item(sequence.location)
+            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+
+            # A subsection that has ORA as a problem. ORA should not inherit due date.
+            ItemFactory.create(parent=vertical3, category='openassessment')
+            sequence = self.store.get_item(sequence.location)
+            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+
+            # A subsection that has an ORA problem and a non ORA problem. ORA should
+            # not inherit due date, but non ORA problems should.
+            problem3 = ItemFactory(parent=vertical3, category='problem')
+            expected_dates.append((problem3.location, {'due': timedelta(weeks=2)}))
+            sequence = self.store.get_item(sequence.location)
+            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+
+
+class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
+    """
+    Tests the custom Personalized Learner Schedule (PLS) dates in self paced courses
+    """
+    def setUp(self):
+        super().setUp()
+        SelfPacedRelativeDatesConfig.objects.create(enabled=True)
+        self.course = CourseFactory.create(self_paced=True)
+        self.chapter = ItemFactory.create(category='chapter', parent=self.course)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_inheritance(self):
+        """
+        extract_dates_from_course should return a list of (block item location, field metadata dictionary)
+        and the blocks should inherit the dates from those above in the hiearchy
+        (ex. If a subsection is assigned a due date, its children should also have the same due date)
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
+            vertical = ItemFactory.create(category='vertical', parent=sequential)
+            problem = ItemFactory.create(category='problem', parent=vertical)
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, timedelta(days=28)),
+                (sequential.location, {'due': timedelta(days=21)}),
+                (vertical.location, {'due': timedelta(days=21)}),
+                (problem.location, {'due': timedelta(days=21)})
+            ]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_custom_and_default_pls_one_subsection(self):
+        """
+        due_num_weeks in one of the subsections. Only one of them should have a set due date.
+        The other subsections do not have due dates because they are not graded
+        and default PLS do not assign due dates to non graded assignments.
+        If custom PLS is not set, the subsection will fall back to the default
+        PLS logic of evenly spaced sections.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
+            ItemFactory.create(category='sequential', parent=self.chapter)
+            ItemFactory.create(category='sequential', parent=self.chapter)
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, timedelta(days=28)),
+                (sequential.location, {'due': timedelta(days=21)})
+            ]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_custom_and_default_pls_one_subsection_graded(self):
+        """
+        A section with a subsection that has due_num_weeks and
+        a subsection without due_num_weeks that has graded content.
+        Default PLS should apply for the subsection without due_num_weeks that has graded content.
+        If custom PLS is not set, the subsection will fall back to the default
+        PLS logic of evenly spaced sections.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=2)
+            vertical1 = ItemFactory.create(category='vertical', parent=sequential1)
+            problem1 = ItemFactory.create(category='problem', parent=vertical1)
+
+            chapter2 = ItemFactory.create(category='chapter', parent=self.course)
+            sequential2 = ItemFactory.create(category='sequential', parent=chapter2, graded=True)
+            vertical2 = ItemFactory.create(category='vertical', parent=sequential2)
+            problem2 = ItemFactory.create(category='problem', parent=vertical2)
+
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, timedelta(days=21)),
+                (sequential1.location, {'due': timedelta(days=14)}),
+                (vertical1.location, {'due': timedelta(days=14)}),
+                (problem1.location, {'due': timedelta(days=14)}),
+                (chapter2.location, timedelta(days=42)),
+                (sequential2.location, {'due': timedelta(days=42)}),
+                (vertical2.location, {'due': timedelta(days=42)}),
+                (problem2.location, {'due': timedelta(days=42)})
+            ]
+        course = self.store.get_item(self.course.location)
+        with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=6)):
+            self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_custom_and_default_pls_multiple_subsections_graded(self):
+        """
+        A section with a subsection that has due_num_weeks and multiple sections without
+        due_num_weeks that has graded content. Default PLS should apply for the subsections
+        without due_num_weeks that has graded content.
+        If custom PLS is not set, the subsection will fall back to the default
+        PLS logic of evenly spaced sections.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=4)
+            vertical1 = ItemFactory.create(category='vertical', parent=sequential1)
+            problem1 = ItemFactory.create(category='problem', parent=vertical1)
+
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, timedelta(days=14)),
+                (sequential1.location, {'due': timedelta(days=28)}),
+                (vertical1.location, {'due': timedelta(days=28)}),
+                (problem1.location, {'due': timedelta(days=28)})
+            ]
+
+            for i in range(3):
+                chapter = ItemFactory.create(category='chapter', parent=self.course)
+                sequential = ItemFactory.create(category='sequential', parent=chapter, graded=True)
+                vertical = ItemFactory.create(category='vertical', parent=sequential)
+                problem = ItemFactory.create(category='problem', parent=vertical)
+                num_days = i * 14 + 28
+                expected_dates.extend([
+                    (chapter.location, timedelta(days=num_days)),
+                    (sequential.location, {'due': timedelta(days=num_days)}),
+                    (vertical.location, {'due': timedelta(days=num_days)}),
+                    (problem.location, {'due': timedelta(days=num_days)}),
+                ])
+        course = self.store.get_item(self.course.location)
+        with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=8)):
+            self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_all_subsections(self):
+        """
+        With due_num_weeks on all subsections. All subsections should
+        have their corresponding due dates.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=3)
+            sequential2 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=4)
+            sequential3 = ItemFactory.create(category='sequential', parent=self.chapter, due_num_weeks=5)
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, timedelta(days=28)),
+                (sequential1.location, {'due': timedelta(days=21)}),
+                (sequential2.location, {'due': timedelta(days=28)}),
+                (sequential3.location, {'due': timedelta(days=35)})
+            ]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_PLS, active=True)
+    def test_extract_dates_from_course_no_subsections(self):
+        """
+        Without due_num_weeks on all subsections. None of the subsections should
+        have due dates.
+        """
+        with self.store.bulk_operations(self.course.id):
+            for _ in range(3):
+                ItemFactory.create(category='sequential', parent=self.chapter)
+            expected_dates = [(self.course.location, {})]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)

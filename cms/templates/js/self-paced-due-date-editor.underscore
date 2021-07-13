@@ -1,0 +1,24 @@
+<ul class="list-fields list-input date-setter">
+    <li class="field field-text field-due-in">
+        <label for="due_in"><%- gettext('Due in:') %></label>
+        <input type="number" id="due_in" name="due_in" value=""
+            placeholder="" autocomplete="off" min="1" max="18"/> weeks
+    </li>
+</ul>
+
+<ul class="list-actions">
+    <li class="action-item">
+        <a href="#" data-tooltip="<%- gettext('Clear Due Date') %>" class="clear-date action-button action-clear">
+            <span class="icon fa fa-undo" aria-hidden="true"></span>
+            <span class="sr"><%- gettext('Clear Due Date') %></span>
+        </a>
+    </li>
+</ul>
+
+<div id="due-num-weeks-warning-max" class="message-status error">
+    <%- gettext('The maximum number of weeks this subsection can be due in is 18 weeks.') %>
+</div>
+
+<div id="due-num-weeks-warning-min" class="message-status error">
+    <%- gettext('The minimum number of weeks this subsection can be due in is 1 week.') %>
+</div>

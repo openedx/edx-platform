@@ -180,6 +180,9 @@ class UserPartitionGroup(models.Model):
     group_id = models.BigIntegerField(null=False)
 
     class Meta:
+        unique_together = [
+            ['partition_id', 'group_id'],
+        ]
         indexes = [
             models.Index(fields=['partition_id', 'group_id']),
         ]
@@ -198,8 +201,6 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
 
     # What is our position within the Course? (starts with 0)
     ordering = models.PositiveIntegerField(null=False)
-
-    user_partition_groups = models.ManyToManyField(UserPartitionGroup)
 
     new_user_partition_groups = models.ManyToManyField(
         UserPartitionGroup,
@@ -262,8 +263,6 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
     # Ordering, starts with 0, but global for the course. So if you had 200
     # sequences across 20 sections, the numbering here would be 0-199.
     ordering = models.PositiveIntegerField(null=False)
-
-    user_partition_groups = models.ManyToManyField(UserPartitionGroup)
 
     new_user_partition_groups = models.ManyToManyField(
         UserPartitionGroup,

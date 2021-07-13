@@ -23,12 +23,8 @@ from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
-    can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
-    generate_user_certificates as _generate_user_certificates,
-    is_on_certificate_allowlist as _is_on_certificate_allowlist,
-    is_using_v2_course_certificates as _is_using_v2_course_certificates,
-    regenerate_user_certificates as _regenerate_user_certificates
+    is_on_certificate_allowlist as _is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -47,7 +43,7 @@ from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -56,7 +52,7 @@ MODES = GeneratedCertificate.MODES
 
 def _format_certificate_for_user(username, cert):
     """
-    Helper function to serialize an user certificate.
+    Helper function to serialize a user certificate.
 
     Arguments:
         username (unicode): The identifier of the user.
@@ -64,7 +60,8 @@ def _format_certificate_for_user(username, cert):
 
     Returns: dict
     """
-    try:
+    course_overview = get_course_overview_or_none(cert.course_id)
+    if cert.download_url or course_overview:
         return {
             "username": username,
             "course_key": cert.course_id,
@@ -82,8 +79,8 @@ def _format_certificate_for_user(username, cert):
                 else None
             ),
         }
-    except CourseOverview.DoesNotExist:
-        return None
+
+    return None
 
 
 def get_certificates_for_user(username):
@@ -202,25 +199,6 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
 
-def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
-    return _generate_user_certificates(student, course_key, insecure, generation_mode, forced_grade)
-
-
-def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
-    return _regenerate_user_certificates(student, course_key, forced_grade, template_file, insecure)
-
-
-def can_generate_certificate_task(user, course_key):
-    """
-    Determine if we can create a task to generate a certificate for this user in this course run.
-
-    This will return True if either:
-    - the course run is using the allowlist and the user is on the allowlist, or
-    - the course run is using v2 course certificates
-    """
-    return _can_generate_certificate_task(user, course_key)
-
-
 def generate_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
@@ -264,7 +242,7 @@ def certificate_downloadable_status(student, course_key):
         'uuid': None,
     }
 
-    course_overview = CourseOverview.get_from_id(course_key)
+    course_overview = get_course_overview_or_none(course_key)
     if (
         not certificates_viewable_for_course(course_overview) and
         CertificateStatuses.is_passing_status(current_status['status']) and
@@ -733,13 +711,6 @@ def get_certificate_invalidation_entry(certificate):
         return None
 
     return certificate_invalidation_entry
-
-
-def is_using_v2_course_certificates(course_key):
-    """
-    Determines if the given course run is using V2 of course certificates
-    """
-    return _is_using_v2_course_certificates(course_key)
 
 
 def get_allowlist(course_key):

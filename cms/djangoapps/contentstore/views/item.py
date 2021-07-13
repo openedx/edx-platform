@@ -20,7 +20,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseEditLTIFieldsEnabledFlag
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
@@ -311,7 +311,7 @@ class StudioEditModuleRuntime:
             if service_name == "settings":
                 return SettingsService()
             if service_name == "lti-configuration":
-                return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
+                return ConfigurationService(CourseAllowPIISharingInLTIFlag)
             if service_name == "teams_configuration":
                 return TeamsConfigurationService()
             if service_name == "library_tools":
@@ -1230,6 +1230,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'graded': xblock.graded,
             'due_date': get_default_time_display(xblock.due),
             'due': xblock.fields['due'].to_json(xblock.due),
+            'due_num_weeks': xblock.due_num_weeks,
             'format': xblock.format,
             'course_graders': [grader.get('type') for grader in graders],
             'has_changes': has_changes,

@@ -2,12 +2,15 @@
 Test app view logic
 """
 # pylint: disable=test-inherits-tests
+from datetime import datetime, timedelta, timezone
 import unittest
+from contextlib import contextmanager
 
 import ddt
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -180,6 +183,59 @@ class DataTest(AuthorizedApiTest):
         """
         response = self._get()
         self._assert_defaults(response)
+
+    @contextmanager
+    def _pii_sharing_for_course(self, enabled):
+        instance = CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=enabled)
+        yield
+        instance.delete()
+
+    @ddt.data(
+        {"pii_share_username": True},
+        {"pii_share_email": True},
+        {"pii_share_email": True, "pii_share_username": True},
+    )
+    def test_post_pii_fields_fail(self, pii_fields):
+        """
+        If no record exists, defaults should be returned.
+        """
+        data = self._setup_lti()
+        data['lti_configuration'].update(pii_fields)
+        response = self._post(data)
+        assert response.status_code == 400
+
+    @ddt.data(
+        {"pii_share_username": True},
+        {"pii_share_email": True},
+        {"pii_share_email": True, "pii_share_username": True},
+    )
+    def test_post_pii_fields(self, pii_fields):
+        """
+        Only if PII sharing is enabled should a user be able to set pii fields.
+        """
+        data = self._setup_lti()
+        data['lti_configuration'].update(pii_fields)
+        with self._pii_sharing_for_course(enabled=False):
+            response = self._post(data)
+            assert response.status_code == 400
+        with self._pii_sharing_for_course(enabled=True):
+            response = self._post(data)
+            assert response.status_code == 200
+
+    @ddt.data(
+        True, False
+    )
+    def test_get_pii_fields(self, pii_sharing):
+        """
+        Only if PII is enabled should pii fields be returned.
+        """
+        self._setup_lti()
+        with self._pii_sharing_for_course(enabled=pii_sharing):
+            response = self._get()
+            data = response.json()
+            # If pii_sharing is true, then the fields should be present, and absent otherwise
+            assert ("pii_share_email" in data["lti_configuration"]) == pii_sharing
+            assert ("pii_share_username" in data["lti_configuration"]) == pii_sharing
 
     def test_post_everything(self):
         """
@@ -422,3 +478,54 @@ class DataTest(AuthorizedApiTest):
         assert data['provider_type'] == 'legacy'
         assert not data['plugin_configuration']['allow_anonymous']
         assert not data['lti_configuration']
+
+    @ddt.data(*[
+        user_type.name for user_type in CourseUserType
+        if user_type not in {  # pylint: disable=undefined-variable
+            CourseUserType.ANONYMOUS,
+            CourseUserType.GLOBAL_STAFF
+        }
+    ])
+    def test_unable_to_change_provider_for_running_course(self, user_type):
+        """
+        Ensure that certain users cannot change provider for a running course.
+        """
+        self.course.start = datetime.now(timezone.utc) - timedelta(days=5)
+        self.course = self.update_course(self.course, self.user.id)
+
+        # use the global staff user to do the initial config
+        # so we're sure to not get permissions errors
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'legacy',
+        })
+        assert response.status_code == status.HTTP_200_OK
+
+        self.create_user_for_course(self.course, CourseUserType[user_type])
+
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'piazza',
+        })
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_global_staff_can_change_provider_for_running_course(self):
+        """
+        Ensure that global staff can change provider for a running course.
+        """
+        self.course.start = datetime.now(timezone.utc) - timedelta(days=5)
+        self.course = self.update_course(self.course, self.user.id)
+
+        # use the global staff user to do the initial config
+        # so we're sure to not get permissions errors
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'legacy',
+        })
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'piazza',
+        })
+        assert response.status_code == status.HTTP_200_OK

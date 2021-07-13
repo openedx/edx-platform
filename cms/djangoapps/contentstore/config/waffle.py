@@ -67,3 +67,15 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
     flag_name='library_authoring_mfe',
     module_name=__name__,
 )
+
+
+# .. toggle_name: studio.custom_pls
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable custom pacing for PLS
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-07-12
+# .. toggle_target_removal_date: 2021-12-31
+# .. toggle_warnings: For this flag to be active, add flag 'studio.custom_pls' in Django Admin
+# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
+CUSTOM_PLS = CourseWaffleFlag(WAFFLE_NAMESPACE, 'custom_pls', module_name=__name__,)

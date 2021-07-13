@@ -977,6 +977,9 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = ""
+
 # Site info
 SITE_NAME = "localhost"
 HTTPS = 'on'
