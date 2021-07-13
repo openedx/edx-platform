@@ -2,6 +2,7 @@
 CourseBlocks API views
 """
 
+from base64 import (urlsafe_b64encode, urlsafe_b64decode)
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -240,6 +241,12 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
+            blocks = response.data['blocks']
+            for block in blocks:
+                current_block = blocks[block]
+                id_hash = bytes(current_block['id'], 'utf-8')
+                current_block['hash_key'] = urlsafe_b64encode(id_hash)
+                print(urlsafe_b64decode(current_block['hash_key']))
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from

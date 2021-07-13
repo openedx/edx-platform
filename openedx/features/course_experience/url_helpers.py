@@ -177,8 +177,7 @@ def make_learning_mfe_courseware_url(
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
-
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/c/{course_key}'
     if sequence_key:
         mfe_link += f'/{sequence_key}'
 
@@ -201,7 +200,7 @@ def get_learning_mfe_home_url(
     `course_key` can be either an OpaqueKey or a string.
     `view_name` is an optional string.
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/c/{course_key}'
 
     if view_name:
         mfe_link += f'/{view_name}'

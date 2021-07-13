@@ -2,6 +2,7 @@
 Course API Views
 """
 
+from base64 import (urlsafe_b64encode, urlsafe_b64decode)
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -544,8 +545,18 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
+        processed_key = usage_key_string[2:len(usage_key_string)-1]
+        # b_processed = bytes(processed_key,'utf-8')
+        decoded_usage_key_string = urlsafe_b64decode(processed_key)
+        print(decoded_usage_key_string)
+        decoded_usage_key = decoded_usage_key_string.decode('utf-8')
+        print(decoded_usage_key)
         try:
-            usage_key = UsageKey.from_string(usage_key_string)
+            usage_key = UsageKey.from_string(decoded_usage_key)
+
+            print("FAILED")
+        # try:
+        #     usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -566,6 +577,15 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         view = STUDENT_VIEW
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
+
+        # metadata = sequence.get_metadata(view=view)
+        # id_hash = bytes(metadata['item_id'], 'ascii')
+        # metadata['hash_key'] = urlsafe_b64encode(id_hash)
+        # print(urlsafe_b64decode(metadata['hash_key']))
+        # for item in metadata['items']:
+        #     # if item['hash_key'] == undefined:
+        #     item_id_hash = bytes(item['id'], 'utf-8')
+        #     item['hash_key'] = urlsafe_b64encode(item_id_hash)
 
         return Response(sequence.get_metadata(view=view))
 

@@ -2,6 +2,7 @@
 
 
 from logging import getLogger
+from base64 import urlsafe_b64encode
 
 
 from lms.djangoapps.courseware.access import has_access
@@ -42,7 +43,9 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
         Not a general flatten function. '''
         p = []
         while xs != ():
-            p.append(xs[0])
+            xs_hash = urlsafe_b64encode(bytes(xs[0].block_id, 'utf-8'))
+            p.append(xs_hash)
+            # p.append(xs[0])
             xs = xs[1]
         return p
 
