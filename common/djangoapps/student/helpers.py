@@ -37,6 +37,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.password_policy_validators import normalize_password
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
+    cert_generation_enabled,
     get_certificate_url,
     has_html_certificates_enabled
 )
@@ -46,6 +47,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -591,6 +593,15 @@ def _cert_info(user, course_overview, cert_status):
             else max(filter(lambda x: x is not None, grades_input))
         )
         status_dict['grade'] = str(max_grade)
+
+        # If the grade is passing, the status is one of these statuses, and request certificate
+        # is enabled for a course then we need to provide the option to the learner
+        if (
+            status_dict['status'] != CertificateStatuses.downloadable and
+            (cert_generation_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
+            persisted_grade.passed
+        ):
+            status_dict['status'] = CertificateStatuses.requesting
 
     return status_dict
 
