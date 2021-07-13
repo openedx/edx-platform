@@ -24,7 +24,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.certificates.api import generate_certificate_task, get_certificates_for_user
 from lms.djangoapps.certificates.permissions import GENERATE_ALL_CERTIFICATES, VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger(__name__)
@@ -187,9 +187,8 @@ def regenerate_certificate_for_user(request):
     user = params["user"]
     course_key = params["course_key"]
 
-    try:
-        get_course_overview(course_key)
-    except CourseOverview.DoesNotExist:
+    course_overview = get_course_overview_or_none(course_key)
+    if not course_overview:
         msg = _("The course {course_key} does not exist").format(course_key=course_key)
         return HttpResponseBadRequest(msg)
 
