@@ -164,7 +164,7 @@ def _can_generate_certificate_common(user, course_key):
         log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
         return False
 
-    if not _can_generate_certificate_for_status(user, course_key):
+    if not _can_generate_certificate_for_status(user, course_key, enrollment_mode):
         return False
 
     course_overview = get_course_overview_or_none(course_key)
@@ -295,7 +295,7 @@ def is_on_certificate_allowlist(user, course_key):
     return CertificateAllowlist.objects.filter(user=user, course_id=course_key, allowlist=True).exists()
 
 
-def _can_generate_certificate_for_status(user, course_key):
+def _can_generate_certificate_for_status(user, course_key, enrollment_mode):
     """
     Check if the user's certificate status can handle regular (non-allowlist) certificate generation
     """
@@ -304,12 +304,14 @@ def _can_generate_certificate_for_status(user, course_key):
         return True
 
     if cert.status == CertificateStatuses.downloadable:
-        log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is not '
-                 f'eligible for generation. Certificate cannot be generated as it is already in a final state.')
-        return False
+        if not _is_mode_now_eligible(enrollment_mode, cert):
+            log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is not '
+                     f'eligible for generation. Certificate cannot be generated as it is already in a final state. The '
+                     f'current enrollment mode is {enrollment_mode} and the existing cert mode is {cert.mode}')
+            return False
 
     log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is eligible for '
-             f'generation')
+             f'generation. The current enrollment mode is {enrollment_mode} and the existing cert mode is {cert.mode}')
     return True
 
 
@@ -367,3 +369,12 @@ def _is_cert_downloadable(user, course_key):
         return False
 
     return True
+
+
+def _is_mode_now_eligible(enrollment_mode, cert):
+    """
+    Check if the current enrollment mode is now eligible, while the enrollment mode on the cert is NOT eligible
+    """
+    if modes_api.is_eligible_for_certificate(enrollment_mode) and not modes_api.is_eligible_for_certificate(cert.mode):
+        return True
+    return False
