@@ -68,7 +68,7 @@ def clean_json(value, of_type):
 
 def clean_username(username=''):
     """ Simple helper method to ensure a username is compatible with our system requirements. """
-    return re.sub(r'[^-\w]+', '_', username)[:USERNAME_MAX_LENGTH]
+    return ('_').join(re.findall(r'[a-zA-Z0-9\-]+', username))[:USERNAME_MAX_LENGTH]
 
 
 class AuthNotConfigured(SocialAuthBaseException):
