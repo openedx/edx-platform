@@ -10,6 +10,7 @@ import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tasks import generate_certificate
@@ -54,6 +55,8 @@ class GenerateUserCertificateTest(TestCase):
                 user=self.user,
                 course_key=CourseKey.from_string(course_key),
                 status=CertificateStatuses.downloadable,
+                enrollment_mode=None,
+                course_grade=None,
                 generation_mode='batch'
             )
 
@@ -63,14 +66,20 @@ class GenerateUserCertificateTest(TestCase):
         """
         course_key = 'course-v1:edX+DemoX+Demo_Course'
         gen_mode = 'self'
+        status = CertificateStatuses.notpassing
+        enrollment_mode = CourseMode.AUDIT
+        course_grade = '0.89'
 
         with mock.patch(
             'lms.djangoapps.certificates.tasks.generate_course_certificate',
             return_value=None
         ) as mock_generate_cert:
             kwargs = {
+                'status': status,
                 'student': self.user.id,
                 'course_key': course_key,
+                'course_grade': course_grade,
+                'enrollment_mode': enrollment_mode,
                 'generation_mode': gen_mode,
                 'what_about': 'dinosaurs'
             }
@@ -79,6 +88,8 @@ class GenerateUserCertificateTest(TestCase):
             mock_generate_cert.assert_called_with(
                 user=self.user,
                 course_key=CourseKey.from_string(course_key),
-                status=CertificateStatuses.downloadable,
+                status=status,
+                enrollment_mode=enrollment_mode,
+                course_grade=course_grade,
                 generation_mode=gen_mode
             )

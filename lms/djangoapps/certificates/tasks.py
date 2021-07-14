@@ -29,12 +29,17 @@ def generate_certificate(self, **kwargs):  # pylint: disable=unused-argument
         - course_key: The course key for the course that the student is
             receiving a certificate in.
         - status: Certificate status (value from the CertificateStatuses model)
+        - enrollment_mode: user's enrollment mode (ex. verified)
+        - course_grade: user's course grade
         - generation_mode: Used when emitting an event. Options are "self" (implying the user generated the cert
             themself) and "batch" for everything else.
     """
     student = User.objects.get(id=kwargs.pop('student'))
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     status = kwargs.pop('status', CertificateStatuses.downloadable)
+    enrollment_mode = kwargs.pop('enrollment_mode', None)
+    course_grade = kwargs.pop('course_grade', None)
     generation_mode = kwargs.pop('generation_mode', 'batch')
 
-    generate_course_certificate(user=student, course_key=course_key, status=status, generation_mode=generation_mode)
+    generate_course_certificate(user=student, course_key=course_key, status=status, enrollment_mode=enrollment_mode,
+                                course_grade=course_grade, generation_mode=generation_mode)
