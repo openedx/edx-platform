@@ -191,4 +191,4 @@ class MultilingualCourseManager(Manager):
         return self.get_queryset().filter(
             course__start_date__lte=today,
             course__end_date__gte=today
-        )
+        ).select_related('course')

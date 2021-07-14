@@ -116,7 +116,7 @@ def test_user_application_string_representation(user_application):
     """
     Test that the string representation of a UserApplication object translates to the the full name of the applicant.
     """
-    expected_str = user_application.user.profile.name
+    expected_str = 'id={}, user_id={}'.format(user_application.id, user_application.user_id)
     actual_str = user_application.__str__()
 
     assert expected_str == actual_str
