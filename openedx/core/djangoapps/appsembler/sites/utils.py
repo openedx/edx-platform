@@ -164,7 +164,8 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     write a custom hash creation function to generates 32 chars
     """
     app = get_amc_oauth_app()
-    one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
+    valid_days = getattr(settings, 'OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS', 365)
+    one_year_ahead = timezone.now() + timedelta(days=valid_days)
 
     access, _created = AccessToken.objects.get_or_create(
         user=user,
