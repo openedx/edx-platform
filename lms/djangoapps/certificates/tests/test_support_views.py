@@ -22,7 +22,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_v2_certificate'
+CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
