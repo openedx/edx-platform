@@ -38,7 +38,7 @@ from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
@@ -972,9 +972,6 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
-
-
-@python_2_unicode_compatible
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1201,9 +1198,6 @@ class CourseEnrollmentManager(models.Manager):
 # CourseEnrollment for a user in a course.  This type
 # is used to cache the state in the request cache.
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
-
-
-@python_2_unicode_compatible
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -2252,7 +2246,6 @@ class CourseEnrollment(models.Model):
         )
 
 
-@python_2_unicode_compatible
 class FBEEnrollmentExclusion(models.Model):
     """
     Disable FBE for enrollments in this table.
@@ -2369,7 +2362,6 @@ class ManualEnrollmentAudit(models.Model):
         return True
 
 
-@python_2_unicode_compatible
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
@@ -2430,7 +2422,6 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
 
 @total_ordering
-@python_2_unicode_compatible
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -2792,7 +2783,6 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
 
-@python_2_unicode_compatible
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
@@ -2900,7 +2890,6 @@ class SocialLink(models.Model):
     social_link = models.CharField(max_length=100, blank=True)
 
 
-@python_2_unicode_compatible
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
@@ -3008,7 +2997,6 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
 
 
-@python_2_unicode_compatible
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
@@ -3057,7 +3045,6 @@ class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     )
 
 
-@python_2_unicode_compatible
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.
