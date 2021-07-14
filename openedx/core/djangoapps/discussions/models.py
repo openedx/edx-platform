@@ -128,7 +128,7 @@ AVAILABLE_PROVIDER_MAP = {
         'external_links': ProviderExternalLinks(
             'https://www.youtube.com/watch?v=ZACief-qMwY',
             '',
-            'https://hubs.ly/H0J5Bn7',
+            'https://hubs.ly/H0J5Bn70',
             '',
             'learnmore@yellowdig.com',
         )._asdict(),
