@@ -40,7 +40,7 @@ def generate_certificate_task(user, course_key, generation_mode=None):
         return generate_allowlist_certificate_task(user, course_key, generation_mode)
 
     log.info(f'Attempt will be made to generate course certificate for user {user.id} : {course_key}')
-    return generate_regular_certificate_task(user, course_key, generation_mode)
+    return _generate_regular_certificate_task(user, course_key, generation_mode)
 
 
 def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
@@ -57,15 +57,15 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     return False
 
 
-def generate_regular_certificate_task(user, course_key, generation_mode=None):
+def _generate_regular_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
     """
-    if _can_generate_v2_certificate(user, course_key):
+    if _can_generate_regular_certificate(user, course_key):
         return _generate_certificate_task(user=user, course_key=course_key, generation_mode=generation_mode)
 
-    status = _set_v2_cert_status(user, course_key)
+    status = _set_regular_cert_status(user, course_key)
     if status is not None:
         return True
 
@@ -76,12 +76,11 @@ def _generate_certificate_task(user, course_key, status=None, generation_mode=No
     """
     Create a task to generate a certificate
     """
-    log.info(f'About to create a V2 certificate task for {user.id} : {course_key}')
+    log.info(f'About to create a regular certificate task for {user.id} : {course_key}')
 
     kwargs = {
         'student': str(user.id),
-        'course_key': str(course_key),
-        'v2_certificate': True
+        'course_key': str(course_key)
     }
     if status is not None:
         kwargs['status'] = status
@@ -113,10 +112,10 @@ def _can_generate_allowlist_certificate(user, course_key):
     return True
 
 
-def _can_generate_v2_certificate(user, course_key):
+def _can_generate_regular_certificate(user, course_key):
     """
-    Check if a v2 course certificate can be generated (created if it doesn't already exist, or updated if it does
-    exist) for this user, in this course run.
+    Check if a regular (non-allowlist) course certificate can be generated (created if it doesn't already exist, or
+    updated if it does exist) for this user, in this course run.
     """
     if _is_ccx_course(course_key):
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
@@ -134,7 +133,7 @@ def _can_generate_v2_certificate(user, course_key):
         log.info(f'One of the common checks failed. Certificate cannot be generated for {user.id} : {course_key}.')
         return False
 
-    log.info(f'V2 certificate can be generated for {user.id} : {course_key}')
+    log.info(f'Regular certificate can be generated for {user.id} : {course_key}')
     return True
 
 
@@ -143,7 +142,7 @@ def _can_generate_certificate_common(user, course_key):
     Check if a course certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
 
-    This method contains checks that are common to both allowlist and V2 regular course certificates.
+    This method contains checks that are common to both allowlist and regular course certificates.
     """
     if CertificateInvalidation.has_certificate_invalidation(user, course_key):
         # The invalidation list prevents certificate generation
@@ -194,14 +193,14 @@ def _set_allowlist_cert_status(user, course_key):
     return _get_cert_status_common(user, course_key, cert)
 
 
-def _set_v2_cert_status(user, course_key):
+def _set_regular_cert_status(user, course_key):
     """
-    Determine the V2 certificate status for this user, in this course run.
+    Determine the regular (non-allowlist) certificate status for this user, in this course run.
 
     This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
     be generated.
     """
-    if not _can_set_v2_cert_status(user, course_key):
+    if not _can_set_regular_cert_status(user, course_key):
         return None
 
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
@@ -251,9 +250,9 @@ def _can_set_allowlist_cert_status(user, course_key):
     return _can_set_cert_status_common(user, course_key)
 
 
-def _can_set_v2_cert_status(user, course_key):
+def _can_set_regular_cert_status(user, course_key):
     """
-    Determine whether we can set a custom (non-downloadable) cert status for a V2 certificate
+    Determine whether we can set a custom (non-downloadable) cert status for a regular (non-allowlist) certificate
     """
     if _is_ccx_course(course_key):
         return False
