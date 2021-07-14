@@ -20,7 +20,7 @@ from functools import wraps
 from unittest.mock import Mock
 
 from django.test import TestCase
-from django.utils.encoding import python_2_unicode_compatible
+
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from xblock.core import XBlock
@@ -204,7 +204,6 @@ def map_references(value, field, actual_course_key):
     return value
 
 
-@python_2_unicode_compatible
 class LazyFormat:
     """
     An stringy object that delays formatting until it's put into a string context.
