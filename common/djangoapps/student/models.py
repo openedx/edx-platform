@@ -85,6 +85,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
+from edx_django_utils.management.commands.manage_user import manage_user_cmd
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -741,6 +742,11 @@ def invalidate_user_profile_country_cache(sender, instance, **kwargs):  # pylint
         cache_key = UserProfile.country_cache_key_name(instance.user_id)
         cache.delete(cache_key)
         log.info("Country changed in UserProfile for %s, cache deleted", instance.user_id)
+
+
+@receiver(manage_user_cmd)
+def user_profile_manage(sender, user, **kwargs):
+    user_profile, _ = UserProfile.objects.get_or_create(user=user)
 
 
 @receiver(pre_save, sender=UserProfile)
