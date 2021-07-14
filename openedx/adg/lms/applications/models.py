@@ -106,7 +106,7 @@ class ApplicationHub(TimeStampedModel):
         return self.is_prerequisite_courses_passed and self.is_bu_prerequisite_courses_passed
 
     def __str__(self):
-        return 'User {user_id}, application status id={id}'.format(user_id=self.user_id, id=self.id)
+        return f'User {self.user_id}, application status id={self.id}'
 
 
 class BusinessLine(TimeStampedModel):
@@ -143,7 +143,7 @@ class BusinessLine(TimeStampedModel):
         return cls.objects.filter(group__user=user).exists()
 
     def __str__(self):
-        return '{}'.format(self.title)
+        return self.title
 
 
 class UserApplication(TimeStampedModel):
@@ -192,7 +192,7 @@ class UserApplication(TimeStampedModel):
         ordering = ['created']
 
     def __str__(self):
-        return '{}'.format(self.user.profile.name)  # pylint: disable=E1101
+        return f'id={self.id}, user_id={self.user_id}'
 
     @property
     def program_prereq_course_scores(self):
@@ -419,7 +419,7 @@ class MultilingualCourse(models.Model):
         app_label = 'applications'
 
     def __str__(self):
-        return 'id={id} name={name}'.format(id=self.course.id, name=self.course.display_name)
+        return f'{self.course_id}'
 
 
 class Reference(models.Model):
