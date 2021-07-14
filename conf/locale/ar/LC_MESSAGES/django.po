@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-07-06 13:07+0000\n"
+"POT-Creation-Date: 2021-07-14 08:12+0000\n"
 "PO-Revision-Date: 2021-06-24 09:14+0000\n"
 "Last-Translator: Ahmed Faraz <ahmed.faraz@arbisoft.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9702,10 +9702,6 @@ msgstr ""
 
 #: openedx/adg/lms/applications/helpers.py
 msgid "to"
-msgstr ""
-
-#: openedx/adg/lms/applications/helpers.py
-msgid "{message[:-1]}."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
@@ -21300,31 +21296,7 @@ msgid "Omnipreneurship Courses"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "You will have to complete"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "both"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"of the Omnipreneurship courses. However, you will have to enroll in and"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid "complete Omnipreneurship 101 first."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"Once you have completed Omnipreneurship 101 and received a passing grade, "
-"the Omnipreneurship 102 course will be unlocked."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
-msgid ""
-"Omnipreneurship 102 has been unlocked for you to enroll in and complete!"
+msgid "No courses to be displayed yet."
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
