@@ -2,6 +2,7 @@
 Outline Tab Views
 """
 from datetime import datetime, timezone
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
@@ -146,6 +147,7 @@ class OutlineTabView(RetrieveAPIView):
             has_visited_course: (bool) Whether the user has ever visited the course
             url: (str) The display name of the course block to resume
         welcome_message_html: (str) Raw HTML for the course updates banner
+        user_has_passing_grade: (bool) Whether the user currently is passing the course
 
     **Returns**
 
@@ -312,6 +314,13 @@ class OutlineTabView(RetrieveAPIView):
                         seq_data['type'] != 'sequential'
                     )
                 ] if 'children' in chapter_data else []
+        
+        if not request.user.is_anonymous:
+            user_grade = CourseGradeFactory().read(request.user, course)
+            if user_grade:
+                user_has_passing_grade = user_grade.passed
+        else:
+            user_has_passing_grade = False
 
         data = {
             'access_expiration': access_expiration,
@@ -325,6 +334,7 @@ class OutlineTabView(RetrieveAPIView):
             'has_ended': course.has_ended(),
             'offer': offer_data,
             'resume_course': resume_course,
+            'user_has_passing_grade': user_has_passing_grade,
             'welcome_message_html': welcome_message_html,
         }
         context = self.get_serializer_context()

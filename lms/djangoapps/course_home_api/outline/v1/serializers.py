@@ -126,3 +126,4 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     offer = serializers.DictField()
     resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()
+    user_has_passing_grade = serializers.BooleanField()
