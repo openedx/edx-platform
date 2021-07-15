@@ -120,12 +120,12 @@ certifi==2021.5.30
 cffi==1.14.6
     # via cryptography
 chardet==4.0.0
-    # via pysrt
+    # via
+    #   aiohttp
+    #   pysrt
 charset-normalizer==2.0.2
     # via
     #   -r requirements/edx/paver.txt
-    #   aiohttp
-    #   pysrt
     #   requests
 chem==1.2.0
     # via -r requirements/edx/base.in
@@ -403,7 +403,7 @@ edx-ace==1.1.1
     # via -r requirements/edx/base.in
 edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.in
-edx-api-doc-tools==1.4.0
+edx-api-doc-tools==1.4.3
     # via -r requirements/edx/base.in
 edx-bulk-grades==0.8.12
     # via
@@ -595,7 +595,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==3.0.0
+lti-consumer-xblock==3.0.1
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via
