@@ -86,7 +86,7 @@ def collect_assets_from_text(text, course_id, include_content=False):
             path = path[8:]
         info = {
             'path': path,
-            'url': '/' + str(course_id.make_asset_key("asset", path)),
+            'url': '/' + str(StaticContent.compute_location(course_id, path)),
         }
         if include_content:
             content = get_asset_content_from_path(course_id, path)
