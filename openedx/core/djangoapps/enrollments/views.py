@@ -6,31 +6,48 @@ consist primarily of authentication, request validation, and serialization.
 
 
 import logging
-from openedx.core.djangoapps.enrollments.utils import enroll_user_in_course
-from openedx.core.djangoapps.enrollments.exceptions import(
-    CourseIdMissingException,
-    EnrollmentAttributesMissingError,
-    EnrollmentModeMismatchError,
-)
 
-from common.djangoapps.course_modes.models import CourseMode
-from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
+    ObjectDoesNotExist,
+    ValidationError
+)
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.jwt.authentication import \
+    JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.session.authentication import \
+    SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
-    CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError,
+    CourseEnrollmentError,
+    CourseEnrollmentExistsError,
+    CourseModeNotFoundError
+)
+from openedx.core.djangoapps.enrollments.exceptions import (
+    CourseIdMissingException,
+    EnrollmentAttributesMissingError,
+    EnrollmentModeMismatchError
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
+from openedx.core.djangoapps.enrollments.utils import enroll_user_in_course
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -39,15 +56,6 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeade
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
-from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, User
-from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
-from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 

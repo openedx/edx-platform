@@ -9,9 +9,10 @@ import itertools
 import json
 import unittest
 from unittest.mock import patch
-import pytest
+
 import ddt
 import httpretty
+import pytest
 import pytz
 from django.conf import settings
 from django.core.cache import cache
@@ -23,9 +24,16 @@ from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
+from common.djangoapps.util.models import RateLimitConfiguration
+from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
@@ -38,13 +46,6 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag,
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
-from common.djangoapps.util.models import RateLimitConfiguration
-from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin:

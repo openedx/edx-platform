@@ -1,14 +1,18 @@
 import logging
-from openedx.core.djangoapps.enrollments.exceptions import CourseIdMissingException, EnrollmentAttributesMissingError, EnrollmentModeMismatchError, UserDoesNotExistException
 
 from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+
+from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.enrollments import api
-from openedx.core.lib.log_utils import audit_log
-from openedx.core.djangoapps.enrollments.errors import (
-    CourseEnrollmentError, CourseEnrollmentExistsError,
+from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
+from openedx.core.djangoapps.enrollments.exceptions import (
+    CourseIdMissingException,
+    EnrollmentAttributesMissingError,
+    EnrollmentModeMismatchError,
+    UserDoesNotExistException
 )
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
@@ -18,7 +22,6 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiServiceClient,
     enterprise_enabled
 )
-from common.djangoapps.student.models import User
 
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
