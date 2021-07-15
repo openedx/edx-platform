@@ -21,7 +21,6 @@ import copy
 import datetime
 import os
 
-import dateutil
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
@@ -781,10 +780,6 @@ JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 STUDENTMODULEHISTORYEXTENDED_OFFSET = ENV_TOKENS.get(
     'STUDENTMODULEHISTORYEXTENDED_OFFSET', STUDENTMODULEHISTORYEXTENDED_OFFSET
 )
-
-# Cutoff date for granting audit certificates
-if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
-    AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
 
 ################################ Settings for Credentials Service ################################
 
