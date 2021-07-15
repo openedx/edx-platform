@@ -972,6 +972,8 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
+
+
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1198,6 +1200,8 @@ class CourseEnrollmentManager(models.Manager):
 # CourseEnrollment for a user in a course.  This type
 # is used to cache the state in the request cache.
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should

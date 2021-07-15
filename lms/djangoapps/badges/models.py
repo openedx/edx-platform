@@ -180,6 +180,8 @@ class BadgeAssertion(TimeStampedModel):
 
 # Abstract model doesn't index this, so we have to.
 BadgeAssertion._meta.get_field('created').db_index = True
+
+
 class CourseCompleteImageConfiguration(models.Model):
     """
     Contains the icon configuration for badges for a specific course mode.

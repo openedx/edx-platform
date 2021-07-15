@@ -56,6 +56,8 @@ EMAIL_TARGET_CHOICES = list(zip(
     ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
 ))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
+
+
 class Target(models.Model):
     """
     A way to refer to a particular group (within a course) as a "Send to:" target.
