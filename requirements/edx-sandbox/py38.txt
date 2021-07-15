@@ -8,7 +8,7 @@
     # via -r requirements/edx-sandbox/py38.in
 -e common/lib/symmath
     # via -r requirements/edx-sandbox/py38.in
-cffi==1.14.5
+cffi==1.14.6
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
@@ -71,7 +71,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.4.4
+regex==2021.7.6
     # via nltk
 scipy==1.7.0
     # via
@@ -88,7 +88,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   symmath
-tqdm==4.61.1
+tqdm==4.61.2
     # via nltk
 
 # The following packages are considered to be unsafe in a requirements file:
