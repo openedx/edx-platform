@@ -5,6 +5,7 @@ Django Model for tags
 
 from django.db import models
 
+
 class TagCategories(models.Model):
     """
     This model represents tag categories.

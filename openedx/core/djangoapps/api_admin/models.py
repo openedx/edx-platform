@@ -24,6 +24,8 @@ from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
+
+
 class ApiAccessRequest(TimeStampedModel):
     """
     Model to track API access for a user.

@@ -19,6 +19,8 @@ send_admin_notification = Signal(providing_args=["user"])
 
 # A signal that will be sent when user should be notified of change in course creator privileges
 send_user_notification = Signal(providing_args=["user", "state"])
+
+
 class CourseCreator(models.Model):
     """
     Creates the database table model.
