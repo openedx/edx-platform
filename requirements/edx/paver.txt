@@ -6,11 +6,11 @@
 #
 certifi==2021.5.30
     # via requests
-chardet==4.0.0
+charset-normalizer==2.0.2
     # via requests
 edx-opaque-keys==2.2.2
     # via -r requirements/edx/paver.in
-idna==2.10
+idna==3.2
     # via requests
 lazy==1.4
     # via -r requirements/edx/paver.in
@@ -35,7 +35,7 @@ pymongo==3.10.1
     #   edx-opaque-keys
 python-memcached==1.59
     # via -r requirements/edx/paver.in
-requests==2.25.1
+requests==2.26.0
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via

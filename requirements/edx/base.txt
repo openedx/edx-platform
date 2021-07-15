@@ -12,6 +12,17 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki
     # via -r requirements/edx/github.in
+-e git+https://github.com/edx/edx-django-utils.git@f870289aa49cc2ecf59f2a9bb150c2de69f7ebe7#egg=edx-django-utils
+    # via
+    #   -r requirements/edx/github.in
+    #   django-config-models
+    #   edx-drf-extensions
+    #   edx-enterprise
+    #   edx-rest-api-client
+    #   edx-toggles
+    #   edx-when
+    #   ora2
+    #   super-csv
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
@@ -66,7 +77,7 @@ beautifulsoup4==4.9.3
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach==3.3.0
+bleach==3.3.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -109,6 +120,8 @@ certifi==2021.5.30
 cffi==1.14.6
     # via cryptography
 chardet==4.0.0
+    # via pysrt
+charset-normalizer==2.0.2
     # via
     #   -r requirements/edx/paver.txt
     #   aiohttp
@@ -231,7 +244,7 @@ django-celery-results==2.0.1
     #   -r requirements/edx/base.in
 django-classy-tags==2.0.0
     # via django-sekizai
-django-config-models==2.1.2
+django-config-models==2.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -342,7 +355,7 @@ django-storages==1.8
     #   edxval
 django-user-tasks==2.1.0
     # via -r requirements/edx/base.in
-django-waffle==2.2.0
+django-waffle==2.2.1
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -408,18 +421,7 @@ edx-django-release-util==1.0.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.1.0
-    # via
-    #   -r requirements/edx/base.in
-    #   django-config-models
-    #   edx-drf-extensions
-    #   edx-enterprise
-    #   edx-rest-api-client
-    #   edx-toggles
-    #   edx-when
-    #   ora2
-    #   super-csv
-edx-drf-extensions==6.5.0
+edx-drf-extensions==6.6.0
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -433,7 +435,7 @@ edx-enterprise==3.26.23
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-edx-event-routing-backends==4.0.1
+edx-event-routing-backends==4.1.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3
     # via ora2
@@ -465,7 +467,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
 edx-rbac==1.5.0
     # via edx-enterprise
-edx-rest-api-client==5.3.0
+edx-rest-api-client==5.4.0
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -537,7 +539,7 @@ html5lib==1.1
     #   ora2
 icalendar==4.0.7
     # via -r requirements/edx/base.in
-idna==2.10
+idna==3.2
     # via
     #   -r requirements/edx/paver.txt
     #   requests
@@ -832,7 +834,7 @@ redis==3.5.3
     # via -r requirements/edx/base.in
 regex==2021.7.6
     # via nltk
-requests==2.25.1
+requests==2.26.0
     # via
     #   -r requirements/edx/paver.txt
     #   analytics-python
@@ -965,7 +967,7 @@ sympy==1.6.2
     #   symmath
 tableauserverclient==0.15.0
     # via edx-enterprise
-testfixtures==6.17.1
+testfixtures==6.18.0
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
@@ -1001,7 +1003,7 @@ voluptuous==0.12.1
     # via ora2
 watchdog==2.1.3
     # via -r requirements/edx/paver.txt
-web-fragments==1.0.0
+web-fragments==1.1.0
     # via
     #   -r requirements/edx/base.in
     #   crowdsourcehinter-xblock
