@@ -27,7 +27,7 @@ class CertificateStatuses:
     unavailable         - Certificate has been invalidated.
     unverified          - The user does not have an approved, unexpired identity verification.
 
-    The following statuses are set by V2 of course certificates:
+    The following statuses are set by the current course certificates code:
       downloadable - See generation.py
       notpassing - See GeneratedCertificate.mark_notpassing()
       unavailable - See GeneratedCertificate.invalidate()
