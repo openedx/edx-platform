@@ -125,6 +125,16 @@ COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
 )
 
+# .. toggle_name: courseware.enable_bulk_allowance_modal
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enable new bulk allowance modal
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-14
+BULK_ALLOWANCE_MODAL = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'enable_bulk_allowance', __name__,
+)
+
 
 def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
