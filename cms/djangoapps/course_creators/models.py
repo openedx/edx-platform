@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.dispatch import Signal, receiver
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 
 # A signal that will be sent when users should be added or removed from the creator group
@@ -21,7 +21,6 @@ send_admin_notification = Signal(providing_args=["user"])
 send_user_notification = Signal(providing_args=["user", "state"])
 
 
-@python_2_unicode_compatible
 class CourseCreator(models.Model):
     """
     Creates the database table model.
