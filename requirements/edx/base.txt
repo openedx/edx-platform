@@ -12,7 +12,7 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki
     # via -r requirements/edx/github.in
--e git+https://github.com/edx/edx-django-utils.git@f870289aa49cc2ecf59f2a9bb150c2de69f7ebe7#egg=edx-django-utils
+-e git+https://github.com/edx/edx-django-utils.git@5617766fdaf7a45bfb0d92e3429ad7c1af7fd628#egg=edx-django-utils
     # via
     #   -r requirements/edx/github.in
     #   django-config-models
