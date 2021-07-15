@@ -4,10 +4,8 @@ Django Model for tags
 
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class TagCategories(models.Model):
     """
     This model represents tag categories.
@@ -33,7 +31,6 @@ class TagCategories(models.Model):
         return [t.value for t in TagAvailableValues.objects.filter(category=self)]
 
 
-@python_2_unicode_compatible
 class TagAvailableValues(models.Model):
     """
     This model represents available values for tags.

@@ -22,7 +22,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.db.models.signals import post_save
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
@@ -74,7 +74,6 @@ class ChunkingManager(models.Manager):
         return res
 
 
-@python_2_unicode_compatible
 class StudentModule(models.Model):
     """
     Keeps student state for a particular XBlock usage and particular student.
@@ -234,7 +233,6 @@ class BaseStudentModuleHistory(models.Model):
         return history_entries
 
 
-@python_2_unicode_compatible
 class StudentModuleHistory(BaseStudentModuleHistory):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
@@ -271,7 +269,6 @@ class StudentModuleHistory(BaseStudentModuleHistory):
         post_save.connect(save_history, sender=StudentModule)
 
 
-@python_2_unicode_compatible
 class XBlockFieldBase(models.Model):
     """
     Base class for all XBlock field storage.
@@ -341,7 +338,6 @@ class XModuleStudentInfoField(XBlockFieldBase):  # lint-amnesty, pylint: disable
     student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
 
-@python_2_unicode_compatible
 class OfflineComputedGrade(models.Model):
     """
     Table of grades computed offline for a given user and course.
@@ -364,7 +360,6 @@ class OfflineComputedGrade(models.Model):
         return f"[OfflineComputedGrade] {self.user}: {self.course_id} ({self.created}) = {self.gradeset}"
 
 
-@python_2_unicode_compatible
 class OfflineComputedGradeLog(models.Model):
     """
     Log of when offline grades are computed.
