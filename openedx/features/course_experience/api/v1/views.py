@@ -73,8 +73,12 @@ def reset_course_deadlines(request):
             has_access(request.user, 'staff', course_key)
         )
 
-        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
-        if missed_deadlines and not missed_gated_content:
+        # We ignore the missed_deadlines because this endpoint is used in the Learning MFE for
+        # learners who have remaining attempts on a problem and reset their due dates in order to
+        # submit additional attempts. This can apply for 'completed' (submitted) content that would
+        # not be marked as past_due
+        _missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
+        if not missed_gated_content:
             reset_self_paced_schedule(user, course_key)
 
             course_overview = course_detail(request, user.username, course_key)
@@ -102,9 +106,9 @@ def reset_course_deadlines(request):
             'link_text': _('View all dates'),
             'message': _('Deadlines successfully reset.'),
         })
-    except Exception as e:
-        log.exception(e)
-        raise UnableToResetDeadlines  # lint-amnesty, pylint: disable=raise-missing-from
+    except Exception as reset_deadlines_exception:
+        log.exception('Error occurred while trying to reset deadlines!')
+        raise UnableToResetDeadlines from reset_deadlines_exception
 
 
 class CourseDeadlinesMobileView(RetrieveAPIView):
