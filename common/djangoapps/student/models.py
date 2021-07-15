@@ -745,8 +745,8 @@ def invalidate_user_profile_country_cache(sender, instance, **kwargs):  # pylint
 
 
 @receiver(manage_user_cmd)
-def user_profile_manage(sender, user, **kwargs):
-    user_profile, _ = UserProfile.objects.get_or_create(user=user)
+def user_profile_manage(sender, user, **kwargs):  # pylint: disable=unused-argument
+    user_profile, _ = UserProfile.objects.get_or_create(user=user)  # pylint: disable=unused-variable
 
 
 @receiver(pre_save, sender=UserProfile)
