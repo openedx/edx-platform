@@ -25,10 +25,16 @@ class GenerateUserCertificateTest(TestCase):
         super().setUp()
 
         self.user = UserFactory()
+        self.course_key = 'course-v1:edX+DemoX+Demo_Course'
 
-    @ddt.data('student', 'course_key')
+    @ddt.data('student', 'course_key', 'enrollment_mode')
     def test_missing_args(self, missing_arg):
-        kwargs = {'student': 'a', 'course_key': 'b', 'otherarg': 'c'}
+        kwargs = {
+            'student': self.user.id,
+            'course_key': self.course_key,
+            'other_arg': 'shiny',
+            'enrollment_mode': CourseMode.MASTERS
+        }
         del kwargs[missing_arg]
 
         with patch('lms.djangoapps.certificates.tasks.User.objects.get'):
@@ -39,7 +45,7 @@ class GenerateUserCertificateTest(TestCase):
         """
         Verify the task handles certificate generation
         """
-        course_key = 'course-v1:edX+DemoX+Demo_Course'
+        enrollment_mode = CourseMode.VERIFIED
 
         with mock.patch(
             'lms.djangoapps.certificates.tasks.generate_course_certificate',
@@ -47,16 +53,17 @@ class GenerateUserCertificateTest(TestCase):
         ) as mock_generate_cert:
             kwargs = {
                 'student': self.user.id,
-                'course_key': course_key
+                'course_key': self.course_key,
+                'enrollment_mode': enrollment_mode
             }
 
             generate_certificate.apply_async(kwargs=kwargs)
             mock_generate_cert.assert_called_with(
                 user=self.user,
-                course_key=CourseKey.from_string(course_key),
+                course_key=CourseKey.from_string(self.course_key),
                 status=CertificateStatuses.downloadable,
-                enrollment_mode=None,
-                course_grade=None,
+                enrollment_mode=enrollment_mode,
+                course_grade='',
                 generation_mode='batch'
             )
 
@@ -64,7 +71,6 @@ class GenerateUserCertificateTest(TestCase):
         """
         Verify the task handles certificate generation custom params
         """
-        course_key = 'course-v1:edX+DemoX+Demo_Course'
         gen_mode = 'self'
         status = CertificateStatuses.notpassing
         enrollment_mode = CourseMode.AUDIT
@@ -77,7 +83,7 @@ class GenerateUserCertificateTest(TestCase):
             kwargs = {
                 'status': status,
                 'student': self.user.id,
-                'course_key': course_key,
+                'course_key': self.course_key,
                 'course_grade': course_grade,
                 'enrollment_mode': enrollment_mode,
                 'generation_mode': gen_mode,
@@ -87,7 +93,7 @@ class GenerateUserCertificateTest(TestCase):
             generate_certificate.apply_async(kwargs=kwargs)
             mock_generate_cert.assert_called_with(
                 user=self.user,
-                course_key=CourseKey.from_string(course_key),
+                course_key=CourseKey.from_string(self.course_key),
                 status=status,
                 enrollment_mode=enrollment_mode,
                 course_grade=course_grade,
