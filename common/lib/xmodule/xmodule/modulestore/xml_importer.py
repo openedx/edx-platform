@@ -897,16 +897,20 @@ def _update_and_import_module(
             if lib_content_block_already_published:
                 return block
 
-            # Update library content block's children on draft branch
-            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store, user_id).update_children(
-                    block,
-                    version=block.source_library_version,
-                )
-
-            # Publish it if importing the course for branch setting published_only.
-            if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                store.publish(block.location, user_id)
+            try:
+                # Update library content block's children on draft branch
+                with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+                    LibraryToolsService(store, user_id).update_children(
+                        block,
+                        version=block.source_library_version,
+                    )
+            except ValueError as err:
+                # The specified library version does not exist.
+                log.error(err)
+            else:
+                # Publish it if importing the course for branch setting published_only.
+                if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+                    store.publish(block.location, user_id)
 
     return block
 
