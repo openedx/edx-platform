@@ -738,7 +738,7 @@ class ProblemBlock(
                 # Also input error in report
                 report = {
                     _("Answer ID"): "Python Error",
-                    _("Question"): "Attempting to generate a report on the problem failed.",
+                    _("Question"): "Generating a report on the problem failed.",
                     _("Answer"): "Python Error: No Answer Retrieved",
                 }
                 yield (user_state.username, report)
