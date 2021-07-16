@@ -742,6 +742,7 @@ class ProblemBlock(
                     _("Answer"): "Python Error: No Answer Retrieved",
                 }
                 yield (user_state.username, report)
+
     @property
     def close_date(self):
         """
