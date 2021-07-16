@@ -1,8 +1,9 @@
+"""
+Utils for use in enrollment codebase such as views.
+"""
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
@@ -14,7 +15,6 @@ from openedx.core.djangoapps.enrollments.exceptions import (
     EnrollmentModeMismatchError,
     UserDoesNotExistException
 )
-from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
@@ -30,17 +30,13 @@ REQUIRED_ATTRIBUTES = {
 log = logging.getLogger(__name__)
 
 
-def enroll_user_in_course(
-    username,
-    course_id,
-    mode,
-    enrollment_attributes,
-    cohort_name=None,
-    is_active=False,
-    has_global_staff_status=False,
-    has_api_key_permissions=False,
-    explicit_linked_enterprise=False,
-):
+def enroll_user_in_course(username, course_id, mode, enrollment_attributes,
+                          cohort_name=None,
+                          is_active=False,
+                          has_global_staff_status=False,
+                          has_api_key_permissions=False,
+                          explicit_linked_enterprise=False,
+                          ):
     """
     Arguments:
      - username (str): User name
@@ -54,32 +50,19 @@ def enroll_user_in_course(
     - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is active. Only server-to-server requests can
         deactivate an enrollment.
-
+    - has_global_staff_status (bool): Optional default False
+    - has_api_key_permissions: Optional default False
+    - explicit_linked_enterprise: Optional default False
     """
-    if not course_id:
-        raise CourseIdMissingException("Course ID must be specified to create a new enrollment.")
-    try:
-        # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
-        user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise UserDoesNotExistException(f'The user {username} does not exist.')
+    user = _validate_enrollment_inputs(username, course_id)
 
     try:
-        if explicit_linked_enterprise and has_api_key_permissions and enterprise_enabled():
-            enterprise_api_client = EnterpriseApiServiceClient()
-            consent_client = ConsentApiServiceClient()
-            try:
-                enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
-            except EnterpriseApiException as error:
-                log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                              "for user [%s] in course run [%s]", username, course_id)
-                raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
-            kwargs = {
-                'username': username,
-                'course_id': str(course_id),
-                'enterprise_customer_uuid': explicit_linked_enterprise,
-            }
-            consent_client.provide_consent(**kwargs)
+        enroll_in_enterprise_and_provide_consent(
+            username,
+            course_id,
+            has_api_key_permissions,
+            explicit_linked_enterprise
+        )
 
         enrollment = api.get_enrollment(username, str(course_id))
         mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
@@ -139,14 +122,14 @@ def enroll_user_in_course(
         return response
     except CourseEnrollmentExistsError as error:
         log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
-        raise(error)
+        raise error
     except CourseEnrollmentError as error:
         log.exception("An error occurred while creating the new course enrollment for user "
                       "[%s] in course run [%s]", username, course_id)
-        raise(error)
+        raise error
     except CourseUserGroup.DoesNotExist as error:
         log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
-        raise(error)
+        raise error
     finally:
         # Assumes that the ecommerce service uses an API key to authenticate.
         if has_api_key_permissions:
@@ -160,3 +143,42 @@ def enroll_user_in_course(
                 actual_activation=current_enrollment['is_active'] if current_enrollment else None,
                 user_id=user.id
             )
+
+
+def _validate_enrollment_inputs(username, course_id):
+    """
+    Validates username and course_id.
+    Raises:
+     - UserDoesNotExistException if user not found.
+     - CourseIdMissingException if course_id not provided.
+    """
+    if not course_id:
+        raise CourseIdMissingException("Course ID must be specified to create a new enrollment.")
+    try:
+        # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise UserDoesNotExistException(f'The user {username} does not exist.')
+    return user
+
+
+def enroll_in_enterprise_and_provide_consent(username, course_id, has_api_key_permissions, explicit_linked_enterprise):
+    """
+    Enrolls a user in a course using enterprise_course_enrollment api if both of the flags are true
+      - has_api_key_permissions, explicit_linked_enterprise
+    """
+    if explicit_linked_enterprise and has_api_key_permissions and enterprise_enabled():
+        enterprise_api_client = EnterpriseApiServiceClient()
+        consent_client = ConsentApiServiceClient()
+        try:
+            enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
+        except EnterpriseApiException as error:
+            log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                          "for user [%s] in course run [%s]", username, course_id)
+            raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
+        kwargs = {
+            'username': username,
+            'course_id': str(course_id),
+            'enterprise_customer_uuid': explicit_linked_enterprise,
+        }
+        consent_client.provide_consent(**kwargs)

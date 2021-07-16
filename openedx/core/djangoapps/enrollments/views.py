@@ -55,7 +55,6 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
-from openedx.core.lib.log_utils import audit_log
 
 log = logging.getLogger(__name__)
 
