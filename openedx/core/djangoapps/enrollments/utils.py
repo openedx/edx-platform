@@ -41,12 +41,13 @@ def enroll_user_in_course(
     has_api_key_permissions=False,
     explicit_linked_enterprise=False,
 ):
+    """
+    Arguments:
+    - username (str): User name
+    - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
+    """
     if not course_id:
         raise CourseIdMissingException("Course ID must be specified to create a new enrollment.")
-    try:
-        course_id = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise CourseNotFoundError(f"No course '{course_id}' found for enrollment")
     try:
         # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
         user = User.objects.get(username=username)

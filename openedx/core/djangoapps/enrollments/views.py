@@ -674,7 +674,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         # Get the User, Course ID, and Mode from the request.
 
         username = request.data.get('user', request.user.username)
-        course_id = request.data.get('course_details', {}).get('course_id')
+        course_id_input = request.data.get('course_details', {}).get('course_id')
         mode = request.data.get('mode')
         explicit_linked_enterprise = request.data.get('linked_enterprise_customer')
         enrollment_attributes = request.data.get('enrollment_attributes')
@@ -683,6 +683,16 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         is_active = request.data.get('is_active')
 
         has_api_key_permissions = self.has_api_key_permissions(request)
+
+        try:
+            course_id = CourseKey.from_string(course_id_input)
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": f"No course '{course_id_input}' found for enrollment"
+                }
+            )
 
         # Check that the user specified is either the same user, or this is a server-to-server request.
         if not username:
