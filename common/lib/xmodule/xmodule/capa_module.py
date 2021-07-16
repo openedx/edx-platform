@@ -731,7 +731,7 @@ class ProblemBlock(
             except LoncapaProblemError:
                 # Capture a backtrace for errors from failed loncapa problems
                 log.exception(
-                    "An error occured generating a problem report on course %s, problem %s, and student %s",
+                    "An error occurred generating a problem report on course %s, problem %s, and student %s",
                     self.course_id, self.scope_ids.usage_id,
                     self.scope_ids.user_id
                 )
