@@ -735,16 +735,13 @@ class ProblemBlock(
                     self.course_id, self.scope_ids.usage_id,
                     self.scope_ids.user_id
                 )
-                # Also input that the question resulted in an error as an answer in the report.
-                #Todo: text of this report.
+                # Also input error in report
                 report = {
                     _("Answer ID"): "Python Error",
-                    _("Question"): "Attempting to generate a report on the problem %s failed. Often this is the result of too large a request. Try requesting a smaller subset of responses".format(self.scope_ids.usage_id),
+                    _("Question"): "Attempting to generate a report on the problem failed.",
                     _("Answer"): "Python Error: No Answer Retrieved",
                 }
                 yield (user_state.username, report)
-                pass
-
     @property
     def close_date(self):
         """
