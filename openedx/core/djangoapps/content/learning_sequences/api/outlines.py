@@ -85,7 +85,7 @@ def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
     return False
 
 
-def public_api_available(course_key: CourseKey, user: types.User = None) -> bool:  # pylint: disable=unused-argument
+def public_api_available(course_key: CourseKey) -> bool:
     """
     Is the Public API available for this Course to this User?
 

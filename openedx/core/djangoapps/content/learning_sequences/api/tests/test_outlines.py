@@ -101,24 +101,20 @@ class PublicApiAvailableTestCase(django.test.TestCase):
 
     def test_flag_inactive(self):
         # Old Mongo and non-existent courses are always unavailable
-        for user in [self.global_staff, self.student]:
-            assert not public_api_available(self.fake_course_1, user)
-            assert not public_api_available(self.fake_course_2, user)
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
 
-        assert not public_api_available(self.course_key, self.global_staff)
-        assert not public_api_available(self.course_key, self.student)
+        # Waffle-flag controlled
+        assert not public_api_available(self.course_key)
 
     @override_waffle_flag(USE_FOR_OUTLINES, active=True)
     def test_flag_active(self):
         # Old Mongo and non-existent courses are always unavailable
-        for user in [self.global_staff, self.student]:
-            assert not public_api_available(self.fake_course_1, user)
-            assert not public_api_available(self.fake_course_2, user)
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
 
-        # Since the waffle flag is on, both global staff and students can use
-        # the Learning Sequences API.
-        assert public_api_available(self.course_key, self.global_staff)
-        assert public_api_available(self.course_key, self.student)
+        # Waffle-flag controlled
+        assert public_api_available(self.course_key)
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
