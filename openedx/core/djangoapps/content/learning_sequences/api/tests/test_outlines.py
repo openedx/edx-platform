@@ -105,9 +105,7 @@ class PublicApiAvailableTestCase(django.test.TestCase):
             assert not public_api_available(self.fake_course_1, user)
             assert not public_api_available(self.fake_course_2, user)
 
-        # Since the waffle flag is off, only global staff can use the Learning
-        # Sequences API.
-        assert public_api_available(self.course_key, self.global_staff)
+        assert not public_api_available(self.course_key, self.global_staff)
         assert not public_api_available(self.course_key, self.student)
 
     @override_waffle_flag(USE_FOR_OUTLINES, active=True)

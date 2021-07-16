@@ -30,6 +30,7 @@ from ..data import CourseOutlineData, CourseVisibility
 from ..toggles import USE_FOR_OUTLINES
 
 
+@override_waffle_flag(USE_FOR_OUTLINES, active=True)
 class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
     """
     General tests for the CourseOutline.
@@ -61,16 +62,6 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-
-    def test_student_access_denied(self):
-        """
-        For now, make sure you need staff access bits to use the API.
-
-        This is a temporary safeguard until the API is more complete
-        """
-        self.client.login(username='student', password='student_pass')
-        result = self.client.get(self.course_url)
-        assert result.status_code == 403
 
     def test_non_existent_course_404(self):
         """
@@ -119,12 +110,22 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
         assert len(data['outline']['sections'][1]['sequence_ids']) == 2
         assert len(data['outline']['sequences']) == 4
 
-    def test_query_for_other_user(self):
+    @override_waffle_flag(USE_FOR_OUTLINES, active=False)
+    def test_override_rollout(self):
+        """
+        Test that we can still access the API by sending force_on
+
+        This lets us manually test the outline rendering on live courses that
+        haven't been rolled out to yet.
+
+        TODO: Remove this test entirely after rollout.
+        """
         self.client.login(username='staff', password='staff_pass')
-        result = self.client.get(self.course_url + "?user=student")
-        data = result.data
-        assert data['username'] == 'student'
-        assert data['user_id'] == self.student.id
+        result = self.client.get(self.course_url)
+        assert result.status_code == 403
+
+        result = self.client.get(self.course_url, {'force_on': '1'})
+        assert result.status_code == 200
 
 
 @ddt.ddt

@@ -85,7 +85,7 @@ def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
     return False
 
 
-def public_api_available(course_key: CourseKey, user: types.User) -> bool:
+def public_api_available(course_key: CourseKey, user: types.User = None) -> bool:  # pylint: disable=unused-argument
     """
     Is the Public API available for this Course to this User?
 
@@ -96,7 +96,7 @@ def public_api_available(course_key: CourseKey, user: types.User) -> bool:
     return (
         key_supports_outlines(course_key) and
         LearningContext.objects.filter(context_key=course_key).exists() and
-        can_call_public_api(user, course_key)
+        can_call_public_api(course_key)
     )
 
 
