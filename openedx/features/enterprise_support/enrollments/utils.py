@@ -2,9 +2,10 @@
 Utils for use in enrollment codebase such as views.
 """
 import logging
+from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort, check_mode_and_enroll
 
 from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: disable=wrong-import-order
-
+from django.db import transaction
 from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.enrollments import api
@@ -12,8 +13,6 @@ from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, Co
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
-    EnrollmentAttributesMissingError,
-    EnrollmentModeMismatchError,
     UserDoesNotExistException
 )
 from openedx.features.enterprise_support.api import (
@@ -22,7 +21,6 @@ from openedx.features.enterprise_support.api import (
     enterprise_enabled
 )
 
-from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from enterprise.api.v1.serializers import EnterpriseCourseEnrollmentWriteSerializer
 
 REQUIRED_ATTRIBUTES = {
@@ -56,93 +54,45 @@ def enroll_user_in_course(username, course_id, mode, enrollment_attributes,
     """
     user = _validate_enrollment_inputs(username, course_id)
 
-    try:
-        if explicit_linked_enterprise and enterprise_enabled():
-            enroll_in_enterprise_and_provide_consent(
-                user,
-                course_id,
-                explicit_linked_enterprise
-            )
-
-        enrollment = api.get_enrollment(username, str(course_id))
-        mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
-        active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
-        missing_attrs = []
-        if enrollment_attributes:
-            actual_attrs = [
-                "{namespace}:{name}".format(**attr)
-                for attr in enrollment_attributes
-            ]
-            missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-        if mode_changed or active_changed:
-            if mode_changed and active_changed and not is_active:
-                # if the requester wanted to deactivate but specified the wrong mode, fail
-                # the request (on the assumption that the requester had outdated information
-                # about the currently active enrollment).
-                msg = "Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
-                    enrollment["mode"], mode
+    with transaction.atomic():
+        try:
+            if explicit_linked_enterprise and enterprise_enabled():
+                enroll_in_enterprise_and_provide_consent(
+                    user,
+                    course_id,
+                    explicit_linked_enterprise
                 )
-                log.warning(msg)
-                raise EnrollmentModeMismatchError(msg)
-            if missing_attrs:
-                msg = "Missing enrollment attributes: requested mode={} required attributes={}".format(
-                    mode, REQUIRED_ATTRIBUTES.get(mode)
+
+            enrollment = api.get_enrollment(username, str(course_id))
+            response = check_mode_and_enroll(username, course_id, mode, enrollment, enrollment_attributes, is_active, has_api_key_permissions)
+
+            add_user_to_course_cohort(cohort_name, course_id, user)
+
+            log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
+            return response
+        except CourseEnrollmentExistsError as error:
+            log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+            raise error
+        except CourseEnrollmentError as error:
+            log.exception("An error occurred while creating the new course enrollment for user "
+                          "[%s] in course run [%s]", username, course_id)
+            raise error
+        except CourseUserGroup.DoesNotExist as error:
+            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
+            raise error
+        finally:
+            # Assumes that the ecommerce service uses an API key to authenticate.
+            if has_api_key_permissions:
+                current_enrollment = api.get_enrollment(username, str(course_id))
+                audit_log(
+                    'enrollment_change_requested',
+                    course_id=str(course_id),
+                    requested_mode=mode,
+                    actual_mode=current_enrollment['mode'] if current_enrollment else None,
+                    requested_activation=is_active,
+                    actual_activation=current_enrollment['is_active'] if current_enrollment else None,
+                    user_id=user.id
                 )
-                log.warning(msg)
-                raise EnrollmentAttributesMissingError(msg)
-
-            response = api.update_enrollment(
-                username,
-                str(course_id),
-                mode=mode,
-                is_active=is_active,
-                enrollment_attributes=enrollment_attributes,
-                # If we are updating enrollment by authorized api caller, we should allow expired modes
-                include_expired=has_api_key_permissions
-            )
-        else:
-            # Will reactivate inactive enrollments.
-            response = api.add_enrollment(
-                username,
-                str(course_id),
-                mode=mode,
-                is_active=is_active,
-                enrollment_attributes=enrollment_attributes
-            )
-
-        if cohort_name is not None:
-            cohort = get_cohort_by_name(course_id, cohort_name)
-            try:
-                add_user_to_cohort(cohort, user)
-            except ValueError:
-                # user already in cohort, probably because they were un-enrolled and re-enrolled
-                log.exception('Cohort re-addition')
-
-        log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
-        return response
-    except CourseEnrollmentExistsError as error:
-        log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
-        raise error
-    except CourseEnrollmentError as error:
-        log.exception("An error occurred while creating the new course enrollment for user "
-                      "[%s] in course run [%s]", username, course_id)
-        raise error
-    except CourseUserGroup.DoesNotExist as error:
-        log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
-        raise error
-    finally:
-        # Assumes that the ecommerce service uses an API key to authenticate.
-        if has_api_key_permissions:
-            current_enrollment = api.get_enrollment(username, str(course_id))
-            audit_log(
-                'enrollment_change_requested',
-                course_id=str(course_id),
-                requested_mode=mode,
-                actual_mode=current_enrollment['mode'] if current_enrollment else None,
-                requested_activation=is_active,
-                actual_activation=current_enrollment['is_active'] if current_enrollment else None,
-                user_id=user.id
-            )
 
 
 def _validate_enrollment_inputs(username, course_id):

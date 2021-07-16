@@ -7,6 +7,7 @@ class CourseEnrollmentError(Exception):
     Describes any error that may occur when reading or updating enrollment information for a user or a course.
 
     """
+
     def __init__(self, msg, data=None):
         super().__init__(msg)
         # Corresponding information to help resolve the error.
@@ -51,3 +52,15 @@ class EnrollmentApiLoadError(CourseEnrollmentError):
 class InvalidEnrollmentAttribute(CourseEnrollmentError):
     """Enrollment Attributes could not be validated"""
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class EnrollmentModeMismatchError(Exception):
+    """
+    requester has outdated information about the currently active enrollment
+    """
+
+
+class EnrollmentAttributesMissingError(Exception):
+    """
+    some enrollment attributes are missing
+    """
