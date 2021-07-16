@@ -730,15 +730,15 @@ class ProblemBlock(
                     yield (user_state.username, report)
             except LoncapaProblemError:
                 # Capture a backtrace for errors from failed loncapa problems
-                log.exception("An error occured generating a problem report on course %s, problem %s, and student %s",
-                self.course_id,
-                self.scope_ids.usage_id,
-                self.scope_ids.user_id
+                log.exception(
+                    "An error occured generating a problem report on course %s, problem %s, and student %s",
+                    self.course_id, self.scope_ids.usage_id,
+                    self.scope_ids.user_id
                 )
                 # Also input that the question resulted in an error as an answer in the report.
                 #Todo: text of this report.
                 report = {
-                   _("Answer ID"): "Python Error",
+                    _("Answer ID"): "Python Error",
                     _("Question"): "Attempting to generate a report on the problem %s failed. Often this is the result of too large a request. Try requesting a smaller subset of responses".format(self.scope_ids.usage_id),
                     _("Answer"): "Python Error: No Answer Retrieved",
                 }
