@@ -9,13 +9,13 @@ from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
-from openedx.core.djangoapps.enrollments.exceptions import (
+from openedx.core.lib.log_utils import audit_log
+from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
     EnrollmentAttributesMissingError,
     EnrollmentModeMismatchError,
     UserDoesNotExistException
 )
-from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
     EnterpriseApiException,
