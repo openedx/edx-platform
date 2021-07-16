@@ -314,7 +314,7 @@ class OutlineTabView(RetrieveAPIView):
                         seq_data['type'] != 'sequential'
                     )
                 ] if 'children' in chapter_data else []
-        
+
         user_has_passing_grade = False
         if not request.user.is_anonymous:
             user_grade = CourseGradeFactory().read(request.user, course)

@@ -396,4 +396,4 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         CourseGradeFactory().update(self.user, self.course)
         response = self.client.get(self.url)
         assert response.status_code == 200
-        assert response.data['user_has_passing_grade'] == True
+        assert response.data['user_has_passing_grade'] is True
