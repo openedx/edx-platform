@@ -19,9 +19,11 @@ from openedx.features.enterprise_support.enrollments.exceptions import (
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
     EnterpriseApiException,
-    EnterpriseApiServiceClient,
     enterprise_enabled
 )
+
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
+from enterprise.api.v1.serializers import EnterpriseCourseEnrollmentWriteSerializer
 
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
@@ -31,17 +33,17 @@ log = logging.getLogger(__name__)
 
 
 def enroll_user_in_course(username, course_id, mode, enrollment_attributes,
+                          explicit_linked_enterprise,
                           cohort_name=None,
                           is_active=False,
-                          has_global_staff_status=False,
                           has_api_key_permissions=False,
-                          explicit_linked_enterprise=False,
                           ):
     """
     Arguments:
      - username (str): User name
      - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
      - mode (CourseMode): course mode
+     - explicit_linked_enterprise: uuid of enterprise
      - enrollment_attributes (dict): A dictionary that contains the following values.
         * namespace: Namespace of the attribute
         * name: Name of the attribute
@@ -50,19 +52,17 @@ def enroll_user_in_course(username, course_id, mode, enrollment_attributes,
     - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is active. Only server-to-server requests can
         deactivate an enrollment.
-    - has_global_staff_status (bool): Optional default False
-    - has_api_key_permissions: Optional default False
-    - explicit_linked_enterprise: Optional default False
+    - has_api_key_permissions: Default False, set to True for server calls
     """
     user = _validate_enrollment_inputs(username, course_id)
 
     try:
-        enroll_in_enterprise_and_provide_consent(
-            username,
-            course_id,
-            has_api_key_permissions,
-            explicit_linked_enterprise
-        )
+        if explicit_linked_enterprise and enterprise_enabled():
+            enroll_in_enterprise_and_provide_consent(
+                user,
+                course_id,
+                explicit_linked_enterprise
+            )
 
         enrollment = api.get_enrollment(username, str(course_id))
         mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
@@ -74,7 +74,7 @@ def enroll_user_in_course(username, course_id, mode, enrollment_attributes,
                 for attr in enrollment_attributes
             ]
             missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-        if (has_global_staff_status or has_api_key_permissions) and (mode_changed or active_changed):
+        if mode_changed or active_changed:
             if mode_changed and active_changed and not is_active:
                 # if the requester wanted to deactivate but specified the wrong mode, fail
                 # the request (on the assumption that the requester had outdated information
@@ -162,23 +162,27 @@ def _validate_enrollment_inputs(username, course_id):
     return user
 
 
-def enroll_in_enterprise_and_provide_consent(username, course_id, has_api_key_permissions, explicit_linked_enterprise):
+def enroll_in_enterprise_and_provide_consent(user, course_id, enterprise_customer_uuid):
     """
     Enrolls a user in a course using enterprise_course_enrollment api if both of the flags are true
       - has_api_key_permissions, explicit_linked_enterprise
     """
-    if explicit_linked_enterprise and has_api_key_permissions and enterprise_enabled():
-        enterprise_api_client = EnterpriseApiServiceClient()
-        consent_client = ConsentApiServiceClient()
-        try:
-            enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
-        except EnterpriseApiException as error:
-            log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                          "for user [%s] in course run [%s]", username, course_id)
-            raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
-        kwargs = {
-            'username': username,
-            'course_id': str(course_id),
-            'enterprise_customer_uuid': explicit_linked_enterprise,
-        }
-        consent_client.provide_consent(**kwargs)
+    consent_client = ConsentApiServiceClient()
+    try:
+        serializer = EnterpriseCourseEnrollmentWriteSerializer({
+            'username': user.username,
+            'course_id': course_id,
+        })
+        if not serializer.is_valid():
+            raise CourseEnrollmentError(str(serializer.errors))
+        serializer.save()
+    except EnterpriseApiException as error:
+        log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                      "for user id [%s] in course run [%s]", user.id, course_id)
+        raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
+    kwargs = {
+        'username': user.username,
+        'course_id': str(course_id),
+        'enterprise_customer_uuid': enterprise_customer_uuid,
+    }
+    consent_client.provide_consent(**kwargs)
