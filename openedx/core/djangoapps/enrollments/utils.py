@@ -43,8 +43,18 @@ def enroll_user_in_course(
 ):
     """
     Arguments:
-    - username (str): User name
-    - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
+     - username (str): User name
+     - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
+     - mode (CourseMode): course mode
+     - enrollment_attributes (dict): A dictionary that contains the following values.
+        * namespace: Namespace of the attribute
+        * name: Name of the attribute
+        * value: Value of the attribute
+    - cohort_name (str): Optional. If provided, user will be added to cohort
+    - is_active (bool): Optional. A Boolean value that indicates whether the
+        enrollment is active. Only server-to-server requests can
+        deactivate an enrollment.
+
     """
     if not course_id:
         raise CourseIdMissingException("Course ID must be specified to create a new enrollment.")

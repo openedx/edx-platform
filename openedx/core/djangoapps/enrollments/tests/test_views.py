@@ -104,7 +104,7 @@ class EnrollmentTestMixin:
 
         # Verify that the modulestore is queried as expected.
         with check_mongo_calls_range(min_finds=min_mongo_calls, max_finds=max_mongo_calls):
-            with patch('openedx.core.djangoapps.enrollments.views.audit_log') as mock_audit_log:
+            with patch('openedx.core.djangoapps.enrollments.utils.audit_log') as mock_audit_log:
                 url = reverse('courseenrollments')
                 response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
                 assert response.status_code == expected_status
