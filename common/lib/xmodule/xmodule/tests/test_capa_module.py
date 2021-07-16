@@ -3242,5 +3242,5 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
         descriptor = self._get_descriptor()
         with patch('xmodule.capa_module.LoncapaProblem') as mock_LoncapaProblem:
             mock_LoncapaProblem.side_effect = LoncapaProblemError
-            report_data = (list(descriptor.generate_report_data(self._mock_user_state_generator(user_count=1,response_count=5))))
+            report_data = (list(descriptor.generate_report_data(self._mock_user_state_generator(user_count=1, response_count=5))))
             assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
