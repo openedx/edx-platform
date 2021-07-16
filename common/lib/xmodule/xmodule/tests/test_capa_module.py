@@ -3248,4 +3248,4 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
                     response_count=5,
                 )
             ))
-        assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
+            assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
