@@ -157,8 +157,8 @@ def _validate_enrollment_inputs(username, course_id):
     try:
         # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
         user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise UserDoesNotExistException(f'The user {username} does not exist.')
+    except ObjectDoesNotExist as error:
+        raise UserDoesNotExistException(f'The user {username} does not exist.') from error
     return user
 
 
