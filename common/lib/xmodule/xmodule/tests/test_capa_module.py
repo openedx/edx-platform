@@ -3249,3 +3249,4 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
                 )
             ))
             assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
+
