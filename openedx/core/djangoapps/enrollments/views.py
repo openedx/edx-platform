@@ -6,7 +6,6 @@ consist primarily of authentication, request validation, and serialization.
 
 
 import logging
-from openedx.core.djangoapps.enrollments.exceptions import
 from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort, check_mode_and_enroll
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -22,7 +21,11 @@ from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_u
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
-    CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError, EnrollmentModeMismatchError, EnrollmentAttributesMissingError,
+    CourseEnrollmentError,
+    CourseEnrollmentExistsError,
+    CourseModeNotFoundError,
+    EnrollmentModeMismatchError,
+    EnrollmentAttributesMissingError,
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination

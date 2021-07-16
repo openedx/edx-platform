@@ -23,10 +23,6 @@ from openedx.features.enterprise_support.api import (
 
 from enterprise.api.v1.serializers import EnterpriseCourseEnrollmentWriteSerializer
 
-REQUIRED_ATTRIBUTES = {
-    "credit": ["credit:provider_id"],
-}
-
 log = logging.getLogger(__name__)
 
 
