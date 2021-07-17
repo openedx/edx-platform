@@ -1,13 +1,19 @@
 """
 Serializer for Admin Panel APIs
 """
+from uuid import uuid4
+
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, UserProfile
+from openedx.core.djangoapps.user_api.accounts.serializers import LanguageProficiencySerializer
+from student.models import CourseEnrollment, LanguageProficiency, UserProfile
 
-from .constants import GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
+from .constants import GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, ORG_ROLES, TRAINING_MANAGER
+from .utils import specify_user_role
 
 
 class CourseStatsListSerializer(serializers.ModelSerializer):
@@ -87,8 +93,8 @@ class UserDetailViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'employee_id', 'is_active', 'date_joined', 'last_login', 'course_enrolled',
-                  'completed_courses')
+        fields = ('id', 'email', 'name', 'employee_id', 'is_active', 'date_joined',
+                  'last_login', 'course_enrolled', 'completed_courses')
 
     @staticmethod
     def get_course_enrolled(obj):
@@ -99,7 +105,7 @@ class UserDetailViewSerializer(serializers.ModelSerializer):
         return obj.completed
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserListingSerializer(serializers.ModelSerializer):
     """
     Serializer User's view-set list view
     """
@@ -120,16 +126,89 @@ class UserSerializer(serializers.ModelSerializer):
         return LEARNER
 
 
-class BasicUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
-
-
 class UserProfileSerializer(serializers.ModelSerializer):
+    language_code = LanguageProficiencySerializer(write_only=True)
+    languages = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = UserProfile
-        fields = ('user', 'employee_id', 'language', 'organization')
+        fields = ('name', 'employee_id', 'languages', 'language_code', 'organization')
+
+    def validate_name(self, value):
+        if not self.instance and not value.strip():
+            raise serializers.ValidationError('This field required!')
+        return value
+
+    def validate_organization(self, value):
+        if not self.instance and not value:
+            raise serializers.ValidationError('This field required!')
+        return value
+
+    def get_languages(self, obj):
+        return [{'code': lang.code, 'value': lang.get_code_display()} for lang in obj.language_proficiencies.all()]
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(required=True)
+    role = serializers.ChoiceField(choices=ORG_ROLES, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'profile', 'role')
+        read_only_fields = ['id']
+
+    def validate_email(self, value):
+        if not self.instance and not value.strip():
+            raise serializers.ValidationError('This field required!')
+
+        qs = User.objects.filter(email=value)
+        if self.instance:
+            qs = qs.filter(~Q(id=self.instance.pk))
+        if qs.exists():
+            raise serializers.ValidationError('email already exists')
+
+        return value
+
+    @transaction.atomic()
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+        role = validated_data.pop('role')
+        user = User.objects.create(**validated_data)
+        user.set_password(uuid4().hex[:8])
+        user.save()
+
+        specify_user_role(user, role)
+        profile_data['user'] = user
+        language_code = profile_data.pop('language_code', None)
+        profile = UserProfile.objects.create(**profile_data)
+
+        if language_code:
+            profile.language_proficiencies.create(code=language_code['code'])
+
+        return user
+
+    @transaction.atomic()
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        role = validated_data.pop('role', None)
+
+        instance.email = validated_data.get('email', instance.email)
+        instance.save(update_fields=['email'])
+
+        if role:
+            specify_user_role(instance, role)
+
+        if profile_data:
+            profile = instance.profile
+            profile.name = profile_data.get('name', profile.name)
+            profile.employee_id = profile_data.get('employee_id', profile.employee_id)
+            profile.save(update_fields=['name', 'employee_id'])
+
+            language_code = profile_data.pop('language_code', None)
+            if language_code:
+                LanguageProficiency.objects.filter(user_profile=profile).update(code=language_code['code'])
+
+        return instance
 
 
 class LearnersSerializer(serializers.ModelSerializer):

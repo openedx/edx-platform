@@ -1,10 +1,7 @@
 """
 Views for Admin Panel API
 """
-import uuid
-
 from django.contrib.auth.models import Group, User
-from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
 from django.middleware import csrf
@@ -23,12 +20,11 @@ from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, ORG_AD
 from .pagination import CourseEnrollmentPagination, PakxAdminAppPagination
 from .permissions import CanAccessPakXAdminPanel, IsSameOrganization
 from .serializers import (
-    BasicUserSerializer,
     CourseStatsListSerializer,
     LearnersSerializer,
     UserCourseEnrollmentSerializer,
     UserDetailViewSerializer,
-    UserProfileSerializer,
+    UserListingSerializer,
     UserSerializer
 )
 from .tasks import enroll_users
@@ -37,8 +33,7 @@ from .utils import (
     get_org_users_qs,
     get_roles_q_filters,
     get_user_org_filter,
-    send_registration_email,
-    specify_user_role
+    send_registration_email
 )
 
 COMPLETED_COURSE_COUNT = Count("courseenrollment", filter=Q(
@@ -108,7 +103,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
     pagination_class = PakxAdminAppPagination
-    serializer_class = UserSerializer
+    serializer_class = UserListingSerializer
     filter_backends = [OrderingFilter]
     OrderingFilter.ordering_fields = ('id', 'name', 'email', 'employee_id')
     ordering = ['-id']
@@ -132,49 +127,32 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         raise Http404
 
     def get_serializer_class(self):
-        if self.action in ['retrieve', 'create']:
+        if self.action in ['retrieve', 'partial_update']:
             return UserDetailViewSerializer
 
-        return UserSerializer
+        return UserListingSerializer
 
     def create(self, request, *args, **kwargs):
-        profile_data = request.data.pop('profile', None)
-        role = request.data.pop('role', None)
+        request.data['profile'].update({'organization': self.request.user.profile.organization_id})
+        user_serializer = UserSerializer(data=request.data)
 
-        user_serializer = BasicUserSerializer(data=request.data)
-        profile_serializer = UserProfileSerializer(data=profile_data)
+        if user_serializer.is_valid():
+            user = user_serializer.save()
+            send_registration_email(user, user.profile, request.scheme)
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
-        if user_serializer.is_valid() and profile_serializer.is_valid():
-            with transaction.atomic():
-                user = user_serializer.save()
-                user.set_password(uuid.uuid4().hex[:8])
-                user.save()
-
-                profile_data['user'] = user.id
-                profile_data['organization'] = self.request.user.profile.organization_id
-                user_profile = profile_serializer.save()
-                specify_user_role(user, role)
-                send_registration_email(user, user_profile, request.scheme)
-
-                return Response(self.get_serializer(user), status=status.HTTP_201_CREATED)
-
-        return Response({**user_serializer.errors, **profile_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({**user_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         user = self.get_object()
-        user_profile_data = request.data.pop('profile', {})
-        user_data = request.data
+        request.data['profile'].update({'organization': self.request.user.profile.organization_id})
+        user_serializer = UserSerializer(user, data=request.data, partial=True)
 
-        user_serializer = BasicUserSerializer(user, data=user_data, partial=True)
-        profile_serializer = UserProfileSerializer(user.profile, data=user_profile_data, partial=True)
-
-        if user_serializer.is_valid() and profile_serializer.is_valid():
+        if user_serializer.is_valid():
             user_serializer.save()
-            profile_serializer.save()
-            specify_user_role(user, request.data.pop("role", None))
             return Response(self.get_serializer(user).data, status=status.HTTP_200_OK)
 
-        return Response({**user_serializer.errors, **profile_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         if self.get_queryset().filter(id=kwargs['pk']).update(is_active=False):
@@ -184,6 +162,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         self.queryset = self.get_queryset()
+        total_users_count = self.get_queryset().count()
 
         roles = self.request.query_params['roles'].split(',') if self.request.query_params.get('roles') else []
         roles_qs = get_roles_q_filters(roles)
@@ -205,10 +184,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             self.queryset = self.queryset.filter(Q(profile__name__icontains=s_text) | Q(email__icontains=s_text))
 
         page = self.paginate_queryset(self.queryset)
-        if page is not None:
-            return self.get_paginated_response(self.get_serializer(page, many=True).data)
+        response_data = {'total_users_count': total_users_count}
 
-        return Response(self.get_serializer(self.queryset, many=True).data)
+        if page is not None:
+            response_data['users'] = self.get_serializer(page, many=True).data
+            return self.get_paginated_response(response_data)
+
+        response_data['users'] = self.get_serializer(self.queryset, many=True).data
+        return Response(response_data)
 
     def get_queryset(self):
         if self.request.query_params.get("ordering"):

@@ -11,6 +11,15 @@ class PakxAdminAppPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
 
+    def get_paginated_response(self, data):
+        response = super(PakxAdminAppPagination, self).get_paginated_response(data)
+
+        if 'total_users_count' in response.data.get('results'):
+            response.data['total_users_count'] = response.data['results']['total_users_count']
+            response.data['results'] = response.data['results']['users']
+
+        return response
+
 
 class CourseEnrollmentPagination(PageNumberPagination):
     """

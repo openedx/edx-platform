@@ -8,3 +8,9 @@ ORG_ADMIN = 1
 STAFF = 2
 TRAINING_MANAGER = 3
 LEARNER = 4
+
+ORG_ROLES = (
+    (ORG_ADMIN, 'Admin'),
+    (TRAINING_MANAGER, 'Training Manager'),
+    (LEARNER, 'LEARNER'),
+)

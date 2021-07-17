@@ -48,10 +48,18 @@ def get_roles_q_filters(roles):
 
 
 def specify_user_role(user, role):
+    g_admin, g_tm = Group.objects.filter(
+        name__in=[GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS]
+    ).order_by('name')
+
     if role == ORG_ADMIN:
-        user.groups.add(Group.objects.get(name=GROUP_ORGANIZATION_ADMIN))
+        user.groups.add(g_admin)
+        user.groups.remove(g_tm)
     elif role == TRAINING_MANAGER:
-        user.groups.add(Group.objects.get(name=GROUP_TRAINING_MANAGERS))
+        user.groups.remove(g_admin)
+        user.groups.add(g_tm)
+    elif role == LEARNER:
+        user.groups.remove(g_admin, g_tm)
 
 
 def get_registration_email_message_context(user, user_profile, protocol):
