@@ -5,6 +5,7 @@ Common utility functions related to courses.
 from django import forms
 from django.conf import settings
 from django.http import Http404
+from openedx.core.lib.cache_utils import RequestCache
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
@@ -93,9 +94,16 @@ def get_course_by_id(course_key, depth=0):
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
+    request_cache = RequestCache('get_course_by_id')
+    cache_key = (course_key, depth)
+    cache_response = request_cache.get_cached_response(cache_key)
+    if cache_response.is_found:
+        return cache_response.value
+
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key, depth=depth)
     if course:
+        request_cache.set(cache_key, course)
         return course
     else:
         raise Http404(f"Course not found: {str(course_key)}.")
