@@ -94,6 +94,7 @@ def get_course_by_id(course_key, depth=0):
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
+    # Do we be extra defensive and make this LMS-only?
     request_cache = RequestCache('get_course_by_id')
     cache_key = (course_key, depth)
     cache_response = request_cache.get_cached_response(cache_key)

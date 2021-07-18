@@ -88,17 +88,11 @@ class CoursesTest(ModuleStoreTestCase):
         assert error.value.access_response.error_code == 'not_visible_to_user'
         assert not error.value.access_response.has_access
 
-    @ddt.data(
-        (GET_COURSE_WITH_ACCESS, 1),
-        (GET_COURSE_OVERVIEW_WITH_ACCESS, 0),
-    )
-    @ddt.unpack
-    def test_get_course_func_with_access(self, course_access_func_name, num_mongo_calls):
-        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
+    def test_overview_doesnt_call_mongo(self):
         user = UserFactory.create()
         course = CourseFactory.create(emit_signals=True)
-        with check_mongo_calls(num_mongo_calls):
-            course_access_func(user, 'load', course.id)
+        with check_mongo_calls(0):
+            get_course_overview_with_access(user, 'load', course.id)
 
     def test_get_courses_by_org(self):
         """
