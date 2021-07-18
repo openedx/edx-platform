@@ -5,7 +5,6 @@ Common utility functions related to courses.
 from django import forms
 from django.conf import settings
 from django.http import Http404
-from edx_django_utils.cache import RequestCache
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
