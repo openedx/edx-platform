@@ -1100,7 +1100,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # Remember that there may be multiple keys for the same course
         cache_keys_to_del = [
             cache_key
-            for cache_key, _course in self._course_request_cache.data
+            for cache_key in self._course_request_cache.data
             if cache_key[0] == course_key
         ]
         for cache_key in cache_keys_to_del:
