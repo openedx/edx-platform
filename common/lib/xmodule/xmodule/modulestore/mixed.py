@@ -79,6 +79,13 @@ def strip_key(func):
                     field_value = strip_key_func(field_value)
             return field_value
 
+        # Write an attribute just so we can scan for it later on when we want to
+        # determine if we're calling get_xxx methods with the default arguments
+        # (this is mixed in via decorator). We can't just compare direclty with
+        # the strip_key_collection function here because it's a local func that
+        # will be regenerated with every decorator.
+        strip_key_collection.default_strip_key_collection = True
+
         # call the decorated function
         retval = func(field_decorator=strip_key_collection, *args, **kwargs)
 
@@ -402,13 +409,17 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         :param course_key: must be a CourseKey
         """
         assert isinstance(course_key, CourseKey)
-
         # Only use the request cache if we're dealing with a simple query with
         # no advanced params. (This is the vast, vast majority of queries.)
-        use_cache = not kwargs
+        # Unfortunately, we have to account for the slightly magical param added
+        # by the @strip_key decorator.
+        use_cache = (
+            ('field_decorator' in kwargs) and
+            getattr(kwargs['field_decorator'], 'default_strip_key_collection', False)
+        )
         cache_key = (course_key, depth)
         if use_cache:
-            cache_response = self._course_request_cache(cache_key)
+            cache_response = self._course_request_cache.get_cached_response(cache_key)
             if cache_response.is_found:
                 return cache_response.value
 
@@ -1083,4 +1094,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             store.ensure_indexes()
 
     def _remove_from_course_cache(self, course_key):
-        pass
+        """
+        Remove all instances of this course_key from the local request cache.
+        """
+        # Remember that there may be multiple keys for the same course
+        cache_keys_to_del = [
+            cache_key
+            for cache_key, _course in self._course_request_cache.data
+            if cache_key[0] == course_key
+        ]
+        for cache_key in cache_keys_to_del:
+            self._course_request_cache.delete(cache_key)
