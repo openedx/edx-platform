@@ -1000,7 +1000,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         :return: True if the draft and published versions differ
         """
         store = self._verify_modulestore_support(xblock.location.course_key, 'has_changes')
-        self._remove_from_course_cache(location.course_key)
+        self._remove_from_course_cache(xblock.location.course_key)
         return store.has_changes(xblock)
 
     def check_supports(self, course_key, method):
