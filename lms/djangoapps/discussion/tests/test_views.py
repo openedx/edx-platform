@@ -1891,6 +1891,7 @@ class DividedDiscussionsTestCase(CohortViewsTestCase):  # lint-amnesty, pylint: 
             discussion_topics=discussion_topics,
             divided_discussions=divided_discussions
         )
+
         return divided_inline_discussions, divided_course_wide_discussions
 
 
