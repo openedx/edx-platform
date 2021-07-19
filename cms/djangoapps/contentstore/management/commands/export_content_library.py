@@ -61,6 +61,6 @@ class Command(BaseCommand):
                 filename = prefix + suffix
                 target = os.path.join(dest_path, filename)
                 tarball.file.seek(0)
-                with open(target, 'w') as f:
+                with open(target, 'wb') as f:
                     shutil.copyfileobj(tarball.file, f)
                 print(f'Library "{library.location.library_key}" exported to "{target}"')
