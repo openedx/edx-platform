@@ -4224,10 +4224,6 @@ APP_UPGRADE_CACHE_TIMEOUT = 3600
 # if you want to avoid an overlap in ids while searching for history across the two tables.
 STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
-# Cutoff date for granting audit certificates
-
-AUDIT_CERT_CUTOFF_DATE = None
-
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
