@@ -183,13 +183,22 @@ class BadgrBackend(BadgeBackend):
         )
         self._log_if_raised(response, data)
         assertion, __ = BadgeAssertion.objects.get_or_create(user=user, badge_class=badge_class)
-        assertion.data = response.json()
-        assertion.backend = 'BadgrBackend'
-        assertion.image_url = assertion.data['image']
-        assertion.assertion_url = assertion.data['json']['id']
-        assertion.save()
-        self._send_assertion_created_event(user, assertion)
-        return assertion
+        try:
+            response_json = response.json()
+            assertion.data = response_json['result'][0]
+            assertion.image_url = assertion.data['image']
+            assertion.assertion_url = assertion.data['openBadgeId']
+            assertion.backend = 'BadgrBackend'
+            assertion.save()
+            self._send_assertion_created_event(user, assertion)
+            return assertion
+
+        except Exception as exc:  # pylint: disable=broad-except
+            LOGGER.error(
+                'Error saving BadgeAssertion for user: "{0}" '
+                'with response from server: {1};'
+                'Encountered exception: {2}'.format(
+                    user.email, response.text, exc))
 
     @staticmethod
     def _fernet_setup():
