@@ -93,9 +93,6 @@ social-auth-core<4.0.0  # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
 # celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
 click<8.0.0
 
-# pylint==2.9.3 introduced a lot of new warnings. It will be removed in https://openedx.atlassian.net/browse/BOM-2667.
-pylint==2.8.3
-
 # constraints present due to Python35 support. Need to be tested and removed independently.
 
 joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
