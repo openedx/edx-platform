@@ -58,16 +58,16 @@ class CourseAppSerializer(serializers.Serializer):  # pylint: disable=abstract-m
 
     def to_representation(self, instance: CourseApp) -> Dict:
         course_key = self.context.get("course_key")
-        user = self.context.get("user")
+        request = self.context.get("request")
         data = {
             "id": instance.app_id,
             "enabled": is_course_app_enabled(course_key, instance.app_id),
             "name": instance.name,
             "description": instance.description,
-            "allowed_operations": instance.get_allowed_operations(course_key, user),
+            "allowed_operations": instance.get_allowed_operations(course_key, request.user),
         }
         if hasattr(instance, "legacy_link"):
-            data["legacy_link"] = instance.legacy_link(course_key)
+            data["legacy_link"] = request.build_absolute_uri(instance.legacy_link(course_key))
         return data
 
 
@@ -132,7 +132,12 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
         course_key = CourseKey.from_string(course_id)
         course_apps = CourseAppsPluginManager.get_apps_available_for_course(course_key)
         serializer = CourseAppSerializer(
-            course_apps, many=True, context={"course_key": course_key, "user": request.user}
+            course_apps,
+            many=True,
+            context={
+                "course_key": course_key,
+                "request": request,
+            }
         )
         return Response(serializer.data)
 
@@ -186,5 +191,11 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
         if not course_app or not course_app.is_available(course_key):
             raise ValidationError({"id": "Invalid app ID"})
         set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
-        serializer = CourseAppSerializer(course_app, context={"course_key": course_key, "user": request.user})
+        serializer = CourseAppSerializer(
+            course_app,
+            context={
+                "course_key": course_key,
+                "request": request,
+            }
+        )
         return Response(serializer.data)

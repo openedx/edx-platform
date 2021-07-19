@@ -125,6 +125,28 @@ COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
 )
 
+# .. toggle_name: courseware.enable_bulk_allowance_modal
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enable new bulk allowance modal
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-14
+BULK_ALLOWANCE_MODAL = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'enable_bulk_allowance', __name__,
+)
+
+# .. toggle_name: courseware.verified_name
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Course waffle flag for verified name functionality (see https://github.com/edx/edx-name-affirmation)
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-7-14
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+COURSEWARE_VERIFIED_NAME_FLAG = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'verified_name', __name__
+)
+
 
 def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
@@ -279,6 +301,10 @@ def streak_celebration_is_active(course_key):
         courseware_mfe_progress_milestones_are_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )
+
+
+def is_verified_name_enabled_for_course(course_key):
+    return COURSEWARE_VERIFIED_NAME_FLAG.is_enabled(course_key)
 
 
 # .. toggle_name: COURSES_INVITE_ONLY

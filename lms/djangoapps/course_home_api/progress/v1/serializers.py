@@ -27,12 +27,23 @@ class SubsectionScoresSerializer(serializers.Serializer):
     num_points_earned = serializers.FloatField(source='graded_total.earned')
     num_points_possible = serializers.FloatField(source='graded_total.possible')
     percent_graded = serializers.FloatField()
+    problem_scores = serializers.SerializerMethodField()
     show_correctness = serializers.CharField()
     show_grades = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     def get_block_key(self, subsection):
         return str(subsection.location)
+
+    def get_problem_scores(self, subsection):
+        problem_scores = [
+            {
+                'earned': score.earned,
+                'possible': score.possible,
+            }
+            for score in subsection.problem_scores.values()
+        ]
+        return problem_scores
 
     def get_url(self, subsection):
         relative_path = reverse('jump_to', args=[self.context['course_key'], subsection.location])

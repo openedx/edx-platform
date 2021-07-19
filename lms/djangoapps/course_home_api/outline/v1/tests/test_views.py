@@ -4,6 +4,7 @@ Tests for Outline Tab API in the Course Home API
 
 import itertools
 from datetime import datetime, timezone
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from unittest.mock import Mock, patch
 
 import ddt
@@ -387,3 +388,12 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             response = self.client.get(self.url)
             blocks = response.data['course_blocks']['blocks']
             assert seq_block_id not in blocks
+
+    def test_user_has_passing_grade(self):
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0
+        self.update_course(self.course, self.user.id)
+        CourseGradeFactory().update(self.user, self.course)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['user_has_passing_grade'] is True

@@ -30,13 +30,22 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
 
     def test_reset_deadlines(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
-        # Test correct post body
-        response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id})
-        assert response.status_code == 200
         # Test body with incorrect body param (course_key is required)
         response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course': self.course.id})
         assert response.status_code == 400
         self.assert_no_events_were_emitted()
+
+        # Test correct post body
+        response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id})
+        assert response.status_code == 200
+        self.assert_event_emitted(
+            'edx.ui.lms.reset_deadlines.clicked',
+            courserun_key=str(self.course.id),
+            is_masquerading=False,
+            is_staff=False,
+            org_key=self.course.org,
+            user_id=self.user.id,
+        )
 
     def test_reset_deadlines_with_masquerade(self):
         """ Staff users should be able to masquerade as a learner and reset the learner's schedule """
@@ -54,9 +63,7 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
         self.switch_to_staff()
         self.update_masquerade(course=course, username=student_username)
 
-        with patch('openedx.features.course_experience.api.v1.views.dates_banner_should_display',
-                   return_value=(True, False)):
-            self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': course.id})
+        self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': course.id})
         updated_schedule = Schedule.objects.get(id=student_enrollment.schedule.id)
         assert updated_schedule.start_date.date() == datetime.datetime.today().date()
         updated_staff_schedule = Schedule.objects.get(id=staff_enrollment.schedule.id)

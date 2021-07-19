@@ -683,50 +683,64 @@ class ProblemBlock(
 
             if 'student_answers' not in user_state.state:
                 continue
+            try:
+                lcp = LoncapaProblem(
+                    problem_text=self.data,
+                    id=self.location.html_id(),
+                    capa_system=capa_system,
+                    # We choose to run without a fully initialized CapaModule
+                    capa_module=None,
+                    state={
+                        'done': user_state.state.get('done'),
+                        'correct_map': user_state.state.get('correct_map'),
+                        'student_answers': user_state.state.get('student_answers'),
+                        'has_saved_answers': user_state.state.get('has_saved_answers'),
+                        'input_state': user_state.state.get('input_state'),
+                        'seed': user_state.state.get('seed'),
+                    },
+                    seed=user_state.state.get('seed'),
+                    # extract_tree=False allows us to work without a fully initialized CapaModule
+                    # We'll still be able to find particular data in the XML when we need it
+                    extract_tree=False,
+                )
 
-            lcp = LoncapaProblem(
-                problem_text=self.data,
-                id=self.location.html_id(),
-                capa_system=capa_system,
-                # We choose to run without a fully initialized CapaModule
-                capa_module=None,
-                state={
-                    'done': user_state.state.get('done'),
-                    'correct_map': user_state.state.get('correct_map'),
-                    'student_answers': user_state.state.get('student_answers'),
-                    'has_saved_answers': user_state.state.get('has_saved_answers'),
-                    'input_state': user_state.state.get('input_state'),
-                    'seed': user_state.state.get('seed'),
-                },
-                seed=user_state.state.get('seed'),
-                # extract_tree=False allows us to work without a fully initialized CapaModule
-                # We'll still be able to find particular data in the XML when we need it
-                extract_tree=False,
-            )
+                for answer_id, orig_answers in lcp.student_answers.items():
+                    # Some types of problems have data in lcp.student_answers that isn't in lcp.problem_data.
+                    # E.g. formulae do this to store the MathML version of the answer.
+                    # We exclude these rows from the report because we only need the text-only answer.
+                    if answer_id.endswith('_dynamath'):
+                        continue
 
-            for answer_id, orig_answers in lcp.student_answers.items():
-                # Some types of problems have data in lcp.student_answers that isn't in lcp.problem_data.
-                # E.g. formulae do this to store the MathML version of the answer.
-                # We exclude these rows from the report because we only need the text-only answer.
-                if answer_id.endswith('_dynamath'):
-                    continue
+                    if limit_responses and count >= limit_responses:
+                        # End the iterator here
+                        return
 
-                if limit_responses and count >= limit_responses:
-                    # End the iterator here
-                    return
+                    question_text = lcp.find_question_label(answer_id)
+                    answer_text = lcp.find_answer_text(answer_id, current_answer=orig_answers)
+                    correct_answer_text = lcp.find_correct_answer_text(answer_id)
 
-                question_text = lcp.find_question_label(answer_id)
-                answer_text = lcp.find_answer_text(answer_id, current_answer=orig_answers)
-                correct_answer_text = lcp.find_correct_answer_text(answer_id)
-
-                count += 1
+                    count += 1
+                    report = {
+                        _("Answer ID"): answer_id,
+                        _("Question"): question_text,
+                        _("Answer"): answer_text,
+                    }
+                    if correct_answer_text is not None:
+                        report[_("Correct Answer")] = correct_answer_text
+                    yield (user_state.username, report)
+            except LoncapaProblemError:
+                # Capture a backtrace for errors from failed loncapa problems
+                log.exception(
+                    "An error occurred generating a problem report on course %s, problem %s, and student %s",
+                    self.course_id, self.scope_ids.usage_id,
+                    self.scope_ids.user_id
+                )
+                # Also input error in report
                 report = {
-                    _("Answer ID"): answer_id,
-                    _("Question"): question_text,
-                    _("Answer"): answer_text,
+                    _("Answer ID"): "Python Error",
+                    _("Question"): "Generating a report on the problem failed.",
+                    _("Answer"): "Python Error: No Answer Retrieved",
                 }
-                if correct_answer_text is not None:
-                    report[_("Correct Answer")] = correct_answer_text
                 yield (user_state.username, report)
 
     @property

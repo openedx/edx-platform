@@ -12,13 +12,13 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation_handler import (
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
-    _can_generate_v2_certificate,
+    _can_generate_regular_certificate,
     generate_allowlist_certificate_task,
     generate_certificate_task,
-    generate_regular_certificate_task,
+    _generate_regular_certificate_task,
     is_on_certificate_allowlist,
     _set_allowlist_cert_status,
-    _set_v2_cert_status
+    _set_regular_cert_status
 )
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import (
@@ -344,26 +344,26 @@ class CertificateTests(ModuleStoreTestCase):
         """
         Test handling of a valid user/course run combo.
         """
-        assert _can_generate_v2_certificate(self.user, self.course_run_key)
+        assert _can_generate_regular_certificate(self.user, self.course_run_key)
         assert generate_certificate_task(self.user, self.course_run_key)
 
     def test_handle_valid_task(self):
         """
         Test handling of a valid user/course run combo.
 
-        We test generate_certificate_task() and generate_regular_certificate_task() separately since they both
+        We test generate_certificate_task() and _generate_regular_certificate_task() separately since they both
         generate a cert.
         """
-        assert generate_regular_certificate_task(self.user, self.course_run_key) is True
+        assert _generate_regular_certificate_task(self.user, self.course_run_key) is True
 
     def test_handle_invalid(self):
         """
         Test handling of an invalid user/course run combo
         """
         other_user = UserFactory()
-        assert not _can_generate_v2_certificate(other_user, self.course_run_key)
+        assert not _can_generate_regular_certificate(other_user, self.course_run_key)
         assert not generate_certificate_task(other_user, self.course_run_key)
-        assert not generate_regular_certificate_task(other_user, self.course_run_key)
+        assert not _generate_regular_certificate_task(other_user, self.course_run_key)
 
     def test_handle_audit_status(self):
         """
@@ -377,8 +377,8 @@ class CertificateTests(ModuleStoreTestCase):
             mode=GeneratedCertificate.MODES.audit,
         )
 
-        assert _set_v2_cert_status(different_user, self.course_run_key) is None
-        assert not generate_regular_certificate_task(different_user, self.course_run_key)
+        assert _set_regular_cert_status(different_user, self.course_run_key) is None
+        assert not _generate_regular_certificate_task(different_user, self.course_run_key)
 
     def test_handle_not_passing_id_verified_no_cert(self):
         """
@@ -393,8 +393,8 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-            assert _set_v2_cert_status(different_user, self.course_run_key) is None
-            assert not generate_regular_certificate_task(different_user, self.course_run_key)
+            assert _set_regular_cert_status(different_user, self.course_run_key) is None
+            assert not _generate_regular_certificate_task(different_user, self.course_run_key)
 
     def test_handle_not_passing_id_verified_cert(self):
         """
@@ -415,9 +415,9 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-            assert _set_v2_cert_status(different_user, self.course_run_key) == CertificateStatuses.notpassing
-            assert generate_regular_certificate_task(different_user, self.course_run_key) is True
-            assert not _can_generate_v2_certificate(different_user, self.course_run_key)
+            assert _set_regular_cert_status(different_user, self.course_run_key) == CertificateStatuses.notpassing
+            assert _generate_regular_certificate_task(different_user, self.course_run_key) is True
+            assert not _can_generate_regular_certificate(different_user, self.course_run_key)
 
     @ddt.data(
         (CertificateStatuses.deleted, True),
@@ -476,8 +476,8 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
-            assert not _can_generate_v2_certificate(u, self.course_run_key)
-            assert _set_v2_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
+            assert not _can_generate_regular_certificate(u, self.course_run_key)
+            assert _set_regular_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
 
     def test_can_generate_not_verified_no_cert(self):
         """
@@ -492,8 +492,8 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
-            assert not _can_generate_v2_certificate(u, self.course_run_key)
-            assert _set_v2_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
+            assert not _can_generate_regular_certificate(u, self.course_run_key)
+            assert _set_regular_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
 
     def test_can_generate_not_verified_not_passing(self):
         """
@@ -515,8 +515,8 @@ class CertificateTests(ModuleStoreTestCase):
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
             with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-                assert not _can_generate_v2_certificate(u, self.course_run_key)
-                assert _set_v2_cert_status(u, self.course_run_key) is None
+                assert not _can_generate_regular_certificate(u, self.course_run_key)
+                assert _set_regular_cert_status(u, self.course_run_key) is None
 
     def test_can_generate_not_verified_not_passing_allowlist(self):
         """
@@ -539,32 +539,32 @@ class CertificateTests(ModuleStoreTestCase):
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
             with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-                assert not _can_generate_v2_certificate(u, self.course_run_key)
-                assert _set_v2_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
+                assert not _can_generate_regular_certificate(u, self.course_run_key)
+                assert _set_regular_cert_status(u, self.course_run_key) == CertificateStatuses.unverified
 
     def test_can_generate_ccx(self):
         """
         Test handling when the course is a CCX (custom edX) course
         """
         with mock.patch(CCX_COURSE_METHOD, return_value=True):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+            assert not _can_generate_regular_certificate(self.user, self.course_run_key)
+            assert _set_regular_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_beta_tester(self):
         """
         Test handling when the user is a beta tester
         """
         with mock.patch(BETA_TESTER_METHOD, return_value=True):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+            assert not _can_generate_regular_certificate(self.user, self.course_run_key)
+            assert _set_regular_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_not_passing_no_cert(self):
         """
         Test handling when the user does not have a passing grade and no cert exists
         """
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+            assert not _can_generate_regular_certificate(self.user, self.course_run_key)
+            assert _set_regular_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_not_passing_cert(self):
         """
@@ -585,8 +585,8 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
-            assert not _can_generate_v2_certificate(u, self.course_run_key)
-            assert _set_v2_cert_status(u, self.course_run_key) == CertificateStatuses.notpassing
+            assert not _can_generate_regular_certificate(u, self.course_run_key)
+            assert _set_regular_cert_status(u, self.course_run_key) == CertificateStatuses.notpassing
 
     def test_can_generate_not_enrolled(self):
         """
@@ -595,8 +595,8 @@ class CertificateTests(ModuleStoreTestCase):
         u = UserFactory()
         cr = CourseFactory()
         key = cr.id  # pylint: disable=no-member
-        assert not _can_generate_v2_certificate(u, key)
-        assert _set_v2_cert_status(u, key) is None
+        assert not _can_generate_regular_certificate(u, key)
+        assert _set_regular_cert_status(u, key) is None
 
     def test_can_generate_audit(self):
         """
@@ -612,8 +612,8 @@ class CertificateTests(ModuleStoreTestCase):
             mode=GeneratedCertificate.MODES.audit,
         )
 
-        assert not _can_generate_v2_certificate(u, key)
-        assert _set_v2_cert_status(u, key) is None
+        assert not _can_generate_regular_certificate(u, key)
+        assert _set_regular_cert_status(u, key) is None
 
     def test_can_generate_invalidated(self):
         """
@@ -640,24 +640,24 @@ class CertificateTests(ModuleStoreTestCase):
             active=True
         )
 
-        assert not _can_generate_v2_certificate(u, key)
-        assert _set_v2_cert_status(u, key) == CertificateStatuses.unavailable
+        assert not _can_generate_regular_certificate(u, key)
+        assert _set_regular_cert_status(u, key) == CertificateStatuses.unavailable
 
     def test_can_generate_web_cert_disabled(self):
         """
         Test handling when web certs are not enabled
         """
         with mock.patch(WEB_CERTS_METHOD, return_value=False):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+            assert not _can_generate_regular_certificate(self.user, self.course_run_key)
+            assert _set_regular_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_no_overview(self):
         """
         Test handling when the course overview is missing
         """
         with mock.patch(COURSE_OVERVIEW_METHOD, return_value=None):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
-            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+            assert not _can_generate_regular_certificate(self.user, self.course_run_key)
+            assert _set_regular_cert_status(self.user, self.course_run_key) is None
 
     def test_cert_status_downloadable(self):
         """
@@ -679,4 +679,4 @@ class CertificateTests(ModuleStoreTestCase):
             status=CertificateStatuses.downloadable
         )
 
-        assert _set_v2_cert_status(u, key) is None
+        assert _set_regular_cert_status(u, key) is None

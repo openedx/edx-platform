@@ -79,6 +79,9 @@ class ProgressTabView(RetrieveAPIView):
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
                 num_points_possible: (int) the total amount of points possible for the given subsection
                 percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
+                problem_scores: List of objects that represent individual problem scores with the following fields:
+                    earned: (float) number of earned points
+                    possible: (float) number of possible points
                 show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                   ('always', 'never', 'past_due', values defined in
                                    common/lib/xmodule/xmodule/modulestore/inheritance.py)

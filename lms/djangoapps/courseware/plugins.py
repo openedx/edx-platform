@@ -1,6 +1,7 @@
 """Course app config for courseware apps."""
 from typing import Dict, Optional
 
+from django import urls
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_noop as _
@@ -102,6 +103,10 @@ class TextbooksCourseApp(CourseApp):
             "enable": False,
             "configure": True,
         }
+
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return urls.reverse('textbooks_list_handler', kwargs={'course_key_string': course_key})
 
 
 class CalculatorCourseApp(CourseApp):

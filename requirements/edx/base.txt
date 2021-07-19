@@ -457,7 +457,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.9.0
     # via -r requirements/edx/base.in
-edx-proctoring==3.17.2
+edx-proctoring==3.18.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -593,7 +593,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==3.0.0
+lti-consumer-xblock==3.0.1
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via

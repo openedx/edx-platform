@@ -5,11 +5,11 @@ Tests for Discussion API forms
 
 import itertools
 from unittest import TestCase
+from urllib.parse import urlencode
 
 import ddt
 from django.http import QueryDict
 from opaque_keys.edx.locator import CourseLocator
-from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.discussion.rest_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
@@ -63,9 +63,13 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             'course_id': CourseLocator.from_string('Foo/Bar/Baz'),
             'page': 2,
             'page_size': 13,
+            'count_flagged': None,
             'topic_id': set(),
             'text_search': '',
             'following': None,
+            'author': '',
+            'thread_type': '',
+            'flagged': None,
             'view': '',
             'order_by': 'last_activity_at',
             'order_direction': 'desc',
@@ -93,6 +97,29 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_empty_topic_id(self):
         self.form_data.setlist("topic_id", ["", "not empty"])
         self.assert_error("topic_id", "This field cannot be empty.")
+
+    @ddt.data("discussion", "question")
+    def test_thread_type(self, value):
+        self.form_data["thread_type"] = value
+        self.assert_field_value("thread_type", value)
+
+    def test_thread_type_invalid(self):
+        self.form_data["thread_type"] = "invalid-option"
+        self.assert_error("thread_type", "Select a valid choice. invalid-option is not one of the available choices.")
+
+    @ddt.data("True", "true", 1, True)
+    def test_flagged_true(self, value):
+        self.form_data["flagged"] = value
+        self.assert_field_value("flagged", True)
+
+    @ddt.data("False", "false", 0, False)
+    def test_flagged_false(self, value):
+        self.form_data["flagged"] = value
+        self.assert_field_value("flagged", False)
+
+    def test_invalid_flagged(self):
+        self.form_data["flagged"] = "invalid-boolean"
+        self.assert_error("flagged", "Invalid Boolean Value.")
 
     @ddt.data("True", "true", 1, True)
     def test_following_true(self, value):

@@ -3109,7 +3109,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=903 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=904 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4864,20 +4864,6 @@ CREATE TABLE `learning_sequences_coursesection` (
   CONSTRAINT `learning_sequences_c_course_context_id_f9845b47_fk_learning_` FOREIGN KEY (`course_context_id`) REFERENCES `learning_sequences_coursecontext` (`learning_context_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `learning_sequences_coursesection_user_partition_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `learning_sequences_coursesection_user_partition_groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `coursesection_id` bigint(20) NOT NULL,
-  `userpartitiongroup_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `learning_sequences_cours_coursesection_id_userpar_b6721a80_uniq` (`coursesection_id`,`userpartitiongroup_id`),
-  KEY `learning_sequences_c_userpartitiongroup_i_41637568_fk_learning_` (`userpartitiongroup_id`),
-  CONSTRAINT `learning_sequences_c_coursesection_id_4c92ccff_fk_learning_` FOREIGN KEY (`coursesection_id`) REFERENCES `learning_sequences_coursesection` (`id`),
-  CONSTRAINT `learning_sequences_c_userpartitiongroup_i_41637568_fk_learning_` FOREIGN KEY (`userpartitiongroup_id`) REFERENCES `learning_sequences_userpartitiongroup` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `learning_sequences_coursesectionsequence`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -4899,20 +4885,6 @@ CREATE TABLE `learning_sequences_coursesectionsequence` (
   CONSTRAINT `learning_sequences_c_course_context_id_bb2762af_fk_learning_` FOREIGN KEY (`course_context_id`) REFERENCES `learning_sequences_coursecontext` (`learning_context_id`),
   CONSTRAINT `learning_sequences_c_section_id_646c2074_fk_learning_` FOREIGN KEY (`section_id`) REFERENCES `learning_sequences_coursesection` (`id`),
   CONSTRAINT `learning_sequences_c_sequence_id_e6a12a64_fk_learning_` FOREIGN KEY (`sequence_id`) REFERENCES `learning_sequences_learningsequence` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `learning_sequences_coursesectionsequence_user_partition_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `learning_sequences_coursesectionsequence_user_partition_groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `coursesectionsequence_id` bigint(20) NOT NULL,
-  `userpartitiongroup_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `learning_sequences_cours_coursesectionsequence_id_318cffd5_uniq` (`coursesectionsequence_id`,`userpartitiongroup_id`),
-  KEY `learning_sequences_c_userpartitiongroup_i_2a4c2c04_fk_learning_` (`userpartitiongroup_id`),
-  CONSTRAINT `learning_sequences_c_coursesectionsequenc_51c3f713_fk_learning_` FOREIGN KEY (`coursesectionsequence_id`) REFERENCES `learning_sequences_coursesectionsequence` (`id`),
-  CONSTRAINT `learning_sequences_c_userpartitiongroup_i_2a4c2c04_fk_learning_` FOREIGN KEY (`userpartitiongroup_id`) REFERENCES `learning_sequences_userpartitiongroup` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `learning_sequences_coursesequenceexam`;
@@ -8506,4 +8478,3 @@ CREATE TABLE `xblock_django_xblockstudioconfigurationflag` (
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

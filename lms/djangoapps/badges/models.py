@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible  # lint-amnesty, pylint: disable=no-name-in-module
 from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
@@ -48,7 +47,6 @@ class CourseBadgesDisabledError(Exception):
     """
 
 
-@python_2_unicode_compatible
 class BadgeClass(models.Model):
     """
     Specifies a badge class to be registered with a backend.
@@ -146,7 +144,6 @@ class BadgeClass(models.Model):
         verbose_name_plural = "Badge Classes"
 
 
-@python_2_unicode_compatible
 class BadgeAssertion(TimeStampedModel):
     """
     Tracks badges on our side of the badge baking transaction
@@ -184,7 +181,6 @@ class BadgeAssertion(TimeStampedModel):
 BadgeAssertion._meta.get_field('created').db_index = True
 
 
-@python_2_unicode_compatible
 class CourseCompleteImageConfiguration(models.Model):
     """
     Contains the icon configuration for badges for a specific course mode.
@@ -240,7 +236,6 @@ class CourseCompleteImageConfiguration(models.Model):
         app_label = "badges"
 
 
-@python_2_unicode_compatible
 class CourseEventBadgesConfiguration(ConfigurationModel):
     """
     Determines the settings for meta course awards-- such as completing a certain

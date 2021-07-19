@@ -74,9 +74,11 @@ class TrackMiddlewareTestCase(TestCase):
 
     def test_default_request_context(self):
         context = self.get_context_for_path('/courses/')
-        assert context == {'accept_language': '', 'referer': '', 'user_id': '', 'session': '', 'username': '',
-                           'ip': '127.0.0.1', 'host': 'testserver', 'agent': '', 'path': '/courses/', 'org_id': '',
-                           'course_id': '', 'client_id': None}
+        assert context == {
+            'accept_language': '', 'referer': '', 'user_id': '', 'session': '', 'username': '', 'ip': '127.0.0.1',
+            'host': 'testserver', 'agent': '', 'path': '/courses/', 'org_id': '', 'course_id': '', 'client_id': None,
+            'enterprise_uuid': ''
+        }
 
     def test_no_forward_for_header_ip_context(self):
         request = self.request_factory.get('/courses/')
