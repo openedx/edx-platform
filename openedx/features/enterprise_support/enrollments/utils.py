@@ -41,6 +41,8 @@ def lms_enroll_user_in_course(username, course_id, mode,
      - cohort_name (str): Optional. If provided, user will be added to cohort
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
+
+    Returns: A serializable dictionary of the new course enrollment.
     """
     user = _validate_enrollment_inputs(username, course_id)
 
@@ -59,7 +61,6 @@ def lms_enroll_user_in_course(username, course_id, mode,
             return response
         except CourseEnrollmentExistsError as error:
             log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
-            raise error
         except CourseEnrollmentError as error:
             log.exception("An error occurred while creating the new course enrollment for user "
                           "[%s] in course run [%s]", username, course_id)
