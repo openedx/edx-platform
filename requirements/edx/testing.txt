@@ -55,7 +55,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/edx/base.txt
     #   fs
-astroid==2.5.6
+astroid==2.6.2
     # via
     #   pylint
     #   pylint-celery
@@ -941,9 +941,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.8.3
+pylint==2.9.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
