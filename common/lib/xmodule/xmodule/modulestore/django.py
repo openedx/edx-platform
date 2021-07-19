@@ -22,7 +22,7 @@ from django.core.cache import caches, InvalidCacheBackendError  # lint-amnesty, 
 import django.dispatch  # lint-amnesty, pylint: disable=wrong-import-position
 import django.utils  # lint-amnesty, pylint: disable=wrong-import-position
 from django.utils.translation import get_language, to_locale  # lint-amnesty, pylint: disable=wrong-import-position
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE  # lint-amnesty, pylint: disable=wrong-import-position
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE, RequestCache  # lint-amnesty, pylint: disable=wrong-import-position
 
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-position
 from xmodule.modulestore.draft_and_published import BranchSettingMixin  # lint-amnesty, pylint: disable=wrong-import-position
@@ -308,6 +308,193 @@ def create_modulestore_instance(
 _MIXED_MODULESTORE = None
 
 
+class CachingModuleStoreWrapper:
+    """
+    Wrap a modulestore and add request-level caching of get_course()
+
+    This class proxies most of its requests to its underlying Modulestore
+    object. It was necessary to do this as a separate wrapping layer because
+    our _MIXED_MODULESTORE can be a CCXModulestoreWrapper or a MixedModuleStore
+    depending on our settings. Putting this caching into MixedModuleStore itself
+    doesn't work because of the way CCXModulestoreWrapper pulls back results
+    from MixedModuleStore and changes their usage keys.
+
+    So yes, this means that content access is layered behind proxies like:
+
+      CachingModuleStoreWrapper ->
+        (CCXModulestoreWrapper -> if CCX enabled)
+          MixedModuleStore ->
+            DraftVersioningModuleStore (Split Mongo)
+            DraftModuleStore (Old Mongo)
+
+    The main thing we have to worry about in this class is to be able to detect
+    any call that might potentially invalidate the cache course, and to do that
+    invalidation before sending the call along.
+    """
+    def __init__(self, modulestore_obj):
+        self.__dict__['_modulestore'] = modulestore_obj
+        self.__dict__['_request_cache'] = RequestCache('CachingModulestoreWrapper')
+
+    def __getattr__(self, name):
+        """Look up missing attributes on the wrapped modulestore"""
+        return getattr(self._modulestore, name)
+
+    def __setattr__(self, name, value):
+        """Set attributes only on the wrapped modulestore"""
+        setattr(self._modulestore, name, value)
+
+    def __delattr__(self, name):
+        """Delete attributes only on the wrapped modulestore"""
+        delattr(self._modulestore, name)
+
+    def _remove_from_course_cache(self, course_key):
+        """
+        Remove all instances of this course_key from the local request cache.
+        """
+        # Remember that there may be multiple keys for the same course
+        cache_keys_to_del = [
+            cache_key
+            for cache_key in self._request_cache.data
+            if cache_key[0] == course_key  # cache_key is (course_key, depth)
+        ]
+        for cache_key in cache_keys_to_del:
+            self._request_cache.delete(cache_key)
+
+    def get_course(self, course_key, depth=0, **kwargs):
+        """
+        Call get_course on wrapped modulestore, but with request-caching.
+
+        This is the only call that actually _uses_ caching at this layer.
+        """
+        # Only use the request cache if we're dealing with a simple query with
+        # no advanced params. (This is the vast, vast majority of queries.)
+        use_cache = not kwargs
+        cache_key = (course_key, depth)
+        if use_cache:
+            cache_response = self._request_cache.get_cached_response(cache_key)
+            if cache_response.is_found:
+                return cache_response.value
+
+        course = self._modulestore.get_course(course_key, depth, **kwargs)
+        if use_cache:
+            self._request_cache.set(cache_key, course)
+
+        return course
+
+    # Everything that follows are method calls that would cause cache
+    # invalidation. Unfortunately, how we derive a course_key and when it's safe
+    # to use varies by method, so there's a lot of boilerplate copying. Some of
+    # these might not be necessary, but it's better to err on the side of
+    # invalidation than risk correctness.
+
+    def delete_course(self, course_key, user_id):
+        result = self._modulestore.delete_course(course_key, user_id)
+        self._remove_from_course_cache(course_key)
+        return result
+
+    def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
+        result = self._modulestore.save_asset_metadata(asset_metadata, user_id, import_only)
+        self._remove_from_course_cache(asset_metadata.asset_id.course_key)
+        return result
+
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        result = self.modulestore.save_asset_metadata_list(asset_metadata_list, user_id, import_only)
+        if asset_metadata_list:
+            self._remove_from_course_cache(asset_metadata_list[0].asset_id.course_key)
+        return result
+
+    def delete_asset_metadata(self, asset_key, user_id):
+        result = self._modulestore.delete_asset_metadata(asset_key, user_id)
+        self._remove_from_course_cache(asset_key.course_key)
+        return result
+
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        result = self._modulestore.copy_all_asset_metadata(source_course_key, dest_course_key, user_id)
+        self._remove_from_course_cache(dest_course_key)
+        return result
+
+    def set_asset_metadata_attr(self, asset_key, attr, value, user_id):
+        result = self._modulestore.set_asset_metadata_attr(asset_key, attr, value, user_id)
+        self._remove_from_course_cache(asset_key.course_key)
+        return result
+
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+        result = self._modulestore.set_asset_metadata_attrs(asset_key, attr_dict, user_id)
+        self._remove_from_course_cache(asset_key.course_key)
+        return result
+
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
+        result = self._modulestore.clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+        self._remove_from_course_cache(dest_course_id)
+        return result
+
+    def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
+        result = self._modulestore.create_item(user_id, course_key, block_type, block_id, fields, **kwargs)
+        self._remove_from_course_cache(course_key)
+        return result
+
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
+        result = self._modulestore.create_child(user_id, parent_usage_key, block_type, block_id, fields, **kwargs)
+        self._remove_from_course_cache(parent_usage_key.course_key)
+        return result
+
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
+        result = self._modulestore.import_xblock(user_id, course_key, block_type, block_id, fields, runtime, **kwargs)
+        self._remove_from_course_cache(course_key)
+        return result
+
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        result = self._modulestore.copy_from_template(source_keys, dest_key, user_id, **kwargs)
+        self._remove_from_course_cache(dest_key.course_key)
+        return result
+
+    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
+        result = self._modulestore.update_item(xblock, user_id, allow_not_found, **kwargs)
+        self._remove_from_course_cache(xblock.location.course_key)
+        return result
+
+    def delete_item(self, location, user_id, **kwargs):
+        result = self._modulestore.delete_item(location, user_id, **kwargs)
+        self._remove_from_course_cache(location.course_key)
+        return result
+
+    def revert_to_published(self, location, user_id):
+        result = self._modulestore.revert_to_published(location, user_id)
+        self._remove_from_course_cache(location.course_key)
+        return result
+
+    def reset_course_to_version(self, course_key, version_guid, user_id):
+        result = self._modulestore.reset_course_to_version(course_key, version_guid, user_id)
+        self._remove_from_course_cache(course_key)
+        return result
+
+    def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
+        result = self._modulestore.create_xblock(runtime, course_key, block_type, block_id, fields, **kwargs)
+        self._remove_from_course_cache(course_key)
+        return result
+
+    def publish(self, location, user_id, **kwargs):
+        result = self._modulestore.publish(location, user_id, **kwargs)
+        self._remove_from_course_cache(location.course_key)
+        return result
+
+    def unpublish(self, location, user_id, **kwargs):
+        result = self._modulestore.unpublish(location, user_id, **kwargs)
+        self._remove_from_course_cache(location.course_key)
+        return result
+
+    def convert_to_draft(self, location, user_id):
+        result = self._modulestore.convert_to_draft(self, location, user_id)
+        self._remove_from_course_cache(location.course_key)
+        return result
+
+    def has_changes(self, xblock):
+        # Intentionally clearing cache before the proxied call, in order to make
+        # sure our cache can't affect the comparison being done in has_changes.
+        self._remove_from_course_cache(xblock.location.course_key)
+        return self._modulestore.has_changes(self, xblock)
+
+
 def modulestore():
     """
     Returns the Mixed modulestore
@@ -330,7 +517,7 @@ def modulestore():
             from lms.djangoapps.ccx.modulestore import CCXModulestoreWrapper
             _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
 
-    return _MIXED_MODULESTORE
+    return CachingModuleStoreWrapper(_MIXED_MODULESTORE)
 
 
 def clear_existing_modulestores():
