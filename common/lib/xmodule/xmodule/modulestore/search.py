@@ -3,17 +3,27 @@
 
 from logging import getLogger
 from base64 import urlsafe_b64encode
+from hashlib import blake2b
 
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff  # lint-amnesty, pylint: disable=unused-import
 from .exceptions import ItemNotFoundError, NoPathToItem
+from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
+
 
 LOGGER = getLogger(__name__)
 
+def get_usage_key_hash(usage_key):
 
-def path_to_location(modulestore, usage_key, request=None, full_path=False):
+    short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
+    hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
+    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=short_key.hexdigest(),usage_key=usage_key)
+    return hash
+
+
+def path_to_location(modulestore, usage_key, experience, request=None, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -43,9 +53,11 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
         Not a general flatten function. '''
         p = []
         while xs != ():
-            xs_hash = urlsafe_b64encode(bytes(xs[0].block_id, 'utf-8'))
-            p.append(xs_hash)
-            # p.append(xs[0])
+            if experience == 'NEW':
+                usage_key_hash = get_usage_key_hash(xs[0])
+                p.append(usage_key_hash)
+            else:
+                p.append(xs[0])
             xs = xs[1]
         return p
 
