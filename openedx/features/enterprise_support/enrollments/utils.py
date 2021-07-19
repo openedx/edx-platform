@@ -43,7 +43,6 @@ def lms_enroll_user_in_course(username, course_id, mode,
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
     """
-    breakpoint()
     user = _validate_enrollment_inputs(username, course_id)
 
     with transaction.atomic():
