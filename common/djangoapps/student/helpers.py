@@ -441,32 +441,32 @@ class AccountValidationError(Exception):
         self.error_code = error_code
 
 
-def cert_info(user, course_overview):
+def cert_info(user, enrollment):
     """
     Get the certificate info needed to render the dashboard section for the given
     student and course.
 
     Arguments:
         user (User): A user.
-        course_overview (CourseOverview): A course.
+        enrollment (CourseEnrollment): A course enrollment.
 
     Returns:
         See _cert_info
     """
     return _cert_info(
         user,
-        course_overview,
-        certificate_status_for_student(user, course_overview.id),
+        enrollment,
+        certificate_status_for_student(user, enrollment.course_overview.id),
     )
 
 
-def _cert_info(user, course_overview, cert_status):
+def _cert_info(user, enrollment, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
 
     Arguments:
         user (User): A user.
-        course_overview (CourseOverview): A course.
+        enrollment (CourseEnrollment): A course enrollment.
         cert_status (dict): dictionary containing information about certificate status for the user
 
     Returns:
@@ -506,9 +506,10 @@ def _cert_info(user, course_overview, cert_status):
         'can_unenroll': True,
     }
 
-    if cert_status is None:
+    if cert_status is None or enrollment is None:
         return default_info
 
+    course_overview = enrollment.course_overview if enrollment else None
     status = template_state.get(cert_status['status'], default_status)
     is_hidden_status = status in ('processing', 'generating', 'notpassing', 'auditing')
 
@@ -523,6 +524,9 @@ def _cert_info(user, course_overview, cert_status):
         course_overview.certificates_display_behavior == 'early_no_info' and
         is_hidden_status
     ):
+        return default_info
+
+    if not CourseMode.is_eligible_for_certificate(enrollment.mode, status=status):
         return default_info
 
     status_dict = {
