@@ -12,7 +12,7 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki
     # via -r requirements/edx/testing.txt
--e git+https://github.com/edx/edx-django-utils.git@5617766fdaf7a45bfb0d92e3429ad7c1af7fd628#egg=edx-django-utils
+-e git+https://github.com/edx/edx-django-utils.git@37181a95b9e0e154ce58c3051b3becf9139339a9#egg=edx-django-utils
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -57,7 +57,7 @@ amqp==2.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   kombu
-analytics-python==1.3.1
+analytics-python==1.4.0
     # via -r requirements/edx/testing.txt
 aniso8601==9.0.1
     # via
@@ -157,7 +157,7 @@ chardet==4.0.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.2
+charset-normalizer==2.0.3
     # via
     #   -r requirements/edx/testing.txt
     #   requests
@@ -556,7 +556,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.17.2
+edx-proctoring==3.19.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -875,7 +875,7 @@ nltk==3.6.2
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/testing.txt
-numpy==1.21.0
+numpy==1.21.1
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -919,7 +919,7 @@ pbr==5.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   stevedore
-pep517==0.10.0
+pep517==0.11.0
     # via
     #   -r requirements/edx/pip-tools.txt
     #   pip-tools
@@ -1346,7 +1346,7 @@ sympy==1.6.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   symmath
-tableauserverclient==0.15.0
+tableauserverclient==0.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1365,15 +1365,17 @@ tincan==1.0.0
     #   edx-event-routing-backends
 toml==0.10.2
     # via
-    #   -r requirements/edx/pip-tools.txt
     #   -r requirements/edx/testing.txt
     #   mypy
-    #   pep517
     #   pylint
     #   pytest
     #   pytest-cov
     #   tox
     #   vulture
+tomli==1.0.4
+    # via
+    #   -r requirements/edx/pip-tools.txt
+    #   pep517
 tox==3.24.0
     # via
     #   -r requirements/edx/testing.txt
