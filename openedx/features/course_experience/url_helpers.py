@@ -82,7 +82,7 @@ def _get_legacy_courseware_url(
     (
         course_key, chapter, section, vertical_unused,
         position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request)
+    ) = path_to_location(modulestore(), usage_key, 'LEGACY', request)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -120,7 +120,7 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, full_path=True)
+    path = path_to_location(modulestore(), usage_key, 'NEW', request, full_path=True)
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
