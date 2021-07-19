@@ -4,6 +4,7 @@
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from unittest import mock
 from unittest.mock import patch
 
 import ddt
@@ -23,7 +24,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     GlobalStaffFactory,
@@ -37,6 +37,7 @@ from lms.djangoapps.certificates.api import (
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
     example_certificates_status,
+    generate_certificate_task,
     generate_example_certificates,
     get_allowlist_entry,
     get_allowlisted_users,
@@ -66,6 +67,7 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     CertificateInvalidationFactory
 )
+from lms.djangoapps.certificates.tests.test_generation_handler import ID_VERIFIED_METHOD, PASSING_GRADE_METHOD
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
@@ -536,38 +538,45 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert get_certificate_for_user(self.student.username, self.nonexistent_course_id) is None
 
 
-@override_settings(CERT_QUEUE='certificates')
-class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
+class GenerateUserCertificatesTest(ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
-    ERROR_REASON = "Kaboom!"
-    ENABLED_SIGNALS = ['course_published']
+    def setUp(self):
+        super().setUp()
 
-    def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.certificates.utils.tracker')
-
-        self.student = UserFactory.create(
-            email='joe_user@edx.org',
-            username='joeuser',
-            password='foo'
+        self.user = UserFactory()
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
         )
-        self.student_no_cert = UserFactory()
-        self.course = CourseFactory.create(
-            org='edx',
-            number='verified',
-            display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
-        )
-        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.request_factory = RequestFactory()
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_url_empty_with_invalid_certificate(self):
         """
         Test certificate url is empty if html view is not enabled and certificate is not yet generated
         """
-        url = get_certificate_url(self.student.id, self.course.id)
+        url = get_certificate_url(self.user.id, self.course_run_key)
         assert url == ''
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation(self):
+        """
+        Test that a cert is successfully generated
+        """
+        cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+        assert not cert
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=True):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=True):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.downloadable
+                assert cert.mode == CourseMode.VERIFIED
 
 
 @ddt.ddt
