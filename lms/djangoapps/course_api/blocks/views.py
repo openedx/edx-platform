@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.search import get_usage_key_hash
 
 from .api import get_blocks
 from .forms import BlockListGetForm
@@ -244,9 +245,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             blocks = response.data['blocks']
             for block in blocks:
                 current_block = blocks[block]
-                id_hash = bytes(current_block['id'], 'utf-8')
-                current_block['hash_key'] = urlsafe_b64encode(id_hash)
-                print(urlsafe_b64decode(current_block['hash_key']))
+                current_block['hash_key'] = get_usage_key_hash(current_block['id'])
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from
