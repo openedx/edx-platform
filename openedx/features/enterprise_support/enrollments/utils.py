@@ -12,7 +12,6 @@ from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 from openedx.core.lib.log_utils import audit_log
-from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
     UserDoesNotExistException
