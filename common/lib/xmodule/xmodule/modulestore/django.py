@@ -484,7 +484,7 @@ class CachingModuleStoreWrapper:
         return result
 
     def convert_to_draft(self, location, user_id):
-        result = self._modulestore.convert_to_draft(self, location, user_id)
+        result = self._modulestore.convert_to_draft(location, user_id)
         self._remove_from_course_cache(location.course_key)
         return result
 
@@ -492,7 +492,7 @@ class CachingModuleStoreWrapper:
         # Intentionally clearing cache before the proxied call, in order to make
         # sure our cache can't affect the comparison being done in has_changes.
         self._remove_from_course_cache(xblock.location.course_key)
-        return self._modulestore.has_changes(self, xblock)
+        return self._modulestore.has_changes(xblock)
 
 
 def modulestore():
