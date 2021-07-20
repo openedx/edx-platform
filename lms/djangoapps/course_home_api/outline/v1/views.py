@@ -134,6 +134,7 @@ class OutlineTabView(RetrieveAPIView):
         enroll_alert:
             can_enroll: (bool) Whether the user can enroll in the given course
             extra_text: (str)
+        enrollment_mode: (str) Current enrollment mode. Null if the user is not enrolled.
         handouts_html: (str) Raw HTML for the handouts section of the course info
         has_ended: (bool) Indicates whether course has ended
         offer: An object detailing upgrade discount information
@@ -190,6 +191,7 @@ class OutlineTabView(RetrieveAPIView):
 
         course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        enrollment_mode = getattr(enrollment, 'mode', None)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
         allow_public_outline = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -329,6 +331,7 @@ class OutlineTabView(RetrieveAPIView):
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
+            'enrollment_mode': enrollment_mode,
             'handouts_html': handouts_html,
             'has_ended': course.has_ended(),
             'offer': offer_data,
