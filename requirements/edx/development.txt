@@ -273,6 +273,7 @@ django==2.2.24
     #   edx-i18n-tools
     #   edx-lint
     #   edx-milestones
+    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -367,6 +368,7 @@ django-model-utils==4.1.1
     #   edx-completion
     #   edx-enterprise
     #   edx-milestones
+    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -450,6 +452,7 @@ djangorestframework==3.12.4
     #   edx-completion
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
@@ -519,6 +522,7 @@ edx-drf-extensions==6.6.0
     #   -r requirements/edx/testing.txt
     #   edx-completion
     #   edx-enterprise
+    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -537,6 +541,8 @@ edx-i18n-tools==0.5.3
 edx-lint==5.0.0
     # via -r requirements/edx/testing.txt
 edx-milestones==0.3.2
+    # via -r requirements/edx/testing.txt
+edx-name-affirmation==0.1.2
     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.2
     # via
@@ -590,6 +596,7 @@ edx-toggles==4.2.0
     #   -r requirements/edx/testing.txt
     #   edx-completion
     #   edx-event-routing-backends
+    #   edx-name-affirmation
     #   edxval
     #   ora2
 edx-user-state-client==1.3.2
