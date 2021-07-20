@@ -27,11 +27,6 @@ class EnrollmentUtilsTest(TestCase):
     Test enterprise support utils.
     """
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = UserFactory.create(password='password')
-        super().setUpTestData()
-
     def test_validation_of_inputs_course_id(self):
         with self.assertRaises(CourseIdMissingException):
             lms_enroll_user_in_course('user', None, 'verified')
@@ -44,12 +39,14 @@ class EnrollmentUtilsTest(TestCase):
                 'verified'
             )
 
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
-    def test_validation_of_inputs_user_not_found(self, mock_user_model):
-        mock_user_model.return_value.objects.return_value.get.side_effect = ObjectDoesNotExist
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
+    def test_validation_of_inputs_user_not_found(self, mock_tx, mock_user_model):
+        mock_tx.return_value.atomic.side_effect = None
+        mock_user_model.side_effect = ObjectDoesNotExist()
         with self.assertRaises(UserDoesNotExistException):
             lms_enroll_user_in_course(
-                None,
+                "a_user",
                 CourseKey.from_string(COURSE_STRING),
                 'verified'
             )
@@ -57,7 +54,7 @@ class EnrollmentUtilsTest(TestCase):
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_course_enrollment_error_raises(self,
                                             mock_tx,
@@ -76,8 +73,11 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = {'id': 1223, 'username': username}
-        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+        a_user = mock.MagicMock()
+        a_user.id = 1223
+        a_user.username = username
+
+        mock_user_model.return_value = a_user
 
         with self.assertRaises(CourseEnrollmentError):
             lms_enroll_user_in_course(username, course_id, mode)
@@ -87,7 +87,7 @@ class EnrollmentUtilsTest(TestCase):
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_course_group_error_raises(self,
                                        mock_tx,
@@ -106,8 +106,10 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = {'id': 1223, 'username': username}
-        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+        a_user = mock.MagicMock()
+        a_user.id = 1223
+        a_user.username = username
+        mock_user_model.return_value = a_user
 
         with self.assertRaises(CourseUserGroup.DoesNotExist):
             lms_enroll_user_in_course(username, course_id, mode)
@@ -117,7 +119,7 @@ class EnrollmentUtilsTest(TestCase):
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_calls_enrollment_and_cohort_apis(
         self,
@@ -139,8 +141,10 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = {'id': 1223, 'username': username}
-        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+        a_user = mock.MagicMock()
+        a_user.id = 1223
+        a_user.username = username
+        mock_user_model.return_value = a_user
 
         response = lms_enroll_user_in_course(username, course_id, mode)
 
@@ -159,7 +163,7 @@ class EnrollmentUtilsTest(TestCase):
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_existing_enrollment_does_not_fail(
         self,
@@ -181,8 +185,10 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = {'id': 1223, 'username': username}
-        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+        a_user = mock.MagicMock()
+        a_user.id = 1223
+        a_user.username = username
+        mock_user_model.return_value = a_user
 
         response = lms_enroll_user_in_course(username, course_id, mode)
 
