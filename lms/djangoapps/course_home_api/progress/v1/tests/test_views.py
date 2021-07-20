@@ -64,7 +64,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
             CourseEnrollment.enroll(self.user, self.course.id)
             CourseEnrollment.unenroll(self.user, self.course.id)
         response = self.client.get(self.url)
-        assert response.status_code == 401
+        assert response.status_code == 403
+        assert response.json() == {'redirect': f'http://learning-mfe/course/{self.course.id}/home'}
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_get_unauthenticated_user(self):
@@ -83,7 +84,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     def test_waffle_flag_disabled(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        assert response.status_code == 403
+        assert response.json() == {'redirect': f'http://testserver/courses/{self.course.id}/progress'}
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_masquerade(self):
@@ -155,7 +157,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         DisableProgressPageStackedConfig.objects.create(disabled=True, course=course_overview)
 
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        assert response.status_code == 403
+        assert response.json() == {'redirect': f'http://testserver/courses/{self.course.id}/progress'}
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_learner_has_access(self):

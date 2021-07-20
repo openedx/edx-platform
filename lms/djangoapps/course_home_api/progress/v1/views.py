@@ -2,8 +2,8 @@
 Progress Tab Views
 """
 
-from django.http.response import Http404
 from django.contrib.auth.models import User
+from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -12,19 +12,18 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.course_home_api.decorators import course_home_redirects
 from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers import start_date
-
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary, get_course_with_access, get_studio_url
+from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
-
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
@@ -32,7 +31,14 @@ from openedx.core.djangoapps.content.block_structure.api import get_block_struct
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
+from xmodule.modulestore.django import modulestore
+
+
+class RedirectToLegacyProgress(Redirect):
+    def __init__(self, course_key_string):
+        super().__init__(reverse('progress', args=[course_key_string]))
 
 
 class ProgressTabView(RetrieveAPIView):
@@ -103,8 +109,7 @@ class ProgressTabView(RetrieveAPIView):
     **Returns**
 
         * 200 on success with above fields.
-        * 401 if the user is not authenticated or not enrolled.
-        * 404 if the course is not available or cannot be seen.
+        * 403 for redirects (with redirect location in the json). Used for access denied errors and the like.
     """
 
     authentication_classes = (
@@ -115,6 +120,7 @@ class ProgressTabView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ProgressTabSerializer
 
+    @course_home_redirects
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
@@ -123,10 +129,10 @@ class ProgressTabView(RetrieveAPIView):
             try:
                 student_id = int(student_id)
             except ValueError:
-                raise Http404
+                raise RedirectToLegacyProgress(course_key_string)
 
         if not course_home_mfe_progress_tab_is_active(course_key):
-            raise Http404
+            raise RedirectToLegacyProgress(course_key_string)
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
@@ -152,11 +158,11 @@ class ProgressTabView(RetrieveAPIView):
             has_access_on_students_profiles = is_staff or coach_access
             # Requesting access to a different student's profile
             if not has_access_on_students_profiles:
-                raise Http404
+                raise RedirectToLegacyProgress(course_key_string)
             try:
                 student = User.objects.get(id=student_id)
             except User.DoesNotExist as exc:
-                raise Http404 from exc
+                raise RedirectToLegacyProgress(course_key_string) from exc
 
         username = get_enterprise_learner_generic_name(request) or student.username
 
@@ -167,7 +173,7 @@ class ProgressTabView(RetrieveAPIView):
         enrollment_mode = getattr(enrollment, 'mode', None)
 
         if not (enrollment and enrollment.is_active) and not is_staff:
-            return Response('User not enrolled.', status=401)
+            raise Redirect(get_learning_mfe_home_url(course_key, view_name='home'))
 
         # The block structure is used for both the course_grade and has_scheduled content fields
         # So it is called upfront and reused for optimization purposes

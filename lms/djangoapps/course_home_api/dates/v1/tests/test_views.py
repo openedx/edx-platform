@@ -41,7 +41,8 @@ class DatesTabTestViews(BaseCourseHomeTests):
             CourseEnrollment.enroll(self.user, self.course.id)
             CourseEnrollment.unenroll(self.user, self.course.id)
         response = self.client.get(self.url)
-        assert response.status_code == 401
+        assert response.status_code == 403
+        assert response.json() == {'redirect': f'http://learning-mfe/course/{self.course.id}/home'}
 
     def test_get_unauthenticated_user(self):
         self.client.logout()

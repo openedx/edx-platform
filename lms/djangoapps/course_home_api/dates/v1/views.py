@@ -2,7 +2,7 @@
 Dates Tab Views
 """
 
-from django.http.response import Http404
+from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -13,14 +13,17 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
+from lms.djangoapps.course_home_api.decorators import course_home_redirects
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
+from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 
 class DatesTabView(RetrieveAPIView):
@@ -59,8 +62,7 @@ class DatesTabView(RetrieveAPIView):
     **Returns**
 
         * 200 on success with above fields.
-        * 401 if the user is not authenticated.
-        * 404 if the course is not available or cannot be seen.
+        * 403 for redirects (with redirect location in the json). Used for access denied errors and the like.
     """
 
     authentication_classes = (
@@ -71,12 +73,13 @@ class DatesTabView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DatesTabSerializer
 
+    @course_home_redirects
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
 
         if course_home_legacy_is_active(course_key):
-            raise Http404
+            raise Redirect(reverse('dates', args=[course_key_string]))
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
@@ -94,7 +97,7 @@ class DatesTabView(RetrieveAPIView):
         )
 
         if not CourseEnrollment.is_enrolled(request.user, course_key) and not is_staff:
-            return Response('User not enrolled.', status=401)
+            raise Redirect(get_learning_mfe_home_url(course_key, view_name='home'))
 
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
 

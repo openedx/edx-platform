@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.http.response import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_django_utils import monitoring as monitoring_utils
@@ -28,14 +27,14 @@ from lms.djangoapps.course_goals.api import (
     has_course_goal_permission,
     valid_course_goals_ordered
 )
+from lms.djangoapps.course_home_api.decorators import course_home_redirects
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
-from lms.djangoapps.course_home_api.toggles import (
-    course_home_legacy_is_active,
-)
+from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
+from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
 from openedx.core.djangoapps.content.learning_sequences.api import (
@@ -45,7 +44,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user,
@@ -55,7 +54,6 @@ from openedx.features.course_experience.url_helpers import get_learning_mfe_home
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore.django import modulestore
 
 
 class UnableToDismissWelcomeMessage(APIException):
@@ -150,7 +148,7 @@ class OutlineTabView(RetrieveAPIView):
     **Returns**
 
         * 200 on success with above fields.
-        * 404 if the course is not available or cannot be seen.
+        * 403 for redirects (with redirect location in the json). Used for access denied errors and the like.
 
     """
 
@@ -162,13 +160,13 @@ class OutlineTabView(RetrieveAPIView):
 
     serializer_class = OutlineTabSerializer
 
+    @course_home_redirects
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
-        course_usage_key = modulestore().make_course_usage_key(course_key)
 
         if course_home_legacy_is_active(course_key):
-            raise Http404
+            raise Redirect(reverse(course_home_url_name(course_key), args=[course_key_string]))
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
@@ -196,10 +194,7 @@ class OutlineTabView(RetrieveAPIView):
         user_timezone_locale = user_timezone_locale_prefs(request)
         user_timezone = user_timezone_locale['user_timezone']
 
-        if course_home_legacy_is_active(course.id):
-            dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
-        else:
-            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
+        dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
 
         # Set all of the defaults
         access_expiration = None

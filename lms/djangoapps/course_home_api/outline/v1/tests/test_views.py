@@ -164,7 +164,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_legacy_view_enabled(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        assert response.status_code == 403
+        assert response.json() == {'redirect': f'http://testserver/courses/{self.course.id}/course/'}
 
     @ddt.data(True, False)
     def test_welcome_message(self, welcome_message_is_dismissed):
@@ -387,3 +388,10 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             response = self.client.get(self.url)
             blocks = response.data['course_blocks']['blocks']
             assert seq_block_id not in blocks
+
+    def test_access_expired(self):
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(self.url)
+        assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
