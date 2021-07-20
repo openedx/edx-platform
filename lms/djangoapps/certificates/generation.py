@@ -10,17 +10,15 @@ These methods should be called from tasks.
 import logging
 from uuid import uuid4
 
-from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.models import UserProfile
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.utils import emit_certificate_event
-from lms.djangoapps.grades.api import CourseGradeFactory
 
 log = logging.getLogger(__name__)
 
 
-def generate_course_certificate(user, course_key, status, enrollment_mode=None, course_grade=None,
-                                generation_mode=None):
+def generate_course_certificate(user, course_key, status, enrollment_mode, course_grade, generation_mode):
     """
     Generate a course certificate for this user, in this course run. If the certificate has a passing status, also emit
     a certificate event.
@@ -37,13 +35,6 @@ def generate_course_certificate(user, course_key, status, enrollment_mode=None, 
         generation_mode: used when emitting an event. Options are "self" (implying the user generated the cert
             themself) and "batch" for everything else.
     """
-    if not enrollment_mode:
-        enrollment_mode = _get_enrollment_mode(user, course_key)
-    if not course_grade:
-        course_grade = _get_course_grade(user, course_key)
-    if not generation_mode:
-        generation_mode = 'batch'
-
     cert = _generate_certificate(user=user, course_key=course_key, status=status, enrollment_mode=enrollment_mode,
                                  course_grade=course_grade)
 
@@ -109,19 +100,3 @@ def _generate_certificate(user, course_key, status, enrollment_mode, course_grad
     log.info(f'Generated certificate with status {cert.status}, mode {cert.mode} and grade {cert.grade} for {user.id} '
              f': {course_key}. {created_msg}')
     return cert
-
-
-def _get_course_grade(user, course_key):
-    """
-    Get the user's course grade in this course run
-    """
-    course_grade = CourseGradeFactory().read(user, course_key=course_key)
-    return course_grade.percent
-
-
-def _get_enrollment_mode(user, course_key):
-    """
-    Get the user's enrollment mode in this course run
-    """
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    return enrollment_mode
