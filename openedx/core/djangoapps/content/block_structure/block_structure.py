@@ -327,7 +327,6 @@ class TransformerData(FieldData):
     """
     Data structure to encapsulate collected data for a transformer.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class TransformerDataMap(dict):
