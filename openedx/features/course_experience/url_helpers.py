@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode, urlparse
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore
@@ -213,7 +213,9 @@ def is_request_from_learning_mfe(request: HttpRequest):
     """
     Returns whether the given request was made by the frontend-app-learning MFE.
     """
-    return (
-        settings.LEARNING_MICROFRONTEND_URL and
-        request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL)
-    )
+    if not settings.LEARNING_MICROFRONTEND_URL:
+        return False
+
+    url = urlparse(settings.LEARNING_MICROFRONTEND_URL)
+    mfe_url_base = f'{url.scheme}://{url.netloc}'
+    return request.META.get('HTTP_REFERER', '').startswith(mfe_url_base)
