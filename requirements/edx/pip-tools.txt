@@ -8,11 +8,11 @@ click==7.1.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   pip-tools
-pep517==0.10.0
+pep517==0.11.0
     # via pip-tools
 pip-tools==6.2.0
     # via -r requirements/edx/pip-tools.in
-toml==0.10.2
+tomli==1.0.4
     # via pep517
 wheel==0.36.2
     # via pip-tools
