@@ -3,7 +3,6 @@ Utils for use in enrollment code
 """
 import logging
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
-from openedx.core.djangoapps.enrollments import api
 
 logger = logging.getLogger(__name__)
 

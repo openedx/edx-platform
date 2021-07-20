@@ -1,3 +1,6 @@
+"""
+Tests for enrollment utils
+"""
 import unittest
 from unittest.mock import patch
 
@@ -5,6 +8,9 @@ from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 
 
 class EnrollmentUtilsTest(unittest.TestCase):
+    """
+    Enrollment utils test cases
+    """
     @patch("openedx.core.djangoapps.enrollments.utils.add_user_to_cohort")
     @patch("openedx.core.djangoapps.enrollments.utils.get_cohort_by_name")
     def test_adds_user_to_cohort(self, mock_get_cohort_by_name, mock_add_user_to_cohort):
