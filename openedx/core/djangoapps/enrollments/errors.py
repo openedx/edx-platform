@@ -52,15 +52,3 @@ class EnrollmentApiLoadError(CourseEnrollmentError):
 class InvalidEnrollmentAttribute(CourseEnrollmentError):
     """Enrollment Attributes could not be validated"""
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class EnrollmentModeMismatchError(Exception):
-    """
-    requester has outdated information about the currently active enrollment
-    """
-
-
-class EnrollmentAttributesMissingError(Exception):
-    """
-    some enrollment attributes are missing
-    """
