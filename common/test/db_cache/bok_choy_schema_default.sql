@@ -3109,7 +3109,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=906 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=907 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4427,8 +4427,10 @@ CREATE TABLE `event_routing_backends_routerconfiguration` (
   `backend_name` varchar(50) NOT NULL,
   `configurations` longblob NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
+  `route_url` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `event_routing_backen_changed_by_id_32085a77_fk_auth_user` (`changed_by_id`),
+  KEY `event_routing_backends_routerconfiguration_backend_name_5d1feedc` (`backend_name`),
   CONSTRAINT `event_routing_backen_changed_by_id_32085a77_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
