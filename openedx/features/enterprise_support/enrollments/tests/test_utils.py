@@ -2,7 +2,6 @@
 Test the enterprise support utils.
 """
 
-from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentExistsError
 from unittest import mock
 from unittest.case import TestCase
 
@@ -10,13 +9,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
+from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
     UserDoesNotExistException
 )
 from openedx.features.enterprise_support.enrollments.utils import lms_enroll_user_in_course
-
 
 COURSE_STRING = 'course-v1:OpenEdX+OutlineCourse+Run3'
 
@@ -53,6 +53,66 @@ class EnrollmentUtilsTest(TestCase):
                 CourseKey.from_string(COURSE_STRING),
                 'verified'
             )
+
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
+    def test_course_enrollment_error_raises(self,
+                                            mock_tx,
+                                            mock_user_model,
+                                            mock_add_user_to_course_cohort,
+                                            mock_get_enrollment_api,
+                                            mock_add_enrollment_api,
+                                            ):
+        enrollment_response = {'mode': 'verified', 'is_active': True}
+        username = 'test'
+        course_id = CourseKey.from_string(COURSE_STRING)
+        mode = "verified"
+
+        mock_add_enrollment_api.side_effect = CourseEnrollmentError("test")
+        mock_tx.return_value.atomic.side_effect = None
+
+        mock_get_enrollment_api.return_value = enrollment_response
+
+        a_user = {'id': 1223, 'username': username}
+        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+
+        with self.assertRaises(CourseEnrollmentError):
+            lms_enroll_user_in_course(username, course_id, mode)
+            mock_add_user_to_course_cohort.assert_not_called()
+            mock_get_enrollment_api.assert_called_once()
+
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
+    def test_course_group_error_raises(self,
+                                       mock_tx,
+                                       mock_user_model,
+                                       mock_add_user_to_course_cohort,
+                                       mock_get_enrollment_api,
+                                       mock_add_enrollment_api,
+                                       ):
+        enrollment_response = {'mode': 'verified', 'is_active': True}
+        username = 'test'
+        course_id = CourseKey.from_string(COURSE_STRING)
+        mode = "verified"
+
+        mock_add_enrollment_api.side_effect = CourseUserGroup.DoesNotExist()
+        mock_tx.return_value.atomic.side_effect = None
+
+        mock_get_enrollment_api.return_value = enrollment_response
+
+        a_user = {'id': 1223, 'username': username}
+        mock_user_model.return_value.objects.return_value.get.return_value = a_user
+
+        with self.assertRaises(CourseUserGroup.DoesNotExist):
+            lms_enroll_user_in_course(username, course_id, mode)
+            mock_add_user_to_course_cohort.assert_not_called()
+            mock_get_enrollment_api.assert_called_once()
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
