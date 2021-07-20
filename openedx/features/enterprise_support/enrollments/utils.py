@@ -61,6 +61,7 @@ def lms_enroll_user_in_course(username, course_id, mode,
             return response
         except CourseEnrollmentExistsError as error:
             log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+            return None
         except CourseEnrollmentError as error:
             log.exception("An error occurred while creating the new course enrollment for user "
                           "[%s] in course run [%s]", username, course_id)
@@ -71,15 +72,16 @@ def lms_enroll_user_in_course(username, course_id, mode,
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
             current_enrollment = api.get_enrollment(username, str(course_id))
-            audit_log(
-                'enrollment_change_requested',
-                course_id=str(course_id),
-                requested_mode=mode,
-                actual_mode=current_enrollment['mode'] if current_enrollment else None,
-                requested_activation=is_active,
-                actual_activation=current_enrollment['is_active'] if current_enrollment else None,
-                user_id=user.id
-            )
+            if current_enrollment:
+                audit_log(
+                    'enrollment_change_requested',
+                    course_id=str(course_id),
+                    requested_mode=mode,
+                    actual_mode=current_enrollment['mode'] if current_enrollment else None,
+                    requested_activation=is_active,
+                    actual_activation=current_enrollment['is_active'] if current_enrollment else None,
+                    user_id=user.id
+                )
 
 
 def _validate_enrollment_inputs(username, course_id):
@@ -91,6 +93,8 @@ def _validate_enrollment_inputs(username, course_id):
     """
     if not course_id:
         raise CourseIdMissingException("Course ID must be specified to create a new enrollment.")
+    if not username:
+        raise UserDoesNotExistException('username is a required argument for enrollment')
     try:
         # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
         user = User.objects.get(username=username)
