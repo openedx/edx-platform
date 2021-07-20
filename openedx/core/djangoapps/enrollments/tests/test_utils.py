@@ -1,7 +1,7 @@
-from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 import unittest
-
 from unittest.mock import patch
+
+from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 
 
 class EnrollmentUtilsTest(unittest.TestCase):
