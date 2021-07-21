@@ -555,6 +555,9 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
         metadata = sequence.get_metadata(view=view)
+        seq_id = metadata['item_id']
+        metadata['decoded_id'] = seq_id
+        metadata['item_id'] = get_usage_key_hash(seq_id)
         for item in metadata['items']:
             item_id = item['id']
             hash_key = get_usage_key_hash(item_id)
