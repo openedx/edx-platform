@@ -1,20 +1,32 @@
 """
 URL configuration for Studio's Content Libraries REST API
 """
+
 from django.conf.urls import include, url
+
+from rest_framework import routers
 
 from . import views
 
 
+# Django application name.
+
 app_name = 'openedx.core.djangoapps.content_libraries'
+
+# Router for importing blocks from courseware.
+
+import_blocks_router = routers.DefaultRouter()
+import_blocks_router.register(r'tasks', views.LibraryImportTaskViewSet, basename='import-block-task')
 
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the
 # standard XBlock REST API (see openedx.core.django_apps.xblock.rest_api.urls)
+
 urlpatterns = [
     url(r'^api/libraries/v2/', include([
         # list of libraries / create a library:
         url(r'^$', views.LibraryRootView.as_view()),
+        url(r'importable_courses/$', views.LibraryImportableCourseView.as_view()),
         url(r'^(?P<lib_key_str>[^/]+)/', include([
             # get data about a library, update a library, or delete a library:
             url(r'^$', views.LibraryDetailsView.as_view()),
@@ -34,6 +46,8 @@ urlpatterns = [
             url(r'^team/user/(?P<username>[^/]+)/$', views.LibraryTeamUserView.as_view()),
             # Add/Edit (PUT) or remove (DELETE) a group's permission to use this library
             url(r'^team/group/(?P<group_name>[^/]+)/$', views.LibraryTeamGroupView.as_view()),
+            # Import blocks into this library.
+            url(r'^import_blocks/', include(import_blocks_router.urls)),
         ])),
         url(r'^blocks/(?P<usage_key_str>[^/]+)/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:

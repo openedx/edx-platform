@@ -1,14 +1,15 @@
 """
-Python API for content libraries.
+Python API for content libraries
+================================
 
-Via 'views.py', most of these API methods are also exposed as a REST API.
+Via ``views.py``, most of these API methods are also exposed as a REST API.
 
 The API methods in this file are focused on authoring and specific to content
 libraries; they wouldn't necessarily apply or work in other learning contexts
 such as courses, blogs, "pathways," etc.
 
 ** As this is an authoring-focused API, all API methods in this file deal with
-the DRAFT version of the content library. **
+the DRAFT version of the content library.**
 
 Some of these methods will work and may be used from the LMS if needed (mostly
 for test setup; other use is discouraged), but some of the implementation
@@ -17,29 +18,46 @@ LMS. (The REST API is not available at all from the LMS.)
 
 Any APIs that use/affect content libraries but are generic enough to work in
 other learning contexts too are in the core XBlock python/REST API at
-    openedx.core.djangoapps.xblock.api/rest_api
+``openedx.core.djangoapps.xblock.api/rest_api``.
 
-For example, to render a content library XBlock as HTML, one can use the generic
+For example, to render a content library XBlock as HTML, one can use the
+generic:
+
     render_block_view(block, view_name, user)
-API in openedx.core.djangoapps.xblock.api (use it from Studio for the draft
-version, from the LMS for published version).
+
+That is an API in ``openedx.core.djangoapps.xblock.api`` (use it from Studio for
+the draft version, from the LMS for published version).
 
 There are one or two methods in this file that have some overlap with the core
-XBlock API; for example, this content library API provides a get_library_block()
-which returns metadata about an XBlock; it's in this API because it also returns
-data about whether or not the XBlock has unpublished edits, which is an
-authoring-only concern. Likewise, APIs for getting/setting an individual
-XBlock's OLX directly seem more appropriate for small, reusable components in
-content libraries and may not be appropriate for other learning contexts so they
-are implemented here in the library API only. In the future, if we find a need
-for these in most other learning contexts then those methods could be promoted
-to the core XBlock API and made generic.
+XBlock API; for example, this content library API provides a
+``get_library_block()`` which returns metadata about an XBlock; it's in this API
+because it also returns data about whether or not the XBlock has unpublished
+edits, which is an authoring-only concern.  Likewise, APIs for getting/setting
+an individual XBlock's OLX directly seem more appropriate for small, reusable
+components in content libraries and may not be appropriate for other learning
+contexts so they are implemented here in the library API only.  In the future,
+if we find a need for these in most other learning contexts then those methods
+could be promoted to the core XBlock API and made generic.
+
+Import from Courseware
+----------------------
+
+Content Librarie can import blocks from Courseware (Modulestore).  The import
+can be done per-course, by listing its content, and support both access to
+remote platform instances as well as local modulestore APIs.  Additionally,
+there are Celery-based interfaces suitable for background processing controlled
+through RESTful APIs (see :mod:`.views`).
 """
-from uuid import UUID
+
+
+import collections
 from datetime import datetime
+from uuid import UUID
 import logging
 
 import attr
+import requests
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
@@ -48,17 +66,21 @@ from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
-from opaque_keys.edx.keys import LearningContextKey
+from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
-
+from edx_rest_api_client.client import OAuthAPIClient
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
+from openedx.core.djangoapps.content_libraries.models import (
+    ContentLibrary,
+    ContentLibraryPermission,
+    ContentLibraryBlockImportTask,
+)
 from openedx.core.djangoapps.content_libraries.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_UPDATED,
@@ -67,6 +89,7 @@ from openedx.core.djangoapps.content_libraries.signals import (
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_DELETED,
 )
+from openedx.core.djangoapps.olx_rest_api.block_serializer import XBlockSerializer
 from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import XBlockInclude
@@ -86,10 +109,18 @@ from openedx.core.lib.blockstore_api import (
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
+from xmodule.modulestore.django import modulestore
+
+from . import tasks
+
 
 log = logging.getLogger(__name__)
 
-# Exceptions:
+
+# Exceptions
+# ==========
+
+
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
 
@@ -121,7 +152,9 @@ class LibraryPermissionIntegrityError(IntegrityError):
     """ Thrown when an operation would cause insane permissions. """
 
 
-# Models:
+# Models
+# ======
+
 
 @attr.s
 class ContentLibraryMetadata:
@@ -227,6 +260,10 @@ class AccessLevel:  # lint-amnesty, pylint: disable=function-redefined
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
     READ_LEVEL = ContentLibraryPermission.READ_LEVEL
     NO_ACCESS = None
+
+
+# General APIs
+# ============
 
 
 def get_libraries_for_user(user, org=None, library_type=None):
@@ -1051,3 +1088,271 @@ def revert_changes(library_key):
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
     CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)
+
+
+# Import from Courseware
+# ======================
+
+
+class BaseEdxImportClient:
+    """
+    Base class for all courseware import clients.
+
+    Import clients are wrappers tailored to implement the steps used in the
+    import APIs and can leverage different backends.  It is not aimed towards
+    being a generic API client for Open edX.
+    """
+
+    EXPORTABLE_BLOCK_TYPES = {
+        "drag-and-drop-v2",
+        "problem",
+        "html",
+        "video",
+    }
+
+    def get_block_data(self, block_key):
+        """
+        Get the block's OLX and static files, if any.
+        """
+        raise NotImplementedError()
+
+    def get_export_keys(self, course_key):
+        """
+        Get all exportable block keys of a given course.
+        """
+        raise NotImplementedError()
+
+    def get_block_static_data(self, asset_file):
+        """
+        Get the contents of an asset_file..
+        """
+        raise NotImplementedError()
+
+    def import_block(self, library, modulestore_key):
+        """
+        Import a single modulestore block.
+        """
+
+        # Get or create the block in the library.
+
+        block_data = self.get_block_data(modulestore_key)
+
+        try:
+            library_block = create_library_block(
+                library.library_key,
+                modulestore_key.block_type,
+                modulestore_key.block_id,
+            )
+            blockstore_key = library_block.usage_key
+        except LibraryBlockAlreadyExists:
+            blockstore_key = LibraryUsageLocatorV2(
+                lib_key=library.library_key,
+                block_type=modulestore_key.block_type,
+                usage_id=modulestore_key.block_id,
+            )
+            get_library_block(blockstore_key)
+
+        # Handle static files.
+
+        for filename, static_file in block_data.get('static_files', {}).items():
+            files = [
+                f.path for f in
+                get_library_block_static_asset_files(blockstore_key)
+            ]
+            if filename in files:
+                # Files already added, move on.
+                continue
+            file_content = self.get_block_static_data(static_file)
+            add_library_block_static_asset_file(
+                blockstore_key, filename, file_content)
+
+        # Import OLX and publish.
+
+        set_library_block_olx(blockstore_key, block_data['olx'])
+        publish_changes(blockstore_key.lib_key)
+
+
+class EdxModulestoreImportClient(BaseEdxImportClient):
+    """
+    An import client based on the local instance of modulestore.
+    """
+
+    def __init__(self, modulestore_instance=None):
+        """
+        Initialize the client with a modulestore instance.
+        """
+        self.modulestore = modulestore_instance or modulestore()
+
+    def get_block_data(self, block_key):
+        """
+        Get block OLX by serializing it from modulestore directly.
+        """
+        block = self.modulestore.get_item(block_key)
+        data = XBlockSerializer(block)
+        return {'olx': data.olx_str,
+                'static_file': {s.name: s for s in data.static_files}}
+
+    def get_export_keys(self, course_key):
+        """
+        Retrieve the course from modulestore and traverse its content tree.
+        """
+        course = self.modulestore.get_course(course_key)
+        export_keys = set()
+        blocks_q = collections.deque(course.get_children())
+        while blocks_q:
+            block = blocks_q.popleft()
+            usage_id = block.scope_ids.usage_id
+            if usage_id in export_keys:
+                continue
+            if usage_id.block_type in self.EXPORTABLE_BLOCK_TYPES:
+                export_keys.add(usage_id)
+            if block.has_children:
+                blocks_q.extend(block.get_children())
+        return list(export_keys)
+
+    def get_block_static_data(self, asset_file):
+        """
+        Get static content from its URL if available, otherwise from its data.
+        """
+        if asset_file.data:
+            return asset_file.data
+        resp = requests.get(f"http://{settings.CMS_BASE}" + asset_file.url)
+        resp.raise_for_status()
+        return resp.content
+
+
+class EdxApiImportClient(BaseEdxImportClient):
+    """
+    An import client based on a remote Open Edx API interface.
+    """
+
+    URL_COURSES = "/api/courses/v1/courses/{course_key}"
+
+    URL_MODULESTORE_BLOCK_OLX = "/api/olx-export/v1/xblock/{block_key}/"
+
+    def __init__(self, lms_url, studio_url, oauth_key, oauth_secret):
+        """
+        Initialize the API client with URLs and OAuth keys.
+        """
+        self.lms_url = lms_url
+        self.studio_url = studio_url
+        self.oauth_client = OAuthAPIClient(
+            self.lms_url,
+            oauth_key,
+            oauth_secret,
+        )
+
+    def get_block_data(self, block_key):
+        """
+        See parent's docstring.
+        """
+        olx_path = self.URL_MODULESTORE_BLOCK_OLX.format(block_key=block_key)
+        resp = self._get(self.studio_url + olx_path)
+        return resp['blocks'][str(block_key)]
+
+    def get_export_keys(self, course_key):
+        """
+        See parent's docstring.
+        """
+        course_blocks_url = self._get_course(course_key)['blocks_url']
+        course_blocks = self._get(
+            course_blocks_url,
+            params={'all_blocks': True, 'depth': 'all'})['blocks']
+        export_keys = []
+        for block_info in course_blocks.values():
+            if block_info['type'] in self.EXPORTABLE_BLOCK_TYPES:
+                export_keys.append(UsageKey.from_string(block_info['id']))
+        return export_keys
+
+    def get_block_static_data(self, asset_file):
+        """
+        See parent's docstring.
+        """
+        if (asset_file["url"].startswith(self.studio_url)
+                and 'export-file' in asset_file['url']):
+            # We must call download this file with authentication. But
+            # we only want to pass the auth headers if this is the same
+            # studio instance, or else we could leak credentials to a
+            # third party.
+            path = asset_file['url'][len(self.studio_url):]
+            resp = self._get(path)
+        else:
+            resp = requests.get(asset_file['url'])
+        resp.raise_for_status()
+        return resp.content
+
+    def _get(self, *args, **kwds):
+        """
+        Perform a get request to the client.
+        """
+        return self._json_call('get', *args, **kwds)
+
+    def _get_course(self, course_key):
+        """
+        Request details for a course.
+        """
+        course_url = self.lms_url + self.URL_COURSES.format(course_key=course_key)
+        return self._get(course_url)
+
+    def _json_call(self, method, *args, **kwds):
+        """
+        Wrapper around request calls that ensures valid json responses.
+        """
+        response = getattr(self.oauth_client, method)(*args, **kwds)
+        response.raise_for_status()
+        return response.json()
+
+
+def import_blocks_create_task(library_key, course_key):
+    """
+    Create a new import block task.
+
+    This API will schedule a celery task to perform the import, and it returns a
+    import task object for polling.
+    """
+    library = ContentLibrary.objects.get_by_key(library_key)
+    import_task = ContentLibraryBlockImportTask.objects.create(
+        library=library,
+        course_id=course_key,
+    )
+    result = tasks.import_blocks_from_course.apply_async(
+        args=(import_task.pk, str(course_key))
+    )
+    log.info(f"Import block task created: import_task={import_task} "
+             f"celery_task={result.id}")
+    return import_task
+
+
+def import_blocks_from_course(import_task_id, course_key):
+    """
+    A Celery task to import blocks from a course through modulestore.
+    """
+
+    with ContentLibraryBlockImportTask.execute(import_task_id) as import_task:
+
+        log.info('Import task started: course_key=%s task=%s created_at=%s',
+                 course_key, import_task, import_task.created_at)
+
+        # Query the course and rerieve all course blocks.
+
+        edx_client = EdxModulestoreImportClient()
+        export_keys = edx_client.get_export_keys(course_key)
+        if not export_keys:
+            raise ValueError(f"The courseware course {course_key} does not have "
+                             "any exportable content.  No action taken.")
+
+        # Import each block, skipping the ones that failed.
+
+        failed_blocks = []
+        for index, block_key in enumerate(export_keys):
+            try:
+                log.info(f"Importing block: {index + 1}/{len(export_keys)}: {block_key}")
+                edx_client.import_block(import_task.library, block_key)
+            except Exception:  # pylint: disable=broad-except
+                log.exception("Error importing modulestore block: %s", block_key)
+                failed_blocks.append(block_key)
+            else:
+                log.info(f"Import block succesful: {block_key}")
+            import_task.save_progress((index + 1) / len(export_keys))
+
+    log.info('Import task done.')

@@ -1,11 +1,16 @@
 """
-Models for new Content Libraries
+Models for new Content Libraries.
 """
+
+import contextlib
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
@@ -127,3 +132,82 @@ class ContentLibraryPermission(models.Model):
     def __str__(self):
         who = self.user.username if self.user else self.group.name
         return f"ContentLibraryPermission ({self.access_level} for {who})"
+
+
+class ContentLibraryBlockImportTask(models.Model):
+    """
+    Model of a task to import blocks from an external source (e.g. modulestore).
+    """
+
+    library = models.ForeignKey(
+        ContentLibrary,
+        on_delete=models.CASCADE,
+        related_name='import_tasks',
+    )
+
+    TASK_CREATED = 'created'
+    TASK_PENDING = 'pending'
+    TASK_RUNNING = 'running'
+    TASK_FAILED = 'failed'
+    TASK_SUCCESSFUL = 'successful'
+
+    TASK_STATE_CHOICES = (
+        (TASK_CREATED, _('Task was created, but not queued to run.')),
+        (TASK_PENDING, _('Task was created and queued to run.')),
+        (TASK_RUNNING, _('Task is running.')),
+        (TASK_FAILED, _('Task finished, but some blocks failed to import.')),
+        (TASK_SUCCESSFUL, _('Task finished successfully.')),
+    )
+
+    state = models.CharField(
+        choices=TASK_STATE_CHOICES,
+        default=TASK_CREATED,
+        max_length=30,
+        verbose_name=_('state'),
+        help_text=_('The state of the block import task.'),
+    )
+
+    progress = models.FloatField(
+        default=0.0,
+        verbose_name=_('progress'),
+        help_text=_('A float from 0.0 to 1.0 representing the task progress.'),
+    )
+
+    course_id = CourseKeyField(
+        max_length=255,
+        db_index=True,
+        verbose_name=_('course ID'),
+        help_text=_('ID of the imported course.'),
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at', '-updated_at']
+
+    @classmethod
+    @contextlib.contextmanager
+    def execute(cls, import_task_id):
+        """
+        A context manager to manage a task that is being executed.
+        """
+        self = cls.objects.get(pk=import_task_id)
+        self.state = self.TASK_RUNNING
+        self.save()
+        try:
+            yield self
+            self.state = self.TASK_SUCCESSFUL
+        except:  # pylint: disable=broad-except
+            self.state = self.TASK_FAILED
+            raise
+        finally:
+            self.save()
+
+    def save_progress(self, progress):
+        self.progress = progress
+        self.save()
+
+    def __str__(self):
+        return f'{self.library} #{self.pk}'

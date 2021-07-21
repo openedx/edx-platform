@@ -19,14 +19,18 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 
+from lms.djangoapps.courseware.courses import get_courses
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
+    ContentLibraryBlockImportTaskCreateSerializer,
+    ContentLibraryBlockImportTaskSerializer,
+    ContentLibraryFilterSerializer,
     ContentLibraryMetadataSerializer,
-    ContentLibraryUpdateSerializer,
     ContentLibraryPermissionLevelSerializer,
     ContentLibraryPermissionSerializer,
-    ContentLibraryFilterSerializer,
+    ContentLibraryUpdateSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
@@ -36,8 +40,11 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
     ContentLibraryAddPermissionByEmailSerializer,
+    BaseFilterSerializer,
 )
+from openedx.core.djangoapps.enrollments.api import get_user_roles
 from openedx.core.lib.api.view_utils import view_auth_classes
+
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -689,3 +696,130 @@ class LibraryBlockAssetView(APIView):
         except ValueError:
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@view_auth_classes()
+class LibraryImportTaskViewSet(ViewSet):
+    """
+    Import blocks from Courseware through modulestore.
+    """
+
+    @convert_exceptions
+    def list(self, request, lib_key_str):
+        """
+        List all import tasks for this library.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(
+            library_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+        )
+        queryset = api.ContentLibrary.objects.get_by_key(library_key).import_tasks
+        result = ContentLibraryBlockImportTaskSerializer(queryset, many=True).data
+        paginator = LibraryApiPagination()
+        return paginator.get_paginated_response(
+            paginator.paginate_queryset(result, request)
+        )
+
+    @convert_exceptions
+    def create(self, request, lib_key_str):
+        """
+        Create and queue an import tasks for this library.
+        """
+
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(
+            library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+
+        serializer = ContentLibraryBlockImportTaskCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        course_key = serializer.validated_data['course_key']
+
+        import_task = api.import_blocks_create_task(library_key, course_key)
+        return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
+
+    @convert_exceptions
+    def retrieve(self, request, lib_key_str, pk=None):
+        """
+        Retrieve a import task for inspection.
+        """
+
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(
+            library_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+
+        import_task = api.ContentLibraryBlockImportTask.objects.get(pk=pk)
+        return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
+
+
+@view_auth_classes()
+class LibraryImportableCourseView(APIView):
+    """
+    List libraries that can be imported by the given user.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            *LibraryApiPagination.apidoc_params,
+            apidocs.query_parameter(
+                'org',
+                str,
+                description="The organization short-name used to filter libraries",
+            ),
+            apidocs.query_parameter(
+                'text_search',
+                str,
+                description="The string used to filter libraries by searching in title, id, org, or description",
+            ),
+        ],
+    )
+    @convert_exceptions
+    def get(self, request):
+        """
+        List all courses that the user has appropriate access to.
+        """
+        serializer = BaseFilterSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        organization = serializer.validated_data['org']
+        text_search = (serializer.validated_data['text_search'] or '').lower()
+
+        paginator = LibraryApiPagination()
+
+        importable_course_ids = [
+            role.course_id
+            for role in get_user_roles(request.user.username)
+            if role.role == "instructor" or request.user.is_staff
+        ]
+
+        courses = [
+            course for course in get_courses(request.user, org=organization)
+            if course.id in importable_course_ids
+        ]
+
+        if text_search:
+            courses = [
+                course for course in courses
+                if (
+                    text_search in str(course.id).lower() or
+                    text_search in course.display_name.lower() or
+                    text_search in course.org.lower()
+                )
+            ]
+
+        result = [{
+            "course_id": str(course.id),
+            "course_name": course.display_name,
+            "organization": course.org,
+        } for course in courses]
+
+        return paginator.get_paginated_response(
+            paginator.paginate_queryset(result, request)
+        )
