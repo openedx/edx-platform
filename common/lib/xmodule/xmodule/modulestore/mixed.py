@@ -4,13 +4,12 @@ MixedModuleStore allows for aggregation between multiple modulestores.
 In this way, courses can be served up via either SplitMongoModuleStore or MongoModuleStore.
 
 """
-
-
 import functools
 import itertools
 import logging
 from contextlib import contextmanager
 
+from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -392,6 +391,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courselike(course_key)
         return store.make_course_usage_key(course_key)
 
+    @function_trace('get_course')
     @strip_key
     def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
