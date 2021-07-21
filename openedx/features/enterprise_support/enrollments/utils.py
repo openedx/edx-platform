@@ -74,16 +74,15 @@ def lms_enroll_user_in_course(username, course_id, mode, enterprise_uuid,
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
             current_enrollment = api.get_enrollment(username, str(course_id))
-            if current_enrollment:
-                audit_log(
-                    'enrollment_change_requested',
-                    course_id=str(course_id),
-                    requested_mode=mode,
-                    actual_mode=current_enrollment['mode'] if current_enrollment else None,
-                    requested_activation=is_active,
-                    actual_activation=current_enrollment['is_active'] if current_enrollment else None,
-                    user_id=user.id
-                )
+            audit_log(
+                'enrollment_change_requested',
+                course_id=str(course_id),
+                requested_mode=mode,
+                actual_mode=current_enrollment['mode'] if current_enrollment else None,
+                requested_activation=is_active,
+                actual_activation=current_enrollment['is_active'] if current_enrollment else None,
+                user_id=user.id
+            )
 
 
 def _validate_enrollment_inputs(username, course_id):
