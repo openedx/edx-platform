@@ -577,8 +577,14 @@ def get_video_transcript_content(edx_video_id, language_code):
     transcript = None
     edx_video_id = clean_video_id(edx_video_id)
     if edxval_api and edx_video_id:
-        transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
-
+        try:
+            transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
+        except Exception:
+            log.exception(
+                "Error getting transcript from edx-val id: {edx_video_id}: language code {language_code}"
+                )
+            content = '{"start": [],"end": [],"text": ["An error occured obtaining the transcript."]}'
+            transcript = dict(file_name='error-{language_code}.srt', content=content)
     return transcript
 
 
@@ -680,14 +686,19 @@ class Transcript:
                     content_str = content.decode('latin-1')
             else:
                 content_str = content
-
+            try:
+                content_dict = json.loads(content_str)
+            except Exception:
+                log.exception(
+                    "Failed to convert {input_format} to {output_format} for {content_str}."
+                    )
+                content_dict = {"start": [1],"end": [2],"text": ["An error occured obtaining the transcript."]}
             if output_format == 'txt':
-                text = json.loads(content_str)['text']
+                text = content_dict['text']
                 text_without_none = [line if line else '' for line in text]
                 return html.unescape("\n".join(text_without_none))
-
             elif output_format == 'srt':
-                return generate_srt_from_sjson(json.loads(content_str), speed=1.0)
+                return generate_srt_from_sjson(content_dict, speed=1.0)
 
     @staticmethod
     def asset(location, subs_id, lang='en', filename=None):
