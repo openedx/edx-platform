@@ -585,7 +585,8 @@ def get_video_transcript_content(edx_video_id, language_code):
             )
             content = '{"start": [1],"end": [2],"text": ["An error occured obtaining the transcript."]}'
             transcript = dict(
-                file_name='error-{edx_video_id}-{language_code}.srt', content=Transcript.convert(content, 'sjson', 'srt')
+                file_name='error-{edx_video_id}-{language_code}.srt',
+                content=Transcript.convert(content, 'sjson', 'srt')
             )
     return transcript
 
