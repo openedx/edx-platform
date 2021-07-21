@@ -1006,9 +1006,10 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         Verify that `get transcript` function returns a working json file if the original throws an error
         """
-        mock_get_video_transcript_data.side_effect = Exception
+        error_transcript = {"start": [1], "end": [2], "text": ["An error occured obtaining the transcript."]}
+        mock_get_video_transcript_data.side_effect = ValueError
         content, _, _ = transcripts_utils.get_transcript(self.video, 'zh')
-        assert content == '{"start": [],"end": [],"text": ["An error occured obtaining the transcript."]}'
+        assert error_transcript["text"][0] in content
 
     @ddt.data(
         transcripts_utils.TranscriptsGenerationException,
