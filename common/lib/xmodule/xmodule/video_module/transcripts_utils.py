@@ -589,6 +589,7 @@ def get_video_transcript_content(edx_video_id, language_code):
             )
     return transcript
 
+
 def get_available_transcript_languages(edx_video_id):
     """
     Gets available transcript languages for a video.
