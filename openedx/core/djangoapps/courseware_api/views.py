@@ -61,6 +61,7 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import get_usage_key_hash
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -524,9 +525,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
-        if usage_key_string.startswith("b'"):
-            processed_hash = usage_key_string[2:len(usage_key_string)-1]
-            decoded_hash_string = urlsafe_b64decode(processed_hash)
+        if not usage_key_string.startswith("block"):
+            decoded_hash_string = urlsafe_b64decode(usage_key_string)
             usage_key_hash = decoded_hash_string.decode('utf-8')
             usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
 
@@ -554,8 +554,13 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         view = STUDENT_VIEW
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
-
-        return Response(sequence.get_metadata(view=view))
+        metadata = sequence.get_metadata(view=view)
+        for item in metadata['items']:
+            item_id = item['id']
+            hash_key = get_usage_key_hash(item_id)
+            item['decoded_id'] = item_id
+            item['id'] = hash_key
+        return Response(metadata)
 
 
 class Resume(DeveloperErrorViewMixin, APIView):
