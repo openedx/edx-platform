@@ -8,7 +8,7 @@ from django.db import transaction
 
 from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
-from openedx.core.djangoapps.enrollments import api
+from openedx.core.djangoapps.enrollments import api as enrollment_api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 from openedx.core.lib.log_utils import audit_log
@@ -20,14 +20,18 @@ from openedx.features.enterprise_support.enrollments.exceptions import (
 log = logging.getLogger(__name__)
 
 
-def lms_enroll_user_in_course(username, course_id, mode, enterprise_uuid,
-                              cohort_name=None,
-                              is_active=True,
-                              ):
+def lms_enroll_user_in_course(
+    username,
+    course_id,
+    mode,
+    enterprise_uuid,
+    cohort_name=None,
+    is_active=True,
+):
     """
     Enrollment function meant to be called by edx-enterprise to replace the
     current uses of the EnrollmentApiClient
-    The REST enrollment endpoint may also eventually also want to eventually reuse this function
+    The REST enrollment endpoint may also eventually also want to reuse this function
     since it's a subset of what the endpoint handles
 
     Unlike the REST endpoint, this function does not check for enterprise enabled, or user api key
@@ -43,14 +47,14 @@ def lms_enroll_user_in_course(username, course_id, mode, enterprise_uuid,
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
 
-    Returns: A serializable dictionary of the new course enrollment.
+    Returns: A serializable dictionary of the new course enrollment. If it hits
+     `CourseEnrollmentExistsError` then it logs the error and returns None.
     """
     user = _validate_enrollment_inputs(username, course_id)
 
     with transaction.atomic():
         try:
-            # Will reactivate inactive enrollments.
-            response = api.add_enrollment(
+            response = enrollment_api.add_enrollment(
                 username,
                 str(course_id),
                 mode=mode,
@@ -73,7 +77,7 @@ def lms_enroll_user_in_course(username, course_id, mode, enterprise_uuid,
             raise error
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
-            current_enrollment = api.get_enrollment(username, str(course_id))
+            current_enrollment = enrollment_api.get_enrollment(username, str(course_id))
             audit_log(
                 'enrollment_change_requested',
                 course_id=str(course_id),

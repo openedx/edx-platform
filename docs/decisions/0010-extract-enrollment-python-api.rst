@@ -6,17 +6,32 @@ Status
 Accepted
 
 
+Context
+-------
+
+edx-enterprise bulk enrollment use case currently invokes the mentioned endpoint once per learner + course
+which leads to a large number of REST api calls in a short period. It is expensive, and leads to
+hitting rate limits when used with our own services/functions within Enterprise.
+
+
+
 Decisions
 ---------
 
-We will extract some of the core enrollment functionality present in the POST handler from
+We will copy some of the core enrollment functionality present in the POST handler from
     `POST /api/enrollment/v1/enrollment`
-into a non-REST Python method while leaving functionality intact.
+into a non-REST Python method without modify the existing POST handler.
 
 This is so we can call the basic 'create enrollment in LMS' functionality from edx-enterprise without
 incurring REST expense. We also do not need to apply the rigorous access and embargo checks present
 in the api handler that check the `request` object, since the caller inthis case will be our co-located
 code running with the LMS already.
+
+We are not changing the POST handler because it serves various use cases and parameters, as well as
+performs authorization checks on request object, none of which are needed and would require careful
+and rigorous testing of various enrollment flows, and also introduce risk of regressions if done in a single round of work.
+
+We will add a new function to the `enterprise_support` package in edx-platform to achieve this.
 
 A few other features of the endpoint are also not needed in order to obtain the functionality needed
 to replace the existing POST call:
@@ -33,14 +48,6 @@ to replace the existing POST call:
 NOTE: No changes will be made to the REST endpoint mentioned, since it also has external customers who may be using
 parameters such as `explicit_linked_enterprise` and other pieces of logic too none of which are relevant
 to the usage within edx-enterprise and also increase the scope of the task to a great extent.
-
-
-Context
--------
-
-edx-enterprise bulk enrollment use case currently invokes this endpoint once per learner + course
-which leads to a large number of REST api calls in a short period thus hitting rate limits. It is
-expensive, and leads to us hitting rate limits when used with our own services/functions within Enterprise.
 
 
 Consequences

@@ -22,6 +22,7 @@ ENTERPRISE_UUID = 'enterprise_uuid'
 COURSE_ID = CourseKey.from_string(COURSE_STRING)
 USERNAME = 'test'
 USER_ID = 1223
+COURSE_MODE = 'verified'
 
 
 @skip_unless_lms
@@ -38,14 +39,14 @@ class EnrollmentUtilsTest(TestCase):
 
     def test_validation_of_inputs_course_id(self):
         with self.assertRaises(CourseIdMissingException):
-            lms_enroll_user_in_course('user', None, 'verified', ENTERPRISE_UUID)
+            lms_enroll_user_in_course(USERNAME, None, COURSE_MODE, ENTERPRISE_UUID)
 
     def test_validation_of_inputs_user_not_provided(self):
         with self.assertRaises(UserDoesNotExistException):
             lms_enroll_user_in_course(
                 None,
                 COURSE_ID,
-                'verified',
+                COURSE_MODE,
                 ENTERPRISE_UUID,
             )
 
@@ -56,27 +57,26 @@ class EnrollmentUtilsTest(TestCase):
         mock_user_model.side_effect = ObjectDoesNotExist()
         with self.assertRaises(UserDoesNotExistException):
             lms_enroll_user_in_course(
-                "a_user",
+                USERNAME,
                 COURSE_ID,
-                'verified',
+                COURSE_MODE,
                 ENTERPRISE_UUID,
             )
 
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
-    def test_course_enrollment_error_raises(self,
-                                            mock_tx,
-                                            mock_user_model,
-                                            mock_add_user_to_course_cohort,
-                                            mock_get_enrollment_api,
-                                            mock_add_enrollment_api,
-                                            ):
-        enrollment_response = {'mode': 'verified', 'is_active': True}
-        username = 'test'
-        mode = "verified"
+    def test_course_enrollment_error_raises(
+        self,
+        mock_tx,
+        mock_user_model,
+        mock_add_user_to_course_cohort,
+        mock_get_enrollment_api,
+        mock_add_enrollment_api,
+    ):
+        enrollment_response = {'mode': COURSE_MODE, 'is_active': True}
 
         mock_add_enrollment_api.side_effect = CourseEnrollmentError("test")
         mock_tx.return_value.atomic.side_effect = None
@@ -86,26 +86,24 @@ class EnrollmentUtilsTest(TestCase):
         mock_user_model.return_value = self.a_user
 
         with self.assertRaises(CourseEnrollmentError):
-            lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
+            lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
             mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
-    def test_course_group_error_raises(self,
-                                       mock_tx,
-                                       mock_user_model,
-                                       mock_add_user_to_course_cohort,
-                                       mock_get_enrollment_api,
-                                       mock_add_enrollment_api,
-                                       ):
-        enrollment_response = {'mode': 'verified', 'is_active': True}
-        username = 'test'
-
-        mode = "verified"
+    def test_course_group_error_raises(
+        self,
+        mock_tx,
+        mock_user_model,
+        mock_add_user_to_course_cohort,
+        mock_get_enrollment_api,
+        mock_add_enrollment_api,
+    ):
+        enrollment_response = {'mode': COURSE_MODE, 'is_active': True}
 
         mock_add_enrollment_api.side_effect = CourseUserGroup.DoesNotExist()
         mock_tx.return_value.atomic.side_effect = None
@@ -115,12 +113,12 @@ class EnrollmentUtilsTest(TestCase):
         mock_user_model.return_value = self.a_user
 
         with self.assertRaises(CourseUserGroup.DoesNotExist):
-            lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
+            lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
             mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
@@ -134,9 +132,7 @@ class EnrollmentUtilsTest(TestCase):
     ):
 
         expected_response = {'a': 'value'}
-        enrollment_response = {'mode': 'verified', 'is_active': True}
-        username = 'test'
-        mode = "verified"
+        enrollment_response = {'mode': COURSE_MODE, 'is_active': True}
 
         mock_add_enrollment_api.return_value = expected_response
         mock_tx.return_value.atomic.side_effect = None
@@ -145,23 +141,23 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_user_model.return_value = self.a_user
 
-        response = lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
+        response = lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
 
         assert response == expected_response
         mock_add_enrollment_api.assert_called_once_with(
-            username,
+            USERNAME,
             str(COURSE_ID),
-            mode=mode,
+            mode=COURSE_MODE,
             is_active=True,
             enrollment_attributes=None,
             enterprise_uuid=ENTERPRISE_UUID,
         )
 
         mock_add_user_to_course_cohort.assert_called_once()
-        mock_get_enrollment_api.assert_called_once_with(username, str(COURSE_ID))
+        mock_get_enrollment_api.assert_called_once_with(USERNAME, str(COURSE_ID))
 
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
@@ -175,9 +171,7 @@ class EnrollmentUtilsTest(TestCase):
     ):
 
         expected_response = None
-        enrollment_response = {'mode': 'verified', 'is_active': True}
-        username = 'test'
-        mode = "verified"
+        enrollment_response = {'mode': COURSE_MODE, 'is_active': True}
 
         mock_add_enrollment_api.side_effect = CourseEnrollmentExistsError("test", {})
         mock_tx.return_value.atomic.side_effect = None
@@ -186,13 +180,13 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_user_model.return_value = self.a_user
 
-        response = lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
+        response = lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
 
         assert response == expected_response
         mock_add_enrollment_api.assert_called_once_with(
-            username,
+            USERNAME,
             str(COURSE_ID),
-            mode=mode,
+            mode=COURSE_MODE,
             is_active=True,
             enrollment_attributes=None,
             enterprise_uuid=ENTERPRISE_UUID,
