@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
-from openedx_events.learning.data import StudentData, RegistrationFormData
+from openedx_events.learning.data import UserData, UserNonPersonalData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from pytz import UTC
 from ratelimit.decorators import ratelimit
@@ -248,17 +248,17 @@ def create_account_with_params(request, params):
 
     # Announce registration
     STUDENT_REGISTRATION_COMPLETED.send_event(
-        user=StudentData(
-            username=user.username,
-            email=user.email,
-            is_active=user.is_active,
-            meta=user.profile.meta,
-            name=user.profile.name,
+        user=UserData(
+            user_non_pii=UserNonPersonalData(
+                id=user.id,
+                is_active=user.is_active,
+            ),
+            user=UserPersonalData(
+                username=user.username,
+                email=user.email,
+                name=user.profile.name,
+            )
         ),
-        registration_form=RegistrationFormData(
-            account_form=form,
-            extension_form=custom_form,
-        )
     )
 
     create_comments_service_user(user)
