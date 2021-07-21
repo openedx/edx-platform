@@ -8,7 +8,6 @@ from unittest.case import TestCase
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.djangolib.testing.utils import skip_unless_lms
