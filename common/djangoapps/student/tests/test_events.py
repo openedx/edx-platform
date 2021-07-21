@@ -10,10 +10,15 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from common.djangoapps.student.models import CourseEnrollmentAllowed
+from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 
+from openedx_events.learning.data import CourseEnrollmentData, UserData, UserNonPersonalData, UserPersonalData, CourseData
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
     """
@@ -179,3 +184,53 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         # CEAs shouldn't have been affected
         assert CourseEnrollmentAllowed.objects.count() == 1
         assert CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count() == 1
+
+
+@skip_unless_lms
+class EnrollmentEventsTest(SharedModuleStoreTestCase):
+    """
+    Tests for the events associated with the registration process through the user API.
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory(
+            username="somestudent",
+            first_name="Student",
+            last_name="Person",
+            email="robot@robot.org",
+            is_active=True
+        )
+
+    @mock.patch("common.djangoapps.student.models.COURSE_ENROLLMENT_CREATED")
+    def test_enrollment_event_emitted(self, enrollment_event):
+        """
+        Test whether the student registration event is sent during the user's
+        registration process.
+        Expected result:
+            - STUDENT_REGISTRATION_COMPLETED is sent via send_event.
+            - The arguments match the event definition.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        enrollment_event.send_event.assert_called_once_with(
+            enrollment=CourseEnrollmentData(
+                user=UserData(
+                    user_non_pii=UserNonPersonalData(
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    user=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name
+                    ),
+                    mode='audit',
+                    is_active=True
+                )
+            )
+        )
