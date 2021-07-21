@@ -18,6 +18,10 @@ from openedx.features.enterprise_support.enrollments.exceptions import (
 from openedx.features.enterprise_support.enrollments.utils import lms_enroll_user_in_course
 
 COURSE_STRING = 'course-v1:OpenEdX+OutlineCourse+Run3'
+ENTERPRISE_UUID = 'enterprise_uuid'
+COURSE_ID = CourseKey.from_string(COURSE_STRING)
+USERNAME = 'test'
+USER_ID = 1223
 
 
 @skip_unless_lms
@@ -26,16 +30,23 @@ class EnrollmentUtilsTest(TestCase):
     Test enterprise support utils.
     """
 
+    def setUp(self):
+        super().setUp()
+        self.a_user = mock.MagicMock()
+        self.a_user.id = USER_ID
+        self.a_user.username = USERNAME
+
     def test_validation_of_inputs_course_id(self):
         with self.assertRaises(CourseIdMissingException):
-            lms_enroll_user_in_course('user', None, 'verified')
+            lms_enroll_user_in_course('user', None, 'verified', ENTERPRISE_UUID)
 
     def test_validation_of_inputs_user_not_provided(self):
         with self.assertRaises(UserDoesNotExistException):
             lms_enroll_user_in_course(
                 None,
-                CourseKey.from_string(COURSE_STRING),
-                'verified'
+                COURSE_ID,
+                'verified',
+                ENTERPRISE_UUID,
             )
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
@@ -46,8 +57,9 @@ class EnrollmentUtilsTest(TestCase):
         with self.assertRaises(UserDoesNotExistException):
             lms_enroll_user_in_course(
                 "a_user",
-                CourseKey.from_string(COURSE_STRING),
-                'verified'
+                COURSE_ID,
+                'verified',
+                ENTERPRISE_UUID,
             )
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
@@ -64,7 +76,6 @@ class EnrollmentUtilsTest(TestCase):
                                             ):
         enrollment_response = {'mode': 'verified', 'is_active': True}
         username = 'test'
-        course_id = CourseKey.from_string(COURSE_STRING)
         mode = "verified"
 
         mock_add_enrollment_api.side_effect = CourseEnrollmentError("test")
@@ -72,14 +83,10 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = mock.MagicMock()
-        a_user.id = 1223
-        a_user.username = username
-
-        mock_user_model.return_value = a_user
+        mock_user_model.return_value = self.a_user
 
         with self.assertRaises(CourseEnrollmentError):
-            lms_enroll_user_in_course(username, course_id, mode)
+            lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
             mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
@@ -97,7 +104,7 @@ class EnrollmentUtilsTest(TestCase):
                                        ):
         enrollment_response = {'mode': 'verified', 'is_active': True}
         username = 'test'
-        course_id = CourseKey.from_string(COURSE_STRING)
+
         mode = "verified"
 
         mock_add_enrollment_api.side_effect = CourseUserGroup.DoesNotExist()
@@ -105,13 +112,10 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = mock.MagicMock()
-        a_user.id = 1223
-        a_user.username = username
-        mock_user_model.return_value = a_user
+        mock_user_model.return_value = self.a_user
 
         with self.assertRaises(CourseUserGroup.DoesNotExist):
-            lms_enroll_user_in_course(username, course_id, mode)
+            lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
             mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
@@ -132,7 +136,6 @@ class EnrollmentUtilsTest(TestCase):
         expected_response = {'a': 'value'}
         enrollment_response = {'mode': 'verified', 'is_active': True}
         username = 'test'
-        course_id = CourseKey.from_string(COURSE_STRING)
         mode = "verified"
 
         mock_add_enrollment_api.return_value = expected_response
@@ -140,24 +143,22 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = mock.MagicMock()
-        a_user.id = 1223
-        a_user.username = username
-        mock_user_model.return_value = a_user
+        mock_user_model.return_value = self.a_user
 
-        response = lms_enroll_user_in_course(username, course_id, mode)
+        response = lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
 
         assert response == expected_response
         mock_add_enrollment_api.assert_called_once_with(
             username,
-            str(course_id),
+            str(COURSE_ID),
             mode=mode,
             is_active=True,
-            enrollment_attributes=None
+            enrollment_attributes=None,
+            enterprise_uuid=ENTERPRISE_UUID,
         )
 
         mock_add_user_to_course_cohort.assert_called_once()
-        mock_get_enrollment_api.assert_called_once_with(username, str(course_id))
+        mock_get_enrollment_api.assert_called_once_with(username, str(COURSE_ID))
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.api.get_enrollment')
@@ -176,7 +177,6 @@ class EnrollmentUtilsTest(TestCase):
         expected_response = None
         enrollment_response = {'mode': 'verified', 'is_active': True}
         username = 'test'
-        course_id = CourseKey.from_string(COURSE_STRING)
         mode = "verified"
 
         mock_add_enrollment_api.side_effect = CourseEnrollmentExistsError("test", {})
@@ -184,20 +184,18 @@ class EnrollmentUtilsTest(TestCase):
 
         mock_get_enrollment_api.return_value = enrollment_response
 
-        a_user = mock.MagicMock()
-        a_user.id = 1223
-        a_user.username = username
-        mock_user_model.return_value = a_user
+        mock_user_model.return_value = self.a_user
 
-        response = lms_enroll_user_in_course(username, course_id, mode)
+        response = lms_enroll_user_in_course(username, COURSE_ID, mode, ENTERPRISE_UUID)
 
         assert response == expected_response
         mock_add_enrollment_api.assert_called_once_with(
             username,
-            str(course_id),
+            str(COURSE_ID),
             mode=mode,
             is_active=True,
-            enrollment_attributes=None
+            enrollment_attributes=None,
+            enterprise_uuid=ENTERPRISE_UUID,
         )
 
         mock_add_user_to_course_cohort.assert_not_called()

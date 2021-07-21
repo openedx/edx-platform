@@ -20,7 +20,7 @@ from openedx.features.enterprise_support.enrollments.exceptions import (
 log = logging.getLogger(__name__)
 
 
-def lms_enroll_user_in_course(username, course_id, mode,
+def lms_enroll_user_in_course(username, course_id, mode, enterprise_uuid,
                               cohort_name=None,
                               is_active=True,
                               ):
@@ -38,6 +38,7 @@ def lms_enroll_user_in_course(username, course_id, mode,
      - username (str): User name
      - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
      - mode (CourseMode): course mode
+     - enterprise_uuid (str): id to identify the enterprise to enroll under
      - cohort_name (str): Optional. If provided, user will be added to cohort
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
@@ -54,7 +55,8 @@ def lms_enroll_user_in_course(username, course_id, mode,
                 str(course_id),
                 mode=mode,
                 is_active=is_active,
-                enrollment_attributes=None
+                enrollment_attributes=None,
+                enterprise_uuid=enterprise_uuid,
             )
             add_user_to_course_cohort(cohort_name, course_id, user)
             log.info('The user [%s] has been enrolled in course run [%s].', username, course_id)
