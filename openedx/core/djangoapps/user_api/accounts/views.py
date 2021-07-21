@@ -246,6 +246,9 @@ class AccountViewSet(ViewSet):
             * phone_number: The phone number for the user. String of numbers with
               an optional `+` sign at the start.
 
+            * is_verified_name_enabled: Temporary flag to control verified name field - see
+              https://github.com/edx/edx-name-affirmation/blob/main/edx_name_affirmation/toggles.py
+
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
             rendered values to avoid script injections.
