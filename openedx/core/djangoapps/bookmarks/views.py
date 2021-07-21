@@ -7,6 +7,7 @@ https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 
 
 import logging
+from base64 import urlsafe_b64decode
 
 import eventtracking
 from django.conf import settings
@@ -23,6 +24,7 @@ from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
@@ -223,8 +225,15 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         if not usage_id:
             return self.error_response(ugettext_noop('Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
 
+        if not usage_id.startswith("block"):
+            decoded_hash_string = urlsafe_b64decode(usage_id)
+            usage_key_hash = decoded_hash_string.decode('utf-8')
+            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
+        else:
+            usage_id = unquote_slashes(usage_id)
+
         try:
-            usage_key = UsageKey.from_string(unquote_slashes(usage_id))
+            usage_key = UsageKey.from_string(usage_id)
         except InvalidKeyError:
             error_message = ugettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
@@ -304,6 +313,11 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         Arguments:
             usage_id (string): The id of required block.
         """
+        if not usage_id.startswith("block"):
+            decoded_hash_string = urlsafe_b64decode(usage_id)
+            usage_key_hash = decoded_hash_string.decode('utf-8')
+            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
+        
         try:
             return UsageKey.from_string(usage_id)
         except InvalidKeyError:
