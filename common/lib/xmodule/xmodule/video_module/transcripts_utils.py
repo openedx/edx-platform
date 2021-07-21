@@ -690,7 +690,7 @@ class Transcript:
             try:
                 content_dict = json.loads(content_str)
             except ValueError:
-                truncated = content_str[0:min(len(content), 100)].strip()
+                truncated = content_str[:100].strip()
                 log.exception(
                     f"Failed to convert {input_format} to {output_format} for {repr(truncated)}..."
                 )
