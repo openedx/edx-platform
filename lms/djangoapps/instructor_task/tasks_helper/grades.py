@@ -20,7 +20,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import GeneratedCertificate, certificate_info_for_user
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -677,7 +677,7 @@ class CourseGradeReport:
         Returns the course certification information for the given user.
         """
         is_allowlisted = user.id in bulk_certs.allowlisted_user_ids
-        certificate_info = certificate_info_for_user(
+        certificate_info = certs_api.certificate_info_for_user(
             user,
             context.course_id,
             course_grade.letter_grade,

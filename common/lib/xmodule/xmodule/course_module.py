@@ -1197,18 +1197,6 @@ class CourseBlock(
         """
         return course_metadata_utils.has_course_ended(self.end)
 
-    def may_certify(self):
-        """
-        Return whether it is acceptable to show the student a certificate download link.
-        """
-        return course_metadata_utils.may_certify_for_course(
-            self.certificates_display_behavior,
-            self.certificates_show_before_end,
-            self.has_ended(),
-            self.certificate_available_date,
-            self.self_paced
-        )
-
     def has_started(self):
         return course_metadata_utils.has_course_started(self.start)
 

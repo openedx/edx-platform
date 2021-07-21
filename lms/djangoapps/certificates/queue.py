@@ -23,8 +23,8 @@ from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
     ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
+from lms.djangoapps.certificates.utils import certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none

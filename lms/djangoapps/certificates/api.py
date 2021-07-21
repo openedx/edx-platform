@@ -19,6 +19,7 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
@@ -36,12 +37,14 @@ from lms.djangoapps.certificates.models import (
     CertificateTemplateAsset,
     ExampleCertificateSet,
     GeneratedCertificate,
-    certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
-    has_html_certificates_enabled as _has_html_certificates_enabled
+    has_html_certificates_enabled as _has_html_certificates_enabled,
+    should_certificate_be_visible as _should_certificate_be_visible,
+    certificate_status as _certificate_status,
+    certificate_status_for_student as _certificate_status_for_student,
 )
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -228,7 +231,7 @@ def certificate_downloadable_status(student, course_key):
     Returns:
         Dict containing student passed status also download url, uuid for cert if available
     """
-    current_status = certificate_status_for_student(student, course_key)
+    current_status = _certificate_status_for_student(student, course_key)
 
     # If the certificate status is an error user should view that status is "generating".
     # On the back-end, need to monitor those errors and re-submit the task.
@@ -251,7 +254,13 @@ def certificate_downloadable_status(student, course_key):
         response_data['earned_but_not_available'] = True
         response_data['certificate_available_date'] = course_overview.certificate_available_date
 
-    may_view_certificate = course_overview.may_certify()
+    may_view_certificate = _should_certificate_be_visible(
+        course_overview.certificates_display_behavior,
+        course_overview.certificates_show_before_end,
+        course_overview.has_ended(),
+        course_overview.certificate_available_date,
+        course_overview.self_paced
+    )
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(
@@ -745,3 +754,69 @@ def get_enrolled_allowlisted_not_passing_users(course_key):
         generatedcertificate__course_id=course_key,
         generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
     )
+
+
+def should_certificate_be_visible(
+    certificates_display_behavior,
+    certificates_show_before_end,
+    has_ended,
+    certificate_available_date,
+    self_paced
+):
+    """
+    Returns whether it is acceptable to show the student a certificate download
+    link for a course, based on provided attributes of the course.
+    Arguments:
+        certificates_display_behavior (str): string describing the course's
+            certificate display behavior.
+            See CourseFields.certificates_display_behavior.help for more detail.
+        certificates_show_before_end (bool): whether user can download the
+            course's certificates before the course has ended.
+        has_ended (bool): Whether the course has ended.
+        certificate_available_date (datetime): the date the certificate is available on for the course.
+        self_paced (bool): Whether the course is self-paced.
+    """
+    return _should_certificate_be_visible(
+        certificates_display_behavior,
+        certificates_show_before_end,
+        has_ended,
+        certificate_available_date,
+        self_paced
+    )
+
+
+def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_certificate):
+    """
+    Returns the certificate info for a user for grade report.
+    """
+    certificate_is_delivered = 'N'
+    certificate_type = 'N/A'
+    status = _certificate_status(user_certificate)
+    certificate_generated = status['status'] == CertificateStatuses.downloadable
+    course_overview = get_course_overview_or_none(course_id)
+    if not course_overview:
+        return None
+    can_have_certificate = _should_certificate_be_visible(
+        course_overview.certificates_display_behavior,
+        course_overview.certificates_show_before_end,
+        course_overview.has_ended(),
+        course_overview.certificate_available_date,
+        course_overview.self_paced
+    )
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
+    user_is_verified = grade is not None and mode_is_verified
+
+    eligible_for_certificate = 'Y' if (user_is_allowlisted or user_is_verified or certificate_generated) \
+        else 'N'
+
+    if certificate_generated and can_have_certificate:
+        certificate_is_delivered = 'Y'
+        certificate_type = status['mode']
+
+    return [eligible_for_certificate, certificate_is_delivered, certificate_type]
+
+
+def certificate_status_for_student(student, course_id):
+    """This returns a dictionary with a key for status, and other information."""
+    return _certificate_status_for_student(student, course_id)
