@@ -17,9 +17,9 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 @skip_unless_lms
 class RegistrationEventTest(UserAPITestCase):
     """
-    Tests for the events associated with the registration process through the user API.
+    Tests for the Open edX Events associated with the registration process through the user API.
 
-    This class guarantees that STUDENT_REGISTRATION_COMPLETED event is sent while registering
+    This class guarantees that STUDENT_REGISTRATION_COMPLETED event is sent after registering
     a user, with the exact Data Attributes as the event definition stated.
     """
 
@@ -66,7 +66,12 @@ class RegistrationEventTest(UserAPITestCase):
 @skip_unless_lms
 class LoginSessionEventTest(UserAPITestCase):
     """
-    Tests for the events associated with the login process through the user API.
+    Tests for the Open edX Events associated with the login process through the user API.
+
+    This class guarantees that the following events are sent after the user's session
+    creation, with the exact Data Attributes as the event definition stated:
+
+        - SESSION_LOGIN_COMPLETED: after login has been completed.
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
@@ -82,7 +87,7 @@ class LoginSessionEventTest(UserAPITestCase):
     @patch("openedx.core.djangoapps.user_authn.views.login.SESSION_LOGIN_COMPLETED")
     def test_send_login_event(self, login_event):
         """
-        Test whether the student login event is sent during the user's
+        Test whether the student login event is sent after the user's
         login process.
 
         Expected result:

@@ -1611,13 +1611,14 @@ class CourseEnrollment(models.Model):
                         email=user.email,
                         name=user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=enrollment.course.id,
-                        display_name=enrollment.course.display_name
-                    ),
-                    mode=enrollment.mode,
-                    is_active=enrollment.is_active
-                )
+                ),
+                course=CourseData(
+                    course_key=enrollment.course.id,
+                    display_name=enrollment.course.display_name
+                ),
+                mode=enrollment.mode,
+                is_active=enrollment.is_active,
+                creation_date=enrollment.created,
             )
         )
 

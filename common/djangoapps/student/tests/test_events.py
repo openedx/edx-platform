@@ -11,7 +11,7 @@ from django.test import TestCase
 from django_countries.fields import Country
 
 from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 
 from openedx_events.learning.data import CourseEnrollmentData, UserData, UserNonPersonalData, UserPersonalData, CourseData
@@ -189,29 +189,35 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
 @skip_unless_lms
 class EnrollmentEventsTest(SharedModuleStoreTestCase):
     """
-    Tests for the events associated with the registration process through the user API.
+    Tests for the Open edX Events associated with the enrollment process through the user API.
+
+    This class guarantees that the following events are sent during the user's enrollment, with
+    the exact Data Attributes as the event definition stated:
+
+        - COURSE_ENROLLMENT_CREATED: sent after the user's enrollment.
     """
+
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory(
-            username="somestudent",
-            first_name="Student",
-            last_name="Person",
-            email="robot@robot.org",
-            is_active=True
+        self.user = UserFactory.create(
+            username="test",
+            email="test@example.com",
+            password="password",
         )
+        self.user_profile = UserProfileFactory.create(user=self.user, name="Test Example")
 
     @mock.patch("common.djangoapps.student.models.COURSE_ENROLLMENT_CREATED")
-    def test_enrollment_event_emitted(self, enrollment_event):
+    def test_enrollment_created_event_emitted(self, enrollment_event):
         """
-        Test whether the student registration event is sent during the user's
-        registration process.
+        Test whether the student enrollment event is sent after the user's
+        enrollment process.
+
         Expected result:
-            - STUDENT_REGISTRATION_COMPLETED is sent via send_event.
+            - COURSE_ENROLLMENT_CREATED is sent via send_event.
             - The arguments match the event definition.
         """
-        CourseEnrollment.enroll(self.user, self.course.id)
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
 
         enrollment_event.send_event.assert_called_once_with(
             enrollment=CourseEnrollmentData(
@@ -225,12 +231,13 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase):
                         email=self.user.email,
                         name=self.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=self.course.id,
-                        display_name=self.course.display_name
-                    ),
-                    mode='audit',
-                    is_active=True
-                )
+                ),
+                course=CourseData(
+                    course_key=self.course.id,
+                    display_name=self.course.display_name
+                ),
+                mode='audit',
+                is_active=True,
+                creation_date=enrollment.created,
             )
         )
