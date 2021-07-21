@@ -13,6 +13,7 @@ from pytz import utc
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 
