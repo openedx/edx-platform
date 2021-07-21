@@ -582,7 +582,7 @@ def get_video_transcript_content(edx_video_id, language_code):
         except Exception:
             log.exception(
                 "Error getting transcript from edx-val id: {edx_video_id}: language code {language_code}"
-                )
+            )
             content = '{"start": [],"end": [],"text": ["An error occured obtaining the transcript."]}'
             transcript = dict(file_name='error-{language_code}.srt', content=content)
     return transcript
@@ -691,8 +691,8 @@ class Transcript:
             except Exception:
                 log.exception(
                     "Failed to convert {input_format} to {output_format} for {content_str}."
-                    )
-                content_dict = {"start": [1],"end": [2],"text": ["An error occured obtaining the transcript."]}
+                )
+                content_dict = {"start": [1], "end": [2], "text": ["An error occured obtaining the transcript."]}
             if output_format == 'txt':
                 text = content_dict['text']
                 text_without_none = [line if line else '' for line in text]

@@ -1002,7 +1002,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.assertEqual(exception_message, 'No transcript for `en` language')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    def test_get_transcript_incorrect_json_(self,mock_get_video_transcript_data):
+    def test_get_transcript_incorrect_json_(self, mock_get_video_transcript_data):
         """
         Verify that `get transcript` function returns a working json file if the original throws an error
         """
