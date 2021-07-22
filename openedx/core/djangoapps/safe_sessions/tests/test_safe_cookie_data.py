@@ -215,8 +215,9 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         a_random_string = 'HvGnjXf1b3jU'
         timestamp = 1626895850
 
-        with patch('openedx.core.djangoapps.safe_sessions.middleware.signing.time.time', return_value=timestamp):
-            with patch('openedx.core.djangoapps.safe_sessions.middleware.get_random_string', return_value=a_random_string):
+        module = 'openedx.core.djangoapps.safe_sessions.middleware'
+        with patch(f"{module}.signing.time.time", return_value=timestamp):
+            with patch(f"{module}.get_random_string", return_value=a_random_string):
                 safe_cookie_data = SafeCookieData.create(session_id, user_id)
         serialized_value = str(safe_cookie_data)
 
@@ -227,4 +228,11 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         #
         # Also assumes SECRET_KEY is '85920908f28904ed733fe576320db18cabd7b6cd'
         # (set in lms or cms.envs.test)
-        assert serialized_value == "1|SSdtIGEgc2Vzc2lvbiE|HvGnjXf1b3jU|ImExZWZiNzVlZGFmM2FkZWZmYjM4YjI0ZmZkOWU4MzExODU0MTk4NmVlNGRiYzBlODdhYWUzOGM5MzVlNzk4NjUi:1m6Hve:OMhY2FL2pudJjSSXChtI-zR8QVA"
+        assert serialized_value == (
+            "1"
+            "|SSdtIGEgc2Vzc2lvbiE"
+            "|HvGnjXf1b3jU"
+            "|ImExZWZiNzVlZGFmM2FkZWZmYjM4YjI0ZmZkOWU4MzExODU0MTk4NmVlNGRiYzBlODdhYWUzOGM5MzVlNzk4NjUi"
+            ":1m6Hve"
+            ":OMhY2FL2pudJjSSXChtI-zR8QVA"
+        )
