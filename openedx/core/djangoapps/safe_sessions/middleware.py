@@ -1,7 +1,7 @@
 """
 This module defines SafeSessionMiddleware that makes use of a
 SafeCookieData that cryptographically binds the user to the session id
-in the cookie (but does not reveal the user ID to the holder).
+in the cookie.
 
 The implementation is inspired in part by the proposal in the paper
 <http://www.cse.msu.edu/~alexliu/publications/Cookie/cookie.pdf>
