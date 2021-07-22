@@ -220,7 +220,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         """
         num_cookies = len(names_to_size)
         num_captured = num_captured if num_cookies > num_captured else num_cookies
-        random_index_list = random.choices(range(len(names_to_size)), k=num_captured)
+        random_index_list = random.sample(range(len(names_to_size)), k=num_captured)
         sorted_cookies = sorted(
             names_to_size,
             key=lambda x: names_to_size[x],
