@@ -56,27 +56,27 @@ class CertificateUtilityTests(TestCase):
 
     @ddt.data(
         # Test certificates_show_before_end
-        (CertificatesDisplayBehaviors.EARLY_NO_INFO, True, False, test_datetime, False, True),
-        (CertificatesDisplayBehaviors.END, True, False, test_datetime, False, True),
+        (CertificatesDisplayBehaviors.EARLY_NO_INFO, True, False, _LAST_MONTH, False, True),
+        (CertificatesDisplayBehaviors.END, True, False, _LAST_MONTH, False, True),
         (CertificatesDisplayBehaviors.END_WITH_DATE, True, False, _NEXT_WEEK, False, True),
 
         # Test that EARLY_NO_INFO
-        (CertificatesDisplayBehaviors.EARLY_NO_INFO, True, True, test_datetime, False, True),
-        (CertificatesDisplayBehaviors.EARLY_NO_INFO, False, False, test_datetime, False, True),
+        (CertificatesDisplayBehaviors.EARLY_NO_INFO, True, True, _LAST_MONTH, False, True),
+        (CertificatesDisplayBehaviors.EARLY_NO_INFO, False, False, _LAST_MONTH, False, True),
 
         # Test END_WITH_DATE
-        (CertificatesDisplayBehaviors.END_WITH_DATE, False, False, test_datetime, False, True),
+        (CertificatesDisplayBehaviors.END_WITH_DATE, False, False, _LAST_MONTH, False, True),
         (CertificatesDisplayBehaviors.END_WITH_DATE, False, False, _LAST_WEEK, False, True),
         (CertificatesDisplayBehaviors.END_WITH_DATE, False, False, _NEXT_WEEK, False, False),
         (CertificatesDisplayBehaviors.END_WITH_DATE, False, False, None, False, False),
 
         # Test END
-        (CertificatesDisplayBehaviors.END, False, False, test_datetime, False, False),
-        (CertificatesDisplayBehaviors.END, False, True, test_datetime, False, True),
+        (CertificatesDisplayBehaviors.END, False, False, _LAST_MONTH, False, False),
+        (CertificatesDisplayBehaviors.END, False, True, _LAST_MONTH, False, True),
 
         # Test self_paced
-        (CertificatesDisplayBehaviors.END, False, False, test_datetime, False, False),
-        (CertificatesDisplayBehaviors.END, False, False, test_datetime, True, True),
+        (CertificatesDisplayBehaviors.END, False, False, _LAST_MONTH, False, False),
+        (CertificatesDisplayBehaviors.END, False, False, _LAST_MONTH, True, True),
     )
     @ddt.unpack
     def should_certificate_be_visible(
