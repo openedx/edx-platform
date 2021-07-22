@@ -52,14 +52,14 @@ from lms.djangoapps.certificates.api import (
     is_certificate_invalidated,
     is_on_allowlist,
     remove_allowlist_entry,
-    set_cert_generation_enabled
+    set_cert_generation_enabled,
+    certificate_status_for_student,
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
     ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import (

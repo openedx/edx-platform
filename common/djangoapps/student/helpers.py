@@ -39,10 +39,10 @@ from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
     cert_generation_enabled,
     get_certificate_url,
-    has_html_certificates_enabled
+    has_html_certificates_enabled,
+    certificate_status_for_student,
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.certificates.models import certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService

@@ -19,8 +19,8 @@ from lms.djangoapps.certificates.api import generate_certificate_task
 from lms.djangoapps.certificates.models import (
     ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
+from lms.djangoapps.certificates.utils import certificate_status_for_student
 
 log = logging.getLogger(__name__)
 User = get_user_model()
