@@ -207,6 +207,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
+        set_custom_attribute('cookies_total_num', len(cookie_names_to_size))
+        set_custom_attribute('cookies_group_total_num', len(cookie_groups_to_size))
         log.debug('cookies_total_size = %d', total_cookie_size)
 
     def set_custom_attributes_for_n_random_cookies(self, names_to_size, num_captured, attribute_prefix):
