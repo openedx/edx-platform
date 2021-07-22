@@ -1,8 +1,12 @@
 """
 Progress Tab Serializers
 """
+from datetime import datetime
+
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+from pytz import UTC
+
 from lms.djangoapps.course_home_api.mixins import VerifiedModeSerializerMixin
 
 
@@ -20,8 +24,8 @@ class SubsectionScoresSerializer(serializers.Serializer):
     Serializer for subsections in section_scores
     """
     assignment_type = serializers.CharField(source='format')
-    display_name = serializers.CharField()
     block_key = serializers.SerializerMethodField()
+    display_name = serializers.CharField()
     has_graded_assignment = serializers.BooleanField(source='graded')
     learner_has_access = serializers.SerializerMethodField()
     num_points_earned = serializers.FloatField(source='graded_total.earned')
@@ -46,6 +50,15 @@ class SubsectionScoresSerializer(serializers.Serializer):
         return problem_scores
 
     def get_url(self, subsection):
+        """
+        Returns the URL for the subsection while taking into account if the course team has
+        marked the subsection's visibility as hide after due.
+        """
+        hide_url_date = (subsection.self_paced and subsection.end) or subsection.due
+        if (not self.context['staff_access'] and subsection.hide_after_due and hide_url_date
+                and datetime.now(UTC) > hide_url_date):
+            return None
+
         relative_path = reverse('jump_to', args=[self.context['course_key'], subsection.location])
         request = self.context['request']
         return request.build_absolute_uri(relative_path)
