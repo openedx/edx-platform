@@ -57,5 +57,10 @@
     @include rtl {
       @include transform(rotateY(180deg));
     }
+
+    // Hide a trailing separator.
+    &:last-child {
+      display: none;
+    }
   }
 }
