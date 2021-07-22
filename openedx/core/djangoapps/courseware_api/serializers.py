@@ -106,7 +106,8 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     original_user_is_staff = serializers.BooleanField()
     can_view_legacy_courseware = serializers.BooleanField()
     is_staff = serializers.BooleanField()
-    can_load_courseware = serializers.DictField()
+    course_access = serializers.DictField()
+    can_load_courseware = serializers.DictField(source='course_access')  # can be removed once MFE updates
     notes = serializers.DictField()
     marketing_url = serializers.CharField()
     celebrations = serializers.DictField()
