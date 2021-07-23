@@ -212,6 +212,16 @@ class ProviderConfig(ConfigurationModel):
         default=False,
         help_text="Use the presence of a profile from a trusted third party as proof of identity verification.",
     )
+
+    disable_for_enterprise_sso = models.BooleanField(
+        default=False,
+        verbose_name='Disabled for Enterprise TPA',
+        help_text=_(
+            "IDPs with this set to True will be excluded from the dropdown IDP selection "
+            "in the EnterpriseCustomer Django Admin form."
+        )
+    )
+
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
