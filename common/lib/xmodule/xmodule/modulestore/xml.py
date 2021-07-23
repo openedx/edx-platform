@@ -448,7 +448,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 org = 'edx'
 
             # Parent XML should be something like 'library.xml' or 'course.xml'
-            courselike_label = self.parent_xml.split('.')[0]
+            courselike_label = self.parent_xml.split('.', maxsplit=1)[0]
 
             course = course_data.get(courselike_label)
 
