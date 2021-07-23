@@ -145,7 +145,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             return
 
         # .. setting_name: TOP_N_COOKIES_CAPTURED
-        # .. setting_default: 5
+        # .. setting_default: 8
         # .. setting_description: The number of the largest cookies to capture when monitoring. Capture fewer cookies
         #       if you need to save on monitoring resources.
         # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
@@ -208,13 +208,13 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         # Get the size of unmonitored cookies to allow us to see what cookies we are missing
         top_n_cookies = sorted(
-            names_to_size,
-            key=lambda x: names_to_size[x],
+            cookie_names_to_size,
+            key=lambda x: cookie_names_to_size[x],
             reverse=True,
-        )[:top_n_captured]
-        top_n_cookies_size = sum([names_to_size[name] for name in top_n_cookies])
+        )[:top_n_cookies_captured]
+        top_n_cookies_size = sum([cookie_names_to_size[name] for name in top_n_cookies])
         set_custom_attribute('cookies_unaccounted_size', total_cookie_size - top_n_cookies_size)
-        set_custom_attribute('cookies_total_num', len(cookie_numes_to_size))
+        set_custom_attribute('cookies_total_num', len(cookie_names_to_size))
         log.debug('cookies_total_size = %d', total_cookie_size)
 
     def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
@@ -231,10 +231,10 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             key=lambda x: names_to_size[x],
             reverse=True,
         )[:top_n_captured]
-        for index, name in enumerate(top_n_cookies, start=1):
+        for count, name in enumerate(top_n_cookies, start=1):
             size = names_to_size[name]
-            name_attribute = f'{attribute_prefix}.{index}.name'
-            size_attribute = f'{attribute_prefix}.{index}.size'
+            name_attribute = f'{attribute_prefix}.{count}.name'
+            size_attribute = f'{attribute_prefix}.{count}.size'
 
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)
