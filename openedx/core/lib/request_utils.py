@@ -205,6 +205,14 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
+        top_n_cookies = sorted(
+            names_to_size,
+            key=lambda x: names_to_size[x],
+            reverse=True,
+        )[:top_n_captured]
+        top_n_cookies_size = sum([names_to_size[name] for name in top_n_cookies])
+        set_custom_attribute('cookies_unaccounted_size', total_cookie_size - top_n_cookies_size)
+        set_custom_attribute('cookies_total_num', len(cookie_numes_to_size))
         log.debug('cookies_total_size = %d', total_cookie_size)
 
     def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
