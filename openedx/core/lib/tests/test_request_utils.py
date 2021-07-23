@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import Mock, call, patch
 
 import ddt
+from random import Random
 import pytest
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -31,6 +32,7 @@ class RequestUtilTestCase(unittest.TestCase):
         super().setUp()
         self.old_site_name = settings.SITE_NAME
         self.old_allowed_hosts = settings.ALLOWED_HOSTS
+        self.random = Random(0)
 
     def tearDown(self):
         super().tearDown()
@@ -97,10 +99,144 @@ class RequestUtilTestCase(unittest.TestCase):
         assert course_id.course == course
         assert course_id.run == run
 
+
+    @patch("random.sample")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_cookie_monitoring(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+    def test_cookie_monitoring_N_random(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag, random_sample):
 
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = True
+        mock_capture_cookie_sizes.is_enabled.return_value = False
+        random_sample.side_effect = self.random.sample
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 100,
+            "_b": "." * 13,
+            "_c_": "." * 13,
+            "a.b": "." * 10,
+            "a.c": "." * 10,
+            "b.": "." * 13,
+            "b_a": "." * 15,
+            "b_c": "." * 15,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.1.name', 'a'),
+            call('cookies.1.size', 100),
+            call('cookies.2.name', 'b_a'),
+            call('cookies.2.size', 15),
+            call('cookies.3.name', 'b_c'),
+            call('cookies.3.size', 15),
+            call('cookies.4.name', '_c_'),
+            call('cookies.4.size', 13),
+            call('cookies.5.name', 'a.b'),
+            call('cookies.5.size', 10),
+            call('cookies.group.1.name', 'b'),
+            call('cookies.group.1.size', 43),
+            call('cookies.group.2.name', 'a'),
+            call('cookies.group.2.size', 20),
+            call('cookies.max.name', 'a'),
+            call('cookies.max.size', 100),
+            call('cookies.max.group.name', 'a'),
+            call('cookies.max.group.size', 100),
+            call('cookies_total_size', 189),
+            call('cookies_total_num', 8),
+            call('cookies_group_total_num', 2),
+        ], any_order=True)
+
+    @patch('random.sample')
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_N_random_max_group(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag, random_sample):
+
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = True
+        mock_capture_cookie_sizes.is_enabled.return_value = False
+        random_sample.side_effect = self.random.sample
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 10,
+            "b_a": "." * 15,
+            "b_c": "." * 20,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.1.name', 'b_c'),
+            call('cookies.1.size', 20),
+            call('cookies.2.name', 'b_a'),
+            call('cookies.2.size', 15),
+            call('cookies.3.name', 'a'),
+            call('cookies.3.size', 10),
+            call('cookies.group.1.name', 'b'),
+            call('cookies.group.1.size', 35),
+            call('cookies.max.name', 'b_c'),
+            call('cookies.max.size', 20),
+            call('cookies.max.group.name', 'b'),
+            call('cookies.max.group.size', 35),
+            call('cookies_total_size', 45)
+        ], any_order=True)
+
+    @patch('random.sample')
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_N_random_no_cookies(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag, random_sample):
+
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = True
+        mock_capture_cookie_sizes.is_enabled.return_value = False
+        random_sample.side_effect = self.random.sample
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {}
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([call('cookies_total_size', 0)], any_order=True)
+
+    @patch('random.sample')
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_N_random_no_groups(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag, random_sample):
+
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = True
+        mock_capture_cookie_sizes.is_enabled.return_value = False
+        random_sample.side_effect = self.random.sample
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.max.name', 'b'),
+            call('cookies.max.size', 15),
+            call('cookies.1.name', 'b'),
+            call('cookies.1.size', 15),
+            call('cookies.2.name', 'a'),
+            call('cookies.2.size', 10),
+            call('cookies_total_size', 25),
+        ], any_order=True)
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_N_largest(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag):
+
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = False
         mock_capture_cookie_sizes.is_enabled.return_value = True
         middleware = CookieMonitoringMiddleware()
 
@@ -140,10 +276,12 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 189),
         ], any_order=True)
 
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_cookie_monitoring_max_group(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+    def test_cookie_monitoring_N_largest_max_group(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag):
 
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = False
         mock_capture_cookie_sizes.is_enabled.return_value = True
         middleware = CookieMonitoringMiddleware()
 
@@ -172,10 +310,12 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 45)
         ], any_order=True)
 
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_cookie_monitoring_no_cookies(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+    def test_cookie_monitoring_N_largest_no_cookies(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag):
 
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = False
         mock_capture_cookie_sizes.is_enabled.return_value = True
         middleware = CookieMonitoringMiddleware()
 
@@ -186,10 +326,12 @@ class RequestUtilTestCase(unittest.TestCase):
 
         mock_set_custom_attribute.assert_has_calls([call('cookies_total_size', 0)], any_order=True)
 
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_RANDOM_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_cookie_monitoring_no_groups(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+    def test_cookie_monitoring_N_largest_no_groups(self, mock_set_custom_attribute, mock_capture_cookie_sizes, mock_capture_n_random_cookie_sizes_flag):
 
+        mock_capture_n_random_cookie_sizes_flag.is_enabled.return_value = False
         mock_capture_cookie_sizes.is_enabled.return_value = True
         middleware = CookieMonitoringMiddleware()
 

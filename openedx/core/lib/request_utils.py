@@ -156,7 +156,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         """
         if CAPTURE_N_RANDOM_COOKIE_SIZES.is_enabled():
-            self.captrue_N_random_cookies(request)
+            self.capture_N_random_cookies(request)
         elif CAPTURE_N_LARGEST_COOKIE_SIZES.is_enabled():
             self.capture_N_largest_cookies(request)
 
@@ -223,7 +223,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
-        set_custom_attribute('cookies_total_num', len(cookie_names_to_size))
+        set_custom_attribute('cookies_total_num', len(request.COOKIES))
         set_custom_attribute('cookies_group_total_num', len(cookie_groups_to_size))
         log.debug('cookies_total_size = %d', total_cookie_size)
 
@@ -239,7 +239,7 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         # if num_captured is less than the # of cookies, set num_capture to # of cookies
         num_captured = min(len(names_to_size), num_captured)
         # select N random cookies, such that in aggregate of data from multiple requests, we get a list of all the cookies
-        random_captured_cookies = random.sample(names_to_size, k=num_captured)
+        random_captured_cookies = random.sample(names_to_size.keys(), k=num_captured)
         sorted_random_captured_cookies = sorted(
             random_captured_cookies,
             key=lambda x: names_to_size[x],
@@ -247,8 +247,9 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         )
         for index, name in enumerate(sorted_random_captured_cookies):
             size = names_to_size[name]
-            name_attribute = f'{attribute_prefix}.{index}.name'
-            size_attribute = f'{attribute_prefix}.{index}.size'
+            # its index+1 cause we started off the numbering system for cookie name at cookies.1.name
+            name_attribute = f'{attribute_prefix}.{index + 1}.name'
+            size_attribute = f'{attribute_prefix}.{index + 1}.size'
 
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)
@@ -317,6 +318,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
+        set_custom_attribute('cookies_total_num', len(request.COOKIES))
+        set_custom_attribute('cookies_group_total_num', len(cookie_groups_to_size))
         log.debug('cookies_total_size = %d', total_cookie_size)
 
     def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
