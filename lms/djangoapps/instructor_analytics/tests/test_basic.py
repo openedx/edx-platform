@@ -276,15 +276,15 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
         proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)
         ProctoredExamStudentAttempt.create_exam_attempt(
-            proctored_exam_id, self.users[0].id, '',
+            proctored_exam_id, self.users[0].id,
             'Test Code 1', True, False, 'ad13'
         )
         ProctoredExamStudentAttempt.create_exam_attempt(
-            proctored_exam_id, self.users[1].id, '',
+            proctored_exam_id, self.users[1].id,
             'Test Code 2', True, False, 'ad13'
         )
         ProctoredExamStudentAttempt.create_exam_attempt(
-            proctored_exam_id, self.users[2].id, '',
+            proctored_exam_id, self.users[2].id,
             'Test Code 3', True, False, 'asd'
         )
 
