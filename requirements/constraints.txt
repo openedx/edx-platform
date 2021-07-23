@@ -27,9 +27,6 @@ django-config-models>=1.0.0
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
-# It seems like django-countries > 5.5 may cause performance issues for us.
-django-countries==5.5
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
