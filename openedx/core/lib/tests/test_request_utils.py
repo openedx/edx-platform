@@ -97,7 +97,7 @@ class RequestUtilTestCase(unittest.TestCase):
         assert course_id.course == course
         assert course_id.run == run
 
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
     def test_cookie_monitoring(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
 
@@ -140,7 +140,7 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 189),
         ], any_order=True)
 
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
     def test_cookie_monitoring_max_group(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
 
@@ -172,7 +172,7 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 45)
         ], any_order=True)
 
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
     def test_cookie_monitoring_no_cookies(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
 
@@ -186,7 +186,7 @@ class RequestUtilTestCase(unittest.TestCase):
 
         mock_set_custom_attribute.assert_has_calls([call('cookies_total_size', 0)], any_order=True)
 
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.CAPTURE_N_LARGEST_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
     def test_cookie_monitoring_no_groups(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
 

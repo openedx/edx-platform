@@ -21,18 +21,30 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
 COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
 
-# .. toggle_name: request_utils.capture_cookie_sizes
+# .. toggle_name: request_utils.capture_n_largest_cookie_sizes
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables capturing of cookie sizes for monitoring purposes. This can be useful for tracking
 #       down large cookies and avoiding hitting limits on the total size of cookies. See the CookieMonitoringMiddleware
 #       docstring for details on the monitoring custom attributes that will be set.
 # .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
-#       monitoring. Only enable temporarily, or lower NUM_COOKIES_CAPTURED and NUM_COOKIE_GROUPS_CAPTURED django
+#       monitoring. Only enable temporarily, or lower TOP_N_COOKIES_CAPTURED and TOP_N_COOKIE_GROUPS_CAPTURED  django
 #       settings to capture less data.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-02-22
-CAPTURE_COOKIE_SIZES = WaffleFlag('request_utils.capture_cookie_sizes', __name__)
+CAPTURE_N_LARGEST_COOKIE_SIZES = WaffleFlag('request_utils.capture_n_largest_cookie_sizes', __name__)
+# .. toggle_name: request_utils.capture_n_random_cookie_sizes
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables capturing of cookie sizes for monitoring purposes. This can be useful for tracking
+#       list of cookies and avoiding hitting limits on the total size of cookies. See the CookieMonitoringMiddleware
+#       docstring for details on the monitoring custom attributes that will be set.
+# .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
+#       monitoring. Only enable temporarily, or lower  NUM_CAPTURED_COOKIES and NUM_COOKIE_GROUPS_CAPTURED django
+#       settings to capture less data.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2019-02-22
+CAPTURE_N_RANDOM_COOKIE_SIZES = WaffleFlag('request_utils.capture_n_random_cookie_sizes', __name__)
 log = logging.getLogger(__name__)
 
 
@@ -143,9 +155,13 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         - NUM_COOKIE_GROUPS_CAPTURED
 
         """
-        if not CAPTURE_COOKIE_SIZES.is_enabled():
-            return
+        if CAPTURE_N_RANDOM_COOKIE_SIZES.is_enabled():
+            self.captrue_N_random_cookies(request)
+        elif CAPTURE_N_LARGEST_COOKIE_SIZES.is_enabled():
+            self.capture_N_largest_cookies(request)
 
+    def capture_N_random_cookies(self, request):
+        """TODO add readme"""
         # .. setting_name: NUM_COOKIES_CAPTURED
         # .. setting_default: 5
         # .. setting_description: The number of the cookies to capture when monitoring. Capture fewer cookies
@@ -220,16 +236,16 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             num_captured: Number of  sizes to monitor.
             attribute_prefix: Prefix (cookies|cookies.group) to use in the custom attribute name.
         """
-        num_cookies = len(names_to_size)
-        num_captured = num_captured if num_cookies > num_captured else num_cookies
-        random_index_list = random.sample(range(len(names_to_size)), k=num_captured)
-        sorted_cookies = sorted(
-            names_to_size,
+        # if num_captured is less than the # of cookies, set num_capture to # of cookies
+        num_captured = min(len(names_to_size), num_captured)
+        # select N random cookies, such that in aggregate of data from multiple requests, we get a list of all the cookies
+        random_captured_cookies = random.sample(names_to_size, k=num_captured)
+        sorted_random_captured_cookies = sorted(
+            random_captured_cookies,
             key=lambda x: names_to_size[x],
             reverse=True,
         )
-        num_random_cookies = [sorted_cookies[i] for i in random_index_list]
-        for index, name in enumerate(num_random_cookies):
+        for index, name in enumerate(sorted_random_captured_cookies):
             size = names_to_size[name]
             name_attribute = f'{attribute_prefix}.{index}.name'
             size_attribute = f'{attribute_prefix}.{index}.size'
@@ -238,6 +254,92 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             set_custom_attribute(size_attribute, size)
             log.debug('%s = %d', name, size)
 
+
+    def capture_N_largest_cookies(self, request):
+        # .. setting_name: TOP_N_COOKIES_CAPTURED
+        # .. setting_default: 5
+        # .. setting_description: The number of the largest cookies to capture when monitoring. Capture fewer cookies
+        #       if you need to save on monitoring resources.
+        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
+        top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 5)
+        # .. setting_name: TOP_N_COOKIE_GROUPS_CAPTURED
+        # .. setting_default: 5
+        # .. setting_description: The number of the largest cookie groups to capture when monitoring. Capture
+        #       fewer cookies if you need to save on monitoring resources.
+        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
+        top_n_cookie_groups_captured = getattr(settings, "TOP_N_COOKIE_GROUPS_CAPTURED", 5)
+
+        cookie_names_to_size = {}
+        cookie_groups_to_size = {}
+
+        for name, value in request.COOKIES.items():
+            # Get cookie size for all cookies.
+            cookie_size = len(value)
+            cookie_names_to_size[name] = cookie_size
+
+            # Group cookies by their prefix seperated by a period or underscore
+            grouping_name = re.split('[._]', name, 1)[0]
+            if grouping_name and grouping_name != name:
+                # Add or update the size for this group.
+                cookie_groups_to_size[grouping_name] = cookie_groups_to_size.get(grouping_name, 0) + cookie_size
+
+        if cookie_names_to_size:
+            self.set_custom_attributes_for_top_n(
+                cookie_names_to_size,
+                top_n_cookies_captured,
+                attribute_prefix='cookies',
+            )
+
+            max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
+            max_cookie_size = cookie_names_to_size[max_cookie_name]
+
+            set_custom_attribute('cookies.max.name', max_cookie_name)
+            set_custom_attribute('cookies.max.size', max_cookie_size)
+
+        if cookie_groups_to_size:
+            self.set_custom_attributes_for_top_n(
+                cookie_groups_to_size,
+                top_n_cookie_groups_captured,
+                attribute_prefix='cookies.group',
+            )
+
+            max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
+            max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
+
+            # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
+            # Treating an individual cookie as a group of 1 for calculating the max.
+            if max_group_cookie_size < max_cookie_size:
+                max_group_cookie_name = max_cookie_name
+                max_group_cookie_size = max_cookie_size
+
+            set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
+            set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
+
+        total_cookie_size = sum(cookie_names_to_size.values())
+        set_custom_attribute('cookies_total_size', total_cookie_size)
+        log.debug('cookies_total_size = %d', total_cookie_size)
+
+    def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
+        """
+        Sets custom metric for the top N biggest cookies or cookie groups.
+        Arguments:
+            names_to_size: Dict of sizes keyed by cookie name or cookie group name
+            top_n_captured: Number of largest sizes to monitor.
+            attribute_prefix: Prefix (cookies|cookies.group) to use in the custom attribute name.
+        """
+        top_n_cookies = sorted(
+            names_to_size,
+            key=lambda x: names_to_size[x],
+            reverse=True,
+        )[:top_n_captured]
+        for index, name in enumerate(top_n_cookies, start=1):
+            size = names_to_size[name]
+            name_attribute = f'{attribute_prefix}.{index}.name'
+            size_attribute = f'{attribute_prefix}.{index}.size'
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug('%s = %d', name, size)
 
 def expected_error_exception_handler(exc, context):
     """
