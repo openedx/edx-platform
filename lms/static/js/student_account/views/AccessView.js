@@ -284,7 +284,7 @@
                     this.element.show($form);
 
                 // Update url without reloading page
-                    if (type != 'institution_login') {
+                    if (type != 'institution_login' && type != 'reset') {
                         History.pushState(null, document.title, '/' + type + queryStr);
                     }
                     analytics.page('login_and_registration', type);
