@@ -206,7 +206,6 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
 
-        # Get the size of unmonitored cookies to allow us to see what cookies we are missing
         top_n_cookies = sorted(
             cookie_names_to_size,
             key=lambda x: cookie_names_to_size[x],
