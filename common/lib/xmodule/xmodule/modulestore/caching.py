@@ -1,20 +1,57 @@
 """
-Different ModuleStores have their own internal caching mechanisms, but sometimes
-we need utilities that can be used across multiple ModuleStore types.
+Different ModuleStores have their own internal caching, but this module is for
+caching mechanisms that cut across the various ModuleStores (see the class
+docstrings for more detailed explanations).
 """
 from collections import defaultdict
+
 from edx_django_utils.cache import RequestCache
 
 
 class ModuleStoreCache:
     """
-    Used to cache certain ModuleStore queries at a request level.
+    Used to ModuleStore queries (for now, just get_course) at a request level.
 
     This uses a RequestCache underneath, but tries to present a higher-level
     interface.
+
+    You might be wondering, "Why does this class exist? Why not make caching an
+    internal implementation detail of any given ModuleStore?" The answer is that
+    CCX works by mutating the course that is returned by the
+    DraftVersioningModuleStore (a.k.a. "Split Mongo"), and replacing its various
+    UsageKeys and field data to convert them into CCX Usage Keys and overrides.
+    But because those mutate the courses being passed back, it means that if we
+    were to cache it at the DraftVersioningModuleStore level, we'd store it in
+    the cache by its "base course" key ("course-v1:..."), but it would be
+    mutated in-place to be the contents of the derived CCX ("ccx-v1:..."), and
+    the results for subsequent cache hits would be incorrect.
+
+    To get around this limitation, we have to do the caching at at outer layer,
+    after CCX has done its mutations. Since CCX works with a wrapper class that
+    proxies most calls to the wrapped ModuleStore (CCXModulestoreWrapper), we
+    can do the same thing (see CachingModuleStoreWrapper).
+
+    That works great for caching the value, but it makes invalidation trickier.
+    We _could_ make CachingModuleStoreWrapper understand every ModuleStore call
+    that could lead to the course being invalidated, but that's brittle and
+    error prone. But the underlying ModuleStores themselves know _exactly_ when
+    data is being changed, because doing so is an explicit write that they have
+    to perform.
+
+    That's why we have an explicit ModuleStoreCache object. We create an
+    instance of this object for the CachingModuleStoreWrapper layer to use to
+    get courses from the cache and add courses to the cache, but then we pass
+    that same instance of ModuleStoreCache to the underlying ModuleStores,
+    because they will know how to _invalidate_ the cache entries for a given
+    course when writes occur.
     """
     def __init__(self):
-        self._request_cache = RequestCache('CachingModulestoreWrapper')
+        """Init our namespaced request cache."""
+        self._request_cache = RequestCache('ModuleStoreCache')
+
+        # This is a secondary lookup just in case we are holding a large number
+        # of courses in the cache for some reason. That way we don't have to
+        # iterate through all keys when doing invalidation.
         self._courses_to_depths = defaultdict(set)
 
     def get_course(self, course_key, depth):
@@ -31,7 +68,8 @@ class ModuleStoreCache:
         for depth in self._courses_to_depths[course_key]:
             cache_key = (course_key, depth)
             self._request_cache.delete(cache_key)
-        self._courses_to_depths[cache_key] = set()
+        self._courses_to_depths[course_key] = set()
+
 
 class CachingModuleStoreWrapper:
     """
@@ -75,7 +113,9 @@ class CachingModuleStoreWrapper:
         This is the only call that actually _uses_ caching at this layer.
         """
         # Only use the request cache if we're dealing with a simple query with
-        # no advanced params. (This is the vast, vast majority of queries.)
+        # no advanced params. This is the vast, vast majority of queries, so
+        # it's not really worth figuring out how to correctly handle the kwargs
+        # cases.
         use_cache = not kwargs
         if use_cache:
             cache_response = self._modulestore_cache.get_course(course_key, depth)
