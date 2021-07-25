@@ -137,6 +137,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             user_service=None,
             create_modulestore_instance=None,
             signal_handler=None,
+            modulestore_cache=None,
             **kwargs
     ):
         """
@@ -158,6 +159,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
                 continue
 
+#        import pudb; pu.db
+
         for store_settings in stores:
             key = store_settings['NAME']
             store = create_modulestore_instance(
@@ -169,6 +172,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 fs_service=fs_service,
                 user_service=user_service,
                 signal_handler=signal_handler,
+                modulestore_cache=modulestore_cache,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.items():

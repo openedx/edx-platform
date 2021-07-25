@@ -289,6 +289,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                     from_index=bulk_write_record.initial_index,
                     course_context=bulk_write_record.course_key
                 )
+            self.modulestore_cache.invalidate_course(structure_key)
 
         return dirty
 
@@ -316,6 +317,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             bulk_write_record.index = index_entry
         else:
             self.db_connection.insert_course_index(index_entry, course_key)
+            self.modulestore_cache.invalidate_course(course_key)
 
     def update_course_index(self, course_key, updated_index_entry):
         """
@@ -330,6 +332,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             bulk_write_record.index = updated_index_entry
         else:
             self.db_connection.update_course_index(updated_index_entry, course_context=course_key)
+            self.modulestore_cache.invalidate_course(course_key)
 
     def get_structure(self, course_key, version_guid):  # lint-amnesty, pylint: disable=missing-function-docstring
         bulk_write_record = self._get_bulk_ops_record(course_key)
@@ -706,7 +709,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None, fs_service=None, user_service=None,
-                 services=None, signal_handler=None, **kwargs):
+                 services=None, signal_handler=None, modulestore_cache=None, **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
@@ -738,6 +741,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.services["request_cache"] = self.request_cache
 
         self.signal_handler = signal_handler
+        self.modulestore_cache = modulestore_cache
 
     def close_connections(self):
         """
@@ -3123,6 +3127,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise TypeError(f'new_id must be an ObjectId, but is {new_id!r}')
         index_entry['versions'][branch] = new_id
         self.update_course_index(course_key, index_entry)
+        self.modulestore_cache.invalidate_course(course_key)
 
     def partition_xblock_fields_by_scope(self, xblock):
         """

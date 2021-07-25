@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from openedx.core.lib.cache_utils import get_cache
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -177,6 +178,8 @@ def override_field_for_ccx(ccx, block, name, value):
     _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name] = value_json
     _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name + "_instance"] = override
 
+    modulestore().modulestore_cache.invalidate_course(block.location.course)
+
 
 def clear_override_for_ccx(ccx, block, name):
     """
@@ -192,6 +195,7 @@ def clear_override_for_ccx(ccx, block, name):
             field=name).delete()
 
         clear_ccx_field_info_from_ccx_map(ccx, block, name)
+        modulestore().modulestore_cache.invalidate_course(block.location.course)
 
     except CcxFieldOverride.DoesNotExist:
         pass

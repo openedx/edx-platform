@@ -533,6 +533,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  user_service=None,
                  signal_handler=None,
                  retry_wait_time=0.1,
+                 modulestore_cache=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -580,6 +581,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         self._course_run_cache = {}
         self.signal_handler = signal_handler
+        self.modulestore_cache = modulestore_cache
 
     def close_connections(self):
         """
