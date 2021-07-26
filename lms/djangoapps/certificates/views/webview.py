@@ -343,7 +343,7 @@ def _get_user_certificate(request, user, course_key, course_overview, preview_mo
     user_certificate = None
     if preview_mode:
         # certificate is being previewed from studio
-        if request.user.has_perm(PREVIEW_CERTIFICATES, course):
+        if request.user.has_perm(PREVIEW_CERTIFICATES, course_overview):
             if (
                 course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
                 and course_overview.certificate_available_date

@@ -226,7 +226,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     @ddt.data(
         (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
         (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, False, True),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, True),
         (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None),
         (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True),
         (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
