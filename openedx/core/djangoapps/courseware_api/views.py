@@ -86,7 +86,6 @@ class CoursewareMeta:
             self.request.user,
             'load',
             check_if_enrolled=True,
-            check_survey_complete=False,
             check_if_authenticated=True,
         )
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
@@ -165,7 +164,7 @@ class CoursewareMeta:
         return self.course.license
 
     @property
-    def can_load_courseware(self) -> dict:
+    def course_access(self) -> dict:
         """
         Can the user load this course in the learning micro-frontend?
 

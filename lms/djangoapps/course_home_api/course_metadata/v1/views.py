@@ -6,20 +6,19 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=reimported
-
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
-from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
 
-from common.djangoapps.student.models import CourseEnrollment, UserCelebration  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible
 
 
 class CourseHomeMetadataView(RetrieveAPIView):
@@ -71,22 +70,38 @@ class CourseHomeMetadataView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
+        original_user_is_global_staff = self.request.user.is_staff
         original_user_is_staff = has_access(request.user, 'staff', course_key).has_access
+
+        course = course_detail(request, request.user.username, course_key)
+
+        # We must compute course load access *before* setting up masquerading,
+        # else course staff (who are not enrolled) will not be able view
+        # their course from the perspective of a learner.
+        load_access = check_course_access(
+            course,
+            request.user,
+            'load',
+            check_if_enrolled=True,
+            check_if_authenticated=True,
+        )
 
         _, request.user = setup_masquerade(
             request,
             course_key,
-            staff_access=has_access(request.user, 'staff', course_key),
+            staff_access=original_user_is_staff,
             reset_masquerade_data=True,
         )
 
         username = request.user.username if request.user.username else None
-        course = course_detail(request, request.user.username, course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key_string)
         user_is_enrolled = bool(enrollment and enrollment.is_active)
 
-        courseware_meta = CoursewareMeta(course_key, request, request.user.username)
-        can_load_courseware = courseware_meta.is_microfrontend_enabled_for_user()
+        can_load_courseware = courseware_mfe_is_visible(
+            course_key=course_key,
+            is_global_staff=original_user_is_global_staff,
+            is_course_staff=original_user_is_staff
+        )
 
         browser_timezone = self.request.query_params.get('browser_timezone', None)
         celebrations = get_celebrations_dict(request.user, enrollment, course, browser_timezone)
@@ -98,10 +113,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'original_user_is_staff': original_user_is_staff,
             'number': course.display_number_with_default,
             'org': course.display_org_with_default,
+            'start': course.start,
             'tabs': get_course_tab_list(request.user, course),
             'title': course.display_name_with_default,
             'is_self_paced': getattr(course, 'self_paced', False),
             'is_enrolled': user_is_enrolled,
+            'course_access': load_access.to_json(),
             'can_load_courseware': can_load_courseware,
             'celebrations': celebrations,
         }
