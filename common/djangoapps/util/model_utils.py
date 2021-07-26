@@ -9,6 +9,12 @@ from django.dispatch import Signal
 from django_countries.fields import Country
 from eventtracking import tracker
 
+from common.djangoapps.track import contexts, segment
+ENTERPRISE_ENABLED = 'enterprise' in settings.INSTALLED_APPS \
+                     and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
+if ENTERPRISE_ENABLED:
+    from enterprise.models import EnterpriseCourseEnrollment
+
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 # Used to signal a field value change
@@ -154,6 +160,41 @@ def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[
 
     # Announce field change
     USER_FIELDS_CHANGED.send(sender=None, user=user, table=db_table, changed_fields=changed_fields)
+
+
+def emit_course_completed_tracking_event(user, course_id):
+    """Emits an event for a course completion.
+
+    Args:
+        user (User): the user that completed this course
+        course_id (str): the course id of course that is completed
+
+    Returns:
+        None
+    """
+    context = contexts.course_context_from_course_id(course_id)
+    if ENTERPRISE_ENABLED:
+        enterprise_uuids = EnterpriseCourseEnrollment.get_enterprise_uuids_with_user_and_course(user.id, str(course_id))
+        if enterprise_uuids:
+            context["enterprise_uuid"] = str(enterprise_uuids[0])
+
+    data = {
+        'user_id': user.id,
+        'username': user.username,
+        'course_id': str(course_id),
+    }
+    segment_properties = {
+        'category': 'conversion',
+        'label': str(course_id),
+        'org': course_id.org,
+        'course': course_id.course,
+        'run': course_id.run,
+        'email': user.email
+    }
+    event_name = 'edx.course.completed'
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, data)
+        segment.track(user.id, event_name, segment_properties)
 
 
 def _get_truncated_setting_value(value, max_length=None):

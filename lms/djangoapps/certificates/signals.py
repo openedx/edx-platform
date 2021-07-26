@@ -29,6 +29,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
+from common.djangoapps.util.model_utils import emit_course_completed_tracking_event
 
 log = logging.getLogger(__name__)
 
@@ -69,6 +70,7 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
 
     If needed, generate a certificate task.
     """
+    emit_course_completed_tracking_event(user, course_id)
     if not auto_certificate_generation_enabled():
         return
 

@@ -11,6 +11,7 @@ from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import cert_generation_enabled
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -215,6 +216,69 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 with mock_passing_grade():
                     grade_factory.update(self.user, self.course)
                     mock_cert_task.assert_called_with(self.user, self.course_key)
+
+
+class PassingGradeCertsEventsTest(EventTestMixin):
+    """
+    Tests for course completion event on certificate generation task firing on passing grade receipt
+    """
+
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super().setUp('common.djangoapps.util.model_utils.tracker')
+        self.course = CourseFactory.create(
+            self_paced=True,
+        )
+        self.course_key = self.course.id
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="verified",
+        )
+        self.ip_course = CourseFactory.create(self_paced=False)
+        self.ip_enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.ip_course.id,
+            is_active=True,
+            mode="verified",
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            status='submitted'
+        )
+        attempt.approve()
+
+    def test_cert_already_generated_with_events(self):
+        with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+                return_value=None
+        ) as mock_generate_certificate_apply_async:
+            grade_factory = CourseGradeFactory()
+            # Create the certificate
+            GeneratedCertificateFactory(
+                user=self.user,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable
+            )
+            # Certs are not re-fired after passing
+            with mock_passing_grade():
+                grade_factory.update(self.user, self.course)
+                mock_generate_certificate_apply_async.assert_not_called()
+
+            self.assert_completion_event_was_emitted(self.user, self.course.id)
+
+    def assert_completion_event_was_emitted(self, user, course_key):
+        """Ensures an enrollment event was emitted since the last event related assertion"""
+        self.mock_tracker.emit.assert_called_once_with(
+            'edx.course.completed',
+            {
+                'course_id': str(course_key),
+                'user_id': user.pk,
+                'username': user.username
+            }
+        )
+        self.mock_tracker.reset_mock()
 
 
 @ddt.ddt
