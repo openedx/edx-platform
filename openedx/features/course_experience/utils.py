@@ -12,6 +12,7 @@ from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import get_usage_key_hash
 
 
 @request_cached()
@@ -38,6 +39,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         children = block.get('children', [])
 
         for i in range(len(children)):
+            block['hash_key'] = get_usage_key_hash(block['id'])
             child_id = block['children'][i]
             child_detail = populate_children(all_blocks[child_id], all_blocks)
             block['children'][i] = child_detail
