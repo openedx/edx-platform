@@ -4,8 +4,6 @@ MixedModuleStore allows for aggregation between multiple modulestores.
 In this way, courses can be served up via either SplitMongoModuleStore or MongoModuleStore.
 
 """
-
-
 import functools
 import itertools
 import logging
@@ -18,6 +16,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from xmodule.assetstore import AssetMetadata
 
 from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreEnum, ModuleStoreWriteBase
+from .caching import ModuleStoreCache
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .exceptions import DuplicateCourseError, ItemNotFoundError
 from .split_migrator import SplitMigrator
@@ -137,7 +136,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             user_service=None,
             create_modulestore_instance=None,
             signal_handler=None,
-            modulestore_cache=None,
             **kwargs
     ):
         """
@@ -151,6 +149,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         self.modulestores = []
         self.mappings = {}
+        self.modulestore_cache = ModuleStoreCache()
 
         for course_id, store_name in mappings.items():
             try:
@@ -158,8 +157,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             except InvalidKeyError:
                 log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
                 continue
-
-#        import pudb; pu.db
 
         for store_settings in stores:
             key = store_settings['NAME']
@@ -172,7 +169,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 fs_service=fs_service,
                 user_service=user_service,
                 signal_handler=signal_handler,
-                modulestore_cache=modulestore_cache,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.items():

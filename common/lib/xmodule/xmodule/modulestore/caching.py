@@ -49,11 +49,6 @@ class ModuleStoreCache:
         """Init our namespaced request cache."""
         self._request_cache = RequestCache('ModuleStoreCache')
 
-        # This is a secondary lookup just in case we are holding a large number
-        # of courses in the cache for some reason. That way we don't have to
-        # iterate through all keys when doing invalidation.
-        self._courses_to_depths = defaultdict(set)
-
     def get_course(self, course_key, depth):
         cache_key = (course_key, depth)
         return self._request_cache.get_cached_response(cache_key)
@@ -61,14 +56,16 @@ class ModuleStoreCache:
     def update_course(self, course_key, depth, course):
         cache_key = (course_key, depth)
         self._request_cache.set(cache_key, course)
-        self._courses_to_depths[course_key].add(depth)
 
     def invalidate_course(self, course_key):
         # Remember that there may be multiple keys for the same course
-        for depth in self._courses_to_depths[course_key]:
-            cache_key = (course_key, depth)
+        cache_keys_to_del = [
+            cache_key
+            for cache_key in self._request_cache.data
+            if cache_key[0] == course_key  # cache_key is (course_key, depth)
+        ]
+        for cache_key in cache_keys_to_del:
             self._request_cache.delete(cache_key)
-        self._courses_to_depths[course_key] = set()
 
 
 class CachingModuleStoreWrapper:

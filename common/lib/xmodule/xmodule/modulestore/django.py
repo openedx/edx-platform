@@ -239,7 +239,6 @@ def create_modulestore_instance(
         fs_service=None,
         user_service=None,
         signal_handler=None,
-        modulestore_cache=None
 ):
     """
     This will return a new instance of a modulestore given an engine and options
@@ -303,7 +302,6 @@ def create_modulestore_instance(
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
         signal_handler=signal_handler or SignalHandler(class_),
-        modulestore_cache=modulestore_cache,
         **_options
     )
 
@@ -325,7 +323,6 @@ def modulestore():
             contentstore(),
             settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
             settings.MODULESTORE['default'].get('OPTIONS', {}),
-            modulestore_cache=modulestore_cache,
         )
 
         if settings.FEATURES.get('CUSTOM_COURSES_EDX'):

@@ -53,8 +53,6 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
-
-
 import copy
 import datetime
 import hashlib
@@ -93,6 +91,7 @@ from xmodule.modulestore import (
     SortedAssetList,
     inheritance
 )
+from xmodule.modulestore.caching import ModuleStoreCache
 from xmodule.modulestore.exceptions import (
     DuplicateCourseError,
     DuplicateItemError,
@@ -108,6 +107,7 @@ from xmodule.partitions.partitions_service import PartitionService
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
+
 
 log = logging.getLogger(__name__)
 
@@ -709,7 +709,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None, fs_service=None, user_service=None,
-                 services=None, signal_handler=None, modulestore_cache=None, **kwargs):
+                 services=None, signal_handler=None, **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
@@ -741,7 +741,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.services["request_cache"] = self.request_cache
 
         self.signal_handler = signal_handler
-        self.modulestore_cache = modulestore_cache
+        self.modulestore_cache = ModuleStoreCache()
 
     def close_connections(self):
         """

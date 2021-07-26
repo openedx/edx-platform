@@ -41,6 +41,7 @@ from xmodule.errortracker import exc_info_to_str, null_error_tracker
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import BulkOperationsMixin, BulkOpsRecord, ModuleStoreEnum, ModuleStoreWriteBase
+from xmodule.modulestore.caching import ModuleStoreCache
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, ReferentialIntegrityError
@@ -533,7 +534,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  user_service=None,
                  signal_handler=None,
                  retry_wait_time=0.1,
-                 modulestore_cache=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -581,7 +581,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         self._course_run_cache = {}
         self.signal_handler = signal_handler
-        self.modulestore_cache = modulestore_cache
+        self.modulestore_cache = ModuleStoreCache()
 
     def close_connections(self):
         """
