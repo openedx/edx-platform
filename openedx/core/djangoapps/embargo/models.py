@@ -16,7 +16,6 @@ import ipaddress
 import json
 import logging
 
-from django.utils.encoding import python_2_unicode_compatible
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.db import models
@@ -36,7 +35,6 @@ from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 log = logging.getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
@@ -73,7 +71,6 @@ class EmbargoedCourse(models.Model):
         return f"Course '{str(self.course_id)}' is {not_em}Embargoed"
 
 
-@python_2_unicode_compatible
 class EmbargoedState(ConfigurationModel):
     """
     Register countries to be embargoed.
@@ -101,7 +98,6 @@ class EmbargoedState(ConfigurationModel):
         return self.embargoed_countries
 
 
-@python_2_unicode_compatible
 class RestrictedCourse(models.Model):
     """
     Course with access restrictions.
@@ -373,7 +369,6 @@ class RestrictedCourse(models.Model):
         log.info("Invalidated cached messaging URLs ")
 
 
-@python_2_unicode_compatible
 class Country(models.Model):
     """Representation of a country.
 
@@ -399,7 +394,6 @@ class Country(models.Model):
         ordering = ['country']
 
 
-@python_2_unicode_compatible
 class CountryAccessRule(models.Model):
     """Course access rule based on the user's country.
 
@@ -682,7 +676,6 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sender=CountryAccessRule)
 
 
-@python_2_unicode_compatible
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.

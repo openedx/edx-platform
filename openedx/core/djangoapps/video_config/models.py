@@ -6,14 +6,13 @@ Configuration models for Video XModule
 from config_models.models import ConfigurationModel
 from django.db import models
 from django.db.models import BooleanField, PositiveIntegerField, TextField
-from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 URL_REGEX = r'^[a-zA-Z0-9\-_]*$'
 
 
-@python_2_unicode_compatible
+
 class HLSPlaybackEnabledFlag(ConfigurationModel):
     """
     Enables HLS Playback across the platform.
@@ -65,7 +64,6 @@ class HLSPlaybackEnabledFlag(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
     """
     Enables HLS Playback for a specific course. Global feature must be
@@ -96,7 +94,6 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class CourseYoutubeBlockedFlag(ConfigurationModel):
     """
     Disables the playback of youtube videos for a given course.
@@ -132,7 +129,6 @@ class CourseYoutubeBlockedFlag(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class VideoTranscriptEnabledFlag(ConfigurationModel):
     """
     Enables Video Transcript across the platform.
@@ -178,7 +174,6 @@ class VideoTranscriptEnabledFlag(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
     """
     Enables Video Transcript for a specific course. Global feature must be
@@ -203,7 +198,6 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class TranscriptMigrationSetting(ConfigurationModel):
     """
     Arguments for the Transcript Migration management command
@@ -247,7 +241,6 @@ class TranscriptMigrationSetting(ConfigurationModel):
         return self.command_run
 
 
-@python_2_unicode_compatible
 class MigrationEnqueuedCourse(TimeStampedModel):
     """
     Temporary model to persist the course IDs who has been enqueued for transcripts migration to S3.
@@ -263,7 +256,6 @@ class MigrationEnqueuedCourse(TimeStampedModel):
         )
 
 
-@python_2_unicode_compatible
 class VideoThumbnailSetting(ConfigurationModel):
     """
     Arguments for the Video Thumbnail management command
@@ -306,7 +298,6 @@ class VideoThumbnailSetting(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class UpdatedCourseVideos(TimeStampedModel):
     """
     Temporary model to persist the course videos which have been enqueued to update video thumbnails.
