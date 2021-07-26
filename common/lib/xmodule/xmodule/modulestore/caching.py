@@ -117,6 +117,7 @@ class CachingModuleStoreWrapper:
         if use_cache:
             cache_response = self._modulestore_cache.get_course(course_key, depth)
             if cache_response.is_found:
+                print(f"Cache hit for {course_key}!")
                 return cache_response.value
 
         course = self._modulestore.get_course(course_key, depth, **kwargs)

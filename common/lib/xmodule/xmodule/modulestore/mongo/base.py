@@ -1543,6 +1543,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
+
+            self.modulestore_cache.invalidate_course(course_key)
             # fire signal that we've written to DB
         except ItemNotFoundError:
             if not allow_not_found:  # lint-amnesty, pylint: disable=no-else-raise
