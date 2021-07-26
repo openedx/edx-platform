@@ -415,7 +415,11 @@ def clean_certificate_available_date():
     command is meant to be ran one time to clean up any courses that were not supposed to have 
     certificate_available_date
     """
-    course_run_list = CourseOverview.objects.exclude(self_paced=0, certificates_display_behavior="end", certificate_available_date__isnull=False)
+    course_run_list = CourseOverview.objects.exclude(
+        self_paced=0,
+        certificates_display_behavior="end",
+        certificate_available_date__isnull=False
+    )
     for index, course_run in enumerate(course_run_list):
         logger.info(
             f"removing certificate_available_date for course {course_run.id}"

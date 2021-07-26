@@ -1,7 +1,7 @@
 """
     This task will clean out the misconfigured certificate available date. When courses Change their
     certificates_display_behavior, the certificate_available_date was not updating properly. This is
-    command is meant to be ran one time to clean up any courses that were not supposed to have 
+    command is meant to be ran one time to clean up any courses that were not supposed to have
     certificate_available_date
 """
 from django.core.management.base import BaseCommand
