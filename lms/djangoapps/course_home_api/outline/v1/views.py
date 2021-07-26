@@ -57,6 +57,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.discounts.utils import generate_offer_data
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import get_usage_key_hash
 
 
 class UnableToDismissWelcomeMessage(APIException):
@@ -104,6 +105,7 @@ class OutlineTabView(RetrieveAPIView):
                     the child blocks.
                 resume_block: (bool) Whether the block is the resume block
                 has_scheduled_content: (bool) Whether the block has more content scheduled for the future
+                hash_key: (str) The blake2b hash of the usage ID of the block.
         course_goals:
             goal_options: (list) A list of goals where each goal is represented as a tuple (goal_key, goal_string)
             selected_goal:
@@ -298,8 +300,7 @@ class OutlineTabView(RetrieveAPIView):
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
-            available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
-
+            available_seq_ids = {get_usage_key_hash(usage_key) for usage_key in user_course_outline.sequences}
             # course_blocks is a reference to the root of the course, so we go
             # through the chapters (sections) to look for sequences to remove.
             for chapter_data in course_blocks['children']:
@@ -307,7 +308,7 @@ class OutlineTabView(RetrieveAPIView):
                     seq_data
                     for seq_data in chapter_data['children']
                     if (
-                        seq_data['id'] in available_seq_ids or
+                        seq_data['hash_key'] in available_seq_ids or
                         # Edge case: Sometimes we have weird course structures.
                         # We expect only sequentials here, but if there is
                         # another type, just skip it (don't filter it out).
