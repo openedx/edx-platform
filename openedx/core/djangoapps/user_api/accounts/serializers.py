@@ -13,6 +13,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
 
+from edx_name_affirmation.toggles import is_verified_name_enabled
+
 from common.djangoapps.student.models import UserPasswordToggleHistory
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -161,6 +163,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "social_links": None,
             "extended_profile_fields": None,
             "phone_number": None,
+            "is_verified_name_enabled": is_verified_name_enabled(),
         }
 
         if user_profile:

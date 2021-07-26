@@ -47,10 +47,13 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
-    if _can_generate_allowlist_certificate(user, course_key):
-        return _generate_certificate_task(user=user, course_key=course_key, generation_mode=generation_mode)
+    enrollment_mode = _get_enrollment_mode(user, course_key)
+    course_grade = _get_course_grade(user, course_key)
+    if _can_generate_allowlist_certificate(user, course_key, enrollment_mode):
+        return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
+                                          course_grade=course_grade, generation_mode=generation_mode)
 
-    status = _set_allowlist_cert_status(user, course_key)
+    status = _set_allowlist_cert_status(user, course_key, enrollment_mode, course_grade)
     if status is not None:
         return True
 
@@ -62,25 +65,32 @@ def _generate_regular_certificate_task(user, course_key, generation_mode=None):
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
     """
-    if _can_generate_regular_certificate(user, course_key):
-        return _generate_certificate_task(user=user, course_key=course_key, generation_mode=generation_mode)
+    enrollment_mode = _get_enrollment_mode(user, course_key)
+    course_grade = _get_course_grade(user, course_key)
+    if _can_generate_regular_certificate(user, course_key, enrollment_mode, course_grade):
+        return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
+                                          course_grade=course_grade, generation_mode=generation_mode)
 
-    status = _set_regular_cert_status(user, course_key)
+    status = _set_regular_cert_status(user, course_key, enrollment_mode, course_grade)
     if status is not None:
         return True
 
     return False
 
 
-def _generate_certificate_task(user, course_key, status=None, generation_mode=None):
+def _generate_certificate_task(user, course_key, enrollment_mode, course_grade, status=None, generation_mode=None):
     """
     Create a task to generate a certificate
     """
     log.info(f'About to create a regular certificate task for {user.id} : {course_key}')
 
+    course_grade_val = _get_grade_value(course_grade)
+
     kwargs = {
         'student': str(user.id),
-        'course_key': str(course_key)
+        'course_key': str(course_key),
+        'enrollment_mode': str(enrollment_mode),
+        'course_grade': str(course_grade_val)
     }
     if status is not None:
         kwargs['status'] = status
@@ -91,7 +101,7 @@ def _generate_certificate_task(user, course_key, status=None, generation_mode=No
     return True
 
 
-def _can_generate_allowlist_certificate(user, course_key):
+def _can_generate_allowlist_certificate(user, course_key, enrollment_mode):
     """
     Check if an allowlist certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
@@ -103,7 +113,7 @@ def _can_generate_allowlist_certificate(user, course_key):
 
     log.info(f'{user.id} : {course_key} is on the certificate allowlist')
 
-    if not _can_generate_certificate_common(user, course_key):
+    if not _can_generate_certificate_common(user, course_key, enrollment_mode):
         log.info(f'One of the common checks failed. Allowlist certificate cannot be generated for {user.id} : '
                  f'{course_key}.')
         return False
@@ -112,7 +122,7 @@ def _can_generate_allowlist_certificate(user, course_key):
     return True
 
 
-def _can_generate_regular_certificate(user, course_key):
+def _can_generate_regular_certificate(user, course_key, enrollment_mode, course_grade):
     """
     Check if a regular (non-allowlist) course certificate can be generated (created if it doesn't already exist, or
     updated if it does exist) for this user, in this course run.
@@ -125,11 +135,11 @@ def _can_generate_regular_certificate(user, course_key):
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
 
-    if not _has_passing_grade(user, course_key):
+    if not _is_passing_grade(course_grade):
         log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
         return False
 
-    if not _can_generate_certificate_common(user, course_key):
+    if not _can_generate_certificate_common(user, course_key, enrollment_mode):
         log.info(f'One of the common checks failed. Certificate cannot be generated for {user.id} : {course_key}.')
         return False
 
@@ -137,7 +147,7 @@ def _can_generate_regular_certificate(user, course_key):
     return True
 
 
-def _can_generate_certificate_common(user, course_key):
+def _can_generate_certificate_common(user, course_key, enrollment_mode):
     """
     Check if a course certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
@@ -149,7 +159,6 @@ def _can_generate_certificate_common(user, course_key):
         log.info(f'{user.id} : {course_key} is on the certificate invalidation list. Certificate cannot be generated.')
         return False
 
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     if enrollment_mode is None:
         log.info(f'{user.id} : {course_key} does not have an enrollment. Certificate cannot be generated.')
         return False
@@ -179,45 +188,45 @@ def _can_generate_certificate_common(user, course_key):
     return True
 
 
-def _set_allowlist_cert_status(user, course_key):
+def _set_allowlist_cert_status(user, course_key, enrollment_mode, course_grade):
     """
     Determine the allowlist certificate status for this user, in this course run and update the cert.
 
     This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
     be generated.
     """
-    if not _can_set_allowlist_cert_status(user, course_key):
+    if not _can_set_allowlist_cert_status(user, course_key, enrollment_mode):
         return None
 
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
-    return _get_cert_status_common(user, course_key, cert)
+    return _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cert)
 
 
-def _set_regular_cert_status(user, course_key):
+def _set_regular_cert_status(user, course_key, enrollment_mode, course_grade):
     """
     Determine the regular (non-allowlist) certificate status for this user, in this course run.
 
     This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
     be generated.
     """
-    if not _can_set_regular_cert_status(user, course_key):
+    if not _can_set_regular_cert_status(user, course_key, enrollment_mode):
         return None
 
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
-    status = _get_cert_status_common(user, course_key, cert)
+    status = _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cert)
     if status is not None:
         return status
 
-    if IDVerificationService.user_is_verified(user) and not _has_passing_grade(user, course_key) and cert is not None:
+    if IDVerificationService.user_is_verified(user) and not _is_passing_grade(course_grade) and cert is not None:
         if cert.status != CertificateStatuses.notpassing:
-            course_grade = _get_course_grade(user, course_key)
-            cert.mark_notpassing(course_grade.percent, source='certificate_generation')
+            course_grade_val = _get_grade_value(course_grade)
+            cert.mark_notpassing(course_grade_val, source='certificate_generation')
         return CertificateStatuses.notpassing
 
     return None
 
 
-def _get_cert_status_common(user, course_key, cert):
+def _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cert):
     """
     Determine the certificate status for this user, in this course run.
 
@@ -229,10 +238,12 @@ def _get_cert_status_common(user, course_key, cert):
             cert.invalidate(source='certificate_generation')
         return CertificateStatuses.unavailable
 
-    if not IDVerificationService.user_is_verified(user) and _has_passing_grade_or_is_allowlisted(user, course_key):
+    if not IDVerificationService.user_is_verified(user) and _has_passing_grade_or_is_allowlisted(user, course_key,
+                                                                                                 course_grade):
         if cert is None:
-            _generate_certificate_task(user=user, course_key=course_key, generation_mode='batch',
-                                       status=CertificateStatuses.unverified)
+            _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
+                                       course_grade=course_grade, status=CertificateStatuses.unverified,
+                                       generation_mode='batch')
         elif cert.status != CertificateStatuses.unverified:
             cert.mark_unverified(source='certificate_generation')
         return CertificateStatuses.unverified
@@ -240,17 +251,17 @@ def _get_cert_status_common(user, course_key, cert):
     return None
 
 
-def _can_set_allowlist_cert_status(user, course_key):
+def _can_set_allowlist_cert_status(user, course_key, enrollment_mode):
     """
     Determine whether we can set a custom (non-downloadable) cert status for an allowlist certificate
     """
     if not is_on_certificate_allowlist(user, course_key):
         return False
 
-    return _can_set_cert_status_common(user, course_key)
+    return _can_set_cert_status_common(user, course_key, enrollment_mode)
 
 
-def _can_set_regular_cert_status(user, course_key):
+def _can_set_regular_cert_status(user, course_key, enrollment_mode):
     """
     Determine whether we can set a custom (non-downloadable) cert status for a regular (non-allowlist) certificate
     """
@@ -260,17 +271,16 @@ def _can_set_regular_cert_status(user, course_key):
     if _is_beta_tester(user, course_key):
         return False
 
-    return _can_set_cert_status_common(user, course_key)
+    return _can_set_cert_status_common(user, course_key, enrollment_mode)
 
 
-def _can_set_cert_status_common(user, course_key):
+def _can_set_cert_status_common(user, course_key, enrollment_mode):
     """
     Determine whether we can set a custom (non-downloadable) cert status
     """
     if _is_cert_downloadable(user, course_key):
         return False
 
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     if enrollment_mode is None:
         return False
 
@@ -329,7 +339,7 @@ def _is_ccx_course(course_key):
     return hasattr(course_key, 'ccx')
 
 
-def _has_passing_grade_or_is_allowlisted(user, course_key):
+def _has_passing_grade_or_is_allowlisted(user, course_key, course_grade):
     """
     Check if the user has a passing grade in this course run, or is on the allowlist and so is exempt from needing
     a passing grade.
@@ -337,22 +347,40 @@ def _has_passing_grade_or_is_allowlisted(user, course_key):
     if is_on_certificate_allowlist(user, course_key):
         return True
 
-    return _has_passing_grade(user, course_key)
+    return _is_passing_grade(course_grade)
 
 
-def _has_passing_grade(user, course_key):
+def _is_passing_grade(course_grade):
     """
-    Check if the user has a passing grade in this course run
+    Check if the grade is a passing grade
     """
-    course_grade = _get_course_grade(user, course_key)
-    return course_grade.passed
+    if course_grade:
+        return course_grade.passed
+    return False
+
+
+def _get_grade_value(course_grade):
+    """
+    Get the user's course grade as a percent, or an empty string if there is no grade
+    """
+    if course_grade:
+        return course_grade.percent
+    return ''
 
 
 def _get_course_grade(user, course_key):
     """
-    Get the user's course grade in this course run
+    Get the user's course grade in this course run. Note that this may be None.
     """
     return CourseGradeFactory().read(user, course_key=course_key)
+
+
+def _get_enrollment_mode(user, course_key):
+    """
+    Get the user's enrollment mode for this course run. Note that this may be None.
+    """
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    return enrollment_mode
 
 
 def _is_cert_downloadable(user, course_key):

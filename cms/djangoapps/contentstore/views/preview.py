@@ -35,7 +35,7 @@ from xmodule.error_module import ErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
+from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -217,7 +217,8 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
-            "partitions": StudioPartitionService(course_id=course_id)
+            "partitions": StudioPartitionService(course_id=course_id),
+            "teams_configuration": TeamsConfigurationService(),
         },
     )
 

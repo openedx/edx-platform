@@ -2,7 +2,6 @@
 Tests for certificate generation
 """
 import logging
-from unittest import mock
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -15,9 +14,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
-
-ENROLLMENT_METHOD = 'lms.djangoapps.certificates.generation._get_enrollment_mode'
-GRADE_METHOD = 'lms.djangoapps.certificates.generation._get_course_grade'
 
 
 class CertificateTests(EventTestMixin, ModuleStoreTestCase):
@@ -163,18 +159,3 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
                                                      self.enrollment_mode, self.grade, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid != ''
-
-    def test_generation_few_params(self):
-        """
-        Test that ensures we retrieve values as needed
-        """
-        grade = '.33'
-        enrollment_mode = CourseMode.AUDIT
-
-        with mock.patch(ENROLLMENT_METHOD, return_value=enrollment_mode):
-            with mock.patch(GRADE_METHOD, return_value=grade):
-                generated_cert = generate_course_certificate(self.u, self.key, CertificateStatuses.downloadable)
-
-                assert generated_cert.status, CertificateStatuses.downloadable
-                assert generated_cert.mode, enrollment_mode
-                assert generated_cert.grade, grade

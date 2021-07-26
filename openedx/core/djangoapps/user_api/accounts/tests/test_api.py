@@ -554,7 +554,8 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'secondary_email_enabled': None,
             'time_zone': None,
             'course_certificates': None,
-            'phone_number': None
+            'phone_number': None,
+            'is_verified_name_enabled': False,
         }
 
     def test_normalize_password(self):

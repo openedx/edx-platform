@@ -53,15 +53,3 @@ class ProviderDoesNotExistException(Exception):
         return 'Unable to find organization for short_name {}'.format(
             self.organization.id
         )
-
-
-class ProviderConfigurationException(Exception):
-
-    def __init__(self, organization):
-        self.organization = organization
-
-    def __str__(self):
-        return (
-            'Multiple active SAML configurations found for organization={}. '
-            'Expected one.'
-        ).format(self.organization.short_name)

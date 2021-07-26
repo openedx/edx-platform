@@ -4,6 +4,9 @@ Test some of the functions in url_helpers
 from unittest import mock
 
 import ddt
+from django.test import TestCase
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -18,6 +21,33 @@ def _patch_courseware_mfe_is_active(ret_val):
         'courseware_mfe_is_active',
         return_value=ret_val,
     )
+
+
+@ddt.ddt
+class IsLearningMfeTests(TestCase):
+    """
+    Test is_request_from_learning_mfe.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.request_factory = RequestFactory()
+
+    @ddt.data(
+        ('', '', False,),
+        ('https://mfe-url/', 'https://platform-url/course', False,),
+        ('https://mfe-url/', 'https://mfe-url/course', True,),
+        ('https://mfe-url/', 'https://mfe-url/', True,),
+        ('https://mfe-url/subpath/', 'https://platform-url/course', False,),
+        ('https://mfe-url/subpath/', 'https://mfe-url/course', True,),
+        ('https://mfe-url/subpath/', 'https://mfe-url/', True,),
+    )
+    @ddt.unpack
+    def test_is_request_from_learning_mfe(self, mfe_url, referrer_url, is_mfe):
+        with override_settings(LEARNING_MICROFRONTEND_URL=mfe_url):
+            request = self.request_factory.get('/course')
+            request.META['HTTP_REFERER'] = referrer_url
+            assert url_helpers.is_request_from_learning_mfe(request) == is_mfe
 
 
 @ddt.ddt
