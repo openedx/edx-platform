@@ -710,11 +710,15 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
             f"Failed to update certificate availability date for course {course_key}. Reason: {error_msg}"
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
-    # Always update the course certificate with the new certificate available date
-    update_credentials_course_certificate_configuration_available_date.delay(
-        str(course_key),
-        certificate_available_date
-    )
+    # update the course certificate with the new certificate available date if:
+    # - The course is self paced
+    # - The certificates_display_behavior is not "end"
+    course_overview = CourseOverview.get_from_id(course_key)
+    if course_overview.self_paced is False and course_overview.certificates_display_behavior == 'end':
+        update_credentials_course_certificate_configuration_available_date.delay(
+            str(course_key),
+            certificate_available_date
+        )
     users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
         course_id=course_key
     ).values_list('user__username', flat=True)
