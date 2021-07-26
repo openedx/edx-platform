@@ -1467,6 +1467,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'$set': update},
             upsert=allow_not_found,
         )
+        self.modulestore_cache.invalidate_course(location.course)
         if result.matched_count == 0 and result.upserted_id is None:
             raise ItemNotFoundError(location)
 
@@ -1602,6 +1603,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                         {'$set': {'definition.children': []}},
                         upsert=True,
                     )
+                    self.modulestore_cache.invalidate_course(location.course)
                 elif ancestor_loc.block_type == 'course':
                     # once we reach the top location of the tree and if the location is not an orphan then the
                     # parent is not an orphan either
