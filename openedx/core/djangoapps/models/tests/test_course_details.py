@@ -10,9 +10,11 @@ from pytz import UTC
 
 from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+EXAMPLE_CERTIFICATE_AVAILABLE_DATE = datetime.date(2020, 1, 1)
 
 @ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
@@ -142,3 +144,59 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         assert CourseDetails.fetch_youtube_video_id(self.course.id) == video_value
         video_url = CourseDetails.fetch_video_url(self.course.id)
         self.assertRegex(video_url, fr'http://.*{video_value}')
+
+    @ddt.data(
+        (
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.END,
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        ),
+        (
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.END_WITH_DATE,
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        ),
+        (
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO,
+            None,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO
+        ),
+        (
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            "invalid_option",
+            EXAMPLE_CERTIFICATE_AVAILABLE_DATE,
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        ),
+        (
+            None,
+            CertificatesDisplayBehaviors.END,
+            None,
+            CertificatesDisplayBehaviors.END
+        ),
+        (
+            None,
+            CertificatesDisplayBehaviors.END_WITH_DATE,
+            None,
+            CertificatesDisplayBehaviors.END
+        ),
+        (
+            None,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO,
+            None,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO
+        ),
+        (
+            None,
+            "invalid_option",
+            None,
+            CertificatesDisplayBehaviors.END
+        ),
+    )
+    @ddt.unpack
+    def test_validate_certificate_settings(self, stored_date, stored_behavior, expected_date, expected_behavior):
+        assert CourseDetails.validate_certificate_settings(
+            stored_date, stored_behavior
+        ) == (expected_date, expected_behavior)

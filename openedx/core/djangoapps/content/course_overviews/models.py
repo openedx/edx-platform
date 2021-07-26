@@ -219,7 +219,10 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_image_url = course_image_url(course)
         course_overview.social_sharing_url = course.social_sharing_url
 
-        updated_display_behavior, updated_available_date = cls.validate_certificate_settings(course)
+        updated_available_date, updated_display_behavior = CourseDetails.validate_certificate_settings(
+            course.certificate_available_date,
+            course.certificates_display_behavior
+        )
 
         course_overview.certificates_display_behavior = updated_display_behavior
         course_overview.certificate_available_date = updated_available_date
@@ -892,35 +895,6 @@ class CourseOverview(TimeStampedModel):
         TODO: move this to the model.
         """
         return self._original_course.edxnotes_visibility
-
-    @staticmethod
-    def validate_certificate_settings(course):
-        """
-        Take a course and returns validated certificate display settings
-
-        Arguments:
-            course (CourseBlock): any course descriptor object
-
-        Returns:
-            tuple[str, str]: updated certificates_display_behavior, updated certificate_available_date
-            None
-        """
-        # Backwards compatibility for existing courses that set availability date, didn't set behavior,
-        # and expect availability date to be used
-        certificates_display_behavior = course.certificates_display_behavior
-        certificate_available_date = course.certificate_available_date
-
-        if certificate_available_date:
-            certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
-
-        if not CertificatesDisplayBehaviors.includes_value(certificates_display_behavior):
-            certificates_display_behavior = CertificatesDisplayBehaviors.END
-
-        # Null the date if it's not going to be used
-        if certificates_display_behavior != CertificatesDisplayBehaviors.END_WITH_DATE:
-            certificate_available_date = None
-
-        return (certificates_display_behavior, certificate_available_date)
 
     def __str__(self):
         """Represent ourselves with the course key."""
