@@ -714,7 +714,7 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
     # - The course is self paced
     # - The certificates_display_behavior is not "end"
     course_overview = CourseOverview.get_from_id(course_key)
-    if course_overview.self_paced == False and course_overview.certificates_display_behavior == 'end':
+    if course_overview.self_paced is False and course_overview.certificates_display_behavior == 'end':
         update_credentials_course_certificate_configuration_available_date.delay(
             str(course_key),
             certificate_available_date
