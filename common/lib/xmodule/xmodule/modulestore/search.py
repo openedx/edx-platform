@@ -15,7 +15,19 @@ from openedx.core.djangoapps.content.learning_sequences.data import CourseLearni
 
 LOGGER = getLogger(__name__)
 
+
 def get_usage_key_hash(usage_key):
+    '''
+    Get the blake2b hash key for the given usage_key and encode the value. The
+    hash key will be added to the usage key's mapping dictionary for decoding
+    in LMS.
+
+    Args:
+        usage_key: :class:`UsageKey` the id of the location to which to generate the path
+
+    Returns:
+        The string of the encoded hash key.
+    '''
 
     short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
     hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))

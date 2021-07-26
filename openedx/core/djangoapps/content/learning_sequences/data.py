@@ -127,9 +127,10 @@ class CourseLearningSequenceData:
     """
 
     mapping = {}
+
     def short_id_mapping(self, hash, *args, **kwargs):
         usage_key_id = kwargs.get('usage_key', None)
-        if usage_key_id == None:
+        if usage_key_id is None:
             return self.mapping[hash]
         self.mapping[hash] = usage_key_id
 
