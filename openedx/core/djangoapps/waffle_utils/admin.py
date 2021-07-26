@@ -22,7 +22,7 @@ class WaffleFlagCourseOverrideAdmin(KeyedConfigurationModelAdmin):
     search_fields = ['waffle_flag', 'course_id']
     fieldsets = (
         (None, {
-            'fields': ('waffle_flag', 'course_id', 'override_choice', 'enabled'),
+            'fields': ('waffle_flag', 'course_id', 'note', 'override_choice', 'enabled'),
             'description': 'Enter a valid course id and an existing waffle flag. The waffle flag name is not validated.'
         }),
     )
