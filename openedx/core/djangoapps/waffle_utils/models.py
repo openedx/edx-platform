@@ -2,8 +2,7 @@
 Models for configuring waffle utils.
 """
 
-from django.db.models import CharField
-from django.utils.encoding import python_2_unicode_compatible
+from django.db.models import CharField, TextField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from opaque_keys.edx.django.models import CourseKeyField
@@ -12,7 +11,6 @@ from config_models.models import ConfigurationModel
 from openedx.core.lib.cache_utils import request_cached
 
 
-@python_2_unicode_compatible
 class WaffleFlagCourseOverrideModel(ConfigurationModel):
     """
     Used to force a waffle flag on or off for a course.
@@ -28,6 +26,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
     waffle_flag = CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     override_choice = CharField(choices=OVERRIDE_CHOICES, default=OVERRIDE_CHOICES.on, max_length=3)
+    note = TextField(blank=True, help_text='e.g. why this exists and when/if it can be dropped')
 
     @classmethod
     @request_cached()
@@ -56,10 +55,10 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
         return cls.ALL_CHOICES.unset
 
     class Meta:
-        app_label = "waffle_utils"
+        app_label = 'waffle_utils'
         verbose_name = 'Waffle flag course override'
         verbose_name_plural = 'Waffle flag course overrides'
 
     def __str__(self):
-        enabled_label = "Enabled" if self.enabled else "Not Enabled"
-        return f"Course '{str(self.course_id)}': Persistent Grades {enabled_label}"
+        enabled_label = 'Enabled' if self.enabled else 'Not Enabled'
+        return f'Course {str(self.course_id)}: Waffle Override {enabled_label}'
