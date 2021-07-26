@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
+from testfixtures import LogCapture
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -243,21 +244,26 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         assert response.status_code == 302
 
     def test_generate_example_certificates(self):
+        expected_log_message = (
+            "Generating example certificates is no longer supported. Skipping generation of example certificates for "
+            f"course {self.course.id}"
+        )
+
         self.client.login(username=self.global_staff.username, password='test')
         url = reverse(
             'generate_example_certificates',
             kwargs={'course_id': str(self.course.id)}
         )
-        response = self.client.post(url)
+        logging_messages = None
+        with LogCapture() as log:
+            response = self.client.post(url)
+            logging_messages = [log_msg.getMessage() for log_msg in log.records]
+
+        assert logging_messages is not None
+        assert expected_log_message in logging_messages
 
         # Expect a redirect back to the instructor dashboard
         self._assert_redirects_to_instructor_dash(response)
-
-        # Expect that certificate generation started
-        # Cert generation will fail here because XQueue isn't configured,
-        # but the status should at least not be None.
-        status = certs_api.example_certificates_status(self.course.id)
-        assert status is not None
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
