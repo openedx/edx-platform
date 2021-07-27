@@ -7,7 +7,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="bodyclass">verification-process step-select-track</%block>
 <%block name="pagetitle">
     ${_("Enroll In {course_name} | Choose Your Track").format(course_name=course_name)}
 </%block>
@@ -229,4 +229,8 @@ from openedx.core.djangolib.markup import HTML, Text
             </div> <!-- /wrapper-content-main -->
         </section>
     </div>
+
+    %if show_account_activation_popup:
+      <%include file="../_account-activation-modal.html"/>
+    %endif
 </%block>

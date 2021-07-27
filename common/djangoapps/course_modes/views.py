@@ -11,6 +11,7 @@ import six
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from babel.dates import format_datetime
 from babel.numbers import get_currency_symbol
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -157,6 +158,8 @@ class ChooseModeView(View):
         )
         course_id = str(course_key)
 
+        show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
+
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
@@ -176,6 +179,7 @@ class ChooseModeView(View):
                 course_key=course_key
             ),
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
+            "show_account_activation_popup": show_account_activation_popup,
         }
         context.update(
             get_experiment_user_metadata_context(
@@ -233,7 +237,15 @@ class ChooseModeView(View):
                     context['currency_data'] = json.dumps(currency_data)
                 except TypeError:
                     pass
-        return render_to_response("course_modes/choose.html", context)
+
+        response = render_to_response("course_modes/choose.html", context)
+        if show_account_activation_popup:
+            response.delete_cookie(
+                settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path='/',
+            )
+        return response
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)

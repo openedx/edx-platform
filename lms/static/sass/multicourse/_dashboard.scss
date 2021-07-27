@@ -1658,15 +1658,18 @@ a.fade-cover {
     box-shadow: none;
     background: none;
     outline: 0;
+    z-index: 10000;
+    padding: 0;
 
     .inner-wrapper {
-      h3 {
+      .activate-account-modal-title {
           font-family: inherit;
           padding: 1.5rem 1rem 1rem 1rem;
           text-align: left;
           font-weight: bold;
           font-size: 1.3rem;
           line-height: 1.75rem;
+          color: #000000;
       }
         border: none;
         border-radius: 5px;
@@ -1693,10 +1696,20 @@ a.fade-cover {
     .btn-primary {
         text-transform: none;
         font-weight: 500;
+        letter-spacing: 1px;
     }
 }
 .activate-account-modal-body {
     padding: 0 1rem;
+    color: #002121 !important;
+
+    strong {
+      font-weight: 700 !important;
+    }
+
+    a {
+      text-decoration: underline !important;
+    }
 }
 
 .reasons_survey {

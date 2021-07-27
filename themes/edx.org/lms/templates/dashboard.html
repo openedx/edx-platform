@@ -368,6 +368,10 @@ from common.djangoapps.student.models import CourseEnrollment
 </div>
 </section>
 
+%if show_account_activation_popup:
+  <%include file="_account-activation-modal.html"/>
+%endif
+
 <section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">
