@@ -999,3 +999,14 @@ if settings.FEATURES.get('ENABLE_BULK_USER_RETIREMENT'):
     urlpatterns += [
         url(r'', include('lms.djangoapps.bulk_user_retirement.urls')),
     ]
+
+# Provider States urls
+if getattr(settings, 'PROVIDER_STATES_URL', None):
+    from lms.djangoapps.courseware.tests.pacts.views import provider_state as courseware_xblock_handler_provider_state
+    urlpatterns += [
+        url(
+            r'^courses/xblock/handler/provider_states',
+            courseware_xblock_handler_provider_state,
+            name='courseware_xblock_handler_provider_state',
+        )
+    ]
