@@ -50,7 +50,7 @@ def generate_course_certificate(user, course_key, status, enrollment_mode, cours
         emit_certificate_event(event_name='created', user=user, course_id=course_key, event_data=event_data)
 
     elif CertificateStatuses.unverified == cert.status:
-        cert.mark_unverified(source='certificate_generation')
+        cert.mark_unverified(mode=enrollment_mode, source='certificate_generation')
 
     return cert
 
