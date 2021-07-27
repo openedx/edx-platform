@@ -1048,3 +1048,9 @@ LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
 
 ############## XBlock extra mixins ############################
 XBLOCK_MIXINS += tuple(XBLOCK_EXTRA_MIXINS)
+
+################# Settings for Chrome-specific origin trials ########
+# Token for "Disable Different Origin Subframe Dialog Suppression" Chrome Origin Trial, which must be origin-specific.
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = ENV_TOKENS.get(
+    'CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN', CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN
+)
