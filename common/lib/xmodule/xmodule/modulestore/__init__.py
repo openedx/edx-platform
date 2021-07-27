@@ -27,6 +27,7 @@ from openedx.core.lib.json_utils import EdxJSONEncoder
 from xmodule.assetstore import AssetMetadata
 from xmodule.errortracker import make_error_tracker
 
+from .caching import ModuleStoreCache
 from .exceptions import InsufficientSpecificationError, InvalidLocationError
 
 log = logging.getLogger('edx.modulestore')
@@ -173,6 +174,7 @@ class BulkOperationsMixin:
         super().__init__(*args, **kwargs)
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
         self.signal_handler = None
+        self.modulestore_cache = ModuleStoreCache()
 
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):

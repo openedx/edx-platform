@@ -446,6 +446,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courselike(course_key)
+        self.modulestore_cache.invalidate_course(course_key)
         return store.delete_course(course_key, user_id)
 
     def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
