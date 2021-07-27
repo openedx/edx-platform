@@ -294,9 +294,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         else:
             assert not response.data['course_access']['has_access']
 
-        # Remove this once can_load_courseware is also removed
-        assert response.data['course_access'] == response.data['can_load_courseware']
-
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
