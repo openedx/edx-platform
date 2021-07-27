@@ -1,0 +1,6 @@
+<div class="no-content">
+<label for="add-course-mode"><%- gettext("Enable the honor mode for the course.") %></label>
+<a href="#" class="button new-button add-course-mode">
+    <% if ( enableCourseModeCreation ) { %> <%- gettext("Enable honor mode") %> <% } %>
+</a>
+</div>
