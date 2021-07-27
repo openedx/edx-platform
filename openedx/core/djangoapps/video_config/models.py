@@ -12,7 +12,6 @@ from opaque_keys.edx.django.models import CourseKeyField
 URL_REGEX = r'^[a-zA-Z0-9\-_]*$'
 
 
-
 class HLSPlaybackEnabledFlag(ConfigurationModel):
     """
     Enables HLS Playback across the platform.
