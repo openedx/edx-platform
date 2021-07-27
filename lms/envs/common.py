@@ -4760,3 +4760,7 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
+
+################# Settings for Chrome-specific origin trials ########
+# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
