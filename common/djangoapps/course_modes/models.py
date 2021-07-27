@@ -13,7 +13,7 @@ from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
@@ -39,7 +39,6 @@ Mode = namedtuple('Mode',
                   ])
 
 
-@python_2_unicode_compatible
 class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.
@@ -916,7 +915,6 @@ class CourseModesArchive(models.Model):
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
 
 
-@python_2_unicode_compatible
 class CourseModeExpirationConfig(ConfigurationModel):
     """
     Configuration for time period from end of course to auto-expire a course mode.
