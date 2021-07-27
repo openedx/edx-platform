@@ -652,7 +652,8 @@ $outline-indent-width: $baseline;
     }
 
     .status-grading-value,
-    .status-proctored-exam-value {
+    .status-proctored-exam-value,
+    .status-custom-grading-date {
       display: inline-block;
       vertical-align: middle;
     }
