@@ -185,6 +185,15 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+
+    # Course modes API for certificates generation
+    path(
+        'api/course_modes/',
+        include(
+            ('common.djangoapps.course_modes.rest_api.urls', 'common.djangoapps.course_mods'),
+            namespace='course_modes_api',
+        )
+    ),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

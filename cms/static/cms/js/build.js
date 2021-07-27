@@ -24,6 +24,7 @@
             'js/factories/export',
             'js/factories/group_configurations',
             'js/certificates/factories/certificates_page_factory',
+            'js/certificates/factories/course_mode_factory',
             'js/factories/index',
             'js/factories/manage_users',
             'js/factories/outline',

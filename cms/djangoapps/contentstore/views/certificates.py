@@ -400,19 +400,28 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificate_activation_handler',
                 course_key=course_key
             )
+            course_mode_creation_url = reverse(
+                'course_modes_api:v1:course_modes_list',
+                args=(str(course_key),),
+            )
             course_modes = [
                 mode.slug for mode in CourseMode.modes_for_course(
                     course_id=course.id, include_expired=True
                 ) if mode.slug != 'audit'
             ]
+            # Check whether the audit mode associated with the course exists in database
+            has_audit_mode = CourseMode.objects.filter(course_id=course.id, mode_slug='audit')
 
             has_certificate_modes = len(course_modes) > 0
+
+            enable_course_mode_creation = settings.FEATURES.get('ENABLE_COURSE_MODE_CREATION', False)
 
             if has_certificate_modes:
                 certificate_web_view_url = get_lms_link_for_certificate_web_view(
                     course_key=course_key,
                     mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
                 )
+                enable_course_mode_creation = False
             else:
                 certificate_web_view_url = None
             is_active, certificates = CertificateManager.is_activated(course)
@@ -420,6 +429,9 @@ def certificates_list_handler(request, course_key_string):
                 'context_course': course,
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
+                'course_mode_creation_url': course_mode_creation_url,
+                'enable_course_mode_creation': enable_course_mode_creation and not has_audit_mode,
+                'course_id': str(course_key),
                 'upload_asset_url': upload_asset_url,
                 'certificates': certificates,
                 'has_certificate_modes': has_certificate_modes,

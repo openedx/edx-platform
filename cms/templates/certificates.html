@@ -17,7 +17,7 @@ from six.moves.urllib.parse import quote
 <%block name="bodyclass">is-signedin course view-certificates</%block>
 
 <%block name="header_extras">
-% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview", "signatory-actions"]:
+% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview", "signatory-actions", "course-modes"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -45,6 +45,15 @@ CMS.User.isGlobalStaff = '${is_global_staff | n, js_escaped_string}'=='True' ? t
           ${certificate_web_view_url | n, dump_js_escaped_json},
           ${is_active | n, dump_js_escaped_json},
           ${certificate_activation_handler_url | n, dump_js_escaped_json}
+      );
+  });
+% endif
+% if enable_course_mode_creation:
+  require(["js/certificates/factories/course_mode_factory"], function(CourseModeFactory) {
+    CourseModeFactory(
+          ${enable_course_mode_creation | n, dump_js_escaped_json},
+          ${course_mode_creation_url | n, dump_js_escaped_json},
+          ${course_id | n, dump_js_escaped_json}
       );
   });
 % endif

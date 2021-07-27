@@ -516,6 +516,17 @@ FEATURES = {
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
+
+    # .. toggle_name: ENABLE_COURSE_MODE_CREATION
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable course mode creation through studio.
+    # .. toggle_category: n/a
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2023-02-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-5906
+    'ENABLE_COURSE_MODE_CREATION': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
