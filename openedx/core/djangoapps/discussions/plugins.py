@@ -20,7 +20,7 @@ class DiscussionCourseApp(CourseApp):
 
     app_id = "discussion"
     name = _("Discussion")
-    description = _("Encourage participation and engagement in your course with discussion forums.")
+    description = _("Encourage participation and engagement in your course with discussions.")
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
