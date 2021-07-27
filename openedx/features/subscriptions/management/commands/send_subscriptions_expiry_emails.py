@@ -4,7 +4,6 @@ Django management command to send subscription expiry emails to users.
 from datetime import date, timedelta
 import logging
 
-from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from edx_ace import ace
@@ -13,8 +12,10 @@ from edx_ace.recipient import Recipient
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from openedx.features.edly.context_processor import Colour
 from openedx.features.subscriptions.message_types import ExpiredNotification, ImpendingExpiryNotification
 from openedx.features.subscriptions.models import UserSubscription
 from openedx.features.subscriptions.utils import get_subscription_renew_url
@@ -35,15 +36,37 @@ class Command(BaseCommand):
             marketing_root_url='' if not marketing_site_root else marketing_site_root
         )
         message_context['subscriptions_marketing_url'] = subscriptions_marketing_url
+        color_dict = get_config_value_from_site_or_settings(
+            'COLORS',
+            site=site,
+        )
+
+        primary_color = Colour(str(color_dict.get('primary')))
+
+        message_context.update({
+            'edly_fonts_config': get_config_value_from_site_or_settings(
+                'FONTS',
+                site=site,
+            ),
+            'edly_branding_config': get_config_value_from_site_or_settings(
+                'BRANDING',
+                site=site,
+            ),
+            'edly_copyright_text': get_config_value_from_site_or_settings(
+                'EDLY_COPYRIGHT_TEXT',
+                site=site,
+            ),
+            'edly_colors_config': {'primary': primary_color},
+        })
+
         return message_context
 
     def _send_email_notifications(self, context_values, ace_message_class):
         """
         Send email notifications from the given context values.
         """
-        site = Site.objects.get_current()
-        message_context = self._get_message_context(site)
-        for subscription_id, user in context_values:
+        for subscription_id, user, site in context_values:
+            message_context = self._get_message_context(site)
             if ace_message_class == ExpiredNotification:
                 subscription_renew_url = get_subscription_renew_url(subscription_id, user)
                 message_context.update({
@@ -72,14 +95,16 @@ class Command(BaseCommand):
             Q(expiration_date__isnull=False) & Q(expiration_date=date.today() + timedelta(days=1))
         )
         impending_expiry_subscriptions_context_values = [
-            (subscription.subscription_id, subscription.user) for subscription in impending_expiry_subscriptions
+            (subscription.subscription_id, subscription.user, subscription.site)
+            for subscription in impending_expiry_subscriptions
         ]
 
         expired_subscriptions = UserSubscription.objects.filter(
             Q(expiration_date__isnull=False) & Q(expiration_date=date.today() - timedelta(days=1))
         )
         expired_subscriptions_context_values = [
-            (subscription.subscription_id, subscription.user) for subscription in expired_subscriptions
+            (subscription.subscription_id, subscription.user, subscription.site)
+            for subscription in expired_subscriptions
         ]
 
         self._send_email_notifications(
