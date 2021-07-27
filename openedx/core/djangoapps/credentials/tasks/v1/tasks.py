@@ -406,13 +406,14 @@ def backfill_date_for_all_course_runs():
         if index % 10 == 0:
             time.sleep(3)
 
+
 @shared_task(base=LoggedTask, ignore_result=True)
 @set_code_owner_attribute
 def clean_certificate_available_date():
     """
     This task will clean out the misconfigured certificate available date. When courses Change their
     certificates_display_behavior, the certificate_available_date was not updating properly. This is
-    command is meant to be ran one time to clean up any courses that were not supposed to have 
+    command is meant to be ran one time to clean up any courses that were not supposed to have
     certificate_available_date
     """
     course_run_list = CourseOverview.objects.exclude(
