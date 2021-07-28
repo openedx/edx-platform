@@ -3478,6 +3478,16 @@ BADGR_TOKENS_CACHE_KEY = None
 # .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
 
+# .. toggle_name: BADGR_ENABLE_NOTIFICATIONS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Optional setting for enabling email notifications. When set to "True",
+#    learners will be notified by email when they earn a badge.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-29
+# .. toggle_warnings: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_ENABLE_NOTIFICATIONS = False
+
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.
