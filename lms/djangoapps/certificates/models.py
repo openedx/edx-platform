@@ -19,7 +19,6 @@ from django.dispatch import receiver
 
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-from model_utils.fields import AutoCreatedField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
@@ -43,29 +42,6 @@ class CertificateSocialNetworks:
     linkedin = 'LinkedIn'
     facebook = 'Facebook'
     twitter = 'Twitter'
-
-
-class CertificateWhitelist(models.Model):
-    """
-    Tracks students who are whitelisted, all users
-    in this table will always qualify for a certificate
-    regardless of their grade.
-
-    This model is deprecated. CertificateAllowlist should be used in its place.
-
-    .. no_pii:
-    """
-    class Meta:
-        app_label = "certificates"
-        unique_together = [['course_id', 'user']]
-
-    objects = NoneToEmptyManager()
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    whitelist = models.BooleanField(default=0)
-    created = AutoCreatedField(_('created'))
-    notes = models.TextField(default=None, null=True)
 
 
 class CertificateAllowlist(TimeStampedModel):
