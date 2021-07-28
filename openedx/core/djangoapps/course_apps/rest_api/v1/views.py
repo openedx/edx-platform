@@ -95,7 +95,7 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
             404: "The requested course does not exist.",
         },
     )
-    # @verify_course_exists("Requested apps for unknown course {course}")
+    @verify_course_exists("Requested apps for unknown course {course}")
     def get(self, request: Request, course_id: str):
         """
         Get a list of all the course apps available for a course.
