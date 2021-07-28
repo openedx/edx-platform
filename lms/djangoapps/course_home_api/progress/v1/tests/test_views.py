@@ -208,3 +208,22 @@ class ProgressTabTestViews(BaseCourseHomeTests):
 
         response = self.client.get(self.url)
         assert response.data['username'] == other_user.username
+
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_url_hidden_if_subsection_hide_after_due(self):
+        chapter = ItemFactory(parent=self.course, category='chapter')
+        yesterday = now() - timedelta(days=1)
+        hide_after_due_subsection = ItemFactory(
+            parent=chapter, category='sequential', hide_after_due=True, due=yesterday
+        )
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        sections = response.data['section_scores']
+        regular_subsection = sections[0]['subsections'][0]  # default sequence that parent class gives us
+        hide_after_due_subsection = sections[1]['subsections'][0]
+        assert regular_subsection['url'] is not None
+        assert hide_after_due_subsection['url'] is None

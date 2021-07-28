@@ -6,7 +6,7 @@ Unit test tasks
 import os
 import re
 import sys
-from optparse import make_option
+from optparse import make_option  # pylint: disable=deprecated-module
 
 from paver.easy import cmdopts, needs, sh, task, call_task
 

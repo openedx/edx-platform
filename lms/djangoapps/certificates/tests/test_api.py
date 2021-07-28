@@ -2,7 +2,6 @@
 
 
 import uuid
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 from unittest import mock
 from unittest.mock import patch
@@ -36,9 +35,7 @@ from lms.djangoapps.certificates.api import (
     certificate_downloadable_status,
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
-    example_certificates_status,
     generate_certificate_task,
-    generate_example_certificates,
     get_allowlist_entry,
     get_allowlisted_users,
     get_certificate_footer_context,
@@ -52,16 +49,14 @@ from lms.djangoapps.certificates.api import (
     is_certificate_invalidated,
     is_on_allowlist,
     remove_allowlist_entry,
-    set_cert_generation_enabled
+    set_cert_generation_enabled,
+    certificate_status_for_student,
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
-    ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
-from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import (
     CertificateAllowlistFactory,
     GeneratedCertificateFactory,
@@ -80,20 +75,6 @@ class WebCertificateTestMixin:
     """
     Mixin with helpers for testing Web Certificates.
     """
-    @contextmanager
-    def _mock_queue(self, is_successful=True):
-        """
-        Mock the "send to XQueue" method to return either success or an error.
-        """
-        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
-        with patch(symbol) as mock_send_to_queue:
-            if is_successful:
-                mock_send_to_queue.return_value = (0, "Successfully queued")
-            else:
-                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
-
-            yield mock_send_to_queue
-
     def _setup_course_certificate(self):
         """
         Creates certificate configuration for course
@@ -644,69 +625,6 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         """Check that self-generated certificates are enabled or disabled for the course. """
         actual_enabled = cert_generation_enabled(course_key)
         assert expect_enabled == actual_enabled
-
-
-class GenerateExampleCertificatesTest(ModuleStoreTestCase):
-    """Test generation of example certificates. """
-
-    COURSE_KEY = CourseLocator(org='test', course='test', run='test')
-
-    def test_generate_example_certs(self):
-        # Generate certificates for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 1)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status({
-            'description': 'honor',
-            'status': 'started'
-        })
-
-    def test_generate_example_certs_with_verified_mode(self):
-        # Create verified and honor modes for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='honor')
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='verified')
-
-        # Generate certificates for the course
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 2)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status(
-            {
-                'description': 'verified',
-                'status': 'started'
-            },
-            {
-                'description': 'honor',
-                'status': 'started'
-            }
-        )
-
-    @contextmanager
-    def _mock_xqueue(self):
-        """Mock the XQueue method for adding a task to the queue. """
-        with patch.object(XQueueCertInterface, 'add_example_cert') as mock_queue:
-            yield mock_queue
-
-    def _assert_certs_in_queue(self, mock_queue, expected_num):
-        """Check that the certificate generation task was added to the queue. """
-        certs_in_queue = [call_args[0] for (call_args, __) in mock_queue.call_args_list]
-        assert len(certs_in_queue) == expected_num
-        for cert in certs_in_queue:
-            assert isinstance(cert, ExampleCertificate)
-
-    def _assert_cert_status(self, *expected_statuses):
-        """Check the example certificate status. """
-        actual_status = example_certificates_status(self.COURSE_KEY)
-        assert list(expected_statuses) == actual_status
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)

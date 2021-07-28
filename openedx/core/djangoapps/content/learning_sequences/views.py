@@ -161,7 +161,19 @@ class CourseOutlineView(APIView):
         course_key = validate_course_key(course_key_str)
         at_time = datetime.now(timezone.utc)
 
-        if not can_call_public_api(request.user, course_key):
+        # We use can_call_public_api to slowly roll this feature out, and be
+        # able to turn it off for a course. But it's not really a permissions
+        # thing in that it doesn't give them elevated access. If I had it to do
+        # over again, I'd call it something else, but all this code is supposed
+        # to go away when rollout is completed anyway.
+        #
+        # The force_on param just means, "Yeah, never mind whether you're turned
+        # on by default for the purposes of the MFE. I want to see production
+        # data using this API." The MFE should _never_ pass this parameter. It's
+        # just a way to peek at the API while it's techincally dark for rollout
+        # purposes. TODO: REMOVE THIS PARAM AFTER FULL ROLLOUT OF THIS FEATURE.
+        force_on = request.GET.get("force_on")
+        if (not force_on) and (not can_call_public_api(course_key)):
             raise PermissionDenied()
 
         try:

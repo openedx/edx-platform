@@ -585,19 +585,6 @@ class CourseOverview(TimeStampedModel):
         else:
             return None
 
-    def may_certify(self):
-        """
-        Returns whether it is acceptable to show the student a certificate
-        download link.
-        """
-        return course_metadata_utils.may_certify_for_course(
-            self.certificates_display_behavior,
-            self.certificates_show_before_end,
-            self.has_ended(),
-            self.certificate_available_date,
-            self.self_paced
-        )
-
     @property
     def pre_requisite_courses(self):
         """

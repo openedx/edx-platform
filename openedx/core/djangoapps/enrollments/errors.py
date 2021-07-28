@@ -7,6 +7,7 @@ class CourseEnrollmentError(Exception):
     Describes any error that may occur when reading or updating enrollment information for a user or a course.
 
     """
+
     def __init__(self, msg, data=None):
         super().__init__(msg)
         # Corresponding information to help resolve the error.

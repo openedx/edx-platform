@@ -8,7 +8,7 @@ from urllib.parse import urljoin  # pylint: disable=import-error
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.site_configuration import helpers
@@ -18,7 +18,6 @@ from .helpers import is_learner_records_enabled
 API_VERSION = 'v2'
 
 
-@python_2_unicode_compatible
 class CredentialsApiConfig(ConfigurationModel):
     """
     Manages configuration for connecting to the Credential service and using its
@@ -117,7 +116,6 @@ class CredentialsApiConfig(ConfigurationModel):
         return self.cache_ttl > 0
 
 
-@python_2_unicode_compatible
 class NotifyCredentialsConfig(ConfigurationModel):
     """
     Manages configuration for a run of the notify_credentials management command.

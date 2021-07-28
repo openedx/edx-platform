@@ -131,7 +131,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
     def test_cant_unenroll_status(self):
         """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
         with patch(
-            'lms.djangoapps.certificates.models.certificate_status_for_student',
+            'lms.djangoapps.certificates.api.certificate_status_for_student',
             return_value={'status': 'downloadable'},
         ):
             response = self.client.get(reverse('dashboard'))
@@ -154,10 +154,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_course_run_refund_status_invalid_course_key(self):
         """ Assert that view:course_run_refund_status returns correct Json for Invalid Course Key ."""
-        with patch('opaque_keys.edx.keys.CourseKey.from_string') as mock_method:
-            mock_method.side_effect = InvalidKeyError('CourseKey', 'The course key used to get refund status caused \
-                                                        InvalidKeyError during look up.')
-            response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
+        test_url = reverse('course_run_refund_status', kwargs={'course_id': self.course.id})
+        with patch('common.djangoapps.student.views.management.CourseKey.from_string') as mock_method:
+            mock_method.side_effect = InvalidKeyError(
+                'CourseKey',
+                'The course key used to get refund status caused InvalidKeyError during look up.'
+            )
+            response = self.client.get(test_url)
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': ''}
         assert response.status_code == 406
@@ -229,7 +232,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             certificate_available_date=TOMORROW,
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )
@@ -244,7 +247,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             certificate_available_date=TOMORROW,
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )
@@ -259,7 +262,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             certificate_available_date=now(),
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )

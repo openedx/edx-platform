@@ -24,7 +24,7 @@ class WikiCourseApp(CourseApp):
 
     app_id = "wiki"
     name = _("Wiki")
-    description = _("Enable learners to access, and collaborate on information about your course.")
+    description = _("Enable learners to access, and collaborate on course related information.")
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument

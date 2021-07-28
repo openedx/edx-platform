@@ -1738,7 +1738,7 @@ class ProblemBlock(
                 return {'success': msg, 'html': ''}
 
         # Wait time between resets: check if is too soon for submission.
-        if self.last_submission_time is not None and self.submission_wait_seconds != 0:
+        if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
             seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
             if seconds_since_submission < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)

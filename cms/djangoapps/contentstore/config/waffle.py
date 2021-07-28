@@ -69,13 +69,15 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
 )
 
 
-# .. toggle_name: studio.custom_pls
+# .. toggle_name: studio.custom_relative_dates
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to enable custom pacing for PLS
+# .. toggle_description: Waffle flag to enable custom pacing input for Personalized Learner Schedule (PLS).
+# ..    This flag guards an input in Studio for a self paced course, where the user can enter date offsets
+# ..    for a subsection.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-07-12
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warnings: For this flag to be active, add flag 'studio.custom_pls' in Django Admin
+# .. toggle_warnings: Flag course_experience.relative_dates should also be active for relative dates functionalities to work.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
-CUSTOM_PLS = CourseWaffleFlag(WAFFLE_NAMESPACE, 'custom_pls', module_name=__name__,)
+CUSTOM_RELATIVE_DATES = CourseWaffleFlag(WAFFLE_NAMESPACE, 'custom_relative_dates', module_name=__name__,)

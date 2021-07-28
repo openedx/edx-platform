@@ -10,7 +10,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_noop
 from jsonfield.fields import JSONField
 from opaque_keys.edx.django.models import CourseKeyField
@@ -68,7 +68,6 @@ def assign_role(course_id, user, rolename):
     user.roles.add(role)
 
 
-@python_2_unicode_compatible
 class Role(models.Model):
     """
     Maps users to django_comment_client roles for a given course
@@ -128,7 +127,6 @@ class Role(models.Model):
         return Role.objects.filter(course_id=course_id, name__in=role_names, users=user).exists()
 
 
-@python_2_unicode_compatible
 class Permission(models.Model):
     """
     Permissions for django_comment_client
@@ -195,7 +193,6 @@ def all_permissions_for_user_in_course(user, course_id):
     return permission_names
 
 
-@python_2_unicode_compatible
 class ForumsConfig(ConfigurationModel):
     """
     Config for the connection to the cs_comments_service forums backend.

@@ -2,7 +2,7 @@
 Utilities related to API views
 """
 
-from collections import Sequence  # lint-amnesty, pylint: disable=no-name-in-module
+from collections import Sequence  # lint-amnesty, pylint: disable=no-name-in-module, deprecated-class
 from functools import wraps
 
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError

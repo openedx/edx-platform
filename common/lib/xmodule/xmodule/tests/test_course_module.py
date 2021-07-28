@@ -138,15 +138,6 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         assert not self.future_show_certs_no_info.has_ended()
         assert not self.future_noshow_certs.has_ended()
 
-    def test_may_certify(self):
-        """Check that may_certify correctly tells us when a course may wrap."""
-        assert self.past_show_certs.may_certify()
-        assert self.past_noshow_certs.may_certify()
-        assert self.past_show_certs_no_info.may_certify()
-        assert self.future_show_certs.may_certify()
-        assert self.future_show_certs_no_info.may_certify()
-        assert not self.future_noshow_certs.may_certify()
-
 
 class CourseSummaryHasEnded(unittest.TestCase):
     """ Test for has_ended method when end date is missing timezone information. """

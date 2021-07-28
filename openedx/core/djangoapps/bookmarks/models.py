@@ -7,7 +7,7 @@ import logging
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -41,7 +41,6 @@ def parse_path_data(path_data):
     return path
 
 
-@python_2_unicode_compatible
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
@@ -192,7 +191,6 @@ class Bookmark(TimeStampedModel):
         return path_data
 
 
-@python_2_unicode_compatible
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.

@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-
 from collections import namedtuple
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -20,11 +21,11 @@ from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
 DEFAULT_PROVIDER_TYPE = 'legacy'
-
 
 ProviderExternalLinks = namedtuple(
     'ProviderExternalLinks',
@@ -63,6 +64,25 @@ class Features(Enum):
     USER_MENTIONS = 'user-mentions'
 
 
+def pii_sharing_required_message(provider_name):
+    """
+    Build an i18n'ed message stating PII sharing is required for the provider.
+    """
+    return _(
+        '{provider} requires that LTI advanced sharing be enabled for your course,'
+        ' as this provider uses email address and username to personalize'
+        ' the experience. Please contact {support_contact} to enable this feature.'
+    ).format(
+        provider=provider_name,
+        support_contact=(
+            configuration_helpers.get_value(
+                'CONTACT_EMAIL',
+                getattr(settings, 'CONTACT_EMAIL', _('technical support'))
+            )
+        )
+    )
+
+
 AVAILABLE_PROVIDER_MAP = {
     'legacy': {
         'features': [
@@ -81,12 +101,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
         ],
         'external_links': ProviderExternalLinks(
-            '',
-            '',
-            '',
-            '',
-            '',
+            learn_more='',
+            configuration='',
+            general='',
+            accessibility='',
+            contact_email='',
         )._asdict(),
+        "messages": []
     },
     'piazza': {
         'features': [
@@ -104,12 +125,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.USER_MENTIONS.value,
         ],
         'external_links': ProviderExternalLinks(
-            'https://piazza.com/product/overview',
-            'https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',
-            'https://support.piazza.com/',
-            'https://piazza.com/product/accessibility',
-            'team@piazza.com',
-        )._asdict()
+            learn_more='https://piazza.com/product/overview',
+            configuration='https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',  # pylint: disable=line-too-long
+            general='https://support.piazza.com/',
+            accessibility='https://piazza.com/product/accessibility',
+            contact_email='team@piazza.com',
+        )._asdict(),
+        "messages": []
     },
     'yellowdig': {
         'features': [
@@ -126,12 +148,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.USER_MENTIONS.value,
         ],
         'external_links': ProviderExternalLinks(
-            'https://www.youtube.com/watch?v=ZACief-qMwY',
-            '',
-            'https://hubs.ly/H0J5Bn70',
-            '',
-            'learnmore@yellowdig.com',
+            learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
+            configuration='',
+            general='https://hubs.ly/H0J5Bn70',
+            accessibility='',
+            contact_email='learnmore@yellowdig.com',
         )._asdict(),
+        "messages": [pii_sharing_required_message("Yellowdig")]
     },
     'inscribe': {
         'features': [
@@ -139,12 +162,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.LTI_BASIC_CONFIGURATION.value,
         ],
         'external_links': ProviderExternalLinks(
-            '',
-            '',
-            'https://www.inscribeapp.com/',
-            '',
-            '',
+            learn_more='',
+            configuration='',
+            general='https://www.inscribeapp.com/',
+            accessibility='',
+            contact_email='',
         )._asdict(),
+        "messages": [pii_sharing_required_message('InScribe')]
     },
     'discourse': {
         'features': [
@@ -153,12 +177,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.LTI_ADVANCED_SHARING_MODE.value,
         ],
         'external_links': ProviderExternalLinks(
-            '',
-            '',
-            'http://discourse.org/',
-            '',
-            '',
+            learn_more='',
+            configuration='',
+            general='http://discourse.org/',
+            accessibility='',
+            contact_email='',
         )._asdict(),
+        "messages": [pii_sharing_required_message('Discourse')]
     },
     'ed-discuss': {
         'features': [
@@ -173,12 +198,13 @@ AVAILABLE_PROVIDER_MAP = {
             Features.EMAIL_NOTIFICATIONS.value,
         ],
         'external_links': ProviderExternalLinks(
-            '',
-            '',
-            'https://edstem.org/us/',
-            '',
-            '',
+            learn_more='',
+            configuration='',
+            general='https://edstem.org/us/',
+            accessibility='',
+            contact_email='',
         )._asdict(),
+        "messages": []
     }
 }
 

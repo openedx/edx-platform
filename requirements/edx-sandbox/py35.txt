@@ -26,12 +26,10 @@ decorator==5.0.9
     # via networkx
 joblib==0.14.1
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   nltk
 kiwisolver==1.1.0
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   matplotlib
 lxml==4.5.0

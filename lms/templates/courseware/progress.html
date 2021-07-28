@@ -3,16 +3,18 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
+from datetime import datetime
+
+from django.conf import settings
+from django.urls import reverse
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from pytz import UTC
+
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.grades.api import constants as grades_constants
-from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
-from django.urls import reverse
-from django.conf import settings
-from django.utils.http import urlquote_plus
-from six import text_type
-
 from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
 %>
 
@@ -73,7 +75,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                         %if certificate_data:
                         <div class="auto-cert-message" id="course-success">
                             <div class="has-actions">
-                                <% post_url = reverse('generate_user_cert', args=[text_type(course.id)]) %>
+                                <% post_url = reverse('generate_user_cert', args=[str(course.id)]) %>
                                 <div class="msg-content">
                                     <h4 class="hd hd-4 title">${_(certificate_data.title)}</h4>
                                     <p class="copy">${_(certificate_data.msg)}</p>
@@ -169,20 +171,33 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                 %for section in chapter['sections']:
                                     <div>
                                         <%
+                                        hide_url_date = (section.self_paced and section.end) or section.due
+                                        hide_url = not staff_access and section.hide_after_due and hide_url_date and datetime.now(UTC) > hide_url_date
+
                                         earned = section.graded_total.earned
                                         total = section.graded_total.possible
 
                                         percentageString = "{0:.0%}".format(section.percent_graded) if total > 0 or earned > 0 else ""
                                         %>
                                         <h4 class="hd hd-4">
-                                            <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">
-                                                ${ section.display_name}
+                                            %if hide_url:
+                                                <p class="d-inline">${section.display_name}
                                                 %if (total > 0 or earned > 0) and section.show_grades(staff_access):
-                                                <span class="sr">
-                                                    ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
-                                                </span>
-                                                %endif
-                                            </a>
+                                                    <span class="sr">
+                                                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
+                                                    </span>
+                                                    %endif
+                                                </p>
+                                            %else:
+                                                <a href="${reverse('courseware_section', kwargs=dict(course_id=str(course.id), chapter=chapter['url_name'], section=section.url_name))}">
+                                                    ${ section.display_name}
+                                                    %if (total > 0 or earned > 0) and section.show_grades(staff_access):
+                                                    <span class="sr">
+                                                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
+                                                    </span>
+                                                    %endif
+                                                </a>
+                                            %endif
                                             %if (total > 0 or earned > 0) and section.show_grades(staff_access):
                                             <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                                             %endif

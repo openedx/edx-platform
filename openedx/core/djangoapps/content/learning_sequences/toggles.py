@@ -10,10 +10,11 @@ WAFFLE_NAMESPACE = 'learning_sequences'
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_description: Waffle flag to enable the use of the Learning Sequences
 #   Course Outline API (/api/learning_sequences/v1/course_outline/{course_key}).
-#   Staff can always use this endpoint. If you are a student and this endpoint
-#   is not enabled, it will return a 403 error. The Courseware MFE should know
-#   how to detect this condition.
-#   This flag is also used to determine what is returned by the
+#   If this endpoint is not enabled for a given course, it will return a 403
+#   error. The Courseware MFE should know how to detect this condition. To
+#   see the value of this API for a course before it has officially been rolled
+#   out for it, you can bypass this check by passing force_on=1 as a querystring
+#   parameter. This flag is also used to determine what is returned by the
 #   public_api_available learning_sequences API function, though other apps
 #   calling this API are always able to ignore this result and call any
 #   learning_sequences API directly (e.g. get_course_outline).

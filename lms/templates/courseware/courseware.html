@@ -237,7 +237,9 @@ ${HTML(fragment.foot_html())}
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
-                            <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                            % if sequence_title:
+                                <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                            % endif
                         </div>
                     </div>
                 </nav>

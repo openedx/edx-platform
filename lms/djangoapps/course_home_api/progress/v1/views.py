@@ -86,7 +86,8 @@ class ProgressTabView(RetrieveAPIView):
                                   ('always', 'never', 'past_due', values defined in
                                    common/lib/xmodule/xmodule/modulestore/inheritance.py)
                 show_grades: (bool) a bool for whether to show grades based on the access the user has
-                url: (str) the absolute path url to the Subsection
+                url: (str or None) the absolute path url to the Subsection or None if the Subsection is no longer accessible
+                    to the learner due to a hide_after_due course team setting
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
         grading_policy:
             assignment_policies: List of serialized assignment grading policy objects, each has the following fields:

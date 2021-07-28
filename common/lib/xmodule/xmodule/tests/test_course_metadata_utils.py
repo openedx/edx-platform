@@ -20,7 +20,6 @@ from xmodule.course_metadata_utils import (
     course_start_date_is_default,
     has_course_ended,
     has_course_started,
-    may_certify_for_course,
     number_for_course_location
 )
 from xmodule.modulestore.tests.utils import (
@@ -161,18 +160,6 @@ class CourseMetadataUtilsTestCase(TestCase):
                 TestScenario((test_datetime, None), False),
                 TestScenario((DEFAULT_START_DATE, advertised_start_parsable), False),
                 TestScenario((DEFAULT_START_DATE, None), True),
-            ]),
-            FunctionTest(may_certify_for_course, [
-                TestScenario(('early_with_info', True, True, test_datetime, False), True),
-                TestScenario(('early_no_info', False, False, test_datetime, False), True),
-                TestScenario(('end', True, False, test_datetime, False), True),
-                TestScenario(('end', False, True, test_datetime, False), True),
-                TestScenario(('end', False, False, _NEXT_WEEK, False), False),
-                TestScenario(('end', False, False, _LAST_WEEK, False), True),
-                TestScenario(('end', False, False, None, False), False),
-                TestScenario(('early_with_info', False, False, None, False), True),
-                TestScenario(('end', False, False, _NEXT_WEEK, False), False),
-                TestScenario(('end', False, False, _NEXT_WEEK, True), True),
             ]),
         ]
 
