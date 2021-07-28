@@ -63,9 +63,15 @@ def _gather_graded_items(root, due):  # lint-amnesty, pylint: disable=missing-fu
             # Sequentials can be marked as graded, while only containing ungraded problems
             # To handle this case, we can look at the leaf blocks within a sequential
             # and check that they are a graded assignment
-            # (if they have graded/has_score attributes and nonzero weight)
-            # TODO: Once studio can manually set relative dates, we would need to manually check for them here
-            collected_items.append((next_item.location, {'due': due if _has_assignment_blocks(next_item) else None}))
+            # (if they have graded/has_score attributes and nonzero weight).
+            # Open response assessments (ORA) contain their own set of due dates
+            # and we do not want to potentially conflict with due dates that are set from Studio.
+            # So here we do not assign a due date to items that are ORA.
+            if next_item.category != 'openassessment':
+                collected_items.append((
+                    next_item.location,
+                    {'due': due if _has_assignment_blocks(next_item) else None}
+                ))
             # TODO: This is pretty gross, and should maybe be configurable in the future,
             # especially if we find ourselves needing more exceptions.
             has_non_ora_scored_content = (

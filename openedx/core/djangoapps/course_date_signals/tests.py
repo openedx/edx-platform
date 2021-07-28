@@ -122,6 +122,37 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
             sequence = self.store.get_item(sequence.location)
             self.assertCountEqual(_gather_graded_items(sequence, 5), expected_graded_items)
 
+    def test_sequence_with_ora_and_non_ora_assignments(self):
+        """
+        _gather_graded_items should not set a due date for ORA problems
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequence = ItemFactory(parent=self.course, category="sequential")
+            vertical = ItemFactory(parent=sequence, category="vertical")
+            ItemFactory.create(
+                parent=vertical,
+                category='openassessment',
+                graded=True
+            )
+            ungraded_problem_2 = ItemFactory.create(
+                parent=vertical,
+                category='problem',
+                graded=True,
+                weight=0,
+            )
+            graded_problem_1 = ItemFactory.create(
+                parent=vertical,
+                category='problem',
+                graded=True,
+                weight=1,
+            )
+            expected_graded_items = [
+                (ungraded_problem_2.location, {'due': None}),
+                (graded_problem_1.location, {'due': 5}),
+            ]
+            sequence = self.store.get_item(sequence.location)
+            self.assertCountEqual(_gather_graded_items(sequence, 5), expected_graded_items)
+
     def test_get_custom_pacing_children(self):
         """
         _get_custom_pacing_items should return a list of (block item location, field metadata dictionary)
