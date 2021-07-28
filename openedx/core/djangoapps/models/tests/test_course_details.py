@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 EXAMPLE_CERTIFICATE_AVAILABLE_DATE = datetime.date(2020, 1, 1)
 
+
 @ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
     """
@@ -204,7 +205,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         assert CourseDetails.validate_certificate_settings(
             stored_date, stored_behavior
         ) == (expected_date, expected_behavior)
-
 
     @ddt.data(
         (

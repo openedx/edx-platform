@@ -9,8 +9,6 @@ certificates models or any other certificates modules.
 
 
 import logging
-from datetime import datetime
-from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -611,6 +609,7 @@ def certificates_viewable_for_course(course):
         course.certificate_available_date,
         course.self_paced
     )
+
 
 def get_allowlisted_users(course_key):
     """

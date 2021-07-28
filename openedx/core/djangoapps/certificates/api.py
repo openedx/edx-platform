@@ -59,7 +59,7 @@ def can_show_certificate_available_date_field(course):
 
 
 def _course_uses_available_date(course):
-
+    """Returns if the course has an certificate_available_date set and that it should be used"""
     if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
         display_behavior_is_valid = course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
     else:
@@ -70,6 +70,7 @@ def _course_uses_available_date(course):
         and course.certificate_available_date
         and display_behavior_is_valid
     )
+
 
 def available_date_for_certificate(course, certificate, certificate_available_date=None):
     """

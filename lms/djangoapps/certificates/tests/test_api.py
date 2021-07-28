@@ -204,8 +204,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_pdf_certificate': False,
                 'uuid': cert_status['uuid']}
 
-
-
     @ddt.data(
         (False, timedelta(days=2), False, True),
         (False, -timedelta(days=2), True, None),
@@ -228,7 +226,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         downloadable_status = certificate_downloadable_status(self.student, self.course.id)
         assert downloadable_status['is_downloadable'] == cert_downloadable_status
         assert downloadable_status.get('earned_but_not_available') == earned_but_not_available
-
 
     @ddt.data(
         (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),

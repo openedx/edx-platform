@@ -459,6 +459,7 @@ FEATURES = {
     # .. settings. Will eventually become the default.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2021-07-26
+    # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
