@@ -10,14 +10,13 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-@python_2_unicode_compatible
 class SiteConfiguration(models.Model):
     """
     Model for storing site configuration. These configuration override OpenEdx configurations and settings.
@@ -158,7 +157,6 @@ def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):
     return ret
 
 
-@python_2_unicode_compatible
 class SiteConfigurationHistory(TimeStampedModel):
     """
     This is an archive table for SiteConfiguration, so that we can maintain a history of
