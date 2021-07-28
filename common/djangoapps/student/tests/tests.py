@@ -49,6 +49,8 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.data import CertificatesDisplayBehaviors
+
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +77,8 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2)
         )
         cert = GeneratedCertificateFactory.create(
             user=user,
@@ -152,6 +155,7 @@ class CourseEndingTest(ModuleStoreTestCase):
         )
         enrollment3 = CourseEnrollmentFactory(user=user, course_id=course3.id, mode=CourseMode.VERIFIED)
         # test when the display is unavailable or notpassing, we get the correct results out
+        course2.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
         cert_status = {'status': 'unavailable', 'mode': 'honor', 'uuid': None}
         assert _cert_info(user, enrollment3, cert_status) == {'status': 'processing', 'show_survey_button': False,
                                                               'can_unenroll': True}
@@ -186,7 +190,8 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2),
         )
         enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
 
@@ -212,7 +217,8 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2),
         )
         cert_status = {'status': 'generating', 'mode': 'honor', 'uuid': None}
         enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)

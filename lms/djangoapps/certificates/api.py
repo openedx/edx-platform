@@ -12,6 +12,7 @@ import logging
 from datetime import datetime
 from pytz import UTC
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -46,6 +47,8 @@ from lms.djangoapps.certificates.utils import (
     certificate_status_for_student as _certificate_status_for_student,
 )
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -245,9 +248,18 @@ def certificate_downloadable_status(student, course_key):
     }
 
     course_overview = get_course_overview_or_none(course_key)
+
+    if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
+        display_behavior_is_valid = (
+            course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+        )
+    else:
+        display_behavior_is_valid = True
+
     if (
         not certificates_viewable_for_course(course_overview) and
         CertificateStatuses.is_passing_status(current_status['status']) and
+        display_behavior_is_valid and
         course_overview.certificate_available_date
     ):
         response_data['earned_but_not_available'] = True
@@ -576,26 +588,29 @@ def get_certificate_footer_context():
 def certificates_viewable_for_course(course):
     """
     Returns True if certificates are viewable for any student enrolled in the course, False otherwise.
-    """
-    if course.self_paced:
-        return True
-    if (
-        course.certificates_display_behavior in ('early_with_info', 'early_no_info')
-        or course.certificates_show_before_end
-    ):
-        return True
-    if (
-        course.certificate_available_date
-        and course.certificate_available_date <= datetime.now(UTC)
-    ):
-        return True
-    if (
-        course.certificate_available_date is None
-        and course.has_ended()
-    ):
-        return True
-    return False
 
+    Arguments:
+        course (CourseOverview or course descriptor): The course to check if certificates are viewable
+
+    Returns:
+        boolean: whether the certificates are viewable or not
+    """
+
+    # The CourseOverview contains validation logic on the certificates_display_behavior and certificate_available_date
+    # fields. Thus, we prefer to use the CourseOverview, but will fall back to the course in case the CourseOverview is
+    # not available.
+    if not isinstance(course, CourseOverview):
+        course_overview = get_course_overview_or_none(course.id)
+        if course_overview:
+            course = course_overview
+
+    return _should_certificate_be_visible(
+        course.certificates_display_behavior,
+        course.certificates_show_before_end,
+        course.has_ended(),
+        course.certificate_available_date,
+        course.self_paced
+    )
 
 def get_allowlisted_users(course_key):
     """
@@ -751,35 +766,6 @@ def get_enrolled_allowlisted_not_passing_users(course_key):
     return users.exclude(
         generatedcertificate__course_id=course_key,
         generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
-    )
-
-
-def should_certificate_be_visible(
-    certificates_display_behavior,
-    certificates_show_before_end,
-    has_ended,
-    certificate_available_date,
-    self_paced
-):
-    """
-    Returns whether it is acceptable to show the student a certificate download
-    link for a course, based on provided attributes of the course.
-    Arguments:
-        certificates_display_behavior (str): string describing the course's
-            certificate display behavior.
-            See CourseFields.certificates_display_behavior.help for more detail.
-        certificates_show_before_end (bool): whether user can download the
-            course's certificates before the course has ended.
-        has_ended (bool): Whether the course has ended.
-        certificate_available_date (datetime): the date the certificate is available on for the course.
-        self_paced (bool): Whether the course is self-paced.
-    """
-    return _should_certificate_be_visible(
-        certificates_display_behavior,
-        certificates_show_before_end,
-        has_ended,
-        certificate_available_date,
-        self_paced
     )
 
 

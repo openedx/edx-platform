@@ -2,7 +2,7 @@
 Tests for courseware API
 """
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import Optional
 
@@ -39,12 +39,15 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
 from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 
 
 User = get_user_model()
+
+_NEXT_WEEK = datetime.now() + timedelta(days=7)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -64,6 +67,8 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             enrollment_end=datetime(2028, 1, 1, 1, 1, 1),
             emit_signals=True,
             modulestore=cls.store,
+            certificate_available_date=_NEXT_WEEK,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         cls.chapter = ItemFactory(parent=cls.course, category='chapter')
         cls.sequence = ItemFactory(parent=cls.chapter, category='sequential', display_name='sequence')

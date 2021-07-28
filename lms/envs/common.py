@@ -939,6 +939,16 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
+
+    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
+    # .. settings. Will eventually become the default.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-07-26
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
+    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
