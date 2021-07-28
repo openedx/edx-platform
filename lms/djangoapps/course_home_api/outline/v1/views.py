@@ -296,7 +296,7 @@ class OutlineTabView(RetrieveAPIView):
         #
         # The long term goal is to remove the Course Blocks API call entirely,
         # so this is a tiny first step in that migration.
-        if course_blocks and learning_sequences_api_available(course_key, request.user):
+        if course_blocks and learning_sequences_api_available(course_key):
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
