@@ -988,6 +988,15 @@ ROOT_URLCONF = 'cms.urls'
 COURSE_IMPORT_EXPORT_BUCKET = ''
 COURSE_METADATA_EXPORT_BUCKET = ''
 
+COURSE_APPS_ORDER = [
+    'progress',
+    'discussion',
+    'teams',
+    'edxnotes',
+    'wiki',
+    'calculator',
+    'textbook',
+]
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
@@ -2441,3 +2450,4 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = None
 ################# show account activate cta after register ########################
 SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 SHOW_ACCOUNT_ACTIVATION_CTA = False
+

@@ -1,5 +1,6 @@
 import logging
 from typing import Dict
+from django.conf import settings
 
 from django.contrib.auth import get_user_model
 from edx_api_doc_tools import path_parameter, schema
@@ -94,7 +95,7 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
             404: "The requested course does not exist.",
         },
     )
-    @verify_course_exists("Requested apps for unknown course {course}")
+    # @verify_course_exists("Requested apps for unknown course {course}")
     def get(self, request: Request, course_id: str):
         """
         Get a list of all the course apps available for a course.
@@ -139,7 +140,21 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
                 "request": request,
             }
         )
-        return Response(serializer.data)
+        course_apps = serializer.data
+        unsortable_apps = []
+        sort_as = settings.COURSE_APPS_ORDER
+        for app in serializer.data:
+            try:
+                sort_index = sort_as.index(app['id'])
+            except ValueError:
+                sort_index = None
+
+            if sort_index is not None:
+                course_apps[sort_index] = app
+            else:
+                unsortable_apps.append(app)
+        course_apps = course_apps + unsortable_apps
+        return Response(course_apps)
 
     @schema(
         parameters=[
