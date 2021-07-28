@@ -30,9 +30,10 @@ def get_usage_key_hash(usage_key):
     '''
 
     short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
-    hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
-    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=short_key.hexdigest(), usage_key=usage_key)
-    return str(hash, 'utf-8')
+    encoded_hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
+    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=short_key.hexdigest(),
+                                                usage_key=usage_key)
+    return str(encoded_hash, 'utf-8')
 
 
 def path_to_location(modulestore, usage_key, experience, request=None, full_path=False):
