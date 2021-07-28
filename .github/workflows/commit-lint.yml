@@ -1,0 +1,29 @@
+name: Commit Message Linting
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  commit-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Nodejs
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install commintlint-cli
+        run: npm install -g @commitlint/cli
+      - name: Install commintlint-config
+        run: npm install -g @commitlint/config-conventional
+      - name: Lint commit messages
+        run: for commit in $(git log --no-merges --pretty=format:%H remotes/origin/master..); do git show -s --pretty=format:%B $commit | commitlint -V; done
+
