@@ -4,9 +4,9 @@
 #
 #    make upgrade
 #
--e common/lib/sandbox-packages
+common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
--e common/lib/symmath
+common/lib/symmath
     # via -r requirements/edx-sandbox/py38.in
 cffi==1.14.6
     # via cryptography
