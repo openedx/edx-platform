@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField
@@ -438,7 +438,6 @@ class GeneratedCertificate(models.Model):
             )
 
 
-@python_2_unicode_compatible
 class CertificateGenerationHistory(TimeStampedModel):
     """
     Model for storing Certificate Generation History.
@@ -503,7 +502,6 @@ class CertificateGenerationHistory(TimeStampedModel):
                ("regenerated" if self.is_regeneration else "generated", self.generated_by, self.created, self.course_id)
 
 
-@python_2_unicode_compatible
 class CertificateInvalidation(TimeStampedModel):
     """
     Model for storing Certificate Invalidation.
@@ -1014,7 +1012,6 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         return json_data
 
 
-@python_2_unicode_compatible
 class CertificateTemplate(TimeStampedModel):
     """A set of custom web certificate templates.
 
@@ -1095,7 +1092,6 @@ def template_assets_path(instance, filename):
     return name
 
 
-@python_2_unicode_compatible
 class CertificateTemplateAsset(TimeStampedModel):
     """A set of assets to be used in custom web certificate templates.
 
