@@ -118,13 +118,13 @@ class RegistrationViewSet(RegistrationViewSetV1):
             return Response(errors, status=status.HTTP_409_CONFLICT)
         elif email_exists_error:
             errors = {
-                "title": "Email already exists",
+                "user_message": "Email already exists",
                 "invalid-params": ["email"]
             }
             return Response(errors, status=status.HTTP_409_CONFLICT)
         elif username_exists_error:
             errors = {
-                "title": "Username already exists",
+                "user_message": "Username already exists",
                 "invalid-params": ["username"]
             }
             return Response(errors, status=status.HTTP_409_CONFLICT)
