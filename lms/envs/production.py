@@ -1027,3 +1027,9 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
 
 ################# show account activate cta after register ########################
 SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
+
+################# Settings for Chrome-specific origin trials ########
+# Token for "Disable Different Origin Subframe Dialog Suppression" Chrome Origin Trial, which must be origin-specific.
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = ENV_TOKENS.get(
+    'CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN', CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN
+)
