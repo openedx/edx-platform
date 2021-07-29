@@ -85,7 +85,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
-from edx_django_utils.management.commands.manage_user import manage_user_cmd
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -744,11 +743,6 @@ def invalidate_user_profile_country_cache(sender, instance, **kwargs):  # pylint
         log.info("Country changed in UserProfile for %s, cache deleted", instance.user_id)
 
 
-@receiver(manage_user_cmd)
-def user_profile_manage(sender, user, **kwargs):  # pylint: disable=unused-argument
-    user_profile, _ = UserProfile.objects.get_or_create(user=user)  # pylint: disable=unused-variable
-
-
 @receiver(pre_save, sender=UserProfile)
 def user_profile_pre_save_callback(sender, **kwargs):
     """
@@ -833,6 +827,12 @@ def user_post_save_callback(sender, **kwargs):
                         manual_enrollment_audit.reason,
                         enrollment
                     )
+
+    # Ensure the user has a profile
+    try:
+        __ = user.profile
+    except UserProfile.DoesNotExist:
+        UserProfile.objects.create(user=user)
 
     # Because `emit_field_changed_events` removes the record of the fields that
     # were changed, wait to do that until after we've checked them as part of
