@@ -26,8 +26,10 @@ from common.djangoapps.student.models import (
     ManualEnrollmentAudit,
     PendingEmailChange,
     PendingNameChange,
-    UserCelebration
+    UserCelebration,
+    UserProfile
 )
+from common.djangoapps.student.models_api import get_name
 from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.courseware.toggles import (
@@ -728,3 +730,30 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
                 course_enrollment.save()
 
         return user
+
+
+class TestProfile(SharedModuleStoreTestCase):
+    """
+    Tests for the user profile
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.profile = UserProfile.objects.get(user_id=self.user.id)
+        self.name = self.profile.name
+        self.course = CourseFactory.create()
+
+    def test_name(self):
+        """
+        Test retrieval of the name
+        """
+        assert self.name
+        name = get_name(self.user.id)
+        assert name == self.name
+
+    def test_name_missing_profile(self):
+        """
+        Test retrieval of the name when the user profile doesn't exist
+        """
+        name = get_name(None)
+        assert not name
