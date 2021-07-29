@@ -556,12 +556,8 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     certificates_display_behavior = String(
         display_name=_("Certificates Display Behavior"),
         help=_(
-            "Enter end, end_with_date, or early_no_info. After certificate generation, students who passed see a "
-            "link to their certificates on the dashboard and students who did not pass see information about the "
-            "grading configuration. The default is end, which displays this certificate information to all students "
-            "after the course end date. To display the certificate information to all students at a date after the "
-            "course end date, use end_with_date and add a certificate_available_date. To display only the links to "
-            "passing students as soon as certificates are generated, enter early_no_info."
+            "This field, together with certificate_available_date will determine when a "
+            "user can see their certificate for the course"
         ),
         scope=Scope.settings,
         default=CertificatesDisplayBehaviors.END,
