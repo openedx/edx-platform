@@ -606,6 +606,7 @@ def _cert_info(user, enrollment, cert_status):
 
     return status_dict
 
+
 def _is_certificate_earned_but_not_available(course_overview, status):
     """
     Returns True if the user is passing the course, but the certificate is not visible due to display behavior or
@@ -634,6 +635,7 @@ def _is_certificate_earned_but_not_available(course_overview, status):
             CertificateStatuses.is_passing_status(status) and
             course_overview.certificate_available_date
         )
+
 
 def process_survey_link(survey_link, user):
     """
