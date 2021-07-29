@@ -12,7 +12,7 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki
     # via -r requirements/edx/github.in
--e git+https://github.com/edx/edx-django-utils.git@37181a95b9e0e154ce58c3051b3becf9139339a9#egg=edx-django-utils
+-e git+https://github.com/edx/edx-django-utils.git@156bb33a6cfa60dbf0fda9df334860f81ad10562#egg=edx-django-utils
     # via
     #   -r requirements/edx/github.in
     #   django-config-models
@@ -135,7 +135,7 @@ click==7.1.2
     #   code-annotations
     #   nltk
     #   user-util
-code-annotations==1.1.2
+code-annotations==1.2.0
     # via
     #   edx-enterprise
     #   edx-toggles
@@ -236,7 +236,7 @@ django-appconf==1.0.4
     # via
     #   -r requirements/edx/base.in
     #   django-statici18n
-django-cache-memoize==0.1.9
+django-cache-memoize==0.1.10
     # via edx-enterprise
 django-celery-results==2.0.1
     # via
@@ -336,7 +336,7 @@ django-sekizai==2.0.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.1.1
+django-ses==2.2.0
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -399,13 +399,13 @@ drf-jwt==1.19.0
     #   edx-drf-extensions
 drf-yasg==1.20.0
     # via edx-api-doc-tools
-edx-ace==1.1.1
+edx-ace==1.2.0
     # via -r requirements/edx/base.in
 edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.4.3
     # via -r requirements/edx/base.in
-edx-bulk-grades==0.8.12
+edx-bulk-grades==0.9.0
     # via
     #   -r requirements/edx/base.in
     #   staff-graded-xblock
@@ -415,11 +415,11 @@ edx-celeryutils==1.1.0
     # via
     #   -r requirements/edx/base.in
     #   super-csv
-edx-completion==4.0.4
+edx-completion==4.1.0
     # via -r requirements/edx/base.in
-edx-django-release-util==1.0.0
+edx-django-release-util==1.1.0
     # via -r requirements/edx/base.in
-edx-django-sites-extensions==3.0.0
+edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.in
 edx-drf-extensions==6.6.0
     # via
@@ -437,9 +437,9 @@ edx-enterprise==3.26.23
     #   -r requirements/edx/base.in
 edx-event-routing-backends==4.1.0
     # via -r requirements/edx/base.in
-edx-i18n-tools==0.5.3
+edx-i18n-tools==0.7.0
     # via ora2
-edx-milestones==0.3.1
+edx-milestones==0.3.2
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.2
     # via
@@ -457,9 +457,9 @@ edx-opaque-keys[django]==2.2.2
     #   lti-consumer-xblock
     #   ora2
     #   xmodule
-edx-organizations==6.9.0
+edx-organizations==6.10.0
     # via -r requirements/edx/base.in
-edx-proctoring==3.19.0
+edx-proctoring==3.22.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -472,7 +472,7 @@ edx-rest-api-client==5.4.0
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==3.0.0
+edx-search==3.1.0
     # via -r requirements/edx/base.in
 edx-sga==0.16.0
     # via -r requirements/edx/base.in
@@ -491,19 +491,19 @@ edx-toggles==4.2.0
     #   ora2
 edx-user-state-client==1.3.2
     # via -r requirements/edx/base.in
-edx-when==2.0.0
+edx-when==2.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.in
-elasticsearch==7.13.3
+elasticsearch==7.13.4
     # via edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.1.0
     # via -r requirements/edx/base.in
-event-tracking==1.0.4
+event-tracking==1.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-routing-backends
@@ -679,20 +679,20 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.10
+ora2==3.6.12
     # via -r requirements/edx/base.in
 packaging==21.0
     # via
     #   bleach
     #   drf-yasg
-path==16.0.0
+path==16.2.0
     # via
     #   -r requirements/edx/paver.txt
+    #   edx-i18n-tools
     #   path.py
 path.py==12.5.0
     # via
     #   edx-enterprise
-    #   edx-i18n-tools
     #   ora2
     #   staff-graded-xblock
     #   xmodule
@@ -957,7 +957,7 @@ stevedore==3.3.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==2.0.1
+super-csv==2.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-bulk-grades
@@ -1023,7 +1023,7 @@ wrapt==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
-xblock==1.4.2
+xblock==1.5.0
     # via
     #   -r requirements/edx/base.in
     #   acid-xblock
