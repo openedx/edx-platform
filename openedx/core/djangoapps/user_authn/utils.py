@@ -49,20 +49,6 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
     return is_safe_url
 
 
-def generate_password(length=12, chars=string.ascii_letters + string.digits):
-    """Generate a valid random password"""
-    if length < 8:
-        raise ValueError("password must be at least 8 characters")
-
-    choice = random.SystemRandom().choice
-
-    password = ''
-    password += choice(string.digits)
-    password += choice(string.ascii_letters)
-    password += ''.join([choice(chars) for _i in range(length - 2)])
-    return password
-
-
 def is_registration_api_v1(request):
     """
     Checks if registration api is v1

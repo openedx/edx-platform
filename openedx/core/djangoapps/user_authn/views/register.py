@@ -52,7 +52,7 @@ from openedx.core.djangoapps.user_api.accounts.api import (
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import (
-    generate_password, generate_username_suggestions, is_registration_api_v1
+    generate_username_suggestions, is_registration_api_v1
 )
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
@@ -79,6 +79,8 @@ from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
+
+from edx_django_utils.common import generate_password
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
