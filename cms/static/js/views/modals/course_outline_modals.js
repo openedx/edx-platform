@@ -453,19 +453,29 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            // Grab all the sections, map them to their block_ids, then return as an Array
+            var sectionIds = $('.outline-section').map(function(){return this.id;}).get()
+            // Grab all the subsections, map them to their block_ids, then return as an Array
+            var subsectionIds = $('.outline-subsection').map(function(){return this.id;}).get()
+            var relative_weeks_due = null;
             if (this.getValue() < 19 && this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
-                return {
-                    metadata: {
-                        relative_weeks_due: this.getValue()
-                    }
-                };
-            } else {
-                return {
-                    metadata: {
-                        relative_weeks_due: null
-                    }
-                }
+                relative_weeks_due = this.getValue()
             }
+            window.analytics.track('edx.bi.studio.relative_date.saved', {
+                block_id: this.model.get('id'),
+                courserun_key: course.get('id'),
+                num_of_sections_in_course: $('.outline-section').length,
+                num_of_subsections_in_course: $('.outline-subsection').length,
+                order_in_sections: sectionIds.indexOf(this.parent.options.parentInfo.get('id')) + 1,
+                order_in_subsections: subsectionIds.indexOf(this.model.get('id')) + 1,
+                org_key: course.get('org'),
+                relative_weeks_due: relative_weeks_due,
+            });
+            return {
+                metadata: {
+                    relative_weeks_due: relative_weeks_due
+                }
+            };
         },
     });
 
