@@ -5,10 +5,8 @@ Models for the dark-launching languages
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class DarkLangConfig(ConfigurationModel):
     """
     Configuration for the dark_lang django app.
