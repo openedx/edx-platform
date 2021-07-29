@@ -333,7 +333,7 @@ django-filter==2.4.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==3.0.6
+django-ipware==3.0.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
