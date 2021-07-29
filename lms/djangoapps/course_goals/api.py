@@ -12,7 +12,9 @@ from lms.djangoapps.course_goals.models import CourseGoal, GOAL_KEY_CHOICES
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 
-def add_course_goal(user, course_id, goal_key):
+def add_course_goal(user, course_id, goal_key=None,
+                    number_of_days_with_visits_per_week_goal=None,
+                    subscribed_to_goal_reminders=None):
     """
     Add a new course goal for the provided user and course. If the goal
     already exists, simply update and save the goal.
@@ -21,11 +23,21 @@ def add_course_goal(user, course_id, goal_key):
         user: The user that is setting the goal
         course_id (string): The id for the course the goal refers to
         goal_key (string): The goal key for the new goal.
+        number_of_days_with_visits_per_week_goal (int): number of days learner wants to learn per week
+        subscribed_to_goal_reminders (bool): whether the learner wants to receive email reminders about their goal
     """
     course_key = CourseKey.from_string(str(course_id))
-    CourseGoal.objects.update_or_create(
-        user=user, course_key=course_key, defaults={'goal_key': goal_key}
-    )
+    if goal_key:
+        CourseGoal.objects.update_or_create(
+            user=user, course_key=course_key, defaults={'goal_key': goal_key}
+        )
+    else:
+        CourseGoal.objects.update_or_create(
+            user=user, course_key=course_key, defaults={
+                'number_of_days_with_visits_per_week_goal': number_of_days_with_visits_per_week_goal,
+                'subscribed_to_goal_reminders': subscribed_to_goal_reminders,
+            }
+        )
 
 
 def get_course_goal(user, course_key):
