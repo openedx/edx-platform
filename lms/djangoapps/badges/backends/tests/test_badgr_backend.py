@@ -201,7 +201,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert assertion.image_url == 'http://www.example.com/example.png'
         assert assertion.assertion_url == 'http://www.example.com/example'
         assert kwargs['json'] == {"recipient": {"identity": 'example@example.com', "type": "email"},
-                                  "evidence": [{"url": 'https://example.com/irrefutable_proof'}]}
+                                  "evidence": [{"url": 'https://example.com/irrefutable_proof'}],
+                                  "notify": False}
         assert_event_matches({
             'name': 'edx.badge.assertion.created',
             'data': {
