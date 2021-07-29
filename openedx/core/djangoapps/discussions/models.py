@@ -38,7 +38,12 @@ class Features(Enum):
     Features to be used/mapped in discussion providers
     """
     ANONYMOUS_POSTING = 'anonymous-posting'
-    AUTOMATIC_LEARNER_ENROLLMENT = 'automatic-learner-enrollment'
+
+    # Todo: https://openedx.atlassian.net/browse/TNL-8546
+    # This will be added back in once we add LTI v1.3 support for discussion
+    # configuration in the future.  https://openedx.atlassian.net/browse/TNL-8365
+    # AUTOMATIC_LEARNER_ENROLLMENT = 'automatic-learner-enrollment'
+
     BLACKOUT_DISCUSSION_DATES = 'blackout-discussion-dates'
     COMMUNITY_TA_SUPPORT = 'community-ta-support'
     COURSE_COHORT_SUPPORT = 'course-cohort-support'
@@ -59,7 +64,6 @@ class Features(Enum):
     IN_PLATFORM_NOTIFICATIONS = 'in-platform-notifications'
     LTI_ADVANCED_SHARING_MODE = 'lti-advanced-sharing-mode'
     LTI_BASIC_CONFIGURATION = 'lti-basic-configuration'
-    LTI = 'lti'
     SIMPLIFIED_IN_CONTEXT_DISCUSSION = 'simplified-in-context-discussion'
     USER_MENTIONS = 'user-mentions'
 
@@ -86,19 +90,18 @@ def pii_sharing_required_message(provider_name):
 AVAILABLE_PROVIDER_MAP = {
     'legacy': {
         'features': [
-            Features.DISCUSSION_PAGE.value,
-            Features.WCAG_2_1.value,
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
-            Features.WCAG_2_0_SUPPORT.value,
-            Features.INTERNATIONALIZATION_SUPPORT.value,
             Features.ANONYMOUS_POSTING.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
-            Features.COMMUNITY_TA_SUPPORT.value,
             Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
             Features.COURSE_COHORT_SUPPORT.value,
-            Features.RESEARCH_DATA_EVENTS.value,
+            Features.DISCUSSION_PAGE.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.WCAG_2_1.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -107,22 +110,23 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='',
         )._asdict(),
-        "messages": []
+        'messages': [],
+        'has_full_support': True
     },
     'piazza': {
         'features': [
-            Features.DISCUSSION_PAGE.value,
-            Features.LTI.value,
-            Features.WCAG_2_0_SUPPORT.value,
             Features.ANONYMOUS_POSTING.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
-            Features.COMMUNITY_TA_SUPPORT.value,
-            Features.EMAIL_NOTIFICATIONS.value,
             Features.BLACKOUT_DISCUSSION_DATES.value,
-            Features.DISCUSSION_CONTENT_PROMPTS.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+            Features.DISCUSSION_CONTENT_PROMPTS.value,
+            Features.DISCUSSION_PAGE.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
             Features.USER_MENTIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='https://piazza.com/product/overview',
@@ -131,21 +135,24 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='https://piazza.com/product/accessibility',
             contact_email='team@piazza.com',
         )._asdict(),
-        "messages": []
+        'messages': [],
+        'has_full_support': False
     },
     'yellowdig': {
         'features': [
-            Features.WCAG_2_0_SUPPORT.value,
             Features.ANONYMOUS_POSTING.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
-            Features.EMAIL_NOTIFICATIONS.value,
-            Features.RESEARCH_DATA_EVENTS.value,
-            Features.IN_PLATFORM_NOTIFICATIONS.value,
-            Features.GRADED_DISCUSSIONS.value,
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.GRADED_DISCUSSIONS.value,
+            Features.IN_PLATFORM_NOTIFICATIONS.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.RESEARCH_DATA_EVENTS.value,
             Features.USER_MENTIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
@@ -154,7 +161,8 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='learnmore@yellowdig.com',
         )._asdict(),
-        "messages": [pii_sharing_required_message("Yellowdig")]
+        'messages': [pii_sharing_required_message('Yellowdig')],
+        'has_full_support': False
     },
     'inscribe': {
         'features': [
@@ -168,13 +176,14 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='',
         )._asdict(),
-        "messages": [pii_sharing_required_message('InScribe')]
+        'messages': [pii_sharing_required_message('InScribe')],
+        'has_full_support': False
     },
     'discourse': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
             Features.LTI_ADVANCED_SHARING_MODE.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -183,19 +192,20 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='',
         )._asdict(),
-        "messages": [pii_sharing_required_message('Discourse')]
+        'messages': [pii_sharing_required_message('Discourse')],
+        'has_full_support': False
     },
     'ed-discuss': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
-            Features.WCAG_2_0_SUPPORT.value,
-            Features.INTERNATIONALIZATION_SUPPORT.value,
             Features.ANONYMOUS_POSTING.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.EMAIL_NOTIFICATIONS.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.WCAG_2_0_SUPPORT.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -204,7 +214,8 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='',
         )._asdict(),
-        "messages": []
+        'messages': [],
+        'has_full_support': False
     }
 }
 
