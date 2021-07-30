@@ -144,7 +144,7 @@ class CourseOutlineView(APIView):
                 "id": str(section.usage_key),
                 "title": section.title,
                 "sequence_ids": [
-                    str(seq.usage_key) for seq in section.sequences
+                    get_usage_key_hash(seq.usage_key) for seq in section.sequences
                 ],
                 **schedule_item_dict,
             }
