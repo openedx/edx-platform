@@ -45,6 +45,31 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
         request = self.request_factory.get('/event', {
             'page': self.url_with_course,
             'event_type': sentinel.event_type,
+            'event': '{}',
+            'courserun_key': 'explicit/course/id'
+        })
+
+        views.user_track(request)
+
+        actual_event = self.get_event()
+        expected_event = {
+            'context': {
+                'course_id': 'explicit/course/id',
+                'org_id': 'explicit',
+                'event_source': 'browser',
+                'page': self.url_with_course,
+                'username': 'anonymous'
+            },
+            'data': {},
+            'timestamp': FROZEN_TIME,
+            'name': str(sentinel.event_type)
+        }
+        assert_event_matches(expected_event, actual_event)
+
+    def test_user_track_with_implicit_course_id(self):
+        request = self.request_factory.get('/event', {
+            'page': self.url_with_course,
+            'event_type': sentinel.event_type,
             'event': '{}'
         })
 
