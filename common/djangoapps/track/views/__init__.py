@@ -79,15 +79,16 @@ def user_track(request):
 
     name = _get_request_value(request, 'event_type')
     data = _get_request_value(request, 'event', {})
-    course_id_string = _get_request_value(request, 'courserun_key', None)
     page = _get_request_value(request, 'page')
 
     if isinstance(data, str) and len(data) > 0:
         try:
             data = json.loads(data)
-            _add_user_id_for_username(data)
         except ValueError:
             pass
+
+    _add_user_id_for_username(data)
+    course_id_string = data.get('courserun_key') if (data and 'courserun_key' in data) else None
 
     context_override = contexts.course_context_from_url(page, course_id_string)
     context_override['username'] = username

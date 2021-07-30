@@ -10,14 +10,13 @@
             // proper deprecation and notification for external authors.
             it('can send a request to log event', function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
-                Logger.log('example', 'data');
+                Logger.log('example');
                 expect(jQuery.ajaxWithPrefix).toHaveBeenCalledWith({
                     url: '/event',
                     type: 'POST',
                     data: {
                         event_type: 'example',
-                        event: '"data"',
-                        courserun_key: 'edx/999/test',
+                        event: '{"courserun_key":"edX/999/test"}',
                         page: window.location.href
                     },
                     async: true
@@ -26,14 +25,13 @@
 
             it('can send a request with custom options to log event', function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
-                Logger.log('example', 'data', null, {type: 'GET', async: false});
+                Logger.log('example', null, null, {type: 'GET', async: false});
                 expect(jQuery.ajaxWithPrefix).toHaveBeenCalledWith({
                     url: '/event',
                     type: 'GET',
                     data: {
                         event_type: 'example',
-                        event: '"data"',
-                        courserun_key: 'edx/999/test',
+                        event: '{"courserun_key":"edX/999/test"}',
                         page: window.location.href
                     },
                     async: false
@@ -61,14 +59,13 @@
                 $meta_tag = $('<meta name="path_prefix1" content="">');
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
-                Logger.log('example', 'data');
+                Logger.log('example');
                 expect(jQuery.ajax).toHaveBeenCalledWith({
                     url: 'undefined/event',
                     type: 'POST',
                     data: {
                         event_type: 'example',
-                        event: '"data"',
-                        courserun_key: 'edx/999/test',
+                        event: '{"courserun_key":"edX/999/test"}',
                         page: window.location.href
                     },
                     async: true
@@ -79,14 +76,13 @@
                 $meta_tag = $('<meta name="path_prefix" content="">');
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
-                Logger.log('example', 'data');
+                Logger.log('example');
                 expect(jQuery.ajax).toHaveBeenCalledWith({
                     url: '/event',
                     type: 'POST',
                     data: {
                         event_type: 'example',
-                        event: '"data"',
-                        courserun_key: 'edx/999/test',
+                        event: '{"courserun_key":"edX/999/test"}',
                         page: window.location.href
                     },
                     async: true
@@ -97,14 +93,13 @@
                 $meta_tag = $('<meta name="path_prefix" content="testpath">');
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
-                Logger.log('example', 'data');
+                Logger.log('example');
                 expect(jQuery.ajax).toHaveBeenCalledWith({
                     url: 'testpath/event',
                     type: 'POST',
                     data: {
                         event_type: 'example',
-                        event: '"data"',
-                        courserun_key: 'edx/999/test',
+                        event: '{"courserun_key":"edX/999/test"}',
                         page: window.location.href
                     },
                     async: true
@@ -127,24 +122,24 @@
             });
 
             it('can listen to events when the element name is unknown', function() {
-                Logger.log('example', 'data');
-                expect(this.callbacks[0]).toHaveBeenCalledWith('example', 'data', null);
-                expect(this.callbacks[1]).toHaveBeenCalledWith('example', 'data', null);
+                Logger.log('example');
+                expect(this.callbacks[0]).toHaveBeenCalledWith('example', undefined, null);
+                expect(this.callbacks[1]).toHaveBeenCalledWith('example', undefined, null);
                 expect(this.callbacks[2]).not.toHaveBeenCalled();
                 expect(this.callbacks[3]).not.toHaveBeenCalled();
             });
 
             it('can listen to events when the element name is known', function() {
-                Logger.log('example', 'data', 'element');
+                Logger.log('example', null, 'element');
                 expect(this.callbacks[0]).not.toHaveBeenCalled();
                 expect(this.callbacks[1]).not.toHaveBeenCalled();
-                expect(this.callbacks[2]).toHaveBeenCalledWith('example', 'data', 'element');
+                expect(this.callbacks[2]).toHaveBeenCalledWith('example', null, 'element');
                 expect(this.callbacks[3]).not.toHaveBeenCalled();
             });
 
             it('can catch exceptions', function() {
                 var callback = function() {
-                    Logger.log('exception', 'data');
+                    Logger.log('exception');
                 };
                 Logger.listen('exception', null, function() {
                     throw new Error();
@@ -188,7 +183,6 @@
                     data: {
                         event_type: 'page_close',
                         event: '',
-                        courserun_key: 'edx/999/test',
                         page: window.location.href
                     },
                     async: false
