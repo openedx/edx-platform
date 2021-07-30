@@ -2132,6 +2132,7 @@ describe('CourseOutlinePage', function() {
                 ]);
                 createCourseOutlinePage(this, mockCourseJSON, false);
                 setSelfPacedCustomPLS();
+                course.set('start', '2014-07-09T00:00:00Z');
             });
 
             setEditModalValuesForCustomPacing = function(grading_type, due_in) {
@@ -2149,7 +2150,6 @@ describe('CourseOutlinePage', function() {
                 createMockSubsectionJSON({
                     graded: true,
                     relative_weeks_due: 3,
-                    start: '2014-07-09T00:00:00Z',
                     format: 'Lab',
                     has_explicit_staff_lock: true,
                     staff_only_message: true,
