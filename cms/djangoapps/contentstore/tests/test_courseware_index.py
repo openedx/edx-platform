@@ -320,7 +320,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(response["total"], 1)
 
         # delete the course and look course in search_index
-        modulestore().delete_course(self.course.id, self.user_id)
+        modulestore().delete_course(self.course.id, ModuleStoreEnum.UserID.test)
         self.assertIsNone(modulestore().get_course(self.course.id))
         response = self.search()
         self.assertEqual(response["total"], 0)
