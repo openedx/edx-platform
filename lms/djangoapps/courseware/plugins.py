@@ -25,6 +25,9 @@ class ProgressCourseApp(CourseApp):
     app_id = "progress"
     name = _("Progress")
     description = _("Keep learners engaged and on track throughout the course.")
+    documentation_links = {
+        "learn_more_configuration": settings.PROGRESS_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -69,6 +72,9 @@ class TextbooksCourseApp(CourseApp):
     app_id = "textbooks"
     name = _("Textbooks")
     description = _("Create and manage a library of course readings, textbooks, and chapters.")
+    documentation_links = {
+        "learn_more_configuration": settings.TEXTBOOKS_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
@@ -117,6 +123,9 @@ class CalculatorCourseApp(CourseApp):
     app_id = "calculator"
     name = _("Calculator")
     description = _("Provide an in-course calculator for simple and complex calculations.")
+    documentation_links = {
+        "learn_more_configuration": settings.CALCULATOR_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:

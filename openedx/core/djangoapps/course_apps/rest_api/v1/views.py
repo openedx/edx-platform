@@ -51,6 +51,7 @@ class CourseAppSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     name = serializers.CharField(read_only=True, help_text="Friendly name of the course app.")
     description = serializers.CharField(read_only=True, help_text="A friendly description of what the course app does.")
     legacy_link = serializers.URLField(required=False, help_text="A link to the course app in the legacy studio view.")
+    documentation_links = serializers.JSONField(required=True)
     allowed_operations = serializers.DictField(
         read_only=True,
         help_text="What all operations are supported by the app.",
@@ -65,6 +66,7 @@ class CourseAppSerializer(serializers.Serializer):  # pylint: disable=abstract-m
             "name": instance.name,
             "description": instance.description,
             "allowed_operations": instance.get_allowed_operations(course_key, request.user),
+            "documentation_links": instance.documentation_links,
         }
         if hasattr(instance, "legacy_link"):
             data["legacy_link"] = request.build_absolute_uri(instance.legacy_link(course_key))

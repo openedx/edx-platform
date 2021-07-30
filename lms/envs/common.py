@@ -4785,3 +4785,14 @@ SHOW_ACCOUNT_ACTIVATION_CTA = False
 ################# Settings for Chrome-specific origin trials ########
 # Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
 CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
+
+################# Documentation links for course apps #################
+
+# pylint: disable=line-too-long
+CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
+DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
+EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
+PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
+TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
+TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
+WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"

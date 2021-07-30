@@ -48,6 +48,9 @@ class TeamsCourseApp(CourseApp):
     app_id = "teams"
     name = _("Teams")
     description = _("Leverage teams to allow learners to connect by topic of interest.")
+    documentation_links = {
+        "learn_more_configuration": settings.TEAMS_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
