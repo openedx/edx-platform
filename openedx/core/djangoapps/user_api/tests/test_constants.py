@@ -72,7 +72,7 @@ SORTED_COUNTRIES = [
     ("EE", "Estonia"),
     ("SZ", "Eswatini"),
     ("ET", "Ethiopia"),
-    ("FK", "Falkland Islands  (Malvinas)"),
+    ("FK", "Falkland Islands (Malvinas)"),
     ("FO", "Faroe Islands"),
     ("FJ", "Fiji"),
     ("FI", "Finland"),
