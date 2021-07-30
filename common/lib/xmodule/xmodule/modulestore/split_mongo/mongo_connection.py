@@ -12,6 +12,7 @@ import zlib
 from contextlib import contextmanager
 from time import time
 
+from django.core.cache import caches, InvalidCacheBackendError
 import pymongo
 import pytz
 from mongodb_proxy import autoretry_read
@@ -22,11 +23,6 @@ from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
-try:
-    from django.core.cache import caches, InvalidCacheBackendError
-    DJANGO_AVAILABLE = True
-except ImportError:
-    DJANGO_AVAILABLE = False
 
 log = logging.getLogger(__name__)
 
@@ -198,11 +194,10 @@ class CourseStructureCache:
     """
     def __init__(self):
         self.cache = None
-        if DJANGO_AVAILABLE:
-            try:
-                self.cache = get_cache('course_structure_cache')
-            except InvalidCacheBackendError:
-                pass
+        try:
+            self.cache = get_cache('course_structure_cache')
+        except InvalidCacheBackendError:
+            pass
 
     def get(self, key, course_context=None):
         """Pull the compressed, pickled struct data from cache and deserialize."""
