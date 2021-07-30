@@ -862,9 +862,29 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'video_url': video_url,
             'edx_video_id': video_id
         }
-
         _context.update({'transcripts_basic_tab_metadata': metadata})
+        #### EOL ####
+        eol_videolist = self.get_eol_videos_vimeo(self.course_id)
+        _context['eol_videolist'] = {'data': eol_videolist, 'edx_video_id': self.edx_video_id}
+        #### EOL END ####
         return _context
+
+    def get_eol_videos_vimeo(self, course_key):
+        """
+            EOL: Get a list of vimeo videos, only with status vimeo_encoding and upload_completed 
+        """
+        try:
+            from eol_vimeo.models import EolVimeoVideo
+            from edxval.api import _get_video
+            video_list = []
+            vimeo_list = EolVimeoVideo.objects.filter(course_key=course_key, status__in=['vimeo_encoding', 'upload_completed']).values('edx_video_id')
+            for video in vimeo_list:
+                aux = _get_video(video['edx_video_id'])
+                video_list.append({'edx_video_id': video['edx_video_id'], 'display_name': aux.client_video_id})
+            return video_list
+        except ImportError as e:
+            log.error('EolVimeo - Error to import EolVimeoVideo or edxval.api._get_video, exception: {}'.format(str(e)))
+            return []
 
     @classmethod
     def _parse_youtube(cls, data):

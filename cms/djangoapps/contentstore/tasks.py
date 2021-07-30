@@ -71,6 +71,12 @@ from edxval.api import (
     create_external_video,
 )
 
+try:
+    from eol_vimeo.vimeo_utils import duplicate_all_video as vimeo_duplicate_video
+    HAS_VIMEO = True
+except ImportError:
+    HAS_VIMEO = False
+
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
@@ -469,7 +475,11 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
 
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
-
+        if HAS_VIMEO:
+            LOGGER.info('ReRun Course - Duplicate Vimeo, source_course_key: {}, destination_course_key: {}'.format(str(source_course_key), str(destination_course_key)))
+            vimeo_duplicate_video(source_course_key, destination_course_key, User.objects.get(id=user_id))
+        else:
+            LOGGER.info('ReRun Course - Error to import EolVimeo, source_course_key: {}, destination_course_key: {}'.format(str(source_course_key), str(destination_course_key)))
         # Copy OrganizationCourse
         organization_course = OrganizationCourse.objects.filter(course_id=source_course_key_string).first()
 
