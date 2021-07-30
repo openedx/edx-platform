@@ -59,6 +59,7 @@
                 return sendRequest({
                     event_type: eventType,
                     event: JSON.stringify(data),
+                    courserun_key: $$course_id,
                     page: window.location.href
                 }, requestOptions);
             },
