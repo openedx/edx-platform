@@ -14,7 +14,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
-from testfixtures import LogCapture
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -229,7 +228,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         cache.clear()
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
-    @ddt.data('generate_example_certificates', 'enable_certificate_generation')
+    @ddt.data('enable_certificate_generation')
     def test_allow_only_global_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
@@ -242,28 +241,6 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.global_staff.username, password='test')
         response = self.client.post(url)
         assert response.status_code == 302
-
-    def test_generate_example_certificates(self):
-        expected_log_message = (
-            "Generating example certificates is no longer supported. Skipping generation of example certificates for "
-            f"course {self.course.id}"
-        )
-
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'generate_example_certificates',
-            kwargs={'course_id': str(self.course.id)}
-        )
-        logging_messages = None
-        with LogCapture() as log:
-            response = self.client.post(url)
-            logging_messages = [log_msg.getMessage() for log_msg in log.records]
-
-        assert logging_messages is not None
-        assert expected_log_message in logging_messages
-
-        # Expect a redirect back to the instructor dashboard
-        self._assert_redirects_to_instructor_dash(response)
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):

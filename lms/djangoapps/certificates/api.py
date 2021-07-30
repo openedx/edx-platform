@@ -351,33 +351,6 @@ def cert_generation_enabled(course_key):
     )
 
 
-def generate_example_certificates(course_key):
-    """Generate example (PDF) certificates for a course.
-
-    Example certificates were used to validate that certificates were configured correctly for the course.  Staff
-    members could view the example certificates before enabling the self-generated certificates button for students.
-
-    [07/20/2021 Update]
-    This function was updated to remove the references to queue.py, which has been removed as part of MICROBA-1227, and
-    no longer can fulfill the function it was originally created for. There is further cleanup around PDF certificate
-    generation code, part of DEPR-155, that will remove this function. See DEPR-155 and MICROBA-1094 for additional
-    info.
-
-    It may be important to note that this functionality has been broken since 2018 when the ability to generate PDF
-    certificates was ripped out of edx-platform. This will be removed as part of MICROBA-1394.
-
-    Arguments:
-        course_key (CourseKey): The course identifier.
-
-    Returns:
-        None
-    """
-    log.warning(
-        "Generating example certificates is no longer supported. Skipping generation of example certificates for "
-        f"course {course_key}"
-    )
-
-
 def example_certificates_status(course_key):
     """Check the status of example certificates for a course.
 
