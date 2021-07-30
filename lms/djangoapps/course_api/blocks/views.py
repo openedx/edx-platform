@@ -245,6 +245,9 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             blocks = response.data['blocks']
             for block in blocks:
                 current_block = blocks[block]
+                if 'children' in current_block:
+                    new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
+                    current_block['hash_children'] = new_child_ids
                 current_block['hash_key'] = get_usage_key_hash(current_block['id'])
             return response
         except ItemNotFoundError as exception:
