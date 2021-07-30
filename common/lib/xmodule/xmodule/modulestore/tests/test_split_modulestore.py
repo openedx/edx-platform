@@ -19,6 +19,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator,
 from path import Path as path
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.lib import tempdir
 from openedx.core.lib.tests import attr
 from xmodule.course_module import CourseBlock
@@ -833,19 +834,15 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert root_block_key.block_id == 'course'
 
 
-class TestCourseStructureCache(SplitModuleTest):
+class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
     """Tests for the CourseStructureCache"""
 
+    # CacheIsolationMixin will reset the cache between test cases
+
+    # We'll use the "default" cache as a valid cache, and the "course_structure_cache" as a dummy cache
+    ENABLED_CACHES = ["default"]
+
     def setUp(self):
-        # use the default cache, since the `course_structure_cache`
-        # is a dummy cache during testing
-        self.cache = caches['default']
-
-        # make sure we clear the cache before every test...
-        self.cache.clear()
-        # ... and after
-        self.addCleanup(self.cache.clear)
-
         # make a new course:
         self.user = random.getrandbits(32)
         self.new_course = modulestore().create_course(
@@ -858,7 +855,8 @@ class TestCourseStructureCache(SplitModuleTest):
     def test_course_structure_cache(self, mock_get_cache):
         # force get_cache to return the default cache so we can test
         # its caching behavior
-        mock_get_cache.return_value = self.cache
+        enabled_cache = caches['default']
+        mock_get_cache.return_value = enabled_cache
 
         with check_mongo_calls(1):
             not_cached_structure = self._get_structure(self.new_course)
@@ -872,7 +870,7 @@ class TestCourseStructureCache(SplitModuleTest):
 
         # If data is corrupted, get it from mongo again.
         cache_key = self.new_course.id.version_guid
-        self.cache.set(cache_key, b"bad_data")
+        enabled_cache.set(cache_key, b"bad_data")
         with check_mongo_calls(1):
             not_corrupt_structure = self._get_structure(self.new_course)
 

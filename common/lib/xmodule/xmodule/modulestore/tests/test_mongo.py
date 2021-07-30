@@ -35,9 +35,9 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
+from xmodule.modulestore.tests.utils import mock_tab_from_json
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml, perform_xlint
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 

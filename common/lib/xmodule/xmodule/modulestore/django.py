@@ -265,7 +265,7 @@ def create_modulestore_instance(
         _options['create_modulestore_instance'] = create_modulestore_instance
 
     if issubclass(class_, BranchSettingMixin):
-        _options['branch_setting_func'] = _get_modulestore_branch_setting
+        _options.setdefault('branch_setting_func', _get_modulestore_branch_setting)
 
     if HAS_USER_SERVICE and not user_service:
         xb_user_service = DjangoXBlockUserService(get_current_user())
