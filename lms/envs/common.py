@@ -947,6 +947,16 @@ FEATURES = {
     # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
+
+    # .. toggle_name: FEATURES['WARN_BEFORE_SPECIAL_EXAM_UNLOAD']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to show window unload popup on special exam if
+    #   all problems are not attempted.
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2021-07-30
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/28325'
+    'WARN_BEFORE_SPECIAL_EXAM_UNLOAD': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API

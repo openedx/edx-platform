@@ -178,6 +178,18 @@
                 this.updatedProblems[this.position] = {};
             }
 
+            // Update the problem in appropriate sequence contents.
+            var content = this.contents.eq(this.position - 1);
+            var tempEl = $('<div></div>')
+            edx.HtmlUtils.setHtml(tempEl, edx.HtmlUtils.HTML($(content).text()))
+            tempEl
+                .find("[data-problem-id='" + problemId + "']")
+                .attr('data-content', newContentState)
+                .attr('data-problem-score', newState.current_score)
+                .attr('data-problem-total-possible', newState.total_possible)
+                .attr('data-attempts-used', newState.attempts_used);
+            this.contents.eq(this.position - 1).text(tempEl.html())
+
             // Now, put problem content and score against problem id for current active sequence.
             this.updatedProblems[this.position][problemId] = [newContentState, newState];
         };

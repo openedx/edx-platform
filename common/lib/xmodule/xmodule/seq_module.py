@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 from functools import reduce
 
+from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
@@ -584,6 +585,14 @@ class SequenceBlock(
 
         add_webpack_to_fragment(fragment, 'SequenceBlockPreview')
         shim_xmodule_js(fragment, 'Sequence')
+
+        if (
+            settings.FEATURES.get('WARN_BEFORE_SPECIAL_EXAM_UNLOAD', False)
+            and self.is_timed_exam
+            and view == STUDENT_VIEW
+        ):
+            fragment.add_javascript(resource_string(__name__, 'js/src/sequence/special_exam.js').decode('utf-8'))
+
         return fragment
 
     def _get_gated_content_info(self, prereq_met, prereq_meta_info):
