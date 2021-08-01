@@ -948,6 +948,18 @@ FEATURES = {
     # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
+    
+    # .. toggle_name: ENABLE_CODEJAIL_REST_SERVICE
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set this to True if you want to run Codejail code using
+    #   a separate VM or container and communicate with edx-platform using REST API.
+    # .. toggle_use_cases: tutor
+    # .. toggle_creation_date: 2021-08-19
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: 
+    # .. toggle_tickets: 
+    'ENABLE_CODEJAIL_REST_SERVICE': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1628,6 +1640,9 @@ CODE_JAIL = {
 #       r"Harvard/XY123.1/.*"
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
+
+# Cojail REST service
+CODE_JAIL_REST_SERVICE_HOST = 'http://127.0.0.1:8550'
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here

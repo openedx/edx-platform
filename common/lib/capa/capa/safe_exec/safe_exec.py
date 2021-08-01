@@ -2,10 +2,13 @@
 
 
 import hashlib
+import requests
+import json
 
 from codejail.safe_exec import SafeExecException, json_safe
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import safe_exec as codejail_safe_exec
+from django.conf import settings
 from edx_django_utils.monitoring import function_trace
 import six
 from six import text_type
@@ -143,28 +146,63 @@ def safe_exec(
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
-    # Decide which code executor to use.
-    if unsafely:
-        exec_fn = codejail_not_safe_exec
+    if settings.FEATURES.get('ENABLE_CODEJAIL_REST_SERVICE', False):
+        try:
+            codejail_service_endpoint = "".join([
+                settings.CODE_JAIL_REST_SERVICE_HOST,
+                "/api/v0/code-exec"
+                ])
+            data = {
+                "code": code_prolog + LAZY_IMPORTS + code,
+                "globals_dict": globals_dict,
+                "python_path": python_path,
+                "limit_overrides_context": limit_overrides_context,
+                "slug": slug,
+                "unsafely": unsafely
+            }
+            datajson = json.dumps(data)
+            response = requests.request(
+                "POST",
+                codejail_service_endpoint,
+                files=extra_files,
+                data={'payload': datajson}
+            )
+            response_json = response.json()
+            emsg = response_json["emsg"]
+            if emsg:
+                exception_msg = ". ".join([
+                        emsg,
+                        "For more information check Codejail Service logs."
+                    ])
+                
+                exception = SafeExecException(emsg)
+            globals_dict.update(response_json["globals_dict"])
+        except Exception as e:
+            raise e
+            emsg = None
     else:
-        exec_fn = codejail_safe_exec
+        # Decide which code executor to use.
+        if unsafely:
+            exec_fn = codejail_not_safe_exec
+        else:
+            exec_fn = codejail_safe_exec
 
-    # Run the code!  Results are side effects in globals_dict.
-    try:
-        exec_fn(
-            code_prolog + LAZY_IMPORTS + code,
-            globals_dict,
-            python_path=python_path,
-            extra_files=extra_files,
-            limit_overrides_context=limit_overrides_context,
-            slug=slug,
-        )
-    except SafeExecException as e:
-        # Saving SafeExecException e in exception to be used later.
-        exception = e
-        emsg = text_type(e)
-    else:
-        emsg = None
+        # Run the code!  Results are side effects in globals_dict.
+        try:
+            exec_fn(
+                code_prolog + LAZY_IMPORTS + code,
+                globals_dict,
+                python_path=python_path,
+                extra_files=extra_files,
+                limit_overrides_context=limit_overrides_context,
+                slug=slug,
+            )
+        except SafeExecException as e:
+            # Saving SafeExecException e in exception to be used later.
+            exception = e
+            emsg = text_type(e)
+        else:
+            emsg = None
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
