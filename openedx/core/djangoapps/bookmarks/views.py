@@ -317,7 +317,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             decoded_hash_string = urlsafe_b64decode(usage_id)
             usage_key_hash = decoded_hash_string.decode('utf-8')
             usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
-        
+
         try:
             return UsageKey.from_string(usage_id)
         except InvalidKeyError:
