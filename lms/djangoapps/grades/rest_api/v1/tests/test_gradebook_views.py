@@ -32,7 +32,7 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.grades.config.waffle import BULK_MANAGEMENT, WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
@@ -244,6 +244,43 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
             expected_data = self._get_expected_data()
             expected_data['grades_frozen'] = True
             assert expected_data == resp.data
+
+    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
+    def test_can_see_bulk_management_non_masters(self, mock_course_enrollment_details):
+        # Given a course without a master's track
+        mock_course_enrollment_details.return_value = {'course_modes': [{'slug': 'not-masters'}]}
+
+        # When getting course grading view
+        self.client.login(username=self.staff.username, password=self.password)
+        resp = self.client.get(self.get_url(self.course_key))
+
+        # Course staff should not be shown bulk management controls
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.data['can_see_bulk_management'] is False
+
+    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
+    def test_can_see_bulk_management_masters(self, mock_course_enrollment_details):
+        # Given a course with a master's track
+        mock_course_enrollment_details.return_value = {'course_modes': [{'slug': 'not-masters'}, {'slug': 'masters'}]}
+
+        # When getting course grading view
+        self.client.login(username=self.staff.username, password=self.password)
+        resp = self.client.get(self.get_url(self.course_key))
+
+        # Course staff should be shown bulk management controls (default on for master's track courses)
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.data['can_see_bulk_management'] is True
+
+    @override_waffle_flag(waffle_flags()[BULK_MANAGEMENT], active=True)
+    def test_can_see_bulk_management_force_enabled(self):
+        # Given a course without (or with) a master's track where bulk management is enabled with the config flag
+        # When getting course grading view
+        self.client.login(username=self.staff.username, password=self.password)
+        resp = self.client.get(self.get_url(self.course_key))
+
+        # # Course staff should be able to see bulk management
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.data['can_see_bulk_management'] is True
 
 
 class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
