@@ -404,8 +404,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         showProjectedDate: function() {
-            if (!this.getValue()) return;
-            var startDate = new Date(this.model.get('start'));
+            if (!this.getValue() || !course.get('start')) return;
+            var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
             var startDateList = startDate.toUTCString().split(' ')
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
@@ -430,9 +430,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             else {
                 this.$('#relative_weeks_due_warning_max').hide();
                 this.$('#relative_weeks_due_warning_min').hide();
-                if (this.model.get('start')){
-                    this.showProjectedDate();
-                }
+                this.showProjectedDate();
                 BaseModal.prototype.enableActionButton.call(this.parent, 'save');
             }
         },
@@ -447,9 +445,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
             this.$('.field-due-in input').val(this.model.get('relative_weeks_due'));
             this.$('#relative_weeks_due_projected').hide();
-            if (this.getValue() && this.model.get('start')){
-                this.showProjectedDate();
-            }
+            this.showProjectedDate();
         },
 
         getRequestData: function() {
