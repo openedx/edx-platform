@@ -9,7 +9,7 @@ Pending
 Context
 -------
 
-EdX's implementation of xAPI emits course completion events. In order to replace the existing implementation with ``event-routing-backends``, we need to emit course completion events from edx platform. These events will then be transformed into desired specification (xAPI or Caliper) by ``event-routing-backends``.
+edX's implementation of xAPI emits course completion events. In order to replace the existing implementation with ``event-routing-backends``, we need to emit course completion events from edx platform. These events will then be transformed into desired specification (xAPI or Caliper) by ``event-routing-backends``.
 
 Decision
 --------
