@@ -1158,3 +1158,42 @@ class CertificateGenerationCommandConfiguration(ConfigurationModel):
 
     def __str__(self):
         return str(self.arguments)
+
+
+class CertificateDateOverride(TimeStampedModel):
+    """
+    Model to manually override a given certificate date with the given date.
+
+    .. no_pii:
+    """
+    generated_certificate = models.OneToOneField(
+        GeneratedCertificate,
+        on_delete=models.CASCADE,
+        related_name='date_override',
+        help_text="The id of the Generated Certificate to override",
+    )
+    date = models.DateField(
+        help_text="The date to display on the certificate",
+    )
+    reason = models.TextField(
+        help_text="The reason why you are overriding the certificate date (Update this when you add OR edit the date.)",
+    )
+    overridden_by = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        help_text="The last person to save this record",
+    )
+
+    # This is necessary because CMS does not install the certificates app, but
+    # this code is run when other models in this file are imported there (or in
+    # common code). Simple History will attempt to connect to the installed
+    # model in the certificates app, which will fail.
+    if 'certificates' in apps.app_configs:
+        history = HistoricalRecords()
+
+    class Meta:
+        app_label = "certificates"
+
+    def __str__(self):
+        return "Certificate %s, date overridden to %s by %s on %s." % \
+               (self.generated_certificate, self.date, self.overridden_by, self.created)
