@@ -2,8 +2,6 @@
 CourseBlocks API views
 """
 
-from base64 import (urlsafe_b64encode, urlsafe_b64decode)
-
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
