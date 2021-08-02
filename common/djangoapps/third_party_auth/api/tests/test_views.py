@@ -245,7 +245,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         self._verify_response(response, expect_code, expect_data)
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
-        token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
+        token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters).decode('utf-8')
         return f"JWT {token}"
 
     @ddt.data(
