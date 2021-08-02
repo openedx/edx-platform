@@ -36,7 +36,7 @@ def get_usage_key_hash(usage_key):
     return str(encoded_hash, 'utf-8')
 
 
-def path_to_location(modulestore, usage_key, experience, request=None, full_path=False):
+def path_to_location(modulestore, usage_key, request=None, full_path=False, experience=None):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
