@@ -16,6 +16,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -60,7 +61,8 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
             org='testorg',
             number='run1',
             display_name='refundable course',
-            certificate_available_date=datetime.datetime.today() - datetime.timedelta(days=1)
+            certificate_available_date=datetime.datetime.today() - datetime.timedelta(days=1),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         self.course.cert_html_view_enabled = True
         self.course.save()

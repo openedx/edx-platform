@@ -2,15 +2,20 @@
 
 import datetime
 from unittest.mock import patch
+from collections import namedtuple
 
 import pytest
 import ddt
 
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview
+
+# represents a change of a course overview field. Used to avoid confusing indicies
+Change = namedtuple("Change", ["field_name", "initial_value", "changed_value"])
 
 
 @ddt.ddt
@@ -71,8 +76,11 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
                 self.store.delete_course(course.id, ModuleStoreEnum.UserID.test)
                 CourseOverview.get_from_id(course.id)
 
-    def assert_changed_signal_sent(self, field_name, initial_value, changed_value, mock_signal):  # lint-amnesty, pylint: disable=missing-function-docstring
-        course = CourseFactory.create(emit_signals=True, **{field_name: initial_value})
+    def assert_changed_signal_sent(self, changes, mock_signal):  # lint-amnesty, pylint: disable=missing-function-docstring
+        course = CourseFactory.create(
+            emit_signals=True,
+            **{change.field_name: change.initial_value for change in changes}
+        )
 
         # changing display name doesn't fire the signal
         course.display_name = course.display_name + 'changed'
@@ -80,18 +88,27 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         assert not mock_signal.called
 
         # changing the given field fires the signal
-        setattr(course, field_name, changed_value)
+        for change in changes:
+            setattr(course, change.field_name, change.changed_value)
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert mock_signal.called
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')
     def test_start_changed(self, mock_signal):
-        self.assert_changed_signal_sent('start', self.TODAY, self.NEXT_WEEK, mock_signal)
+        self.assert_changed_signal_sent([Change('start', self.TODAY, self.NEXT_WEEK)], mock_signal)
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_PACING_CHANGED.send')
     def test_pacing_changed(self, mock_signal):
-        self.assert_changed_signal_sent('self_paced', True, False, mock_signal)
+        self.assert_changed_signal_sent([Change('self_paced', True, False)], mock_signal)
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_CERT_DATE_CHANGE.send_robust')
     def test_cert_date_changed(self, mock_signal):
-        self.assert_changed_signal_sent('certificate_available_date', self.TODAY, self.NEXT_WEEK, mock_signal)
+        changes = [
+            Change("certificate_available_date", self.TODAY, self.NEXT_WEEK),
+            Change(
+                "certificates_display_behavior",
+                CertificatesDisplayBehaviors.END,
+                CertificatesDisplayBehaviors.END_WITH_DATE
+            )
+        ]
+        self.assert_changed_signal_sent(changes, mock_signal)

@@ -10,6 +10,7 @@ from django.conf import settings
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -48,6 +49,8 @@ class CourseDetails:
         self.end_date = None  # 'end'
         self.enrollment_start = None
         self.enrollment_end = None
+        self.certificate_available_date = None
+        self.certificates_display_behavior = None
         self.syllabus = None  # a pdf file asset
         self.title = ""
         self.subtitle = ""
@@ -108,7 +111,12 @@ class CourseDetails:
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
         course_details.end_date = course_descriptor.end
-        course_details.certificate_available_date = course_descriptor.certificate_available_date  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        updated_available_date, updated_display_behavior = cls.validate_certificate_settings(
+            course_descriptor.certificate_available_date,
+            course_descriptor.certificates_display_behavior
+        )
+        course_details.certificate_available_date = updated_available_date
+        course_details.certificates_display_behavior = updated_display_behavior
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
@@ -244,6 +252,13 @@ class CourseDetails:
             dirty = True
             descriptor.certificate_available_date = converted
 
+        if (
+            'certificates_display_behavior' in jsondict
+            and jsondict['certificates_display_behavior'] != descriptor.certificates_display_behavior
+        ):
+            descriptor.certificates_display_behavior = jsondict['certificates_display_behavior']
+            dirty = True
+
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
@@ -338,3 +353,31 @@ class CourseDetails:
                      'frameborder="0" allowfullscreen=""></iframe>').format(video_key)
             )
         return result
+
+    @classmethod
+    def validate_certificate_settings(cls, certificate_available_date, certificates_display_behavior):
+        """
+        Takes the stored values for certificate_available_date and certificates_display_behavior and verifies they work
+        together in tandem per ADR: lms/djangoapps/certificates/docs/decisions/005-cert-display-settings.rst
+
+        Arguments:
+            stored_certificate_available_date (str): certificate_available_date from the modulestore
+            stored_certificates_display_behavior (str):
+
+        Returns:
+            tuple[str, str]: updated certificate_available_date, updated certificates_display_behavior
+            None
+        """
+        # If V2 is not enable, return original values
+        if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
+            return (certificate_available_date, certificates_display_behavior)
+
+        # "early_no_info" will always show regardless of settings
+        if certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO:
+            return (None, CertificatesDisplayBehaviors.EARLY_NO_INFO)
+
+        # If the date is set and "early_no_info" isn't
+        if certificate_available_date:
+            return (certificate_available_date, CertificatesDisplayBehaviors.END_WITH_DATE)
+
+        return (None, CertificatesDisplayBehaviors.END)

@@ -18,6 +18,7 @@ from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from testfixtures import LogCapture
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -210,13 +211,49 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
+    @patch.dict(settings.FEATURES, {'ENABLE_V2_CERT_DISPLAY_SETTINGS': False})
+    def test_cert_api_return_v1(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
         """
         Test 'downloadable status'
         """
         cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
         self.course.self_paced = self_paced
         self.course.certificate_available_date = cert_avail_date
+        self.course.save()
+
+        self._setup_course_certificate()
+
+        downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+        assert downloadable_status['is_downloadable'] == cert_downloadable_status
+        assert downloadable_status.get('earned_but_not_available') == earned_but_not_available
+
+    @ddt.data(
+        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True),
+    )
+    @ddt.unpack
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_V2_CERT_DISPLAY_SETTINGS': True})
+    def test_cert_api_return_v2(
+        self,
+        self_paced,
+        cert_avail_delta,
+        certificates_display_behavior,
+        cert_downloadable_status,
+        earned_but_not_available
+    ):
+        """
+        Test 'downloadable status'
+        """
+        cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
+        self.course.self_paced = self_paced
+        self.course.certificate_available_date = cert_avail_date
+        self.course.certificates_display_behavior = certificates_display_behavior
         self.course.save()
 
         self._setup_course_certificate()

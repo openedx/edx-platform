@@ -36,7 +36,6 @@ from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
-
 log = logging.getLogger(__name__)
 
 
@@ -55,6 +54,10 @@ class CourseOverview(TimeStampedModel):
         course catalog (courses to enroll in)
         course about (meta data about the course)
 
+    When you bump the VERSION you will invalidate all existing course overviews. This
+    will cause a slew of modulestore reads as each course needs to be re-cached into
+    the course overview.
+
     .. no_pii:
     """
 
@@ -62,7 +65,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 15
+    VERSION = 16
 
     # Cache entry versioning.
     version = IntegerField()
@@ -210,13 +213,18 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_image_url = course_image_url(course)
         course_overview.social_sharing_url = course.social_sharing_url
 
-        course_overview.certificates_display_behavior = course.certificates_display_behavior
+        updated_available_date, updated_display_behavior = CourseDetails.validate_certificate_settings(
+            course.certificate_available_date,
+            course.certificates_display_behavior
+        )
+
+        course_overview.certificates_display_behavior = updated_display_behavior
+        course_overview.certificate_available_date = updated_available_date
         course_overview.certificates_show_before_end = course.certificates_show_before_end
         course_overview.cert_html_view_enabled = course.cert_html_view_enabled
         course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
         course_overview.cert_name_short = course.cert_name_short
         course_overview.cert_name_long = course.cert_name_long
-        course_overview.certificate_available_date = course.certificate_available_date
         course_overview.lowest_passing_grade = lowest_passing_grade
         course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
