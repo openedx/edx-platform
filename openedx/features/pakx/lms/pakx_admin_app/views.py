@@ -14,12 +14,13 @@ from rest_framework.response import Response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
-from student.models import CourseEnrollment, LanguageProficiency
+from student.models import CourseAccessRole, CourseEnrollment, LanguageProficiency
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, ORG_ADMIN, TRAINING_MANAGER
 from .pagination import CourseEnrollmentPagination, PakxAdminAppPagination
 from .permissions import CanAccessPakXAdminPanel, IsSameOrganization
 from .serializers import (
+    CoursesSerializer,
     CourseStatsListSerializer,
     LearnersSerializer,
     UserCourseEnrollmentSerializer,
@@ -283,8 +284,9 @@ class AnalyticsStats(views.APIView):
 
         user_ids = user_qs.values_list('id', flat=True)
         course_stats = user_qs.annotate(passed=ExpressionWrapper(COMPLETED_COURSE_COUNT,
-                                        output_field=IntegerField()), in_progress=ExpressionWrapper(
-            IN_PROGRESS_COURSE_COUNT, output_field=IntegerField())).aggregate(
+                                                                 output_field=IntegerField()),
+                                        in_progress=ExpressionWrapper(
+                                            IN_PROGRESS_COURSE_COUNT, output_field=IntegerField())).aggregate(
             completions=Sum(F('passed')), pending=Sum(F('in_progress')))
         data = {'learner_count': len(user_ids), 'course_in_progress': course_stats.get('pending', 0),
                 'completed_course_count': course_stats.get('completions', 0)}
@@ -419,3 +421,32 @@ class UserInfo(views.APIView):
             user_info['role'] = TRAINING_MANAGER if user_groups.name == GROUP_TRAINING_MANAGERS else ORG_ADMIN
 
         return Response(status=status.HTTP_200_OK, data=user_info)
+
+
+class CourseListAPI(generics.ListAPIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [CanAccessPakXAdminPanel]
+    pagination_class = PakxAdminAppPagination
+    serializer_class = CoursesSerializer
+
+    PakxAdminAppPagination.page_size = 3
+
+    instructors = {}
+
+    def get_serializer_context(self):
+        context = super(CourseListAPI, self).get_serializer_context()
+        context.update({"instructors": self.instructors})
+        return context
+
+    def get_queryset(self):
+        queryset = CourseOverview.objects.all()
+        course_access_role_qs = CourseAccessRole.objects.filter(course_id__in=queryset.values_list('id'))\
+            .select_related('user__profile')
+
+        for course_access_role in course_access_role_qs:
+            course_instructors = self.instructors.get(course_access_role.course_id, [])
+            if course_access_role.user.profile.name not in course_instructors:
+                course_instructors.append(course_access_role.user.profile.name)
+            self.instructors[course_access_role.course_id] = course_instructors
+
+        return queryset

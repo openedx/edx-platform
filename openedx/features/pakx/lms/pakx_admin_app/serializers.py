@@ -230,9 +230,19 @@ class LearnersSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_incomplete_courses(obj):
-
         return len([stat for stat in obj.enrollment if stat.enrollment_stats.progress < 100])
 
     @staticmethod
     def get_completed_courses(obj):
         return len([stat for stat in obj.enrollment if stat.enrollment_stats.progress == 100])
+
+
+class CoursesSerializer(serializers.ModelSerializer):
+    instructor = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseOverview
+        fields = ('display_name', 'instructor', 'start_date', 'end_date', 'course_image_url')
+
+    def get_instructor(self, obj):
+        return self.context['instructors'].get(obj.id) or []
