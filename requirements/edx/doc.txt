@@ -10,13 +10,13 @@ babel==2.9.1
     # via sphinx
 certifi==2021.5.30
     # via requests
-charset-normalizer==2.0.3
+charset-normalizer==2.0.4
     # via requests
 click==7.1.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-code-annotations==1.1.2
+code-annotations==1.2.0
     # via -r requirements/edx/doc.in
 docutils==0.17.1
     # via sphinx
@@ -60,7 +60,7 @@ smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.1.1
+sphinx==4.1.2
     # via
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme
