@@ -5,7 +5,6 @@
 
 import logging
 
-from django.utils.encoding import python_2_unicode_compatible
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
@@ -16,9 +15,6 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
-
-@python_2_unicode_compatible
 class LibraryRoot(XBlock):
     """
     The LibraryRoot is the root XBlock of a content library. All other blocks in
