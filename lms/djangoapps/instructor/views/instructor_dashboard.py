@@ -342,10 +342,6 @@ def _section_certificates(course):
         'certificate_generation_history':
             CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
-            'generate_example_certificates': reverse(
-                'generate_example_certificates',
-                kwargs={'course_id': course.id}
-            ),
             'enable_certificate_generation': reverse(
                 'enable_certificate_generation',
                 kwargs={'course_id': course.id}
