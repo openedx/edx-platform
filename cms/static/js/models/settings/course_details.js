@@ -11,6 +11,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 language: '',
                 start_date: null,	// maps to 'start'
                 end_date: null,		// maps to 'end'
+                certificates_display_behavior: "",
                 certificate_available_date: null,
                 enrollment_start: null,
                 enrollment_end: null,
@@ -42,6 +43,12 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
                 var errors = {};
+                const CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS = {
+                    END: "end",
+                    END_WITH_DATE: "end_with_date",
+                    EARLY_NO_INFO: "early_no_info"
+                };
+
                 newattrs = DateUtils.convertDateStringsToObjects(
                     newattrs,
                     ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
@@ -75,6 +82,39 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                         'The certificate available date must be later than the course end date.'
                     );
                 }
+
+                if (this.useV2CertDisplaySettings){
+                    if (
+                        newattrs.certificates_display_behavior
+                        && !(Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).includes(newattrs.certificates_display_behavior))
+                    ) {
+
+                        errors.certificates_display_behavior = StringUtils.interpolate(
+                            gettext(
+                                "The certificate display behavior must be one of: {behavior_options}"
+                            ),
+                            {
+                                behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', ')
+                            }
+                        );
+                    }
+
+                    // Throw error if there's a value for certificate_available_date
+                    if(
+                        (newattrs.certificate_available_date && newattrs.certificates_display_behavior != CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
+                        || (!newattrs.certificate_available_date && newattrs.certificates_display_behavior == CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
+                    ){
+                        errors.certificates_display_behavior = StringUtils.interpolate(
+                            gettext(
+                                "The certificates display behavior must be {valid_option} if certificate available date is set."
+                            ),
+                            {
+                                valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE
+                            }
+                        );
+                    }
+                }
+
                 if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
                     if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
                         errors.intro_video = gettext('Key should only contain letters, numbers, _, or -');

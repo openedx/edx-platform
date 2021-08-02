@@ -5,10 +5,8 @@ Models for configuration of Block Structures.
 
 from config_models.models import ConfigurationModel
 from django.db.models import IntegerField
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class BlockStructureConfiguration(ConfigurationModel):
     """
     Configuration model for Block Structures.

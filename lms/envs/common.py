@@ -939,6 +939,17 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
+
+    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
+    # .. settings. Will eventually become the default.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-07-26
+    # .. toggle_target_removal_date: 2021-10-01
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
+    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -3478,6 +3489,16 @@ BADGR_TOKENS_CACHE_KEY = None
 # .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
 
+# .. toggle_name: BADGR_ENABLE_NOTIFICATIONS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Optional setting for enabling email notifications. When set to "True",
+#    learners will be notified by email when they earn a badge.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-29
+# .. toggle_warnings: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_ENABLE_NOTIFICATIONS = False
+
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.
@@ -4760,3 +4781,7 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
+
+################# Settings for Chrome-specific origin trials ########
+# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long

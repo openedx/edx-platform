@@ -537,6 +537,7 @@ class SequenceBlock(
 
     def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
         if prereq_met and not self._is_gate_fulfilled():
+            _ = self.runtime.service(self, "i18n").ugettext
             banner_text = _(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )

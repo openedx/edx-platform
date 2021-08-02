@@ -173,7 +173,8 @@ class BadgrBackend(BadgeBackend):
                 {
                     "url": evidence_url
                 }
-            ]
+            ],
+            "notify": settings.BADGR_ENABLE_NOTIFICATIONS,
         }
         response = requests.post(
             self._assertion_url(badge_class.badgr_server_slug),

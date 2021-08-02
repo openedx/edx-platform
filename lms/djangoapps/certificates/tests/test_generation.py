@@ -2,8 +2,10 @@
 Tests for certificate generation
 """
 import logging
+from unittest import mock
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -14,6 +16,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
+
+PROFILE_NAME_METHOD = 'common.djangoapps.student.models_api.get_name'
 
 
 class CertificateTests(EventTestMixin, ModuleStoreTestCase):
@@ -26,6 +30,8 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
 
         # Create user, a course run, and an enrollment
         self.u = UserFactory()
+        self.profile = UserProfile.objects.get(user_id=self.u.id)
+        self.name = self.profile.name
         self.cr = CourseFactory()
         self.key = self.cr.id  # pylint: disable=no-member
         CourseEnrollmentFactory(
@@ -65,6 +71,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         assert cert.status == CertificateStatuses.downloadable
         assert cert.mode == self.enrollment_mode
         assert cert.grade == self.grade
+        assert cert.name == self.name
 
     def test_generation_existing_unverified(self):
         """
@@ -159,3 +166,24 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
                                                      self.enrollment_mode, self.grade, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid != ''
+
+    def test_generation_missing_profile(self):
+        """
+        Test certificate generation when the user profile is missing
+        """
+        GeneratedCertificateFactory(
+            user=self.u,
+            course_id=self.key,
+            mode=CourseMode.AUDIT,
+            status=CertificateStatuses.unverified
+        )
+
+        with mock.patch(PROFILE_NAME_METHOD, return_value=None):
+            generate_course_certificate(self.u, self.key, CertificateStatuses.downloadable, self.enrollment_mode,
+                                        self.grade, self.gen_mode)
+
+            cert = GeneratedCertificate.objects.get(user=self.u, course_id=self.key)
+            assert cert.status == CertificateStatuses.downloadable
+            assert cert.mode == self.enrollment_mode
+            assert cert.grade == self.grade
+            assert cert.name == ''

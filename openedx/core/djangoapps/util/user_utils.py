@@ -2,12 +2,9 @@
 Custom user-related utility code.
 """
 
-
-from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.auth.models import AnonymousUser
 
 
-@python_2_unicode_compatible
 class SystemUser(AnonymousUser):
     """
     A User that can act on behalf of system actions, when a user object is

@@ -9,7 +9,7 @@ from config_models.models import ConfigurationModel
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
@@ -92,7 +92,6 @@ def pre_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-arg
         instance._old_mode = None  # pylint: disable=protected-access
 
 
-@python_2_unicode_compatible
 class VerifiedTrackCohortedCourse(models.Model):
     """
     Tracks which courses have verified track auto-cohorting enabled.

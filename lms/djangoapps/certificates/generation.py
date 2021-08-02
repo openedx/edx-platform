@@ -10,7 +10,7 @@ These methods should be called from tasks.
 import logging
 from uuid import uuid4
 
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student import models_api as student_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.utils import emit_certificate_event
@@ -66,8 +66,9 @@ def _generate_certificate(user, course_key, status, enrollment_mode, course_grad
     # Retrieve the existing certificate for the learner if it exists
     existing_certificate = GeneratedCertificate.certificate_for_student(user, course_key)
 
-    profile = UserProfile.objects.get(user=user)
-    profile_name = profile.name
+    profile_name = student_api.get_name(user.id)
+    if not profile_name:
+        profile_name = ''
 
     # Retain the `verify_uuid` from an existing certificate if possible, this will make it possible for the learner to
     # keep the existing URL to their certificate

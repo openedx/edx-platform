@@ -1,17 +1,19 @@
 """
-Feature/experiment toggles used for effort estimation.
+Feature toggles used for effort estimation.
 """
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
 
-from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='effort_estimation')
 
-# Temporary flag while we test which location works best:
-# - Bucket 0: off
-# - Bucket 1: section (chapter) estimations
-# - Bucket 2: subsection (sequential) estimations
-EFFORT_ESTIMATION_LOCATION_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'location', __name__, num_buckets=3,  # lint-amnesty, pylint: disable=toggle-missing-annotation
-                                                       use_course_aware_bucketing=False)
+# .. toggle_name: effort_estimation.disabled
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: If effort estimations are confusing for a given course (e.g. the course team has added manual
+#   estimates), you can turn them off case by case here.
+# .. toggle_use_cases: opt_out
+# .. toggle_creation_date: 2021-07-27
+EFFORT_ESTIMATION_DISABLED_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'disabled', __name__)

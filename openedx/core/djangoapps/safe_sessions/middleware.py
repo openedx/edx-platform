@@ -78,7 +78,7 @@ from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.encoding import python_2_unicode_compatible
+
 from edx_django_utils.monitoring import set_custom_attribute
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -106,7 +106,6 @@ class SafeCookieError(Exception):
         log.error(error_message)
 
 
-@python_2_unicode_compatible
 class SafeCookieData:
     """
     Cookie data that cryptographically binds and timestamps the user

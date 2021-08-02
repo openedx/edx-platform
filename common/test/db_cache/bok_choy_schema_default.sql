@@ -1342,22 +1342,6 @@ CREATE TABLE `certificates_certificatetemplateasset` (
   UNIQUE KEY `asset_slug` (`asset_slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `certificates_certificatewhitelist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `certificates_certificatewhitelist` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` varchar(255) NOT NULL,
-  `whitelist` tinyint(1) NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `notes` longtext,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `certificates_certificate_course_id_user_id_da2af91a_uniq` (`course_id`,`user_id`),
-  KEY `certificates_certifi_user_id_c2ab1b7c_fk_auth_user` (`user_id`),
-  CONSTRAINT `certificates_certifi_user_id_c2ab1b7c_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `certificates_examplecertificate`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -3109,7 +3093,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=913 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=914 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
