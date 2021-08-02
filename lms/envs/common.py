@@ -801,9 +801,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
-    # Whether course goals is enabled.
-    'ENABLE_COURSE_GOALS': True,
-
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
 

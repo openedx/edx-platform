@@ -48,8 +48,8 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         segment_call.assert_called_once_with(self.user.id, EVENT_NAME_ADDED, {
             'courserun_key': str(self.course.id),
             'goal_key': 'certify',
-            'number_of_days_with_visits_per_week_goal': 0,
-            'subscribed_to_goal_reminders': False,
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         assert response.status_code == 201
 
@@ -83,18 +83,18 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
 
         segment_call.assert_any_call(self.user.id, EVENT_NAME_ADDED, {
             'courserun_key': str(self.course.id), 'goal_key': 'explore',
-            'number_of_days_with_visits_per_week_goal': 0,
-            'subscribed_to_goal_reminders': False,
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         segment_call.assert_any_call(self.user.id, EVENT_NAME_UPDATED, {
             'courserun_key': str(self.course.id), 'goal_key': 'certify',
-            'number_of_days_with_visits_per_week_goal': 0,
-            'subscribed_to_goal_reminders': False,
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         segment_call.assert_any_call(self.user.id, EVENT_NAME_UPDATED, {
             'courserun_key': str(self.course.id), 'goal_key': 'unsure',
-            'number_of_days_with_visits_per_week_goal': 0,
-            'subscribed_to_goal_reminders': False,
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
         assert len(current_goals) == 1

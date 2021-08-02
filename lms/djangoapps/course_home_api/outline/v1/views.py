@@ -22,16 +22,17 @@ from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import expect_json
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,
+    add_course_goal_deprecated,
     get_course_goal,
     get_course_goal_text,
     has_course_goal_permission,
     valid_course_goals_ordered
 )
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
-from lms.djangoapps.course_goals.models import NUMBER_OF_DAYS_OPTIONS
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
@@ -108,10 +109,9 @@ class OutlineTabView(RetrieveAPIView):
                 resume_block: (bool) Whether the block is the resume block
                 has_scheduled_content: (bool) Whether the block has more content scheduled for the future
         course_goals:
-            goal_options: (list) A list of number of days options for the number of days goal
             selected_goal:
-                number_of_days_with_visits_per_week_goal: (int) The number of days the learner wants to learn per week
-                subscribed_to_goal_reminders: (bool) Whether the learner wants email reminders about their goal
+                days_per_week: (int) The number of days the learner wants to learn per week
+                subscribed_to_reminders: (bool) Whether the learner wants email reminders about their goal
         course_tools: List of serialized Course Tool objects. Each serialization has the following fields:
             analytics_id: (str) The unique id given to the tool.
             title: (str) The display title of the tool.
@@ -250,19 +250,17 @@ class OutlineTabView(RetrieveAPIView):
             cert_data = get_cert_data(request.user, course, enrollment.mode) if is_enrolled else None
 
             if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
-                if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)
-                        and settings.FEATURES.get('ENABLE_COURSE_GOALS')):
+                if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
 
                     course_goals = {
-                        'goal_options': NUMBER_OF_DAYS_OPTIONS,
                         'selected_goal': None
                     }
 
                     selected_goal = get_course_goal(request.user, course_key)
                     if selected_goal:
                         course_goals['selected_goal'] = {
-                            'number_of_days_with_visits_per_week_goal': selected_goal.number_of_days_with_visits_per_week_goal,
-                            'subscribed_to_goal_reminders': selected_goal.subscribed_to_goal_reminders,
+                            'days_per_week': selected_goal.days_per_week,
+                            'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
                         }
             else:
                 # Only show the set course goal message for enrolled, unverified
@@ -409,45 +407,39 @@ def dismiss_welcome_message(request):
 @authentication_classes((JwtAuthentication, SessionAuthenticationAllowInactiveUser,))
 @permission_classes((IsAuthenticated,))
 def save_course_goal(request):
-    course_id = request.data.get('course_id', None)
-    goal_key = request.data.get('goal_key', None)
-    number_of_days_with_visits_per_week_goal = request.data.get('number_of_days_with_visits_per_week_goal', None)
-    subscribed_to_goal_reminders = request.data.get('subscribed_to_goal_reminders', None)
+    course_id = request.data.get('course_id')
+    goal_key = request.data.get('goal_key')
+    days_per_week = request.data.get('days_per_week')
+    subscribed_to_reminders = request.data.get('subscribed_to_reminders')
 
     # If body doesn't contain 'course_id', return 400 to client.
     if not course_id:
-        raise ParseError(_("'course_id' is required."))
+        raise ParseError("'course_id' is required.")
 
     if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
         # If body doesn't contain the required goals fields, return 400 to client.
-        if number_of_days_with_visits_per_week_goal is None or subscribed_to_goal_reminders is None:
-            raise ParseError(_("'number_of_days_with_visits_per_week_goal' and 'subscribed_to_goal_reminders' are required."))
+        if days_per_week is None or subscribed_to_reminders is None:
+            raise ParseError("'days_per_week' and 'subscribed_to_reminders' are required.")
 
         try:
-            number_of_days_with_visits_per_week_goal = int(number_of_days_with_visits_per_week_goal)
-        except ValueError:
-            raise ParseError(_("'number_of_days_with_visits_per_week_goal' needs to be an integer"))
-        subscribed_to_goal_reminders = subscribed_to_goal_reminders == 'True'
-
-        kwargs = {
-            "number_of_days_with_visits_per_week_goal": number_of_days_with_visits_per_week_goal,
-            "subscribed_to_goal_reminders": subscribed_to_goal_reminders,
-        }
+            add_course_goal(request.user, course_id, days_per_week, subscribed_to_reminders)
+            return Response({
+                'header': _('Your course goal has been successfully set.'),
+                'message': _('Course goal updated successfully.'),
+            })
+        except Exception:
+            raise UnableToSaveCourseGoal
 
     else:
         # If body doesn't contain 'goal', return 400 to client.
         if not goal_key:
-            raise ParseError(_("'goal_key' is required."))
+            raise ParseError("'goal_key' is required.")
 
-        kwargs = {
-            "goal_key": goal_key,
-        }
-
-    try:
-        add_course_goal(request.user, course_id, **kwargs)
-        return Response({
-            'header': _('Your course goal has been successfully set.'),
-            'message': _('Course goal updated successfully.'),
-        })
-    except Exception:
-        raise UnableToSaveCourseGoal
+        try:
+            add_course_goal_deprecated(request.user, course_id, goal_key)
+            return Response({
+                'header': _('Your course goal has been successfully set.'),
+                'message': _('Course goal updated successfully.'),
+            })
+        except Exception:
+            raise UnableToSaveCourseGoal

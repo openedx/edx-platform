@@ -8,6 +8,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from unittest.mock import Mock, patch
 
 import ddt
+import json
 from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -244,12 +245,16 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         """ Test that the api returns the correct response when saving a goal """
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
-        post_data = {
-            'course_id': self.course.id,
-            'number_of_days_with_visits_per_week_goal': 1,
-            'subscribed_to_goal_reminders': True,
-        }
-        post_course_goal_response = self.client.post(reverse('course-home-save-course-goal'), post_data)
+        post_data = json.dumps({
+            'course_id': str(self.course.id),
+            'days_per_week': 1,
+            'subscribed_to_reminders': True,
+        })
+        post_course_goal_response = self.client.post(
+            reverse('course-home-save-course-goal'),
+            post_data,
+            content_type='application/json',
+        )
         assert post_course_goal_response.status_code == 200
 
         response = self.client.get(self.url)
@@ -257,10 +262,10 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         course_goals = response.json()['course_goals']
         expected_course_goals = {
-            'goal_options': [1, 3, 5],
+            'goal_options': [],
             'selected_goal': {
-                'number_of_days_with_visits_per_week_goal': 1,
-                'subscribed_to_goal_reminders': True
+                'days_per_week': 1,
+                'subscribed_to_reminders': True
             }
         }
         assert course_goals == expected_course_goals
