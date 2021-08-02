@@ -27,7 +27,7 @@ class TeamsConfig:  # pylint: disable=eq-without-hash
         """
         self._data = data if isinstance(data, dict) else {}
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Return user-friendly string.
 
