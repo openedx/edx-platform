@@ -2,7 +2,6 @@
 
 
 import datetime
-import json
 from unittest.mock import patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -1026,16 +1025,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
         response = self.client.get(test_url)
         self.assertContains(response, "Invalid Certificate")
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
-    def test_request_certificate_without_html_certs(self):
-        self.cert.status = CertificateStatuses.unavailable
-        self.cert.save()
-        request_certificate_url = reverse('request_certificate')
-        response = self.client.post(request_certificate_url, {'course_id': str(self.course.id)})
-        assert response.status_code == 200
-        response_json = json.loads(response.content.decode('utf-8'))
-        assert CertificateStatuses.unavailable == response_json['add_status']
 
     # TEMPLATES WITHOUT LANGUAGE TESTS
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
