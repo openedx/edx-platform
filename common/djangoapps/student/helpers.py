@@ -600,7 +600,7 @@ def _cert_info(user, enrollment, cert_status):
         if (
             status_dict['status'] != CertificateStatuses.downloadable and
             (cert_generation_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
-            persisted_grade.passed
+            persisted_grade and persisted_grade.passed
         ):
             status_dict['status'] = CertificateStatuses.requesting
 
