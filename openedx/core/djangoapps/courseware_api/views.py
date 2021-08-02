@@ -2,7 +2,7 @@
 Course API Views
 """
 
-from base64 import (urlsafe_b64encode, urlsafe_b64decode)
+from base64 import urlsafe_b64decode
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -61,7 +61,7 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import get_usage_key_hash
+from xmodule.modulestore.search import path_to_location, get_usage_key_hash
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -527,7 +527,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if not usage_key_string.startswith("block"):
             decoded_hash_string = urlsafe_b64decode(usage_key_string)
             usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
+            usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
+                                   hash=usage_key_hash))
 
         try:
             usage_key = UsageKey.from_string(usage_key_string)
