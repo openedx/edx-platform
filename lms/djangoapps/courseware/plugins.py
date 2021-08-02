@@ -1,6 +1,7 @@
 """Course app config for courseware apps."""
 from typing import Dict, Optional
 
+from django import urls
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_noop as _
@@ -23,7 +24,7 @@ class ProgressCourseApp(CourseApp):
 
     app_id = "progress"
     name = _("Progress")
-    description = _("Allow students to track their progress throughout the course.")
+    description = _("Keep learners engaged and on track throughout the course.")
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -67,7 +68,7 @@ class TextbooksCourseApp(CourseApp):
 
     app_id = "textbooks"
     name = _("Textbooks")
-    description = _("Provide links to applicable resources for your course.")
+    description = _("Create and manage a library of course readings, textbooks, and chapters.")
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
@@ -103,6 +104,10 @@ class TextbooksCourseApp(CourseApp):
             "configure": True,
         }
 
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return urls.reverse('textbooks_list_handler', kwargs={'course_key_string': course_key})
+
 
 class CalculatorCourseApp(CourseApp):
     """
@@ -111,7 +116,7 @@ class CalculatorCourseApp(CourseApp):
 
     app_id = "calculator"
     name = _("Calculator")
-    description = _("Provide an in-browser calculator that supports simple and complex calculations.")
+    description = _("Provide an in-course calculator for simple and complex calculations.")
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:

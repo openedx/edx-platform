@@ -6,7 +6,6 @@ Module for the Storage of BlockStructure objects.
 
 from logging import getLogger
 
-from django.utils.encoding import python_2_unicode_compatible
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
@@ -20,7 +19,6 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
-@python_2_unicode_compatible
 class StubModel:
     """
     Stub model to use when storage backing is disabled.

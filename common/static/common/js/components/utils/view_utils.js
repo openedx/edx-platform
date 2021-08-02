@@ -16,7 +16,7 @@
     /* End Webpack */
 
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
-                runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
+                runOperationShowingMessage, showErrorMeassage, withDisabledElement, disableElementWhileRunning,
                 getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
                 deleteNotificationHandler, validateRequiredField, validateURLItemEncoding,
                 validateTotalKeyLength, checkTotalKeyLengthViolations, loadJavaScript;
@@ -95,6 +95,21 @@
                 });
             };
 
+            /**
+             * Shows an error notification message for a specifc period of time.
+             * @param heading The heading of notification.
+             * @param message The message to show.
+             * @param timeInterval The time interval to hide the notification.
+             */
+            showErrorMeassage = function(heading, message, timeInterval) {
+                var errorNotificationView = new NotificationView.Error({
+                    title: gettext(heading),
+                    message: gettext(message)
+                });
+                errorNotificationView.show();
+
+                setTimeout(function() { errorNotificationView.hide(); }, timeInterval);
+            };
             /**
              * Wraps a Backbone event callback to disable the event's target element.
              *
@@ -295,6 +310,7 @@
                 hideLoadingIndicator: hideLoadingIndicator,
                 confirmThenRunOperation: confirmThenRunOperation,
                 runOperationShowingMessage: runOperationShowingMessage,
+                showErrorMeassage: showErrorMeassage,
                 withDisabledElement: withDisabledElement,
                 disableElementWhileRunning: disableElementWhileRunning,
                 deleteNotificationHandler: deleteNotificationHandler,

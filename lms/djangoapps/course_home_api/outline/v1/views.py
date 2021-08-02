@@ -2,6 +2,7 @@
 Outline Tab Views
 """
 from datetime import datetime, timezone
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
@@ -102,6 +103,7 @@ class OutlineTabView(RetrieveAPIView):
                 children: (list) If the block has child blocks, a list of IDs of
                     the child blocks.
                 resume_block: (bool) Whether the block is the resume block
+                has_scheduled_content: (bool) Whether the block has more content scheduled for the future
         course_goals:
             goal_options: (list) A list of goals where each goal is represented as a tuple (goal_key, goal_string)
             selected_goal:
@@ -132,6 +134,7 @@ class OutlineTabView(RetrieveAPIView):
         enroll_alert:
             can_enroll: (bool) Whether the user can enroll in the given course
             extra_text: (str)
+        enrollment_mode: (str) Current enrollment mode. Null if the user is not enrolled.
         handouts_html: (str) Raw HTML for the handouts section of the course info
         has_ended: (bool) Indicates whether course has ended
         offer: An object detailing upgrade discount information
@@ -145,6 +148,7 @@ class OutlineTabView(RetrieveAPIView):
             has_visited_course: (bool) Whether the user has ever visited the course
             url: (str) The display name of the course block to resume
         welcome_message_html: (str) Raw HTML for the course updates banner
+        user_has_passing_grade: (bool) Whether the user currently is passing the course
 
     **Returns**
 
@@ -187,6 +191,7 @@ class OutlineTabView(RetrieveAPIView):
 
         course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        enrollment_mode = getattr(enrollment, 'mode', None)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
         allow_public_outline = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -291,7 +296,7 @@ class OutlineTabView(RetrieveAPIView):
         #
         # The long term goal is to remove the Course Blocks API call entirely,
         # so this is a tiny first step in that migration.
-        if course_blocks and learning_sequences_api_available(course_key, request.user):
+        if course_blocks and learning_sequences_api_available(course_key):
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
@@ -312,6 +317,12 @@ class OutlineTabView(RetrieveAPIView):
                     )
                 ] if 'children' in chapter_data else []
 
+        user_has_passing_grade = False
+        if not request.user.is_anonymous:
+            user_grade = CourseGradeFactory().read(request.user, course)
+            if user_grade:
+                user_has_passing_grade = user_grade.passed
+
         data = {
             'access_expiration': access_expiration,
             'cert_data': cert_data,
@@ -320,10 +331,12 @@ class OutlineTabView(RetrieveAPIView):
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
+            'enrollment_mode': enrollment_mode,
             'handouts_html': handouts_html,
             'has_ended': course.has_ended(),
             'offer': offer_data,
             'resume_course': resume_course,
+            'user_has_passing_grade': user_has_passing_grade,
             'welcome_message_html': welcome_message_html,
         }
         context = self.get_serializer_context()

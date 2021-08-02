@@ -977,6 +977,9 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = ""
+
 # Site info
 SITE_NAME = "localhost"
 HTTPS = 'on'
@@ -1266,6 +1269,19 @@ WEBPACK_LOADER = {
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
+
+############################ SERVICE_VARIANT ##################################
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+# configuration files are read during startup.
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', 'cms')
+
+# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# based on the service variant. If no variant is use, don't use a
+# prefix.
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
+
 ################################# CELERY ######################################
 
 # Message configuration
@@ -1292,22 +1308,28 @@ CELERY_SEND_TASK_SENT_EVENT = True
 CELERY_DEFAULT_EXCHANGE = 'edx.core'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
-# Queues configuration
+# Name the exchange and queues for each variant
 
-HIGH_PRIORITY_QUEUE = 'edx.core.high'
-DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
+QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_QUEUE_HA_POLICY = 'all'
+CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
 
-CELERY_CREATE_MISSING_QUEUES = True
+HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
+DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = [
-    'edx.cms.core.default',
-    'edx.cms.core.high',
-]
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
+# Queues configuration
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
 
 CELERY_BROKER_TRANSPORT = 'amqp'
 CELERY_BROKER_HOSTNAME = 'localhost'

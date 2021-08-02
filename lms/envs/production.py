@@ -21,7 +21,6 @@ import copy
 import datetime
 import os
 
-import dateutil
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
@@ -103,15 +102,6 @@ except Exception:  # pylint: disable=broad-except
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
 EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
-# configuration files are read during startup.
-SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
-
-# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
-# based on the service variant. If no variant is use, don't use a
-# prefix.
-CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
 ###################################### CELERY  ################################
 
 # Don't use a connection pool, since connections are dropped by ELB.
@@ -128,28 +118,6 @@ BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
-
-# Rename the exchange and queues for each variant
-
-QUEUE_VARIANT = CONFIG_PREFIX.lower()
-
-CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
-
-HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
-DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
-HIGH_MEM_QUEUE = f'edx.{QUEUE_VARIANT}core.high_mem'
-
-CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
-CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
-
-CELERY_QUEUES = {
-    HIGH_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {},
-    HIGH_MEM_QUEUE: {},
-}
-
-CELERY_ROUTES = "openedx.core.lib.celery.routers.route_task"
-CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
@@ -220,6 +188,10 @@ ALLOWED_HOSTS = [
 if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
     SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
+SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
 CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
@@ -809,10 +781,6 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = ENV_TOKENS.get(
     'STUDENTMODULEHISTORYEXTENDED_OFFSET', STUDENTMODULEHISTORYEXTENDED_OFFSET
 )
 
-# Cutoff date for granting audit certificates
-if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
-    AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
-
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
@@ -1059,3 +1027,9 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
 
 ################# show account activate cta after register ########################
 SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
+
+################# Settings for Chrome-specific origin trials ########
+# Token for "Disable Different Origin Subframe Dialog Suppression" Chrome Origin Trial, which must be origin-specific.
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = ENV_TOKENS.get(
+    'CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN', CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN
+)

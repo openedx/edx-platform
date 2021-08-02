@@ -235,6 +235,25 @@ if (is_proctored_exam) {
                         <% } %>
                     </p>
                 </div>
+                <% if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                    <div class="status-grading">
+                        <p>
+                            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                            <span class="status-custom-grading-date">
+                                <%- edx.StringUtils.interpolate(
+                                        ngettext(
+                                            'Custom due date: {relativeWeeks} week from enrollment',
+                                            'Custom due date: {relativeWeeks} weeks from enrollment',
+                                            xblockInfo.get('relative_weeks_due')),
+                                        {
+                                            relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                        }
+                                    )
+                                %>
+                            </span>
+                        <p>
+                    </div>
+                <% } %>
             <% } else if ((xblockInfo.get('due_date') && !course.get('self_paced')) || xblockInfo.get('graded')) { %>
                 <div class="status-grading">
                     <p>
@@ -245,6 +264,50 @@ if (is_proctored_exam) {
                             <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
                         <% } %>
                     </p>
+                </div>
+                <% if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                    <div class="status-grading">
+                        <p>
+                            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                            <span class="status-custom-grading-date">
+                                <%- edx.StringUtils.interpolate(
+                                        ngettext(
+                                            'Custom due date: {relativeWeeks} week from enrollment',
+                                            'Custom due date: {relativeWeeks} weeks from enrollment',
+                                            xblockInfo.get('relative_weeks_due')),
+                                        {
+                                            relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                        }
+                                    )
+                                %>
+                            </span>
+                        <p>
+                    </div>
+                <% } %>
+            <% } else if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                <div class="status-grading">
+                    <p>
+                        <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
+                        <span class="status-grading-value"> <%- gradingType %> </span>
+                    </p>
+                </div>
+                <div class="status-grading">
+                    <p>
+                        <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                        <span class="status-custom-grading-date">
+                            <%- edx.StringUtils.interpolate(
+                                    ngettext(
+                                        'Custom due date: {relativeWeeks} week from enrollment',
+                                        'Custom due date: {relativeWeeks} weeks from enrollment',
+                                        xblockInfo.get('relative_weeks_due')),
+                                    {
+                                        relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                    }
+                                )
+                            %>
+                        </span>
+                    <p>
                 </div>
             <% } %>
             <div class="status-hide-after-due">

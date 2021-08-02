@@ -28,7 +28,6 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
-    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
@@ -199,9 +198,9 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 # multiple checks use this handler
                 check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
-                assert response.data['can_load_courseware']['has_access']
+                assert response.data['course_access']['has_access']
             else:
-                assert not response.data['can_load_courseware']['has_access']
+                assert not response.data['course_access']['has_access']
 
     @ddt.data(
         # Who has access to MFE courseware?
@@ -211,7 +210,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": True,
             "masquerade_role": None,
-            "expect_can_load_courseware": True,
+            "expect_course_access": True,
         },
         {
             # Un-enrolled learners should NOT have access.
@@ -219,7 +218,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": False,
             "masquerade_role": None,
-            "expect_can_load_courseware": False,
+            "expect_course_access": False,
         },
         {
             # Un-enrolled instructors should have access.
@@ -227,7 +226,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": None,
-            "expect_can_load_courseware": True,
+            "expect_course_access": True,
         },
         {
             # Un-enrolled instructors masquerading as students should have access.
@@ -235,7 +234,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": "student",
-            "expect_can_load_courseware": True,
+            "expect_course_access": True,
         },
         {
             # If MFE is not visible, enrolled learners shouldn't have access.
@@ -243,7 +242,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": True,
             "masquerade_role": None,
-            "expect_can_load_courseware": False,
+            "expect_course_access": False,
         },
         {
             # If MFE is not visible, instructors shouldn't have access.
@@ -251,7 +250,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": None,
-            "expect_can_load_courseware": False,
+            "expect_course_access": False,
         },
         {
             # If MFE is not visible, masquerading instructors shouldn't have access.
@@ -259,20 +258,20 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": "student",
-            "expect_can_load_courseware": False,
+            "expect_course_access": False,
         },
     )
     @ddt.unpack
-    def test_can_load_courseware(
+    def test_course_access(
             self,
             mfe_is_visible: bool,
             username: str,
             enroll_user: bool,
             masquerade_role: Optional[str],
-            expect_can_load_courseware: bool,
+            expect_course_access: bool,
     ):
         """
-        Test that can_load_courseware is calculated correctly based on
+        Test that course_access is calculated correctly based on
         access to MFE and access to the course itself.
         """
         user = User.objects.get(username=username)
@@ -290,21 +289,10 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             response = self.client.get(self.url)
 
         assert response.status_code == 200
-        if expect_can_load_courseware:
-            assert response.data['can_load_courseware']['has_access']
+        if expect_course_access:
+            assert response.data['course_access']['has_access']
         else:
-            assert not response.data['can_load_courseware']['has_access']
-
-    @ddt.data(True, False)
-    def test_is_learning_sequences_api_enabled(self, enable_new_api):
-        """
-        Test that the Courseware API exposes the Learning Sequences API flag.
-        """
-        with override_waffle_flag(COURSEWARE_USE_LEARNING_SEQUENCES_API, active=enable_new_api):
-            response = self.client.get(self.url)
-            assert response.status_code == 200
-            courseware_data = response.json()
-            assert courseware_data['is_learning_sequences_api_enabled'] is enable_new_api
+            assert not response.data['course_access']['has_access']
 
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """

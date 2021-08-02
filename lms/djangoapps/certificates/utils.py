@@ -1,17 +1,18 @@
 """
 Certificates utilities
 """
-
+from datetime import datetime
 import logging
 
 from django.conf import settings
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
+from pytz import utc
 
-from common.djangoapps.track import segment
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
     event_name = '.'.join(['edx', 'certificate', event_name])
 
     if not course_overview:
-        course_overview = get_course_overview(course_id)
+        course_overview = get_course_overview_or_none(course_id)
 
     context = {
         'org_id': course_overview.org,
@@ -62,30 +63,13 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
         tracker.emit(event_name, event_data)
 
 
-def emit_segment_event(user_id, course_id):
-    """
-    Track a successful certificate generation event in segment.
-
-    Arguments:
-        user_id (str): The ID of the user associated with the certificate.
-        course_id (CourseKey): Identifier for the course.
-    Returns:
-        None
-    """
-    event_name = 'edx.bi.user.certificate.generate'
-    segment.track(user_id, event_name, {
-        'category': 'certificates',
-        'label': str(course_id)
-    })
-
-
 def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
     """
     Returns the certificate URL
     """
     url = ''
 
-    course_overview = _course_from_key(course_id)
+    course_overview = get_course_overview_or_none(_safe_course_key(course_id))
     if not course_overview:
         return url
 
@@ -137,13 +121,6 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
     return ''
 
 
-def _course_from_key(course_key):
-    """
-    Returns the course overview
-    """
-    return get_course_overview(_safe_course_key(course_key))
-
-
 def _safe_course_key(course_key):
     """
     Returns the course key
@@ -151,3 +128,87 @@ def _safe_course_key(course_key):
     if not isinstance(course_key, CourseKey):
         return CourseKey.from_string(course_key)
     return course_key
+
+
+def should_certificate_be_visible(
+    certificates_display_behavior,
+    certificates_show_before_end,
+    has_ended,
+    certificate_available_date,
+    self_paced
+):
+    """
+    Returns whether it is acceptable to show the student a certificate download
+    link for a course, based on provided attributes of the course.
+    Arguments:
+        certificates_display_behavior (str): string describing the course's
+            certificate display behavior.
+            See CourseFields.certificates_display_behavior.help for more detail.
+        certificates_show_before_end (bool): whether user can download the
+            course's certificates before the course has ended.
+        has_ended (bool): Whether the course has ended.
+        certificate_available_date (datetime): the date the certificate is available on for the course.
+        self_paced (bool): Whether the course is self-paced.
+    """
+    show_early = (
+        certificates_display_behavior in ('early_with_info', 'early_no_info')
+        or certificates_show_before_end
+    )
+    past_available_date = (
+        certificate_available_date
+        and certificate_available_date < datetime.now(utc)
+    )
+    ended_without_available_date = (certificate_available_date is None) and has_ended
+
+    return any((self_paced, show_early, past_available_date, ended_without_available_date))
+
+
+def certificate_status(generated_certificate):
+    """
+    This returns a dictionary with a key for status, and other information.
+
+    If the status is "downloadable", the dictionary also contains
+    "download_url".
+
+    If the student has been graded, the dictionary also contains their
+    grade for the course with the key "grade".
+    """
+    # Import here instead of top of file since this module gets imported before
+    # the course_modes app is loaded, resulting in a Django deprecation warning.
+    from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=redefined-outer-name, reimported
+
+    if generated_certificate:
+        cert_status = {
+            'status': generated_certificate.status,
+            'mode': generated_certificate.mode,
+            'uuid': generated_certificate.verify_uuid,
+        }
+        if generated_certificate.grade:
+            cert_status['grade'] = generated_certificate.grade
+
+        if generated_certificate.mode == 'audit':
+            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(generated_certificate.course_id)]
+            # Short term fix to make sure old audit users with certs still see their certs
+            # only do this if there if no honor mode
+            if 'honor' not in course_mode_slugs:
+                cert_status['status'] = CertificateStatuses.auditing
+                return cert_status
+
+        if generated_certificate.status == CertificateStatuses.downloadable:
+            cert_status['download_url'] = generated_certificate.download_url
+
+        return cert_status
+    else:
+        return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
+
+
+def certificate_status_for_student(student, course_id):
+    """
+    This returns a dictionary with a key for status, and other information.
+    See certificate_status for more information.
+    """
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(user=student, course_id=course_id)
+    except GeneratedCertificate.DoesNotExist:
+        generated_certificate = None
+    return certificate_status(generated_certificate)

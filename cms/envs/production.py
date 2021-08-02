@@ -93,15 +93,6 @@ except Exception:  # pylint: disable=broad-except
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
 EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
-# configuration files are read during startup.
-SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
-
-# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
-# based on the service variant. If no variant is use, don't use a
-# prefix.
-CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
 ###################################### CELERY  ################################
 
 # Don't use a connection pool, since connections are dropped by ELB.
@@ -118,23 +109,6 @@ BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
-
-# Rename the exchange and queues for each variant
-
-QUEUE_VARIANT = CONFIG_PREFIX.lower()
-
-CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
-
-HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
-DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
-
-CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
-CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
-
-CELERY_QUEUES = {
-    HIGH_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
-}
 
 CELERY_ROUTES = "openedx.core.lib.celery.routers.route_task"
 
@@ -232,6 +206,10 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = ENV_TOKENS.get('REGISTRATION_EMAIL_PATTERN
 if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
     SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
+SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,

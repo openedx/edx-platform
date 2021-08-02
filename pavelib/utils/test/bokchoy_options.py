@@ -4,7 +4,7 @@ Definitions of all options used by the various bok_choy tasks.
 
 
 import os
-from optparse import make_option
+from optparse import make_option  # pylint: disable=deprecated-module
 
 from pavelib.utils.envs import Env
 

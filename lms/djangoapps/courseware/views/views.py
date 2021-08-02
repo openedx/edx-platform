@@ -124,7 +124,6 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
-from common.djangoapps.track import segment
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
@@ -1611,17 +1610,13 @@ def generate_user_cert(request, course_id):
 
     student = request.user
     course_key = CourseKey.from_string(course_id)
-    use_v1_certs = True
 
     course = modulestore().get_course(course_key, depth=2)
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
-    if certs_api.can_generate_certificate_task(student, course_key):
-        log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
-                 f'user {student.id}.')
-        use_v1_certs = False
-        certs_api.generate_certificate_task(student, course_key, 'self')
+    log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
+    certs_api.generate_certificate_task(student, course_key, 'self')
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)
@@ -1641,33 +1636,8 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Certificate has already been created."))
     elif certificate_status["is_generating"]:
         return HttpResponseBadRequest(_("Certificate is being created."))
-    elif use_v1_certs:
-        # If the certificate is not already in-process or completed,
-        # then create a new certificate generation task.
-        # If the certificate cannot be added to the queue, this will
-        # mark the certificate with "error" status, so it can be re-run
-        # with a management command.  From the user's perspective,
-        # it will appear that the certificate task was submitted successfully.
-        certs_api.generate_user_certificates(student, course.id, generation_mode='self')
-        _track_successful_certificate_generation(student.id, course.id)
 
     return HttpResponse()
-
-
-def _track_successful_certificate_generation(user_id, course_id):
-    """
-    Track a successful certificate generation event.
-    Arguments:
-        user_id (str): The ID of the user generating the certificate.
-        course_id (CourseKey): Identifier for the course.
-    Returns:
-        None
-    """
-    event_name = 'edx.bi.user.certificate.generate'
-    segment.track(user_id, event_name, {
-        'category': 'certificates',
-        'label': str(course_id)
-    })
 
 
 def enclosing_sequence_for_gating_checks(block):

@@ -12,7 +12,7 @@ describe('CourseOutlinePage', function() {
     var createCourseOutlinePage, displayNameInput, model, outlinePage, requests, getItemsOfType, getItemHeaders,
         verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState, selectBasicSettings,
         selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
-        createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced,
+        createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced, setSelfPacedCustomPLS,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
         selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
@@ -202,6 +202,11 @@ describe('CourseOutlinePage', function() {
         course.set('self_paced', true);
     };
 
+    setSelfPacedCustomPLS = function() {
+        setSelfPaced();
+        course.set('is_custom_relative_dates_active', true);
+    }
+
     createCourseOutlinePage = function(test, courseJSON, createOnly) {
         requests = AjaxHelpers.requests(test);
         model = new XBlockOutlineInfo(courseJSON, {parse: true});
@@ -294,7 +299,7 @@ describe('CourseOutlinePage', function() {
         TemplateHelpers.installTemplates([
             'course-outline', 'xblock-string-field-editor', 'modal-button',
             'basic-modal', 'course-outline-modal', 'release-date-editor',
-            'due-date-editor', 'grading-editor', 'publish-editor',
+            'due-date-editor', 'self-paced-due-date-editor', 'grading-editor', 'publish-editor',
             'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
@@ -1002,9 +1007,9 @@ describe('CourseOutlinePage', function() {
     });
 
     describe('Subsection', function() {
-        var getDisplayNameWrapper, setEditModalValues, setContentVisibility, mockServerValuesJson,
-            selectDisableSpecialExams, selectTimedExam, selectProctoredExam, selectPracticeExam,
-            selectPrerequisite, selectLastPrerequisiteSubsection, checkOptionFieldVisibility,
+        var getDisplayNameWrapper, setEditModalValues, setEditModalValuesForCustomPacing, setContentVisibility, mockServerValuesJson,
+            mockCustomPacingServerValuesJson, selectDisableSpecialExams, selectTimedExam, selectProctoredExam, selectPracticeExam,
+            selectPrerequisite, selectLastPrerequisiteSubsection, selectRelativeWeeksSubsection, checkOptionFieldVisibility,
             defaultModalSettings, modalSettingsWithExamReviewRules, getMockNoPrereqOrExamsCourseJSON, expectShowCorrectness;
 
         getDisplayNameWrapper = function() {
@@ -2117,6 +2122,196 @@ describe('CourseOutlinePage', function() {
             );
             expect($modalWindow.find('.outline-subsection')).not.toExist();
         });
+
+        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function () {
+            beforeEach(function() {
+                var mockCourseJSON = createMockCourseJSON({}, [
+                    createMockSectionJSON({}, [
+                        createMockSubsectionJSON({}, [])
+                    ])
+                ]);
+                createCourseOutlinePage(this, mockCourseJSON, false);
+                setSelfPacedCustomPLS();
+            });
+
+            setEditModalValuesForCustomPacing = function(grading_type, due_in) {
+                $('#grading_type').val(grading_type);
+                $('#due_in').val(due_in);
+            };
+
+            selectRelativeWeeksSubsection = function(weeks) {
+                $('#due_in').val(weeks).trigger('keyup');
+            }
+
+            mockCustomPacingServerValuesJson = createMockSectionJSON({
+                release_date: 'Jan 01, 2970 at 05:00 UTC'
+            }, [
+                createMockSubsectionJSON({
+                    graded: true,
+                    relative_weeks_due: 3,
+                    start: '2014-07-09T00:00:00Z',
+                    format: 'Lab',
+                    has_explicit_staff_lock: true,
+                    staff_only_message: true,
+                    is_prereq: false,
+                    show_correctness: 'never',
+                    is_time_limited: false,
+                    is_practice_exam: false,
+                    is_proctored_exam: false,
+                    default_time_limit_minutes: null,
+                }, [
+                    createMockVerticalJSON({
+                        has_changes: true,
+                        published: false
+                    })
+                ])
+            ]);
+
+            it('can show correct editors for self_paced course with custom pacing', function (){
+                outlinePage.$('.outline-subsection .configure-button').click();
+                expect($('.edit-settings-release').length).toBe(0);
+                // Due date input exists for custom pacing self paced courses
+                expect($('.grading-due-date').length).toBe(1);
+                expect($('.edit-settings-grading').length).toBe(1);
+                expect($('.edit-content-visibility').length).toBe(1);
+                expect($('.edit-show-correctness').length).toBe(1);
+            });
+
+            it('can be edited when custom pacing for self paced course is active', function() {
+                outlinePage.$('.outline-subsection .configure-button').click();
+                setEditModalValuesForCustomPacing('Lab', '3');
+                $('.wrapper-modal-window .action-save').click();
+
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
+                    graderType: 'Lab',
+                    isPrereq: false,
+                    metadata: {
+                        relative_weeks_due: 3,
+                        is_time_limited: false,
+                        is_practice_exam: false,
+                        is_proctored_enabled: false,
+                        default_time_limit_minutes: null,
+                        is_onboarding_exam: false,
+                    }
+                });
+                expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
+                AjaxHelpers.respondWithJson(requests, {});
+
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                AjaxHelpers.respondWithJson(requests, mockCustomPacingServerValuesJson);
+                AjaxHelpers.expectNoRequests(requests);
+
+                expect($('.outline-subsection .status-custom-grading-date').text().trim()).toEqual(
+                    'Custom due date: 3 weeks from enrollment'
+                );
+
+                expect($('.outline-subsection .status-grading-value')).toContainText(
+                    'Lab'
+                );
+                expect($('.outline-subsection .status-message-copy')).toContainText(
+                    'Contains staff only content'
+                );
+
+                expect($('.outline-item .outline-subsection .status-grading-value')).toContainText('Lab');
+                outlinePage.$('.outline-item .outline-subsection .configure-button').click();
+
+                expect($('#relative_date_input').css('display')).not.toBe('none');
+                expect($('#relative_weeks_due_projected.message').text().trim()).toEqual('If a learner starts on Jul 09, 2014, this subsection will be due on Jul 30, 2014.');
+                expect($('#due_in').val()).toBe('3');
+                expect($('#grading_type').val()).toBe('Lab');
+                expect($('input[name=content-visibility][value=staff_only]').is(':checked')).toBe(true);
+                expect($('input.timed_exam').is(':checked')).toBe(false);
+                expect($('input.proctored_exam').is(':checked')).toBe(false);
+                expect($('input.no_special_exam').is(':checked')).toBe(true);
+                expect($('input.practice_exam').is(':checked')).toBe(false);
+                expectShowCorrectness('never');
+            });
+
+            it ('does not show relative date input when assignment is not graded', function() {
+                outlinePage.$('.outline-subsection .configure-button').click();
+                $('#grading_type').val('Lab').trigger('change');
+                $('#due_in').val('').trigger('change');
+                expect($('#relative_date_input').css('display')).not.toBe('none');
+
+                $('#grading_type').val('notgraded').trigger('change');
+                $('#due_in').val('').trigger('change');
+                expect($('#relative_date_input').css('display')).toBe('none');
+            })
+
+            it('shows validation error on relative date', function() {
+                outlinePage.$('.outline-subsection .configure-button').click();
+
+                // when due number of weeks goes over 18
+                selectRelativeWeeksSubsection('19');
+                expect($('#relative_weeks_due_warning_max').css('display')).not.toBe('none');
+                expect($('#relative_weeks_due_warning_max')).toContainText('The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.');
+                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(true);
+                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
+
+                // when due number of weeks is less than 1
+                selectRelativeWeeksSubsection('-1');
+                expect($('#relative_weeks_due_warning_min').css('display')).not.toBe('none');
+                expect($('#relative_weeks_due_warning_min')).toContainText('The minimum number of weeks this subsection can be due in is 1 week from the learner enrollment date.');
+                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(true);
+                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
+
+                // when no validation error should show up
+                selectRelativeWeeksSubsection('10');
+                expect($('#relative_weeks_due_warning_max').css('display')).toBe('none');
+                expect($('#relative_weeks_due_warning_min').css('display')).toBe('none');
+                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(false);
+                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(false);
+            });
+
+            it('outline with assignment type and date are cleared when relative date input is cleared.', function() {
+                outlinePage.$('.outline-item .outline-subsection .configure-button').click();
+                setEditModalValuesForCustomPacing('Lab', '3');
+                setContentVisibility('staff_only');
+                $('.wrapper-modal-window .action-save').click();
+
+                // This is the response for the change operation.
+                AjaxHelpers.respondWithJson(requests, {});
+                // This is the response for the subsequent fetch operation.
+                AjaxHelpers.respondWithJson(requests, mockCustomPacingServerValuesJson);
+
+                expect($('.outline-subsection .status-custom-grading-date').text().trim()).toEqual(
+                    'Custom due date: 3 weeks from enrollment'
+                );
+
+                expect($('.outline-subsection .status-grading-value')).toContainText(
+                    'Lab'
+                );
+                expect($('.outline-subsection .status-message-copy')).toContainText(
+                    'Contains staff only content'
+                );
+
+                outlinePage.$('.outline-subsection .configure-button').click();
+                expect($('#relative_weeks_due_projected.message').text().trim()).toEqual('If a learner starts on Jul 09, 2014, this subsection will be due on Jul 30, 2014.');
+                expect($('#due_in').val()).toBe('3');
+                expect($('#grading_type').val()).toBe('Lab');
+                expect($('input[name=content-visibility][value=staff_only]').is(':checked')).toBe(true);
+
+                $('#due_in').val('');
+
+                $('#grading_type').val('notgraded');
+                setContentVisibility('visible');
+
+                $('.wrapper-modal-window .action-save').click();
+
+                // This is the response for the change operation.
+                AjaxHelpers.respondWithJson(requests, {});
+                // This is the response for the subsequent fetch operation.
+                AjaxHelpers.respondWithJson(requests,
+                    createMockSectionJSON({}, [createMockSubsectionJSON()])
+                );
+
+                expect($('.outline-subsection .status-custom-grading-date')).not.toExist();
+                expect($('.outline-subsection .status-grading-value')).not.toExist();
+                expect($('.outline-subsection .status-message-copy')).not.toContainText(
+                    'Contains staff only content'
+                );
+            });
+        })
     });
 
     // Note: most tests for units can be found in Bok Choy

@@ -5,10 +5,8 @@ Django models supporting the Comprehensive Theming subsystem
 
 from django.contrib.sites.models import Site
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class SiteTheme(models.Model):
     """
     This is where the information about the site's theme gets stored to the db.

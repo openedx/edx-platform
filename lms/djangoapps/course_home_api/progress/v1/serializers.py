@@ -1,8 +1,12 @@
 """
 Progress Tab Serializers
 """
+from datetime import datetime
+
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+from pytz import UTC
+
 from lms.djangoapps.course_home_api.mixins import VerifiedModeSerializerMixin
 
 
@@ -20,13 +24,14 @@ class SubsectionScoresSerializer(serializers.Serializer):
     Serializer for subsections in section_scores
     """
     assignment_type = serializers.CharField(source='format')
-    display_name = serializers.CharField()
     block_key = serializers.SerializerMethodField()
+    display_name = serializers.CharField()
     has_graded_assignment = serializers.BooleanField(source='graded')
     learner_has_access = serializers.SerializerMethodField()
     num_points_earned = serializers.FloatField(source='graded_total.earned')
     num_points_possible = serializers.FloatField(source='graded_total.possible')
     percent_graded = serializers.FloatField()
+    problem_scores = serializers.SerializerMethodField()
     show_correctness = serializers.CharField()
     show_grades = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
@@ -34,7 +39,26 @@ class SubsectionScoresSerializer(serializers.Serializer):
     def get_block_key(self, subsection):
         return str(subsection.location)
 
+    def get_problem_scores(self, subsection):
+        problem_scores = [
+            {
+                'earned': score.earned,
+                'possible': score.possible,
+            }
+            for score in subsection.problem_scores.values()
+        ]
+        return problem_scores
+
     def get_url(self, subsection):
+        """
+        Returns the URL for the subsection while taking into account if the course team has
+        marked the subsection's visibility as hide after due.
+        """
+        hide_url_date = (subsection.self_paced and subsection.end) or subsection.due
+        if (not self.context['staff_access'] and subsection.hide_after_due and hide_url_date
+                and datetime.now(UTC) > hide_url_date):
+            return None
+
         relative_path = reverse('jump_to', args=[self.context['course_key'], subsection.location])
         request = self.context['request']
         return request.build_absolute_uri(relative_path)
@@ -65,7 +89,7 @@ class GradingPolicySerializer(serializers.Serializer):
     def get_assignment_policies(self, grading_policy):
         return [{
             'num_droppable': assignment_policy['drop_count'],
-            'num_total': assignment_policy['min_count'],
+            'num_total': float(assignment_policy['min_count']),
             'short_label': assignment_policy.get('short_label', ''),
             'type': assignment_policy['type'],
             'weight': assignment_policy['weight'],
@@ -95,6 +119,7 @@ class ProgressTabSerializer(VerifiedModeSerializerMixin):
     """
     Serializer for progress tab
     """
+    username = serializers.CharField()
     certificate_data = CertificateDataSerializer()
     completion_summary = serializers.DictField()
     course_grade = CourseGradeSerializer()

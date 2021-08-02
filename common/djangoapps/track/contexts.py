@@ -68,7 +68,8 @@ def context_dict_for_learning_context(context_key):
         {
             'context_id': 'course-v1:org+course+run',
             'course_id': 'course-v1:org+course+run',
-            'org_id': 'org'
+            'org_id': 'org',
+            'enterprise_uuid': 'enterprise_customer_uuid'
         }
 
     Example 2::
@@ -76,7 +77,8 @@ def context_dict_for_learning_context(context_key):
         {
             'context_id': 'lib:edX:a-content-library',
             'course_id': '',
-            'org_id': 'edX'
+            'org_id': 'edX',
+            'enterprise_uuid': '1a0fbcbe-49e5-42f1-8e83-4cddfa592f22'
         }
 
     """
@@ -84,6 +86,7 @@ def context_dict_for_learning_context(context_key):
         'context_id': str(context_key) if context_key else '',
         'course_id': '',
         'org_id': '',
+        'enterprise_uuid': '',
     }
     if context_key is not None:
         assert isinstance(context_key, LearningContextKey)
@@ -91,4 +94,6 @@ def context_dict_for_learning_context(context_key):
             context_dict['course_id'] = str(context_key)
         if hasattr(context_key, 'org'):
             context_dict['org_id'] = context_key.org
+        if hasattr(context_key, 'enterprise_uuid'):
+            context_dict['enterprise_uuid'] = context_key.enterprise_uuid
     return context_dict

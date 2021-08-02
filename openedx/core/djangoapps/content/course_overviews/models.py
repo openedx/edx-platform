@@ -18,7 +18,7 @@ from django.db.models.fields import (
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -44,7 +44,6 @@ class CourseOverviewCaseMismatchException(Exception):
     pass
 
 
-@python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
     """
     Model for storing and caching basic information about a course.
@@ -63,7 +62,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 12  # this one goes to thirteen
+    VERSION = 15
 
     # Cache entry versioning.
     version = IntegerField()
@@ -131,6 +130,12 @@ class CourseOverview(TimeStampedModel):
 
     # Course highlight info, used to guide course update emails
     has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+
+    # Proctoring
+    enable_proctored_exams = BooleanField(default=False)
+    proctoring_provider = TextField(null=True)
+    proctoring_escalation_email = TextField(null=True)
+    allow_proctoring_opt_out = BooleanField(default=False)
 
     language = TextField(null=True)
 
@@ -233,6 +238,11 @@ class CourseOverview(TimeStampedModel):
         course_overview.self_paced = course.self_paced
 
         course_overview.has_highlights = cls._get_course_has_highlights(course)
+
+        course_overview.enable_proctored_exams = course.enable_proctored_exams
+        course_overview.proctoring_provider = course.proctoring_provider
+        course_overview.proctoring_escalation_email = course.proctoring_escalation_email
+        course_overview.allow_proctoring_opt_out = course.allow_proctoring_opt_out
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
@@ -574,19 +584,6 @@ class CourseOverview(TimeStampedModel):
         else:
             return None
 
-    def may_certify(self):
-        """
-        Returns whether it is acceptable to show the student a certificate
-        download link.
-        """
-        return course_metadata_utils.may_certify_for_course(
-            self.certificates_display_behavior,
-            self.certificates_show_before_end,
-            self.has_ended(),
-            self.certificate_available_date,
-            self.self_paced
-        )
-
     @property
     def pre_requisite_courses(self):
         """
@@ -909,7 +906,6 @@ class CourseOverviewTab(models.Model):
         return self.tab_id
 
 
-@python_2_unicode_compatible
 class CourseOverviewImageSet(TimeStampedModel):
     """
     Model for Course overview images. Each column is an image type/size.
@@ -1052,7 +1048,6 @@ class CourseOverviewImageSet(TimeStampedModel):
         )
 
 
-@python_2_unicode_compatible
 class CourseOverviewImageConfig(ConfigurationModel):
     """
     This sets the size of the thumbnail images that Course Overviews will generate
@@ -1088,7 +1083,6 @@ class CourseOverviewImageConfig(ConfigurationModel):
         )
 
 
-@python_2_unicode_compatible
 class SimulateCoursePublishConfig(ConfigurationModel):
     """
     Manages configuration for a run of the simulate_publish management command.

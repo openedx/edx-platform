@@ -105,6 +105,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
             'effort_time',
             'format',
             'graded',
+            'has_scheduled_content',
             'has_score',
             'show_gated_sections',
             'special_exam_info',

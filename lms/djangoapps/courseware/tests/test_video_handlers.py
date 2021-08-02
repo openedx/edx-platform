@@ -1296,15 +1296,16 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
         assert filename == 'zh_塞.srt'
         assert mime_type == 'application/x-subrip; charset=utf-8'
 
-    def test_value_error(self):
+    def test_value_error_handled(self):
         good_sjson = _create_file(content='bad content')
 
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
         transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
-        with pytest.raises(ValueError):
-            get_transcript(self.item)
+        error_transcript = {"start": [], "end": [], "text": ["An error occured obtaining the transcript."]}
+        content, _, _ = get_transcript(self.item)
+        assert error_transcript["text"][0] in content
 
     def test_key_error(self):
         good_sjson = _create_file(content="""

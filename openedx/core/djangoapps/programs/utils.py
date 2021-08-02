@@ -444,9 +444,18 @@ class ProgramProgressMeter:
             }
 
             try:
-                may_certify = CourseOverview.get_from_id(course_key).may_certify()
+                course_overview = CourseOverview.get_from_id(course_key)
             except CourseOverview.DoesNotExist:
                 may_certify = True
+            else:
+                may_certify = certificate_api.should_certificate_be_visible(
+                    course_overview.certificates_display_behavior,
+                    course_overview.certificates_show_before_end,
+                    course_overview.has_ended(),
+                    course_overview.certificate_available_date,
+                    course_overview.self_paced
+                )
+
             if (
                 CertificateStatuses.is_passing_status(certificate['status'])
                 and may_certify
@@ -583,7 +592,13 @@ class ProgramDataExtender:
             run_mode['upgrade_url'] = None
 
     def _attach_course_run_may_certify(self, run_mode):
-        run_mode['may_certify'] = self.course_overview.may_certify()
+        run_mode['may_certify'] = certificate_api.should_certificate_be_visible(
+            self.course_overview.certificates_display_behavior,
+            self.course_overview.certificates_show_before_end,
+            self.course_overview.has_ended(),
+            self.course_overview.certificate_available_date,
+            self.course_overview.self_paced
+        )
 
     def _attach_course_run_is_mobile_only(self, run_mode):
         run_mode['is_mobile_only'] = self.mobile_only

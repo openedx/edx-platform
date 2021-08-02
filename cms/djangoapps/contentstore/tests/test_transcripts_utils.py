@@ -640,6 +640,12 @@ class TestTranscript(unittest.TestCase):
         with self.assertRaises(transcripts_utils.TranscriptsGenerationException):
             transcripts_utils.Transcript.convert(invalid_srt_transcript, 'srt', 'sjson')
 
+    def test_convert_invalid_invalid_sjson_to_srt(self):
+        invalid_content = "Text with special character /\"\'\b\f\t\r\n."
+        error_transcript = {"start": [1], "end": [2], "text": ["An error occured obtaining the transcript."]}
+        assert transcripts_utils.Transcript.convert(invalid_content, 'sjson', 'txt') == error_transcript['text'][0]
+        assert error_transcript["text"][0] in transcripts_utils.Transcript.convert(invalid_content, 'sjson', 'srt')
+
     def test_dummy_non_existent_transcript(self):
         """
         Test `Transcript.asset` raises `NotFoundError` for dummy non-existent transcript.
@@ -994,6 +1000,16 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
         exception_message = str(no_en_transcript_exception.exception)
         self.assertEqual(exception_message, 'No transcript for `en` language')
+
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    def test_get_transcript_incorrect_json_(self, mock_get_video_transcript_data):
+        """
+        Verify that `get transcript` function returns a working json file if the original throws an error
+        """
+        error_transcript = {"start": [1], "end": [2], "text": ["An error occured obtaining the transcript."]}
+        mock_get_video_transcript_data.side_effect = ValueError
+        content, _, _ = transcripts_utils.get_transcript(self.video, 'zh')
+        assert error_transcript["text"][0] in content
 
     @ddt.data(
         transcripts_utils.TranscriptsGenerationException,

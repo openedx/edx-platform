@@ -4,7 +4,8 @@ Discussion API views
 
 
 import logging
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -15,9 +16,17 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes  # lint-amnesty, pylint: disable=unused-import
-from lms.djangoapps.discussion.rest_api.api import (
+from lms.djangoapps.instructor.access import update_forum_role
+from openedx.core.djangoapps.django_comment_common import comment_client
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from ..rest_api.api import (
     create_comment,
     create_thread,
     delete_comment,
@@ -29,33 +38,24 @@ from lms.djangoapps.discussion.rest_api.api import (
     get_thread,
     get_thread_list,
     update_comment,
-    update_thread
+    update_thread,
 )
-from lms.djangoapps.discussion.rest_api.forms import (
+from ..rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
     CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
-    ThreadListGetForm
+    ThreadListGetForm,
 )
-from lms.djangoapps.discussion.rest_api.serializers import (
+from ..rest_api.serializers import (
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
-    DiscussionSettingsSerializer
+    DiscussionSettingsSerializer,
 )
-from lms.djangoapps.discussion.views import get_divided_discussions  # lint-amnesty, pylint: disable=unused-import
-from lms.djangoapps.instructor.access import update_forum_role
-from openedx.core.djangoapps.django_comment_common import comment_client
-from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
-from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
+
+User = get_user_model()
 
 
 @view_auth_classes()
@@ -82,6 +82,8 @@ class CourseView(DeveloperErrorViewMixin, APIView):
             * end: The ISO 8601 timestamp for the end of the blackout period
 
         * thread_list_url: The URL of the list of all threads in the course.
+
+        * following_thread_list_url: thread_list_url with parameter following=True
 
         * topics_url: The URL of the topic listing for the course.
     """
@@ -173,6 +175,17 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         * topic_id: The id of the topic to retrieve the threads. There can be
             multiple topic_id queries to retrieve threads from multiple topics
             at once.
+
+        * author: The username of an author. If provided, only threads by this
+            author will be returned.
+
+        * thread_type: Can be 'discussion' or 'question', only return threads of
+            the selected thread type.
+
+        * flagged: If True, only return threads that have been flagged (reported)
+
+        * count_flagged: If True, return the count of flagged comments for each thread.
+          (can only be used by moderators or above)
 
         * text_search: A search string to match. Any thread whose content
             (including the bodies of comments in the thread) matches the search
@@ -290,6 +303,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * response_count: The number of direct responses for a thread
 
+        * abuse_flagged_count: The number of flags(reports) on and within the
+            thread. Returns null if requesting user is not a moderator
+
     **DELETE response values:
 
         No content is returned for a DELETE request
@@ -314,10 +330,14 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["topic_id"],
             form.cleaned_data["text_search"],
             form.cleaned_data["following"],
+            form.cleaned_data["author"],
+            form.cleaned_data["thread_type"],
+            form.cleaned_data["flagged"],
             form.cleaned_data["view"],
             form.cleaned_data["order_by"],
             form.cleaned_data["order_direction"],
-            form.cleaned_data["requested_fields"]
+            form.cleaned_data["requested_fields"],
+            form.cleaned_data["count_flagged"],
         )
 
     def retrieve(self, request, thread_id=None):
@@ -467,6 +487,10 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * abuse_flagged: Boolean indicating whether the requesting user has
           flagged the comment for abuse
+
+        * abuse_flagged_any_user: Boolean indicating whether any user has
+            flagged the comment for abuse. Returns null if requesting user
+            is not a moderator.
 
         * voted: Boolean indicating whether the requesting user has voted
           for the comment

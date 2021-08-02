@@ -338,6 +338,7 @@ class ModuleStoreTestUsersMixin():
         Create a test user for a course.
         """
         if user_type is CourseUserType.ANONYMOUS:
+            self.client.logout()
             return AnonymousUser()
 
         is_enrolled = user_type is CourseUserType.ENROLLED

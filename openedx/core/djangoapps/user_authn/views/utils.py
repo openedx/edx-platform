@@ -8,6 +8,7 @@ from ipware.ip import get_client_ip
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.models import clean_username
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 
@@ -70,6 +71,9 @@ def third_party_auth_context(request, redirect_to, tpa_hint=None):
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
             user_details = running_pipeline['kwargs']['details']
             if user_details:
+                username = running_pipeline['kwargs'].get('username') or user_details.get('username')
+                if username:
+                    user_details['username'] = clean_username(username)
                 context['pipeline_user_details'] = user_details
 
             if current_provider is not None:

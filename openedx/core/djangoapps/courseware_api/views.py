@@ -38,7 +38,6 @@ from lms.djangoapps.courseware.toggles import (
     course_exit_page_is_active,
     mfe_special_exams_is_active,
     mfe_proctored_exams_is_active,
-    COURSEWARE_USE_LEARNING_SEQUENCES_API,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -87,7 +86,6 @@ class CoursewareMeta:
             self.request.user,
             'load',
             check_if_enrolled=True,
-            check_survey_complete=False,
             check_if_authenticated=True,
         )
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
@@ -120,23 +118,6 @@ class CoursewareMeta:
             is_global_staff=self.original_user_is_global_staff,
             is_course_staff=self.original_user_is_staff
         )
-
-    @property
-    def is_learning_sequences_api_enabled(self):
-        """
-        Should the Learning Sequences API be used to load course structure data?
-
-        Courseware views in frontend-app-learning need to load course structure data
-        from the backend to display feaures like breadcrumbs, the smart "Next"
-        button, etc. This has been done so far using the Course Blocks API.
-
-        Over the next few weeks (starting 2021-06-25), we will be incrementally
-        transitioning said views to instead use the Learning Sequences API,
-        which we expect to be significantly faster. Once the transition is in
-        progress, this function will surface to frontend-app-learning whether
-        the old Course Blocks API or Learning Sequences API should be used.
-        """
-        return COURSEWARE_USE_LEARNING_SEQUENCES_API.is_enabled(self.course_key)
 
     @property
     def is_mfe_special_exams_enabled(self):
@@ -180,11 +161,10 @@ class CoursewareMeta:
 
     @property
     def license(self):
-        course = get_course_by_id(self.course_key)
-        return course.license
+        return self.course.license
 
     @property
-    def can_load_courseware(self) -> dict:
+    def course_access(self) -> dict:
         """
         Can the user load this course in the learning micro-frontend?
 
@@ -244,9 +224,8 @@ class CoursewareMeta:
     def user_has_passing_grade(self):
         """ Returns a boolean on if the effective_user has a passing grade in the course """
         if not self.effective_user.is_anonymous:
-            course = get_course_by_id(self.course_key)
-            user_grade = CourseGradeFactory().read(self.effective_user, course).percent
-            return user_grade >= course.lowest_passing_grade
+            user_grade = CourseGradeFactory().read(self.effective_user, self.course).percent
+            return user_grade >= self.course.lowest_passing_grade
         return False
 
     @property
@@ -260,9 +239,8 @@ class CoursewareMeta:
         Returns certificate data if the effective_user is enrolled.
         Note: certificate data can be None depending on learner and/or course state.
         """
-        course = get_course_by_id(self.course_key)
         if self.enrollment_object:
-            return get_cert_data(self.effective_user, course, self.enrollment_object.mode)
+            return get_cert_data(self.effective_user, self.course, self.enrollment_object.mode)
 
     @property
     def verify_identity_url(self):

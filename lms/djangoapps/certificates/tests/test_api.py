@@ -2,7 +2,6 @@
 
 
 import uuid
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 from unittest import mock
 from unittest.mock import patch
@@ -24,7 +23,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     GlobalStaffFactory,
@@ -37,9 +35,7 @@ from lms.djangoapps.certificates.api import (
     certificate_downloadable_status,
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
-    example_certificates_status,
-    generate_example_certificates,
-    generate_user_certificates,
+    generate_certificate_task,
     get_allowlist_entry,
     get_allowlisted_users,
     get_certificate_footer_context,
@@ -53,26 +49,24 @@ from lms.djangoapps.certificates.api import (
     is_certificate_invalidated,
     is_on_allowlist,
     remove_allowlist_entry,
-    set_cert_generation_enabled
+    set_cert_generation_enabled,
+    certificate_status_for_student,
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
-    ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
-from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import (
     CertificateAllowlistFactory,
     GeneratedCertificateFactory,
     CertificateInvalidationFactory
 )
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from lms.djangoapps.certificates.tests.test_generation_handler import ID_VERIFIED_METHOD, PASSING_GRADE_METHOD
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
-CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_v2_certificate'
+CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
@@ -81,20 +75,6 @@ class WebCertificateTestMixin:
     """
     Mixin with helpers for testing Web Certificates.
     """
-    @contextmanager
-    def _mock_queue(self, is_successful=True):
-        """
-        Mock the "send to XQueue" method to return either success or an error.
-        """
-        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
-        with patch(symbol) as mock_send_to_queue:
-            if is_successful:
-                mock_send_to_queue.return_value = (0, "Successfully queued")
-            else:
-                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
-
-            yield mock_send_to_queue
-
     def _setup_course_certificate(self):
         """
         Creates certificate configuration for course
@@ -539,51 +519,45 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert get_certificate_for_user(self.student.username, self.nonexistent_course_id) is None
 
 
-@override_settings(CERT_QUEUE='certificates')
-class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
+class GenerateUserCertificatesTest(ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
-    ERROR_REASON = "Kaboom!"
-    ENABLED_SIGNALS = ['course_published']
+    def setUp(self):
+        super().setUp()
 
-    def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.certificates.utils.tracker')
-
-        self.student = UserFactory.create(
-            email='joe_user@edx.org',
-            username='joeuser',
-            password='foo'
+        self.user = UserFactory()
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
         )
-        self.student_no_cert = UserFactory()
-        self.course = CourseFactory.create(
-            org='edx',
-            number='verified',
-            display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
-        )
-        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.request_factory = RequestFactory()
-
-    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_new_cert_request_for_html_certificate(self):
-        """
-        Test generate_user_certificates with HTML certificates
-        """
-        self._setup_course_certificate()
-        with mock_passing_grade():
-            generate_user_certificates(self.student, self.course.id)
-
-        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
-        assert cert.status == CertificateStatuses.downloadable
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_url_empty_with_invalid_certificate(self):
         """
         Test certificate url is empty if html view is not enabled and certificate is not yet generated
         """
-        url = get_certificate_url(self.student.id, self.course.id)
+        url = get_certificate_url(self.user.id, self.course_run_key)
         assert url == ''
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation(self):
+        """
+        Test that a cert is successfully generated
+        """
+        cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+        assert not cert
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=True):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=True):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.downloadable
+                assert cert.mode == CourseMode.VERIFIED
 
 
 @ddt.ddt
@@ -651,69 +625,6 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         """Check that self-generated certificates are enabled or disabled for the course. """
         actual_enabled = cert_generation_enabled(course_key)
         assert expect_enabled == actual_enabled
-
-
-class GenerateExampleCertificatesTest(ModuleStoreTestCase):
-    """Test generation of example certificates. """
-
-    COURSE_KEY = CourseLocator(org='test', course='test', run='test')
-
-    def test_generate_example_certs(self):
-        # Generate certificates for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 1)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status({
-            'description': 'honor',
-            'status': 'started'
-        })
-
-    def test_generate_example_certs_with_verified_mode(self):
-        # Create verified and honor modes for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='honor')
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='verified')
-
-        # Generate certificates for the course
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 2)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status(
-            {
-                'description': 'verified',
-                'status': 'started'
-            },
-            {
-                'description': 'honor',
-                'status': 'started'
-            }
-        )
-
-    @contextmanager
-    def _mock_xqueue(self):
-        """Mock the XQueue method for adding a task to the queue. """
-        with patch.object(XQueueCertInterface, 'add_example_cert') as mock_queue:
-            yield mock_queue
-
-    def _assert_certs_in_queue(self, mock_queue, expected_num):
-        """Check that the certificate generation task was added to the queue. """
-        certs_in_queue = [call_args[0] for (call_args, __) in mock_queue.call_args_list]
-        assert len(certs_in_queue) == expected_num
-        for cert in certs_in_queue:
-            assert isinstance(cert, ExampleCertificate)
-
-    def _assert_cert_status(self, *expected_statuses):
-        """Check the example certificate status. """
-        actual_status = example_certificates_status(self.COURSE_KEY)
-        assert list(expected_statuses) == actual_status
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)

@@ -19,16 +19,13 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
-    can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
-    generate_user_certificates as _generate_user_certificates,
-    is_on_certificate_allowlist as _is_on_certificate_allowlist,
-    is_using_v2_course_certificates as _is_using_v2_course_certificates,
-    regenerate_user_certificates as _regenerate_user_certificates
+    is_on_certificate_allowlist as _is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -40,14 +37,15 @@ from lms.djangoapps.certificates.models import (
     CertificateTemplateAsset,
     ExampleCertificateSet,
     GeneratedCertificate,
-    certificate_status_for_student
 )
-from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
-    has_html_certificates_enabled as _has_html_certificates_enabled
+    has_html_certificates_enabled as _has_html_certificates_enabled,
+    should_certificate_be_visible as _should_certificate_be_visible,
+    certificate_status as _certificate_status,
+    certificate_status_for_student as _certificate_status_for_student,
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -56,7 +54,7 @@ MODES = GeneratedCertificate.MODES
 
 def _format_certificate_for_user(username, cert):
     """
-    Helper function to serialize an user certificate.
+    Helper function to serialize a user certificate.
 
     Arguments:
         username (unicode): The identifier of the user.
@@ -64,7 +62,8 @@ def _format_certificate_for_user(username, cert):
 
     Returns: dict
     """
-    try:
+    course_overview = get_course_overview_or_none(cert.course_id)
+    if cert.download_url or course_overview:
         return {
             "username": username,
             "course_key": cert.course_id,
@@ -82,8 +81,8 @@ def _format_certificate_for_user(username, cert):
                 else None
             ),
         }
-    except CourseOverview.DoesNotExist:
-        return None
+
+    return None
 
 
 def get_certificates_for_user(username):
@@ -202,25 +201,6 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
 
-def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
-    return _generate_user_certificates(student, course_key, insecure, generation_mode, forced_grade)
-
-
-def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
-    return _regenerate_user_certificates(student, course_key, forced_grade, template_file, insecure)
-
-
-def can_generate_certificate_task(user, course_key):
-    """
-    Determine if we can create a task to generate a certificate for this user in this course run.
-
-    This will return True if either:
-    - the course run is using the allowlist and the user is on the allowlist, or
-    - the course run is using v2 course certificates
-    """
-    return _can_generate_certificate_task(user, course_key)
-
-
 def generate_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
@@ -250,7 +230,7 @@ def certificate_downloadable_status(student, course_key):
     Returns:
         Dict containing student passed status also download url, uuid for cert if available
     """
-    current_status = certificate_status_for_student(student, course_key)
+    current_status = _certificate_status_for_student(student, course_key)
 
     # If the certificate status is an error user should view that status is "generating".
     # On the back-end, need to monitor those errors and re-submit the task.
@@ -264,7 +244,7 @@ def certificate_downloadable_status(student, course_key):
         'uuid': None,
     }
 
-    course_overview = CourseOverview.get_from_id(course_key)
+    course_overview = get_course_overview_or_none(course_key)
     if (
         not certificates_viewable_for_course(course_overview) and
         CertificateStatuses.is_passing_status(current_status['status']) and
@@ -273,7 +253,13 @@ def certificate_downloadable_status(student, course_key):
         response_data['earned_but_not_available'] = True
         response_data['certificate_available_date'] = course_overview.certificate_available_date
 
-    may_view_certificate = course_overview.may_certify()
+    may_view_certificate = _should_certificate_be_visible(
+        course_overview.certificates_display_behavior,
+        course_overview.certificates_show_before_end,
+        course_overview.has_ended(),
+        course_overview.certificate_available_date,
+        course_overview.self_paced
+    )
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(
@@ -366,31 +352,30 @@ def cert_generation_enabled(course_key):
 
 
 def generate_example_certificates(course_key):
-    """Generate example certificates for a course.
+    """Generate example (PDF) certificates for a course.
 
-    Example certificates are used to validate that certificates
-    are configured correctly for the course.  Staff members can
-    view the example certificates before enabling
-    the self-generated certificates button for students.
+    Example certificates were used to validate that certificates were configured correctly for the course.  Staff
+    members could view the example certificates before enabling the self-generated certificates button for students.
 
-    Several example certificates may be generated for a course.
-    For example, if a course offers both verified and honor certificates,
-    examples of both types of certificate will be generated.
+    [07/20/2021 Update]
+    This function was updated to remove the references to queue.py, which has been removed as part of MICROBA-1227, and
+    no longer can fulfill the function it was originally created for. There is further cleanup around PDF certificate
+    generation code, part of DEPR-155, that will remove this function. See DEPR-155 and MICROBA-1094 for additional
+    info.
 
-    If an error occurs while starting the certificate generation
-    job, the errors will be recorded in the database and
-    can be retrieved using `example_certificate_status()`.
+    It may be important to note that this functionality has been broken since 2018 when the ability to generate PDF
+    certificates was ripped out of edx-platform. This will be removed as part of MICROBA-1394.
 
     Arguments:
         course_key (CourseKey): The course identifier.
 
     Returns:
         None
-
     """
-    xqueue = XQueueCertInterface()
-    for cert in ExampleCertificateSet.create_example_set(course_key):
-        xqueue.add_example_cert(cert)
+    log.warning(
+        "Generating example certificates is no longer supported. Skipping generation of example certificates for "
+        f"course {course_key}"
+    )
 
 
 def example_certificates_status(course_key):
@@ -735,13 +720,6 @@ def get_certificate_invalidation_entry(certificate):
     return certificate_invalidation_entry
 
 
-def is_using_v2_course_certificates(course_key):
-    """
-    Determines if the given course run is using V2 of course certificates
-    """
-    return _is_using_v2_course_certificates(course_key)
-
-
 def get_allowlist(course_key):
     """
     Return the certificate allowlist for the given course run
@@ -774,3 +752,69 @@ def get_enrolled_allowlisted_not_passing_users(course_key):
         generatedcertificate__course_id=course_key,
         generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
     )
+
+
+def should_certificate_be_visible(
+    certificates_display_behavior,
+    certificates_show_before_end,
+    has_ended,
+    certificate_available_date,
+    self_paced
+):
+    """
+    Returns whether it is acceptable to show the student a certificate download
+    link for a course, based on provided attributes of the course.
+    Arguments:
+        certificates_display_behavior (str): string describing the course's
+            certificate display behavior.
+            See CourseFields.certificates_display_behavior.help for more detail.
+        certificates_show_before_end (bool): whether user can download the
+            course's certificates before the course has ended.
+        has_ended (bool): Whether the course has ended.
+        certificate_available_date (datetime): the date the certificate is available on for the course.
+        self_paced (bool): Whether the course is self-paced.
+    """
+    return _should_certificate_be_visible(
+        certificates_display_behavior,
+        certificates_show_before_end,
+        has_ended,
+        certificate_available_date,
+        self_paced
+    )
+
+
+def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_certificate):
+    """
+    Returns the certificate info for a user for grade report.
+    """
+    certificate_is_delivered = 'N'
+    certificate_type = 'N/A'
+    status = _certificate_status(user_certificate)
+    certificate_generated = status['status'] == CertificateStatuses.downloadable
+    course_overview = get_course_overview_or_none(course_id)
+    if not course_overview:
+        return None
+    can_have_certificate = _should_certificate_be_visible(
+        course_overview.certificates_display_behavior,
+        course_overview.certificates_show_before_end,
+        course_overview.has_ended(),
+        course_overview.certificate_available_date,
+        course_overview.self_paced
+    )
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
+    user_is_verified = grade is not None and mode_is_verified
+
+    eligible_for_certificate = 'Y' if (user_is_allowlisted or user_is_verified or certificate_generated) \
+        else 'N'
+
+    if certificate_generated and can_have_certificate:
+        certificate_is_delivered = 'Y'
+        certificate_type = status['mode']
+
+    return [eligible_for_certificate, certificate_is_delivered, certificate_type]
+
+
+def certificate_status_for_student(student, course_id):
+    """This returns a dictionary with a key for status, and other information."""
+    return _certificate_status_for_student(student, course_id)

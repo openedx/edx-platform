@@ -2414,6 +2414,25 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
     @patch_call_command
+    def test_reset_with_multiple_idp(self, mock_call_command):
+        programs = [str(uuid4()), str(uuid4())]
+        self.set_org_in_catalog_cache(self.organization, programs)
+        provider_2 = SAMLProviderConfigFactory(
+            organization=self.organization,
+            slug='test-shib-2',
+            enabled=True,
+        )
+
+        response = self.request(self.organization.short_name)
+        assert response.status_code == status.HTTP_200_OK
+        mock_call_command.assert_has_calls([
+            mock.call(self.reset_users_cmd, self.provider.slug, force=True),
+            mock.call(self.reset_users_cmd, provider_2.slug, force=True),
+            mock.call(self.reset_enrollments_cmd, ','.join(programs), force=True),
+        ])
+
+    @override_settings(FEATURES=FEATURES_WITH_ENABLED)
+    @patch_call_command
     def test_reset_without_idp(self, mock_call_command):
         organization = LMSOrganizationFactory()
         programs = [str(uuid4()), str(uuid4())]

@@ -183,3 +183,47 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert ungraded_score['learner_has_access']
         assert not gated_score['learner_has_access']
         assert ungated_score['learner_has_access']
+
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_view_other_students_progress_page(self):
+        # Test the ability to view progress pages of other students by changing the url
+        CourseEnrollment.enroll(self.user, self.course.id)
+        response = self.client.get(self.url)
+        assert response.data['username'] == self.user.username
+
+        other_user = UserFactory()
+        self.url = reverse('course-home-progress-tab-other-student', args=[self.course.id, other_user.id])
+        CourseEnrollment.enroll(other_user, self.course.id)
+
+        # users with the ccx coach role can view other students' progress pages
+        with patch(
+            'lms.djangoapps.course_home_api.progress.v1.views.has_ccx_coach_role',
+            return_value=True
+        ):
+            response = self.client.get(self.url)
+            assert response.data['username'] == other_user.username
+
+        # staff users can view other students' progress pages
+        self.switch_to_staff()
+
+        response = self.client.get(self.url)
+        assert response.data['username'] == other_user.username
+
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_url_hidden_if_subsection_hide_after_due(self):
+        chapter = ItemFactory(parent=self.course, category='chapter')
+        yesterday = now() - timedelta(days=1)
+        hide_after_due_subsection = ItemFactory(
+            parent=chapter, category='sequential', hide_after_due=True, due=yesterday
+        )
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        sections = response.data['section_scores']
+        regular_subsection = sections[0]['subsections'][0]  # default sequence that parent class gives us
+        hide_after_due_subsection = sections[1]['subsections'][0]
+        assert regular_subsection['url'] is not None
+        assert hide_after_due_subsection['url'] is None

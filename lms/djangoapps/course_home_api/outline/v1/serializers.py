@@ -54,6 +54,7 @@ class CourseBlockSerializer(serializers.Serializer):
                 'legacy_web_url': block['legacy_web_url'] if enable_links else None,
                 'resume_block': block.get('resume_block', False),
                 'type': block_type,
+                'has_scheduled_content': block.get('has_scheduled_content'),
             },
         }
         for child in children:
@@ -120,8 +121,10 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()
+    enrollment_mode = serializers.CharField()
     handouts_html = serializers.CharField()
     has_ended = serializers.BooleanField()
     offer = serializers.DictField()
     resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()
+    user_has_passing_grade = serializers.BooleanField()

@@ -3236,3 +3236,16 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
         iterator = iter([self._user_state(suffix='_dynamath')])
         report_data = list(descriptor.generate_report_data(iterator))
         assert 0 == len(report_data)
+
+    def test_generate_report_data_report_loncapa_error(self):
+        #Test to make sure reports continue despite loncappa errors, and write them into the report.
+        descriptor = self._get_descriptor()
+        with patch('xmodule.capa_module.LoncapaProblem') as mock_LoncapaProblem:
+            mock_LoncapaProblem.side_effect = LoncapaProblemError
+            report_data = list(descriptor.generate_report_data(
+                self._mock_user_state_generator(
+                    user_count=1,
+                    response_count=5,
+                )
+            ))
+            assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())

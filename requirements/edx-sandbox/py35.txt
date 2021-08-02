@@ -8,7 +8,7 @@ common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py35.in
 common/lib/symmath
     # via -r requirements/edx-sandbox/py35.in
-cffi==1.14.5
+cffi==1.14.6
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py35.in
@@ -26,12 +26,10 @@ decorator==5.0.9
     # via networkx
 joblib==0.14.1
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   nltk
 kiwisolver==1.1.0
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   matplotlib
 lxml==4.5.0
@@ -50,7 +48,9 @@ matplotlib==2.2.4
 mpmath==1.2.1
     # via sympy
 networkx==2.2
-    # via -r requirements/edx-sandbox/py35.in
+    # via
+    #   -c requirements/edx-sandbox/../constraints.txt
+    #   -r requirements/edx-sandbox/py35.in
 nltk==3.6.2
     # via
     #   -r requirements/edx-sandbox/py35.in
@@ -81,7 +81,7 @@ pytz==2021.1
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py35.in
-regex==2021.4.4
+regex==2021.7.6
     # via nltk
 scipy==1.2.1
     # via
@@ -103,7 +103,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   -r requirements/edx-sandbox/py35.in
     #   symmath
-tqdm==4.61.1
+tqdm==4.61.2
     # via nltk
 
 # The following packages are considered to be unsafe in a requirements file:

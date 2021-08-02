@@ -5,6 +5,7 @@ Python APIs exposed by the catalog app to other in-process apps.
 from .utils import get_programs_by_type_slug as _get_programs_by_type_slug
 from .utils import get_programs as _get_programs
 from .utils import course_run_keys_for_program as _course_run_keys_for_program
+from .utils import get_course_run_details as _get_course_run_details
 
 
 def get_programs_by_type(site, program_type_slug):
@@ -47,3 +48,16 @@ def get_course_run_key_for_program_from_cache(program):
         (set): A set of Course Run Keys.
     """
     return _course_run_keys_for_program(parent_program=program)
+
+
+def get_course_run_details(course_key, fields_list):
+    """
+    Retrieves course run details for a given course run key.
+
+    Params:
+        course_key (CourseKey): The identifier for the course.
+        fields_list (List, string): A list of fields (as strings) of values we want returned.
+    Returns:
+        dict containing response from the Discovery API that includes the fields specified in `fields_list`
+    """
+    return _get_course_run_details(course_key, fields_list)

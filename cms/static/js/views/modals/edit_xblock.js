@@ -172,7 +172,18 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                 var self = this,
                     editorView = this.editorView,
                     xblockInfo = this.xblockInfo,
+                    data = null;
+                try {
                     data = editorView.getXBlockFieldData();
+                } catch (e) {
+                    ViewUtils.showErrorMeassage(
+                        gettext("Studio's having trouble parsing the problem component's content"),
+                        e.message,
+                        10000
+                    );
+                    ViewUtils.setScrollOffset(editorView.$el, 100);
+                    return null;
+                }
                 event.preventDefault();
                 if (data) {
                     ViewUtils.runOperationShowingMessage(gettext('Saving'),
@@ -182,6 +193,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                             self.onSave();
                         });
                 }
+                return null;
             },
 
             onSave: function() {

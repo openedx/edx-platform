@@ -27,9 +27,14 @@ class SubsectionGradeBase(metaclass=ABCMeta):
         self.display_name = block_metadata_utils.display_name_with_default(subsection)
         self.url_name = block_metadata_utils.url_name_for_block(subsection)
 
-        self.format = getattr(subsection, 'format', '')
         self.due = getattr(subsection, 'due', None)
+        self.end = getattr(subsection, 'end', None)
+        self.format = getattr(subsection, 'format', '')
         self.graded = getattr(subsection, 'graded', False)
+        transformer_data = getattr(subsection, 'transformer_data', None)
+        hidden_content_data = transformer_data and subsection.transformer_data.get('hidden_content')
+        self.hide_after_due = hidden_content_data and hidden_content_data.fields.get('merged_hide_after_due')
+        self.self_paced = subsection.self_paced
         self.show_correctness = getattr(subsection, 'show_correctness', '')
 
         self.course_version = getattr(subsection, 'course_version', None)

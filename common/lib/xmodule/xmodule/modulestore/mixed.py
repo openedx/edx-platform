@@ -4,8 +4,6 @@ MixedModuleStore allows for aggregation between multiple modulestores.
 In this way, courses can be served up via either SplitMongoModuleStore or MongoModuleStore.
 
 """
-
-
 import functools
 import itertools
 import logging

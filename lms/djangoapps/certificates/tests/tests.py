@@ -15,11 +15,10 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from lms.djangoapps.badges.tests.factories import CourseCompleteImageConfigurationFactory
+from lms.djangoapps.certificates.api import certificate_info_for_user, certificate_status_for_student
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
-    certificate_info_for_user,
-    certificate_status_for_student
 )
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

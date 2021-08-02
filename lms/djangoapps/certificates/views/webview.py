@@ -44,7 +44,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
 from lms.djangoapps.certificates.utils import emit_certificate_event, get_certificate_url
-from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from openedx.core.djangoapps.catalog.api import get_course_run_details
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

@@ -16,21 +16,18 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-from model_utils.fields import AutoCreatedField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
-from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from lms.djangoapps.badges.events.course_complete import course_badge_check
 from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
@@ -45,29 +42,6 @@ class CertificateSocialNetworks:
     linkedin = 'LinkedIn'
     facebook = 'Facebook'
     twitter = 'Twitter'
-
-
-class CertificateWhitelist(models.Model):
-    """
-    Tracks students who are whitelisted, all users
-    in this table will always qualify for a certificate
-    regardless of their grade.
-
-    This model is deprecated. CertificateAllowlist should be used in its place.
-
-    .. no_pii:
-    """
-    class Meta:
-        app_label = "certificates"
-        unique_together = [['course_id', 'user']]
-
-    objects = NoneToEmptyManager()
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    whitelist = models.BooleanField(default=0)
-    created = AutoCreatedField(_('created'))
-    notes = models.TextField(default=None, null=True)
 
 
 class CertificateAllowlist(TimeStampedModel):
@@ -440,7 +414,6 @@ class GeneratedCertificate(models.Model):
             )
 
 
-@python_2_unicode_compatible
 class CertificateGenerationHistory(TimeStampedModel):
     """
     Model for storing Certificate Generation History.
@@ -505,7 +478,6 @@ class CertificateGenerationHistory(TimeStampedModel):
                ("regenerated" if self.is_regeneration else "generated", self.generated_by, self.created, self.course_id)
 
 
-@python_2_unicode_compatible
 class CertificateInvalidation(TimeStampedModel):
     """
     Model for storing Certificate Invalidation.
@@ -594,82 +566,6 @@ def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: d
     """
     if is_prerequisite_courses_enabled():
         fulfill_course_milestone(course_key, user)
-
-
-def certificate_status_for_student(student, course_id):
-    """
-    This returns a dictionary with a key for status, and other information.
-    See certificate_status for more information.
-    """
-    try:
-        generated_certificate = GeneratedCertificate.objects.get(user=student, course_id=course_id)
-    except GeneratedCertificate.DoesNotExist:
-        generated_certificate = None
-    return certificate_status(generated_certificate)
-
-
-def certificate_status(generated_certificate):
-    """
-    This returns a dictionary with a key for status, and other information.
-
-    If the status is "downloadable", the dictionary also contains
-    "download_url".
-
-    If the student has been graded, the dictionary also contains their
-    grade for the course with the key "grade".
-    """
-    # Import here instead of top of file since this module gets imported before
-    # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=redefined-outer-name, reimported
-
-    if generated_certificate:
-        cert_status = {
-            'status': generated_certificate.status,
-            'mode': generated_certificate.mode,
-            'uuid': generated_certificate.verify_uuid,
-        }
-        if generated_certificate.grade:
-            cert_status['grade'] = generated_certificate.grade
-
-        if generated_certificate.mode == 'audit':
-            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(generated_certificate.course_id)]
-            # Short term fix to make sure old audit users with certs still see their certs
-            # only do this if there if no honor mode
-            if 'honor' not in course_mode_slugs:
-                cert_status['status'] = CertificateStatuses.auditing
-                return cert_status
-
-        if generated_certificate.status == CertificateStatuses.downloadable:
-            cert_status['download_url'] = generated_certificate.download_url
-
-        return cert_status
-    else:
-        return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
-
-
-def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_certificate):
-    """
-    Returns the certificate info for a user for grade report.
-    """
-    from common.djangoapps.student.models import CourseEnrollment
-
-    certificate_is_delivered = 'N'
-    certificate_type = 'N/A'
-    status = certificate_status(user_certificate)
-    certificate_generated = status['status'] == CertificateStatuses.downloadable
-    can_have_certificate = CourseOverview.get_from_id(course_id).may_certify()
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
-    user_is_verified = grade is not None and mode_is_verified
-
-    eligible_for_certificate = 'Y' if (user_is_allowlisted or user_is_verified or certificate_generated) \
-        else 'N'
-
-    if certificate_generated and can_have_certificate:
-        certificate_is_delivered = 'Y'
-        certificate_type = status['mode']
-
-    return [eligible_for_certificate, certificate_is_delivered, certificate_type]
 
 
 class ExampleCertificateSet(TimeStampedModel):
@@ -1092,7 +988,6 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         return json_data
 
 
-@python_2_unicode_compatible
 class CertificateTemplate(TimeStampedModel):
     """A set of custom web certificate templates.
 
@@ -1173,7 +1068,6 @@ def template_assets_path(instance, filename):
     return name
 
 
-@python_2_unicode_compatible
 class CertificateTemplateAsset(TimeStampedModel):
     """A set of assets to be used in custom web certificate templates.
 

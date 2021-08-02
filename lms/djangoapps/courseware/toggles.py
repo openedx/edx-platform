@@ -25,23 +25,6 @@ COURSEWARE_USE_LEGACY_FRONTEND = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'use_legacy_frontend', __name__
 )
 
-# .. toggle_name: courseware.use_learning_sequences_api
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: When enbled, frontend-app-learning's courseware pages should use the
-#   new Learning Sequences API (from ``openedx.core.djangoapps.content.learning_sequences``)
-#   instead of the Course Blocks API (from ``lms.djangoapps.course_api.blocks``)
-#   in order to load course structure data.
-# .. toggle_warnings: As of 2021-06-25, the frontend-app-learning changes necessary to honor this
-#   flag's value have not yet been implemented. We expect that they will be implemented in
-#   the coming weeks.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-06-25
-# .. toggle_target_removal_date: 2021-09-01
-COURSEWARE_USE_LEARNING_SEQUENCES_API = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'use_learning_sequences_api', __name__
-)
-
 # .. toggle_name: courseware.microfrontend_course_team_preview
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -140,6 +123,28 @@ COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS = CourseWaffleFlag(
 # .. toggle_warnings: None
 COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
+)
+
+# .. toggle_name: courseware.enable_bulk_allowance_modal
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enable new bulk allowance modal
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-14
+BULK_ALLOWANCE_MODAL = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'enable_bulk_allowance', __name__,
+)
+
+# .. toggle_name: courseware.verified_name
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Course waffle flag for verified name functionality (see https://github.com/edx/edx-name-affirmation)
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-7-14
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+COURSEWARE_VERIFIED_NAME_FLAG = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'verified_name', __name__
 )
 
 
@@ -296,6 +301,10 @@ def streak_celebration_is_active(course_key):
         courseware_mfe_progress_milestones_are_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )
+
+
+def is_verified_name_enabled_for_course(course_key):
+    return COURSEWARE_VERIFIED_NAME_FLAG.is_enabled(course_key)
 
 
 # .. toggle_name: COURSES_INVITE_ONLY

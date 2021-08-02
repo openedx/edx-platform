@@ -42,6 +42,13 @@ class ThreadListGetForm(_PaginationForm):
     topic_id = MultiValueField(required=False)
     text_search = CharField(required=False)
     following = ExtendedNullBooleanField(required=False)
+    author = CharField(required=False)
+    thread_type = ChoiceField(
+        choices=[(choice, choice) for choice in ["discussion", "question"]],
+        required=False,
+    )
+    count_flagged = ExtendedNullBooleanField(required=False)
+    flagged = ExtendedNullBooleanField(required=False)
     view = ChoiceField(
         choices=[(choice, choice) for choice in ["unread", "unanswered"]],
         required=False,

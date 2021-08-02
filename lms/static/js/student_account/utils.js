@@ -10,6 +10,7 @@
                 var hostname = this.getHostname();
                 var isLocalhost = hostname.indexOf('localhost') >= 0;
                 var isStage = hostname.indexOf('stage') >= 0;
+                var isEdge = hostname.indexOf('edge') >= 0;
                 var cookie, edxUserCookie, prefix, user, userCookie;
 
                 if (isLocalhost) {
@@ -18,6 +19,7 @@
                 } else {
                     // does not take sandboxes into account
                     prefix = isStage ? 'stage' : 'prod';
+                    prefix = isEdge ? 'edge' : prefix;
                     edxUserCookie = prefix + '-edx-user-info';
                 }
 

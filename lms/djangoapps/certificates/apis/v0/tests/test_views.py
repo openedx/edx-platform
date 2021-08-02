@@ -318,7 +318,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             assert len(resp.data) == 0
 
         # Test student with 1 certificate
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,
@@ -358,7 +358,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,
@@ -396,7 +396,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         expected_download_url = reverse('certificates:render_cert_by_uuid', kwargs=kwargs)
         self.assert_success_response_for_student(response, download_url=expected_download_url)
 
-    @patch('lms.djangoapps.certificates.apis.v0.views.get_course_run_details')
+    @patch('openedx.core.djangoapps.content.course_overviews.api.get_course_run_details')
     def test_certificate_without_course(self, mock_get_course_run_details):
         """
         Verify that certificates are returned for deleted XML courses.
