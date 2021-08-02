@@ -71,6 +71,8 @@ log = logging.getLogger(__name__)
 #########################################################################
 
 registry = TagRegistry()  # pylint: disable=invalid-name
+
+
 class Status(object):
     """
     Problem status
