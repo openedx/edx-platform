@@ -1,6 +1,8 @@
 """
 Views for Admin Panel API
 """
+from itertools import groupby
+
 from django.contrib.auth.models import Group, User
 from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
@@ -113,6 +115,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN]).order_by('name')
         user_obj = User.objects.filter(
             id=self.kwargs['pk']
+        ).filter(
+            **get_user_org_filter(self.request.user)
         ).select_related(
             'profile'
         ).prefetch_related(
@@ -134,9 +138,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserListingSerializer
 
     def create(self, request, *args, **kwargs):
-        request.data['profile'].update({'organization': self.request.user.profile.organization_id})
-        user_serializer = UserSerializer(data=request.data)
+        if request.data.get('profile'):
+            request.data['profile']['organization'] = self.request.user.profile.organization_id
 
+        user_serializer = UserSerializer(data=request.data)
         if user_serializer.is_valid():
             user = user_serializer.save()
             send_registration_email(user, user.profile, request.scheme)
@@ -405,13 +410,14 @@ class UserInfo(views.APIView):
             languages_qs = LanguageProficiency.objects.filter(
                 user_profile__organization=self.request.user.profile.organization_id
             )
+        languages = [{'code': lang.code, 'value': lang.get_code_display()} for lang in languages_qs]
 
         user_info = {
             'name': self.request.user.get_full_name(),
             'username': self.request.user.username,
             'is_superuser': self.request.user.is_superuser,
             'csrf_token': csrf.get_token(self.request),
-            'languages': [{'code': lang.code, 'value': lang.get_code_display()} for lang in languages_qs],
+            'languages': [lang[0] for lang in groupby(languages)],
             'role': None
         }
         user_groups = Group.objects.filter(
@@ -429,7 +435,7 @@ class CourseListAPI(generics.ListAPIView):
     pagination_class = PakxAdminAppPagination
     serializer_class = CoursesSerializer
 
-    PakxAdminAppPagination.page_size = 3
+    PakxAdminAppPagination.page_size = 5
 
     instructors = {}
 
