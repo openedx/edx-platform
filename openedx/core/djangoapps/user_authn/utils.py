@@ -3,7 +3,6 @@ Utility functions used during user authentication.
 """
 
 import random
-import string
 from urllib.parse import urlparse  # pylint: disable=import-error
 from uuid import uuid4  # lint-amnesty, pylint: disable=unused-import
 

@@ -3,7 +3,6 @@
 
 from collections import namedtuple
 from urllib.parse import urlencode  # pylint: disable=import-error
-import pytest
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
