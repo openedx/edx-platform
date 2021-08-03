@@ -1,4 +1,4 @@
-<%page expression_filter="h" args="cert_status, course_overview, enrollment, reverify_link" />
+<%page expression_filter="h" args="cert_status, course_ended_not_passing, course_overview, enrollment, reverify_link" />
 
 <%!
 from django.urls import reverse
@@ -32,7 +32,10 @@ elif cert_status['status'] == CertificateStatuses.notpassing:
 else:
     status_css_class = 'course-status-processing'
 %>
-<% requesting_post_url = reverse('generate_user_cert', args=[str(course_overview.id)]) %>
+<% 
+  requesting_post_url = reverse('generate_user_cert', args=[str(course_overview.id)])
+  progress_page_url = reverse('progress', args=[str(course_overview.id)])
+%>
 
 % if cert_status['status'] != 'processing':
   % if cert_status['status'] == 'certificate_earned_but_not_available':
@@ -153,5 +156,21 @@ else:
 
     </div>
   % endif
+% elif course_ended_not_passing:
+  <div class="message message-status ${status_css_class} d-flex justify-content-between align-items-center">
+    <div class="message-copy">
+      <%
+        container_string = _("You are not eligible for a certificate.")
+      %>
+      <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-string="${container_string}"></span>
+    </div>
+    <ul class="actions actions-primary">
+      <li class="action">
+        <a class="btn btn-primary" rel="noopener" href="${progress_page_url}" target="_blank" title="${_('This link will open the course progress page' )}">
+          ${_("View grades")}
+        </a>
+      </li>
+    </ul>
+  </div>
 % endif
 

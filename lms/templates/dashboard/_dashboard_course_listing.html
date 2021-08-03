@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, is_passing_course, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import datetime
@@ -41,6 +41,11 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
     cert_name_long = settings.CERT_NAME_LONG
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
+%>
+
+<%
+  is_audit_enrollment = enrollment.mode == "audit" or enrollment.mode == "honor"
+  course_ended_not_passing = course_overview.has_ended() and is_passing_course == False and is_audit_enrollment == False
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -350,7 +355,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       % endif
 
       % if cert_status:
-        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
+        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status, course_ended_not_passing=course_ended_not_passing, course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
       % endif
 
       % if credit_status is not None:
