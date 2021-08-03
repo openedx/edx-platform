@@ -528,7 +528,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             decoded_hash_string = urlsafe_b64decode(usage_key_string)
             usage_key_hash = decoded_hash_string.decode('utf-8')
             usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
-                                   hash=usage_key_hash))
+                                   hash_key=usage_key_hash))
 
         try:
             usage_key = UsageKey.from_string(usage_key_string)

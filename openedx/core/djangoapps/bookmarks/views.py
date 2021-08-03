@@ -228,7 +228,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         if not usage_id.startswith("block"):
             decoded_hash_string = urlsafe_b64decode(usage_id)
             usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
+            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=usage_key_hash))
         else:
             usage_id = unquote_slashes(usage_id)
 
@@ -316,7 +316,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         if not usage_id.startswith("block"):
             decoded_hash_string = urlsafe_b64decode(usage_id)
             usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=usage_key_hash))
+            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=usage_key_hash))
 
         try:
             return UsageKey.from_string(usage_id)

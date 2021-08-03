@@ -31,12 +31,12 @@ def get_usage_key_hash(usage_key):
 
     short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
     encoded_hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
-    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash=short_key.hexdigest(),
+    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=short_key.hexdigest(),
                                                 usage_key=usage_key)
     return str(encoded_hash, 'utf-8')
 
 
-def path_to_location(modulestore, usage_key, request=None, full_path=False, experience=None):
+def path_to_location(modulestore, usage_key, request=None, full_path=False, *args, **kwargs):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -47,6 +47,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, expe
         usage_key: :class:`UsageKey` the id of the location to which to generate the path
         request: Request object containing information about user and masquerade settings, Default is None
         full_path: :class:`Bool` if True, return the full path to location. Default is False.
+        experience: (optional) determines if the `UsageKey` should be hashed.
 
     Raises
         ItemNotFoundError if the location doesn't exist.
@@ -61,6 +62,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, expe
     of this location under that sequence.
     '''
 
+    experience = kwargs.get('experience', None)
     def flatten(xs):
         '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
         Not a general flatten function. '''

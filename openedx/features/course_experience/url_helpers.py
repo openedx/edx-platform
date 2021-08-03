@@ -120,7 +120,7 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, full_path=True, 'NEW')
+    path = path_to_location(modulestore(), usage_key, request, full_path=True, experience='NEW')
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
