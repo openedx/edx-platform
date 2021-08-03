@@ -47,8 +47,6 @@ class ThirdPartyAuthPermissionTest(TestCase):
         request.user = user
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
-        import pdb;
-        pdb.set_trace()
         token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
         return f"JWT {token}"
 
