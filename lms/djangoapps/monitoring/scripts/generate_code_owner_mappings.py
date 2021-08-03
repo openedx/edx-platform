@@ -26,6 +26,7 @@ EDX_REPO_APPS = {
     'config_models': 'https://github.com/edx/django-config-models',
     'consent': 'https://github.com/edx/edx-enterprise',
     'csrf': 'https://github.com/edx/edx-drf-extensions',
+    'edx-name-affirmation': 'https://github.com/edx/edx-name-affirmation',
     'edx_proctoring': 'https://github.com/edx/edx-proctoring',
     'edxval': 'https://github.com/edx/edx-val',
     'enterprise': 'https://github.com/edx/edx-enterprise',
