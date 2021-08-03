@@ -613,9 +613,9 @@ class Resume(DeveloperErrorViewMixin, APIView):
 
         try:
             block_key = get_key_to_last_completed_block(request.user, course_id)
-            path = path_to_location(modulestore(), block_key, request, full_path=True)
-            resp['section_id'] = str(path[2])
-            resp['unit_id'] = str(path[3])
+            path = path_to_location(modulestore(), block_key, request, full_path=True, experience="NEW")
+            resp['section_id'] = path[2]
+            resp['unit_id'] = path[3]
             resp['block_id'] = str(block_key)
 
         except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
