@@ -252,7 +252,7 @@ class CoursesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseOverview
-        fields = ('display_name', 'instructor', 'start_date', 'end_date', 'course_image_url')
+        fields = ('id', 'display_name', 'instructor', 'start_date', 'end_date', 'course_image_url')
 
     def get_instructor(self, obj):
         return self.context['instructors'].get(obj.id) or []

@@ -3,6 +3,7 @@ Views for Admin Panel API
 """
 from itertools import groupby
 
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
@@ -15,6 +16,7 @@ from rest_framework.response import Response
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from student.models import CourseAccessRole, CourseEnrollment, LanguageProficiency
 
@@ -113,10 +115,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN]).order_by('name')
-        user_obj = User.objects.filter(
+        user_qs = User.objects.all()
+        if not self.request.user.is_superuser:
+            user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
+
+        user_obj = user_qs.filter(
             id=self.kwargs['pk']
-        ).filter(
-            **get_user_org_filter(self.request.user)
         ).select_related(
             'profile'
         ).prefetch_related(
@@ -410,14 +414,18 @@ class UserInfo(views.APIView):
             languages_qs = LanguageProficiency.objects.filter(
                 user_profile__organization=self.request.user.profile.organization_id
             )
+        all_languages = [{'code': lang[0], 'value': lang[1]} for lang in settings.ALL_LANGUAGES]
         languages = [{'code': lang.code, 'value': lang.get_code_display()} for lang in languages_qs]
+        profile_image = get_profile_image_urls_for_user(self.request.user)['medium']
 
         user_info = {
-            'name': self.request.user.get_full_name(),
+            'profile_image': profile_image,
+            'name': self.request.user.profile.name,
             'username': self.request.user.username,
             'is_superuser': self.request.user.is_superuser,
             'csrf_token': csrf.get_token(self.request),
             'languages': [lang[0] for lang in groupby(languages)],
+            'all_languages': all_languages,
             'role': None
         }
         user_groups = Group.objects.filter(
@@ -446,8 +454,16 @@ class CourseListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = CourseOverview.objects.all()
-        course_access_role_qs = CourseAccessRole.objects.filter(course_id__in=queryset.values_list('id'))\
-            .select_related('user__profile')
+
+        search_text = self.request.query_params.get('name', '').strip().lower()
+        if search_text:
+            queryset = queryset.filter(display_name__icontains=search_text)
+
+        course_access_role_qs = CourseAccessRole.objects.filter(
+            course_id__in=queryset.values_list('id')
+        ).select_related(
+            'user__profile'
+        )
 
         for course_access_role in course_access_role_qs:
             course_instructors = self.instructors.get(course_access_role.course_id, [])
