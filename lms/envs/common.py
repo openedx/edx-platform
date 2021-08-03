@@ -3378,6 +3378,10 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
+# .. setting_name: LOGIN_REDIRECT_WHITELIST
+# .. setting_default: empty list ([])
+# .. setting_description: While logout, if logout request has a redirect-url as query strings,
+#   then the redirect-url is validated through LOGIN_REDIRECT_WHITELIST.
 LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
