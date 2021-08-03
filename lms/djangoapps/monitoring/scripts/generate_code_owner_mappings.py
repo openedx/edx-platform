@@ -3,7 +3,7 @@ This script generates code owner mappings for monitoring LMS.
 
 Sample usage::
 
-    python lms/djangoapps/monitoring/scripts/generate_code_owner_mappings.py --repo-csv "Own Repos.csv" --app-csv "Own edx-platform Apps.csv" --dep-csv "Own edx-platform Libs.csv"
+    python lms/djangoapps/monitoring/scripts/generate_code_owner_mappings.py --repo-csv "Own Repos.csv" --app-csv "Own edx-platform Apps.csv" --dep-csv "Reference edx-platform Libs.csv"
 
 Or for more details::
 
@@ -26,6 +26,7 @@ EDX_REPO_APPS = {
     'config_models': 'https://github.com/edx/django-config-models',
     'consent': 'https://github.com/edx/edx-enterprise',
     'csrf': 'https://github.com/edx/edx-drf-extensions',
+    'edx_name_affirmation': 'https://github.com/edx/edx-name-affirmation',
     'edx_proctoring': 'https://github.com/edx/edx-proctoring',
     'edxval': 'https://github.com/edx/edx-val',
     'enterprise': 'https://github.com/edx/edx-enterprise',
