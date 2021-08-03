@@ -141,7 +141,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid, verify_uuid
 
-        generated_cert.mark_notpassing(50.00)
+        generated_cert.mark_notpassing(mode=generated_cert.mode, grade=50.00)
         assert generated_cert.status, CertificateStatuses.notpassing
         assert generated_cert.verify_uuid, verify_uuid
 

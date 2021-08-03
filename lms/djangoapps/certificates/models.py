@@ -23,6 +23,8 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
+from common.djangoapps.student import models_api as student_api
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from lms.djangoapps.badges.events.course_complete import course_badge_check
 from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
@@ -296,41 +298,51 @@ class GeneratedCertificate(models.Model):
             user=self.user
         )
 
-    def invalidate(self, source=None):
+    def invalidate(self, mode=None, source=None):
         """
         Invalidate Generated Certificate by marking it 'unavailable'. For additional information see the
         `_revoke_certificate()` function.
 
         Args:
+            mode (String) - learner's current enrollment mode. May be none as the caller likely does not need to
+                evaluate the mode before deciding to invalidate the cert.
             source (String) - source requesting invalidation of the certificate for tracking purposes
         """
-        log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
-        self._revoke_certificate(CertificateStatuses.unavailable, source=source)
+        if not mode:
+            mode, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
 
-    def mark_notpassing(self, grade, source=None):
+        log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id} with mode {mode} from '
+                 f'source {source}')
+        self._revoke_certificate(status=CertificateStatuses.unavailable, mode=mode, source=source)
+
+    def mark_notpassing(self, mode, grade, source=None):
         """
         Invalidates a Generated Certificate by marking it as 'notpassing'. For additional information see the
         `_revoke_certificate()` function.
 
         Args:
+            mode (String) - learner's current enrollment mode
             grade (float) - snapshot of the learner's current grade as a decimal
             source (String) - source requesting invalidation of the certificate for tracking purposes
         """
-        log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
-        self._revoke_certificate(CertificateStatuses.notpassing, grade=grade, source=source)
+        log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id} with mode {mode} from '
+                 f'source {source}')
+        self._revoke_certificate(status=CertificateStatuses.notpassing, mode=mode, grade=grade, source=source)
 
-    def mark_unverified(self, source=None):
+    def mark_unverified(self, mode, source=None):
         """
         Invalidates a Generated Certificate by marking it as 'unverified'. For additional information see the
         `_revoke_certificate()` function.
 
         Args:
+            mode (String) - learner's current enrollment mode
             source (String) - source requesting invalidation of the certificate for tracking purposes
         """
-        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id}')
-        self._revoke_certificate(CertificateStatuses.unverified, source=source)
+        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id} with mode {mode} from '
+                 f'source {source}')
+        self._revoke_certificate(status=CertificateStatuses.unverified, mode=mode, source=source)
 
-    def _revoke_certificate(self, status, grade=None, source=None):
+    def _revoke_certificate(self, status, mode=None, grade=None, source=None):
         """
         Revokes a course certificate from a learner, updating the certificate's status as specified by the value of the
         `status` argument. This will prevent the learner from being able to access their certificate in the associated
@@ -346,16 +358,29 @@ class GeneratedCertificate(models.Model):
 
         Args:
             status (CertificateStatus) - certificate status to set for the `GeneratedCertificate` record
+            mode (String) - learner's current enrollment mode
             grade (float) - snapshot of the learner's current grade as a decimal
             source (String) - source requesting invalidation of the certificate for tracking purposes
         """
         previous_certificate_status = self.status
 
+        if not grade:
+            grade = ''
+
+        if not mode:
+            mode = self.mode
+
+        profile_name = student_api.get_name(self.user.id)
+        if not profile_name:
+            profile_name = ''
+
         self.error_reason = ''
         self.download_uuid = ''
         self.download_url = ''
-        self.grade = grade or ''
+        self.grade = grade
         self.status = status
+        self.mode = mode
+        self.name = profile_name
         self.save()
 
         COURSE_CERT_REVOKED.send_robust(
