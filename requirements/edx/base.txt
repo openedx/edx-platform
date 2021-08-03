@@ -424,7 +424,7 @@ edx-django-utils==4.2.0
     #   edx-when
     #   ora2
     #   super-csv
-git+https://github.com/edx/edx-drf-extensions/@9a335c5bd7d7d7e3f09586373e3e8d76f2116fde#egg=edx-drf-extensions==6.6.1
+git+https://github.com/edx/edx-drf-extensions/@60e42fee61b137772e4d377d862df113959e4664#egg=edx-drf-extensions==6.6.1
     # via
     #   -r requirements/edx/github.in
     #   edx-completion
