@@ -739,7 +739,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==1.7.1
+pyjwt[crypto]==2.1.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -935,7 +935,7 @@ slumber==0.7.1
     #   edx-rest-api-client
 social-auth-app-django==4.0.0
     # via -r requirements/edx/base.in
-social-auth-core==3.4.0
+social-auth-core==4.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
