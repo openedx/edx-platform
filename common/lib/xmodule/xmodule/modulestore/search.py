@@ -63,9 +63,12 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, *arg
     '''
 
     experience = kwargs.get('experience', None)
+
     def flatten(xs):
-        '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
-        Not a general flatten function. '''
+        '''
+        Convert lisp-style (a, (b, (c, ()))) list into a python list.
+        Not a general flatten function.
+        '''
         p = []
         while xs != ():
             if experience == 'NEW':
