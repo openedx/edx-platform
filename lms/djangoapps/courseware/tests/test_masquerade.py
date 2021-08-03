@@ -10,6 +10,7 @@ from importlib import import_module
 from unittest.mock import patch
 import pytest
 import ddt
+from operator import itemgetter
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -171,6 +172,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         assert self.problem_display_name in problem_html
         assert show_answer_expected == ('Show answer' in problem_html)
 
+
     def verify_learner_masquerade_available(self, learner_option_expected):
         """
         Verifies if learner masquerade option is available
@@ -178,10 +180,9 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
             exists: True to test if Learner is in options, False to test it is NOT
         """
         response = self.get_available_masquerade_identities()
-        items = response.content.json['available'].items()
-        is_it_there = (('name', 'Learner') in items)
+        items = response.json()['available']
+        is_it_there = 'Learner' in map(itemgetter('name'), items)
         assert learner_option_expected == is_it_there
-        assert learner_option_expected == (('name', 'Learner') in content.items())
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
@@ -233,7 +234,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return StaffFactory(course_key=self.course.id)
 
 
-class TestMasqueradeOptionsForNoPartitions(MasqueradeTestCase):
+class TestMasqueradeOptionsForNoPartitions(StaffMasqueradeTestCase):
     """
     Check that 'Learner' option is available if there are no groups or partitions
     """
@@ -243,7 +244,7 @@ class TestMasqueradeOptionsForNoPartitions(MasqueradeTestCase):
         self.verify_learner_masquerade_available(True)
 
 
-class TestMasqueradeOptionsForUserPartition(MasqueradeTestCase):
+class TestMasqueradeOptionsForUserPartition(StaffMasqueradeTestCase):
     """
     Check that 'Learner' option is NOT available if there are no groups or partitions
     """
