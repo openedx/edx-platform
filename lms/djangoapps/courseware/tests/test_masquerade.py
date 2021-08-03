@@ -172,7 +172,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         assert self.problem_display_name in problem_html
         assert show_answer_expected == ('Show answer' in problem_html)
 
-
     def verify_learner_masquerade_available(self, learner_option_expected):
         """
         Verifies if learner masquerade option is available
