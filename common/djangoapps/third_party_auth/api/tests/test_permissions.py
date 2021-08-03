@@ -47,7 +47,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         request.user = user
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
-        token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters).decode('utf-8')
+        token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
         return f"JWT {token}"
 
     def test_anonymous_fails(self):

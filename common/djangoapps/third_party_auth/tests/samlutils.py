@@ -26,5 +26,5 @@ def set_jwt_cookie(client, user, role_context_pairs=None):
     """
     Set jwt token in cookies
     """
-    jwt_token = _jwt_token_from_role_context_pairs(user, role_context_pairs or []).decode('utf-8')
+    jwt_token = _jwt_token_from_role_context_pairs(user, role_context_pairs or [])
     client.cookies[jwt_cookie_name()] = jwt_token
