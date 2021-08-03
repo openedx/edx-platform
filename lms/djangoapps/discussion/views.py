@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -683,7 +683,7 @@ def followed_threads(request, course_key, user_id):
                 #                'content': content,
             }
 
-            return render_to_response('discussion/user_profile.html', context)
+            return render(request, 'discussion/user_profile.html', context)
     except User.DoesNotExist:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
