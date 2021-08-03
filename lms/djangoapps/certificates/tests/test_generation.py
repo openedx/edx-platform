@@ -1,8 +1,13 @@
 """
 Tests for certificate generation
 """
+import ddt
 import logging
 from unittest import mock
+
+from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import UserProfile
@@ -20,6 +25,7 @@ log = logging.getLogger(__name__)
 PROFILE_NAME_METHOD = 'common.djangoapps.student.models_api.get_name'
 
 
+@ddt.ddt
 class CertificateTests(EventTestMixin, ModuleStoreTestCase):
     """
     Tests for certificate generation
@@ -187,3 +193,34 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             assert cert.mode == self.enrollment_mode
             assert cert.grade == self.grade
             assert cert.name == ''
+
+    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
+    @ddt.data((True, True), (True, False), (False, False))
+    @ddt.unpack
+    def test_generation_verified_name(self, should_use_verified_name_for_certs, is_verified):
+        """
+        Test that if verified name functionality is enabled and the user has their preference set to use
+        verified name for certificates, their verified name will appear on the certificate rather than
+        their profile name.
+        """
+        verified_name = 'Jonathan Doe'
+        create_verified_name(self.u, verified_name, self.name, is_verified=is_verified)
+        create_verified_name_config(self.u, use_verified_name_for_certs=should_use_verified_name_for_certs)
+
+        GeneratedCertificateFactory(
+            user=self.u,
+            course_id=self.key,
+            mode=CourseMode.AUDIT,
+            status=CertificateStatuses.unverified
+        )
+
+        generate_course_certificate(
+            self.u, self.key, CertificateStatuses.downloadable, self.enrollment_mode, self.grade, self.gen_mode,
+        )
+
+        cert = GeneratedCertificate.objects.get(user=self.u, course_id=self.key)
+
+        if should_use_verified_name_for_certs and is_verified:
+            assert cert.name == verified_name
+        else:
+            assert cert.name == self.name
