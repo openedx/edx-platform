@@ -128,6 +128,18 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
         return self.client.get(url)
 
+    def get_available_masquerade_identities(self):
+        """
+        Returns: the server response for masquerade options
+        """
+        url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': str(self.course.id),
+            }
+        )
+        return self.client.get(url)
+
     def verify_staff_debug_present(self, staff_debug_expected):
         """
         Verifies that the staff debug control visibility is as expected (for staff only).
@@ -158,6 +170,18 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         problem_html = json.loads(self.get_problem().content.decode('utf-8'))['html']
         assert self.problem_display_name in problem_html
         assert show_answer_expected == ('Show answer' in problem_html)
+
+    def verify_learner_masquerade_available(self, learner_option_expected):
+        """
+        Verifies if learner masquerade option is available
+        Args:
+            exists: True to test if Learner is in options, False to test it is NOT
+        """
+        response = self.get_available_masquerade_identities()
+        items = response.content.json['available'].items()
+        is_it_there = (('name', 'Learner') in items)
+        assert learner_option_expected == is_it_there
+        assert learner_option_expected == (('name', 'Learner') in content.items())
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
@@ -207,6 +231,26 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         Creates a staff user.
         """
         return StaffFactory(course_key=self.course.id)
+
+
+class TestMasqueradeOptionsForNoPartitions(MasqueradeTestCase):
+    """
+    Check that 'Learner' option is available if there are no groups or partitions
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False})
+    def test_masquerade_options_enrollment_track(self):
+        self.verify_learner_masquerade_available(True)
+
+
+class TestMasqueradeOptionsForUserPartition(MasqueradeTestCase):
+    """
+    Check that 'Learner' option is NOT available if there are no groups or partitions
+    """
+    @ patch.dict('django.conf.settings.FEATURES', {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True})
+    @ patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    def test_masquerade_options_no_cohort(self):
+        self.verify_learner_masquerade_available(False)
 
 
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):

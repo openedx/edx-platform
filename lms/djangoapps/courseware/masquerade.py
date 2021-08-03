@@ -128,17 +128,19 @@ class MasqueradeView(View):
                     'name': 'Staff',
                     'role': 'staff',
                 },
-                {
-                    'name': 'Learner',
-                    'role': 'student',
-                },
-                {
-                    'name': 'Specific Student...',
-                    'role': 'student',
-                    'user_name': course.user_name or '',
-                },
             ],
         }
+        if len(partitions) == 0:
+            data['available'].append( {
+                'name': 'Learner',
+                'role': 'student',
+            })
+
+        data['available'].append({
+            'name': 'Specific Student...',
+            'role': 'student',
+            'user_name': course.user_name or '',
+        })
         for partition in partitions:
             if partition.active:
                 data['available'].extend([
