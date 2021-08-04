@@ -109,6 +109,7 @@ from ..utils import (
     reverse_usage_url
 )
 from .component import ADVANCED_COMPONENT_TYPES
+from .helpers import is_content_creator
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from .item import create_xblock_info
 from .library import (
@@ -858,10 +859,9 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
-        is_course_creator = (auth.user_has_role(request.user, CourseCreatorRole()) or
-                             auth.user_has_role(request.user, OrgContentCreatorRole(org=org)))
+        has_course_creator_role = is_content_creator(request.user, org)
 
-        if not is_course_creator:
+        if not has_course_creator_role:
             raise PermissionDenied()
 
         # allow/disable unicode characters in course_id according to settings
@@ -1879,12 +1879,11 @@ def _get_course_creator_status(user, org=None):
         course_creator_status = 'disallowed_for_this_site'
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
-        is_course_creator = True
+        has_course_creator_role = True
         if org:
-            is_course_creator = (auth.user_has_role(user, CourseCreatorRole()) or
-                                 auth.user_has_role(user, OrgContentCreatorRole(org=org)))
+            has_course_creator_role = is_content_creator(user, org)
 
-        if course_creator_status is None and is_course_creator:
+        if course_creator_status is None or not has_course_creator_role:
             # User not grandfathered in as an existing user, has not previously visited the dashboard page.
             # Add the user to the course creator admin table with status 'unrequested'.
             add_user_with_status_unrequested(user)
