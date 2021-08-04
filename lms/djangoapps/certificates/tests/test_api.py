@@ -32,7 +32,7 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import (
     can_be_added_to_allowlist,
-    cert_generation_enabled,
+    has_self_generated_certificates_enabled,
     certificate_downloadable_status,
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
@@ -696,7 +696,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
 
     def _assert_enabled_for_course(self, course_key, expect_enabled):
         """Check that self-generated certificates are enabled or disabled for the course. """
-        actual_enabled = cert_generation_enabled(course_key)
+        actual_enabled = has_self_generated_certificates_enabled(course_key)
         assert expect_enabled == actual_enabled
 
 

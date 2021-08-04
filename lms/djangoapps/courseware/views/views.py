@@ -1289,7 +1289,7 @@ def get_cert_data(student, course, enrollment_mode, course_grade=None):
     if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
         return cert_data
 
-    certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
+    certificates_enabled_for_course = certs_api.has_self_generated_certificates_enabled(course.id)
     if course_grade is None:
         course_grade = CourseGradeFactory().read(student, course)
 

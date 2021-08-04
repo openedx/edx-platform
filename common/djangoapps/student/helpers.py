@@ -37,7 +37,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.password_policy_validators import normalize_password
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
-    cert_generation_enabled,
+    has_self_generated_certificates_enabled,
     get_certificate_url,
     has_html_certificates_enabled,
     certificate_status_for_student,
@@ -599,7 +599,7 @@ def _cert_info(user, enrollment, cert_status):
         # is enabled for a course then we need to provide the option to the learner
         if (
             status_dict['status'] != CertificateStatuses.downloadable and
-            (cert_generation_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
+            (has_self_generated_certificates_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
             persisted_grade and persisted_grade.passed
         ):
             status_dict['status'] = CertificateStatuses.requesting
