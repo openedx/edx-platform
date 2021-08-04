@@ -1864,7 +1864,7 @@ def are_content_experiments_enabled(course):
     )
 
 
-def _get_course_creator_status(user):
+def _get_course_creator_status(user, org=None):
     """
     Helper method for returning the course creator status for a particular user,
     taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
@@ -1879,7 +1879,12 @@ def _get_course_creator_status(user):
         course_creator_status = 'disallowed_for_this_site'
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
-        if course_creator_status is None:
+        is_course_creator = True
+        if org:
+            is_course_creator = (auth.user_has_role(user, CourseCreatorRole()) or
+                                 auth.user_has_role(user, OrgContentCreatorRole(org=org)))
+
+        if course_creator_status is None and is_course_creator:
             # User not grandfathered in as an existing user, has not previously visited the dashboard page.
             # Add the user to the course creator admin table with status 'unrequested'.
             add_user_with_status_unrequested(user)

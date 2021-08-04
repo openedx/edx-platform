@@ -165,7 +165,7 @@ def remove_users(caller, role, *users):
     role.remove_users(*users)
 
 
-def update_org_role(caller, role, user, *orgs):
+def update_org_role(caller, role, user, orgs):
     """
     The caller requests updating the Org role for the user. Checks that the caller has
     sufficient authority.
@@ -177,8 +177,8 @@ def update_org_role(caller, role, user, *orgs):
     """
     _check_caller_authority(caller, role())
     existing_org_roles = set(role().get_org_for_user(user))
-    orgs_roles_to_create = list(set(*orgs) - existing_org_roles)
-    org_roles_to_delete = list(existing_org_roles - set(*orgs))
+    orgs_roles_to_create = list(set(orgs) - existing_org_roles)
+    org_roles_to_delete = list(existing_org_roles - set(orgs))
     for org in orgs_roles_to_create:
         role(org=org).add_users(user)
     for org in org_roles_to_delete:
