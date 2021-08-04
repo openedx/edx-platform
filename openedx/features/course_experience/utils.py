@@ -2,6 +2,7 @@
 Common utilities for the course experience, including course outline.
 """
 
+from django.conf import settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
@@ -39,7 +40,8 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         children = block.get('children', [])
 
         for i in range(len(children)):
-            block['hash_key'] = get_usage_key_hash(block['id'])
+            if settings.ENABLE_SHORT_MFE_URL:
+                block['hash_key'] = get_usage_key_hash(block['id'])
             child_id = block['children'][i]
             child_detail = populate_children(all_blocks[child_id], all_blocks)
             block['children'][i] = child_detail

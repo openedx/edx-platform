@@ -7,6 +7,7 @@ from django.db import transaction
 from django.http import Http404
 from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
+from django. conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
@@ -240,13 +241,14 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
-            blocks = response.data['blocks']
-            for block in blocks:
-                current_block = blocks[block]
-                if 'children' in current_block:
-                    new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
-                    current_block['hash_children'] = new_child_ids
-                current_block['hash_key'] = get_usage_key_hash(current_block['id'])
+            if settings.ENABLE_SHORT_MFE_URL:
+                blocks = response.data['blocks']
+                for block in blocks:
+                    current_block = blocks[block]
+                    if 'children' in current_block:
+                        new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
+                        current_block['hash_children'] = new_child_ids
+                    current_block['hash_key'] = get_usage_key_hash(current_block['id'])
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from

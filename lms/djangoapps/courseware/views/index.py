@@ -49,6 +49,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import get_usage_key_hash
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from ..access import has_access
@@ -205,9 +206,16 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
+
+        section_key = self.section.location if self.section else None
+
+        if settings.ENABLE_SHORT_MFE_URL:
+            section_key = get_usage_key_hash(section_key)
+            unit_key = get_usage_key_hash(unit_key)
+
         url = make_learning_mfe_courseware_url(
             self.course_key,
-            self.section.location if self.section else None,
+            section_key,
             unit_key
         )
         return url

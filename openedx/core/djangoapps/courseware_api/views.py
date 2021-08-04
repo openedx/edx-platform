@@ -524,17 +524,18 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
-        if not usage_key_string.startswith("block"):
-            decoded_hash_string = urlsafe_b64decode(usage_key_string)
-            usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
-                                   hash_key=usage_key_hash))
+        if settings.ENABLE_SHORT_MFE_URL:
+            try:
+                decoded_hash_string = urlsafe_b64decode(usage_key_string)
+                usage_key_hash = decoded_hash_string.decode('utf-8')
+                usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
+                                                                                   hash_key=usage_key_hash))
+            except:
+                get_usage_key_hash(usage_key_string)
 
         try:
             usage_key = UsageKey.from_string(usage_key_string)
 
-        # try:
-        #     usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -555,14 +556,15 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
         metadata = sequence.get_metadata(view=view)
-        seq_id = metadata['item_id']
-        metadata['decoded_id'] = seq_id
-        metadata['item_id'] = get_usage_key_hash(seq_id)
-        for item in metadata['items']:
-            item_id = item['id']
-            hash_key = get_usage_key_hash(item_id)
-            item['decoded_id'] = item_id
-            item['id'] = hash_key
+        if settings.ENABLE_SHORT_MFE_URL:
+            seq_id = metadata['item_id']
+            metadata['decoded_id'] = seq_id
+            metadata['item_id'] = get_usage_key_hash(seq_id)
+            for item in metadata['items']:
+                item_id = item['id']
+                hash_key = get_usage_key_hash(item_id)
+                item['decoded_id'] = item_id
+                item['id'] = hash_key
         return Response(metadata)
 
 
@@ -613,10 +615,17 @@ class Resume(DeveloperErrorViewMixin, APIView):
 
         try:
             block_key = get_key_to_last_completed_block(request.user, course_id)
-            path = path_to_location(modulestore(), block_key, request, full_path=True, experience="NEW")
-            resp['section_id'] = path[2]
-            resp['unit_id'] = path[3]
-            resp['block_id'] = str(block_key)
+            if settings.ENABLE_SHORT_MFE_URL:
+                path = path_to_location(modulestore(), block_key, request, experience='NEW', full_path=True)
+
+                resp['section_id'] = path[2]
+                resp['unit_id'] = path[3]
+                resp['block_id'] = str(block_key)
+            else:
+                path = path_to_location(modulestore(), block_key, request, experience=None, full_path=True)
+                resp['section_id'] = str(path[2])
+                resp['unit_id'] = str(path[3])
+                resp['block_id'] = str(block_key)
 
         except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
             pass  # leaving all the IDs as None indicates a redirect to the first unit in the course, as a backup

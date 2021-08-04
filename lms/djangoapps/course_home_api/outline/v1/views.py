@@ -6,6 +6,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.http.response import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -302,21 +303,41 @@ class OutlineTabView(RetrieveAPIView):
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
-            available_seq_ids = {get_usage_key_hash(usage_key) for usage_key in user_course_outline.sequences}
-            # course_blocks is a reference to the root of the course, so we go
-            # through the chapters (sections) to look for sequences to remove.
-            for chapter_data in course_blocks['children']:
-                chapter_data['children'] = [
-                    seq_data
-                    for seq_data in chapter_data['children']
-                    if (
-                        seq_data['hash_key'] in available_seq_ids or
-                        # Edge case: Sometimes we have weird course structures.
-                        # We expect only sequentials here, but if there is
-                        # another type, just skip it (don't filter it out).
-                        seq_data['type'] != 'sequential'
-                    )
-                ] if 'children' in chapter_data else []
+            if settings.ENABLE_SHORT_MFE_URL:
+                print('\n GETTING HASH_KEY')
+                available_seq_ids = {get_usage_key_hash(usage_key) for usage_key in user_course_outline.sequences}
+                print(available_seq_ids)
+                # course_blocks is a reference to the root of the course, so we go
+                # through the chapters (sections) to look for sequences to remove.
+                for chapter_data in course_blocks['children']:
+                    print(chapter_data['children'])
+                    chapter_data['children'] = [
+                        seq_data
+                        for seq_data in chapter_data['children']
+                        if (
+                            seq_data['hash_key'] in available_seq_ids or
+                            # Edge case: Sometimes we have weird course structures.
+                            # We expect only sequentials here, but if there is
+                            # another type, just skip it (don't filter it out).
+                            seq_data['type'] != 'sequential'
+                        )
+                    ] if 'children' in chapter_data else []
+            else:
+                available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
+                # course_blocks is a reference to the root of the course, so we go
+                # through the chapters (sections) to look for sequences to remove.
+                for chapter_data in course_blocks['children']:
+                    chapter_data['children'] = [
+                        seq_data
+                        for seq_data in chapter_data['children']
+                        if (
+                            seq_data['id'] in available_seq_ids or
+                            # Edge case: Sometimes we have weird course structures.
+                            # We expect only sequentials here, but if there is
+                            # another type, just skip it (don't filter it out).
+                            seq_data['type'] != 'sequential'
+                        )
+                    ] if 'children' in chapter_data else []
 
         user_has_passing_grade = False
         if not request.user.is_anonymous:
