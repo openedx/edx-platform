@@ -4,7 +4,7 @@ Views to show a course's bookmarks.
 
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -57,7 +57,7 @@ class CourseBookmarksView(View):
             'disable_courseware_js': True,
             'uses_bootstrap': True,
         }
-        return render_to_response('course_bookmarks/course-bookmarks.html', context)
+        return render(request, 'course_bookmarks/course-bookmarks.html', context)
 
 
 class CourseBookmarksFragmentView(EdxFragmentView):
