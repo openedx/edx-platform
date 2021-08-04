@@ -79,7 +79,6 @@ urlpatterns = [
     url(r'^add_users_to_cohorts$', api.add_users_to_cohorts, name='add_users_to_cohorts'),
 
     # Certificates
-    url(r'^generate_example_certificates$', api.generate_example_certificates, name='generate_example_certificates'),
     url(r'^enable_certificate_generation$', api.enable_certificate_generation, name='enable_certificate_generation'),
     url(r'^start_certificate_generation', api.start_certificate_generation, name='start_certificate_generation'),
     url(r'^start_certificate_regeneration', api.start_certificate_regeneration, name='start_certificate_regeneration'),

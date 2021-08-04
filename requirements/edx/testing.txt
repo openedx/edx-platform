@@ -140,7 +140,7 @@ chardet==4.0.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.3
+charset-normalizer==2.0.4
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -333,7 +333,7 @@ django-filter==2.4.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==3.0.2
+django-ipware==3.0.7
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -473,7 +473,7 @@ edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.4.3
     # via -r requirements/edx/base.txt
-edx-bulk-grades==0.9.0
+edx-bulk-grades==0.9.1
     # via
     #   -r requirements/edx/base.txt
     #   staff-graded-xblock
@@ -511,7 +511,7 @@ edx-drf-extensions==6.6.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.27.12
+edx-enterprise==3.27.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -526,7 +526,7 @@ edx-lint==5.0.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.2
     # via -r requirements/edx/base.txt
-edx-name-affirmation==0.1.2
+edx-name-affirmation==0.3.1
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.2
     # via
@@ -546,7 +546,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==3.22.0
+edx-proctoring==3.23.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -663,7 +663,7 @@ idna==3.2
     #   -r requirements/edx/base.txt
     #   requests
     #   yarl
-importlib-metadata==4.6.1
+importlib-metadata==4.6.3
     # via pytest-randomly
 inflect==5.3.0
     # via
@@ -821,7 +821,7 @@ multidict==5.1.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==6.4.4.161
+newrelic==6.6.0.162
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -847,7 +847,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.6.13
+ora2==3.6.17
     # via -r requirements/edx/base.txt
 packaging==21.0
     # via
@@ -1140,7 +1140,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.7.0
+scipy==1.7.1
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1273,13 +1273,13 @@ toml==0.10.2
     #   pytest
     #   pytest-cov
     #   tox
-tox==3.24.0
+tox==3.24.1
     # via
     #   -r requirements/edx/testing.in
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
-tqdm==4.61.2
+tqdm==4.62.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1319,7 +1319,7 @@ vine==1.3.0
     #   -r requirements/edx/base.txt
     #   amqp
     #   celery
-virtualenv==20.6.0
+virtualenv==20.7.0
     # via tox
 voluptuous==0.12.1
     # via

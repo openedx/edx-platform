@@ -182,6 +182,13 @@ ALLOWED_HOSTS = [
     FEATURES['PREVIEW_LMS_BASE'],
 ]
 
+# Sometimes, OAuth2 clients want the user to redirect back to their site after logout. But to determine if the given
+# redirect URL/path is safe for redirection, the following variable is used by edX.
+LOGIN_REDIRECT_WHITELIST = ENV_TOKENS.get(
+    'LOGIN_REDIRECT_WHITELIST',
+    LOGIN_REDIRECT_WHITELIST
+)
+
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
 # happen with some browsers (e.g. Firefox)

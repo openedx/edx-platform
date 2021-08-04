@@ -12,7 +12,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 
-from django.utils.encoding import python_2_unicode_compatible
 from fs.osfs import OSFS
 from lazy import lazy
 from lxml import etree
@@ -300,7 +299,6 @@ class CourseImportLocationManager(CourseLocationManager):
         self.target_course_id = target_course_id
 
 
-@python_2_unicode_compatible
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore

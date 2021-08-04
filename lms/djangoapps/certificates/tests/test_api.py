@@ -596,6 +596,42 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
                 assert cert.status == CertificateStatuses.downloadable
                 assert cert.mode == CourseMode.VERIFIED
 
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation_unverified(self):
+        """
+        Test that a cert is successfully generated with a status of unverified
+        """
+        cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+        assert not cert
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=True):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=False):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.unverified
+                assert cert.mode == CourseMode.VERIFIED
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation_notpassing(self):
+        """
+        Test that a cert is successfully generated with a status of notpassing
+        """
+        GeneratedCertificateFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            status=CertificateStatuses.unavailable,
+            mode=CourseMode.AUDIT
+        )
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=False):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=True):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.notpassing
+                assert cert.mode == CourseMode.VERIFIED
+
 
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):

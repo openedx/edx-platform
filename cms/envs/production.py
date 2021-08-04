@@ -276,8 +276,13 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 # Heartbeat
 HEARTBEAT_CELERY_ROUTING_KEY = ENV_TOKENS.get('HEARTBEAT_CELERY_ROUTING_KEY', HEARTBEAT_CELERY_ROUTING_KEY)
 
-LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
-
+# Sometimes, OAuth2 clients want the user to redirect back to their site after logout. But to determine if the given
+# redirect URL/path is safe for redirection, the following variable is used by edX.
+LOGIN_REDIRECT_WHITELIST = ENV_TOKENS.get(
+    'LOGIN_REDIRECT_WHITELIST',
+    LOGIN_REDIRECT_WHITELIST
+)
+LOGIN_REDIRECT_WHITELIST.extend([reverse_lazy('home')])
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:

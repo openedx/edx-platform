@@ -256,7 +256,7 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
 
-LOGIN_REDIRECT_WHITELIST = [
+LOGIN_REDIRECT_WHITELIST.extend([
     CMS_BASE,
     # Allow redirection to all micro-frontends.
     # Please add your MFE if is not already listed here.
@@ -272,7 +272,7 @@ LOGIN_REDIRECT_WHITELIST = [
     'localhost:18400',  # frontend-app-publisher
     ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
     ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal
-]
+])
 
 ###################### JWTs ######################
 JWT_AUTH.update({

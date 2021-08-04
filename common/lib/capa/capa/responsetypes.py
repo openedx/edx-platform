@@ -34,7 +34,7 @@ import six
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from django.utils import html
-from django.utils.encoding import python_2_unicode_compatible
+
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
@@ -110,7 +110,6 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
-@python_2_unicode_compatible
 class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,

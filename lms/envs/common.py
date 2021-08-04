@@ -3378,6 +3378,10 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
+# .. setting_name: LOGIN_REDIRECT_WHITELIST
+# .. setting_default: empty list ([])
+# .. setting_description: While logout, if logout request has a redirect-url as query strings,
+#   then the redirect-url is validated through LOGIN_REDIRECT_WHITELIST.
 LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
@@ -4795,3 +4799,14 @@ CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4l
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28174/
 # .. toggle_creation_date: 2021-08-03
 ENABLE_SHORT_MFE_URL = False
+
+################# Documentation links for course apps #################
+
+# pylint: disable=line-too-long
+CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
+DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
+EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
+PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
+TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
+TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
+WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"

@@ -1,8 +1,7 @@
 # pylint: skip-file
-
-
 import json
 import logging
+import regex
 from collections import defaultdict
 from datetime import datetime
 
@@ -773,6 +772,10 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
 
     content = strip_none(extract(content, fields))
 
+    # Replace the content body with a sanitized version
+    if 'body' in content:
+        content['body'] = sanitize_body(content['body'])
+
     if content.get("endorsement"):
         endorsement = content["endorsement"]
         endorser = None
@@ -1076,3 +1079,20 @@ def is_content_authored_by(content, user):
         return int(content.get('user_id')) == user.id
     except (ValueError, TypeError):
         return False
+
+
+def sanitize_body(body):
+    """
+    Return a sanitized version of the body with dangerous Markdown removed.
+
+    This is possibly overly broad, and might tamper with legitimate posts that
+    contain this code in fenced code blocks. As far as we can tell, this is an
+    extra layer of protection, and current handling in the front end and using
+    bleach for HTML rendering on the server side should cover these cases.
+    """
+    if not body:
+        return body
+
+    # This will remove the Markdown style links with data: URLs, and turn them
+    # into empty links.
+    return regex.sub(r'\]\(data:[^)]+\)', ']()', body)

@@ -220,7 +220,7 @@ def _set_regular_cert_status(user, course_key, enrollment_mode, course_grade):
     if IDVerificationService.user_is_verified(user) and not _is_passing_grade(course_grade) and cert is not None:
         if cert.status != CertificateStatuses.notpassing:
             course_grade_val = _get_grade_value(course_grade)
-            cert.mark_notpassing(course_grade_val, source='certificate_generation')
+            cert.mark_notpassing(mode=enrollment_mode, grade=course_grade_val, source='certificate_generation')
         return CertificateStatuses.notpassing
 
     return None
@@ -235,7 +235,7 @@ def _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cer
     """
     if CertificateInvalidation.has_certificate_invalidation(user, course_key) and cert is not None:
         if cert.status != CertificateStatuses.unavailable:
-            cert.invalidate(source='certificate_generation')
+            cert.invalidate(mode=enrollment_mode, source='certificate_generation')
         return CertificateStatuses.unavailable
 
     if not IDVerificationService.user_is_verified(user) and _has_passing_grade_or_is_allowlisted(user, course_key,
@@ -245,7 +245,7 @@ def _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cer
                                        course_grade=course_grade, status=CertificateStatuses.unverified,
                                        generation_mode='batch')
         elif cert.status != CertificateStatuses.unverified:
-            cert.mark_unverified(source='certificate_generation')
+            cert.mark_unverified(mode=enrollment_mode, source='certificate_generation')
         return CertificateStatuses.unverified
 
     return None
