@@ -349,6 +349,13 @@ class CoursewareMeta:
         user_timezone_locale = user_timezone_locale_prefs(self.request)
         return user_timezone_locale['user_timezone']
 
+    @property
+    def mfe_short_url_is_active(self):
+        """
+        Returns a boolean on if the course exit page is active
+        """
+        return settings.ENABLE_SHORT_MFE_URL
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -425,7 +432,8 @@ class CoursewareInformation(RetrieveAPIView):
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
-        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course.
+        * mfe_short_url_is_active: Flag for the learning mfe on whether or not the url will contain the block id or hash key.
 
     **Parameters:**
 
