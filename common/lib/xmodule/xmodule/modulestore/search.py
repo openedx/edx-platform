@@ -5,7 +5,7 @@ from logging import getLogger
 from base64 import urlsafe_b64encode
 from hashlib import blake2b
 
-
+from django. conf import settings
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff  # lint-amnesty, pylint: disable=unused-import
@@ -36,7 +36,7 @@ def get_usage_key_hash(usage_key):
     return str(encoded_hash, 'utf-8')
 
 
-def path_to_location(modulestore, usage_key, request=None, full_path=False, *args, **kwargs):
+def path_to_location(modulestore, usage_key, request=None, experience=None, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -62,8 +62,6 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, *arg
     of this location under that sequence.
     '''
 
-    experience = kwargs.get('experience', None)
-
     def flatten(xs):
         '''
         Convert lisp-style (a, (b, (c, ()))) list into a python list.
@@ -71,7 +69,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, *arg
         '''
         p = []
         while xs != ():
-            if experience == 'NEW':
+            if settings.ENABLE_SHORT_MFE_URL and experience == 'NEW':
                 usage_key_hash = get_usage_key_hash(xs[0])
                 p.append(usage_key_hash)
             else:
