@@ -3,6 +3,7 @@
 
 import datetime
 import json
+import unittest
 from unittest import mock
 from unittest.mock import Mock, patch
 
@@ -31,7 +32,7 @@ from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
     CommentClientMaintenanceError,
-    perform_request
+    perform_request,
 )
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
@@ -1745,3 +1746,37 @@ class MiscUtilsTests(TestCase):
 
         thread_data['course_id'] = CourseKey.from_string(course_id)
         assert utils.permalink(thread_data) == expected_url
+
+
+@ddt.ddt
+class SanitizeTests(unittest.TestCase):
+    """Pure functional tests around sanitizing Markdown"""
+
+    @ddt.data(
+        (None, None),
+        ("", ""),
+        (
+            "No substitutions, even if there's data: ",
+            "No substitutions, even if there's data: ",
+        ),
+        (
+            """
+            [Click here](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==) Some Text
+
+            [This link is fine](https://www.openedx.org)
+
+            More Text [Click here](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0P)
+            """,
+            """
+            [Click here]() Some Text
+
+            [This link is fine](https://www.openedx.org)
+
+            More Text [Click here]()
+            """,
+        ),
+    )
+    @ddt.unpack
+    def test_input_output(self, input_str, expected_output):
+        """Test a range of inputs for cleanup."""
+        assert utils.sanitize_body(input_str) == expected_output

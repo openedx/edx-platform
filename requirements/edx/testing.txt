@@ -511,7 +511,7 @@ git+https://github.com/edx/edx-drf-extensions/@43fd01aed95ea0c0eb2ee0be84f00592e
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.27.12
+edx-enterprise==3.27.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -526,7 +526,7 @@ edx-lint==5.0.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.2
     # via -r requirements/edx/base.txt
-edx-name-affirmation==0.3.0
+edx-name-affirmation==0.3.1
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.2
     # via
@@ -847,10 +847,8 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.6.11
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+ora2==3.6.15
+    # via -r requirements/edx/base.txt
 packaging==21.0
     # via
     #   -r requirements/edx/base.txt

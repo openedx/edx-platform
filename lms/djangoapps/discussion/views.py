@@ -45,7 +45,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_names_by_id,
     is_commentable_divided,
-    strip_none
+    strip_none,
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context

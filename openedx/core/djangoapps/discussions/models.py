@@ -162,7 +162,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='learnmore@yellowdig.com',
         )._asdict(),
         'messages': [pii_sharing_required_message('Yellowdig')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     'inscribe': {
         'features': [
