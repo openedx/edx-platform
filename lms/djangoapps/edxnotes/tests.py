@@ -1077,7 +1077,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         response = self.client.get(self.get_token_url)
         assert response.status_code == 200
         client = Application.objects.get(name='edx-notes')
-        jwt.decode(response.content, client.client_secret, audience=client.client_id)
+        jwt.decode(response.content, client.client_secret, audience=client.client_id, algorithms=["HS256"])
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token_anonymous(self):
