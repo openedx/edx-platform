@@ -43,14 +43,11 @@ from common.djangoapps.course_action_state.managers import CourseActionStateItem
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.roles import (
-    CourseCreatorRole,
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    OrgContentCreatorRole,
     UserBasedRole
 )
 from common.djangoapps.util.course import get_link_for_about_page

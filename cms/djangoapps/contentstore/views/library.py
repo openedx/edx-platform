@@ -25,7 +25,6 @@ from xmodule.modulestore.exceptions import DuplicateCourseError
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student import auth
 from common.djangoapps.student.auth import (
     STUDIO_EDIT_ROLES,
     STUDIO_VIEW_USERS,
