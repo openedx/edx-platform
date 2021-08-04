@@ -169,7 +169,7 @@ class Bookmark(TimeStampedModel):
         """
         with modulestore().bulk_operations(usage_key.course_key):
             try:
-                path = search.path_to_location(modulestore(), usage_key, full_path=True)
+                path = search.path_to_location(modulestore(), usage_key, experience=None, full_path=True)
             except ItemNotFoundError:
                 log.error('Block with usage_key: %s not found.', usage_key)
                 return []

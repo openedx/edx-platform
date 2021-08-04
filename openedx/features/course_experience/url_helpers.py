@@ -65,12 +65,13 @@ def get_courseware_url(
         get_url_fn = _get_new_courseware_url
     else:
         get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request)
+    return get_url_fn(usage_key=usage_key, request=request, experience=experience)
 
 
 def _get_legacy_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        experience: Optional[ExperienceOption] = None,
 ) -> str:
     """
     Return the URL to Legacy (LMS-rendered) courseware content.
@@ -82,7 +83,7 @@ def _get_legacy_courseware_url(
     (
         course_key, chapter, section, vertical_unused,
         position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request)
+    ) = path_to_location(modulestore(), usage_key, request, experience)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -111,6 +112,7 @@ def _get_legacy_courseware_url(
 def _get_new_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        experience: Optional[ExperienceOption] = None,
 ) -> str:
     """
     Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
@@ -120,7 +122,7 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, full_path=True, experience='NEW')
+    path = path_to_location(modulestore(), usage_key, request, experience="NEW", full_path=True)
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
@@ -172,7 +174,12 @@ def make_learning_mfe_courseware_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+
+    If `settings.ENABLE_SHORT_MFE_URL` is set to True, the URL will be built
+    like this:
+
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
@@ -195,7 +202,7 @@ def get_learning_mfe_home_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/dates
 
     `course_key` can be either an OpaqueKey or a string.
     `view_name` is an optional string.
