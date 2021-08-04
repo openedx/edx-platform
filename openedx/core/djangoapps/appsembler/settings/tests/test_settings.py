@@ -6,6 +6,7 @@ from mock import patch
 
 from openedx.core.djangoapps.theming.helpers_dirs import Theme
 
+from openedx.core.djangoapps.appsembler.settings.helpers import get_tahoe_theme_static_dirs
 from openedx.core.djangoapps.appsembler.settings.settings import (
     devstack_cms,
     devstack_lms,
@@ -56,3 +57,22 @@ def test_production_lms(fake_production_settings, retval, additional_count):
             expected_dir_len = len(settings.STATICFILES_DIRS) + additional_count
             production_lms.plugin_settings(settings)
             assert len(settings.STATICFILES_DIRS) == expected_dir_len
+
+
+@pytest.fixture(scope='function')
+def fake_production_settings_non_comprehensive_themes(settings):
+    """
+    Pytest fixture to fake production settings for comprehensive theming turned off
+    """
+    settings.STATICFILES_DIRS = ['dummy', 'dummy']
+    settings.ENABLE_COMPREHENSIVE_THEMING = False
+    return settings
+
+
+def test_get_tahoe_theme_static_dirs_non_comprehensive(fake_production_settings_non_comprehensive_themes):
+    """
+    get_tahoe_theme_static_dirs() should just return the default STATICFILES_DIRS
+    when comprehensive theming isn't enabled
+    """
+    settings = fake_production_settings_non_comprehensive_themes
+    assert get_tahoe_theme_static_dirs(settings) == settings.STATICFILES_DIRS

@@ -37,6 +37,8 @@ def get_tahoe_theme_static_dirs(settings):
         if path.isdir(theme_static):
             static_files_dir_setting += [theme_static]
         return static_files_dir_setting
+    # comprehensive theming not enabled
+    return settings.STATICFILES_DIRS
 
 
 def get_tahoe_multitenant_auth_backends(settings):
