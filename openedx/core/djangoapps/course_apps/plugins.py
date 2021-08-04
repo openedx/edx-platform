@@ -23,6 +23,11 @@ class CourseApp(ABC):
     name: str = ""
     # A description for the app.
     description: str = ""
+    # A map of documentation links for the app
+    documentation_links: Dict = {
+        # eg:
+        # "learn_more_configuration": "https://..."
+    }
 
     @classmethod
     @abstractmethod
