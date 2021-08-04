@@ -4794,4 +4794,4 @@ CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4l
 # .. toggle_use_cases: temporary
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28174/
 # .. toggle_creation_date: 2021-08-03
-ENABLE_SHORT_MFE_URL = True
+ENABLE_SHORT_MFE_URL = False
