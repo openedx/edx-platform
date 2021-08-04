@@ -2,7 +2,9 @@
 Course API Views
 """
 
-from base64 import urlsafe_b64decode
+from base64 import (
+    urlsafe_b64decode, binascii
+)
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -433,7 +435,8 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course.
-        * mfe_short_url_is_active: Flag for the learning mfe on whether or not the url will contain the block id or hash key.
+        * mfe_short_url_is_active: Flag for the learning mfe on whether or not
+            the url will contain the block id or hash key.
 
     **Parameters:**
 
@@ -538,7 +541,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
                 usage_key_hash = decoded_hash_string.decode('utf-8')
                 usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
                                                                                    hash_key=usage_key_hash))
-            except:
+            except binascii.Error:
                 get_usage_key_hash(usage_key_string)
 
         try:
