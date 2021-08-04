@@ -62,6 +62,7 @@ from ..utils import reverse_course_url
 from ..video_utils import validate_video_image
 from .course import get_course_and_check_access
 #### EOL ####
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from django.db import IntegrityError, transaction
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 try:
@@ -243,7 +244,8 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                         video.get('message')
                     )
                 if len(upload_completed_videos) > 0:
-                    status_vimeo_task = vimeo_task(request, course_key_string, upload_completed_videos)
+                    name_folder = configuration_helpers.get_value('EOL_VIMEO_MAIN_FOLDER', settings.EOL_VIMEO_MAIN_FOLDER)
+                    status_vimeo_task = vimeo_task(request, course_key_string, upload_completed_videos, name_folder)
                 return JsonResponse()
             else:
                 LOGGER.info('EolVimeo is not installed')
@@ -255,9 +257,9 @@ def videos_handler(request, course_key_string, edx_video_id=None):
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
 #### EOL ####
-def vimeo_task(request, course_id, data):
+def vimeo_task(request, course_id, data, name_folder):
     try:
-        task = task_process_data(request, course_id, data)
+        task = task_process_data(request, course_id, data, name_folder)
         return True
     except AlreadyRunningError:
         LOGGER.error("EolVimeo - Task Already Running Error, user: {}, course_id: {}".format(request.user, course_id))
