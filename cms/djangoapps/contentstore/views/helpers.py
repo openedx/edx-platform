@@ -293,6 +293,7 @@ def is_item_in_course_tree(item):
 
     return ancestor is not None
 
+
 def is_content_creator(user, org):
     """
     Check if the user has the role to create content.
