@@ -119,8 +119,7 @@ define([
                 {
                     note_id: 'id-123',
                     component_usage_id: 'usage_id-123',
-                    view: 'Test View',
-                    courserun_key: 'edX/999/test'
+                    view: 'Test View'
                 },
                 null,
                 {
