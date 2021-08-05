@@ -56,6 +56,12 @@
                     }
                 }
                 // Regardless of whether any callbacks were made, log this event.
+                if (typeof $$course_id !== 'undefined') {
+                  if (!data) {
+                    data = {}
+                  }
+                  data.courserun_key = $$course_id;
+                }
                 return sendRequest({
                     event_type: eventType,
                     event: JSON.stringify(data),

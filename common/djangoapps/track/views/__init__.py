@@ -69,7 +69,8 @@ def user_track(request):
     """
     Log when POST call to "event" URL is made by a user.
 
-    GET or POST call should provide "event_type", "event", and "page" arguments.
+    GET or POST call should provide "event_type", "event", and "page" arguments. It may optionally provide
+    a "courserun_key" argument (otherwise may be extracted from the page).
     """
     try:
         username = request.user.username
@@ -83,11 +84,13 @@ def user_track(request):
     if isinstance(data, str) and len(data) > 0:
         try:
             data = json.loads(data)
-            _add_user_id_for_username(data)
         except ValueError:
             pass
 
-    context_override = contexts.course_context_from_url(page)
+    _add_user_id_for_username(data)
+    course_id_string = data.get('courserun_key') if (data and 'courserun_key' in data) else None
+
+    context_override = contexts.course_context_from_url(page, course_id_string)
     context_override['username'] = username
     context_override['event_source'] = 'browser'
     context_override['page'] = page
