@@ -335,8 +335,8 @@ def is_certificate_invalidated(student, course_key):
     return False
 
 
-def cert_generation_enabled(course_key):
-    """Check whether certificate generation is enabled for a course.
+def has_self_generated_certificates_enabled(course_key):
+    """Check whether the self-generated certificates feature is enabled for a given course.
 
     There are two "switches" that control whether self-generated certificates
     are enabled for a course:

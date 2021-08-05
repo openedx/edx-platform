@@ -11,7 +11,7 @@ from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.api import cert_generation_enabled
+from lms.djangoapps.certificates.api import has_self_generated_certificates_enabled
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -44,15 +44,15 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         according to course-pacing.
         """
         course = CourseFactory.create(self_paced=False, emit_signals=True)
-        assert not cert_generation_enabled(course.id)
+        assert not has_self_generated_certificates_enabled(course.id)
 
         course.self_paced = True
         self.store.update_item(course, self.user.id)
-        assert cert_generation_enabled(course.id)
+        assert has_self_generated_certificates_enabled(course.id)
 
         course.self_paced = False
         self.store.update_item(course, self.user.id)
-        assert not cert_generation_enabled(course.id)
+        assert not has_self_generated_certificates_enabled(course.id)
 
 
 class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
