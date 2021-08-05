@@ -107,3 +107,9 @@ django-ipware<4.0.0
 # pylint>=2.10.0 introduced a lot of new pylint warnings.
 # A separate PR will be needed to remove the pin and fix all the pylint warnings
 pylint<2.10.0
+
+# At the time of writing this comment, we do not know whether py2neo>=2022
+# will support our currently-deployed Neo4j version (3.5).
+# Feel free to loosen this constraint if/when it is confirmed that a later
+# version of py2neo will work with Neo4j 3.5.
+py2neo<2022
