@@ -176,7 +176,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         """
         Verifies if learner masquerade option is available
         Args:
-            exists: True to test if Learner is in options, False to test it is NOT
+            learner_option_expected: True to test if Learner is in options, False to test it is NOT
         """
         response = self.get_available_masquerade_identities()
         items = response.json()['available']
@@ -247,8 +247,8 @@ class TestMasqueradeOptionsForUserPartition(StaffMasqueradeTestCase):
     """
     Check that 'Learner' option is NOT available if there are no groups or partitions
     """
-    @ patch.dict('django.conf.settings.FEATURES', {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True})
     @ patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    @ patch.dict('django.conf.settings.FEATURES', {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True})
     def test_masquerade_options_no_cohort(self):
         self.verify_learner_masquerade_available(False)
 
