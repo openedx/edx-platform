@@ -94,3 +94,9 @@ click<8.0.0
 
 # jsonfield2 will be replaced with jsonfield in https://openedx.atlassian.net/browse/BOM-1917.
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
+
+# At the time of writing this comment, we do not know whether py2neo>=2022
+# will support our currently-deployed Neo4j version (3.5).
+# Feel free to loosen this constraint if/when it is confirmed that a later
+# version of py2neo will work with Neo4j 3.5.
+py2neo<2022
