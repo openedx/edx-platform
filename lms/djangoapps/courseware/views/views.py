@@ -1809,6 +1809,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'render_course_wide_assets': True,
 
             **optimization_flags,
         }
