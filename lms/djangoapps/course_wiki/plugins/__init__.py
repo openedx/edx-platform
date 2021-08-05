@@ -24,7 +24,7 @@ class WikiCourseApp(CourseApp):
 
     app_id = "wiki"
     name = _("Wiki")
-    description = _("Enable learners to access, and collaborate on course related information.")
+    description = _("Enable learners to access, and collaborate on course-related information.")
     documentation_links = {
         "learn_more_configuration": settings.WIKI_HELP_URL,
     }
