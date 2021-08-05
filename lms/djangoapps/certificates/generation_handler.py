@@ -19,7 +19,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
 from lms.djangoapps.certificates.utils import has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level
+from lms.djangoapps.instructor.access import is_beta_tester
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -131,7 +131,7 @@ def _can_generate_regular_certificate(user, course_key, enrollment_mode, course_
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
         return False
 
-    if _is_beta_tester(user, course_key):
+    if is_beta_tester(user, course_key):
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
 
@@ -268,7 +268,7 @@ def _can_set_regular_cert_status(user, course_key, enrollment_mode):
     if _is_ccx_course(course_key):
         return False
 
-    if _is_beta_tester(user, course_key):
+    if is_beta_tester(user, course_key):
         return False
 
     return _can_set_cert_status_common(user, course_key, enrollment_mode)
@@ -322,14 +322,6 @@ def _can_generate_certificate_for_status(user, course_key, enrollment_mode):
     log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is eligible for '
              f'generation. The current enrollment mode is {enrollment_mode} and the existing cert mode is {cert.mode}')
     return True
-
-
-def _is_beta_tester(user, course_key):
-    """
-    Check if the user is a beta tester in this course run
-    """
-    beta_testers_queryset = list_with_level(course_key, 'beta')
-    return beta_testers_queryset.filter(username=user.username).exists()
 
 
 def _is_ccx_course(course_key):
