@@ -2,12 +2,13 @@
 
 
 import jwt
+from django.conf import settings
 from django.test.client import Client
 from django.urls import reverse
-
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 
 
 class TestCourseUserDiscount(ModuleStoreTestCase):
@@ -46,7 +47,9 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
         assert expected_payload['discount_applicable'] == response.data['discount_applicable']
 
         # make sure that the response matches the expected response
-        response_payload = jwt.decode(response.data['jwt'], algorithms=["HS256"], options={"verify_signature": False})
+        response_payload = jwt.decode(
+            response.data['jwt'], algorithms=settings.JWT_AUTH['JWT_ALGORITHM'], options={"verify_signature": False}
+        )
         assert all(item in list(response_payload.items()) for item in expected_payload.items())
 
     def test_course_user_discount_no_user(self):
