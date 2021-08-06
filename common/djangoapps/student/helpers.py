@@ -744,6 +744,7 @@ def does_user_profile_exist(user):
     except (ProgrammingError, ObjectDoesNotExist):
         return False
 
+
 def user_has_passing_grade_in_course(user, enrollment):
     """
     Check to see if a user has passing grade for a course
