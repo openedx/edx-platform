@@ -30,13 +30,6 @@ def _enabled_and_instructor_paced(course):
     return False
 
 
-def is_certificate_valid(certificate):
-    """
-    Returns True if the student has a valid, verified certificate for this course, False otherwise.
-    """
-    return CourseEnrollment.is_enrolled_as_verified(certificate.user, certificate.course_id) and certificate.is_valid()
-
-
 def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
     """
     Returns True if a course certificate message can be shown
