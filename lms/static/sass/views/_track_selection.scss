@@ -1,0 +1,239 @@
+@import "extends";
+
+.container-fluid {
+    max-width: 946px;
+}
+
+.col-6 {
+    width: calc((100% - 30px) / 2);
+    margin: 0 auto;
+}
+
+.verification-process h3 {
+    color: $gray-700;
+    font-size: 1.4rem;
+    text-align: center;
+    font-weight: 700;
+    line-height: 1.8rem;
+}
+
+.track-selection-choice li {
+    margin-bottom: 26px;
+}
+
+.track-selection-audit {
+    background-color: white;
+    border: 1px solid $gray-500;
+    position: relative;
+    float: right;
+}
+
+.track-selection-certificate {
+    float: left;
+}
+
+.track-selection-certificate .choice-bullets li:last-child {
+    margin-bottom: 2rem;
+}
+
+.certificate-container {
+    background-color: $info-100;
+    border: 1px solid $gray-500;
+    height: auto;
+    position: relative;
+}
+
+.trophy-icon {
+    padding: 10px;
+    color: $info-100;
+    position: absolute;
+}
+
+.upgrade-button {
+    text-align: center
+}
+
+.upgrade-button button {
+    background: $primary-500;
+    width: 90%;
+    height: 40px;
+    font-size: 16px;
+    box-shadow: none;
+    border-radius: 0px;
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+#track_selection_upgrade:hover {
+    background: $primary-300;
+    border-color: transparent;
+    color: #fff;
+}
+
+.audit-button {
+    text-align: center;
+}
+
+.audit-button button {
+    color: $primary-500;
+    width: 90%;
+    height: 40px;
+    font-size: 16px;
+    box-shadow: none;
+    border-radius: 0px;
+    border-color: $light-300;
+    background: white;
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+#track_selection_audit:hover {
+    background: $primary-500;
+    border-color: $primary-500;
+    color: #fff;
+    border-radius: 0px;
+}
+
+.certificate-container-bottom {
+    border: 1px solid $gray-500;
+    display: flex;
+    margin-top: -1px;
+    padding: 18px;
+    float: left;
+}
+
+.extra-verified-info {
+    float: right;
+    font-size: 14px;
+    margin-left: 12px;
+    line-height: 24px;
+}
+
+.choice-bullets {
+    padding: 0 3rem 0 2rem;
+    line-height: 24px;
+    font-size: 14px;
+}
+
+a:not(.btn), a:visited:not(.btn) {
+    color: $gray-700;
+}
+
+.choice-bullets li {
+    color: $gray-700;
+}
+
+.choice-title {
+    width: 100%;
+    display: inline-block;
+}
+
+.choice-title h4 {
+    text-align: center;
+    font-weight: 700;
+    color: $gray-700;
+    line-height: 28px;
+    font-size: 22px;
+}
+
+.price-display {
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px;
+    float: right;
+    margin: 0.75rem;
+    color: $gray-700;
+}
+
+.triangle-overlay {
+    border-color: $primary-700 transparent transparent $primary-700;
+    border-style: solid;
+    border-width: 45px;
+    height: 0;
+    width: 0;
+    position: absolute;
+}
+
+.info-icon {
+    margin-left: 0.1rem;
+    width: 1rem;
+    vertical-align: middle;
+}
+
+.collapsible-item {
+    letter-spacing: -0.3px;
+}
+
+.collapsible {
+    display: none;
+    text-decoration: underline;
+    color: $primary-500;
+    cursor: pointer;
+}
+
+.popover-icon {
+    color: $primary-500;
+    position: relative;
+}
+
+.popover {
+    visibility: hidden;
+    width: 132px;
+    background-color: #fff;
+    color: $gray-700;
+    border: 1px solid #B9BABE;
+    border-radius: 6px;
+    text-align: left;
+    padding: 0.8rem 1rem;
+    position: absolute;
+    z-index: 1;
+    top: -22px;
+    left: 178%;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.popover:before {
+    position: absolute;
+    display: inline-block;
+    left: -18px;
+    top: 22px;
+    content: '';
+    border-width: 9px;
+    border-style: solid;
+    border-color: transparent #B9BABE transparent transparent;
+}
+
+.popover:after {
+    position: absolute;
+    display: inline-block;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent #fff transparent transparent;
+    left: -14px;
+    top: 24px;
+    content: '';
+}
+
+@media (max-width: map-get($grid-breakpoints, 'sm')) {
+    .choice-bullets {
+        padding: 0 2rem 0 1rem;
+    }
+
+    .collapsible {
+        margin-bottom: 1.3rem;
+    }
+}
+
+@media (max-width: map-get($grid-breakpoints, 'md')) {
+    .col-6 {
+        width: 100%;
+    }
+
+    .audit-button button {
+        margin-top: 0;
+    }
+}
+  
