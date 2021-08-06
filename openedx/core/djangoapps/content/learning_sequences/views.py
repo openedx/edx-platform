@@ -16,7 +16,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from xmodule.modulestore.search import get_usage_key_hash
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from openedx.core.lib.api.view_utils import validate_course_key
 from .api import get_user_course_outline_details
 from .api.permissions import can_call_public_api, can_see_content_as_other_users

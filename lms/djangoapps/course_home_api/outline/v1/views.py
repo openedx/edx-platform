@@ -53,12 +53,11 @@ from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user,
     get_current_update_for_user
 )
-from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, get_usage_key_hash
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import get_usage_key_hash
 
 
 class UnableToDismissWelcomeMessage(APIException):

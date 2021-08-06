@@ -11,9 +11,9 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import get_usage_key_hash
 
 
 @request_cached()

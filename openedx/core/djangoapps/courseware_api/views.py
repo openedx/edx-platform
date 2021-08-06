@@ -54,6 +54,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.discounts.utils import generate_offer_data
@@ -63,7 +64,7 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location, get_usage_key_hash
+from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -626,14 +627,12 @@ class Resume(DeveloperErrorViewMixin, APIView):
 
         try:
             block_key = get_key_to_last_completed_block(request.user, course_id)
+            path = path_to_location(modulestore(), block_key, request, full_path=True)
             if settings.ENABLE_SHORT_MFE_URL:
-                path = path_to_location(modulestore(), block_key, request, experience='NEW', full_path=True)
-
-                resp['section_id'] = path[2]
-                resp['unit_id'] = path[3]
+                resp['section_id'] = get_usage_key_hash(path[2])
+                resp['unit_id'] = get_usage_key_hash(path[3])
                 resp['block_id'] = str(block_key)
             else:
-                path = path_to_location(modulestore(), block_key, request, experience=None, full_path=True)
                 resp['section_id'] = str(path[2])
                 resp['unit_id'] = str(path[3])
                 resp['block_id'] = str(block_key)

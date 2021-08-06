@@ -14,9 +14,9 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.search import get_usage_key_hash
 
 from .api import get_blocks
 from .forms import BlockListGetForm
