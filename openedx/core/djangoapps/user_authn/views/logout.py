@@ -12,6 +12,7 @@ from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from oauth2_provider.models import Application
 
+from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -81,6 +82,14 @@ class LogoutView(TemplateView):
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
+
+        # This module makes a POST request to the IES logout endpoint
+        # to allow us to log out the user by clicking
+        # the "Sign Out" button on the platform.
+        run_extension_point(
+            'PEARSON_CORE_SSO_LOGOUT_MODULE',
+            request=request,
+        )
 
         mark_user_change_as_expected(None)
         return response
