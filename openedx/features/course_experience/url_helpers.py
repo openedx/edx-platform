@@ -6,6 +6,8 @@ because the Studio course outline may need these utilities.
 """
 from enum import Enum
 from typing import Optional
+from base64 import urlsafe_b64encode
+from hashlib import blake2b
 
 import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
@@ -18,6 +20,8 @@ from six.moves.urllib.parse import urlencode, urlparse
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
+from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
+
 
 User = get_user_model()
 
@@ -65,13 +69,12 @@ def get_courseware_url(
         get_url_fn = _get_new_courseware_url
     else:
         get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request, experience=experience)
+    return get_url_fn(usage_key=usage_key, request=request,)
 
 
 def _get_legacy_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
-        experience: Optional[ExperienceOption] = None,
 ) -> str:
     """
     Return the URL to Legacy (LMS-rendered) courseware content.
@@ -83,7 +86,7 @@ def _get_legacy_courseware_url(
     (
         course_key, chapter, section, vertical_unused,
         position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request, experience)
+    ) = path_to_location(modulestore(), usage_key, request)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -112,7 +115,6 @@ def _get_legacy_courseware_url(
 def _get_new_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
-        experience: Optional[ExperienceOption] = None,
 ) -> str:
     """
     Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
@@ -122,7 +124,7 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, experience="NEW", full_path=True)
+    path = path_to_location(modulestore(), usage_key, request, full_path=True)
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
@@ -144,6 +146,26 @@ def _get_new_courseware_url(
         sequence_key=sequence_key,
         unit_key=unit_key,
     )
+
+
+def get_usage_key_hash(usage_key):
+    '''
+    Get the blake2b hash key for the given usage_key and encode the value. The
+    hash key will be added to the usage key's mapping dictionary for decoding
+    in LMS.
+
+    Args:
+        usage_key: :class:`UsageKey` the id of the location to which to generate the path
+
+    Returns:
+        The string of the encoded hash key.
+    '''
+
+    short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
+    encoded_hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
+    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=short_key.hexdigest(),
+                                                usage_key=usage_key)
+    return str(encoded_hash, 'utf-8')
 
 
 def make_learning_mfe_courseware_url(
@@ -186,9 +208,13 @@ def make_learning_mfe_courseware_url(
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/c/{course_key}'
     if sequence_key:
+        if settings.ENABLE_SHORT_MFE_URL:
+            sequence_key = get_usage_key_hash(sequence_key)
         mfe_link += f'/{sequence_key}'
 
         if unit_key:
+            if settings.ENABLE_SHORT_MFE_URL:
+                unit_key = get_usage_key_hash(unit_key)
             mfe_link += f'/{unit_key}'
 
     return mfe_link
