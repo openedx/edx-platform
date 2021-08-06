@@ -2453,6 +2453,17 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = None
 SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 SHOW_ACCOUNT_ACTIVATION_CTA = False
 
+############# Shorten MFE URL ##########################
+# .. toggle_name: enable_short_mfe_url
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Flag would be used to hash block_ids and shorten the MFE url
+# .. toggle_use_cases: temporary
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/28174/
+# .. toggle_creation_date: 2021-08-03
+# .. toggle_target_removal_date: 2022-01-01
+ENABLE_SHORT_MFE_URL = False
+
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
