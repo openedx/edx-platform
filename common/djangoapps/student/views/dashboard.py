@@ -675,15 +675,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
     verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
-    cert_statuses = {
-        enrollment.course_id: cert_info(request.user, enrollment)
-        for enrollment in course_enrollments
-    }
-
-    passing_courses = {
-        enrollment.course_id: user_has_passing_grade_in_course(user, enrollment)
-        for enrollment in course_enrollments
-    }
+    cert_statuses = {}
+    passing_courses = {}
+    for enrollment in course_enrollments:
+        cert_statuses[enrollment.course_id] = cert_info(request.user, enrollment)
+        passing_courses[enrollment.course_id] = user_has_passing_grade_in_course(user, enrollment)
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
