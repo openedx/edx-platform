@@ -157,7 +157,10 @@ class ChooseModeView(View):
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
         course_id = str(course_key)
-
+        gated_content = ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key
+        )
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
@@ -172,10 +175,7 @@ class ChooseModeView(View):
             "error": error,
             "responsive": True,
             "nav_hidden": True,
-            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_enrollment(
-                user=request.user,
-                course_key=course_key
-            ),
+            "content_gating_enabled": gated_content,
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
         }
         context.update(
@@ -238,6 +238,14 @@ class ChooseModeView(View):
         duration = get_user_course_duration(request.user, course)
         deadline = duration and get_user_course_expiration_date(request.user, course)
         context['audit_access_deadline'] = deadline
+        fbe_is_on = deadline and gated_content
+
+        # REV-2133 TODO Value Prop: remove waffle after testing is completed
+        # and happy path version is ready to be rolled out to all users.
+        if waffle.flag_is_active(request, 'course_modes.use_new_track_selection'):
+            if not error:  # Happy path does not handle errors.
+                if verified_mode and fbe_is_on and not enterprise_customer:  # Happy path conditions
+                    return render_to_response("course_modes/track_selection.html", context)
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
