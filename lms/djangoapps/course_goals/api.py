@@ -3,7 +3,6 @@ Course Goals Python API
 """
 
 
-from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.reverse import reverse
 
@@ -12,10 +11,12 @@ from lms.djangoapps.course_goals.models import CourseGoal, GOAL_KEY_CHOICES
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 
-def add_course_goal(user, course_id, goal_key):
+def add_course_goal_deprecated(user, course_id, goal_key):
     """
     Add a new course goal for the provided user and course. If the goal
     already exists, simply update and save the goal.
+    This method is for the deprecated version of course goals and will be removed as soon
+    as the newer number of days version of course goals is fully implemented.
 
     Arguments:
         user: The user that is setting the goal
@@ -25,6 +26,27 @@ def add_course_goal(user, course_id, goal_key):
     course_key = CourseKey.from_string(str(course_id))
     CourseGoal.objects.update_or_create(
         user=user, course_key=course_key, defaults={'goal_key': goal_key}
+    )
+
+
+def add_course_goal(user, course_id, days_per_week,
+                    subscribed_to_reminders):
+    """
+    Add a new course goal for the provided user and course. If the goal
+    already exists, simply update and save the goal.
+
+    Arguments:
+        user: The user that is setting the goal
+        course_id (string): The id for the course the goal refers to
+        days_per_week (int): number of days learner wants to learn per week
+        subscribed_to_reminders (bool): whether the learner wants to receive email reminders about their goal
+    """
+    course_key = CourseKey.from_string(str(course_id))
+    CourseGoal.objects.update_or_create(
+        user=user, course_key=course_key, defaults={
+            'days_per_week': days_per_week,
+            'subscribed_to_reminders': subscribed_to_reminders,
+        }
     )
 
 
@@ -56,8 +78,7 @@ def has_course_goal_permission(request, course_id, user_access):
     """
     course_key = CourseKey.from_string(course_id)
     has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(course_key))
-    return user_access['is_enrolled'] and has_verified_mode and ENABLE_COURSE_GOALS.is_enabled(course_key) \
-        and settings.FEATURES.get('ENABLE_COURSE_GOALS')
+    return user_access['is_enrolled'] and has_verified_mode and ENABLE_COURSE_GOALS.is_enabled(course_key)
 
 
 def get_course_goal_options():
