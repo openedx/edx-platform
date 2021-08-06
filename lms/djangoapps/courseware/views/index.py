@@ -43,7 +43,7 @@ from openedx.features.course_experience import (
     default_course_url_name
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
-from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url, get_usage_key_hash
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
@@ -206,15 +206,9 @@ class CoursewareIndex(View):
         except InvalidKeyError:
             unit_key = None
 
-        section_key = self.section.location if self.section else None
-
-        if settings.ENABLE_SHORT_MFE_URL:
-            section_key = get_usage_key_hash(section_key)
-            unit_key = get_usage_key_hash(unit_key)
-
         url = make_learning_mfe_courseware_url(
             self.course_key,
-            section_key,
+            self.section.location if self.section else None,
             unit_key
         )
         return url
