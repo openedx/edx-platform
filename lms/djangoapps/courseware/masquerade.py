@@ -4,7 +4,6 @@ Allow course staff to see a student or staff view of courseware.
 Which kind of view has been selected is stored in the session state.
 '''
 
-
 import logging
 from datetime import datetime
 
@@ -49,6 +48,7 @@ class CourseMasquerade:
     """
     Masquerade settings for a particular course.
     """
+
     def __init__(self, course_key, role='student', user_partition_id=None, group_id=None, user_name=None):
         # All parameters to this function must be named identically to the corresponding attribute.
         # If you remove or rename an attribute, also update the __setstate__() method to migrate
@@ -128,17 +128,19 @@ class MasqueradeView(View):
                     'name': 'Staff',
                     'role': 'staff',
                 },
-                {
-                    'name': 'Learner',
-                    'role': 'student',
-                },
-                {
-                    'name': 'Specific Student...',
-                    'role': 'student',
-                    'user_name': course.user_name or '',
-                },
             ],
         }
+        if len(partitions) == 0:
+            data['available'].append({
+                'name': 'Learner',
+                'role': 'student',
+            })
+
+        data['available'].append({
+            'name': 'Specific Student...',
+            'role': 'student',
+            'user_name': course.user_name or '',
+        })
         for partition in partitions:
             if partition.active:
                 data['available'].extend([
@@ -209,9 +211,9 @@ def setup_masquerade(request, course_key, staff_access=False, reset_masquerade_d
     If the reset_masquerade_data flag is set, the field data stored in the session will be cleared.
     """
     if (
-            request.user is None or
-            not settings.FEATURES.get('ENABLE_MASQUERADE', False) or
-            not staff_access
+        request.user is None or
+        not settings.FEATURES.get('ENABLE_MASQUERADE', False) or
+        not staff_access
     ):
         return None, request.user
     if reset_masquerade_data:
@@ -412,6 +414,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
     This `KeyValueStore` wraps an underlying `KeyValueStore`.  Reads are forwarded to the underlying
     store, but writes go to a Django session (or other dictionary-like object).
     """
+
     def __init__(self, kvs, session):  # lint-amnesty, pylint: disable=super-init-not-called
         """
         Arguments:

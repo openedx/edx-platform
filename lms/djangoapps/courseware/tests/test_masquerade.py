@@ -2,7 +2,6 @@
 Unit tests for masquerade.
 """
 
-
 import json
 import pickle
 from datetime import datetime
@@ -10,6 +9,7 @@ from importlib import import_module
 from unittest.mock import patch
 import pytest
 import ddt
+from operator import itemgetter
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -44,6 +44,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -128,6 +129,18 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
         return self.client.get(url)
 
+    def get_available_masquerade_identities(self):
+        """
+        Returns: the server response for masquerade options
+        """
+        url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': str(self.course.id),
+            }
+        )
+        return self.client.get(url)
+
     def verify_staff_debug_present(self, staff_debug_expected):
         """
         Verifies that the staff debug control visibility is as expected (for staff only).
@@ -177,6 +190,7 @@ class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
     """
+
     def create_user(self):
         """
         Creates a normal student user.
@@ -202,6 +216,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
     """
     Base class for tests of the masquerade behavior for a staff member.
     """
+
     def create_user(self):
         """
         Creates a staff user.
@@ -209,10 +224,30 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return StaffFactory(course_key=self.course.id)
 
 
+@ddt.ddt
+class TestMasqueradeLearnerOptions(StaffMasqueradeTestCase):
+    """
+    Check that 'View as Learner' option is available only if there are NO groups or partitions
+    """
+
+    @ddt.data(True, False)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    def test_masquerade_options_for_learner(self, partitions_enabled):
+        """
+        If there are partitions, then the View as Learner should NOT be available
+        """
+        with patch.dict('django.conf.settings.FEATURES',
+                        {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': partitions_enabled}):
+            response = self.get_available_masquerade_identities()
+            is_learner_available = 'Learner' in map(itemgetter('name'), response.json()['available'])
+            assert partitions_enabled != is_learner_available
+
+
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
     """
+
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_staff_debug_with_masquerade(self):
         """
@@ -251,6 +286,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     """
     Check for staff being able to masquerade as a specific student.
     """
+
     def setUp(self):
         super().setUp()
         self.student_user = self.create_user()
@@ -437,6 +473,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.
     """
+
     def setUp(self):
         super().setUp()
         self.user_partition = UserPartition(
@@ -470,6 +507,7 @@ class ReadOnlyKeyValueStore(DictKeyValueStore):
 
     Used to make sure MasqueradingKeyValueStore does not try to modify the underlying KeyValueStore.
     """
+
     def set(self, key, value):
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
@@ -489,6 +527,7 @@ class MasqueradingKeyValueStoreTest(TestCase):
     """
     Unit tests for the MasqueradingKeyValueStore class.
     """
+
     def setUp(self):
         super().setUp()
         self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
@@ -528,6 +567,7 @@ class CourseMasqueradeTest(TestCase):
     """
     Unit tests for the CourseMasquerade class.
     """
+
     def test_unpickling_sets_all_attributes(self):
         """
         Make sure that old CourseMasquerade objects receive missing attributes when unpickled from
@@ -540,10 +580,11 @@ class CourseMasqueradeTest(TestCase):
         assert unpickled_cmasq.user_name is None
 
 
-class SetupMasqueradeTests(SharedModuleStoreTestCase,):
+class SetupMasqueradeTests(SharedModuleStoreTestCase, ):
     """
     Tests for the setup_masquerade function.
     """
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(number='setup-masquerade-test', metadata={'start': datetime.now(UTC)})
