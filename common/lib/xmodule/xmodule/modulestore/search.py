@@ -2,41 +2,17 @@
 
 
 from logging import getLogger
-from base64 import urlsafe_b64encode
-from hashlib import blake2b
 
-from django. conf import settings
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff  # lint-amnesty, pylint: disable=unused-import
 from .exceptions import ItemNotFoundError, NoPathToItem
-from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
 
 
 LOGGER = getLogger(__name__)
 
 
-def get_usage_key_hash(usage_key):
-    '''
-    Get the blake2b hash key for the given usage_key and encode the value. The
-    hash key will be added to the usage key's mapping dictionary for decoding
-    in LMS.
-
-    Args:
-        usage_key: :class:`UsageKey` the id of the location to which to generate the path
-
-    Returns:
-        The string of the encoded hash key.
-    '''
-
-    short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
-    encoded_hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
-    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=short_key.hexdigest(),
-                                                usage_key=usage_key)
-    return str(encoded_hash, 'utf-8')
-
-
-def path_to_location(modulestore, usage_key, request=None, experience=None, full_path=False):
+def path_to_location(modulestore, usage_key, request=None, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -69,11 +45,7 @@ def path_to_location(modulestore, usage_key, request=None, experience=None, full
         '''
         p = []
         while xs != ():
-            if settings.ENABLE_SHORT_MFE_URL and experience == 'NEW':
-                usage_key_hash = get_usage_key_hash(xs[0])
-                p.append(usage_key_hash)
-            else:
-                p.append(xs[0])
+            p.append(xs[0])
             xs = xs[1]
         return p
 
