@@ -57,6 +57,7 @@ class MockGeneratedCertificate:
         self.status = status
         self.created_date = datetime.now(pytz.UTC)
         self.modified_date = datetime.now(pytz.UTC)
+        self.date_override = None
 
     def is_valid(self):
         """
@@ -178,3 +179,8 @@ class CertificatesApiTestCase(TestCase):
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
             assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)
             assert self.certificate.modified_date == api.display_date_for_certificate(self.course, self.certificate)
+
+            # With a certificate date override, display date returns the override, available date ignores it
+            self.certificate.date_override = { date: datetime(2021, 5, 11) }
+            assert self.certificate.date_override.date == api.display_date_for_certificate(self.course, self.certificate)
+            assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)

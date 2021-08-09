@@ -92,11 +92,16 @@ def display_date_for_certificate(course, certificate):
 
     Arguments:
         course (CourseOverview or course descriptor): The course we're getting the date for
+        certificate (GeneratedCertificate): The certificate we're getting the date for
     Returns:
         datetime.date
     """
+    if certificate.date_override:
+        return certificate.date_override.date
+
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date
+
     return certificate.modified_date
 
 
