@@ -90,6 +90,7 @@ from openedx.features.course_experience.url_helpers import (
     get_courseware_url,
     make_learning_mfe_courseware_url,
     ExperienceOption,
+    get_usage_key_hash,
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.models import CourseEnrollment
@@ -161,7 +162,11 @@ class TestJumpTo(ModuleStoreTestCase):
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         querystring = f"experience={experience_param}" if experience_param else ""
         if expect_mfe:
-            expected_url = f'http://learning-mfe/course/{course.id}/{chapter.location}'
+            if settings.ENABLE_SHORT_MFE_URL:
+                expected_url = f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(chapter.location)}'
+
+            else:
+                expected_url = f'http://learning-mfe/c/{course.id}/{chapter.location}'
         else:
             expected_url = f'/courses/{course.id}/courseware/{chapter.url_name}/'
 
@@ -191,7 +196,7 @@ class TestJumpTo(ModuleStoreTestCase):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
         expected_redirect_url = (
-            f'http://learning-mfe/course/{course.id}'
+            f'http://learning-mfe/c/{course.id}'
         ) if activate_mfe else (
             f'/courses/{course.id}/courseware?' + urlencode({'activate_block_id': str(course.location)})
         )
@@ -224,8 +229,12 @@ class TestJumpTo(ModuleStoreTestCase):
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
         expected_redirect_url = (
-            f'http://learning-mfe/course/{course.id}/{sequence.location}'
+            f'http://learning-mfe/c/{course.id}/{sequence.location}'
         )
+        if settings.ENABLE_SHORT_MFE_URL:
+            expected_redirect_url = (
+                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}'
+            )
         jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
@@ -270,16 +279,24 @@ class TestJumpTo(ModuleStoreTestCase):
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
         expected_redirect_url = (
-            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical1.location}'
+            f'http://learning-mfe/c/{course.id}/{sequence.location}/{vertical1.location}'
         )
+        if settings.ENABLE_SHORT_MFE_URL:
+            expected_redirect_url = (
+                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}/{get_usage_key_hash(vertical1.location)}'
+            )
         jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
         expected_redirect_url = (
-            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical2.location}'
+            f'http://learning-mfe/c/{course.id}/{sequence.location}/{vertical2.location}'
         )
+        if settings.ENABLE_SHORT_MFE_URL:
+            expected_redirect_url = (
+                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}/{get_usage_key_hash(vertical2.location)}'
+            )
         jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
@@ -489,14 +506,19 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
                 'section': str(self.section2.location.block_id),
             }
         )
-        mfe_url = '{}/course/{}/{}'.format(
+        mfe_url = '{}/c/{}/{}'.format(
             settings.LEARNING_MICROFRONTEND_URL,
             self.course_key,
             self.section2.location
         )
+        short_mfe_url = '{}/c/{}/{}'.format(
+            settings.LEARNING_MICROFRONTEND_URL,
+            self.course_key,
+            get_usage_key_hash(self.section2.location)
+        )
         preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
 
-        return lms_url, mfe_url, preview_url
+        return lms_url, mfe_url, short_mfe_url, preview_url
 
 
 @ddt.ddt
@@ -3505,21 +3527,40 @@ class TestShowCoursewareMFE(TestCase):
         course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
         section_key = UsageKey.from_string("block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction")
         unit_id = "block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You"
-        assert make_learning_mfe_courseware_url(course_key) == (
-            'https://learningmfe.openedx.org'
-            '/course/course-v1:OpenEdX+MFE+2020'
-        )
-        assert make_learning_mfe_courseware_url(course_key, section_key, '') == (
-            'https://learningmfe.openedx.org'
-            '/course/course-v1:OpenEdX+MFE+2020'
-            '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
-        )
-        assert make_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
-            'https://learningmfe.openedx.org'
-            '/course/course-v1:OpenEdX+MFE+2020'
-            '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
-            '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
-        )
+        if settings.ENABLE_SHORT_MFE_URL:
+            short_section_key = get_usage_key_hash(section_key)
+            short_unit_id = get_usage_key_hash(unit_id)
+            assert make_learning_mfe_courseware_url(course_key) == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+            )
+            assert make_learning_mfe_courseware_url(course_key, short_section_key, '') == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+                '/YmJiOTNjMGJiYTQ2'
+            )
+            assert make_learning_mfe_courseware_url(course_key, short_section_key, short_unit_id) == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+                '/YmJiOTNjMGJiYTQ2'
+                '/MzI4ODU4MjY5YzVi'
+            )
+        else:
+            assert make_learning_mfe_courseware_url(course_key) == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+            )
+            assert make_learning_mfe_courseware_url(course_key, section_key, '') == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+                '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
+            )
+            assert make_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
+                'https://learningmfe.openedx.org'
+                '/c/course-v1:OpenEdX+MFE+2020'
+                '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
+                '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
+            )
 
 
 @ddt.ddt
@@ -3528,9 +3569,12 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_learner_redirect(self):
         # learners will be redirected when the waffle flag is set
-        lms_url, mfe_url, __ = self._get_urls()
+        lms_url, mfe_url, short_mfe_url, __ = self._get_urls()
 
-        assert self.client.get(lms_url).url == mfe_url
+        if settings.ENABLE_SHORT_MFE_URL:
+            assert self.client.get(lms_url).url == short_mfe_url
+        else:
+            assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
         lms_url, __, __ = self._get_urls()
