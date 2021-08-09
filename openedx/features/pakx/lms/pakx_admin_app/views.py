@@ -20,7 +20,13 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from student.models import CourseAccessRole, CourseEnrollment, LanguageProficiency
 
-from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, ORG_ADMIN, TRAINING_MANAGER
+from .constants import (
+    GROUP_ORGANIZATION_ADMIN,
+    GROUP_TRAINING_MANAGERS,
+    ORG_ADMIN,
+    SELF_ACTIVE_STATUS_CHANGE_ERROR_MSG,
+    TRAINING_MANAGER
+)
 from .pagination import CourseEnrollmentPagination, PakxAdminAppPagination
 from .permissions import CanAccessPakXAdminPanel, IsSameOrganization
 from .serializers import (
@@ -165,6 +171,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
+        if request.user.id == kwargs['pk']:
+            return Response(SELF_ACTIVE_STATUS_CHANGE_ERROR_MSG, status=status.HTTP_403_FORBIDDEN)
+
         if self.get_queryset().filter(id=kwargs['pk']).update(is_active=False):
             return Response(status=status.HTTP_200_OK)
 
@@ -207,12 +216,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if self.request.query_params.get("ordering"):
             self.ordering = self.request.query_params['ordering'].split(',') + self.ordering
 
-        if self.request.user.is_superuser:
-            queryset = User.objects.all()
-        else:
-            queryset = User.objects.filter(**get_user_org_filter(self.request.user))
-
-        queryset = queryset.exclude(id=self.request.user.id)
+        queryset = get_org_users_qs(self.request.user).exclude(id=self.request.user.id)
         group_qs = Group.objects.filter(name__in=[GROUP_TRAINING_MANAGERS, GROUP_ORGANIZATION_ADMIN]).order_by('name')
         return queryset.select_related(
             'profile'
@@ -237,6 +241,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         :param ids: user IDs to be updated
         :return: response with respective status
         """
+        if [str(self.request.user.id)] == ids:
+            return Response(SELF_ACTIVE_STATUS_CHANGE_ERROR_MSG, status=status.HTTP_403_FORBIDDEN)
+
         if ids == "all":
             self.get_queryset().all().update(is_active=activation_status)
             return Response(status=status.HTTP_200_OK)
@@ -256,14 +263,20 @@ class CourseEnrolmentViewSet(viewsets.ModelViewSet):
 
     def enroll_users(self, request, *args, **kwargs):
         user_qs = get_org_users_qs(request.user).filter(id__in=request.data["user_ids"]).values_list('id', flat=True)
-        if request.data.get("user_ids") and request.data.get("course_keys"):
-            if len(request.data["user_ids"]) == len(user_qs):
-                enroll_users.delay(self.request.user.id, request.data["user_ids"], request.data["course_keys"])
-                return Response(status=status.HTTP_200_OK)
+
+        if not request.data.get("user_ids") or not request.data.get("course_keys"):
             return Response(
-                {"User(s) not found!": list(set(request.data["user_ids"]) - set(list(user_qs)))},
-                status=status.HTTP_403_FORBIDDEN)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+                "Invalid request data! User IDs and course keys are required",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if len(request.data["user_ids"]) != len(user_qs):
+            other_org_users = list(set(request.data["user_ids"]) - set(list(user_qs)))
+            err_msg = "You don't have the permission for {} requested users".format(len(other_org_users))
+            return Response(data={'users': other_org_users, 'message': err_msg}, status=status.HTTP_403_FORBIDDEN)
+
+        enroll_users.delay(self.request.user.id, request.data["user_ids"], request.data["course_keys"])
+        return Response('Enrollment task Has been started successfully!', status=status.HTTP_200_OK)
 
 
 class AnalyticsStats(views.APIView):
@@ -286,11 +299,7 @@ class AnalyticsStats(views.APIView):
         """
         get analytics quick stats about learner and their assigned courses
         """
-        user_qs = User.objects.filter(get_learners_filter())
-
-        if not self.request.user.is_superuser:
-            user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
-
+        user_qs = get_org_users_qs(self.request.user)
         user_ids = user_qs.values_list('id', flat=True)
         course_stats = user_qs.annotate(passed=ExpressionWrapper(COMPLETED_COURSE_COUNT,
                                                                  output_field=IntegerField()),
@@ -423,6 +432,7 @@ class UserInfo(views.APIView):
             'name': self.request.user.profile.name,
             'username': self.request.user.username,
             'is_superuser': self.request.user.is_superuser,
+            'id': self.request.user.id,
             'csrf_token': csrf.get_token(self.request),
             'languages': [lang[0] for lang in groupby(languages)],
             'all_languages': all_languages,
@@ -454,6 +464,10 @@ class CourseListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = CourseOverview.objects.all()
+
+        user_id = self.request.query_params.get('user_id', '').strip().lower()
+        if user_id:
+            queryset = queryset.exclude(courseenrollment__user_id=user_id, courseenrollment__is_active=True)
 
         search_text = self.request.query_params.get('name', '').strip().lower()
         if search_text:

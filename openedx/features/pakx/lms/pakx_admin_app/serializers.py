@@ -146,7 +146,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_organization(self, value):
         if not value:
-            raise serializers.ValidationError("Organization can't be empty")
+            raise serializers.ValidationError(
+                'Organization is required. The person registering new user must have an organization.'
+            )
         return value
 
     def validate_employee_id(self, value):
@@ -175,7 +177,7 @@ class UserSerializer(serializers.ModelSerializer):
         if self.instance:
             qs = qs.filter(~Q(id=self.instance.pk))
         if qs.exists():
-            raise serializers.ValidationError('email already exists')
+            raise serializers.ValidationError('Email already exists')
 
         return value
 
