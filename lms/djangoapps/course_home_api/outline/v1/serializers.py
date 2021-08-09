@@ -28,6 +28,8 @@ class CourseBlockSerializer(serializers.Serializer):
         icon = None
         num_graded_problems = block.get('num_graded_problems', 0)
         scored = block.get('scored')
+        hash_key = None
+
         if settings.ENABLE_SHORT_MFE_URL:
             hash_key = block['hash_key']
 
@@ -62,7 +64,6 @@ class CourseBlockSerializer(serializers.Serializer):
                 },
             }
         elif settings.ENABLE_SHORT_MFE_URL:
-            print('\n SETTING HASH KEY', hash_key)
             serialized = {
                 block_key: {
                     'children': [child['id'] for child in children],

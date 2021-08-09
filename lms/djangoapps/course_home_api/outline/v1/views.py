@@ -303,13 +303,10 @@ class OutlineTabView(RetrieveAPIView):
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
             if settings.ENABLE_SHORT_MFE_URL:
-                print('\n GETTING HASH_KEY')
                 available_seq_ids = {get_usage_key_hash(usage_key) for usage_key in user_course_outline.sequences}
-                print(available_seq_ids)
                 # course_blocks is a reference to the root of the course, so we go
                 # through the chapters (sections) to look for sequences to remove.
                 for chapter_data in course_blocks['children']:
-                    print(chapter_data['children'])
                     chapter_data['children'] = [
                         seq_data
                         for seq_data in chapter_data['children']

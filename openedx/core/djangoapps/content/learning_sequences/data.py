@@ -148,7 +148,6 @@ class CourseLearningSequenceData:
         factory=dict,
         validator=[user_partition_groups_not_empty],
     )
-    print(usage_key)
 
 
 @attr.s(frozen=True)

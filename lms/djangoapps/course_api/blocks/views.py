@@ -241,7 +241,6 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
-            print(response.data)
             if settings.ENABLE_SHORT_MFE_URL:
                 if 'blocks' in response.data:
                     blocks = response.data['blocks']
