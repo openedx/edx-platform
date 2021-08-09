@@ -18,6 +18,8 @@ from django.db.models import Count
 from django.dispatch import receiver
 
 from django.utils.translation import ugettext_lazy as _
+from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
+from edx_name_affirmation.toggles import is_verified_name_enabled
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -370,9 +372,7 @@ class GeneratedCertificate(models.Model):
         if not mode:
             mode = self.mode
 
-        profile_name = student_api.get_name(self.user.id)
-        if not profile_name:
-            profile_name = ''
+        preferred_name = self._get_preferred_certificate_name(self.user)
 
         self.error_reason = ''
         self.download_uuid = ''
@@ -380,7 +380,7 @@ class GeneratedCertificate(models.Model):
         self.grade = grade
         self.status = status
         self.mode = mode
-        self.name = profile_name
+        self.name = preferred_name
         self.save()
 
         COURSE_CERT_REVOKED.send_robust(
@@ -403,6 +403,23 @@ class GeneratedCertificate(models.Model):
                 'source': source or '',
             }
             emit_certificate_event('revoked', self.user, str(self.course_id), event_data=event_data)
+
+    def _get_preferred_certificate_name(self, user):
+        """
+        Copy of `get_preferred_certificate_name` from utils.py - importing it here would introduce
+        a circular dependency.
+        """
+        name_to_use = student_api.get_name(user.id)
+
+        if is_verified_name_enabled() and should_use_verified_name_for_certs(user):
+            verified_name_obj = get_verified_name(user, is_verified=True)
+            if verified_name_obj:
+                name_to_use = verified_name_obj.verified_name
+
+        if not name_to_use:
+            name_to_use = ''
+
+        return name_to_use
 
     def is_valid(self):
         """

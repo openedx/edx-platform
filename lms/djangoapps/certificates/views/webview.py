@@ -43,7 +43,11 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
-from lms.djangoapps.certificates.utils import emit_certificate_event, get_certificate_url
+from lms.djangoapps.certificates.utils import (
+    emit_certificate_event,
+    get_certificate_url,
+    get_preferred_certificate_name
+)
 from openedx.core.djangoapps.catalog.api import get_course_run_details
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
@@ -305,7 +309,8 @@ def _update_context_with_user_info(context, user, user_certificate):
     """
     Updates context dictionary with user related info.
     """
-    user_fullname = user.profile.name
+    user_fullname = get_preferred_certificate_name(user)
+
     context['username'] = user.username
     context['course_mode'] = user_certificate.mode
     context['accomplishment_user_id'] = user.id
