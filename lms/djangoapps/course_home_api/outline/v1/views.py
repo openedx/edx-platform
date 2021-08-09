@@ -340,6 +340,12 @@ class OutlineTabView(RetrieveAPIView):
             if user_grade:
                 user_has_passing_grade = user_grade.passed
 
+        user_has_passing_grade = False
+        if not request.user.is_anonymous:
+            user_grade = CourseGradeFactory().read(request.user, course)
+            if user_grade:
+                user_has_passing_grade = user_grade.passed
+
         data = {
             'access_expiration': access_expiration,
             'cert_data': cert_data,

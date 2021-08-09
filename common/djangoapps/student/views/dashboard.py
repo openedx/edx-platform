@@ -47,7 +47,12 @@ from openedx.features.enterprise_support.api import (
     get_enterprise_learner_portal_context,
 )
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
-from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
+from common.djangoapps.student.helpers import (
+    cert_info,
+    check_verify_status_by_course,
+    get_resume_urls_for_enrollments,
+    user_has_passing_grade_in_course
+)
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -675,10 +680,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
     verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
-    cert_statuses = {
-        enrollment.course_id: cert_info(request.user, enrollment)
-        for enrollment in course_enrollments
-    }
+    cert_statuses = {}
+    passing_courses = {}
+    for enrollment in course_enrollments:
+        cert_statuses[enrollment.course_id] = cert_info(request.user, enrollment)
+        passing_courses[enrollment.course_id] = user_has_passing_grade_in_course(user, enrollment)
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
@@ -763,6 +769,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'show_courseware_links_for': show_courseware_links_for,
         'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
+        'passing_courses': passing_courses,
         'credit_statuses': _credit_statuses(user, course_enrollments),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
