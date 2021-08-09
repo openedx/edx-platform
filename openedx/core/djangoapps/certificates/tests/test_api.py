@@ -10,7 +10,6 @@ from django.test import TestCase
 from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 
-from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.certificates import api
 from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
@@ -118,36 +117,6 @@ class CertificatesApiTestCase(TestCase):
         self.course.self_paced = is_self_paced
         with configure_waffle_namespace(feature_enabled):
             assert expected_value == api.can_show_certificate_available_date_field(self.course)
-
-    @ddt.data(
-        (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
-        (CourseMode.VERIFIED, CertificateStatuses.notpassing, False),
-        (CourseMode.AUDIT, CertificateStatuses.downloadable, False)
-    )
-    @ddt.unpack
-    def test_is_certificate_valid(self, enrollment_mode, certificate_status, expected_value):
-        self.enrollment.mode = enrollment_mode
-        self.enrollment.save()
-
-        self.certificate.mode = CourseMode.VERIFIED
-        self.certificate.status = certificate_status
-
-        assert expected_value == api.is_certificate_valid(self.certificate)
-
-    @ddt.data(
-        (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
-        (CourseMode.VERIFIED, CertificateStatuses.notpassing, False),
-        (CourseMode.AUDIT, CertificateStatuses.downloadable, False)
-    )
-    @ddt.unpack
-    def test_available_date(self, enrollment_mode, certificate_status, expected_value):
-        self.enrollment.mode = enrollment_mode
-        self.enrollment.save()
-
-        self.certificate.mode = CourseMode.VERIFIED
-        self.certificate.status = certificate_status
-
-        assert expected_value == api.is_certificate_valid(self.certificate)
 
     @ddt.data(
         (True, True, False),  # feature enabled and self-paced should return False
