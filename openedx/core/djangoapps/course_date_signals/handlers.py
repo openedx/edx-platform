@@ -91,13 +91,30 @@ def _get_custom_pacing_children(subsection, num_weeks):
     Return relative date items for the subsection and its children
     """
     items = [subsection]
+    has_content = False
+    all_problems_are_ora = True
     section_date_items = []
     while items:
         next_item = items.pop()
+        is_problem = next_item.category not in {'sequential', 'vertical'}
+        if is_problem:
+            has_content = True
         # Open response assessment problems have their own due dates
         if next_item.category != 'openassessment':
             section_date_items.append((next_item.location, {'due': timedelta(weeks=num_weeks)}))
             items.extend(next_item.get_children())
+            if is_problem:
+                all_problems_are_ora = False
+
+    # If all the problems are ORA then we return an empty list. This is to avoid potential conflicts with
+    # custom relative dates through PLS and Studio since ORA problems have their own due dates.
+    if has_content and all_problems_are_ora:
+        return []
+
+    # If there are non ORA content problems or if there are no problems at all return the list of date items.
+    # Relative dates should apply to subsections and their children if there are other graded assignments
+    # in it (i.e. non-ORA problems). The current custom PLS allows for due dates to be set even for empty
+    # units.
     return section_date_items
 
 
