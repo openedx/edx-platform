@@ -241,14 +241,23 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
+            print(response.data)
             if settings.ENABLE_SHORT_MFE_URL:
-                blocks = response.data['blocks']
-                for block in blocks:
-                    current_block = blocks[block]
-                    if 'children' in current_block:
-                        new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
-                        current_block['hash_children'] = new_child_ids
-                    current_block['hash_key'] = get_usage_key_hash(current_block['id'])
+                if 'blocks' in response.data:
+                    blocks = response.data['blocks']
+                    for block in blocks:
+                        current_block = blocks[block]
+                        if 'children' in current_block:
+                            new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
+                            current_block['hash_children'] = new_child_ids
+                        current_block['hash_key'] = get_usage_key_hash(current_block['id'])
+                else:
+                    blocks = response.data
+                    for block in blocks:
+                        if 'children' in block:
+                            new_child_ids = [get_usage_key_hash(child) for child in block['children']]
+                            block['hash_children'] = new_child_ids
+                        block['hash_key'] = get_usage_key_hash(block['id'])
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from
