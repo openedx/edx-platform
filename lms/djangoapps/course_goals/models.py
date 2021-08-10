@@ -28,10 +28,10 @@ class CourseGoal(models.Model):
     .. no_pii:
     """
     class Meta:
-        app_label = "course_goals"
-        unique_together = ("user", "course_key")
+        app_label = 'course_goals'
+        unique_together = ('user', 'course_key')
 
-    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
     # The goal a user has set for the number of days they want to learn per week
     days_per_week = models.PositiveIntegerField(default=0)
@@ -46,3 +46,24 @@ class CourseGoal(models.Model):
             goal=self.days_per_week,
             course=self.course_key,
         )
+
+
+class UserActivity(models.Model):
+    """
+    Tracks the date a user performs an activity in a course for goal purposes.
+    To be used in conjunction with the CourseGoal model to establish if a learner is hitting
+    their desired days_per_week.
+
+    To start, this model will only be tracking page views that count towards a learner's goal,
+    but could grow to tracking other types of goal achieving activities in the future.
+
+    .. no_pii:
+    """
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['user', 'course_key', 'date'], name='unique_user_course_date')]
+        indexes = [models.Index(fields=['user', 'course_key'], name='user_course_index')]
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_key = CourseKeyField(max_length=255)
+    date = models.DateField()
