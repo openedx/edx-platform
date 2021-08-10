@@ -63,27 +63,6 @@ class CourseOutlineView(APIView):
             user_course_outline = user_course_outline_details.outline
             schedule = user_course_outline_details.schedule
             exam_information = user_course_outline_details.special_exam_attempts
-            sequences_dict = {}
-            if settings.ENABLE_SHORT_MFE_URL:
-                sequences_dict = {
-                    get_usage_key_hash(seq_usage_key): self._sequence_repr(
-                        sequence,
-                        schedule.sequences.get(seq_usage_key),
-                        exam_information.sequences.get(seq_usage_key, {}),
-                        user_course_outline.accessible_sequences,
-                    )
-                    for seq_usage_key, sequence in user_course_outline.sequences.items()
-                }
-            else:
-                sequences_dict = {
-                    str(seq_usage_key): self._sequence_repr(
-                        sequence,
-                        schedule.sequences.get(seq_usage_key),
-                        exam_information.sequences.get(seq_usage_key, {}),
-                        user_course_outline.accessible_sequences,
-                    )
-                    for seq_usage_key, sequence in user_course_outline.sequences.items()
-                }
             return {
                 # Top level course information
                 "course_key": str(user_course_outline.course_key),
@@ -108,7 +87,15 @@ class CourseOutlineView(APIView):
                         self._section_repr(section, schedule.sections.get(section.usage_key))
                         for section in user_course_outline.sections
                     ],
-                    "sequences": sequences_dict,
+                    "sequences": {
+                        str(seq_usage_key): self._sequence_repr(
+                            sequence,
+                            schedule.sequences.get(seq_usage_key),
+                            exam_information.sequences.get(seq_usage_key, {}),
+                            user_course_outline.accessible_sequences,
+                        )
+                        for seq_usage_key, sequence in user_course_outline.sequences.items()
+                    },
                 },
             }
 
@@ -151,15 +138,6 @@ class CourseOutlineView(APIView):
                     # Any of these values could be `None`
                     'start': section_schedule.start,
                     'effective_start': section_schedule.effective_start,
-                }
-            if settings.ENABLE_SHORT_MFE_URL:
-                return {
-                    "id": str(section.usage_key),
-                    "title": section.title,
-                    "sequence_ids": [
-                        get_usage_key_hash(seq.usage_key) for seq in section.sequences
-                    ],
-                    **schedule_item_dict,
                 }
 
             return {

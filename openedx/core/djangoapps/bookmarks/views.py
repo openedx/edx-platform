@@ -225,14 +225,6 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         if not usage_id:
             return self.error_response(ugettext_noop('Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
 
-        if settings.ENABLE_SHORT_MFE_URL:
-            decoded_hash_string = urlsafe_b64decode(usage_id)
-            usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
-                                                                       hash_key=usage_key_hash))
-        else:
-            usage_id = unquote_slashes(usage_id)
-
         try:
             usage_key = UsageKey.from_string(usage_id)
         except InvalidKeyError:
@@ -314,12 +306,6 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         Arguments:
             usage_id (string): The id of required block.
         """
-        if settings.ENABLE_SHORT_MFE_URL:
-            decoded_hash_string = urlsafe_b64decode(usage_id)
-            usage_key_hash = decoded_hash_string.decode('utf-8')
-            usage_id = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
-                                                                       hash_key=usage_key_hash))
-
         try:
             return UsageKey.from_string(usage_id)
         except InvalidKeyError:

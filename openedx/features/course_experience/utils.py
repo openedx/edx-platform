@@ -38,8 +38,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         of those children.
         """
         children = block.get('children', [])
-        if settings.ENABLE_SHORT_MFE_URL:
-            block['hash_key'] = get_usage_key_hash(block['id'])
+        block['hash_key'] = get_usage_key_hash(block['id'])
 
         for i in range(len(children)):
             child_id = block['children'][i]

@@ -568,15 +568,11 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
         metadata = sequence.get_metadata(view=view)
-        if settings.ENABLE_SHORT_MFE_URL:
-            seq_id = metadata['item_id']
-            metadata['decoded_id'] = seq_id
-            metadata['item_id'] = get_usage_key_hash(seq_id)
-            for item in metadata['items']:
-                item_id = item['id']
-                hash_key = get_usage_key_hash(item_id)
-                item['decoded_id'] = item_id
-                item['id'] = hash_key
+        metadata['decoded_id'] = metadata['item_id']
+        metadata['hash_key'] = get_usage_key_hash(metadata['item_id'])
+        for item in metadata['items']:
+            item['decoded_id'] = item['id']
+            item['hash_key'] = get_usage_key_hash(item['id'])
         return Response(metadata)
 
 

@@ -28,10 +28,7 @@ class CourseBlockSerializer(serializers.Serializer):
         icon = None
         num_graded_problems = block.get('num_graded_problems', 0)
         scored = block.get('scored')
-        hash_key = None
-
-        if settings.ENABLE_SHORT_MFE_URL:
-            hash_key = block['hash_key']
+        hash_key = block['hash_key']
 
         if num_graded_problems and block_type == 'sequential':
             questions = ngettext('({number} Question)', '({number} Questions)', num_graded_problems)
@@ -44,64 +41,25 @@ class CourseBlockSerializer(serializers.Serializer):
             description = block['special_exam_info'].get('short_description')
             icon = block['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')
 
-        if block_type == 'chapter' and settings.ENABLE_SHORT_MFE_URL:
-            serialized = {
-                block_key: {
-                    'children': [child['hash_key'] for child in children],
-                    'complete': block.get('complete', False),
-                    'description': description,
-                    'display_name': display_name,
-                    'due': block.get('due'),
-                    'effort_activities': block.get('effort_activities'),
-                    'effort_time': block.get('effort_time'),
-                    'icon': icon,
-                    'id': block_key,
-                    'lms_web_url': block['lms_web_url'] if enable_links else None,
-                    'legacy_web_url': block['legacy_web_url'] if enable_links else None,
-                    'resume_block': block.get('resume_block', False),
-                    'type': block_type,
-                    'has_scheduled_content': block.get('has_scheduled_content'),
-                },
-            }
-        elif settings.ENABLE_SHORT_MFE_URL:
-            serialized = {
-                block_key: {
-                    'children': [child['id'] for child in children],
-                    'complete': block.get('complete', False),
-                    'description': description,
-                    'display_name': display_name,
-                    'due': block.get('due'),
-                    'effort_activities': block.get('effort_activities'),
-                    'effort_time': block.get('effort_time'),
-                    'icon': icon,
-                    'id': block_key,
-                    'lms_web_url': block['lms_web_url'] if enable_links else None,
-                    'legacy_web_url': block['legacy_web_url'] if enable_links else None,
-                    'resume_block': block.get('resume_block', False),
-                    'type': block_type,
-                    'has_scheduled_content': block.get('has_scheduled_content'),
-                    'hash_key': hash_key,
-                },
-            }
-        else:
-            serialized = {
-                block_key: {
-                    'children': [child['id'] for child in children],
-                    'complete': block.get('complete', False),
-                    'description': description,
-                    'display_name': display_name,
-                    'due': block.get('due'),
-                    'effort_activities': block.get('effort_activities'),
-                    'effort_time': block.get('effort_time'),
-                    'icon': icon,
-                    'id': block_key,
-                    'lms_web_url': block['lms_web_url'] if enable_links else None,
-                    'legacy_web_url': block['legacy_web_url'] if enable_links else None,
-                    'resume_block': block.get('resume_block', False),
-                    'type': block_type,
-                    'has_scheduled_content': block.get('has_scheduled_content'),
-                },
-            }
+        serialized = {
+            block_key: {
+                'children': [child['id'] for child in children],
+                'complete': block.get('complete', False),
+                'description': description,
+                'display_name': display_name,
+                'due': block.get('due'),
+                'effort_activities': block.get('effort_activities'),
+                'effort_time': block.get('effort_time'),
+                'icon': icon,
+                'id': block_key,
+                'lms_web_url': block['lms_web_url'] if enable_links else None,
+                'legacy_web_url': block['legacy_web_url'] if enable_links else None,
+                'resume_block': block.get('resume_block', False),
+                'type': block_type,
+                'has_scheduled_content': block.get('has_scheduled_content'),
+                'hash_key': hash_key,
+            },
+        }
         for child in children:
             serialized.update(self.get_blocks(child))
         return serialized
@@ -173,3 +131,4 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()
     user_has_passing_grade = serializers.BooleanField()
+    mfe_short_url_is_active = serializers.BooleanField()
