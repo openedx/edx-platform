@@ -49,6 +49,11 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.content.learning_sequences.api import (
+    get_learning_sequence,
+    get_learning_sequence_by_hash,
+)
+from openedx.core.djangoapps.content.learning_sequences.data import LearningSequenceData, hash_usage_key
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
@@ -569,13 +574,14 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    def get(self, request, usage_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    def get(self, request, usage_key_string, **kwargs):
         """
         Return response to a GET request.
         """
         try:
             usage_key = UsageKey.from_string(usage_key_string)
-        except InvalidKeyError as exc:
+            learning_sequence = get_learning_sequence(usage_key)
+        except (InvalidKeyError, LearningSequenceData.DoesNotExist) as exc:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
         _, request.user = setup_masquerade(
             request,
@@ -583,24 +589,88 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             staff_access=has_access(request.user, 'staff', usage_key.course_key),
             reset_masquerade_data=True,
         )
+        return Response(_get_sequence_metadata(request, learning_sequence))
 
-        sequence, _ = get_module_by_usage_id(
-            self.request,
-            str(usage_key.course_key),
-            str(usage_key),
-            disable_staff_debug_info=True,
-            will_recheck_access=True)
+class SequenceMetadataByHash(DeveloperErrorViewMixin, APIView):
+    """
+    Variation of the SequenceMetadata view, accepting a hashed sequence
+    usage key instead of a normal sequence usage key.
 
-        if not hasattr(sequence, 'get_metadata'):
-            # Looks like we were asked for metadata on something that is not a sequence (or section).
-            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+      GET /api/courseware/sequence/{usage_key_hash}
 
-        view = STUDENT_VIEW
-        if request.user.is_anonymous:
-            view = PUBLIC_VIEW
+    The hashed usage key is translated to a normal usage key via the Learning
+    Sequences Python API. Refer to `SequenceMetadata` for return value details.
 
-        context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
-        return Response(sequence.get_metadata(view=view, context=context))
+    This allows hashed usage keys to be used in Learning MFE courseware URLs,
+    significantly shortening those URLs. This feature is considered
+    experimental, and is currently behind the `ENABLE_SHORT_MFE_URL` flag.
+    We will likely move the usage_key/usage_key_hash translation logic
+    entirely within the Learning Sequences Outlines API before globally
+    enabling this feature, so we ask that folks avoid relying on this new
+    API view for now. See TNL-8638 for details.
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    def get(self, request, usage_key_hash, **kwargs):
+        """
+        Return response to a GET request.
+        """
+        try:
+            learning_sequence = get_learning_sequence_by_hash(usage_key_hash)
+        except LearningSequenceData.DoesNotExist as exc:
+            raise NotFound(f"Invalid usage key hash: '{usage_key_hash}'.") from exc
+        seq_metadata = _get_sequence_metadata(request, learning_sequence)
+        masquerading_context = {
+            'specific_masquerade': is_masquerading_as_specific_student(
+                request.user, usage_key.course_key
+            )
+        }
+        return Response(seq_metadata, context=masquerading_context)
+
+
+def _get_sequence_metadata(request, learning_sequence: LearningSequenceData) -> dict:
+    """
+    Return metadata about a sequence and its units.
+
+    For use exclusively by the Sequence Metadata HTTP APIs defined above.
+    """
+    usage_key = learning_sequence.usage_key
+
+    _, request.user = setup_masquerade(
+        request,
+        usage_key.course_key,
+        staff_access=has_access(request.user, 'staff', usage_key.course_key),
+        reset_masquerade_data=True,
+    )
+
+    sequence, _ = get_module_by_usage_id(
+        request,
+        str(usage_key.course_key),
+        str(usage_key),
+        disable_staff_debug_info=True,
+        will_recheck_access=True)
+
+    if not hasattr(sequence, 'get_metadata'):
+        # Looks like we were asked for metadata on something that is not a sequence (or section).
+        return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    view = STUDENT_VIEW
+    if request.user.is_anonymous:
+        view = PUBLIC_VIEW
+    sequence_data = sequence.get_metadata(view=view)
+
+    # Insert usage_key_hashes of this sequence and its units into the response.
+    # We do this here in order to avoid further complicating seq_module
+    # with details of usage key hashing.
+    sequence_data["usage_key_hash"] = learning_sequence.usage_key_hash
+    for unit_data in sequence_data["items"]:
+        unit_data["usage_key_hash"] = hash_usage_key(unit_data["id"])
+
+    return sequence_data
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

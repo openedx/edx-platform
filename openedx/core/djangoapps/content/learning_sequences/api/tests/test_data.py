@@ -1,13 +1,22 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+import re
 from datetime import datetime, timezone
 from unittest import TestCase
 
-import pytest
-from opaque_keys.edx.keys import CourseKey
 import attr
+import pytest
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from ...data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData, CourseVisibility
+    hash_usage_key,
+    CourseOutlineData,
+    CourseLearningSequenceData,
+    CourseSectionData,
+    CourseVisibility,
+    LearningSequenceData,
+    VisibilityData,
+    USAGE_KEY_HASH_LENGTH,
+    USAGE_KEY_HASH_PATTERN,
 )
 
 
@@ -149,6 +158,55 @@ class TestCourseOutlineData(TestCase):
                     51: frozenset(),  # This is not allowed
                 }
             )
+
+
+class TestUsageKeyHashing(TestCase):
+    """
+    Basic sanity validation for usage key hashing functionality.
+    """
+    sequence_key = UsageKey.from_string('block-v1:A+B+C+type@sequential+block@D')
+    sequence_title = 'Sequence ABCD!'
+
+    def test_make_sequence_data_with_auto_hash(self):
+        """
+        If no usage_key_hash is specified, we calculate a default using hash_usage_key.
+        """
+        sequence_data = LearningSequenceData(
+            usage_key=self.sequence_key,
+            title=self.sequence_title,
+        )
+        assert sequence_data.usage_key == self.sequence_key
+        assert sequence_data.usage_key_hash == hash_usage_key(self.sequence_key)
+
+    def test_make_sequence_data_with_explicit_hash(self):
+        """
+        An explicit hash key be can be specified instead, for whatever reason.
+        """
+        sequence_data = LearningSequenceData(
+            usage_key=self.sequence_key,
+            usage_key_hash="c00lhash",
+            title=self.sequence_title,
+        )
+        assert sequence_data.usage_key == self.sequence_key
+        assert sequence_data.usage_key_hash == "c00lhash"
+
+    def test_hash_usage_key_output(self):
+        """
+        Compare the hash of `self.sequence_key` against certain expections we
+        have of it, including its literal value.
+
+        This test is meant to fail if the algorithm behind `hash_usage_key`
+        is modified. It is not implausible that we will want to tweak the algorithm
+        one day, but this test exists to make sure that doing so is a conscious
+        decision, taking into account all the potential downstream effects
+        (URLs breaking, etc).
+        """
+        hash_output = hash_usage_key(self.sequence_key)
+
+        assert len(hash_output) == USAGE_KEY_HASH_LENGTH
+        assert re.match(rf"^{USAGE_KEY_HASH_PATTERN}$", hash_output)
+
+        assert hash_output == 'n3Ayh9YV'
 
 
 def generate_sections(course_key, num_sequences):

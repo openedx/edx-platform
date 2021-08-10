@@ -43,7 +43,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (  # lint-amnesty, pylint: disable=unused-import
     LearningContextKeyField, UsageKeyField
 )
-from .data import CourseVisibility
+from .data import CourseVisibility, USAGE_KEY_HASH_LENGTH
 
 
 class LearningContext(TimeStampedModel):
@@ -111,7 +111,16 @@ class LearningSequence(TimeStampedModel):
     learning_context = models.ForeignKey(
         LearningContext, on_delete=models.CASCADE, related_name='sequences'
     )
-    usage_key = UsageKeyField(max_length=255)
+    usage_key = UsageKeyField(max_length=255, unique=True)
+
+    # A URL-safe Base64-encoding of a blake2b hash of the usage key.
+    # For aesthetic use (eg, as a path parameter, to shorten URLs).
+    # This field is experimental. See TNL-8638 for more information.
+    usage_key_hash = models.CharField(
+        max_length=USAGE_KEY_HASH_LENGTH,
+        null=True,
+        default=None,
+    )
 
     # Yes, it's crazy to have a title 1K chars long. But we have ones at least
     # 270 long, meaning we wouldn't be able to make it indexed anyway in InnoDB.
@@ -120,7 +129,7 @@ class LearningSequence(TimeStampedModel):
     # Separate field for when this Sequence's content was last changed?
     class Meta:
         unique_together = [
-            ['learning_context', 'usage_key'],
+            ['learning_context', 'usage_key_hash'],
         ]
 
 

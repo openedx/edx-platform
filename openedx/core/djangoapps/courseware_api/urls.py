@@ -7,20 +7,25 @@ from django.conf import settings
 from django.urls import path, re_path
 
 from openedx.core.djangoapps.courseware_api import views
+from openedx.core.djangoapps.content.learning_sequences.data import USAGE_KEY_HASH_PATTERN
+
 
 urlpatterns = [
-    re_path(fr'^course/{settings.COURSE_KEY_PATTERN}',
-            views.CoursewareInformation.as_view(),
-            name="courseware-api"),
-    re_path(fr'^sequence/{settings.USAGE_KEY_PATTERN}',
-            views.SequenceMetadata.as_view(),
-            name="sequence-api"),
-    re_path(fr'^resume/{settings.COURSE_KEY_PATTERN}',
-            views.Resume.as_view(),
-            name="resume-api"),
-    re_path(fr'^celebration/{settings.COURSE_KEY_PATTERN}',
-            views.Celebration.as_view(),
-            name="celebration-api"),
+    re_path(fr'^course/{settings.COURSE_KEY_PATTERN}$',
+        views.CoursewareInformation.as_view(),
+        name="courseware-api"),
+    re_path(fr'^sequence/{USAGE_KEY_HASH_PATTERN}$',
+        views.SequenceMetadataByHash.as_view(),
+        name="sequence-api-by-hash"),
+    re_path(fr'^sequence/{settings.USAGE_KEY_PATTERN}$',
+        views.SequenceMetadata.as_view(),
+        name="sequence-api"),
+    re_path(fr'^resume/{settings.COURSE_KEY_PATTERN}$',
+        views.Resume.as_view(),
+        name="resume-api"),
+    re_path(fr'^celebration/{settings.COURSE_KEY_PATTERN}$',
+        views.Celebration.as_view(),
+        name="celebration-api"),
 ]
 
 if getattr(settings, 'PROVIDER_STATES_URL', None):

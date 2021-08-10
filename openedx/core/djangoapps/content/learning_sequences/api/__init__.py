@@ -8,3 +8,7 @@ from .outlines import (
     key_supports_outlines,
     replace_course_outline,
 )
+from .sequences import (
+    get_learning_sequence,
+    get_learning_sequence_by_hash,
+)
