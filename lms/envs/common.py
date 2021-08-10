@@ -3147,8 +3147,8 @@ INSTALLED_APPS = [
     # Agreements
     'openedx.core.djangoapps.agreements',
 
-    # edx-django-utils
-    'edx_django_utils'
+    # User and group management via edx-django-utils
+    'edx_django_utils.user'
 ]
 
 ######################### CSRF #########################################
