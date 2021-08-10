@@ -11,6 +11,7 @@ from django.conf import settings
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.instructor import access
 from openedx.core.djangoapps.certificates.config import waffle
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.data import CertificatesDisplayBehaviors
@@ -34,16 +35,18 @@ def can_show_certificate_message(course, student, course_grade, certificates_ena
     """
     Returns True if a course certificate message can be shown
     """
-    is_allowlisted = certs_api.is_on_allowlist(student, course.id)
     auto_cert_gen_enabled = auto_certificate_generation_enabled()
     has_active_enrollment = CourseEnrollment.is_enrolled(student, course.id)
     certificates_are_viewable = certs_api.certificates_viewable_for_course(course)
+    is_beta_tester = access.is_beta_tester(student, course.id)
+    has_passed_or_is_allowlisted = _has_passed_or_is_allowlisted(course, student, course_grade)
 
     return (
         (auto_cert_gen_enabled or certificates_enabled_for_course) and
         has_active_enrollment and
         certificates_are_viewable and
-        (course_grade.passed or is_allowlisted)
+        has_passed_or_is_allowlisted and
+        (not is_beta_tester)
     )
 
 
@@ -95,3 +98,13 @@ def display_date_for_certificate(course, certificate):
 
 def is_valid_pdf_certificate(cert_data):
     return cert_data.cert_status == CertificateStatuses.downloadable and cert_data.download_url
+
+
+def _has_passed_or_is_allowlisted(course, student, course_grade):
+    """
+    Returns True if the student has passed this course run, or is on the allowlist for this course run
+    """
+    is_allowlisted = certs_api.is_on_allowlist(student, course.id)
+    has_passed = course_grade and course_grade.passed
+
+    return has_passed or is_allowlisted

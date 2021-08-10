@@ -44,6 +44,7 @@ from lms.djangoapps.certificates.api import (
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.instructor import access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
@@ -465,6 +466,10 @@ def _cert_info(user, enrollment, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
 
+    TODO: replace with a method that lives in the certificates app and combines this logic with
+     openedx.core.djangoapps.certificates.api.can_show_certificate_message and
+     lms.djangoapps.courseware.views.get_cert_data
+
     Arguments:
         user (User): A user.
         enrollment (CourseEnrollment): A course enrollment.
@@ -524,6 +529,10 @@ def _cert_info(user, enrollment, cert_status):
         return default_info
 
     if not CourseMode.is_eligible_for_certificate(enrollment.mode, status=status):
+        return default_info
+
+    if course_overview and access.is_beta_tester(user, course_overview.id):
+        # Beta testers are not eligible for a course certificate
         return default_info
 
     status_dict = {
