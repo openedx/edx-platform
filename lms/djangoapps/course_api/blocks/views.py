@@ -7,7 +7,6 @@ from django.db import transaction
 from django.http import Http404
 from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
-from django. conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
@@ -241,7 +240,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
-                
+
             if 'blocks' in response.data:
                 blocks = response.data['blocks']
             else:

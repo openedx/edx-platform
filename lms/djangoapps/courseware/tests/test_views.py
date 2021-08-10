@@ -283,7 +283,8 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         if settings.ENABLE_SHORT_MFE_URL:
             expected_redirect_url = (
-                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}/{get_usage_key_hash(vertical1.location)}'
+                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}'
+                f'/{get_usage_key_hash(vertical1.location)}'
             )
         jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
         response = self.client.get(jumpto_url)
@@ -295,7 +296,8 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         if settings.ENABLE_SHORT_MFE_URL:
             expected_redirect_url = (
-                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}/{get_usage_key_hash(vertical2.location)}'
+                f'http://learning-mfe/c/{course.id}/{get_usage_key_hash(sequence.location)}'
+                f'/{get_usage_key_hash(vertical2.location)}'
             )
         jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
@@ -3577,7 +3579,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
-        lms_url, __, __ = self._get_urls()
+        lms_url, __, __, __ = self._get_urls()
 
         # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
@@ -3600,7 +3602,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, __, __ = self._get_urls()
+        lms_url, __, __, __ = self._get_urls()
 
         assert self.client.get(lms_url).status_code == 200
 
@@ -3618,7 +3620,7 @@ class PreviewRedirectTests(BaseViewsTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_staff_no_redirect(self):
-        __, __, preview_url = self._get_urls()
+        __, __, __, preview_url = self._get_urls()
         with patch.object(access_utils, 'get_current_request_hostname',
                           return_value=settings.FEATURES.get('PREVIEW_LMS_BASE', None)):
 

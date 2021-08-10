@@ -2,7 +2,6 @@
 Common utilities for the course experience, including course outline.
 """
 
-from django.conf import settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
