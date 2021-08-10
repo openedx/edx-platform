@@ -8,6 +8,7 @@ from datetime import datetime
 from pytz import UTC
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -96,8 +97,11 @@ def display_date_for_certificate(course, certificate):
     Returns:
         datetime.date
     """
-    if certificate.date_override:
-        return certificate.date_override.date
+    try:
+        if certificate.date_override:
+            return certificate.date_override.date
+    except ObjectDoesNotExist:
+        pass
 
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date

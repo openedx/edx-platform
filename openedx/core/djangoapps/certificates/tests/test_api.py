@@ -65,6 +65,10 @@ class MockGeneratedCertificate:
         """
         return self.status == CertificateStatuses.downloadable
 
+class MockCertificateDateOverride:
+    def __init__(self, date=None):
+        self.date = date or datetime.now(pytz.UTC)
+
 
 @contextmanager
 def configure_waffle_namespace(feature_enabled):
@@ -181,6 +185,6 @@ class CertificatesApiTestCase(TestCase):
             assert self.certificate.modified_date == api.display_date_for_certificate(self.course, self.certificate)
 
             # With a certificate date override, display date returns the override, available date ignores it
-            self.certificate.date_override = { date: datetime(2021, 5, 11) }
+            self.certificate.date_override = MockCertificateDateOverride()
             assert self.certificate.date_override.date == api.display_date_for_certificate(self.course, self.certificate)
             assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)
