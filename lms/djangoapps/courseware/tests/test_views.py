@@ -3644,7 +3644,7 @@ class PreviewRedirectTests(BaseViewsTestCase):
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        __, __, preview_url = self._get_urls()
+        __, __, __, preview_url = self._get_urls()
 
         assert self.client.get(preview_url).status_code == 200
 
