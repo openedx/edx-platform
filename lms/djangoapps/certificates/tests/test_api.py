@@ -1118,6 +1118,7 @@ BETA_TESTER_METHOD = 'lms.djangoapps.certificates.api.access.is_beta_tester'
 CERTS_VIEWABLE_METHOD = 'lms.djangoapps.certificates.api.certificates_viewable_for_course'
 PASSED_OR_ALLOWLISTED_METHOD = 'lms.djangoapps.certificates.api._has_passed_or_is_allowlisted'
 
+
 class MockGeneratedCertificate:
     """
     We can't import GeneratedCertificate from LMS here, so we roll

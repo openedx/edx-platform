@@ -17,7 +17,6 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
-from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory

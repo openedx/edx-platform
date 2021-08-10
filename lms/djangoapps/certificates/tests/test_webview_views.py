@@ -14,7 +14,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_name_affirmation.api import create_verified_name, create_verified_name_config
 from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from organizations import api as organizations_api
 

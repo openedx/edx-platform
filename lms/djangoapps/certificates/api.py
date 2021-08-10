@@ -781,16 +781,20 @@ def certificate_status_for_student(student, course_id):
     """This returns a dictionary with a key for status, and other information."""
     return _certificate_status_for_student(student, course_id)
 
+
 def auto_certificate_generation_enabled():
     return _AUTO_CERTIFICATE_GENERATION.is_enabled()
+
 
 def _enabled_and_instructor_paced(course):
     if auto_certificate_generation_enabled():
         return not course.self_paced
     return False
 
+
 def can_show_certificate_available_date_field(course):
     return _enabled_and_instructor_paced(course)
+
 
 def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
     """
@@ -810,6 +814,7 @@ def can_show_certificate_message(course, student, course_grade, certificates_ena
         (not is_beta_tester)
     )
 
+
 def _course_uses_available_date(course):
     """Returns if the course has an certificate_available_date set and that it should be used"""
     if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
@@ -822,6 +827,7 @@ def _course_uses_available_date(course):
         and course.certificate_available_date
         and display_behavior_is_valid
     )
+
 
 def available_date_for_certificate(course, certificate, certificate_available_date=None):
     """
@@ -836,6 +842,7 @@ def available_date_for_certificate(course, certificate, certificate_available_da
         return certificate_available_date or course.certificate_available_date
     return certificate.modified_date
 
+
 def display_date_for_certificate(course, certificate):
     """
     Returns the display date that a certificate should display.
@@ -849,8 +856,10 @@ def display_date_for_certificate(course, certificate):
         return course.certificate_available_date
     return certificate.modified_date
 
+
 def is_valid_pdf_certificate(cert_data):
     return cert_data.cert_status == CertificateStatuses.downloadable and cert_data.download_url
+
 
 def _has_passed_or_is_allowlisted(course, student, course_grade):
     """
