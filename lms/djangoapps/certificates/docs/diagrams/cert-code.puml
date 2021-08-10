@@ -1,0 +1,42 @@
+@startuml
+skinparam BoxPadding 10
+
+title Protecting course certificates django app code
+header Project: decide when a user can get a cert, implement, then protect the cert (ensure the cert is only revoked in a very few specific instances)
+
+actor Learner as learner
+actor "edX Support Rep" as support
+
+box "Course certificates\ndjango app in edx-platform"
+    participant "api.py" as api
+    participant "generation_handler.py" as generation_handler
+    participant "tasks.py" as tasks
+    participant "generation.py" as generation
+    participant "signals.py" as signals
+    database "GeneratedCertificate\ndb table" as certs_db
+end box
+
+==Manual generation==
+support -> api: Support tries to\nmanually generate a\ncert for a learner
+
+api -> generation_handler: Generic "generate" method\ncalled, regardless of Allowlist\nstatus
+
+note over generation_handler: Both the learner\nand the course run must\nbe eligible for a certificate
+generation_handler -> generation_handler: Cert eligibility checked
+
+generation_handler -> tasks: Eligibility confirmed,\nasynchronous task created
+
+tasks -> generation: Generation code called
+
+generation -> certs_db: Cert is generated
+
+==ID verification==
+note over signals: Signal is triggered by id verification code
+learner -> signals: Learner verifies their identity
+
+signals -> generation_handler: Generic "generate" method\ncalled, regardless of Allowlist\nstatus
+
+note over generation_handler: Flow continues as above
+generation_handler -> generation_handler: Cert eligibility checked
+
+@enduml

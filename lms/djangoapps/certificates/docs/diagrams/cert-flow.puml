@@ -1,0 +1,73 @@
+@startuml
+skinparam BoxPadding 10
+
+title Protecting course certificates user flow
+header Project: decide when a user can get a cert, implement, then protect the cert (ensure the cert is only revoked in a very few specific instances)
+
+actor Learner as learner
+actor "edX Support Rep" as support
+
+box "Other code in edx-platform"
+    participant "Enrollment\nand other courseware" as enrollment
+    participant "Grades app" as grade
+    participant "ID verification app" as id
+end box
+
+box "Course certificates\ndjango app"
+    participant "Certs code" as certs
+    database "GeneratedCertificate\ntable in the LMS database" as certs_db
+    database "CertificateAllowlist\ntable in the LMS database" as allow_db
+    database "CertificateInvalidation\ntable in the LMS database" as invalid_db
+end box
+
+==Passing grade==
+learner -> enrollment: Learner enrolls in\na paid course track
+
+learner -> enrollment: Learner takes course
+
+enrollment -> grade: Learner receives\na passing grade
+
+grade -> certs: Grade signal sent
+
+certs -> certs: Cert eligibility checked.\nNot yet eligible.
+
+note over certs_db: User cannot see cert,\nbut cert is created to allow\nother processes to read the\ncert's status to learn why\nthe user can't see the cert
+certs -> certs_db: Cert is created in the db\nwith status of unverified
+
+note over learner: Timing of ID verification\ncould vary
+learner -> id: Learner verifies their identity
+
+id -> certs: ID signal sent
+
+certs -> certs: Cert eligibility checked
+
+note over certs_db: User can now see cert
+certs -> certs_db: Since all cert requirements have\nbeen met, cert's status is changed\nto downloadable
+
+==Failing grade but allowlisted==
+learner -> enrollment: Learner who already\nhas a verified ID enrolls in\na paid course track\nof a different course
+
+learner -> enrollment: Learner takes course
+
+enrollment -> grade: Learner receives\na failing grade
+
+support -> certs: Support adds user to the Certificate Allowlist\n(formerly the Whitelist),\noverriding the need for a passing grade
+certs -> allow_db
+
+allow_db -> certs: Allowlist signal sent
+
+certs -> certs: Cert eligibility checked
+
+note over certs_db: User can now see cert
+certs -> certs_db: Since all cert requirements have\nbeen met, downloadable cert is created
+
+==Cert is invalidated==
+note over learner: Learner already has a\ndownloadable course certificate
+
+support -> certs: Support adds user to the Certificate Invalidation list\ndue to the course team suspecting cheating
+certs -> invalid_db: Invalidation entry is created
+
+note over certs_db: User can no longer see cert
+certs -> certs_db: Cert is revoked\n(cert's status is marked as unavailable)
+
+@enduml
