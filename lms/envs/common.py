@@ -2572,9 +2572,6 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
-
-    # Management of objects
-    'gestore',
 ]
 
 ######################### CSRF #########################################
