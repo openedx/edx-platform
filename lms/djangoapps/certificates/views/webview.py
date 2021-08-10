@@ -30,6 +30,7 @@ from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
+    display_date_for_certificate,
     get_active_web_certificate,
     get_certificate_footer_context,
     get_certificate_header_context,
@@ -49,7 +50,6 @@ from lms.djangoapps.certificates.utils import (
     get_preferred_certificate_name
 )
 from openedx.core.djangoapps.catalog.api import get_course_run_details
-from openedx.core.djangoapps.certificates.api import display_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

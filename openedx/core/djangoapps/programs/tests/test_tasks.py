@@ -23,7 +23,6 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
@@ -506,9 +505,9 @@ class PostCourseCertificateTestCase(TestCase):
 
 @skip_unless_lms
 @ddt.ddt
+@mock.patch("lms.djangoapps.certificates.api.auto_certificate_generation_enabled", mock.Mock(return_value=True))
 @mock.patch(TASKS_MODULE + '.post_course_certificate')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-@override_switch(waffle.WAFFLE_NAMESPACE + '.' + waffle.AUTO_CERTIFICATE_GENERATION, True)
 class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
     Test the award_course_certificate celery task

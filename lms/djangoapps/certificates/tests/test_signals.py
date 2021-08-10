@@ -12,6 +12,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import has_self_generated_certificates_enabled
+from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -21,11 +22,8 @@ from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFact
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
@@ -80,7 +78,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_generate_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 CertificateAllowlistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
@@ -95,7 +93,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_generate_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=False):
                 CertificateAllowlistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
@@ -135,7 +133,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         attempt.approve()
 
     def test_passing_grade_allowlist(self):
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             # User who is not on the allowlist
             GeneratedCertificateFactory(
                 user=self.user,
@@ -172,7 +170,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_cert_task.assert_called_with(u, course_key)
 
     def test_cert_already_generated_downloadable(self):
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             GeneratedCertificateFactory(
                 user=self.user,
                 course_id=self.course.id,
@@ -189,7 +187,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_cert_task.assert_not_called()
 
     def test_cert_already_generated_unverified(self):
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             GeneratedCertificateFactory(
                 user=self.user,
                 course_id=self.course.id,
@@ -206,7 +204,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_cert_task.assert_called_with(self.user, self.course_key)
 
     def test_without_cert(self):
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             with mock.patch(
                 'lms.djangoapps.certificates.signals.generate_certificate_task',
                 return_value=None
@@ -335,7 +333,7 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate_task',
             return_value=None
         ) as mock_cert_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_two,
                     status='submitted'
@@ -349,7 +347,7 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_two,
                     status='submitted'
@@ -362,7 +360,7 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 u = UserFactory.create()
                 c = CourseFactory()
                 course_key = c.id  # pylint: disable=no-member
@@ -384,7 +382,7 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
                 mock_allowlist_task.assert_called_with(u, course_key)
 
 
-@override_waffle_flag(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True)
+@override_waffle_flag(AUTO_CERTIFICATE_GENERATION, active=True)
 class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing when the user's enrollment mode changes
