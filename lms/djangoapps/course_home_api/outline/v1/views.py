@@ -151,6 +151,8 @@ class OutlineTabView(RetrieveAPIView):
             url: (str) The display name of the course block to resume
         welcome_message_html: (str) Raw HTML for the course updates banner
         user_has_passing_grade: (bool) Whether the user currently is passing the course
+        mfe_short_url_is_active: Flag for the learning mfe on whether or not
+            the url will contain the block id or hash key.
 
     **Returns**
 
@@ -236,6 +238,7 @@ class OutlineTabView(RetrieveAPIView):
         is_enrolled = enrollment and enrollment.is_active
         is_staff = bool(has_access(request.user, 'staff', course_key))
         show_enrolled = is_enrolled or is_staff
+        mfe_short_url_is_active = settings.ENABLE_SHORT_MFE_URL
         if show_enrolled:
             course_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
             date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
@@ -302,38 +305,21 @@ class OutlineTabView(RetrieveAPIView):
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
-            if settings.ENABLE_SHORT_MFE_URL:
-                available_seq_ids = {get_usage_key_hash(usage_key) for usage_key in user_course_outline.sequences}
-                # course_blocks is a reference to the root of the course, so we go
-                # through the chapters (sections) to look for sequences to remove.
-                for chapter_data in course_blocks['children']:
-                    chapter_data['children'] = [
-                        seq_data
-                        for seq_data in chapter_data['children']
-                        if (
-                            seq_data['hash_key'] in available_seq_ids or
-                            # Edge case: Sometimes we have weird course structures.
-                            # We expect only sequentials here, but if there is
-                            # another type, just skip it (don't filter it out).
-                            seq_data['type'] != 'sequential'
-                        )
-                    ] if 'children' in chapter_data else []
-            else:
-                available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
-                # course_blocks is a reference to the root of the course, so we go
-                # through the chapters (sections) to look for sequences to remove.
-                for chapter_data in course_blocks['children']:
-                    chapter_data['children'] = [
-                        seq_data
-                        for seq_data in chapter_data['children']
-                        if (
-                            seq_data['id'] in available_seq_ids or
-                            # Edge case: Sometimes we have weird course structures.
-                            # We expect only sequentials here, but if there is
-                            # another type, just skip it (don't filter it out).
-                            seq_data['type'] != 'sequential'
-                        )
-                    ] if 'children' in chapter_data else []
+            available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
+            # course_blocks is a reference to the root of the course, so we go
+            # through the chapters (sections) to look for sequences to remove.
+            for chapter_data in course_blocks['children']:
+                chapter_data['children'] = [
+                    seq_data
+                    for seq_data in chapter_data['children']
+                    if (
+                        seq_data['id'] in available_seq_ids or
+                        # Edge case: Sometimes we have weird course structures.
+                        # We expect only sequentials here, but if there is
+                        # another type, just skip it (don't filter it out).
+                        seq_data['type'] != 'sequential'
+                    )
+                ] if 'children' in chapter_data else []
 
         user_has_passing_grade = False
         if not request.user.is_anonymous:
@@ -356,6 +342,7 @@ class OutlineTabView(RetrieveAPIView):
             'resume_course': resume_course,
             'user_has_passing_grade': user_has_passing_grade,
             'welcome_message_html': welcome_message_html,
+            'mfe_short_url_is_active': mfe_short_url_is_active,
         }
         context = self.get_serializer_context()
         context['course_overview'] = course_overview
