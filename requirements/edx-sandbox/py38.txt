@@ -71,7 +71,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.7.6
+regex==2021.8.3
     # via nltk
 scipy==1.7.1
     # via
