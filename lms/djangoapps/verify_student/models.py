@@ -1173,8 +1173,10 @@ class VerificationDeadline(TimeStampedModel):
 
 class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
     """
-        SSPVerificationRetryConfig used to inject arguments
-        to retry_failed_photo_verifications management command
+    SSPVerificationRetryConfig used to inject arguments
+    to retry_failed_photo_verifications management command
+
+    .. no_pii:
     """
 
     class Meta:
