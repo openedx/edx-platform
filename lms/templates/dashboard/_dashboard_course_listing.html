@@ -11,6 +11,7 @@ from django.utils.translation import ungettext
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
+from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
@@ -41,6 +42,12 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
     cert_name_long = settings.CERT_NAME_LONG
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
+%>
+
+<%
+  is_non_certificate_enrollment = enrollment.mode == "audit" or enrollment.mode == "honor"
+  is_passing_course = user_has_passing_grade_in_course(enrollment)
+  course_ended_not_passing = course_overview.has_ended() and is_passing_course == False and is_non_certificate_enrollment == False
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -350,7 +357,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       % endif
 
       % if cert_status:
-        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
+        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status, course_ended_not_passing=course_ended_not_passing, course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
       % endif
 
       % if credit_status is not None:

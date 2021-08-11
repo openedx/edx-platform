@@ -779,3 +779,18 @@ def does_user_profile_exist(user):
         return hasattr(user, 'profile')
     except (ProgrammingError, ObjectDoesNotExist):
         return False
+
+
+def user_has_passing_grade_in_course(enrollment):
+    """
+    Check to see if a user has passing grade for a course
+    """
+    try:
+        user = enrollment.user
+        course = enrollment.course_overview
+        course_grade = CourseGradeFactory().read(user, course, create_if_needed=False)
+        if course_grade:
+            return course_grade.passed
+    except AttributeError:
+        pass
+    return False
