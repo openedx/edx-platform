@@ -9,9 +9,6 @@
 # linking to it here is good.
 
 
-# This file contains all common constraints for edx-repos
--c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-
 # celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
 celery<5.0.0
 
