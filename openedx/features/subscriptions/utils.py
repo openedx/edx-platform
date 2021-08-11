@@ -50,7 +50,7 @@ def is_course_accessible_with_subscription(user, course):
         return ACCESS_DENIED
 
 
-def get_subscription_renew_url(subscription_id, user):
+def get_subscription_renew_url(subscription_id, user, ecommerce_url):
     """
     Get subscription renew url if given subscription is renewable.
     """
@@ -63,7 +63,7 @@ def get_subscription_renew_url(subscription_id, user):
     if subscription.subscription_type != UserSubscription.FULL_ACCESS_COURSES:
         return renew_subscription_path
 
-    renew_subscription_path = 'api/v2/subscriptions/renew_subscription/?subscription_id={subscription_id}'.format(
+    renew_subscription_path = 'subscriptions/renew_subscription/?subscription_id={subscription_id}'.format(
         subscription_id=subscription_id
     )
-    return urljoin(get_value('MARKETING_SITE_ROOT', ''), renew_subscription_path)
+    return urljoin(ecommerce_url + '/', renew_subscription_path)

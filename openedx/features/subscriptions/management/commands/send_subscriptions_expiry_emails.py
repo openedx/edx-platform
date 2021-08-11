@@ -31,11 +31,20 @@ class Command(BaseCommand):
         """
         """
         message_context = get_base_template_context(site)
-        marketing_site_root = configuration_helpers.get_value('MARKETING_SITE_ROOT')
+        marketing_urls = get_config_value_from_site_or_settings(
+            'MKTG_URLS',
+            site=site
+        )
+        marketing_site_root = marketing_urls.get('ROOT', '')
         subscriptions_marketing_url = '{marketing_root_url}subscriptions'.format(
             marketing_root_url='' if not marketing_site_root else marketing_site_root
         )
         message_context['subscriptions_marketing_url'] = subscriptions_marketing_url
+        django_settings = get_config_value_from_site_or_settings(
+            'DJANGO_SETTINGS_OVERRIDE',
+            site=site
+        )
+        message_context['ecommerce_api_url'] = django_settings['ECOMMERCE_API_URL'] if django_settings else ''
         color_dict = get_config_value_from_site_or_settings(
             'COLORS',
             site=site,
@@ -68,7 +77,11 @@ class Command(BaseCommand):
         for subscription_id, user, site in context_values:
             message_context = self._get_message_context(site)
             if ace_message_class == ExpiredNotification:
-                subscription_renew_url = get_subscription_renew_url(subscription_id, user)
+                subscription_renew_url = get_subscription_renew_url(
+                    subscription_id,
+                    user,
+                    message_context['ecommerce_api_url']
+                )
                 message_context.update({
                     'subscription_renew_url': subscription_renew_url,
                     'subscription_id': subscription_id,

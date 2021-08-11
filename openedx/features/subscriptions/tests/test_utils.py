@@ -88,11 +88,16 @@ class UtilsTests(ModuleStoreTestCase):
         """
         Test method return correct subscription renew url.
         """
-        self.assertEqual(get_subscription_renew_url(1, self.user), '')
+        test_ecommerce_api = 'http://example.com/api/v2'
+        self.assertEqual(get_subscription_renew_url(1, self.user, test_ecommerce_api), '')
         lifetime_subscription = UserSubscriptionFactory(
             subscription_type=UserSubscription.LIMITED_ACCESS
         )
-        self.assertEqual(get_subscription_renew_url(lifetime_subscription.subscription_id, self.user), '')
+        self.assertEqual(get_subscription_renew_url(
+            lifetime_subscription.subscription_id,
+            self.user,
+            test_ecommerce_api
+        ), '')
         full_access_courses_subscription = UserSubscriptionFactory(
             subscription_type=UserSubscription.FULL_ACCESS_COURSES,
             user=self.user
@@ -101,6 +106,10 @@ class UtilsTests(ModuleStoreTestCase):
             subscription_id=full_access_courses_subscription.subscription_id
         )
         self.assertEqual(
-            get_subscription_renew_url(full_access_courses_subscription.subscription_id, self.user),
+            get_subscription_renew_url(
+                full_access_courses_subscription.subscription_id,
+                self.user,
+                test_ecommerce_api
+            ),
             subscription_renew_url
         )
