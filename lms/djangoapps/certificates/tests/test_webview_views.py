@@ -14,7 +14,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_name_affirmation.api import create_verified_name, create_verified_name_config
 from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from organizations import api as organizations_api
 
@@ -29,6 +28,7 @@ from lms.djangoapps.badges.tests.factories import (
     BadgeClassFactory,
     CourseCompleteImageConfigurationFactory
 )
+from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateSocialNetworks,
@@ -43,7 +43,6 @@ from lms.djangoapps.certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory
 )
 from lms.djangoapps.certificates.utils import get_certificate_url
-from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.tests.test_util import (
     with_site_configuration,
@@ -56,7 +55,6 @@ from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
@@ -938,7 +936,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             expected_date = today
         else:
             expected_date = self.course.certificate_available_date
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             response = self.client.get(test_url)
         date = '{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),

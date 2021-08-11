@@ -8,7 +8,6 @@ from copy import deepcopy
 from unittest import mock
 
 import ddt
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 import httpretty
 from django.conf import settings
@@ -34,7 +33,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     SeatFactory,
     generate_course_run_key
 )
-from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
@@ -61,12 +59,11 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 LOGGER_NAME = 'openedx.core.djangoapps.programs.utils'
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)  # pylint: disable=toggle-missing-annotation
 
 
 @ddt.ddt
 @skip_unless_lms
-@override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True)
+@mock.patch("lms.djangoapps.certificates.api.auto_certificate_generation_enabled", mock.Mock(return_value=True))
 @mock.patch(UTILS_MODULE + '.get_programs')
 class TestProgramProgressMeter(ModuleStoreTestCase):
     """Tests of the program progress utility class."""
@@ -680,7 +677,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
 
-    @mock.patch(UTILS_MODULE + '.available_date_for_certificate')
+    @mock.patch(UTILS_MODULE + '.certificate_api.available_date_for_certificate')
     def test_completed_programs_with_available_dates(self, mock_available_date_for_certificate, mock_get_programs):
         # First we want to set up the scenario:
         # - A program that is incomplete due to no cert (won't show up in result)

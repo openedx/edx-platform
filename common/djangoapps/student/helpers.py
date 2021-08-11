@@ -41,6 +41,7 @@ from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled,
     certificate_status_for_student,
+    auto_certificate_generation_enabled,
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -48,7 +49,6 @@ from lms.djangoapps.instructor import access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -467,7 +467,7 @@ def _cert_info(user, enrollment, cert_status):
     Implements the logic for cert_info -- split out for testing.
 
     TODO: replace with a method that lives in the certificates app and combines this logic with
-     openedx.core.djangoapps.certificates.api.can_show_certificate_message and
+     lms.djangoapps.certificates.api.can_show_certificate_message and
      lms.djangoapps.courseware.views.get_cert_data
 
     Arguments:

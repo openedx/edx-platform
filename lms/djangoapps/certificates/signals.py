@@ -21,8 +21,8 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.api import auto_certificate_generation_enabled
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
