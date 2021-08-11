@@ -45,9 +45,9 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
 <%
-  is_audit_enrollment = enrollment.mode == "audit" or enrollment.mode == "honor"
+  is_non_certificate_enrollment = enrollment.mode == "audit" or enrollment.mode == "honor"
   is_passing_course = user_has_passing_grade_in_course(enrollment)
-  course_ended_not_passing = course_overview.has_ended() and is_passing_course == False and is_audit_enrollment == False
+  course_ended_not_passing = course_overview.has_ended() and is_passing_course == False and is_non_certificate_enrollment == False
 %>
 
 <%namespace name='static' file='../static_content.html'/>

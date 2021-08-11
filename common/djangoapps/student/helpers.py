@@ -786,7 +786,9 @@ def user_has_passing_grade_in_course(enrollment):
     Check to see if a user has passing grade for a course
     """
     try:
-        course_grade = CourseGradeFactory().read(enrollment.user, course=enrollment.course_overview, create_if_needed=False)
+        user = enrollment.user
+        course = enrollment.course_overview
+        course_grade = CourseGradeFactory().read(user, course, create_if_needed=False)
         if course_grade:
             return course_grade.passed
     except AttributeError:
