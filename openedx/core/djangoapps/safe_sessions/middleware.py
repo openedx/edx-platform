@@ -3,6 +3,17 @@ This module defines SafeSessionMiddleware that makes use of a
 SafeCookieData that cryptographically binds the user to the session id
 in the cookie.
 
+The primary goal is to avoid and detect situations where a session is
+corrupted and the client becomes logged in as the wrong user. This
+could happen via cache corruption (which we've seen before) or a
+request handling bug. It's unlikely to happen again, but would be a
+critical issue, so we've built in some checks to make sure the user on
+the session doesn't change over the course of the session or between
+the request and response phases.
+
+The secondary goal is to improve upon Django's session handling by
+including cryptographically enforced expiration.
+
 The implementation is inspired in part by the proposal in the paper
 <http://www.cse.msu.edu/~alexliu/publications/Cookie/cookie.pdf>
 but deviates in a number of ways; mostly it just uses the technique
@@ -278,7 +289,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         Step 4. Once the session is retrieved, verify that the user
         bound in the safe_cookie_data matches the user attached to the
-        server's session information.
+        server's session information. Otherwise, reject the request
+        (bypass the view and return an error or redirect).
 
         Step 5. If all is successful, the now verified user_id is stored
         separately in the request object so it is available for another
@@ -313,6 +325,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 if LOG_REQUEST_USER_CHANGES:
                     log_request_user_changes(request)
             else:
+                # Return an error or redirect, and don't continue to
+                # the underlying view.
                 return self._on_user_authentication_failed(request)
 
     def process_response(self, request, response):
@@ -431,6 +445,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         except KeyError:
             return None
 
+    # TODO move to test code, maybe rename, get rid of old Django compat stuff
     @staticmethod
     def set_user_id_in_session(request, user):
         """
