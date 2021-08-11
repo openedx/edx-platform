@@ -247,7 +247,9 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 blocks = response.data
 
             for block in blocks:
-                current_block = blocks[block]
+                current_block = block
+                if isinstance(blocks, dict):
+                    current_block = blocks[block]
                 if 'children' in current_block:
                     new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
                     current_block['hash_children'] = new_child_ids
