@@ -28,10 +28,12 @@ annotations:
               - other
         - ".. pii_retirement:":
             choices:
-              - retained
-              - local_api
-              - consumer_api
-              - third_party
+              - retained          # Intentionally kept for legal reasons
+              - local_api         # An API exists in this repository for retiring this information
+              - consumer_api      # The data's consumer must implement an API for retiring this information
+              - third_party       # A third party API exists to retire this data
+              - to_be_implemented # Retirement tooling not yet implemented
+
 extensions:
     python:
         - py
