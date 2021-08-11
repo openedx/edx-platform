@@ -37,6 +37,8 @@ class ContentLibrary(models.Model):
     re-imported on another Open edX instance should be kept in Blockstore. This
     model in the LMS should only be used to track settings specific to this Open
     edX instance, like who has permission to edit this content library.
+
+    .. no_pii:
     """
     objects = ContentLibraryManager()
 
@@ -89,6 +91,8 @@ class ContentLibrary(models.Model):
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library
+
+    .. no_pii:
     """
     library = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE, related_name="permission_grants")
     # One of the following must be set (but not both):
