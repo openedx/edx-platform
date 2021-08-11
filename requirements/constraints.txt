@@ -91,3 +91,7 @@ click<8.0.0
 
 # jsonfield2 will be replaced with jsonfield in https://openedx.atlassian.net/browse/BOM-1917.
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
+
+
+# 5.0.0+ of social-auth-app-django requires social-auth-core>=4.1.0
+social-auth-app-django<5.0.0
