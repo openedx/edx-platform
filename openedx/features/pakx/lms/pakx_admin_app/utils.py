@@ -1,6 +1,9 @@
 """
 helpers functions for Admin Panel API
 """
+from datetime import datetime
+
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import default_token_generator
@@ -100,6 +103,22 @@ def get_org_users_qs(user):
 
     return queryset.select_related(
         'profile'
+    )
+
+
+def get_available_course_qs():
+    now = datetime.now(pytz.UTC)
+    # A Course is "enrollable" if its enrollment start date has passed,
+    # is now, or is None, and its enrollment end date is in the future or is None.
+    return (
+        (
+            Q(enrollment_start__lte=now) |
+            Q(enrollment_start__isnull=True)
+        ) &
+        (
+            Q(enrollment_end__gt=now) |
+            Q(enrollment_end__isnull=True)
+        )
     )
 
 

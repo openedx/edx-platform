@@ -91,7 +91,7 @@ def add_enrollment_record(user_id, course_id):
     if enrollment:
         _, created = CourseProgressStats.objects.get_or_create(enrollment=enrollment)
         if not created:
-            log.info("Enrollment record for {} & User:{} already registered".format(course_id, user_id))
+            log.info("Enrollment record for {} & User:{} already enrolled".format(course_id, user_id))
 
 
 @task(name='remove_enrollment_record')

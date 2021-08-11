@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.models import CourseEnrollment
 
 from .message_types import EnrolmentNotification
@@ -20,11 +21,10 @@ from .utils import get_org_users_qs
 log = getLogger(__name__)
 
 
-def get_enrolment_email_message_context(user, courses):
+def get_enrolment_email_message_context(site, user, courses):
     """
     return context for course enrolment notification email body
     """
-    site = Site.objects.get_current()
     message_context = {
         'site_name': site.domain
     }
@@ -45,15 +45,19 @@ def send_course_enrolment_email(request_user_id, user_ids, course_keys_string):
     :param user_ids: (list<int>) user ids
     :param course_keys_string: (list<string>) course key
     """
+    site = Site.objects.get_current()
     request_user = User.objects.filter(id=request_user_id).first()
+
     if request_user:
         for user in get_org_users_qs(request_user).filter(id__in=user_ids):
-            message = EnrolmentNotification().personalize(
-                recipient=Recipient(user.username, user.email),
-                language='en',
-                user_context=get_enrolment_email_message_context(user, course_keys_string),
-            )
-            ace.send(message)
+            with emulate_http_request(site, user):
+                message = EnrolmentNotification().personalize(
+                    recipient=Recipient(user.username, user.email),
+                    language='en',
+                    user_context=get_enrolment_email_message_context(site, user, course_keys_string),
+                )
+                ace.send(message)
+
     else:
         log.info("Invalid request user id - Task terminated!")
 
@@ -75,9 +79,11 @@ def enroll_users(request_user_id, user_ids, course_keys_string):
                 for course_key_string in course_keys_string:
                     course_key = CourseKey.from_string(course_key_string)
                     for user in all_users:
-                        CourseEnrollment.enroll(user, course_key)
-                        if user.id not in enrolled_users_id:
+                        try:
+                            CourseEnrollment.enroll(user, course_key, check_access=True)
                             enrolled_users_id.append(user.id)
+                        except Exception:  # pylint: disable=broad-except
+                            pass
             send_course_enrolment_email.delay(request_user_id, enrolled_users_id, course_keys_string)
             log.info("Enrolled user(s): {}".format(enrolled_users_id))
         except DatabaseError:

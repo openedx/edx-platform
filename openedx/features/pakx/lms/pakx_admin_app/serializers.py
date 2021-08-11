@@ -95,7 +95,7 @@ class UserDetailViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'employee_id', 'is_active', 'date_joined',
+        fields = ('id', 'username', 'email', 'name', 'employee_id', 'is_active', 'date_joined',
                   'last_login', 'course_enrolled', 'completed_courses')
 
     @staticmethod
@@ -131,7 +131,7 @@ class UserListingSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     language_code = LanguageProficiencySerializer(write_only=True)
     languages = serializers.SerializerMethodField(read_only=True)
-    name = serializers.CharField(required=True)
+    name = serializers.CharField(max_length=30, required=True)
 
     class Meta:
         model = UserProfile
@@ -185,6 +185,11 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         role = validated_data.pop('role')
+
+        if profile_data.get('name'):
+            f_name, *l_names = profile_data.get('name').split()
+            validated_data['first_name'], validated_data['last_name'] = f_name, ' '.join(l_names)
+
         user = User.objects.create(**validated_data)
         user.set_password(uuid4().hex[:8])
         user.save()
@@ -234,7 +239,10 @@ class LearnersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'last_login', 'assigned_courses', 'incomplete_courses', 'completed_courses')
+        fields = (
+            'id', 'username', 'name', 'email', 'last_login',
+            'assigned_courses', 'incomplete_courses', 'completed_courses'
+        )
 
     @staticmethod
     def get_assigned_courses(obj):

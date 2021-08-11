@@ -21,6 +21,8 @@ from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from student.models import CourseAccessRole, CourseEnrollment, LanguageProficiency
 
 from .constants import (
+    ENROLLMENT_COURSE_EXPIRED_MSG,
+    ENROLLMENT_SUCCESS_MESSAGE,
     GROUP_ORGANIZATION_ADMIN,
     GROUP_TRAINING_MANAGERS,
     ORG_ADMIN,
@@ -40,6 +42,7 @@ from .serializers import (
 )
 from .tasks import enroll_users
 from .utils import (
+    get_available_course_qs,
     get_learners_filter,
     get_org_users_qs,
     get_roles_q_filters,
@@ -262,8 +265,14 @@ class CourseEnrolmentViewSet(viewsets.ModelViewSet):
     permission_classes = [CanAccessPakXAdminPanel]
 
     def enroll_users(self, request, *args, **kwargs):
-        user_qs = get_org_users_qs(request.user).filter(id__in=request.data["user_ids"]).values_list('id', flat=True)
+        available_courses_count = CourseOverview.objects.filter(
+            get_available_course_qs(),
+            id__in=request.data["course_keys"],
+        ).count()
+        if available_courses_count != len(request.data["course_keys"]):
+            return Response(ENROLLMENT_COURSE_EXPIRED_MSG, status=status.HTTP_400_BAD_REQUEST)
 
+        user_qs = get_org_users_qs(request.user).filter(id__in=request.data["user_ids"]).values_list('id', flat=True)
         if not request.data.get("user_ids") or not request.data.get("course_keys"):
             return Response(
                 "Invalid request data! User IDs and course keys are required",
@@ -273,10 +282,10 @@ class CourseEnrolmentViewSet(viewsets.ModelViewSet):
         if len(request.data["user_ids"]) != len(user_qs):
             other_org_users = list(set(request.data["user_ids"]) - set(list(user_qs)))
             err_msg = "You don't have the permission for {} requested users".format(len(other_org_users))
-            return Response(data={'users': other_org_users, 'message': err_msg}, status=status.HTTP_403_FORBIDDEN)
+            return Response(data={'users': other_org_users, 'message': err_msg}, status=status.HTTP_409_CONFLICT)
 
         enroll_users.delay(self.request.user.id, request.data["user_ids"], request.data["course_keys"])
-        return Response('Enrollment task Has been started successfully!', status=status.HTTP_200_OK)
+        return Response(ENROLLMENT_SUCCESS_MESSAGE, status=status.HTTP_200_OK)
 
 
 class AnalyticsStats(views.APIView):
@@ -463,7 +472,7 @@ class CourseListAPI(generics.ListAPIView):
         return context
 
     def get_queryset(self):
-        queryset = CourseOverview.objects.all()
+        queryset = CourseOverview.objects.filter(get_available_course_qs())
 
         user_id = self.request.query_params.get('user_id', '').strip().lower()
         if user_id:
@@ -481,8 +490,9 @@ class CourseListAPI(generics.ListAPIView):
 
         for course_access_role in course_access_role_qs:
             course_instructors = self.instructors.get(course_access_role.course_id, [])
-            if course_access_role.user.profile.name not in course_instructors:
-                course_instructors.append(course_access_role.user.profile.name)
+            instructor_name = course_access_role.user.profile.name or course_access_role.user.username
+            if instructor_name not in course_instructors:
+                course_instructors.append(instructor_name)
             self.instructors[course_access_role.course_id] = course_instructors
 
         return queryset
