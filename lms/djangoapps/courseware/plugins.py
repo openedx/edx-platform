@@ -163,6 +163,7 @@ class CalculatorCourseApp(CourseApp):
             "configure": False,
         }
 
+
 class ProctoringCourseApp(CourseApp):
     """
     Course App config for proctoring app.
@@ -177,7 +178,7 @@ class ProctoringCourseApp(CourseApp):
         """
         Proctoring is available for all courses.
         """
-        return True
+        return settings.FEATURES.get("ENABLE_SPECIAL_EXAMS", False)
 
     @classmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:
