@@ -852,8 +852,15 @@ def display_date_for_certificate(course, certificate):
     Returns:
         datetime.date
     """
+    try:
+        if certificate.date_override:
+            return certificate.date_override.date
+    except ObjectDoesNotExist:
+        pass
+
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date
+
     return certificate.modified_date
 
 
