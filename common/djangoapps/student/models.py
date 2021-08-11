@@ -3032,9 +3032,11 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         )
 
 
-class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
+class BulkUnenrollConfiguration(ConfigurationModel):
     """
+    Config model for the bulk_unenroll command
 
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -3046,7 +3048,9 @@ class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: di
 
 class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     """
-    config model for the bulk_change_enrollment_csv command
+    Config model for the bulk_change_enrollment_csv command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -3191,7 +3195,9 @@ class AllowedAuthUser(TimeStampedModel):
 
 class AccountRecoveryConfiguration(ConfigurationModel):
     """
-    configuration model for recover account management command
+    Configuration model for recover account management command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
