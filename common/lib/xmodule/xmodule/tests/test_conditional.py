@@ -4,6 +4,7 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
+from django.conf import settings
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
@@ -239,6 +240,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         return courses[0]
 
     @patch('xmodule.x_module.descriptor_global_local_resource_url')
+    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
     def test_conditional_module(self, _):
         """Make sure that conditional module works"""
 

@@ -801,9 +801,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
-    # Whether course goals is enabled.
-    'ENABLE_COURSE_GOALS': True,
-
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
 
@@ -3101,6 +3098,7 @@ INSTALLED_APPS = [
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
+    'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
 
     'lms.djangoapps.experiments',
 

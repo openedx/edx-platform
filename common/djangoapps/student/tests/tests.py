@@ -54,6 +54,8 @@ from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 
+BETA_TESTER_METHOD = 'common.djangoapps.student.helpers.access.is_beta_tester'
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
@@ -168,6 +170,45 @@ class CourseEndingTest(ModuleStoreTestCase):
         }
         assert _cert_info(user, enrollment3, cert_status) == {'status': 'processing', 'show_survey_button': False,
                                                               'can_unenroll': True}
+
+    def test_cert_info_beta_tester(self):
+        user = UserFactory.create()
+        course = CourseOverviewFactory.create()
+        mode = CourseMode.VERIFIED
+        grade = '0.67'
+        status = CertificateStatuses.downloadable
+        cert = GeneratedCertificateFactory.create(
+            user=user,
+            course_id=course.id,
+            status=status,
+            mode=mode
+        )
+        enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=mode)
+
+        cert_status = {
+            'status': status,
+            'grade': grade,
+            'download_url': cert.download_url,
+            'mode': mode,
+            'uuid': 'blah',
+        }
+        with patch(BETA_TESTER_METHOD, return_value=False):
+            assert _cert_info(user, enrollment, cert_status) == {
+                'status': status,
+                'download_url': cert.download_url,
+                'show_survey_button': False,
+                'grade': grade,
+                'mode': mode,
+                'linked_in_url': None,
+                'can_unenroll': False
+            }
+
+        with patch(BETA_TESTER_METHOD, return_value=True):
+            assert _cert_info(user, enrollment, cert_status) == {
+                'status': 'processing',
+                'show_survey_button': False,
+                'can_unenroll': True
+            }
 
     @ddt.data(
         (0.70, 0.60),
@@ -823,7 +864,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
-        # Now deactive
+        # Now deactivate
         enrollment.deactivate()
         assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_unenrollment_event_was_emitted(user, course_id, course, enrollment)

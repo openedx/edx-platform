@@ -511,7 +511,7 @@ edx-drf-extensions==6.6.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.27.16
+edx-enterprise==3.27.21
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -526,7 +526,7 @@ edx-lint==5.0.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.2
     # via -r requirements/edx/base.txt
-edx-name-affirmation==0.3.1
+edx-name-affirmation==0.4.0
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.2
     # via
@@ -546,7 +546,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==3.23.0
+edx-proctoring==3.23.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack

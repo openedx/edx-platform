@@ -1,14 +1,11 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-
-
 import os
 from contextlib import contextmanager
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
-from unittest import TestCase
 from uuid import uuid4
 
 from contextlib2 import ExitStack
@@ -16,16 +13,15 @@ from path import Path as path
 
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
-from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.xml_importer import LocationMixin
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
@@ -97,35 +93,16 @@ def remove_temp_files_from_list(file_list, dir):  # lint-amnesty, pylint: disabl
             os.remove(file_path)
 
 
-class MixedSplitTestCase(TestCase):
+class MixedSplitTestCase(ModuleStoreTestCase):
     """
-    Stripped-down version of ModuleStoreTestCase that can be used without Django
-    (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
+    A minimal version of ModuleStoreTestCase for testing in common/lib/ that sets up MixedModuleStore and Split (only).
+
+    It also enables "draft preferred" mode, like Studio uses.
+
+    Draft/old mongo modulestore is not initialized.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': '{}: {}, {}'.format(t_n, repr(d), repr(ctx))
-    modulestore_options = {
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        'fs_root': DATA_DIR,
-        'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
-    }
-    DOC_STORE_CONFIG = {
-        'host': MONGO_HOST,
-        'port': MONGO_PORT_NUM,
-        'db': f'test_mongo_libs_{os.getpid()}',
-        'collection': 'modulestore',
-        'asset_collection': 'assetstore',
-    }
-    MIXED_OPTIONS = {
-        'stores': [
-            {
-                'NAME': 'split',
-                'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
-                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                'OPTIONS': modulestore_options
-            },
-        ]
-    }
+    CREATE_USER = False
+    MODULESTORE = TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
 
     def setUp(self):
         """
@@ -133,15 +110,6 @@ class MixedSplitTestCase(TestCase):
         """
         super().setUp()
         self.user_id = ModuleStoreEnum.UserID.test
-
-        self.store = MixedModuleStore(
-            None,
-            create_modulestore_instance=create_modulestore_instance,
-            mappings={},
-            **self.MIXED_OPTIONS
-        )
-        self.addCleanup(self.store.close_all_connections)
-        self.addCleanup(self.store._drop_database)  # pylint: disable=protected-access
 
     def make_block(self, category, parent_block, **kwargs):
         """
@@ -505,19 +473,3 @@ DOT_FILES_DICT = {
 TILDA_FILES_DICT = {
     "example.txt~": "RED"
 }
-
-
-class PureModulestoreTestCase(TestCase):
-    """
-    A TestCase designed to make testing Modulestore implementations without using Django
-    easier.
-    """
-
-    MODULESTORE = None
-
-    def setUp(self):
-        super().setUp()
-
-        builder = self.MODULESTORE.build()
-        self.assets, self.store = builder.__enter__()
-        self.addCleanup(builder.__exit__, None, None, None)

@@ -112,3 +112,11 @@ def update_forum_role(course_id, user, rolename, action):
         role.users.remove(user)
     else:
         raise ValueError(f"unrecognized action '{action}'")
+
+
+def is_beta_tester(user, course_id):
+    """
+    Returns True if the user is a beta tester in this course, and False if not
+    """
+    beta_testers_queryset = list_with_level(course_id, 'beta')
+    return beta_testers_queryset.filter(username=user.username).exists()

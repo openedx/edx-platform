@@ -432,6 +432,13 @@ class ProctoringProviderTestCase(unittest.TestCase):
         # since there are no validation errors or missing data
         assert self.proctoring_provider.from_json(default_provider) == default_provider
 
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'mock',
+            'mock': {},
+            'mock_proctoring_without_rules': {}
+        }
+    )
     def test_from_json_with_invalid_provider(self):
         """
         Test that an invalid provider (i.e. not one configured at the platform level)
@@ -451,7 +458,8 @@ class ProctoringProviderTestCase(unittest.TestCase):
         Test that a value with no provider will inherit the default provider
         from the platform defaults.
         """
-        default_provider = 'mock'
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+        assert default_provider is not None
 
         assert self.proctoring_provider.from_json(None) == default_provider
 

@@ -14,8 +14,8 @@ from edx_rest_api_client import exceptions
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client

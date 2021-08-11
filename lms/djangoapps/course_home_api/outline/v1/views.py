@@ -6,6 +6,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.http.response import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -21,14 +22,17 @@ from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import expect_json
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,
+    add_course_goal_deprecated,
     get_course_goal,
     get_course_goal_text,
     has_course_goal_permission,
     valid_course_goals_ordered
 )
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
@@ -46,7 +50,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, ENABLE_COURSE_GOALS
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user,
@@ -105,10 +109,9 @@ class OutlineTabView(RetrieveAPIView):
                 resume_block: (bool) Whether the block is the resume block
                 has_scheduled_content: (bool) Whether the block has more content scheduled for the future
         course_goals:
-            goal_options: (list) A list of goals where each goal is represented as a tuple (goal_key, goal_string)
             selected_goal:
-                key: (str) The unique id given to the user's selected goal.
-                text: (str) The display text for the user's selected goal.
+                days_per_week: (int) The number of days the learner wants to learn per week
+                subscribed_to_reminders: (bool) Whether the learner wants email reminders about their goal
         course_tools: List of serialized Course Tool objects. Each serialization has the following fields:
             analytics_id: (str) The unique id given to the tool.
             title: (str) The display title of the tool.
@@ -246,22 +249,36 @@ class OutlineTabView(RetrieveAPIView):
             access_expiration = get_access_expiration_data(request.user, course_overview)
             cert_data = get_cert_data(request.user, course, enrollment.mode) if is_enrolled else None
 
-            # Only show the set course goal message for enrolled, unverified
-            # users in a course that allows for verified statuses.
-            is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
-            if not is_already_verified and has_course_goal_permission(request, course_key_string,
-                                                                      {'is_enrolled': is_enrolled}):
-                course_goals = {
-                    'goal_options': valid_course_goals_ordered(include_unsure=True),
-                    'selected_goal': None
-                }
+            if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
+                if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
 
-                selected_goal = get_course_goal(request.user, course_key)
-                if selected_goal:
-                    course_goals['selected_goal'] = {
-                        'key': selected_goal.goal_key,
-                        'text': get_course_goal_text(selected_goal.goal_key),
+                    course_goals = {
+                        'selected_goal': None
                     }
+
+                    selected_goal = get_course_goal(request.user, course_key)
+                    if selected_goal:
+                        course_goals['selected_goal'] = {
+                            'days_per_week': selected_goal.days_per_week,
+                            'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
+                        }
+            else:
+                # Only show the set course goal message for enrolled, unverified
+                # users in a course that allows for verified statuses.
+                is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
+                if not is_already_verified and has_course_goal_permission(request, course_key_string,
+                                                                          {'is_enrolled': is_enrolled}):
+                    course_goals = {
+                        'goal_options': valid_course_goals_ordered(include_unsure=True),
+                        'selected_goal': None
+                    }
+
+                    selected_goal = get_course_goal(request.user, course_key)
+                    if selected_goal:
+                        course_goals['selected_goal'] = {
+                            'key': selected_goal.goal_key,
+                            'text': get_course_goal_text(selected_goal.goal_key),
+                        }
 
             try:
                 resume_block = get_key_to_last_completed_block(request.user, course.id)
@@ -390,22 +407,39 @@ def dismiss_welcome_message(request):
 @authentication_classes((JwtAuthentication, SessionAuthenticationAllowInactiveUser,))
 @permission_classes((IsAuthenticated,))
 def save_course_goal(request):
-    course_id = request.data.get('course_id', None)
-    goal_key = request.data.get('goal_key', None)
+    course_id = request.data.get('course_id')
+    goal_key = request.data.get('goal_key')
+    days_per_week = request.data.get('days_per_week')
+    subscribed_to_reminders = request.data.get('subscribed_to_reminders')
 
     # If body doesn't contain 'course_id', return 400 to client.
     if not course_id:
-        raise ParseError(_("'course_id' is required."))
+        raise ParseError("'course_id' is required.")
 
-    # If body doesn't contain 'goal', return 400 to client.
-    if not goal_key:
-        raise ParseError(_("'goal_key' is required."))
+    if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
+        # If body doesn't contain the required goals fields, return 400 to client.
+        if days_per_week is None or subscribed_to_reminders is None:
+            raise ParseError("'days_per_week' and 'subscribed_to_reminders' are required.")
 
-    try:
-        add_course_goal(request.user, course_id, goal_key)
-        return Response({
-            'header': _('Your course goal has been successfully set.'),
-            'message': _('Course goal updated successfully.'),
-        })
-    except Exception:
-        raise UnableToSaveCourseGoal
+        try:
+            add_course_goal(request.user, course_id, days_per_week, subscribed_to_reminders)
+            return Response({
+                'header': _('Your course goal has been successfully set.'),
+                'message': _('Course goal updated successfully.'),
+            })
+        except Exception:
+            raise UnableToSaveCourseGoal
+
+    else:
+        # If body doesn't contain 'goal', return 400 to client.
+        if not goal_key:
+            raise ParseError("'goal_key' is required.")
+
+        try:
+            add_course_goal_deprecated(request.user, course_id, goal_key)
+            return Response({
+                'header': _('Your course goal has been successfully set.'),
+                'message': _('Course goal updated successfully.'),
+            })
+        except Exception:
+            raise UnableToSaveCourseGoal
