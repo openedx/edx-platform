@@ -237,6 +237,8 @@ def get_supported_providers() -> list[str]:
 class ProviderFilter(StackedConfigurationModel):
     """
     Associate allow/deny-lists of discussions providers with courses/orgs
+
+    .. no_pii:
     """
 
     allow = ListCharField(
@@ -322,6 +324,8 @@ class ProviderFilter(StackedConfigurationModel):
 class DiscussionsConfiguration(TimeStampedModel):
     """
     Associates a learning context with discussion provider and configuration
+
+    .. no_pii:
     """
 
     context_key = LearningContextKeyField(
