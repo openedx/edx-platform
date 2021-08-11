@@ -38,6 +38,7 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tests.factories import (
+    CertificateDateOverrideFactory,
     CertificateHtmlViewConfigurationFactory,
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
@@ -236,6 +237,15 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             language=language
         )
         template.save()
+
+    def _add_certificate_date_override(self):
+        """
+        Creates a mock CertificateDateOverride and adds it to the certificate
+        """
+        self.cert.date_override = CertificateDateOverrideFactory.create(
+            generated_certificate = self.cert,
+            overridden_by = self.user,
+        )
 
 
 @ddt.ddt
@@ -646,10 +656,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url)
         self.assertContains(response, '<html class="no-js" lang="ar">')
 
+    @ddt.data(False, True)
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
+    def test_html_view_for_non_viewable_certificate_and_for_student_user(self, date_override):
         """
-        Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate is not viewable yet.
+        Tests that Certificate HTML Web View returns "Cannot Find Certificate"
+        if certificate is not viewable yet, regardless of certificate date
+        override
         """
         test_certificates = [
             {
@@ -660,6 +673,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                 'is_active': True
             }
         ]
+
+        # A certificate with an available date in the past should not be
+        # viewable, regardless of the date override.
+        if date_override:
+            self._add_certificate_date_override()
+
         self.course.certificates = {'certificates': test_certificates}
         self.course.cert_html_view_enabled = True
         self.course.certificate_available_date = datetime.datetime.today() + datetime.timedelta(days=1)
@@ -943,6 +962,54 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             day=expected_date.day,
             year=expected_date.year
         )
+        self.assertContains(response, date)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @ddt.data(
+        (True, False),
+        (False, False),
+        (True, True),
+        (False, True)
+    )
+    @ddt.unpack
+    def test_html_view_certificate_display_date(self, self_paced, date_override):
+        """
+        Test certificate web view should display the correct date on the
+        certificate in all cases:
+            * self-paced, no date override
+            * instructor-paced with certificate_available_date
+            * self-paced with date override
+            * instructor-paced with date override
+        """
+        self.course.self_paced = self_paced
+        if date_override:
+            self._add_certificate_date_override()
+        today = datetime.datetime.utcnow()
+        self.course.certificate_available_date = today + datetime.timedelta(-2)
+        self.store.update_item(self.course, self.user.id)
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
+
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
+            response = self.client.get(test_url)
+
+        if date_override:
+            expected_date = self.cert.date_override.date
+        elif self_paced or self.course.certificate_available_date > today:
+            expected_date = today
+        else:
+            expected_date = self.course.certificate_available_date
+
+        date = '{month} {day}, {year}'.format(
+            month=strftime_localized(expected_date, "%B"),
+            day=expected_date.day,
+            year=expected_date.year
+        )
+
         self.assertContains(response, date)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
