@@ -37,17 +37,18 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.password_policy_validators import normalize_password
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
-    cert_generation_enabled,
+    has_self_generated_certificates_enabled,
     get_certificate_url,
     has_html_certificates_enabled,
     certificate_status_for_student,
+    auto_certificate_generation_enabled,
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.instructor import access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -465,6 +466,10 @@ def _cert_info(user, enrollment, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
 
+    TODO: replace with a method that lives in the certificates app and combines this logic with
+     lms.djangoapps.certificates.api.can_show_certificate_message and
+     lms.djangoapps.courseware.views.get_cert_data
+
     Arguments:
         user (User): A user.
         enrollment (CourseEnrollment): A course enrollment.
@@ -524,6 +529,10 @@ def _cert_info(user, enrollment, cert_status):
         return default_info
 
     if not CourseMode.is_eligible_for_certificate(enrollment.mode, status=status):
+        return default_info
+
+    if course_overview and access.is_beta_tester(user, course_overview.id):
+        # Beta testers are not eligible for a course certificate
         return default_info
 
     status_dict = {
@@ -599,7 +608,7 @@ def _cert_info(user, enrollment, cert_status):
         # is enabled for a course then we need to provide the option to the learner
         if (
             status_dict['status'] != CertificateStatuses.downloadable and
-            (cert_generation_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
+            (has_self_generated_certificates_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
             persisted_grade and persisted_grade.passed
         ):
             status_dict['status'] = CertificateStatuses.requesting
@@ -770,3 +779,18 @@ def does_user_profile_exist(user):
         return hasattr(user, 'profile')
     except (ProgrammingError, ObjectDoesNotExist):
         return False
+
+
+def user_has_passing_grade_in_course(enrollment):
+    """
+    Check to see if a user has passing grade for a course
+    """
+    try:
+        user = enrollment.user
+        course = enrollment.course_overview
+        course_grade = CourseGradeFactory().read(user, course, create_if_needed=False)
+        if course_grade:
+            return course_grade.passed
+    except AttributeError:
+        pass
+    return False

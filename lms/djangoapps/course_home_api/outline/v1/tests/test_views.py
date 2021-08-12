@@ -8,6 +8,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from unittest.mock import Mock, patch
 
 import ddt
+import json
 from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -18,6 +19,7 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
 from openedx.core.djangoapps.content.learning_sequences.toggles import USE_FOR_OUTLINES
@@ -219,7 +221,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.data['access_expiration']['expiration_date'] == deadline
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-    def test_post_course_goal(self):
+    def test_post_course_goal_deprecated(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
         post_data = {
@@ -236,6 +238,37 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         selected_goal = course_goals['selected_goal']
         assert selected_goal is not None
         assert selected_goal['key'] == 'certify'
+
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
+    @override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
+    def test_post_course_goal(self):
+        """ Test that the api returns the correct response when saving a goal """
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+
+        post_data = json.dumps({
+            'course_id': str(self.course.id),
+            'days_per_week': 1,
+            'subscribed_to_reminders': True,
+        })
+        post_course_goal_response = self.client.post(
+            reverse('course-home-save-course-goal'),
+            post_data,
+            content_type='application/json',
+        )
+        assert post_course_goal_response.status_code == 200
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        course_goals = response.json()['course_goals']
+        expected_course_goals = {
+            'goal_options': [],
+            'selected_goal': {
+                'days_per_week': 1,
+                'subscribed_to_reminders': True
+            }
+        }
+        assert course_goals == expected_course_goals
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
     @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')

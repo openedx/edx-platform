@@ -237,6 +237,27 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             }
         )
 
+    def test_register_fullname_url_validation_error(self):
+        """
+        Test for catching invalid full name errors
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "Bob Smith http://test.com",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
     @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
     def test_registration_failure_logging(self):
         # Register a user

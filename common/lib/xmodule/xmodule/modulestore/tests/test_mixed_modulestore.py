@@ -51,13 +51,12 @@ from xmodule.modulestore.tests.factories import check_exact_number_of_calls, che
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.modulestore.tests.utils import (
-    LocationMixin,
     MongoContentstoreBuilder,
     create_modulestore_instance,
     mock_tab_from_json
 )
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 from xmodule.x_module import XModuleMixin
 

@@ -4,12 +4,16 @@ Certificates utilities
 from datetime import datetime
 import logging
 
+from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
+from edx_name_affirmation.toggles import is_verified_name_enabled
+
 from django.conf import settings
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
+from common.djangoapps.student import models_api as student_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
@@ -228,3 +232,22 @@ def certificate_status_for_student(student, course_id):
     except GeneratedCertificate.DoesNotExist:
         generated_certificate = None
     return certificate_status(generated_certificate)
+
+
+def get_preferred_certificate_name(user):
+    """
+    If the verified name feature is enabled and the user has their preference set to use their
+    verified name for certificates, return their verified name. Else, return the user's profile
+    name, or an empty string if it doesn't exist.
+    """
+    name_to_use = student_api.get_name(user.id)
+
+    if is_verified_name_enabled() and should_use_verified_name_for_certs(user):
+        verified_name_obj = get_verified_name(user, is_verified=True)
+        if verified_name_obj:
+            name_to_use = verified_name_obj.verified_name
+
+    if not name_to_use:
+        name_to_use = ''
+
+    return name_to_use

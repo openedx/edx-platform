@@ -69,7 +69,7 @@ class CourseGoalsSerializer(serializers.Serializer):
     """
     Serializer for Course Goal data
     """
-    goal_options = serializers.ListField()
+    goal_options = serializers.ListField(default=[])
     selected_goal = serializers.DictField()
 
 

@@ -12,6 +12,7 @@ import zlib
 from contextlib import contextmanager
 from time import time
 
+from django.core.cache import caches, InvalidCacheBackendError
 import pymongo
 import pytz
 from mongodb_proxy import autoretry_read
@@ -22,11 +23,6 @@ from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
-try:
-    from django.core.cache import caches, InvalidCacheBackendError
-    DJANGO_AVAILABLE = True
-except ImportError:
-    DJANGO_AVAILABLE = False
 
 log = logging.getLogger(__name__)
 
@@ -198,11 +194,10 @@ class CourseStructureCache:
     """
     def __init__(self):
         self.cache = None
-        if DJANGO_AVAILABLE:
-            try:
-                self.cache = get_cache('course_structure_cache')
-            except InvalidCacheBackendError:
-                pass
+        try:
+            self.cache = get_cache('course_structure_cache')
+        except InvalidCacheBackendError:
+            pass
 
     def get(self, key, course_context=None):
         """Pull the compressed, pickled struct data from cache and deserialize."""
@@ -349,51 +344,6 @@ class MongoConnection:
                     {'_id': {'$in': ids}},
                     {'blocks': {'$elemMatch': {'block_type': block_type}}, 'root': 1}
                 )
-            ]
-            tagger.measure("structures", len(docs))
-            return docs
-
-    @autoretry_read()
-    def find_structures_derived_from(self, ids, course_context=None):
-        """
-        Return all structures that were immediately derived from a structure listed in ``ids``.
-
-        Arguments:
-            ids (list): A list of structure ids
-        """
-        with TIMER.timer("find_structures_derived_from", course_context) as tagger:
-            tagger.measure("base_ids", len(ids))
-            docs = [
-                structure_from_mongo(structure, course_context)
-                for structure in self.structures.find({'previous_version': {'$in': ids}})
-            ]
-            tagger.measure("structures", len(docs))
-            return docs
-
-    @autoretry_read()
-    def find_ancestor_structures(self, original_version, block_key, course_context=None):
-        """
-        Find all structures that originated from ``original_version`` that contain ``block_key``.
-
-        Arguments:
-            original_version (str or ObjectID): The id of a structure
-            block_key (BlockKey): The id of the block in question
-        """
-        with TIMER.timer("find_ancestor_structures", course_context) as tagger:
-            docs = [
-                structure_from_mongo(structure, course_context)
-                for structure in self.structures.find({
-                    'original_version': original_version,
-                    'blocks': {
-                        '$elemMatch': {
-                            'block_id': block_key.id,
-                            'block_type': block_key.type,
-                            'edit_info.update_version': {
-                                '$exists': True,
-                            },
-                        },
-                    },
-                })
             ]
             tagger.measure("structures", len(docs))
             return docs

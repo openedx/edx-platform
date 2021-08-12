@@ -1,7 +1,7 @@
 $(function() {
     var icons = {
-        header: 'ui-icon-carat-1-e',
-        activeHeader: 'ui-icon-carat-1-s'
+        header: 'ui-icon-carat-1-s',
+        activeHeader: 'ui-icon-carat-1-n'
     };
     var $proctoringAccordionPane = $('#proctoring-accordion');
     $proctoringAccordionPane.accordion(

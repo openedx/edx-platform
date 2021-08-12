@@ -54,7 +54,7 @@ class TemplateTests(ModuleStoreTestCase):
             course='course',
             run='2014',
             display_name='fun test course',
-            user_id='testbot'
+            user_id=ModuleStoreEnum.UserID.test,
         )
         self.assertIsInstance(test_course, CourseBlock)
         self.assertEqual(test_course.display_name, 'fun test course')
@@ -79,7 +79,7 @@ class TemplateTests(ModuleStoreTestCase):
                 course='course',
                 run='2014',
                 display_name='fun test course',
-                user_id='testbot'
+                user_id=ModuleStoreEnum.UserID.test,
             )
 
     def test_temporary_xblocks(self):
@@ -88,7 +88,7 @@ class TemplateTests(ModuleStoreTestCase):
         """
         test_course = CourseFactory.create(
             course='course', run='2014', org='testx',
-            display_name='fun test course', user_id='testbot'
+            display_name='fun test course', user_id=ModuleStoreEnum.UserID.test,
         )
 
         test_chapter = self.store.create_xblock(
@@ -117,7 +117,8 @@ class TemplateTests(ModuleStoreTestCase):
             course='history',
             run='doomed',
             display_name='doomed test course',
-            user_id='testbot')
+            user_id=ModuleStoreEnum.UserID.test,
+        )
         ItemFactory.create(
             parent_location=test_course.location,
             category='chapter',
@@ -131,7 +132,7 @@ class TemplateTests(ModuleStoreTestCase):
         # guid_locator = test_course.location.course_agnostic()
         # Verify it can be retrieved by guid
         # self.assertIsInstance(self.store.get_item(guid_locator), CourseBlock)
-        self.store.delete_course(id_locator, 'testbot')
+        self.store.delete_course(id_locator, ModuleStoreEnum.UserID.test)
         # Test can no longer retrieve by id.
         self.assertIsNone(self.store.get_course(id_locator))
         # But can retrieve by guid -- same TODO as above

@@ -256,7 +256,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self._assert_redirects_to_instructor_dash(response)
 
         # Expect that certificate generation is now enabled for the course
-        actual_enabled = certs_api.cert_generation_enabled(self.course.id)
+        actual_enabled = certs_api.has_self_generated_certificates_enabled(self.course.id)
         assert is_enabled == actual_enabled
 
     def _assert_redirects_to_instructor_dash(self, response):

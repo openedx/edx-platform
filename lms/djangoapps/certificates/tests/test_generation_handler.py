@@ -32,7 +32,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 
-BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler._is_beta_tester'
+BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler.is_beta_tester'
 COURSE_OVERVIEW_METHOD = 'lms.djangoapps.certificates.generation_handler.get_course_overview_or_none'
 CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_course'
 GET_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._get_course_grade'

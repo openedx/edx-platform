@@ -89,6 +89,14 @@ def contains_html(value):
     return bool(regex.search(value))
 
 
+def contains_url(value):
+    """
+    Validator method to check whether full name contains url
+    """
+    regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', value)
+    return bool(regex)
+
+
 def validate_name(name):
     """
     Verifies a Full_Name is valid, raises a ValidationError otherwise.
@@ -97,6 +105,8 @@ def validate_name(name):
     """
     if contains_html(name):
         raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
+    if contains_url(name):
+        raise forms.ValidationError(_('Enter a valid name'))
 
 
 class UsernameField(forms.CharField):

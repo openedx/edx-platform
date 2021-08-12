@@ -12,6 +12,9 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
 
@@ -360,6 +363,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         assert mock_revoke_task.call_args[0] == (self.user.username, str(self.course_id))
 
 
+@ddt.ddt
 class GeneratedCertificateTest(SharedModuleStoreTestCase):
     """
     Test GeneratedCertificates
@@ -539,6 +543,35 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         }
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
+    @ddt.data((True, True), (True, False), (False, False))
+    @ddt.unpack
+    def test_invalidate_with_verified_name(self, should_use_verified_name_for_certs, is_verified):
+        """
+        Test the invalidate method with verified name turned on for the user's certificates
+        """
+        verified_name = 'Jonathan Doe'
+        profile = UserProfile.objects.get(user=self.user)
+        create_verified_name(self.user, verified_name, profile.name, is_verified=is_verified)
+        create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
+
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT,
+            name='Fuzzy Hippo'
+        )
+        mode = CourseMode.VERIFIED
+        source = 'invalidated_test'
+        cert.invalidate(mode=mode, source=source)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        if should_use_verified_name_for_certs and is_verified:
+            assert cert.name == verified_name
+        else:
+            assert cert.name == profile.name
 
     @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
     def test_unverified(self, mock_emit_certificate_event):
