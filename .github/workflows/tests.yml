@@ -3,8 +3,8 @@ name: edx-platform tests
 on:
   push:
     branches:
-      - "appsembler/tahoe/develop"
-      - "appsembler/tahoe/master"
+      - "hawthorn/main"
+      - "hawthorn/prod"
   pull_request:
 
 jobs:
