@@ -183,28 +183,25 @@ class ProctoringCourseApp(CourseApp):
     @classmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:
         """
-        Get calculator enabled status from course overview model.
+        Get proctoring enabled status from course overview model.
         """
         return CourseOverview.get_from_id(course_key).enable_proctored_exams
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
         """
-        Update calculator enabled status in modulestore.
+        Don't allow proctored exam settings to be enabled from the card
         """
-        course = get_course_by_id(course_key)
-        course.enable_proctored_exams = enabled
-        modulestore().update_item(course, user.id)
-        return enabled
+        raise ValueError("Teams cannot be enabled/disabled via this API.")
 
     @classmethod
     def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
         """
-        Get allowed operations for calculator app.
+        Get allowed operations for proctoring app.
         """
         return {
-            "enable": True,
-            # There is nothing to configure for calculator yet.
+            "enable": False,
+            # There is nothing to configure for proctored exams yet.
             "configure": False,
         }
 
