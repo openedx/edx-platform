@@ -250,11 +250,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 current_block = block
                 if isinstance(blocks, dict):
                     current_block = blocks[block]
-                if 'children' in current_block:
-                    new_child_ids = [get_usage_key_hash(child) for child in current_block['children']]
-                    current_block['hash_children'] = new_child_ids
                 current_block['hash_key'] = get_usage_key_hash(current_block['id'])
-
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from
