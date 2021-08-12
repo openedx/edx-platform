@@ -3,11 +3,11 @@
 
 from logging import getLogger
 
+
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff  # lint-amnesty, pylint: disable=unused-import
 from .exceptions import ItemNotFoundError, NoPathToItem
-
 
 LOGGER = getLogger(__name__)
 
@@ -23,7 +23,6 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
         usage_key: :class:`UsageKey` the id of the location to which to generate the path
         request: Request object containing information about user and masquerade settings, Default is None
         full_path: :class:`Bool` if True, return the full path to location. Default is False.
-        experience: (optional) determines if the `UsageKey` should be hashed.
 
     Raises
         ItemNotFoundError if the location doesn't exist.
@@ -39,10 +38,8 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
     '''
 
     def flatten(xs):
-        '''
-        Convert lisp-style (a, (b, (c, ()))) list into a python list.
-        Not a general flatten function.
-        '''
+        '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
+        Not a general flatten function. '''
         p = []
         while xs != ():
             p.append(xs[0])
