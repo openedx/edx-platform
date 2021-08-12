@@ -14,12 +14,10 @@ class TestCookieNameChange(TestCase):
     Test class for CookieNameChange
     """
 
-
     def setUp(self):
         self.mock_response = Mock()
         self.cookie_name_change_middleware = CookieNameChange(self.mock_response)
         self.mock_request = Mock()
-
 
         self.old_value = "." * 100
         self.old_key = 'a'
@@ -74,7 +72,6 @@ class TestCookieNameChange(TestCase):
 
         self.mock_request.COOKIES = self.old_dict.copy()
 
-
         with self.settings(
             COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE=True
         ), self.settings(COOKIE_NAME_CHANGE_EXPAND_INFO=self.expand_settings):
@@ -100,7 +97,6 @@ class TestCookieNameChange(TestCase):
         self.old_dict.update(no_change_cookies)
 
         self.mock_request.COOKIES = self.old_dict.copy()
-
 
         with self.settings(
             COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE=False
