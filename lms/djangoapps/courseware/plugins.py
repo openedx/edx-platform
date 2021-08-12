@@ -1,4 +1,5 @@
 """Course app config for courseware apps."""
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from typing import Dict, Optional
 
 from django import urls
@@ -161,3 +162,49 @@ class CalculatorCourseApp(CourseApp):
             # There is nothing to configure for calculator yet.
             "configure": False,
         }
+
+
+class ProctoringCourseApp(CourseApp):
+    """
+    Course App config for proctoring app.
+    """
+
+    app_id = "proctoring"
+    name = _("Proctoring")
+    description = _("Maintain exam integrity by enabling a proctoring solution for your course")
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:
+        """
+        Proctoring is available for all courses.
+        """
+        return settings.FEATURES.get("ENABLE_SPECIAL_EXAMS", False)
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Get proctoring enabled status from course overview model.
+        """
+        return CourseOverview.get_from_id(course_key).enable_proctored_exams
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+        """
+        Don't allow proctored exam settings to be enabled from the card
+        """
+        raise ValueError("Teams cannot be enabled/disabled via this API.")
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Get allowed operations for proctoring app.
+        """
+        return {
+            "enable": False,
+            # There is nothing to configure for proctored exams yet.
+            "configure": False,
+        }
+
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return get_proctored_exam_settings_url(course_key)
