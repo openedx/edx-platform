@@ -638,7 +638,7 @@ class SequenceBlock(
 
         return None
 
-    def descendants_are_gated(self):
+    def descendants_are_gated(self, context):
         """
         Sequences do their own access gating logic as to whether their content
         should be viewable, based on things like pre-reqs and time exam starts.
@@ -664,7 +664,7 @@ class SequenceBlock(
             comes to determining whether a student is allowed to access this,
             with other checks being done in has_access calls.
         """
-        if self.runtime.user_is_staff:
+        if self.runtime.user_is_staff or context.get('specific_masquerade', False):
             return False
 
         # We're not allowed to see it because of pre-reqs that haven't been
