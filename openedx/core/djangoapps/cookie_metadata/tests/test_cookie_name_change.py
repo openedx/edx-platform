@@ -1,5 +1,5 @@
 """
-Test Modle to test CookieNameChange class
+Test Module to test CookieNameChange class
 """
 from unittest.mock import Mock
 
@@ -15,6 +15,7 @@ class TestCookieNameChange(TestCase):
     """
 
     def setUp(self):
+        super().setUp()
         self.mock_response = Mock()
         self.cookie_name_change_middleware = CookieNameChange(self.mock_response)
         self.mock_request = Mock()
@@ -33,7 +34,6 @@ class TestCookieNameChange(TestCase):
         self.expand_settings = {
             "old_name": self.old_key,
             "new_name": "b",
-            "old_domain": "old_domain.com",
         }
 
     def test_cookie_swap(self):

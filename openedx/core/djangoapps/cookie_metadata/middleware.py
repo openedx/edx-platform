@@ -1,4 +1,4 @@
-"""Middleware to changes name of an incoming cookie"""
+"""Middleware to change name of an incoming cookie"""
 from django.conf import settings
 
 
@@ -17,7 +17,6 @@ class CookieNameChange:
         - COOKIE_NAME_CHANGE_EXPAND_INFO is a dict and has following info:
             "old_name": Previous name of cookie
             "new_name": New name of cookie
-            if you also want to delete the cookie in user's browser, set "old_domain" as well
 
         Actions taken by middleware:
             - will delete any cookie with "old_name"
@@ -26,21 +25,21 @@ class CookieNameChange:
         """
 
         # .. toggle_name: COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE
-        # .. toggle_implementation: SettingToggle
+        # .. toggle_implementation: DjangoSetting
         # .. toggle_default: False
         # .. toggle_description: Used to enable CookieNameChange middleware which changes a cookie name in request.COOKIES
         # .. toggle_warnings: This should be set at the same time you set COOKIE_NAME_CHANGE_EXPAND_INFO setting
         # .. toggle_use_cases: temporary
         # .. toggle_creation_date: 2021-08-04
-        # .. toggle_removal_date: 2021-09-01
-        # .. toggle_tickets: TODO
+        # .. toggle_target_removal_date: 2021-10-01
+        # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1872
         if getattr(settings, "COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE", False):
             old_cookie_in_request = False
             expand_settings = getattr(settings, "COOKIE_NAME_CHANGE_EXPAND_INFO", None)
 
             if (
                 expand_settings is not None
-                and type(expand_settings) is dict
+                and isinstance(expand_settings, dict)
                 and "new_name" in expand_settings
                 and "old_name" in expand_settings
             ):
