@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3124 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3128 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1935,6 +1935,8 @@ CREATE TABLE `course_goals_coursegoal` (
   `course_key` varchar(255) NOT NULL,
   `goal_key` varchar(100) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `days_per_week` int(10) unsigned NOT NULL,
+  `subscribed_to_reminders` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_goals_coursegoal_user_id_course_key_052bc0d3_uniq` (`user_id`,`course_key`),
   KEY `course_goals_coursegoal_course_key_5585ca51` (`course_key`),
@@ -1954,12 +1956,28 @@ CREATE TABLE `course_goals_historicalcoursegoal` (
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
+  `days_per_week` int(10) unsigned NOT NULL,
+  `subscribed_to_reminders` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` (`history_user_id`),
   KEY `course_goals_historicalcoursegoal_id_ae96ee01` (`id`),
   KEY `course_goals_historicalcoursegoal_course_key_a8e29f00` (`course_key`),
   KEY `course_goals_historicalcoursegoal_user_id_3aef8b4b` (`user_id`),
   CONSTRAINT `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `course_goals_useractivity`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_goals_useractivity` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `course_key` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_course_date` (`user_id`,`course_key`,`date`),
+  KEY `user_course_index` (`user_id`,`course_key`),
+  CONSTRAINT `course_goals_useractivity_user_id_aed932d9_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `course_groups_cohortmembership`;
@@ -3124,7 +3142,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=881 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=882 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3135,7 +3153,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=919 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=922 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4836,6 +4854,7 @@ CREATE TABLE `integrated_channel_contentmetadataitemtransmission` (
   `content_id` varchar(255) NOT NULL,
   `channel_metadata` longtext NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `content_last_changed` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `integrated_channel_conte_enterprise_customer_id_i_44ca3772_uniq` (`enterprise_customer_id`,`integrated_channel_code`,`content_id`),
   CONSTRAINT `integrated_channel_c_enterprise_customer__f6439bfb_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
