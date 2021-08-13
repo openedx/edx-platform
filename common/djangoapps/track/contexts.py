@@ -12,23 +12,32 @@ from openedx.core.lib.request_utils import COURSE_REGEX
 log = logging.getLogger(__name__)
 
 
-def course_context_from_url(url):
+def course_context_from_url(url, course_id_string=None):
     """
-    Extracts the course_context from the given `url` and passes it on to
-    `course_context_from_course_id()`.
+    If course_id_string string is not present, extracts it from the given `url`. Either way, then passes
+    it on to `course_context_from_course_id()`.
     """
     url = url or ''
-
-    match = COURSE_REGEX.match(url)
     course_id = None
-    if match:
-        course_id_string = match.group('course_id')
+
+    if not course_id_string:
+        match = COURSE_REGEX.match(url)
+        if match:
+            course_id_string = match.group('course_id')
+    if not course_id_string:
+        log.debug(
+            'no course_id found in "{url}"'.format(
+                url=str(url)[0:256]
+            ),
+            exc_info=True
+        )
+    else:
         try:
             course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
             log.warning(
                 'unable to parse course_id "{course_id}"'.format(
-                    course_id=course_id_string
+                    course_id=str(course_id_string)[0:256]
                 ),
                 exc_info=True
             )
