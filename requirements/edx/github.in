@@ -97,6 +97,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xbloc
 
 # Third Party XBlocks
 
-git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6
+git+https://github.com/open-craft/xblock-poll@3f09dda40d912735ccbe8781215e8f50b3af368f#egg=xblock-poll==1.11.0  # Tahoe: bumped from 1.9.6 for i18n updates
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
