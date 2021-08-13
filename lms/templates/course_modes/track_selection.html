@@ -12,7 +12,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">step-select-track verification-process</%block>
 <%block name="pagetitle">
-    ${_("Enroll In {course_name} | Choose Your Track").format(course_name=course_name)}
+    ${_("Enroll In {course_name} | Upgrade Now").format(course_name=course_name)}
 </%block>
 
 <%block name="js_extra">
@@ -72,7 +72,7 @@ from openedx.core.djangolib.markup import HTML, Text
         // resize window
         var onresize = function(e) {
             width = e.target.outerWidth;
-            if(width < 576) {
+            if(width <= 768) {
                 $('.collapsible-item').css({"display":"none"});
                 $('.collapsible').css({"display":"block"});
             };
@@ -81,7 +81,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
         // responsive: show more 
         $(function(){
-            if($(window).width() < 576) {
+            if($(window).width() <= 768) {
             $('.collapsible-item').css({"display":"none"});
             $('.collapsible').css({"display":"block"});
             };
@@ -103,20 +103,6 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <%block name="content">
-    % if error:
-        <div class="wrapper-msg wrapper-msg-error">
-            <div class=" msg msg-error">
-                <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
-                <div class="msg-content">
-                    <h3 class="title">${_("Sorry, there was an error when trying to enroll you")}</h3>
-                    <div class="copy">
-                        <p>${error}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    %endif
-
     <div id="currency_data" value="${currency_data}"></div>
 
     <div class="container-md container-fluid mx-auto">
