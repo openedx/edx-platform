@@ -18,6 +18,7 @@ from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -188,7 +189,12 @@ def get_proctored_exam_settings_url(course_locator) -> str:
     if exam_setting_view_enabled():
         mfe_base_url = get_course_authoring_url(course_locator)
         if mfe_base_url:
-            proctored_exam_settings_url = f'{mfe_base_url}/course/{course_locator}/proctored-exam-settings'
+            if proctoring_settings_modal_view_enabled(course_locator):
+                proctored_exam_settings_url = (
+                    f'{mfe_base_url}/course/{course_locator}/pages-and-resources/proctoring/settings'
+                )
+            else:
+                proctored_exam_settings_url = f'{mfe_base_url}/course/{course_locator}/proctored-exam-settings'
     return proctored_exam_settings_url
 
 
