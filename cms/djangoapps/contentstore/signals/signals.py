@@ -28,5 +28,4 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
     Catches the signal that course pacing has changed and enable/disable
     the self-generated certificates according to course-pacing.
     """
-    log.info('This reciever will now work')
-    import pdb;pdb.set_trace()
+    log.info('This receiver will now work')
