@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:52+0000\n"
-"PO-Revision-Date: 2020-11-22 20:52:49.830515\n"
+"POT-Creation-Date: 2021-08-15 20:44+0000\n"
+"PO-Revision-Date: 2021-08-15 20:44:39.663106\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -41,7 +41,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.1\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js
@@ -162,7 +162,7 @@ msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм ι#"
 
@@ -1792,6 +1792,13 @@ msgstr ""
 "Pröçééd tö thé Àdvänçéd Édïtör änd çönvért thïs prößlém tö XML? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢α#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid ""
+"An answer option has been left blank. Please review and edit the component."
+msgstr ""
+"Àn änswér öptïön häs ßéén léft ßlänk. Pléäsé révïéw änd édït thé çömpönént. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
 msgstr "Éxplänätïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -2640,6 +2647,10 @@ msgid "Subject"
 msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr "Séléçt ä çätégörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2669,28 +2680,12 @@ msgid "Financial Aid"
 msgstr "Fïnänçïäl Àïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr "Mästérs Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr "MïçröMästérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr "MïçröBäçhélörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "Phötö Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr "Pröçtörïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
-msgstr "Séçürïtý Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2766,28 +2761,6 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-"Düé tö thé réçént ïnçréäsé ïn ïntérést ïn önlïné édüçätïön änd édX, wé äré "
-"çürréntlý éxpérïénçïng än ünüsüällý hïgh völümé öf süppört réqüésts. Wé "
-"äppréçïäté ýöür pätïénçé äs wé wörk tö révïéw éäçh réqüést. Pléäsé çhéçk thé"
-"  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
-msgstr ""
-" äs mäný qüéstïöns mäý hävé älréädý ßéén änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
 msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2797,10 +2770,6 @@ msgid "Find answers to the top questions asked by learners."
 msgstr ""
 "Fïnd änswérs tö thé töp qüéstïöns äskéd ßý léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Search the {platform} Help Center"
-msgstr "Séärçh thé {platform} Hélp Çéntér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -3088,7 +3057,7 @@ msgid "My Teams"
 msgstr "Mý Téäms Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
 msgid "Browse"
 msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
 
@@ -3424,18 +3393,17 @@ msgstr "Héädïng Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/ajax-error.js
 msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+"You have been logged out of your account. Click Okay to log in again now. "
+"Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
-"Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt. Çlïçk Ökäý tö lög ïn ägäïn "
-"nöw. Çlïçk Çänçél tö stäý ön thïs pägé (ýöü müst lög ïn ägäïn tö sävé ýöür "
-"wörk). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
+"Ýöü hävé ßéén löggéd öüt öf ýöür äççöünt. Çlïçk Ökäý tö lög ïn ägäïn nöw. "
+"Çlïçk Çänçél tö stäý ön thïs pägé (ýöü müst lög ïn ägäïn tö sävé ýöür wörk)."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3517,72 +3485,146 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
 
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+#: lms/static/js/certificates/views/certificate_allowlist.js
+msgid "Student Removed from certificate allowlist successfully."
+msgstr ""
+"Stüdént Rémövéd fröm çértïfïçäté ällöwlïst süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_allowlist.js
+msgid ""
+"Could not find Certificate Exception in the allowlist. Please refresh the "
+"page and try again"
+msgstr ""
+"Çöüld nöt fïnd Çértïfïçäté Éxçéptïön ïn thé ällöwlïst. Pléäsé réfrésh thé "
+"pägé änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/static/js/certificates/views/certificate_allowlist.js
+#: lms/static/js/certificates/views/certificate_allowlist_editor.js
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "Server Error, Please refresh the page and try again."
+msgstr ""
+"Sérvér Érrör, Pléäsé réfrésh thé pägé änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_allowlist_editor.js
+msgid "<%- user %> already in exception list."
+msgstr ""
+"<%- user %> älréädý ïn éxçéptïön lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/certificates/views/certificate_allowlist_editor.js
+msgid ""
+"<%- user %> has been successfully added to the exception list. Click "
+"Generate Exception Certificate below to send the certificate."
+msgstr ""
+"<%- user %> häs ßéén süççéssfüllý äddéd tö thé éxçéptïön lïst. Çlïçk "
+"Généräté Éxçéptïön Çértïfïçäté ßélöw tö sénd thé çértïfïçäté. Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learners were successfully added to exception list"
+msgstr ""
+" léärnérs wéré süççéssfüllý äddéd tö éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learner was successfully added to the exception list"
+msgstr ""
+" léärnér wäs süççéssfüllý äddéd tö thé éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" records are not in the correct format and have not been added to the "
+"exception list"
+msgstr ""
+" réçörds äré nöt ïn thé çörréçt förmät änd hävé nöt ßéén äddéd tö thé "
+"éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" record is not in the correct format and has not been added to the exception"
+" list"
+msgstr ""
+" réçörd ïs nöt ïn thé çörréçt förmät änd häs nöt ßéén äddéd tö thé éxçéptïön"
+" lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learner accounts cannot be found and have not been added to the exception "
+"list"
+msgstr ""
+" léärnér äççöünts çännöt ßé föünd änd hävé nöt ßéén äddéd tö thé éxçéptïön "
+"lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learner account cannot be found and has not been added to the exception "
+"list"
+msgstr ""
+" léärnér äççöünt çännöt ßé föünd änd häs nöt ßéén äddéd tö thé éxçéptïön "
+"lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learners already appear on the exception list in this course"
+msgstr ""
+" léärnérs älréädý äppéär ön thé éxçéptïön lïst ïn thïs çöürsé Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learner already appears on the exception list in this course"
+msgstr ""
+" léärnér älréädý äppéärs ön thé éxçéptïön lïst ïn thïs çöürsé Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learners are not enrolled in this course and have not added to the "
+"exception list"
+msgstr ""
+" léärnérs äré nöt énrölléd ïn thïs çöürsé änd hävé nöt äddéd tö thé "
+"éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learner is not enrolled in this course and has not been added to the "
+"exception list"
+msgstr ""
+" léärnér ïs nöt énrölléd ïn thïs çöürsé änd häs nöt ßéén äddéd tö thé "
+"éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learners have an active certificate invalidation in this course and have "
+"not been added to the exception list"
+msgstr ""
+" léärnérs hävé än äçtïvé çértïfïçäté ïnvälïdätïön ïn thïs çöürsé änd hävé "
+"nöt ßéén äddéd tö thé éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid ""
+" learner has an active certificate invalidation in this course and has not "
+"been added to the exception list"
+msgstr ""
+" léärnér häs än äçtïvé çértïfïçäté ïnvälïdätïön ïn thïs çöürsé änd häs nöt "
+"ßéén äddéd tö thé éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+" léärnérs énçöüntéréd ünknöwn érrörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+" léärnér énçöüntéréd än ünknöwn érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
 msgstr ""
 "Ûplöädéd fïlé ïssüés. Çlïçk ön \"+\" tö vïéw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are successfully added to exception list"
-msgstr ""
-" léärnérs äré süççéssfüllý äddéd tö éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is successfully added to the exception list"
-msgstr ""
-" léärnér ïs süççéssfüllý äddéd tö thé éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to the exception list"
-msgstr ""
-" réçörds äré nöt ïn çörréçt förmät änd nöt äddéd tö thé éxçéptïön lïst "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception list"
-msgstr ""
-" réçörd ïs nöt ïn çörréçt förmät änd nöt äddéd tö thé éxçéptïön lïst Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the exception list"
-msgstr ""
-" léärnérs dö nöt éxïst ïn LMS änd nöt äddéd tö thé éxçéptïön lïst Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner does not exist in LMS and not added to the exception list"
-msgstr ""
-" léärnér döés nöt éxïst ïn LMS änd nöt äddéd tö thé éxçéptïön lïst Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to the exception list"
-msgstr ""
-" léärnérs äré älréädý whïté lïstéd änd nöt äddéd tö thé éxçéptïön lïst "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception list"
-msgstr ""
-" léärnér ïs älréädý whïté lïstéd änd nöt äddéd tö thé éxçéptïön lïst Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid ""
-" learners are not enrolled in course and not added to the exception list"
-msgstr ""
-" léärnérs äré nöt énrölléd ïn çöürsé änd nöt äddéd tö thé éxçéptïön lïst "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception list"
-msgstr ""
-" léärnér ïs nöt énrölléd ïn çöürsé änd nöt äddéd tö thé éxçéptïön lïst "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
@@ -3599,14 +3641,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-#: lms/static/js/certificates/views/certificate_whitelist.js
-#: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "Server Error, Please refresh the page and try again."
-msgstr ""
-"Sérvér Érrör, Pléäsé réfrésh thé pägé änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
@@ -3621,33 +3655,6 @@ msgid ""
 msgstr ""
 "Çöüld nöt fïnd Çértïfïçäté Ìnvälïdätïön ïn thé lïst. Pléäsé réfrésh thé pägé"
 " änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/static/js/certificates/views/certificate_whitelist.js
-msgid "Student Removed from certificate white list successfully."
-msgstr ""
-"Stüdént Rémövéd fröm çértïfïçäté whïté lïst süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/certificates/views/certificate_whitelist.js
-msgid ""
-"Could not find Certificate Exception in white list. Please refresh the page "
-"and try again"
-msgstr ""
-"Çöüld nöt fïnd Çértïfïçäté Éxçéptïön ïn whïté lïst. Pléäsé réfrésh thé pägé "
-"änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
-msgstr ""
-"<%= user %> älréädý ïn éxçéptïön lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
-"Generate Exception Certificate below to send the certificate."
-msgstr ""
-"<%= user %> häs ßéén süççéssfüllý äddéd tö thé éxçéptïön lïst. Çlïçk "
-"Généräté Éxçéptïön Çértïfïçäté ßélöw tö sénd thé çértïfïçäté. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3734,10 +3741,10 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
-"Thé réfünd déädlïné för thïs çöürsé häs pässéd,sö ýöü wïll nöt réçéïvé ä "
+"Thé réfünd déädlïné för thïs çöürsé häs pässéd, sö ýöü wïll nöt réçéïvé ä "
 "réfünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/static/js/dashboard/legacy.js
@@ -4008,10 +4015,10 @@ msgid "Recent Activity"
 msgstr "Réçént Àçtïvïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
-"Nö résülts föünd för \"%(query_string)s\". Pléäsé trý séärçhïng ägäïn. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Nö résülts föünd för \"{query_string}\". Pléäsé trý séärçhïng ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -4319,6 +4326,12 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+"Érrör générätïng änönýmöüs ÌDs. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
@@ -4571,12 +4584,6 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr ""
-"Rölé fïéld shöüld nöt ßé léft ünséléçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr ""
 "Érrör énröllïng/ünénröllïng üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
@@ -4799,11 +4806,11 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Érrör réséttïng prößlém ättémpts för prößlém '<%= problem_id %>' änd stüdént"
+"Érrör réséttïng prößlém ättémpts för prößlém '<%- problem_id %>' änd stüdént"
 " '<%- student_id %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré"
 " çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
 "єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
@@ -5175,6 +5182,18 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid ""
+"To access the courses available to you through {enterpriseName}, visit the "
+"{enterpriseName} dashboard."
+msgstr ""
+"Tö äççéss thé çöürsés äväïläßlé tö ýöü thröügh {enterpriseName}, vïsït thé "
+"{enterpriseName} däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "Go to dashboard"
+msgstr "Gö tö däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -6749,6 +6768,20 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/models/settings/course_details.js
+msgid "The certificate display behavior must be one of: {behavior_options}"
+msgstr ""
+"Thé çértïfïçäté dïspläý ßéhävïör müst ßé öné öf: {behavior_options} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/models/settings/course_details.js
+msgid ""
+"The certificates display behavior must be {valid_option} if certificate "
+"available date is set."
+msgstr ""
+"Thé çértïfïçätés dïspläý ßéhävïör müst ßé {valid_option} ïf çértïfïçäté "
+"äväïläßlé däté ïs sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr ""
 "Kéý shöüld önlý çöntäïn léttérs, nümßérs, _, ör - Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -6790,9 +6823,9 @@ msgstr ""
 "Pléäsé éntér nön-négätïvé ïntégér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
-"Çännöt dröp möré <%= types %> ässïgnménts thän äré ässïgnéd. Ⱡ'σяєм ιρѕυм "
+"Çännöt dröp möré <%- types %> ässïgnménts thän äré ässïgnéd. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -7360,8 +7393,8 @@ msgid "Highlights for {display_name}"
 msgstr "Hïghlïghts för {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
-msgstr "Énäßlé Wééklý Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Enable Course Highlight Emails"
+msgstr "Énäßlé Çöürsé Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -7400,6 +7433,12 @@ msgstr "Ûnït Ⱡ'σяєм ι#"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
 msgstr "Çömpönént Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Studio's having trouble parsing the problem component's content"
+msgstr ""
+"Stüdïö's hävïng tröüßlé pärsïng thé prößlém çömpönént's çöntént Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -8147,8 +8186,8 @@ msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Action"
 msgstr "Àçtïön Ⱡ'σяєм ιρѕυ#"
 
@@ -8592,8 +8631,8 @@ msgid "course id"
 msgstr "çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "Nö résülts Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -9096,11 +9135,71 @@ msgstr ""
 msgid "Go to Dashboard"
 msgstr "Gö tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore
+msgid "Individual Exceptions"
+msgstr "Ìndïvïdüäl Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore
+msgid ""
+"Enter the username or email address of each learner that you want to add as "
+"an exception."
+msgstr ""
+"Éntér thé üsérnämé ör émäïl äddréss öf éäçh léärnér thät ýöü wänt tö ädd äs "
+"än éxçéptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore
+msgid "Student email or username"
+msgstr "Stüdént émäïl ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore
+msgid "Free text notes"
+msgstr "Fréé téxt nötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
+msgid "Add to Exception List"
+msgstr "Àdd tö Éxçéptïön Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Generate Exception Certificates"
+msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "All users on the Exception list who do not yet have a certificate"
+msgstr ""
+"Àll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét hävé ä çértïfïçäté Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "All users on the Exception list"
+msgstr "Àll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "User Email"
+msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Exception Granted"
+msgstr "Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate Generated"
+msgstr "Çértïfïçäté Générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Notes"
+msgstr "Nötés Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Remove from List"
+msgstr "Rémövé fröm Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
 msgid "Bulk Exceptions"
 msgstr "Bülk Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
 msgid ""
 "Upload a comma separated values (.csv) file that contains the usernames or "
 "email addresses of learners who have been given exceptions. Include the "
@@ -9116,14 +9215,9 @@ msgstr ""
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηι#"
 
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
 msgid "Upload a CSV file"
 msgstr "Ûplöäd ä ÇSV fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Add to Exception List"
-msgstr "Àdd tö Éxçéptïön Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid ""
@@ -9154,63 +9248,8 @@ msgid "Invalidated"
 msgstr "Ìnvälïdätéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Notes"
-msgstr "Nötés Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
 msgstr "Rémövé fröm Ìnvälïdätïön Täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Individual Exceptions"
-msgstr "Ìndïvïdüäl Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid ""
-"Enter the username or email address of each learner that you want to add as "
-"an exception."
-msgstr ""
-"Éntér thé üsérnämé ör émäïl äddréss öf éäçh léärnér thät ýöü wänt tö ädd äs "
-"än éxçéptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Student email or username"
-msgstr "Stüdént émäïl ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Free text notes"
-msgstr "Fréé téxt nötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate Exception Certificates"
-msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "All users on the Exception list who do not yet have a certificate"
-msgstr ""
-"Àll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét hävé ä çértïfïçäté Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "All users on the Exception list"
-msgstr "Àll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User Email"
-msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Exception Granted"
-msgstr "Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Certificate Generated"
-msgstr "Çértïfïçäté Générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Remove from List"
-msgstr "Rémövé fröm Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Divided"
@@ -11196,8 +11235,8 @@ msgid "Copy Component Location"
 msgstr "Çöpý Çömpönént Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
-msgstr "Wééklý Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+msgid "Course Highlight Emails"
+msgstr "Çöürsé Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -11778,14 +11817,6 @@ msgstr "délété gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
-"Thïs féätüré ïs çürréntlý ïn téstïng. Çöürsé téäms çän éntér hïghlïghts, ßüt"
-" léärnérs wïll nöt réçéïvé émäïl méssägés. Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
 "Enter 3-5 highlights to include in the email message that learners receive "
 "for this section (250 character limit)."
 msgstr ""
@@ -12057,6 +12088,39 @@ msgstr "Réléäsé Tïmé ïn ÛTÇ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
 msgstr "Çléär Réléäsé Däté/Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/js/self-paced-due-date-editor.underscore
+msgid "Due in:"
+msgstr "Düé ïn: Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/self-paced-due-date-editor.underscore
+msgid "weeks from learner enrollment date"
+msgstr ""
+"wééks fröm léärnér énröllmént däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/self-paced-due-date-editor.underscore
+msgid ""
+"If a learner starts on {startDate}, this subsection will be due on "
+"{projectedDueIn}."
+msgstr ""
+"Ìf ä léärnér stärts ön {startDate}, thïs süßséçtïön wïll ßé düé ön "
+"{projectedDueIn}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/self-paced-due-date-editor.underscore
+msgid ""
+"The maximum number of weeks this subsection can be due in is 18 weeks from "
+"the learner enrollment date."
+msgstr ""
+"Thé mäxïmüm nümßér öf wééks thïs süßséçtïön çän ßé düé ïn ïs 18 wééks fröm "
+"thé léärnér énröllmént däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/self-paced-due-date-editor.underscore
+msgid ""
+"The minimum number of weeks this subsection can be due in is 1 week from the"
+" learner enrollment date."
+msgstr ""
+"Thé mïnïmüm nümßér öf wééks thïs süßséçtïön çän ßé düé ïn ïs 1 wéék fröm thé"
+" léärnér énröllmént däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"

@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -9,14 +9,14 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -25,22 +25,22 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"POT-Creation-Date: 2021-08-08 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)\n"
@@ -65,7 +65,9 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/djangoapps/discussions/plugins.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: openedx/features/lti_course_tab/tab.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -109,6 +111,15 @@ msgid "The following parameters are required: {missing}."
 msgstr "Nepieciešami šādi parametri: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Ar šo transkripta failu ir problēmas. Mēģiniet augšupielādēt citu failu."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
@@ -119,15 +130,6 @@ msgstr "Transkripts ar {language_code} valodas kodu jau eksistē."
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Nepieciešams transkripta fails."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Ar šo transkripta failu ir problēmas. Mēģiniet augšupielādēt citu failu."
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -238,7 +240,7 @@ msgstr "Profesionālā izglītība"
 
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -363,7 +365,6 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Parole"
@@ -391,7 +392,7 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
-msgid "Email doesn't have {domain_name} domain name."
+msgid "Email doesn't have {allowed_site_email_domain} domain name."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -968,6 +969,12 @@ msgstr ""
 "nodrošinātāja, ar edX lietotāja kontu katrā SSO pieteikšanās reizē. "
 "Lietotājam tiks paziņots, ja ar kontu saistītā e-pasta adrese tiks izmainīta"
 " sinhronizācijas ietvaros."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"IDPs with this set to True will be excluded from the dropdown IDP selection "
+"in the EnterpriseCustomer Django Admin form."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -1623,12 +1630,12 @@ msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Incorrect"
 msgstr "Nepareizi"
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct"
 msgstr "Pareizi"
 
@@ -2062,7 +2069,7 @@ msgid "XML data for the annotation"
 msgstr "XML dati anotācijai"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2081,20 +2088,20 @@ msgstr "Šī komponenta parādāmais vārds."
 msgid "Annotation"
 msgstr "Anotācija"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Tukša padziļinātā problēma"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Studenta veikto mēģinājumu skaits pie šīs problēmas"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Maksimālais mēģinājumu skaits"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -2102,20 +2109,20 @@ msgstr ""
 "Definē mēģinājumu skaitu, ko students var veikt pie šīs problēmas. Ja "
 "vērtība nav iestatīta, ir atļauts neierobežots mēģinājumu skaits."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Date that this problem is due by"
 msgstr "Datums, līdz kuram šī problēma ir jāatrisina"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr "Termiņš pēc izpildes datuma, kura laikā tiks pieņemti iesniegumi."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Parādīt rezultātus"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -2123,24 +2130,24 @@ msgstr ""
 "Definē, kad parādīt to, ka audzēkņa atbilde uz problēmu ir bijusi pareiza. "
 "Konfigurējams apakšiedaļā."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Always"
 msgstr "Vienmēr"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Never"
 msgstr "Nekad"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Past Due"
 msgstr "Pēc termiņa"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Parādīt atbildi"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -2148,61 +2155,61 @@ msgstr ""
 "Definē, kad parādīt atbildi uz problēmu. Noklusējuma vērtību var iestatīt "
 "papildu iestatījumos."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answered"
 msgstr "Atbildēts"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Closed"
 msgstr "Aizvērts"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Finished"
 msgstr "Pabeigts"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct or Past Due"
 msgstr "Pareizs vai pēc termiņa"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After Some Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted"
 msgstr "Mēģināts"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Answer: Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Vai saglabāšanas taustiņu parādīt lapā piespiedu kārtā"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Reset Button"
 msgstr "Parādīt atiestates taustiņu"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -2211,12 +2218,12 @@ msgstr ""
 "varētu atiestatīt savu atbildi. Noklusējuma vērtību var iestatīt papildu "
 "iestatījumos."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Randomizācija"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -2224,55 +2231,55 @@ msgstr ""
 "Definē, kad randomizēt mainīgos, kas norādīti saistītajā Python skriptā. "
 "Problēmām, kurām netiek randomizētas vērtības, norādiet \"Never\". "
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "On Reset"
 msgstr "Pie atiestates"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Per Student"
 msgstr "Uz studentu"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "XML data for the problem"
 msgstr "XML dati problēmai"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Vārdnīca ar studentu pašreizējo atbilžu pareizību"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Vārdnīca ievades veidu stāvokļa uzturēšanai"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student responses"
 msgstr "Vārdnīca ar studentu pašreizējām atbildēm"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student score"
 msgstr "Vārdnīca ar studentu pašreizējiem vērtējumiem"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr "Vai atbildes ir vai nav tikušas saglabātas kopš pēdējās iesniegšanas"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether the student has answered the problem"
 msgstr "Vai students ir atbildējis uz problēmu"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Random seed for this student"
 msgstr "Nejauša sākotnējā vērtība šim studentam"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Last submission time"
 msgstr "Pēdējās iesniegšanas laiks"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Timer Between Attempts"
 msgstr "Laiks starp mēģinājumiem"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -2280,11 +2287,11 @@ msgstr ""
 "Studenta gaidīšanas laiks sekundēs starp iesniegšanas reizēm problēmā ar "
 "vairākiem mēģinājumiem."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Problem Weight"
 msgstr "Problēmas svarīgums"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -2292,26 +2299,26 @@ msgstr ""
 "Definē katras problēmas vērtības punktu skaitu. Ja vērtība nav iestatīta, "
 "katra problēmas atbildes lauka vērtība ir viens punkts."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Markdown source of this module"
 msgstr "Šī moduļa Markdown avots"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr "LaTeX un Word problēmu pirmkods. Šis līdzeklis nav labi atbalstīts."
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr "Iespējot LaTeX veidnes?"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Matlab API atslēga"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -2326,186 +2333,6 @@ msgstr ""
 "nekavējoties paziņojiet MathWorks, ja domājat, ka atslēga ir tikusi "
 "kompromitēta vai sniegta (atklāta). Lai iegūtu atslēgu Jūsu kursam, vai "
 "ziņotu par problēmu, lūdzu, sazinieties ar moocsupport@mathworks.com."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-#: lms/templates/manage_user_standing.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: lms/templates/widgets/footer-language-selector.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "Iesniegt"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Submitting"
-msgstr "Iesniedz"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Warning: The problem has been reset to its initial state!"
-msgstr "Brīdinājums: Problēma tika atiestatīta tās sākotnējā stāvoklī!"
-
-#. Translators: Following this message, there will be a bulleted list of
-#. items.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid ""
-"The problem's state was corrupted by an invalid submission. The submission "
-"consisted of:"
-msgstr ""
-"Problēmas stāvoklis tika sabojāts nederīga iesnieguma dēļ. Iesniegums "
-"sastāvēja no:"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "If this error persists, please contact the course staff."
-msgstr "Ja šī kļūda atkārtojas, lūdzu, sazinieties ar kursa personālu."
-
-#. Translators: {previous_hints} is the HTML of hints that have already been
-#. generated, {hint_number_prefix}
-#. is a header for this hint, and {hint_text} is the text of the hint itself.
-#. This string is being passed to translation only for possible reordering of
-#. the placeholders.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-
-#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
-#. hints.
-#. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Hint ({hint_num} of {hints_count}): "
-msgstr "Ieteikums nr. ({hint_num} no {hints_count}): "
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers were previously saved. Click '{button_name}' to grade them."
-msgstr ""
-"Jūsu atbildes iepriekš tika saglabātas. Klikšķiniet uz '{button_name}', lai "
-"tās novērtētu."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Incorrect ({progress} point)"
-msgid_plural "Incorrect ({progress} points)"
-msgstr[0] "Nepareizi ({progress} punkts)"
-msgstr[1] "Nepareizi ({progress} punkti)"
-msgstr[2] "Nepareizi ({progress} punkti)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Correct ({progress} point)"
-msgid_plural "Correct ({progress} points)"
-msgstr[0] "Pareizi ({progress} punkts)"
-msgstr[1] "Pareizi ({progress} punkti)"
-msgstr[2] "Pareizi ({progress} punkti)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Partially correct ({progress} point)"
-msgid_plural "Partially correct ({progress} points)"
-msgstr[0] "Daļēji pareizi ({progress} punkts)"
-msgstr[1] "Daļēji pareizi ({progress} punkti)"
-msgstr[2] "Daļēji pareizi ({progress} punkti)"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Partially Correct"
-msgstr "Daļēji pareizi"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Answer submitted."
-msgstr "Atbilde iesniegta."
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem is closed."
-msgstr "Problēma ir slēgta."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be submitted again."
-msgstr "Problēmu nepieciešams atiestatīt pirms to var atkārtoti iesniegt."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "You must wait at least {wait} seconds between submissions."
-msgstr "Jums ir jāuzgaida vismaz {wait} sekundes starp iesniegšanas reizēm."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"You must wait at least {wait_secs} between submissions. {remaining_secs} "
-"remaining."
-msgstr ""
-"Jums ir jāuzgaida vismaz {wait_secs} starp iesniegšanas reizēm. Ir atlicis "
-"{remaining_secs}."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_hour} hour"
-msgid_plural "{num_hour} hours"
-msgstr[0] "{num_hour} stunda"
-msgstr[1] "{num_hour} stundas"
-msgstr[2] "{num_hour} stundas"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_minute} minute"
-msgid_plural "{num_minute} minutes"
-msgstr[0] "{num_minute} minūte"
-msgstr[1] "{num_minute} minūtes"
-msgstr[2] "{num_minute} minūtes"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_second} second"
-msgid_plural "{num_second} seconds"
-msgstr[0] "{num_second} sekunde"
-msgstr[1] "{num_second} sekundes"
-msgstr[2] "{num_second} sekundes"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem needs to be reset prior to save."
-msgstr "Problēmu ir nepieciešams atiestatīt pirms saglabāšanas."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Your answers have been saved."
-msgstr "Jūsu atbildes tika saglabātas."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers have been saved but not graded. Click '{button_name}' to grade "
-"them."
-msgstr ""
-"Jūsu atbildes tika saglabātas, bet netika novērtētas. Klikšķiniet uz "
-"'{button_name}', lai tās novērtētu."
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You cannot select Reset for a problem that is closed."
-msgstr "Jūs nevarat izvēlēties atiestati problēmai, kura ir slēgta."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You must submit an answer before you can select Reset."
-msgstr "Jums ir jāiesniedz atbilde pirms Jūs varat izvēlēties atiestati."
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr "Problēmas definīcijā nav atbalstīta atkārtota novērtēšana."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
-msgstr "Uz problēmu nepieciešams atbildēt pirms to var atkal novērtēt."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2534,6 +2361,186 @@ msgstr "Jautājums"
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct Answer"
 msgstr "Pareizā atbilde"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "Iesniegt"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Submitting"
+msgstr "Iesniedz"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr "Brīdinājums: Problēma tika atiestatīta tās sākotnējā stāvoklī!"
+
+#. Translators: Following this message, there will be a bulleted list of
+#. items.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+"Problēmas stāvoklis tika sabojāts nederīga iesnieguma dēļ. Iesniegums "
+"sastāvēja no:"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "If this error persists, please contact the course staff."
+msgstr "Ja šī kļūda atkārtojas, lūdzu, sazinieties ar kursa personālu."
+
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
+#. hints.
+#. This text is shown in bold before the accompanying hint text.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr "Ieteikums nr. ({hint_num} no {hints_count}): "
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
+"Jūsu atbildes iepriekš tika saglabātas. Klikšķiniet uz '{button_name}', lai "
+"tās novērtētu."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] "Nepareizi ({progress} punkts)"
+msgstr[1] "Nepareizi ({progress} punkti)"
+msgstr[2] "Nepareizi ({progress} punkti)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] "Pareizi ({progress} punkts)"
+msgstr[1] "Pareizi ({progress} punkti)"
+msgstr[2] "Pareizi ({progress} punkti)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] "Daļēji pareizi ({progress} punkts)"
+msgstr[1] "Daļēji pareizi ({progress} punkti)"
+msgstr[2] "Daļēji pareizi ({progress} punkti)"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Partially Correct"
+msgstr "Daļēji pareizi"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer submitted."
+msgstr "Atbilde iesniegta."
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem is closed."
+msgstr "Problēma ir slēgta."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be reset before it can be submitted again."
+msgstr "Problēmu nepieciešams atiestatīt pirms to var atkārtoti iesniegt."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr "Jums ir jāuzgaida vismaz {wait} sekundes starp iesniegšanas reizēm."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+"Jums ir jāuzgaida vismaz {wait_secs} starp iesniegšanas reizēm. Ir atlicis "
+"{remaining_secs}."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_hour} hour"
+msgid_plural "{num_hour} hours"
+msgstr[0] "{num_hour} stunda"
+msgstr[1] "{num_hour} stundas"
+msgstr[2] "{num_hour} stundas"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] "{num_minute} minūte"
+msgstr[1] "{num_minute} minūtes"
+msgstr[2] "{num_minute} minūtes"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_second} second"
+msgid_plural "{num_second} seconds"
+msgstr[0] "{num_second} sekunde"
+msgstr[1] "{num_second} sekundes"
+msgstr[2] "{num_second} sekundes"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem needs to be reset prior to save."
+msgstr "Problēmu ir nepieciešams atiestatīt pirms saglabāšanas."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Your answers have been saved."
+msgstr "Jūsu atbildes tika saglabātas."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
+msgstr ""
+"Jūsu atbildes tika saglabātas, bet netika novērtētas. Klikšķiniet uz "
+"'{button_name}', lai tās novērtētu."
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You cannot select Reset for a problem that is closed."
+msgstr "Jūs nevarat izvēlēties atiestati problēmai, kura ir slēgta."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You must submit an answer before you can select Reset."
+msgstr "Jums ir jāiesniedz atbilde pirms Jūs varat izvēlēties atiestati."
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem's definition does not support rescoring."
+msgstr "Problēmas definīcijā nav atbalstīta atkārtota novērtēšana."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be answered before it can be graded again."
+msgstr "Uz problēmu nepieciešams atbildēt pirms to var atkal novērtēt."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -2613,13 +2620,6 @@ msgstr "Šim komponentam vēl nav konfigurētu avota komponentu."
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
 msgstr "Konfigurēt avotu sarakstu"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"The selected proctoring provider, {proctoring_provider}, is not a valid "
-"provider. Please select from one of {available_providers}."
-msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2718,10 +2718,8 @@ msgstr ""
 "kalkulatoru."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
+msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
-"Ievadiet kursa nosaukumu tā, kā tam būtu jāparādās edX.org kursu sarakstā."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
@@ -2843,12 +2841,9 @@ msgstr "Kurss ir jauns"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"Enter true or false. If true, the course appears in the list of new courses,"
+" and a New! badge temporarily appears next to the course image."
 msgstr ""
-"Ievadiet kā patiesu vai nepatiesu. Ja patiess, tad kurss tiks parādīts jauno"
-" kursu sarakstā edx.org, un New! žetons uz laiku parādīsies blakus kursa "
-"attēlam."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -3069,25 +3064,9 @@ msgstr "Sertifikātu atspoguļošanas režīms"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter end, early_with_info, or early_no_info. After certificate generation, "
-"students who passed see a link to their certificates on the dashboard and "
-"students who did not pass see information about the grading configuration. "
-"The default is end, which displays this certificate information to all "
-"students after the course end date. To display this certificate information "
-"to all students as soon as certificates are generated, enter "
-"early_with_info. To display only the links to passing students as soon as "
-"certificates are generated, enter early_no_info."
+"This field, together with certificate_available_date will determine when a "
+"user can see their certificate for the course"
 msgstr ""
-"Ievadiet end (beigās), early_with_info (iepriekš, ar informāciju), vai "
-"early_no_info (iepriekš, bez informācijas). Pēc sertifikātu ģenerēšanas, "
-"studenti, kuri būs nokārtojuši nepieciešamo, redzēs saiti uz saviem "
-"sertifikātiem informācijas panelī, un studenti, kuri nebūs nokārtojuši, "
-"redzēs informāciju par vērtēšanas konfigurāciju. Noklusētā vērtība ir end, "
-"kuras gadījumā tiek parādīta šī sertifikāta informāciju visiem studentiem "
-"pēc kursa beigu datuma. Lai parādītu šī sertifikāta informāciju visiem "
-"studentiem, tiklīdz sertifikāti tiek ģenerēti, ievadiet early_with_info. Lai"
-" studentiem, kas ir nokārtojuši nepieciešamo, parādītu tikai saites tiklīdz "
-"sertifikāti tiek ģenerēti, ievadiet early_no_info."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -3283,11 +3262,9 @@ msgstr "Atļaut publisku piekļuvi vikivietnei"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
+"Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
-"Ievadiet kā patiesu vai nepatiesu. Ja patiess, edX lietotāji varēs redzēt "
-"kursa vikivietni pat tad, ja nebūs reģistrējušies kursā."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Invitation Only"
@@ -3646,6 +3623,13 @@ msgstr "{section_type} Vidēji = {percent:.0%}"
 #, python-brace-format
 msgid "{short_label} Avg"
 msgstr "{short_label} Vid."
+
+#: common/lib/xmodule/xmodule/hidden_module.py
+#, python-brace-format
+msgid ""
+"ERROR: \"{block_type}\" is an unknown component type. This component will be"
+" hidden in LMS."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
@@ -4053,6 +4037,18 @@ msgid "Enter the default date by which problems are due."
 msgstr "Ievadiet noklusēto datumu, kurā ir jābūt izpildītām problēmām."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Number of Relative Weeks Due By"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"Enter the number of weeks the problems are due by relative to the learner's "
+"enrollment date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
@@ -4287,6 +4283,14 @@ msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja šī vērtība ir patiesa, atbilžu "
 "iesniegšana problēmu moduļiem tiks ņemta vērā iestājpārbaudījumu "
 "vērtēšanas/piesaistīšanas algoritmā."
+
+#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
+msgid "Error while reading {}. Check file for XML errors."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
+msgid "Failed to import module: {} at location: {}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -4992,7 +4996,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Account Activation"
+msgid "Account activation"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -5005,7 +5009,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Activate Your Account"
+msgid "Activate your account"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -5155,6 +5159,140 @@ msgstr ""
 "Mēs saglabājam veco e-pastu žurnālu, tādēļ, ja šis pieprasījums bija "
 "nejaušs, mēs varam veikt izmeklēšanu."
 
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctoring requirements for %(course_name)s\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Hello %(full_name)s,\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You are enrolled in %(course_name)s at %(platform_name)s. This course contains proctored exams.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses %(proctoring_provider)s software for proctoring.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                Proctoring Instructions and Requirements\n"
+"            "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Before taking a graded proctored exam, you must have approved ID verification photos. \n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                        You can submit ID verification photos here.\n"
+"                    "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "Paldies Jums,"
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"You are enrolled in %(course_name)s at %(platform_name)s. This course "
+"contains proctored exams."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Proctored exams are timed exams that you take while proctoring software "
+"monitors your computer's desktop, webcam video, and audio. Your course uses "
+"%(proctoring_provider)s software for proctoring."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+msgid ""
+"Carefully review the system requirements as well as the steps to take a "
+"proctored exam in order to ensure that you are prepared."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"To view proctoring instructions and requirements, please visit: "
+"%(proctoring_requirements_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Before taking a graded proctored exam, you must have approved ID "
+"verification photos. You can submit ID verification photos here: "
+"%(id_verification_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"This email was automatically sent from %(platform_name)s to %(full_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/subject.txt
+#, python-format
+msgid "Proctoring requirements for %(course_name)s"
+msgstr ""
+
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr ""
@@ -5281,12 +5419,9 @@ msgstr "Noklausieties bezmaksas kursus edX.org"
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
-"their respective logos are registered trademarks of edX Inc."
+"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
+"and their respective logos are registered trademarks of edX Inc."
 msgstr ""
-"© {org_name}. Visas tiesības paturētas, izņemot gadījumos, kad tas norādīts."
-" EdX, Open edX un to atbilstošie logo ir edX Inc. preču zīmes vai "
-"reģistrētās preču zīmes."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -5454,10 +5589,6 @@ msgstr ""
 "izveidojiet šī kursa atkārtotu demonstrāciju studio, lai pieļautu šo "
 "darbību."
 
-#: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
-msgid "created"
-msgstr "izveidots"
-
 #. Translators: This is a past-tense verb that is used for task action
 #. messages.
 #: lms/djangoapps/certificates/models.py
@@ -5606,12 +5737,17 @@ msgstr "Kurss {course_key} neeksistē"
 
 #: lms/djangoapps/certificates/views/support.py
 #, python-brace-format
-msgid "User {username} is not enrolled in the course {course_key}"
-msgstr "Lietotājs {username} nav reģistrējies kursā {course_key}"
+msgid "User {user_id} is not enrolled in the course {course_key}"
+msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "An unexpected error occurred while regenerating certificates."
 msgstr "Notika neparedzēta kļūda, ģenerējot sertifikātus."
+
+#: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
+msgid "User {username} is not enrolled in the course {course_key}"
+msgstr "Lietotājs {username} nav reģistrējies kursā {course_key}"
 
 #. Translators:  This text describes the 'Honor' course certificate type.
 #: lms/djangoapps/certificates/views/webview.py
@@ -5656,11 +5792,6 @@ msgid ""
 msgstr ""
 "Ar {cert_type} tiek demonstrēts augsts sasnieguma līmenis mācību programmā "
 "un ir iekļauta studenta identitātes pārbaude."
-
-#: lms/djangoapps/certificates/views/webview.py
-#, python-brace-format
-msgid "{month} {day}, {year}"
-msgstr "{month} {day}, {year}"
 
 #. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
@@ -5810,7 +5941,7 @@ msgstr "Strādājiet pie {platform_name}"
 msgid "Contact {platform_name}"
 msgstr "Sazinieties ar {platform_name}"
 
-#. Translators:  This text appears near the top of the certficate and
+#. Translators:  This text appears near the top of the certificate and
 #. describes the guarantee provided by edX
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -5948,6 +6079,30 @@ msgstr "Izpētiet kursu"
 msgid "Not sure yet"
 msgstr "Vēl nav pārliecības"
 
+#: lms/djangoapps/course_home_api/admin.py
+msgid ""
+"These define the context to disable the frontend-app-learning progress "
+"page.If no values are set, then the configuration applies globally. If a "
+"single value is set, then the configuration applies to all courses within "
+"that context. At most one value can be set at a time.<br>If multiple "
+"contexts apply to a course (for example, if configuration is specified for "
+"the course specifically, and for the org that the course is in, then the "
+"more specific context overrides the more general context."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/admin.py openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/models.py
+#: openedx/features/discounts/models.py
+msgid "Disabled"
+msgstr ""
+
 #: lms/djangoapps/course_home_api/outline/v1/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
@@ -5976,10 +6131,6 @@ msgid "Welcome message successfully dismissed."
 msgstr ""
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "'goal_key' is required."
-msgstr ""
-
-#: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "Your course goal has been successfully set."
 msgstr ""
 
@@ -5987,11 +6138,17 @@ msgstr ""
 msgid "Course goal updated successfully."
 msgstr ""
 
+#: lms/djangoapps/course_wiki/plugins/__init__.py
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Wiki"
 msgstr "Vikivietne"
+
+#: lms/djangoapps/course_wiki/plugins/__init__.py
+msgid ""
+"Enable learners to access, and collaborate on course-related information."
+msgstr ""
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -6044,11 +6201,6 @@ msgstr ""
 #: lms/djangoapps/courseware/access_response.py
 msgid "Please view your course in the existing experience"
 msgstr ""
-
-#: lms/djangoapps/courseware/course_tools.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified"
-msgstr "Jaunināt uz verificētu"
 
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
@@ -6104,8 +6256,8 @@ msgid "Enrollment Date"
 msgstr "Reģistrēšanās datums"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course Starts"
-msgstr "Kurss sākas"
+msgid "Course starts"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Don't forget to add a calendar reminder!"
@@ -6124,18 +6276,21 @@ msgstr ""
 "Kurss sākas {time_remaining_string} laikā, pulksten {course_start_time}."
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course End"
-msgstr "Kursa beigas"
+msgid "Course ends"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
-"To earn a certificate, you must complete all requirements before this date."
+"After this date, the course will be archived, which means you can review the"
+" course content but can no longer participate in graded assignments or work "
+"towards earning a certificate."
 msgstr ""
-"Lai nopelnītu sertifikātu, Jums ir jāizpilda visas prasības pirms šī datuma."
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "After this date, course content will be archived."
-msgstr "Pēc šī datuma kursa saturs tiks arhivēts."
+msgid ""
+"After the course ends, the course content will be archived and no longer "
+"active."
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6332,23 +6487,40 @@ msgstr "Atspējot dinamisko jaunināšanas izpildes termiņu šī kursa norisei.
 msgid "Disable the dynamic upgrade deadline for this organization."
 msgstr "Atspējot dinamisko jaunināšanas izpildes termiņu šai organizācijai."
 
-#: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
-msgid "Syllabus"
-msgstr "Mācību programma"
-
-#: lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Progress"
 msgstr "Progress"
 
+#: lms/djangoapps/courseware/plugins.py
+msgid "Keep learners engaged and on track throughout the course."
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Textbooks' refers to the tab in the course that leads to the
 #. course' textbooks
-#: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
+#: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "Mācību grāmatas"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid ""
+"Create and manage a library of course readings, textbooks, and chapters."
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Calculator"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide an in-course calculator for simple and complex calculations."
+msgstr ""
+
+#: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
+msgid "Syllabus"
+msgstr "Mācību programma"
 
 #: lms/djangoapps/courseware/tabs.py
 msgid "Dates"
@@ -6493,6 +6665,11 @@ msgid "You must be enrolled in the course to see course content."
 msgstr "Jums ir jābūt reģistrētiem kursā, lai redzētu kursa saturu."
 
 #: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/instructor/views/api.py
+msgid "User does not exist."
+msgstr "Lietotājs neeksistē."
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
 msgstr "Nederīga atrašanās vieta."
 
@@ -6580,186 +6757,6 @@ msgstr ""
 "Es dodu atļauju edX izmantot manis sniegto informāciju šajā pieteikumā "
 "(izņemot finanšu informāciju) edX mārketinga mērķiem."
 
-#: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
-msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with"
-" GIT_REPO_DIR"
-msgstr ""
-"Ceļš {0} neeksistē, lūdzu, izveidojiet to vai arī konfigurējiet citu ceļu, "
-"izmantojot GIT_REPO_DIR"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid ""
-"Non usable git url provided. Expecting something like: "
-"git@github.com:edx/edx4edx_lite.git"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to get git log"
-msgstr "Nebija iespējams iegūt git žurnālu"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "git clone or pull failed!"
-msgstr "git klonēšana vai pieprasījumpiegādes veikšana neizdevās!"
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to run import command."
-msgstr "Nebija iespējams izpildīt importēšanas komandu."
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The underlying module store does not support import."
-msgstr "Pamatā esošais moduļu veikals neatbalsta importēšanu."
-
-#. Translators: This is an error message when they ask for a
-#. particular version of a git repository and that version isn't
-#. available from the remote source they specified
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The specified remote branch is not available."
-msgstr "Norādītais attālinātais zars nav pieejams."
-
-#. Translators: Error message shown when they have asked for a git
-#. repository branch, a specific version within a repository, that
-#. doesn't exist, or there is a problem changing to it.
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to switch to specified branch. Please check your branch name."
-msgstr ""
-"Nebija iespējams pārslēgties uz norādīto zaru. Lūdzu, pārbaudiet savu zara "
-"nosaukumu."
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid ""
-"Import the specified git repository and optional branch into the modulestore"
-" and optionally specified directory."
-msgstr ""
-"Importējiet norādīto git repozitoriju un neobligāto zaru moduļu veikalā un "
-"neobligāti noteiktajā direktorijā."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide username"
-msgstr "Ir jāsniedz lietotājvārds"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide full name"
-msgstr "Ir jāsniedz pilns vārds"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Password must be supplied"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "email address required (not username)"
-msgstr "ir nepieciešama e-pasta adrese (nevis lietotājvārds)"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Oops, failed to create user {user}, {error}"
-msgstr "Atvainojiet, neizdevās izveidot lietotāju {user}, {error}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "User {user} created successfully!"
-msgstr "Lietotājs {user} izveidots veiksmīgi!"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with email address {email_addr}"
-msgstr "Nav iespējams atrast lietotāju ar e-pasta adresi {email_addr}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with username {username} - {error}"
-msgstr "Nav iespējams atrast lietotāju ar lietotājvārdu {username} - {error}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Deleted user {username}"
-msgstr "Lietotājs {username} dzēsts"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Statistic"
-msgstr "Statistika"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Value"
-msgstr "Vērtība"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Site statistics"
-msgstr "Vietnes statistika"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Total number of users"
-msgstr "Kopējais lietotāju skaits"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Create User Results"
-msgstr "Izveidot lietotāja rezultātus"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Delete User Results"
-msgstr "Dzēst lietotāja rezultātus"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "The git repo location should end with '.git', and be a valid url"
-msgstr "Git repo atrašanās vietai ir jābeidzas ar '.git’ un jābūt derīgam URL"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Added Course"
-msgstr "Pievienots kurss"
-
-#: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course Name"
-msgstr "Kursa nosaukums"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Directory/ID"
-msgstr "Direktorija/ID"
-
-#. Translators: "Git Commit" is a computer command; see
-#. http://gitref.org/basic/#commit
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Git Commit"
-msgstr "Git izpilde"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Change"
-msgstr "Pēdējā izmaiņa"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Editor"
-msgstr "Pēdējais rediģētājs"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Information about all courses"
-msgstr "Informācija par visiem kursiem"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted"
-msgstr "Dzēsts"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "course_id"
-msgstr "course_id"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# enrolled"
-msgstr "# reģistrēts"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# staff"
-msgstr "# personāls"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "instructors"
-msgstr "treneri"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Enrollment information for all courses"
-msgstr "Reģistrēšanās informācija visiem kursiem"
-
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
 msgstr "Virsraksts nedrīkst būt tukšs"
@@ -6788,8 +6785,8 @@ msgid "Good"
 msgstr "Labi"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to"
+#, python-format, python-brace-format
+msgid "%(comment_username)s replied to {start_tag}%(thread_title)s{end_tag}:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
@@ -6832,102 +6829,10 @@ msgstr "Beigu vēre netika sniegta EdxNotes."
 msgid "Notes"
 msgstr "Piezīmes"
 
-#: lms/djangoapps/email_marketing/models.py
-msgid "API key for accessing Sailthru. "
-msgstr "API atslēga piekļūšanai Sailthru."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "API secret for accessing Sailthru. "
-msgstr "API noslēpums piekļūšanai Sailthru."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru list name to add new users to. "
-msgstr "Sailthru saraksta nosaukums, kuram pievienot jaunus lietotājus."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru connection retry interval (secs)."
-msgstr "Sailthru savienojumu atkārtošanas intervāls (sekundēs)."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru maximum retries."
-msgstr "Sailthru maksimālais atkārtotu mēģinājumu skaits."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on welcome send."
-msgstr "Sailthru izmantojamā veidne sūtot sveicināšanas ziņojumu."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
-msgstr ""
-"Sailthru izmantojamā veidne sūtot pamesta iepirkumu groza atgādinājumu. "
-"Novecojis."
-
-#: lms/djangoapps/email_marketing/models.py
+#: lms/djangoapps/edxnotes/plugins.py
 msgid ""
-"Sailthru minutes to wait before sending abandoned cart message. Deprecated."
+"Allow learners to highlight passages and make notes right in the course."
 msgstr ""
-"Sailthru gaidīšanas minūtes pirms pamesta iepirkumu groza ziņas sūtīšana. "
-"Novecojis."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on enrolling for audit. "
-msgstr "Sailthru sūtīšanas veidne, kuru izmantot reģistrējoties auditam."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on passed ID verification."
-msgstr "Sailthru sūtīšanas veidne, kuru izmantot veiksmīgai ID verifikācijai."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on failed ID verification."
-msgstr ""
-"Sailthru sūtīšanas veidne, kuru izmantot neveiksmīgai ID verifikācijai."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on upgrading a course. Deprecated "
-msgstr "Sailthru sūtīšanas veidne, kuru izmantot jauninot kursu. Novecojis."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
-msgstr ""
-"Sailthru sūtīšanas veidne, kuru izmantot pērkot kursa piedalīšanās biļeti. "
-"Novecojis."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Use the Sailthru content API to fetch course tags."
-msgstr "Izmantot Sailthru satura API, lai ienestu kursa tagus."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Number of seconds to cache course content retrieved from Sailthru."
-msgstr ""
-"Sekunžu skaits no Sailthru izgūtā kursa satura saglabāšanai kešatmiņā."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Cost in cents to report to Sailthru for enrolls."
-msgstr "Maksa centos, lai ziņotu uz Sailthru par reģistrēšanos."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Optional lms url scheme + host used to construct urls for content library, "
-"e.g. https://courses.edx.org."
-msgstr ""
-"Neobligāta LMS URL shēma + resursdators, kas izmantoti, lai konstruētu URL "
-"satura bibliotēkai, piemēram, https://courses.edx.org."
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Number of seconds to delay the sending of User Welcome email after user has "
-"been created"
-msgstr ""
-"Aizkaves laiks sekundēs, lai sūtītu lietotāja sveikšanas e-pastu pēc tam, "
-"kad ir izveidots lietotājs"
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"The number of seconds to delay/timeout wait to get cookie values from "
-"sailthru."
-msgstr ""
-"Aizkaves/noildzes gaidīšanas laiks sekundēs, lai iegūtu sīkdatņu vērtības no"
-" Sailthru."
 
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
@@ -6959,10 +6864,6 @@ msgid ""
 msgstr ""
 "Tiek veidots {report_type} ziņojums. Lai apskatītu ziņojuma statusu, lūdzu, "
 "apmeklējiet ‘Gaidīšanā esošie uzdevumi’ tālāk."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "User does not exist."
-msgstr "Lietotājs neeksistē."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7025,6 +6926,48 @@ msgstr ""
 "Kļūda '{error}' sūtot e-pastu jaunam lietotājam (lietotāja e-pasts={email})."
 " Bez e-pasta students nevarēs pieslēgties. Lūdzu, sazinieties ar atbalsta "
 "dienestu, lai iegūtu tālāku informāciju."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A usage key location for a section or a problem. If the location is a block "
+"that contains other blocks, (such as the course, section, subsection, or "
+"unit blocks) then all blocks under that block will be included in the "
+"report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "A list of usage keys for the blocks to include in the report. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A list of problem/block types to generate the report for. This field can be "
+"omitted if the report should include details of allblock types. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly text describing current status of report generation."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A unique id for the report generation task. It can be used to query the "
+"latest report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The provided parameters were invalid. Make sure you've provided at least one"
+" valid usage key for `problem_locations`."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user is not authenticated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user lacks access to the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7137,6 +7080,10 @@ msgid "Date Joined"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "External User Key"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Kohorta"
 
@@ -7185,6 +7132,10 @@ msgstr "aptauja"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
 msgstr "uzraudzīto eksāmenu rezultāti"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Anonymized User IDs"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7249,9 +7200,86 @@ msgstr ""
 "Nav iespējams atkārtoti vērtēt ar all_students un unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Current status of task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Identifies the kind of task being performed, e.g. rescoring."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The celery ID for the task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The date and time when the task was created."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The input parameters for the task. The format and content of this data will "
+"depend on the kind of task being performed. For instanceit may contain the "
+"problem locations for a problem resources task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The username of the user who initiated this task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The last knows state of the celery task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Task duration information, if known"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly task status information, if available."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of instructor tasks."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requested course does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "URL from which report can be downloaded."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Name of report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "HTML anchor tag that contains the name and link."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of report downloads"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ID for the course whose reports need to be listed."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Filter results to only return details of for the report with the specified "
+"name."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "ORA data"
 msgstr "ORA dati"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ORA summary"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Attachments archive is being created."
@@ -7325,6 +7353,20 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
+msgid ""
+"Student {user} is not enrolled in this course. Please check your spelling "
+"and retry."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Student {user} is already on the certificate invalidation list and cannot be"
+" added to the certificate exception list."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 "Studentam (lietotājvārds/e-pasts={user}) jau ir sertifikātu izņēmumu "
@@ -7333,11 +7375,9 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Certificate exception (user={user}) does not exist in certificate white "
-"list. Please refresh the page and try again."
+"Error occurred removing the allowlist entry for student {student}. Please "
+"refresh the page and try again"
 msgstr ""
-"Sertifikāta izņēmums (lietotājs={user}) neeksistē sertifikātu baltajā "
-"sertifikātā. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7365,20 +7405,12 @@ msgstr ""
 "mēģiniet vēlreiz."
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid ""
-"{user} is not enrolled in this course. Please check your spelling and retry."
-msgstr ""
-"Lietotājs {user} nav reģistrējies šajā kursā. Lūdzu, pārbaudiet Jūsu "
-"pareizrakstību un mēģiniet vēlreiz."
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, generate_for must be \"new\" or \"all\"."
 msgstr "Nederīgi dati, generate_for ir jābūt \"jauns\" vai \"visi\"."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Certificate generation started for white listed students."
-msgstr "Sertifikātu ģenerācija ir sākta baltā saraksta studentiem."
+msgid "Certificate generation started for students on the allowlist."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7389,6 +7421,14 @@ msgstr "lietotājs \"{user}\" rindā# {row}"
 #, python-brace-format
 msgid "user \"{username}\" in row# {row}"
 msgstr "lietotājs \"{username}\" rindā# {row}"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"The student {student} appears on the Certificate Exception list in course "
+"{course}. Please remove them from the Certificate Exception list before "
+"attempting to invalidate their certificate."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7581,7 +7621,7 @@ msgstr ""
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7707,6 +7747,14 @@ msgstr "sertifikāti ģenerēti"
 msgid "cohorted"
 msgstr "kohortēts"
 
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#. An example of such a message is: "Progress: {action} {succeeded} of
+#. {attempted} so far"
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "generate_anonymized_id"
+msgstr ""
+
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "compressed"
 msgstr ""
@@ -7752,28 +7800,32 @@ msgstr ""
 " {1}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {attempted} and {succeeded} are counts.
+#. {attempted} and {succeeded} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "Progress: {action} {succeeded} no {attempted} līdz šim"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr "Nav iespējams atrast, ka iesniegums ir {action} studentam '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "Problēmai neizdevās būt {action} studentam '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
@@ -7818,7 +7870,8 @@ msgid "Problem successfully {action} for {attempted} students"
 msgstr "Problēma veiksmīgi {action} {attempted} studentiem"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
@@ -7845,14 +7898,16 @@ msgid "Message successfully {action} for {attempted} recipients"
 msgstr "Ziņojums veiksmīgi {action} {attempted} saņēmējiem"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr "Ziņojums {action} {succeeded} no {attempted} saņēmējiem"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
@@ -8088,6 +8143,10 @@ msgstr "Izvēles valoda, ko izmanto komanda kā ISO 639-1 kodu."
 msgid "Teams"
 msgstr "Komandas"
 
+#: lms/djangoapps/teams/plugins.py
+msgid "Leverage teams to allow learners to connect by topic of interest."
+msgstr ""
+
 #: lms/djangoapps/teams/views.py
 msgid "course_id must be provided"
 msgstr "ir jāsniedz course_id"
@@ -8250,10 +8309,6 @@ msgid "Missing required parameter face_image"
 msgstr "Trūkst nepieciešamais parametrs face_image"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid course key"
-msgstr "Nederīga kursa atslēga"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr "Lietotājam netika atrasts profils"
 
@@ -8263,8 +8318,17 @@ msgid "Name must be at least {min_length} character long."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
+msgid "Image data is in an unsupported format."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
 msgstr "Attēla dati nav derīgi."
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID verification was approved!"
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -8683,7 +8747,6 @@ msgstr "Atļaut"
 
 #: lms/templates/oauth2_provider/authorize.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
 msgstr "Kļūda"
 
@@ -8710,23 +8773,14 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for one year, and it will expire "
+"Your approval status remains valid for two years, and it will expire "
 "%(expiration_datetime)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "Enjoy your studies,"
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "The %(platform_name)s Team "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -8781,15 +8835,6 @@ msgstr ""
 msgid "ID verification FAQ : %(help_center_link)s "
 msgstr ""
 
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Paldies Jums,"
-
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
@@ -8810,7 +8855,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 5-7 days."
+"We have received your photos and they will be reviewed within 3-5 days."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
@@ -9620,8 +9665,16 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Error Status"
+msgstr ""
+
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Courses with Errors"
+msgstr ""
+
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
-msgid "Learning Sequences"
+msgid "Learning Sequences and Outlines"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -9926,6 +9979,70 @@ msgstr "Šis ir pārbaudes brīdinājums"
 msgid "This is a test error"
 msgstr "Šī ir pārbaudes kļūda"
 
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid ""
+"{provider} requires that LTI advanced sharing be enabled for your course, as"
+" this provider uses email address and username to personalize the "
+"experience. Please contact {support_contact} to enable this feature."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "technical support"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to allow, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Allow List"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to deny, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Deny List"
+msgstr ""
+
+#. Translators: A key specifying a course, library, program,
+#. website, or some other collection of content where learning
+#. happens.
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Learning Context Key"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated learning context/course will "
+"be disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The plugin configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Discussion provider"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion tool/provider's id"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/plugins.py
+msgid ""
+"Encourage participation and engagement in your course with discussions."
+msgstr ""
+
 #: openedx/core/djangoapps/django_comment_common/models.py
 msgid "Administrator"
 msgstr "Administrators"
@@ -10125,7 +10242,6 @@ msgstr "Pieredze"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/support/feature_based_enrollments.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Course ID"
 msgstr "Kursa ID"
 
@@ -10390,6 +10506,7 @@ msgid "You are eligible to upgrade in these courses:"
 msgstr "Jums ir tiesības uz jaunināšanu šādos kursos:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Example of a verified certificate"
 msgstr "Verificēta sertifikāta piemērs"
 
@@ -10453,6 +10570,10 @@ msgid "\"{email}\" is not a valid email address."
 msgstr "\"{email}\" ir nederīga e-pasta adrese."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter a valid email address"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -10462,6 +10583,10 @@ msgstr ""
 "vēlreiz ar citu e-pasta adresi.  "
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this email address is already registered"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
@@ -10469,6 +10594,10 @@ msgid ""
 msgstr ""
 "Izskatās, ka lietotājvārds {username} pieder jau esošam kontam. Mēģiniet "
 "vēlreiz ar citu lietotājvārdu."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this username is already taken"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -10649,10 +10778,6 @@ msgstr "Veiksmīgi"
 msgid "Actions"
 msgstr "Darbības"
 
-#: openedx/core/djangoapps/user_api/config/waffle.py
-msgid "System maintenance in progress. Please try again later."
-msgstr "Notiek sistēmas apkope. Lūdzu, vēlāk mēģiniet vēlreiz."
-
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -10744,9 +10869,8 @@ msgid "Your Account Has Been Queued For Deletion"
 msgstr "Jūsu konts tiek pievienots rindai uz dzēšanu"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Paroles atiestatīšana"
+msgid "Password reset"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -10774,8 +10898,8 @@ msgid "If you did not request this change, you can ignore this email."
 msgstr "Ja Jūs nepieprasījāt šīs izmaiņas, Jūs varat ignorēt šo e-pastu."
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr "Mainīt manu paroli"
+msgid "Reset my password"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Please go to the following page and choose a new password:"
@@ -10787,7 +10911,7 @@ msgid "Password reset on %(platform_name)s"
 msgstr "Parole atiestatīta %(platform_name)s"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
-msgid "Password Reset Success"
+msgid "Password reset success"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
@@ -10861,13 +10985,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Pārāk daudz neveiksmīgu pieteikšanās mēģinājumu. Lūdzu, vēlāk mēģiniet "
@@ -10880,14 +10997,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10954,8 +11063,8 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "Some error occured during password change. Please try again"
-msgstr "Notika kļūda paroles nomaiņas laikā. Lūdzu, mēģiniet vēlreiz"
+msgid "Some error occurred during password change. Please try again"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
@@ -11209,7 +11318,8 @@ msgid "This content is only accessible to enrolled learners. "
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
-msgid "The about me field must be at most {} characters long."
+#, python-brace-format
+msgid "The about me field must be at most {BIO_MAX_LENGTH} characters long."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -11425,10 +11535,6 @@ msgid "'course_key' is required."
 msgstr ""
 
 #: openedx/features/course_experience/api/v1/views.py
-msgid "Only 'course_key' is expected."
-msgstr ""
-
-#: openedx/features/course_experience/api/v1/views.py
 msgid "View all dates"
 msgstr ""
 
@@ -11447,11 +11553,6 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "Atjauninājumi"
-
-#: openedx/features/course_experience/plugins.py
-#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
-msgid "Reviews"
-msgstr "Apskati"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11514,14 +11615,6 @@ msgstr ""
 
 #: openedx/features/discounts/admin.py
 msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Disabled only if the org that it is in is Disabled."
-msgstr ""
-
-#: openedx/features/discounts/admin.py
-msgid ""
 "These define the context to configure the percentage for the first purchase "
 "discount.If multiple contexts apply to a course (for example, if "
 "configuration is specified for the course specifically, and for the org that"
@@ -11529,23 +11622,11 @@ msgid ""
 " context."
 msgstr ""
 
-#: openedx/features/discounts/models.py
-msgid "Disabled"
-msgstr ""
-
 #: openedx/features/discounts/utils.py
 #, python-brace-format
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
-msgstr ""
-
-#: openedx/features/discounts/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
-"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/admin/forms.py
@@ -11568,9 +11649,9 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid ""
-"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
-"custom dashboard for learning. {link_start}Click here{link_end} to continue "
-"in that experience."
+"You have access to the {bold_start}{enterprise_name}{bold_end} dashboard. To"
+" access the courses available to you through {enterprise_name}, "
+"{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11638,6 +11719,28 @@ msgid ""
 "won’t lose any of your progress."
 msgstr ""
 
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "Try again ({attempts} attempt remaining)"
+msgid_plural "Try again ({attempts} attempts remaining)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of {max_attempts} attempts for this problem."
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid "Try again (unlimited attempts)"
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of unlimited attempts for this problem."
+msgstr ""
+
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -11660,6 +11763,24 @@ msgstr ""
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
 msgstr "Kursa komandas lietotājs neeksistē"
+
+#: cms/djangoapps/contentstore/admin.py
+#, python-brace-format
+msgid ""
+"Number of course outline regenerations successfully requested: {regenerates}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "Regenerate selected course outlines"
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "All course outline regenerations successfully requested."
+msgstr ""
+
+#: cms/djangoapps/contentstore/admin.py
+msgid "Regenerate *all* course outlines"
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -11708,6 +11829,61 @@ msgstr "Notikusi vispārēja indeksēšanas kļūda"
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
 msgstr "(Nenosaukts)"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import because a course with this id: {} already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied. You do not have write access to this course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Could not find the {0} file in the package."
+msgstr "Paketē nevar atrast failu {0}."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Uploaded Tar file not found. Try again."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import since a library with this id already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Course olx validation failed. Please check your email."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied"
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unknown error while importing course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "An Unknown error occurred during the unpacking step."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Unknown User ID: {0}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unsafe tar file. Aborting import."
+msgstr "Nedrošs tar fails. Importēšana tiek pārtraukta."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "User permission denied."
+msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 #, python-brace-format
@@ -11769,33 +11945,6 @@ msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Unknown User ID: {0}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Permission denied"
-msgstr ""
-
-#: cms/djangoapps/contentstore/tasks.py
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Tar file not found"
-msgstr "Tar fails nav atrasts"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Unsafe tar file. Aborting import."
-msgstr "Nedrošs tar fails. Importēšana tiek pārtraukta."
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Could not find the {0} file in the package."
-msgstr "Paketē nevar atrast failu {0}."
 
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
@@ -11890,8 +12039,16 @@ msgid "HTML"
 msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Open Response"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Tukšs"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank Open Response Assessment"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -11979,7 +12136,11 @@ msgid "Subsection"
 msgstr "Apakšsegments"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
+msgid "Some chunks missed during file upload. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload failed. Please try again"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
@@ -12081,6 +12242,11 @@ msgid ""
 "There is already a library defined with the same organization and library "
 "code. Please change your library code so that it is unique within your "
 "organization."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/library.py
+#, python-brace-format
+msgid "'{organization_key}' is not a valid organization identifier."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
@@ -12418,6 +12584,11 @@ msgid "Loading"
 msgstr "Ielādējas"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course Name"
+msgstr "Kursa nosaukums"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Kursa numurs"
@@ -12458,8 +12629,6 @@ msgstr "Kursa izpildes reize:"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Mani kursi"
@@ -12496,16 +12665,6 @@ msgstr "Skatīt"
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
 msgstr "Saglabāt"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "previous"
-msgstr "iepriekšējais"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "next"
-msgstr "Nākamais"
 
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html
@@ -12828,6 +12987,21 @@ msgstr ""
 msgid "Account Status Info"
 msgstr "Konta statusa informācija"
 
+#: lms/templates/dashboard.html
+msgid "Activate your account so you can log back in"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid ""
+"We sent an email to {strong_start}{email}{strong_end} with a link to "
+"activate your account. Can’t find it? Check your spam folder or "
+"{link_start}resend the email{link_end}."
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Continue to {platform_name}"
+msgstr ""
+
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "E-pasta iestatījumi kursam {course_number}"
@@ -13004,6 +13178,10 @@ msgstr "Ārēja autentifikācija neizdevās"
 #: lms/templates/footer.html
 msgid "organization logo"
 msgstr ""
+
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "Paroles atiestatīšana"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -13567,8 +13745,12 @@ msgid "Submission History Viewer"
 msgstr "Iesniegumu vēstures skatītājs"
 
 #: lms/templates/staff_problem_info.html
-msgid "User:"
-msgstr "Lietotājs:"
+msgid "Learner's {platform_name} email address or username:"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Enter the learner email address or username"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
@@ -13595,122 +13777,6 @@ msgstr "Iepriekšējā lapa"
 #: lms/templates/staticbook.html
 msgid "Next page"
 msgstr "Nākamā lapa"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Sysadmin Dashboard"
-msgstr "Sistēmas administratora informācijas panelis"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Users"
-msgstr "Lietotāji"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Staffing and Enrollment"
-msgstr "Darbinieki un reģistrācija"
-
-#. Translators: refers to http://git-scm.com/docs/git-log
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Logs"
-msgstr "Git žurnāli"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "User Management"
-msgstr "Lietotāju pārvaldīšana"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Email or username"
-msgstr "E-pasts vai lietotājvārds"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete user"
-msgstr "Dzēst lietotāju"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Create user"
-msgstr "Izveidot lietotāju"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid ""
-"Go to each individual course's Instructor dashboard to manage course "
-"enrollment."
-msgstr ""
-"Doties uz katra individuālā kursa instruktora informācijas paneli, lai "
-"pārvaldītu kursa reģistrēšanos."
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Administer Courses"
-msgstr "Administrēt kursus"
-
-#. Translators: Repo is short for git repository or source of
-#. courseware; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Location"
-msgstr "Repozitorija atrašanās vieta"
-
-#. Translators: Repo is short for git repository (http://git-scm.com/about) or
-#. source of
-#. courseware and branch is a specific version within that repository
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Branch (optional)"
-msgstr "Repozitorija zars (neobligāts)"
-
-#. Translators: GitHub is a popular website for hosting code
-#: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from GitHub"
-msgstr "Ielādēt jaunu kursu no GitHub"
-
-#. Translators: 'dir' is short for 'directory'
-#: lms/templates/sysadmin_dashboard.html
-msgid "Course ID or dir"
-msgstr "Kursa ID vai direktorija"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete course from site"
-msgstr "Dzēst kursu no vietnes"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Page {current_page} of {total_pages}"
-msgstr "Lapa {current_page} no {total_pages}"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for {course_id}"
-msgstr "Nesenā git ielādes aktivitāte {course_id}"
-
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Date"
-msgstr "Datums"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Action"
-msgstr "Git darbība"
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded."
-msgstr "Nav reģistrēti git importēšanas žurnāli."
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded for this course."
-msgstr "Šim kursam nav reģistrēti git importēšanas žurnāli."
-
-#: lms/templates/text-me-the-app.html
-msgid "Text Me The App"
-msgstr "Nosūtīt lietotni man īsziņā"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -13803,6 +13869,10 @@ msgstr "{subsection_format} izpildes datums {{date}}"
 
 #: lms/templates/vert_module.html
 msgid "Due {date}"
+msgstr ""
+
+#: lms/templates/vert_module.html
+msgid "Past due"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14887,6 +14957,13 @@ msgstr ""
 "Datuma formāts kā četri gada cipari, svītra, divi mēneša cipari, svītra, "
 "divi dienas cipari"
 
+#: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Date"
+msgstr "Datums"
+
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
 #: lms/templates/ccx/schedule.html
@@ -15749,6 +15826,7 @@ msgid "Download Your Certificate"
 msgstr "Lejupielādēt Jūsu sertifikātu"
 
 #: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Request Certificate"
 msgstr "Pieprasīt sertifikātu"
 
@@ -15937,6 +16015,7 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "The {platform_name} Team"
 msgstr "{platform_name} komanda"
 
@@ -15949,15 +16028,11 @@ msgstr ""
 "kredītpunktiem {platform_name}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your certificate will be available on or before {date}"
-msgstr "Jūsu sertifikāts būs pieejams pirms vai {date}"
+msgid "Your grade and certificate will be ready after {date}."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final grade:"
-msgstr "Jūsu gala atzīme:"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Grades will be finalized on {cert_available_date}"
+msgid "Congratulations! Your certificate is ready."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -16007,10 +16082,6 @@ msgstr ""
 "identitātes ar {platform_name}. "
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr "Verificējiet Jūsu identitāti tagad."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
 msgstr "Jūsu {cert_name_short} tiek ģenerēts"
 
@@ -16019,20 +16090,16 @@ msgid "This link will open the certificate web view"
 msgstr "Šī saite atvērsies sertifikāta tīmekļa skatā"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "View {cert_name_short}"
-msgstr "Skatīt {cert_name_short}"
+msgid "View my {cert_name_short}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
 msgstr "Šajā saitē tiks atvērts/lejupielādēts PDF dokuments"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download {cert_name_short} (PDF)"
-msgstr "Lejupielādēt {cert_name_short} (PDF)"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your {cert_name_short} (PDF)"
-msgstr "Lejupielādēt Jūsu {cert_name_short} (PDF)"
+msgid "Download my {cert_name_short}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -16041,10 +16108,6 @@ msgid ""
 msgstr ""
 "Šajā saitē tiks atvērts/lejupielādēts PDF dokuments ar Jūsu verificēto "
 "{cert_name_long}."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your ID Verified {cert_name_short} (PDF)"
-msgstr "Lejupielādējiet Jūsu ID verificēto {cert_name_short} (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -16125,10 +16188,6 @@ msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr "Jūs varat nomainīt sesijas līdz {entitlement_expiration_date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr "Skatīt arhivēto kursu"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr "Es piedalos {course_name} tiešsaistē ar {facebook_brand}. Novērtē to!"
 
@@ -16170,12 +16229,16 @@ msgid "Email Settings"
 msgstr "E-pasta iestatījumi"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "View Archived Course"
+msgstr "Skatīt arhivēto kursu"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "Saistītās programmas"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Verification not yet complete."
-msgstr "Verifikācija vēl nav pabeigta."
+msgid "To earn a certificate, you must verify your ID"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
@@ -16245,21 +16308,15 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
-"this course."
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
+"access to the course material, unlock both graded and non-graded "
+"assignments, and earn a {link_start}verified certificate{link_end} to "
+"showcase on your resume."
 msgstr ""
-"Iegūstiet {cert_name_long}, lai izceltu zināšanas un prasmes, kuras ieguvāt "
-"šajā kursā."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"It's official. It's easily shareable. It's a proven motivator to complete "
-"the course. {line_break}{link_start}Learn more about the verified "
-"{cert_name_long}{link_end}."
+msgid "Upgrade"
 msgstr ""
-"Tas ir oficiāls. Tas ir viegli kopīgojams. Tas ir pārbaudīts motivētājs, lai"
-" pabeigtu kursu. {line_break}{link_start}Uzziniet vairāk par verificēto "
-"{cert_name_long}{link_end}."
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
@@ -16355,22 +16412,20 @@ msgid "View Consent"
 msgstr "Skatīt piekrišanu"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Approved"
-msgstr "Pašreizējais verifikācijas statuss: apstiprināta"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
+msgid "Current ID Verification Status: Approved"
 msgstr ""
-"Jūsu edX verifikācija tika apstiprināta. Jūsu verifikācija ir spēkā vienu "
-"gadu pēc iesniegšanas."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}. Please be aware "
-"photo verification can take up to three days once initiated and you will not"
-" be able to earn a certificate or take a proctored exam until approved."
+"Your edX ID verification has been approved. Your ID verification is "
+"effective for two years after submission."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your photo ID verification expires on {verification_expiry}. Please be aware"
+" photo verification can take up to three days once initiated and you will "
+"not be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16378,48 +16433,40 @@ msgid "Resubmit Verification"
 msgstr "Atkārtoti iesniegt verifikāciju"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Pending"
-msgstr "Pašreizējais verifikācijas statuss: gaida"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX ID verification is pending. Your verification information has been "
-"submitted and will be reviewed shortly."
+msgid "Current ID Verification Status: Pending"
 msgstr ""
-"Jūsu edX ID verifikācija ir gaidīšanas režīmā. Jūsu verifikācijas "
-"informācija ir iesniegta un tiks drīz izskatīta."
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Denied"
-msgstr "Pašreizējais verifikācijas statuss: atteikta"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification submission was not accepted. To receive a verified "
+"Your edX ID verification is pending. Your ID verification information has "
+"been submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current ID Verification Status: Denied"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your ID verification submission was not accepted. To receive a verified "
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
-"Jūsu verifikācijas iesniegums netika apstiprināts. Lai saņemtu verificētu "
-"sertifikātu, Jums ir jāiesniedz jauna Jūsu fotogrāfija un valdības izdota ID"
-" fotogrāfija pirms kursa verifikācijas gala termiņa."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification was denied for the following reasons:"
-msgstr "Jūsu verifikācija tika atteikta sekojošu iemeslu dēļ:"
+msgid "Your ID verification was denied for the following reasons:"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Expired"
-msgstr "Pašreizējais verifikācijas statuss: beidzies termiņš"
+msgid "Current ID Verification Status: Expired"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification has expired. To receive a verified certificate, you must "
-"submit a new photo of yourself and your government-issued photo ID before "
-"the verification deadline for your course."
+"Your ID verification has expired. To receive a verified certificate, you "
+"must submit a new photo of yourself and your government-issued photo ID "
+"before the verification deadline for your course."
 msgstr ""
-"Jūsu verifikācijas termiņš ir beidzies. Lai saņemtu verificētu sertifikātu, "
-"Jums ir jāiesniedz jauna Jūsu fotogrāfija un valdības izdota ID fotogrāfija "
-"pirms kursa verifikācijas gala termiņa."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -16906,7 +16953,6 @@ msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
@@ -16926,17 +16972,17 @@ msgid "Your order number is: {order_number}"
 msgstr "Jūsu pasūtījuma numurs ir: {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Hi {full_name}"
+msgid "Hello {full_name},"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
+msgid "Your {platform_name} ID verification photos have been approved."
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your approval status remains valid for two years, and it will expire "
+"{expiration_datetime}."
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -17170,13 +17216,6 @@ msgstr ""
 msgid "Discover New"
 msgstr "Visi kursi"
 
-#. Translators: This is short for "System administration".
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-msgid "Sysadmin"
-msgstr "Sistēmas administrators"
-
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
 msgstr ""
@@ -17240,8 +17279,10 @@ msgid "Example Certificates"
 msgstr "Sertifikātu paraugi"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Generate example certificates for the course."
-msgstr "Ģenerēt sertifikātu paraugus kursam."
+msgid ""
+"This course is configured to generate PDF certificates and this certificate "
+"type is no longer supported. Example certificates cannot be generated."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Example Certificates"
@@ -17470,15 +17511,6 @@ msgstr "Iedaļu skaits:"
 msgid "Grade Cutoffs:"
 msgstr "Atzīmju noslēgšanas līmenis:"
 
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"View detailed Git import logs for this course {link_start}by clicking "
-"here{link_end}."
-msgstr ""
-"Skatīt detalizētus Git importēšanas žurnālus kursam, {link_start}klikšķinot "
-"šeit{link_end}."
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
 msgstr "Kursa brīdinājumi"
@@ -17500,12 +17532,10 @@ msgid "Grading Configuration"
 msgstr "Vērtēšanas konfigurācija"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Click to download a CSV of anonymized student IDs:"
-msgstr "Klikšķiniet, lai lejupielādētu CSV ar anonimizētiem studentu ID:"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Get Student Anonymized IDs CSV"
-msgstr "Iegūt studentu anonimizētu ID CSV"
+msgid ""
+"The CSV of anonymized student IDs download has been relocated to the Reports"
+" section below."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports"
@@ -17558,6 +17588,14 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
 msgstr "Lejupielādēt CSV ar audzēkņiem, kuri var reģistrēties"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to download a CSV of anonymized student IDs:"
+msgstr "Klikšķiniet, lai lejupielādētu CSV ar anonimizētiem studentu ID:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Get Student Anonymized IDs CSV"
+msgstr "Iegūt studentu anonimizētu ID CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -17646,6 +17684,10 @@ msgstr "Ģenerēt uzdevumu atzīmju atskaiti"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "Ģenerēt ORA datu atskaiti"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Summary Report"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -17970,10 +18012,6 @@ msgid ""
 msgstr ""
 "Jūs nesaņemsiet paziņojumus par e-pastiem, kas netiek nogādāti, tādēļ, "
 "lūdzu, vēlreiz pārbaudiet pareizrakstību."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Role of the users being enrolled."
-msgstr "Reģistrēto lietotāju loma"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -18399,6 +18437,10 @@ msgid "Allowance Section"
 msgstr "Atļauju sadaļa"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Onboarding Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
 msgstr "Studentu īpašo eksāmenu mēģinājumi"
 
@@ -18722,22 +18764,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mani kursi"
 
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Get the {platform_name} Mobile App!"
-msgstr "Iegūstiet {platform_name} mobilo lietotni!"
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "We'll send you a one time SMS with a link to download the app."
-msgstr "Mēs nosūtīsim Jums vienīgo SMS ar saiti uz lietotnes lejupielādi."
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Mobile phone number"
-msgstr "Mobilā tālruņa numurs"
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Send me a text with the link"
-msgstr "Nosūtiet man īsziņu ar saiti"
-
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Nomainīt vēlamo valodu"
@@ -18992,6 +19018,14 @@ msgstr ""
 msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} ."
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Too Many Requests"
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Your request has been rate-limited. Please try again later."
 msgstr ""
 
 #: lms/templates/static_templates/about.html
@@ -19377,6 +19411,12 @@ msgstr "Rediģēt Jūsu kursa mērķi:"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Pursue a verified certificate"
 msgstr "Iegūt verificētu sertifikātu"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid ""
+"Sample verified certificate with your name, the course title, the logo of "
+"the institution and the signatures of the instructors for this course."
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
@@ -22119,11 +22159,57 @@ msgid "Course End Time"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Certificates Available Date"
+msgid "Immediately upon passing"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "By default, 48 hours after course end date"
+msgid "End date of course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "A date after the course end date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Certificates are awarded at the end of a course run"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Read more about this setting"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"In all configurations of this setting, certificates are generated for "
+"learners as soon as they achieve the passing threshold in the course (which "
+"can occur before a final assignment based on course design)"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Learners can access their certificate as soon as they achieve a passing "
+"grade above the course grade threshold. Note: learners can achieve a passing"
+" grade before encountering all assignments in some course configurations."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "On course end date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Learners with passing grades can access their certificate once the end date "
+"of the course has elapsed."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Learners with passing grades can access their certificate after the date "
+"that you set has elapsed."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Certificates Available Date"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -22792,6 +22878,18 @@ msgid ""
 " to view the details of your task or download any files created."
 msgstr ""
 
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Here are some validations we found with your course content."
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Errors: "
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Warnings: "
+msgstr ""
+
 #: cms/templates/emails/user_task_complete_email_subject.txt
 msgid "{platform_name} {studio_name}: Task Status Update"
 msgstr ""
@@ -22814,6 +22912,14 @@ msgstr ""
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "Create New"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "previous"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "next"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
@@ -22903,6 +23009,10 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+msgid "Pages & Resources"
 msgstr ""
 
 #: cms/templates/widgets/header.html
@@ -23004,6 +23114,10 @@ msgstr ""
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
 msgstr ""
+
+#: wiki/admin.py wiki/models/article.py
+msgid "created"
+msgstr "izveidots"
 
 #: wiki/apps.py
 msgid "Wiki notifications"
