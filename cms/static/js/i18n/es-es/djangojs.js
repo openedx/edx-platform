@@ -84,7 +84,6 @@
     "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Esta es la lista de %s disponibles. Puede elegir algunos seleccion\u00e1ndolos en la caja inferior y luego haciendo clic en la flecha \"Elegir\" que hay entre las dos cajas.",
     "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Esta es la lista de los %s elegidos. Puede elmininar algunos seleccion\u00e1ndolos en la caja inferior y luego haciendo click en la flecha \"Eliminar\" que hay entre las dos cajas.",
     "This problem could not be saved.": "Este ejercicio no ha podido guardarse.",
-    "This problem has already been released. Any changes will apply only to future assessments.": "Este ejercicio ya se ha enviado. Cualquier otro cambio se aplicar\u00e1 solamente a calificaciones futuras.",
     "This response could not be saved.": "Esta respuesta no ha podido guardarse.",
     "This response could not be submitted.": "Esta respuesta no ha podido enviarse.",
     "This response has been saved but not submitted.": "Esta respuesta se ha guardado pero no se ha enviado",
