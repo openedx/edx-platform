@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-15 20:44+0000\n"
-"PO-Revision-Date: 2021-08-15 20:44:39.708116\n"
+"POT-Creation-Date: 2021-08-16 13:36+0000\n"
+"PO-Revision-Date: 2021-08-16 13:36:09.153984\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -6418,11 +6418,11 @@ msgstr ""
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
-"and their respective logos are registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
-"\\ü00À9 {org_name}.  Àll rïghts résérvéd éxçépt whéré nötéd.  édX, Öpén édX "
-"änd théïr réspéçtïvé lögös äré régïstéréd trädémärks öf édX Ìnç. #"
+"© {org_name}.  Àll rïghts résérvéd éxçépt whéré nötéd.  édX, Öpén édX änd "
+"théïr réspéçtïvé lögös äré régïstéréd trädémärks öf édX Ìnç. Ⱡ'σяє#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
