@@ -3091,7 +3091,6 @@ INSTALLED_APPS = [
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
 
-    'openedx.features.wikimedia_features.admin_dashboard',
 
 ]
 
