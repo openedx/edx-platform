@@ -152,7 +152,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of 1.0
 
-        num_queries = 33
+        num_queries = 34
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 

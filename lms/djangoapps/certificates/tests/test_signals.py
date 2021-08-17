@@ -281,6 +281,68 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, expected_status)
 
 
+@ddt.ddt
+class FailingGradeCertsTestWithWhiteLabelCert(ModuleStoreTestCase):
+    """
+    Tests for marking if a certificate is whitelisted it won't change from a
+    passing status to notpassing when grade goes from passing to failing, we
+    also test and that the signal has no effect on the cert status if the cert
+    has a non-passing status
+    """
+
+    def setUp(self):
+        super(FailingGradeCertsTestWithWhiteLabelCert, self).setUp()
+        self.course = CourseFactory.create(
+            self_paced=True,
+        )
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="verified",
+        )
+        self.whitelist_cert = CertificateWhitelist.objects.create(
+            user=self.user,
+            course_id=self.course.id,
+            whitelist=True
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            status='submitted'
+        )
+        attempt.approve()
+
+    @ddt.data(
+        CertificateStatuses.deleted,
+        CertificateStatuses.deleting,
+        CertificateStatuses.downloadable,
+        CertificateStatuses.error,
+        CertificateStatuses.generating,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.restricted,
+        CertificateStatuses.unavailable,
+        CertificateStatuses.auditing,
+        CertificateStatuses.audit_passing,
+        CertificateStatuses.audit_notpassing,
+        CertificateStatuses.unverified,
+        CertificateStatuses.invalidated,
+        CertificateStatuses.requesting,
+    )
+    def test_cert_failure(self, status):
+        # we want to make sure the certificate status does not change
+        # upon course change, since the certificate is whitelisted.
+        expected_status = status
+        GeneratedCertificate.eligible_certificates.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=status
+        )
+        CourseGradeFactory().update(self.user, self.course)
+        cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
+        self.assertEqual(cert.status, expected_status)
+
+
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
