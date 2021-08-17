@@ -120,7 +120,6 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
             }),
         )
     })
-
     msg = PasswordReset().personalize(
         recipient=Recipient(user.username, preferred_email or user.email),
         language=get_user_preference(user, LANGUAGE_KEY),
@@ -578,7 +577,6 @@ def password_change_request_handler(request):
                     'request': request,  # Used by google_analytics_tracking_pixel
                     'email_address': email,
                 })
-
                 msg = PasswordReset().personalize(
                     recipient=Recipient(username='', email_address=email),
                     language=settings.LANGUAGE_CODE,
