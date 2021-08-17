@@ -240,11 +240,14 @@ class ChooseModeView(View):
         context['audit_access_deadline'] = deadline
         fbe_is_on = deadline and gated_content
 
-        # REV-2133 TODO Value Prop: remove waffle after testing is completed
+        # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
         if waffle.flag_is_active(request, 'course_modes.use_new_track_selection'):
-            if not error:  # Happy path does not handle errors.
-                if verified_mode and fbe_is_on and not enterprise_customer:  # Happy path conditions
+            # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
+            # technically considered happy path, old Track Selection page will be displayed.
+            if not error:
+                # Happy path conditions.
+                if verified_mode and fbe_is_on and not enterprise_customer:
                     return render_to_response("course_modes/track_selection.html", context)
         return render_to_response("course_modes/choose.html", context)
 
