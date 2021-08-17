@@ -652,6 +652,13 @@ def _section_data_download(course, access):
         section_data['gradeucursos_assig_types'] = views.Content()._get_assignment_types(course_key)
     except ImportError:
         section_data['has_gradeucursos'] = False
+    
+    try:
+        from eolreportcertificate import views
+        section_data['has_eolreportcertificate'] = True
+        section_data['eolreportcertificate_url'] = '{}?{}'.format(reverse('eolreportcertificate-export:data'), urllib.parse.urlencode({'course': six.text_type(course_key)}))
+    except ImportError:
+        section_data['has_eolreportcertificate'] = False
     ######### EOL #############
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True
