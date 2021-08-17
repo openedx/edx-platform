@@ -241,7 +241,7 @@ distlib==0.3.2
     #   virtualenv
 django==2.2.24
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -489,7 +489,7 @@ done-xblock==2.0.4
     # via -r requirements/edx/testing.txt
 drf-jwt==1.19.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
 drf-yasg==1.20.0
@@ -533,9 +533,8 @@ edx-django-utils==4.4.0
     #   edx-when
     #   ora2
     #   super-csv
-edx-drf-extensions==6.6.0
+edx-drf-extensions==7.0.1
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-completion
     #   edx-enterprise
@@ -580,7 +579,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.24.5
+git+https://github.com/edx/edx-proctoring.git@df23c081a0f604ce58c275f5b9d49881fc98f1dc#egg=edx-proctoring
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -629,7 +628,7 @@ edxval==2.0.3
     #   -r requirements/edx/testing.txt
 elasticsearch==7.13.4
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-search
 enmerkar==0.7.1
@@ -1040,12 +1039,11 @@ pyjwkest==1.4.2
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==1.7.1
+pyjwt[crypto]==2.1.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   drf-jwt
+    #   edx-drf-extensions
     #   edx-auth-backends
     #   edx-proctoring
     #   edx-rest-api-client
@@ -1338,7 +1336,6 @@ six==1.16.0
     #   python-swiftclient
     #   singledispatch
     #   social-auth-app-django
-    #   social-auth-core
     #   sphinxcontrib-httpdomain
     #   tox
     #   transifex-client
@@ -1357,13 +1354,11 @@ snowballstemmer==2.1.0
     # via sphinx
 social-auth-app-django==4.0.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==3.4.0
+social-auth-core==4.1.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
     #   social-auth-app-django
