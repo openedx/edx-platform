@@ -1,4 +1,4 @@
-name: CI
+name: Check Migrations
 
 on:
   workflow_dispatch:
@@ -9,7 +9,6 @@ on:
 
 jobs:
   run_tests:
-    name: Migrations Test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

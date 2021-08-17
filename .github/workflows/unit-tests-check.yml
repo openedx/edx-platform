@@ -1,4 +1,4 @@
-name: CI
+name: Collect Unit Tests
 
 on:
   pull_request:
@@ -7,7 +7,6 @@ on:
 
 jobs:
   run_tests:
-    name: Ensure Unit Tests Running
     runs-on: ubuntu-20.04
     strategy:
       matrix:

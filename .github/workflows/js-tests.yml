@@ -1,4 +1,4 @@
-name: CI
+name: Test JavaScript
 
 on:
   pull_request:
@@ -10,7 +10,6 @@ on:
 
 jobs:
   run_tests:
-    name: JS
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
