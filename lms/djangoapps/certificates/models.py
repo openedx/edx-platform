@@ -1239,3 +1239,31 @@ class CertificateDateOverride(TimeStampedModel):
     def __str__(self):
         return "Certificate %s, date overridden to %s by %s on %s." % \
                (self.generated_certificate, self.date, self.overridden_by, self.created)
+
+    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
+        """
+        After the base save() method finishes, fire the COURSE_CERT_CHANGED
+        signal.
+        """
+        super().save(*args, **kwargs)
+        COURSE_CERT_CHANGED.send_robust(
+            sender=self.__class__,
+            user=self.generated_certificate.user,
+            course_key=self.generated_certificate.course_id,
+            mode=self.generated_certificate.mode,
+            status=self.generated_certificate.status,
+        )
+
+    def delete(self, *args, **kwargs):  # pylint: disable=signature-differs
+        """
+        After the base delete() method finishes, fire the COURSE_CERT_CHANGED
+        signal.
+        """
+        super().delete(*args, **kwargs)
+        COURSE_CERT_CHANGED.send_robust(
+            sender=self.__class__,
+            user=self.generated_certificate.user,
+            course_key=self.generated_certificate.course_id,
+            mode=self.generated_certificate.mode,
+            status=self.generated_certificate.status,
+        )

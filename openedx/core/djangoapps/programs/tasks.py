@@ -9,6 +9,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute
 from edx_rest_api_client import exceptions
 from opaque_keys.edx.keys import CourseKey
@@ -293,7 +294,7 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     })
 
 
-def post_course_certificate(client, username, certificate, visible_date):
+def post_course_certificate(client, username, certificate, visible_date, date_override=None):
     """
     POST a certificate that has been updated to Credentials
     """
@@ -305,6 +306,7 @@ def post_course_certificate(client, username, certificate, visible_date):
             'mode': certificate.mode,
             'type': COURSE_CERTIFICATE,
         },
+        'date_override': date_override.strftime(VISIBLE_DATE_FORMAT) if date_override else None,
         'attributes': [
             {
                 'name': 'visible_date',
@@ -458,7 +460,19 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
                 "Task award_course_certificate will award certificate for course "
                 f"{course_key} with a visible date of {visible_date}"
             )
-            post_course_certificate(credentials_client, username, certificate, visible_date)
+
+            # If the certificate has an associated CertificateDateOverride, send
+            # it along
+            try:
+                date_override = certificate.date_override.date
+                LOGGER.info(
+                    "Task award_course_certificate will award certificate for  "
+                    f"course {course_key} with a date override of {date_override}"
+                )
+            except ObjectDoesNotExist:
+                date_override = None
+
+            post_course_certificate(credentials_client, username, certificate, visible_date, date_override)
 
             LOGGER.info(f"Awarded certificate for course {course_key} to user {username}")
     except Exception as exc:

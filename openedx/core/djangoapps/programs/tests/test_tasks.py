@@ -20,7 +20,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -493,6 +493,7 @@ class PostCourseCertificateTestCase(TestCase):
                 'mode': self.certificate.mode,
                 'type': tasks.COURSE_CERTIFICATE,
             },
+            'date_override': None,
             'attributes': [{
                 'name': 'visible_date',
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
@@ -536,6 +537,15 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
+    def _add_certificate_date_override(self):
+        """
+        Creates a mock CertificateDateOverride and adds it to the certificate
+        """
+        self.certificate.date_override = CertificateDateOverrideFactory.create(
+            generated_certificate=self.certificate,
+            overridden_by=UserFactory.create(username='test-admin'),
+        )
+
     @ddt.data(
         'verified',
         'no-id-professional',
@@ -563,6 +573,18 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
         assert call_args[3] == self.available_date
+
+    def test_award_course_certificates_override_date(self, mock_post_course_certificate):
+        """
+        Tests the API POST method is called with date override when present
+        """
+        self._add_certificate_date_override()
+        tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
+        call_args, _ = mock_post_course_certificate.call_args
+        assert call_args[1] == self.student.username
+        assert call_args[2] == self.certificate
+        assert call_args[3] == self.certificate.modified_date
+        assert call_args[4] == self.certificate.date_override.date.date()
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """
