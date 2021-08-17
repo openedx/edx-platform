@@ -783,7 +783,7 @@ class CertificatesBrandingTest(ModuleStoreTestCase):
         },
     }
 
-    @with_site_configuration(configuration=configuration)
+    @with_site_configuration(domain='test_site.localhost', configuration=configuration)
     def test_certificate_header_data(self):
         """
         Test that get_certificate_header_context from lms.djangoapps.certificates api

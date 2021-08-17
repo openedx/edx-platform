@@ -99,6 +99,10 @@ class SiteConfiguration(models.Model):
             scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
             domain=self.site.domain)
 
+        # This ensures if the site has a custom domain set, we set the custom
+        # domain instead the Tahoe URL.
+        self.site_values['SITE_NAME'] = self.site.domain
+
         super(SiteConfiguration, self).save(**kwargs)
 
         # recompile SASS on every save
