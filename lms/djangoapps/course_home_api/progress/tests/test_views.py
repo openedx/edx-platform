@@ -33,7 +33,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     """
     def setUp(self):
         super().setUp()
-        self.url = reverse('course-home-progress-tab', args=[self.course.id])
+        self.url = reverse('course-home:progress-tab', args=[self.course.id])
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -45,7 +45,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.data['section_scores'] is not None
         for chapter in response.data['section_scores']:
             assert chapter is not None
-        assert ('settings/grading/' + str(self.course.id)) in response.data['studio_url']
+        assert 'settings/grading/' + str(self.course.id) in response.data['studio_url']
         assert response.data['verification_data'] is not None
         assert response.data['verification_data']['status'] == 'none'
         if enrollment_mode == CourseMode.VERIFIED:
@@ -74,7 +74,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_get_unknown_course(self):
-        url = reverse('course-home-progress-tab', args=['course-v1:unknown+course+2T2020'])
+        url = reverse('course-home:progress-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 
@@ -108,7 +108,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     def test_has_scheduled_content_data(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         future = now() + timedelta(days=30)
-        chapter = ItemFactory(parent=self.course, category='chapter', start=future)
+        ItemFactory(parent=self.course, category='chapter', start=future)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.json()['has_scheduled_content']
@@ -127,7 +127,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0
+        self.course.grade_cutoffs = {'Pass': 0}
         self.update_course(self.course, self.user.id)
         response = self.client.get(self.url)
         assert response.status_code == 200
@@ -192,12 +192,12 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.data['username'] == self.user.username
 
         other_user = UserFactory()
-        self.url = reverse('course-home-progress-tab-other-student', args=[self.course.id, other_user.id])
+        self.url = reverse('course-home:progress-tab-other-student', args=[self.course.id, other_user.id])
         CourseEnrollment.enroll(other_user, self.course.id)
 
         # users with the ccx coach role can view other students' progress pages
         with patch(
-            'lms.djangoapps.course_home_api.progress.v1.views.has_ccx_coach_role',
+            'lms.djangoapps.course_home_api.progress.views.has_ccx_coach_role',
             return_value=True
         ):
             response = self.client.get(self.url)

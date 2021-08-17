@@ -20,7 +20,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
     """
     def setUp(self):
         super().setUp()
-        self.url = reverse('course-home-dates-tab', args=[self.course.id])
+        self.url = reverse('course-home:dates-tab', args=[self.course.id])
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -49,7 +49,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 401
 
     def test_get_unknown_course(self):
-        url = reverse('course-home-dates-tab', args=['course-v1:unknown+course+2T2020'])
+        url = reverse('course-home:dates-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 

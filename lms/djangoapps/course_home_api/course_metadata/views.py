@@ -13,7 +13,7 @@ from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
+from lms.djangoapps.course_home_api.course_metadata.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade

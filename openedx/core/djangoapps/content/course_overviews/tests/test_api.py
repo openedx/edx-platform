@@ -3,11 +3,13 @@ course_overview api tests
 """
 from mock import patch
 
+from django.http.response import Http404
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.api import (
+    get_course_overview_or_404,
     get_course_overview_or_none,
     get_course_overviews,
     get_course_overviews_from_ids,
@@ -27,7 +29,7 @@ class TestCourseOverviewsApi(ModuleStoreTestCase):
         for _ in range(3):
             CourseOverviewFactory.create()
 
-    def test_get_course_overview_or_none(self):
+    def test_get_course_overview_or_none_success(self):
         """
         Test for `test_get_course_overview_or_none` function when the overview exists.
         """
@@ -42,6 +44,22 @@ class TestCourseOverviewsApi(ModuleStoreTestCase):
         course_run_key = CourseKey.from_string('course-v1:coping+with+deletions')
         retrieved_course_overview = get_course_overview_or_none(course_run_key)
         assert retrieved_course_overview is None
+
+    def test_get_course_overview_or_404_success(self):
+        """
+        Test for `test_get_course_overview_or_404` function when the overview exists.
+        """
+        course_overview = CourseOverviewFactory.create()
+        retrieved_course_overview = get_course_overview_or_404(course_overview.id)
+        assert course_overview.id == retrieved_course_overview.id
+
+    def test_get_course_overview_or_404_missing(self):
+        """
+        Test for `test_get_course_overview_or_404` function when the overview does not exist.
+        """
+        course_run_key = CourseKey.from_string('course-v1:coping+with+deletions')
+        with self.assertRaises(Http404):
+            get_course_overview_or_404(course_run_key)
 
     def test_get_course_overview_from_ids(self):
         """

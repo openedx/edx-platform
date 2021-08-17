@@ -986,7 +986,13 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.LMS))
 
 # Course Home API urls
 urlpatterns += [
-    url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
+    # This is a BFF ("backend for frontend") djangoapp for the Learning MFE (like courseware_api).
+    # It will change and morph as needed for the frontend, and is not a stable API on which other code can rely.
+    url(r'^api/course_home/', include(('lms.djangoapps.course_home_api.urls', 'course-home'))),
+
+    # This v1 version is just kept for transitional reasons and is going away as soon as the MFE stops referencing it.
+    # We don't promise any sort of versioning stability.
+    url(r'^api/course_home/v1/', include(('lms.djangoapps.course_home_api.urls', 'course-home-v1'))),
 ]
 
 # Course Experience API urls

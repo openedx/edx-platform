@@ -3,6 +3,7 @@ Unit tests for course_goals djangoapp
 """
 
 import json
+import uuid
 from unittest import mock
 
 from django.contrib.auth import get_user_model
@@ -11,13 +12,15 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_goals.models import CourseGoal
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
+from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 EVENT_NAME_ADDED = 'edx.course.goal.added'
 EVENT_NAME_UPDATED = 'edx.course.goal.updated'
@@ -43,7 +46,7 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user.password)
         self.client.force_authenticate(user=self.user)
 
-        self.apiUrl = reverse('course-home-save-course-goal')
+        self.apiUrl = reverse('course-home:save-course-goal')
 
     def save_course_goal(self, number, subscribed):
         """
@@ -126,3 +129,42 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         response = self.save_course_goal('notnumber', False)
         assert response.status_code == 400
         assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
+
+
+class TestUnsubscribeAPI(BaseCourseHomeTests):
+    """
+    Testing the unsubscribe API.
+    """
+    def unsubscribe(self, token):
+        url = reverse('course-home:unsubscribe-from-course-goal', kwargs={'token': token})
+        return self.client.post(url)
+
+    def make_goal(self, course_key, **kwargs) -> CourseGoal:
+        return CourseGoal.objects.create(user=self.user, course_key=course_key, **kwargs)
+
+    def test_happy_path(self):
+        goal = self.make_goal(self.course.id, subscribed_to_reminders=True)
+        goal2 = self.make_goal('course-v1:foo+bar+2T2020', subscribed_to_reminders=True)  # a control group
+
+        def unsubscribe_and_check():
+            response = self.unsubscribe(goal.unsubscribe_token)
+            goal.refresh_from_db()
+            goal2.refresh_from_db()
+            assert response.status_code == 200
+            assert not goal.subscribed_to_reminders
+            assert goal2.subscribed_to_reminders
+            assert response.json() == {'course_title': self.course.display_name}
+
+        unsubscribe_and_check()
+
+        # Unsubscribe again to confirm that we're not like, toggling the subscription status or anything
+        unsubscribe_and_check()
+
+    def test_bad_token(self):
+        response = self.unsubscribe(uuid.uuid4())
+        assert response.status_code == 404
+
+    def test_bad_course(self):
+        goal = self.make_goal('course-v1:foo+bar+2T2020')
+        response = self.unsubscribe(goal.unsubscribe_token)
+        assert response.status_code == 404

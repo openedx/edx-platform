@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from lms.djangoapps.course_home_api.mixins import VerifiedModeSerializerMixin
+from lms.djangoapps.course_home_api.serializers import VerifiedModeSerializer
 
 
 class CourseTabSerializer(serializers.Serializer):
@@ -29,7 +29,7 @@ class CourseTabSerializer(serializers.Serializer):
         return request.build_absolute_uri(tab.link_func(self.context.get('course'), reverse))
 
 
-class CourseHomeMetadataSerializer(VerifiedModeSerializerMixin, serializers.Serializer):
+class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     """
     Serializer for the Course Home Course Metadata
     """
