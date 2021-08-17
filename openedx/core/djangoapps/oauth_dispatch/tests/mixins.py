@@ -46,8 +46,10 @@ class AccessTokenMixin:
                 algorithms=[settings.JWT_AUTH['JWT_ALGORITHM']],
                 audience=audience,
                 issuer=issuer,
-                verify_expiration=verify_expiration,
-                options={'verify_signature': False},
+                options={
+                    'verify_signature': False,
+                    "verify_exp": verify_expiration
+                },
             )
 
         # Note that if we expect the claims to have expired
