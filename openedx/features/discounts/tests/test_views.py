@@ -46,7 +46,7 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
         assert expected_payload['discount_applicable'] == response.data['discount_applicable']
 
         # make sure that the response matches the expected response
-        response_payload = jwt.decode(response.data['jwt'], verify=False)
+        response_payload = jwt.decode(response.data['jwt'], options={"verify_signature": False})
         assert all(item in list(response_payload.items()) for item in expected_payload.items())
 
     def test_course_user_discount_no_user(self):

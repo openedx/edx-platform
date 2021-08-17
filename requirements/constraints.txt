@@ -10,7 +10,7 @@
 
 
 # This file contains all common constraints for edx-repos
--c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+-c common_constraints.txt
 
 # celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
 celery<5.0.0
@@ -82,10 +82,6 @@ python-slugify<5.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
-
-# edx-proctoring==3.11.4 (latest) requires PyJWT<2.0.0
-PyJWT[crypto]<2.0.0
-social-auth-core<4.0.0  # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
 
 # celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
 click<8.0.0
