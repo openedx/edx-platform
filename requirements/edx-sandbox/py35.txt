@@ -81,7 +81,7 @@ pytz==2021.1
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py35.in
-regex==2021.7.6
+regex==2021.8.3
     # via nltk
 scipy==1.2.1
     # via
@@ -103,7 +103,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   -r requirements/edx-sandbox/py35.in
     #   symmath
-tqdm==4.62.0
+tqdm==4.62.1
     # via nltk
 
 # The following packages are considered to be unsafe in a requirements file:
