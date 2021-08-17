@@ -43,7 +43,7 @@
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
-
+            pages_and_resources_mfe_enabled = ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id)
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -68,12 +68,12 @@
                   <li class="nav-item nav-course-courseware-updates">
                     <a href="${course_info_url}">${_("Updates")}</a>
                   </li>
-                  % if not ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id):
+                  % if not pages_and_resources_mfe_enabled:
                   <li class="nav-item nav-course-courseware-pages">
                     <a href="${tabs_url}">${_("Pages")}</a>
                   </li>
                   % endif
-                  % if ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id):
+                  % if pages_and_resources_mfe_enabled:
                   <li class="nav-item nav-course-courseware-pages-resources">
                     <a href="${get_pages_and_resources_url(course_key)}" rel="external">${_("Pages & Resources")}</a>
                   </li>
@@ -81,7 +81,7 @@
                   <li class="nav-item nav-course-courseware-uploads">
                     <a href="${assets_url}">${_("Files & Uploads")}</a>
                   </li>
-                  % if not ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id):
+                  % if not pages_and_resources_mfe_enabled:
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
                   </li>
