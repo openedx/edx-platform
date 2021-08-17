@@ -12,9 +12,9 @@ pep517==0.11.0
     # via pip-tools
 pip-tools==6.2.0
     # via -r requirements/edx/pip-tools.in
-tomli==1.2.0
+tomli==1.2.1
     # via pep517
-wheel==0.36.2
+wheel==0.37.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
