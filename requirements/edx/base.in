@@ -87,7 +87,7 @@ edx-event-routing-backends
 edx-milestones
 edx-name-affirmation
 edx-organizations
-edx-proctoring>=2.0.1
+git+https://github.com/edx/edx-proctoring.git@23cec354945263d63e744fc24e1fed9d732810f8#egg=edx-proctoring
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
