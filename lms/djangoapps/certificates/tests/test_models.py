@@ -13,6 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.statuses import VerifiedNameStatus
 from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseKey, CourseLocator
@@ -545,15 +546,17 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
     @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
-    @ddt.data((True, True), (True, False), (False, False))
+    @ddt.data((True, VerifiedNameStatus.APPROVED),
+              (True, VerifiedNameStatus.DENIED),
+              (False, VerifiedNameStatus.PENDING))
     @ddt.unpack
-    def test_invalidate_with_verified_name(self, should_use_verified_name_for_certs, is_verified):
+    def test_invalidate_with_verified_name(self, should_use_verified_name_for_certs, status):
         """
         Test the invalidate method with verified name turned on for the user's certificates
         """
         verified_name = 'Jonathan Doe'
         profile = UserProfile.objects.get(user=self.user)
-        create_verified_name(self.user, verified_name, profile.name, is_verified=is_verified)
+        create_verified_name(self.user, verified_name, profile.name, status=status)
         create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
 
         cert = GeneratedCertificateFactory.create(
@@ -568,7 +571,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         cert.invalidate(mode=mode, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
-        if should_use_verified_name_for_certs and is_verified:
+        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
             assert cert.name == verified_name
         else:
             assert cert.name == profile.name
