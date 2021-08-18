@@ -197,9 +197,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @unittest.skip(
-        "Temporary skip for MST-969 while the is_verified column is removed from the verified_name table"
-    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
