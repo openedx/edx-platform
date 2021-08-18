@@ -454,6 +454,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         "CERTIFICATE_FACEBOOK": True,
     })
     @with_site_configuration(
+        domain='test_site.localhost',
         configuration=dict(
             platform_name='My Platform Site',
             SITE_NAME='test_site.localhost',
