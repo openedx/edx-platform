@@ -172,6 +172,11 @@ class ProctoringCourseApp(CourseApp):
     app_id = "proctoring"
     name = _("Proctoring")
     description = _("Maintain exam integrity by enabling a proctoring solution for your course")
+    documentation_links = {
+        "learn_more_configuration": settings.PROCTORING_SETTINGS.get(
+            'LINK_URLS', {}
+        ).get('course_authoring_faq', ''),
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -192,7 +197,7 @@ class ProctoringCourseApp(CourseApp):
         """
         Don't allow proctored exam settings to be enabled from the card
         """
-        raise ValueError("Teams cannot be enabled/disabled via this API.")
+        raise ValueError("Proctoring cannot be enabled/disabled via this API.")
 
     @classmethod
     def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
@@ -201,8 +206,7 @@ class ProctoringCourseApp(CourseApp):
         """
         return {
             "enable": False,
-            # There is nothing to configure for proctored exams yet.
-            "configure": False,
+            "configure": True,
         }
 
     @staticmethod
