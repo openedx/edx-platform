@@ -74,6 +74,7 @@ done-xblock
 edx-ace
 edx-analytics-data-api-client
 edx-api-doc-tools
+edx-auth-backends                   # Allow Studio to use LMS SSO
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
 edx-ccx-keys
 edx-celeryutils
