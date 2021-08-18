@@ -4,7 +4,7 @@ Signal handler for setting default course verification dates
 
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.dispatch.dispatcher import receiver
+from django.dispatch import dispatcher, Signal
 
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -12,7 +12,7 @@ from xmodule.modulestore.django import SignalHandler, modulestore
 from .models import SoftwareSecurePhotoVerification, VerificationDeadline
 
 
-@receiver(SignalHandler.course_published)
+@dispatcher.receiver(SignalHandler.course_published)
 def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been published in Studio and
@@ -28,7 +28,10 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
             VerificationDeadline.set_deadline(course_key, course.end)
 
 
-@receiver(USER_RETIRE_LMS_CRITICAL)
+@dispatcher.receiver(USER_RETIRE_LMS_CRITICAL)
 def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
     user = kwargs.get('user')
     SoftwareSecurePhotoVerification.retire_user(user.id)
+
+# Signal for emitting IDV submission and review updates
+idv_update_signal = Signal(providing_args=["attempt_id", "user_id", "status", "full_name"])

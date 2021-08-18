@@ -50,6 +50,7 @@ from openedx.core.lib.log_utils import audit_log
 from xmodule.modulestore.django import modulestore
 
 from .services import IDVerificationService
+from .signals import idv_update_signal
 
 log = logging.getLogger(__name__)
 
@@ -1050,6 +1051,14 @@ class SubmitPhotosView(View):
         attempt.mark_ready()
         attempt.submit(copy_id_photo_from=initial_verification)
 
+        idv_update_signal.send(
+            sender='verify_student.submit_idv_attempt',
+            attempt_id=attempt.id,
+            user_id=user.id,
+            status='submitted',
+            full_name=attempt.name
+        )
+
         return attempt
 
     def _send_confirmation_email(self, user):
@@ -1200,6 +1209,14 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         "result": result
     }
     segment.track(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
+
+    idv_update_signal.send(
+        sender='verify_student.idv_attempt_review',
+        attempt_id=attempt.id,
+        user_id=user.id,
+        status=attempt.status,
+        full_name=attempt.name
+    )
 
     return HttpResponse("OK!")
 

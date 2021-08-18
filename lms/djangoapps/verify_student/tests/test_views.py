@@ -1274,6 +1274,26 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         )
         self._assert_confirmation_email(True)
 
+    @patch('lms.djangoapps.verify_student.views.idv_update_signal.send')
+    def test_submit_photos_idv_signal(self, mock_signal):
+        """
+        Test that Django signal is sent when IDV attempt is submitted
+        """
+        self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='verify_student.submit_idv_attempt',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status='submitted',
+            full_name=attempt.name,
+        )
+
     def test_submit_photos_error_does_not_send_email(self):
         # Error because invalid parameters, so no confirmation email
         # should be sent.
@@ -1620,9 +1640,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
+    @patch('lms.djangoapps.verify_student.views.idv_update_signal.send')
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_passed_status_template(self, mock_segment_track, _mock_log_error):
+    def test_passed_status_template(self, mock_segment_track, _mock_log_error, mock_signal):
         """
         Test for verification passed.
         """
@@ -1662,6 +1683,15 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             "result": "PASS"
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
+
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='verify_student.idv_attempt_review',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            full_name=attempt.name,
+        )
 
     @patch.dict(settings.VERIFY_STUDENT, {'USE_DJANGO_MAIL': True})
     def test_approved_email_without_ace(self):
@@ -1733,9 +1763,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
+    @patch('lms.djangoapps.verify_student.views.idv_update_signal.send')
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_failed_status_template(self, mock_segment_track, _mock_log_error):
+    def test_failed_status_template(self, mock_segment_track, _mock_log_error, mock_signal):
         """
         Test for failed verification.
         """
@@ -1767,12 +1798,22 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='verify_student.idv_attempt_review',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            full_name=attempt.name,
+        )
+
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
+    @patch('lms.djangoapps.verify_student.views.idv_update_signal.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_system_fail_result(self, mock_segment_track):
+    def test_system_fail_result(self, mock_segment_track, mock_signal):
         """
         Test for software secure result system failure.
         """
@@ -1800,6 +1841,15 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             "result": "SYSTEM FAIL"
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
+
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='verify_student.idv_attempt_review',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            full_name=attempt.name,
+        )
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
