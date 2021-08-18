@@ -3,10 +3,9 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
+from django.urls import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -17,42 +16,6 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%block name="js_extra">
     <script type="text/javascript">
-        var expandCallback = function(event) {
-            event.preventDefault();
-            $(this).next('.expandable-area').slideToggle();
-            var title = $(this).parent();
-            title.toggleClass('is-expanded');
-            if (title.attr("aria-expanded") === "false") {
-                title.attr("aria-expanded", "true");
-            } else {
-                title.attr("aria-expanded", "false");
-            }
-        };
-
-        $(document).ready(function() {
-            $('.expandable-area').slideUp();
-            $('.is-expandable').addClass('is-ready');
-
-            $('.is-expandable .title-expand').click(expandCallback);
-            $('.is-expandable .title-expand').keypress(function(e) {
-                if (e.which == 13) {  // only activate on pressing enter
-                    expandCallback.call(this, e); // make sure that we bind `this` correctly
-                }
-            });
-
-            $('#contribution-other-amt').focus(function() {
-                $('#contribution-other').attr('checked',true);
-            });
-
-            % if use_ecommerce_payment_flow:
-            $('button[name=verified_mode]').click(function(e){
-                e.preventDefault();
-                window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
-                encodeURIComponent('${sku | n, js_escaped_string}');
-            });
-            % endif
-        });
-
         // popover icon toggle
         $(function(){
             $('body').click(function (e) {
@@ -106,87 +69,120 @@ from openedx.core.djangolib.markup import HTML, Text
     <div id="currency_data" value="${currency_data}"></div>
 
     <div class="container-md container-fluid mx-auto">
-        <section class="wrapper m-4 m-md-0" dir="ltr"> 
-            <div class="row">
-                <header>
-                    <h3 class="py-3 pt-md-5 pb-md-4">Choose a path for your course in ${course_name}</h3>
-                </header>
-                <form class="form-track-selection" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
-                    <%
-                    b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
-                    %>
-                    % if "verified" in modes:
-                    <div class="track-selection-choice track-selection-certificate col-6 mb-5">
-                        <div class="certificate-container">
-                            <div class="triangle-overlay"></div>
-                            <span class="trophy-icon">
-                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M26.6667 3.33333H23.3333V0H6.66667V3.33333H3.33333C1.5 3.33333 0 4.83333 0 6.66667V8.33333C0 12.5833 3.2 16.05 7.31667 16.5667C8.36667 19.0667 10.6167 20.95 13.3333 21.5V26.6667H6.66667V30H23.3333V26.6667H16.6667V21.5C19.3833 20.95 21.6333 19.0667 22.6833 16.5667C26.8 16.05 30 12.5833 30 8.33333V6.66667C30 4.83333 28.5 3.33333 26.6667 3.33333ZM3.33333 8.33333V6.66667H6.66667V13.0333C4.73333 12.3333 3.33333 10.5 3.33333 8.33333ZM26.6667 8.33333C26.6667 10.5 25.2667 12.3333 23.3333 13.0333V6.66667H26.6667V8.33333Z" fill="#EFF8FA"/>
-                                </svg>
-                            </span>
-                            <p class="price-display">${currency_symbol}${min_price} ${currency}</p>
-                            <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
+        <section class="wrapper m-4 m-md-0">
+            <div class="wrapper-register-choose wrapper-content-main">
+                <article class="register-choose content-main">
+                    <header class="page-header content-main">
+                        <h3 class="py-3">
+                            ${_("Choose a path for your course in")} ${_(course_name)}
+                        </h3>
+                    </header>
+
+                    <form class="form-register-choose mb-4 mt-0" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        % if "verified" in modes:
+                        <div class="track-selection-choice track-selection-certificate col-6 mb-5">
+                            <div class="certificate-container">
+                                <div class="triangle-overlay"></div>
+                                <span class="trophy-icon">
+                                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M26.6667 3.33333H23.3333V0H6.66667V3.33333H3.33333C1.5 3.33333 0 4.83333 0 6.66667V8.33333C0 12.5833 3.2 16.05 7.31667 16.5667C8.36667 19.0667 10.6167 20.95 13.3333 21.5V26.6667H6.66667V30H23.3333V26.6667H16.6667V21.5C19.3833 20.95 21.6333 19.0667 22.6833 16.5667C26.8 16.05 30 12.5833 30 8.33333V6.66667C30 4.83333 28.5 3.33333 26.6667 3.33333ZM3.33333 8.33333V6.66667H6.66667V13.0333C4.73333 12.3333 3.33333 10.5 3.33333 8.33333ZM26.6667 8.33333C26.6667 10.5 25.2667 12.3333 23.3333 13.0333V6.66667H26.6667V8.33333Z" fill="#EFF8FA"/>
+                                    </svg>
+                                </span>
+                                <p class="price-display">${currency_symbol}${min_price} ${currency}</p>
+                                <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
+                                <div class="choice-bullets">
+                                    <ul>
+                                        <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
+                                            link_start=HTML('<b><u><a class="verified" href="https://www.edx.org/verified-certificate" target="_blank">'),
+                                            link_end=HTML('</a></u></b>'),
+                                        )}</li>
+                                        <li>${Text(_("Get {start_bold}access to all course activities{end_bold}, including both graded and non-graded assignments, while the course is running")).format(
+                                            start_bold=HTML('<b>'),
+                                            end_bold=HTML('</b>'),
+                                        )}</li>
+                                        <div class="collapsible">${_("Show more")}</div>
+                                        <li class="collapsible-item">
+                                            ${Text(_("{start_bold}Full access{end_bold} to course content and materials, even after the course ends")).format(
+                                                start_bold=HTML('<b>'),
+                                                end_bold=HTML('</b>'),
+                                            )}
+                                            <span class="popover-icon">
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                                <span class="popover">
+                                                    ${Text(_("{link_start}Learn more{link_end} about course access")).format(
+                                                        link_start=HTML('<u><a href="https://support.edx.org/hc/en-us/articles/360013426573-What-are-the-differences-between-audit-free-and-verified-paid-courses-" target="_blank">'),
+                                                        link_end=HTML('</a></u>'),
+                                                    )}
+                                                </span>
+                                            </span>
+                                        </li>
+                                        <li class="collapsible-item">${Text(_("Support our {start_bold}non-profit mission{end_bold} to increase access to high-quality education for everyone, everywhere")).format(
+                                            start_bold=HTML('<b>'),
+                                            end_bold=HTML('</b>'),
+                                        )}</li>
+                                    </ul>
+                                </div>
+                                <ul class="list-actions">
+                                    <li class="action action-select upgrade-button">
+                                        <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
+                                            <button id="track_selection_upgrade" type="submit" name="verified_mode" class="mt-2">
+                                                <span>${_('Upgrade Now')}</span>
+                                            </buton>
+                                    </li>
+                                </ul>
+                                <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+                                var upgradeLink = $("#track_selection_upgrade");
+
+                                TrackECommerceEvents.trackUpsellClick(upgradeLink, 'track_selection', {
+                                    pageName: "track_selection",
+                                    linkType: "button",
+                                    linkCategory: "(none)"
+                                });
+
+                                </%static:require_module_async>
+                            </div>
+                            <div class="certificate-container-bottom">
+                                <span class="mt-1"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
+                                <div class="extra-verified-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
+                                    start_bold=HTML('<b>'),
+                                    end_bold=HTML('</b>'),
+                                )}</div>
+                            </div>
+                        </div>
+                        % endif
+                        <div class="track-selection-choice track-selection-audit col-6">
+                            <p class="float-right m-3"><b>${_("FREE")}</b></p>
+                            <div class="choice-title"><h4>${_("Access this course")}</h4></div>
                             <div class="choice-bullets">
                                 <ul>
-                                    <li>Showcase a <a class="verified" href="https://www.edx.org/verified-certificate" target="_blank"><b><u> verified certificate</u></b></a> of completion on your resumé to advance your career</li>
-                                    <li>Get <b>access to all course activities</b>, including both graded and non-graded assignments, while the course is running</li>
-                                    <div class="collapsible">Show more</div>
-                                    <li class="collapsible-item"><b>Gain full access</b> to course content and materials, even after the course ends <span class="popover-icon"><i class="fa fa-question-circle" aria-hidden="true"></i><span class="popover"><a href="https://support.edx.org/hc/en-us/articles/360013426573-What-are-the-differences-between-audit-free-and-verified-paid-courses-" target="_blank"><u>Learn more</u></a> about course access</span></span></li>
-                                    <li class="collapsible-item">Support our <b>non-profit mission</b> to increase access to high-quality education for everyone, everywhere</li>
+                                    <li>${Text(_("Get temporary access to  {start_bold}non-graded{end_bold} activities, including discussion forums and non-graded assignments")).format(
+                                        start_bold=HTML('<b>'),
+                                        end_bold=HTML('</b>'),
+                                    )}</li>
+                                    <li>${Text(_("Get {start_bold}temporary access{end_bold} to the course material, including videos and readings")).format(
+                                        start_bold=HTML('<b>'),
+                                        end_bold=HTML('</b>'),
+                                    )}</li>
+                                    % if audit_access_deadline:
+                                    <li>${_("Access expires and all progress will be lost on")} ${_(audit_access_deadline)}</li>
+                                    % else:
+                                    <li>${_("Access expires and all progress will be lost")}</li>
+                                    % endif
                                 </ul>
                             </div>
-                            <!-- JK TODO: check ids, do a separate template? -->
-                            <ul class="list-actions">
-                            <li class="action action-select upgrade-button">
-                                <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
-                                    <button id="track_selection_upgrade" type="submit" name="verified_mode">
-                                        <span>${_('Upgrade Now')}</span>
-                                
-                            </li>
-                            </ul>
-                            <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-                            var upgradeLink = $("#track_selection_upgrade");
-
-                            TrackECommerceEvents.trackUpsellClick(upgradeLink, 'track_selection', {
-                                pageName: "track_selection",
-                                linkType: "button",
-                                linkCategory: "(none)"
-                            });
-
-                            </%static:require_module_async>  
-                        </div>
-                        <div class="certificate-container-bottom">
-                            <span class="mt-1"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
-                            <div class="extra-verified-info">
-                                Studies show that those who choose this option are <b>more engaged and motivated</b> to complete their courses
-                            </div>
-                        </div>
-                    </div>
-                    % endif
-                    <div class="track-selection-choice track-selection-audit col-6">
-                        <p class="float-right m-3"><b>FREE</b></p>
-                        <div class="choice-title"><h4>${_("Access this course")}</h4></div>
-                        <div class="choice-bullets mb-large">
-                            <ul>
-                                <li>Get temporary access to <b>non-graded</b> activities, including discussion forums and non-graded assignments</li>
-                                <li>Get <b>temporary access</b> to the course material, including videos and readings</li>
-                                % if audit_access_deadline:
-                                <li>Access expires and all progress will be lost on  ${audit_access_deadline}</li>
-                                % else:
-                                <li>Access expires and all progress will be lost</li>
-                                % endif
+                            <ul class="list-actions audit-button">
+                                <li class="action action-select">
+                                    <input type="hidden" name="contribution" />
+                                    <button id="track_selection_audit" type="submit" name="audit_mode">
+                                        <span>${_('Continue')}</span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
-                        <ul class="list-actions audit-button">
-                            <li class="action action-select">
-                                <input type="hidden" name="contribution" />
-                                <button id="track_selection_audit" type="submit" name="audit_mode">
-                                    <span>${_('Continue')}</span>
-                            </li>
-                        </ul>
-                    </div>
-                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                </form>
+
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                    </form>
+                </article>
             </div>
         </section>
     </div>

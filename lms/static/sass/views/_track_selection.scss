@@ -191,6 +191,10 @@ a:not(.btn), a:visited:not(.btn) {
     left: 178%;
 }
 
+.popover a {
+    text-decoration: underline;
+}
+
 .visible {
     visibility: visible;
 }
