@@ -6,6 +6,7 @@ Unit tests for the VerificationDeadline signals
 from datetime import timedelta
 
 from django.utils.timezone import now
+from unittest.mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
@@ -102,3 +103,46 @@ class RetirementSignalTest(ModuleStoreTestCase):
         # All values for this user should now be empty string
         for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
             assert '' == getattr(ver_obj, field)
+
+
+class PostSavePhotoVerificationTest(ModuleStoreTestCase):
+    """
+    Tests for the post_save signal on the SoftwareSecurePhotoVerification model.
+    This receiver should emit another signal that contains limited data about
+    the verification attempt that was updated.
+    """
+
+    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    def test_post_save_signal(self, mock_signal):
+        user = UserFactory.create()
+
+        # create new softwaresecureverification
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=user,
+            name='Bob Doe',
+            face_image_url='https://test.face',
+            photo_id_image_url='https://test.photo',
+            photo_id_key='test+key'
+        )
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='idv_update',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            full_name=attempt.name,
+            profile_name=attempt.user.profile.name
+        )
+        mock_signal.reset_mock()
+
+        attempt.mark_ready()
+
+        self.assertTrue(mock_signal.called)
+        mock_signal.assert_called_with(
+            sender='idv_update',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            full_name=attempt.name,
+            profile_name=attempt.user.profile.name
+        )
