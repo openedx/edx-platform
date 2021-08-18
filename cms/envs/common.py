@@ -710,6 +710,10 @@ MIDDLEWARE = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
+    # Monitoring and logging middleware
+    'openedx.core.lib.request_utils.ExpectedErrorMiddleware',
+    'edx_django_utils.monitoring.CachedCustomMonitoringMiddleware',
+
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
