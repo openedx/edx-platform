@@ -3197,9 +3197,12 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
-
     # For save for later
-    'lms.djangoapps.save_for_later'
+    'lms.djangoapps.save_for_later',
+
+    # Arch Experiments,
+    'lms.djangoapps.arch_experiments.apps.ArchExperimentsConfig',
+    'lms.djangoapps.arch_experiments.event_bus.apps.EventBusExperimentConfig'
 ]
 
 ######################### CSRF #########################################

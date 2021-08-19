@@ -77,7 +77,6 @@ attrs==21.2.0
     #   aiohttp
     #   edx-ace
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.9.1
     # via
@@ -177,6 +176,8 @@ code-annotations==1.2.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
+confluent-kafka==1.7.0
+    # via -r requirements/edx/base.txt
 contextlib2==21.6.0
     # via -r requirements/edx/base.txt
 coreapi==2.3.3
@@ -627,6 +628,8 @@ faker==9.8.3
     # via factory-boy
 fastapi==0.70.0
     # via pact-python
+fastavro==1.4.7
+    # via -r requirements/edx/base.txt
 filelock==3.4.0
     # via
     #   tox

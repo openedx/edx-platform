@@ -22,6 +22,7 @@ omit =
     lms/envs/*
     lms/djangoapps/*/migrations/*
     lms/djangoapps/*/features/*
+    lms/djangoapps/arch_experiments/*
     common/djangoapps/terrain/*
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
