@@ -42,7 +42,7 @@ six==1.16.0
     #   libsass
     #   paver
     #   python-memcached
-stevedore==3.3.0
+stevedore==3.4.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys

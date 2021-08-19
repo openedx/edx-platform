@@ -48,6 +48,9 @@ jobs:
         pip install setuptools wheel
         pip install -r requirements/edx/testing.txt
 
+    - name: Install Django
+      run: pip install -r requirements/edx/django.txt
+
     - name: Collect Tests
       env:
         STUDIO_CFG: lms/envs/bok_choy.yml
