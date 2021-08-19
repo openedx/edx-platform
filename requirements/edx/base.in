@@ -165,3 +165,5 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+confluent-kafka                     # Client for working with kafka used by the arch_experiments djangoapp.
+fastavro==1.4.7

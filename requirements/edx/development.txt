@@ -188,6 +188,8 @@ code-annotations==1.2.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
+confluent-kafka==1.7.0
+    # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
     # via -r requirements/edx/testing.txt
 coreapi==2.3.3
@@ -654,6 +656,8 @@ fastapi==0.70.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
+fastavro==1.4.7
+    # via -r requirements/edx/testing.txt
 filelock==3.4.0
     # via
     #   -r requirements/edx/testing.txt

@@ -3200,6 +3200,9 @@ INSTALLED_APPS = [
 
     # For save for later
     'lms.djangoapps.save_for_later'
+    # Arch Experiments,
+    'lms.djangoapps.arch_experiments.apps.ArchExperimentsConfig',
+    'lms.djangoapps.arch_experiments.event_bus.apps.EventBusExperimentConfig'
 ]
 
 ######################### CSRF #########################################
