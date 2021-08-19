@@ -94,3 +94,8 @@ click<8.0.0
 
 # jsonfield2 will be replaced with jsonfield in https://openedx.atlassian.net/browse/BOM-1917.
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
+
+# Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
+# a testing requirement. Installing it would cause a bunch of new tool packages to become base
+# requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
+edxval<2.1
