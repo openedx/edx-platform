@@ -72,6 +72,8 @@ class SiteConfigurationTests(TestCase):
                          self.test_config['platform_name'])
         self.assertEqual(site_configuration.get_value("LMS_ROOT_URL"),
                          self.expected_site_root_url)
+        self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK'))
+        self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help'))
 
     def test_get_value_for_org(self):
         """
