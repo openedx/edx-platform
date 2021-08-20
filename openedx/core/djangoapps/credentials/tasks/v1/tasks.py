@@ -71,7 +71,8 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
         logger.info(f"Sent grade for course {course_run_key} to user {username}")
 
     except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable
-        error_msg = f"Failed to send grade for course {course_run_key} to user {username}."
+        grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
+        error_msg = f'Failed to send grade{grade_str} for course {course_run_key} to user {username}.'
         logger.exception(error_msg)
         exception = MaxRetriesExceededError(
             f"Failed to send grade to credentials. Reason: {error_msg}"
