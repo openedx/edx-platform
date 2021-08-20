@@ -22,4 +22,9 @@ Decision
 
 #. For LRS consumers who may be interested in knowing whenever a learner passes or fails a course, edX platform will be configured to emit events named ``edx.course.grade.now_passed`` and ``edx.course.grade.now_failed``.
 
+Consequences
+------------
+
+#. `edx.course.completed` event will only be emitted for a course if `PersistentGradesEnabledFlag` is `True` for that course.
+
 .. _here: https://github.com/edx/edx-platform/blob/8aedebcdb29bb16b94786503c12a52b07c73dff5/lms/djangoapps/grades/models.py#L647
