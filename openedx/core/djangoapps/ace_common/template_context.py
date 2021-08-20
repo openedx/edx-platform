@@ -3,6 +3,7 @@ Context dictionary for templates that use the ace_common base template.
 """
 
 
+from datetime import datetime
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 
@@ -25,6 +26,7 @@ def get_base_template_context(site):
         # Platform information
         'homepage_url': marketing_link('ROOT'),
         'dashboard_url': dashboard_url,
+        'date': datetime.today().strftime("%A, %B %d, %Y"),
         'template_revision': getattr(settings, 'EDX_PLATFORM_REVISION', None),
         'platform_name': get_config_value_from_site_or_settings(
             'PLATFORM_NAME',
