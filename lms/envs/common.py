@@ -3934,6 +3934,10 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
+# Override to skip excluding invitation-only courses in course search
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = True
+# Override to skip excluding non-catalog courses in course search
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = True
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {
