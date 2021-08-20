@@ -33,6 +33,7 @@ MAX_RETRIES = 11
 PROGRAM_CERTIFICATE = 'program'
 COURSE_CERTIFICATE = 'course-run'
 VISIBLE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+DATE_OVERRIDE_FORMAT = '%Y-%m-%d'
 
 
 def get_completed_programs(site, student):
@@ -306,7 +307,7 @@ def post_course_certificate(client, username, certificate, visible_date, date_ov
             'mode': certificate.mode,
             'type': COURSE_CERTIFICATE,
         },
-        'date_override': date_override.strftime(VISIBLE_DATE_FORMAT) if date_override else None,
+        'date_override': {'date': date_override.strftime(DATE_OVERRIDE_FORMAT)} if date_override else None,
         'attributes': [
             {
                 'name': 'visible_date',
