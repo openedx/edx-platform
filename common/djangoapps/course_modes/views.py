@@ -35,6 +35,7 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.db import outer_atomic
@@ -156,7 +157,10 @@ class ChooseModeView(View):
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
         course_id = str(course_key)
-
+        gated_content = ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key
+        )
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
@@ -171,10 +175,7 @@ class ChooseModeView(View):
             "error": error,
             "responsive": True,
             "nav_hidden": True,
-            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_enrollment(
-                user=request.user,
-                course_key=course_key
-            ),
+            "content_gating_enabled": gated_content,
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
         }
         context.update(
@@ -233,6 +234,21 @@ class ChooseModeView(View):
                     context['currency_data'] = json.dumps(currency_data)
                 except TypeError:
                     pass
+
+        duration = get_user_course_duration(request.user, course)
+        deadline = duration and get_user_course_expiration_date(request.user, course)
+        context['audit_access_deadline'] = deadline
+        fbe_is_on = deadline and gated_content
+
+        # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
+        # and happy path version is ready to be rolled out to all users.
+        if waffle.flag_is_active(request, 'course_modes.use_new_track_selection'):
+            # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
+            # technically considered happy path, old Track Selection page will be displayed.
+            if not error:
+                # Happy path conditions.
+                if verified_mode and fbe_is_on and not enterprise_customer:
+                    return render_to_response("course_modes/track_selection.html", context)
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
