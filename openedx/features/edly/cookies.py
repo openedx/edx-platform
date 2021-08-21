@@ -77,7 +77,7 @@ def _get_edly_user_info_cookie_string(request):
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
             'edly-sub-org': edly_sub_organization.slug,
-            'edx-org': edly_sub_organization.edx_organization.short_name,
+            'edx-orgs': edly_sub_organization.get_edx_organizations,
             'is_course_creator': auth.user_has_role(
                 request.user,
                 CourseCreatorRole()

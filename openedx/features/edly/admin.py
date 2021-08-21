@@ -18,8 +18,8 @@ class EdlySubOrganizationAdmin(admin.ModelAdmin):
         'edly_organization_slug',
         'name',
         'slug',
-        'edx_organization_name',
-        'edx_organization_short_name',
+        'edx_organizations_names',
+        'edx_organizations_short_names',
         'created',
         'modified'
     ]
@@ -30,11 +30,11 @@ class EdlySubOrganizationAdmin(admin.ModelAdmin):
     def edly_organization_slug(self, obj):
         return obj.edly_organization.slug
 
-    def edx_organization_name(self, obj):
-        return obj.edx_organization.name
+    def edx_organizations_names(self, obj):
+        return ', '.join(obj.edx_organizations.all().values_list('name', flat=True))
 
-    def edx_organization_short_name(self, obj):
-        return obj.edx_organization.short_name
+    def edx_organizations_short_names(self, obj):
+        return ', '.join(obj.get_edx_organizations)
 
 
 class EdlySubOrganizationInlineAdmin(admin.StackedInline):

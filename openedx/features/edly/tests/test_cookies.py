@@ -54,7 +54,7 @@ class CookieTests(TestCase):
             {
                 'edly-org': edly_sub_organization.edly_organization.slug,
                 'edly-sub-org': edly_sub_organization.slug,
-                'edx-org': edly_sub_organization.edx_organization.short_name,
+                'edx-orgs': edly_sub_organization.get_edx_organizations,
                 'is_course_creator': auth.user_has_role(self.request.user, CourseCreatorRole()),
                 'user_groups': list(self.user.groups.all().values_list('name', flat=True))
             },

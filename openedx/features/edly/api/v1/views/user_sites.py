@@ -54,7 +54,7 @@ class UserSitesViewSet(viewsets.ViewSet):
         for edly_sub_org_of_user in edly_sub_orgs_of_user.all():
             context['edly_sub_org_of_user'] = edly_sub_org_of_user
             site_configuration = SiteConfiguration.get_configuration_for_org(
-                edly_sub_org_of_user.edx_organization.short_name
+                edly_sub_org_of_user.get_edx_organizations
             )
             site_configuration = site_configuration.__dict__.get('site_values', {}) if site_configuration else {}
             context['site_configuration'] = site_configuration

@@ -44,7 +44,7 @@ class UserSiteSerializerTests(TestCase):
                 'secondary': 'fake-color',
             },
             'SITE_NAME': self.edly_sub_org_of_user.lms_site.domain,
-            'course_org_filter': self.edly_sub_org_of_user.edx_organization.short_name,
+            'course_org_filter': self.edly_sub_org_of_user.get_edx_organizations,
             'contact_email': 'fake@example.com',
             'MKTG_URLS': {
                 'ROOT': 'fake-root-url',
@@ -95,7 +95,7 @@ class UserSiteSerializerTests(TestCase):
         for mobile_app_config_key, mobile_app_config_value in self.test_site_configuration['MOBILE_APP_CONFIG'].items():
             assert mobile_app_config_value == app_config.get(mobile_app_config_key)
 
-        assert self.edly_sub_org_of_user.edx_organization.short_name == app_config.get('ORGANIZATION_CODE')
+        assert self.edly_sub_org_of_user.get_edx_organizations == app_config.get('ORGANIZATION_CODE')
 
         expected_api_host_url = self.get_expected_url()
         assert expected_api_host_url == app_config.get('API_HOST_URL')

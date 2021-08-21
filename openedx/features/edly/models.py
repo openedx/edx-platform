@@ -29,7 +29,8 @@ class EdlySubOrganization(TimeStampedModel):
     slug = models.CharField(max_length=50, unique=True, validators=[EDLY_SLUG_VALIDATOR])
 
     edly_organization = models.ForeignKey(EdlyOrganization, on_delete=models.CASCADE)
-    edx_organization = models.OneToOneField(Organization, on_delete=models.CASCADE)
+    edx_organization = models.OneToOneField(Organization, on_delete=models.CASCADE, null=True, blank=True)
+    edx_organizations = models.ManyToManyField(Organization, related_name='edx_organizations')
     lms_site = models.OneToOneField(Site, related_name='edly_sub_org_for_lms', on_delete=models.CASCADE)
     studio_site = models.OneToOneField(Site, related_name='edly_sub_org_for_studio', on_delete=models.CASCADE)
     preview_site = models.OneToOneField(
@@ -38,11 +39,18 @@ class EdlySubOrganization(TimeStampedModel):
         null=True, on_delete=models.CASCADE
     )
 
-    class Meta:
-        unique_together = (('edly_organization', 'edx_organization'),)
-
     def __str__(self):
         return '{name}: ({slug})'.format(name=self.name, slug=self.slug)
+
+    @property
+    def get_edx_organizations(self):
+        """
+        Helper method to get list of short names of edX organizations of an edly suborganization.
+
+        Returns:
+            list: List of edx organizations short names
+        """
+        return list(self.edx_organizations.values_list('short_name', flat=True))
 
 
 class EdlyUserProfile(models.Model):

@@ -439,7 +439,13 @@ def _accessible_courses_summary_iter(request, org=None):
 
         return has_studio_read_access(request.user, course_summary.id)
     if org is not None:
-        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
+        orgs = []
+        if isinstance(org, list):
+            orgs.extend(org)
+        else:
+            orgs.append(org)
+
+        courses_summary = CourseOverview.get_all_courses(orgs=orgs)
     else:
         courses_summary = modulestore().get_course_summaries()
     courses_summary = six.moves.filter(course_filter, courses_summary)
@@ -540,8 +546,8 @@ def _accessible_libraries_iter(user, org=None):
         string will result in no libraries, and otherwise only libraries with the
         specified org will be returned. The default value is None.
     """
-    if org is not None:
-        libraries = [] if org == '' else modulestore().get_libraries(org=org)
+    if org:
+        libraries = modulestore().get_libraries(org=org)
     else:
         libraries = modulestore().get_library_summaries()
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.

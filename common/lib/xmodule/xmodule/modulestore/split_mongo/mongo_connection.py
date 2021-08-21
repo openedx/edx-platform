@@ -475,7 +475,7 @@ class MongoConnection(object):
                         query['search_targets.{}'.format(key)] = value
 
                 if org_target:
-                    query['org'] = org_target
+                    query['org'] = {'$in': org_target}
 
             return self.course_index.find(query)
 

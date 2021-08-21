@@ -38,9 +38,24 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
     name = Sequence('Edly SubOrganization {}'.format)
     slug = Sequence('edly-sub-organization-{}'.format)
     edly_organization = SubFactory(EdlyOrganizationFactory)
-    edx_organization = SubFactory(OrganizationFactory)
     lms_site = SubFactory(SiteFactory)
     studio_site = SubFactory(SiteFactory)
+
+    @factory.post_generation
+    def edx_organizations(self, create, extracted, **kwargs):
+        """
+        EdX organizations post generation method.
+        """
+        # pylint: disable=no-member,unused-argument
+        if not create:
+            return
+
+        if extracted:
+            edx_orgs = []
+            edx_orgs.extend(extracted if isinstance(extracted, list) else [extracted])
+            for edx_org in edx_orgs:
+                self.edx_organizations.add(edx_org)
+
 
 
 class EdlyUserFactory(UserFactory):

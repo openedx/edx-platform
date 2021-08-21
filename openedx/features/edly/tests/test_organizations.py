@@ -56,7 +56,7 @@ class TestEdlyOrganizationListing(TestCase):
 
         assert response.status_code == 200
         assert len(response.json()) == 1
-        assert response.json()[0] == edly_sub_organization.edx_organization.short_name
+        assert response.json()[0] in edly_sub_organization.get_edx_organizations
 
     def test_organization_list_without_linked_edly_sub_organization(self):
         """

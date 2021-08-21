@@ -25,7 +25,8 @@ class UserSiteSerializer(serializers.Serializer):
             url = self.context['site_configuration'].get('SITE_NAME', '')
             protocol = 'https' if self.context['request'].is_secure() else 'http'
             mobile_app_config['API_HOST_URL'] = '{}://{}'.format(protocol, url) if url else ''
-            mobile_app_config['ORGANIZATION_CODE'] = self.context['edly_sub_org_of_user'].edx_organization.short_name
+            mobile_app_config['ORGANIZATION_CODE'] = self.context[
+                'edly_sub_org_of_user'].get_edx_organizations
             return str(json.dumps(mobile_app_config))
 
     def get_site_data(self, obj):  # pylint: disable=unused-argument

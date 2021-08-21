@@ -252,7 +252,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         edly_sub_organization = self._create_edly_sub_organization()
         edly_user_info_cookie = cookies_api._get_edly_user_info_cookie_string(self.request)
-        assert edly_sub_organization.edx_organization.short_name == get_edx_org_from_cookie(edly_user_info_cookie)
+        assert edly_sub_organization.get_edx_organizations == get_edx_org_from_cookie(edly_user_info_cookie)
 
     def test_create_user_link_with_edly_sub_organization(self):
         """
@@ -347,7 +347,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         assert len(modulestore().get_courses()) == 3
 
         EdlySubOrganizationFactory(
-            edx_organization=edx_org_1,
+            edx_organizations=[edx_org_1],
             lms_site=self.request.site,
             studio_site=self.request.site
         )
@@ -529,7 +529,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         Test "is_course_org_same_as_site_org" for match & mismatch orgs.
         """
         EdlySubOrganizationFactory(
-            edx_organization=OrganizationFactory(short_name=edx_org_short_name),
+            edx_organizations=[OrganizationFactory(short_name=edx_org_short_name)],
             lms_site=self.request.site
         )
         course_key = CourseKey.from_string(course_id)
@@ -548,7 +548,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         Test "is_course_org_same_as_site_org" when invalid "course_id" passed.
         """
         EdlySubOrganizationFactory(
-            edx_organization=OrganizationFactory(short_name='edly'),
+            edx_organizations=[OrganizationFactory(short_name='edly')],
             lms_site=self.request.site
         )
         course_id = CourseKey.from_string('course-v1:edX+Test+Test_Course')
