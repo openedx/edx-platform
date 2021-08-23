@@ -13,6 +13,7 @@
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2015
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
+# Dillon Dumesnil <ddumesnil@edx.org>, 2021
 # David Salazar <imdjsg@gmail.com>, 2014
 # Eduardo Zambrano <ezambrano@edx.org>, 2017,2019
 # Elias Estay <eestay@u.uchile.cl>, 2015
@@ -23,7 +24,7 @@
 # Gerardo Laster, 2014
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2021
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # karlman72 <karlman72@gmail.com>, 2014
@@ -168,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-08 20:44+0000\n"
+"POT-Creation-Date: 2021-08-22 20:44+0000\n"
 "PO-Revision-Date: 2021-08-01 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -432,11 +433,11 @@ msgstr "Cargando..."
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr ""
+msgstr "Bloques seleccionados"
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
-msgstr ""
+msgstr "No es posible modificar las configuraciones"
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -2555,7 +2556,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "View Report"
-msgstr ""
+msgstr "Ver el reporte"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
 msgid "There was an error generating the report link."
@@ -2654,7 +2655,7 @@ msgstr "Asunto"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Select a category"
-msgstr ""
+msgstr "Seleccione una categoría"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -3671,7 +3672,7 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
-msgstr ""
+msgstr "Borrar todo"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "demographics questionnaire"
@@ -3683,7 +3684,7 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "terminar despues"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
@@ -4835,6 +4836,8 @@ msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
 msgstr ""
+"Para acceder a los cursos que tienes disponible en {enterpriseName}, visita "
+"el panel de control de {enterpriseName}."
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
@@ -5243,6 +5246,11 @@ msgid ""
 "your spam folders or  {anchorStart}contact {platform_name} "
 "Support{anchorEnd}."
 msgstr ""
+"Para iniciar sesión, debes activar tu cuenta.{line_break}{line_break} "
+"Acabamos de enviar un enlace de activación a "
+"{strong_start}{email}{strong_end}. Si no recibes un correo electrónico, "
+"revisa tus carpetas de spam o {anchorStart}contacta al equipo de soporte de "
+"{platform_name}{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
@@ -5437,7 +5445,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "{platform_display_name} Link"
-msgstr ""
+msgstr "Link a {platform_display_name}"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -5806,8 +5814,8 @@ msgstr "Mostrar menos"
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{total_results} resultado encontrado para \"{search_term}\""
+msgstr[1] "{total_results} resultados encontrados para \"{search_term}\""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"

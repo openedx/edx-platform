@@ -351,7 +351,6 @@
     "Could not submit order": "Kh\u00f4ng g\u1eedi \u0111\u01b0\u1ee3c \u0111\u01a1n h\u00e0ng",
     "Could not submit photos": "Kh\u00f4ng th\u1ec3 t\u1ea3i \u1ea3nh l\u00ean.",
     "Could not upload the video image file": "Kh\u00f4ng th\u1ec3 t\u1ea3i l\u00ean t\u1ec7p h\u00ecnh \u1ea3nh video",
-    "Couldn't Save This Assignment": "Kh\u00f4ng Th\u1ec3 L\u01b0u B\u00e0i T\u1eadp N\u00e0y",
     "Country": "Qu\u1ed1c gia",
     "Country or Region of Residence": "Qu\u1ed1c gia ho\u1eb7c N\u01a1i c\u01b0 tr\u00fa",
     "Course Credit Requirements": "Nh\u1eefng y\u00eau c\u1ea7u v\u1ec1 T\u00edn ch\u1ec9",

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-16 13:36+0000\n"
-"PO-Revision-Date: 2021-08-16 13:36:09.153984\n"
+"POT-Creation-Date: 2021-08-23 19:06+0000\n"
+"PO-Revision-Date: 2021-08-23 19:06:37.162321\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7162,6 +7162,7 @@ msgstr ""
 "thïs réqüést, pléäsé vïsït thé lïnk(s) ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/course_goals/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
 msgstr "Éärn ä çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
@@ -7215,7 +7216,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "Dïsäßléd Ⱡ'σяєм ιρѕυм ∂#"
 
-#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: lms/djangoapps/course_home_api/outline/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
@@ -7223,7 +7224,7 @@ msgid_plural "({number} Questions)"
 msgstr[0] "({number} Qüéstïön) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgstr[1] "({number} Qüéstïöns) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
@@ -7231,27 +7232,27 @@ msgstr ""
 "Pléäsé çöntäçt ýöür dégréé ädmïnïsträtör ör édX Süppört ïf ýöü hävé "
 "qüéstïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr "'çöürsé_ïd' ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr "Önlý 'çöürsé_ïd' ïs éxpéçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr ""
 "Wélçömé méssägé süççéssfüllý dïsmïsséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr ""
 "Ýöür çöürsé göäl häs ßéén süççéssfüllý sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr ""
 "Çöürsé göäl üpdätéd süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
@@ -11153,6 +11154,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
 msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -11569,6 +11571,58 @@ msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 "Öné änd önlý öné öf 'üsér' änd 'gröüp' müst ßé sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created, but not queued to run."
+msgstr ""
+"Täsk wäs çréätéd, ßüt nöt qüéüéd tö rün. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created and queued to run."
+msgstr ""
+"Täsk wäs çréätéd änd qüéüéd tö rün. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task is running."
+msgstr "Täsk ïs rünnïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished, but some blocks failed to import."
+msgstr ""
+"Täsk fïnïshéd, ßüt sömé ßlöçks fäïléd tö ïmpört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished successfully."
+msgstr "Täsk fïnïshéd süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "state"
+msgstr "stäté Ⱡ'σяєм ιρѕ#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The state of the block import task."
+msgstr ""
+"Thé stäté öf thé ßlöçk ïmpört täsk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "progress"
+msgstr "prögréss Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "A float from 0.0 to 1.0 representing the task progress."
+msgstr ""
+"À flöät fröm 0.0 tö 1.0 répréséntïng thé täsk prögréss. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "course ID"
+msgstr "çöürsé ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "ID of the imported course."
+msgstr "ÌD öf thé ïmpörtéd çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
@@ -14009,6 +14063,7 @@ msgstr ""
 "léärnïng! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: openedx/features/enterprise_support/utils.py
+#: lms/templates/course_modes/track_selection.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "Çöntïnüé Ⱡ'σяєм ιρѕυм ∂#"
@@ -14019,19 +14074,28 @@ msgid "Shift due dates"
 msgstr "Shïft düé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
 msgid ""
-"To participate in this assignment, the suggested schedule for your course "
-"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
-"won’t lose any of your progress."
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
 msgstr ""
-"Tö pärtïçïpäté ïn thïs ässïgnmént, thé süggéstéd sçhédülé för ýöür çöürsé "
-"nééds üpdätïng. Dön’t wörrý, wé’ll shïft äll thé düé dätés för ýöü änd ýöü "
-"wön’t lösé äný öf ýöür prögréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт#"
+"Ìt lööks lïké ýöü mïsséd sömé ïmpörtänt déädlïnés ßäséd ön öür süggéstéd "
+"sçhédülé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
+msgstr ""
+"Tö kéép ýöürsélf ön träçk, ýöü çän üpdäté thïs sçhédülé änd shïft thé päst "
+"düé ässïgnménts ïntö thé fütüré. Dön’t wörrý—ýöü wön’t lösé äný öf thé "
+"prögréss ýöü’vé mädé whén ýöü shïft ýöür düé dätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -15587,14 +15651,6 @@ msgid ""
 msgstr ""
 " Dön't wörrý—ýöü wön't lösé äný öf thé prögréss ýöü'vé mädé whén ýöü shïft "
 "ýöür düé dätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
-msgstr ""
-"Ìt lööks lïké ýöü mïsséd sömé ïmpörtänt déädlïnés ßäséd ön öür süggéstéd "
-"sçhédülé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -18425,6 +18481,103 @@ msgstr ""
 "єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
 "νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ#"
 
+#: lms/templates/course_modes/track_selection.html
+msgid "Enroll In {course_name} | Upgrade Now"
+msgstr ""
+"Énröll Ìn {course_name} | Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Choose a path for your course in"
+msgstr ""
+"Çhöösé ä päth för ýöür çöürsé ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Showcase a {link_start}verified certificate{link_end} of completion on your "
+"resumé to advance your career"
+msgstr ""
+"Shöwçäsé ä {link_start}vérïfïéd çértïfïçäté{link_end} öf çömplétïön ön ýöür "
+"résümé tö ädvänçé ýöür çäréér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}access to all course activities{end_bold}, including both "
+"graded and non-graded assignments, while the course is running"
+msgstr ""
+"Gét {start_bold}äççéss tö äll çöürsé äçtïvïtïés{end_bold}, ïnçlüdïng ßöth "
+"grädéd änd nön-grädéd ässïgnménts, whïlé thé çöürsé ïs rünnïng Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Show more"
+msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"{start_bold}Full access{end_bold} to course content and materials, even "
+"after the course ends"
+msgstr ""
+"{start_bold}Füll äççéss{end_bold} tö çöürsé çöntént änd mätérïäls, évén "
+"äftér thé çöürsé énds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "{link_start}Learn more{link_end} about course access"
+msgstr ""
+"{link_start}Léärn möré{link_end} äßöüt çöürsé äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Support our {start_bold}non-profit mission{end_bold} to increase access to "
+"high-quality education for everyone, everywhere"
+msgstr ""
+"Süppört öür {start_bold}nön-pröfït mïssïön{end_bold} tö ïnçréäsé äççéss tö "
+"hïgh-qüälïtý édüçätïön för évérýöné, évérýwhéré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Studies show that those who choose this option are  {start_bold}more engaged"
+" and motivated{end_bold} to complete their courses"
+msgstr ""
+"Stüdïés shöw thät thösé whö çhöösé thïs öptïön äré  {start_bold}möré éngägéd"
+" änd mötïvätéd{end_bold} tö çömplété théïr çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "FREE"
+msgstr "FRÉÉ Ⱡ'σяєм ι#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access this course"
+msgstr "Àççéss thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
+"including discussion forums and non-graded assignments"
+msgstr ""
+"Gét témpörärý äççéss tö  {start_bold}nön-grädéd{end_bold} äçtïvïtïés, "
+"ïnçlüdïng dïsçüssïön förüms änd nön-grädéd ässïgnménts Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕι#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}temporary access{end_bold} to the course material, including"
+" videos and readings"
+msgstr ""
+"Gét {start_bold}témpörärý äççéss{end_bold} tö thé çöürsé mätérïäl, ïnçlüdïng"
+" vïdéös änd réädïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost on"
+msgstr ""
+"Àççéss éxpïrés änd äll prögréss wïll ßé löst ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost"
+msgstr ""
+"Àççéss éxpïrés änd äll prögréss wïll ßé löst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "{chapter} çürrént çhäptér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -18447,12 +18600,6 @@ msgstr "{section_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "Thïs çöntént ïs grädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/courseware/course_about.html
-msgid "An error has occurred. Please ensure that you are logged in to enroll."
-msgstr ""
-"Àn érrör häs öççürréd. Pléäsé énsüré thät ýöü äré löggéd ïn tö énröll. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
