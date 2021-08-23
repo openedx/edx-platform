@@ -91,24 +91,8 @@ REQ_FILES = \
 	requirements/edx/development \
 	scripts/xblock/requirements
 
-define COMMON_CONSTRAINTS_TEMP_COMMENT
-# This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n
-endef
-
-COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
-.PHONY: $(COMMON_CONSTRAINTS_TXT)
-$(COMMON_CONSTRAINTS_TXT):
-	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
-	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
-
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
-compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	# This is a temporary solution to override the real common_constraints.txt
-	# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
-	# See BOM-271 for more details.
-	sed 's/drf-jwt<1.19.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-
+compile-requirements: ## Re-compile *.in requirements to *.txt
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
@@ -124,7 +108,7 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
-upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 check-types: ## run static type-checking tests
