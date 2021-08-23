@@ -38,6 +38,7 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
     name = Sequence('Edly SubOrganization {}'.format)
     slug = Sequence('edly-sub-organization-{}'.format)
     edly_organization = SubFactory(EdlyOrganizationFactory)
+    edx_organization = SubFactory(OrganizationFactory)
     lms_site = SubFactory(SiteFactory)
     studio_site = SubFactory(SiteFactory)
 
