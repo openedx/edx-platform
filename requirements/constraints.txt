@@ -10,7 +10,33 @@
 
 
 # This file contains all common constraints for edx-repos
--c common_constraints.txt
+# using LTS django version
+Django<2.3
+
+# 4.0.0 requires pyjwt[crypto] 2.1.0. See pyjwt[crypto]<2.0.0 comment.
+edx-auth-backends<4.0.0
+
+# 7.0.0 requires pyjwt[crypto] 2.1.0. See pyjwt[crypto]<2.0.0 comment.
+edx-drf-extensions<7.0.0
+
+# PyJWT[crypto] 2.0.0 has a number of breaking changes that we are
+# actively working to fix. A number of the active constraints are all related
+# to this effort. Additionally, your IDA/service may also be affected directly
+# by these changes. You should not upgrade without knowing what you are doing.
+pyjwt[crypto]<2.0.0
+
+# 5.0.0+ of social-auth-app-django requires social-auth-core>=4.1.0
+social-auth-app-django<5.0.0
+
+# latest version requires PyJWT>=2.0.0 but drf-jwt requires PyJWT[crypto]<2.0.0,>=1.5.2.
+# See pyjwt[crypto]<2.0.0 comment.
+social-auth-core<4.0.3
+
+# elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
+# elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
+elasticsearch<7.14.0
+
+
 
 # celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
 celery<5.0.0
