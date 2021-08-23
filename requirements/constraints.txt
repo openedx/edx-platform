@@ -103,3 +103,7 @@ edxval<2.1
 # django-ipware==4.0.0 contains a critical change related to ip-handling which needs to be tested on sandbox
 # This constraint will be removed in https://openedx.atlassian.net/browse/BOM-2747
 django-ipware<4.0.0
+
+# pylint>=2.10.0 introduced a lot of new pylint warnings.
+# A separate PR will be needed to remove the pin and fix all the pylint warnings
+pylint<2.10.0
