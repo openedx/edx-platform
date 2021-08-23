@@ -162,7 +162,6 @@ defusedxml==0.7.1
     #   social-auth-core
 django==2.2.24
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-appconf
@@ -174,7 +173,6 @@ django==2.2.24
     #   django-filter
     #   django-method-override
     #   django-model-utils
-    #   django-mptt
     #   django-multi-email-field
     #   django-mysql
     #   django-oauth-toolkit
@@ -272,7 +270,7 @@ django-filter==2.4.0
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==3.0.7
+django-ipware==4.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -299,7 +297,7 @@ django-model-utils==4.1.1
     #   edxval
     #   ora2
     #   super-csv
-django-mptt==0.12.0
+django-mptt==0.13.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -386,10 +384,8 @@ docutils==0.17.1
     # via botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in
-drf-jwt==1.19.0
-    # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   edx-drf-extensions
+drf-jwt==1.19.1
+    # via edx-drf-extensions
 drf-yasg==1.20.0
     # via edx-api-doc-tools
 edx-ace==1.3.1
@@ -414,7 +410,7 @@ edx-django-release-util==1.1.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.2.0
+edx-django-utils==4.3.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -427,7 +423,7 @@ edx-django-utils==4.2.0
     #   super-csv
 edx-drf-extensions==6.6.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-completion
     #   edx-enterprise
@@ -510,7 +506,7 @@ edxval==2.0.3
     #   -r requirements/edx/base.in
 elasticsearch==7.13.4
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
@@ -622,7 +618,7 @@ lxml==4.5.0
     #   xmlsec
 mailsnake==1.6.4
     # via -r requirements/edx/base.in
-mako==1.1.4
+mako==1.1.5
     # via
     #   -r requirements/edx/base.in
     #   acid-xblock
@@ -745,7 +741,6 @@ pyjwkest==1.4.2
     #   lti-consumer-xblock
 pyjwt[crypto]==1.7.1
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   drf-jwt
@@ -843,7 +838,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==3.5.3
     # via -r requirements/edx/base.in
-regex==2021.8.3
+regex==2021.8.21
     # via nltk
 requests==2.26.0
     # via
@@ -874,7 +869,7 @@ rest-condition==1.0.3
     # via
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
-ruamel.yaml==0.17.11
+ruamel.yaml==0.17.13
     # via drf-yasg
 ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
@@ -895,7 +890,7 @@ semantic-version==2.8.5
     # via edx-drf-extensions
 shapely==1.7.1
     # via -r requirements/edx/base.in
-simplejson==3.17.3
+simplejson==3.17.4
     # via
     #   -r requirements/edx/base.in
     #   sailthru-client
@@ -939,11 +934,10 @@ slumber==0.7.1
     #   edx-rest-api-client
 social-auth-app-django==4.0.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
 social-auth-core==3.4.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   social-auth-app-django
@@ -980,13 +974,13 @@ sympy==1.6.2
     #   symmath
 tableauserverclient==0.16.0
     # via edx-enterprise
-testfixtures==6.18.0
+testfixtures==6.18.1
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
 tincan==1.0.0
     # via edx-event-routing-backends
-tqdm==4.62.1
+tqdm==4.62.2
     # via nltk
 typing-extensions==3.10.0.0
     # via aiohttp
@@ -1014,7 +1008,7 @@ vine==1.3.0
     #   celery
 voluptuous==0.12.1
     # via ora2
-watchdog==2.1.3
+watchdog==2.1.5
     # via -r requirements/edx/paver.txt
 web-fragments==1.1.0
     # via
