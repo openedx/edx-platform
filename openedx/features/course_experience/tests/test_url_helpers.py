@@ -173,14 +173,14 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ModuleStoreEnum.Type.split,
             'mfe',
             'course_run',
-            'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split'
+            'http://learning-mfe/c/course-v1:TestX+UrlHelpers+split'
         ),
         (
             ModuleStoreEnum.Type.split,
             'mfe',
             'section',
             (
-                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                'http://learning-mfe/c/course-v1:TestX+UrlHelpers+split' +
                 '/block-v1:TestX+UrlHelpers+split+type@chapter+block@Generated_Section'
             ),
         ),
@@ -189,7 +189,7 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             'mfe',
             'subsection',
             (
-                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                'http://learning-mfe/c/course-v1:TestX+UrlHelpers+split' +
                 '/block-v1:TestX+UrlHelpers+split+type@sequential+block@Generated_Subsection'
             ),
         ),
@@ -198,7 +198,7 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             'mfe',
             'unit',
             (
-                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                'http://learning-mfe/c/course-v1:TestX+UrlHelpers+split' +
                 '/block-v1:TestX+UrlHelpers+split+type@sequential+block@Generated_Subsection' +
                 '/block-v1:TestX+UrlHelpers+split+type@vertical+block@Generated_Unit'
             ),
@@ -208,7 +208,7 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             'mfe',
             'component',
             (
-                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                'http://learning-mfe/c/course-v1:TestX+UrlHelpers+split' +
                 '/block-v1:TestX+UrlHelpers+split+type@sequential+block@Generated_Subsection' +
                 '/block-v1:TestX+UrlHelpers+split+type@vertical+block@Generated_Unit'
             ),

@@ -125,6 +125,15 @@ class CourseLearningSequenceData:
     learning sequences in Courses vs. Pathways vs. Libraries. Such an object
     would likely not have `visibility` as that holds course-specific concepts.
     """
+
+    mapping = {}
+
+    def short_id_mapping(self, hash_key, *args, **kwargs):
+        usage_key_id = kwargs.get('usage_key', None)
+        if usage_key_id is None:
+            return self.mapping[hash_key]
+        self.mapping[hash_key] = usage_key_id
+
     usage_key = attr.ib(type=UsageKey)
     title = attr.ib(type=str)
     visibility = attr.ib(type=VisibilityData, default=VisibilityData())

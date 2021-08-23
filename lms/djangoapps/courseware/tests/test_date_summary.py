@@ -735,7 +735,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         if legacy_active:
             html_elements.append('/courses/' + str(course.id) + '/dates')
         else:
-            html_elements.append('/course/' + str(course.id) + '/dates')
+            html_elements.append('/c/' + str(course.id) + '/dates')
         url = reverse(url_name, args=(course.id,))
 
         def assert_html_elements(assert_function, user):

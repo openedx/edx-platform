@@ -10,6 +10,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -36,6 +37,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         of those children.
         """
         children = block.get('children', [])
+        block['hash_key'] = get_usage_key_hash(block['id'])
 
         for i in range(len(children)):
             child_id = block['children'][i]

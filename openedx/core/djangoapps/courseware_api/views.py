@@ -2,6 +2,9 @@
 Course API Views
 """
 
+from base64 import (
+    urlsafe_b64decode, binascii
+)
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -44,12 +47,14 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
 from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
+from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.discounts.utils import generate_offer_data
@@ -59,8 +64,8 @@ from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from .serializers import CourseInfoSerializer
@@ -347,6 +352,13 @@ class CoursewareMeta:
         user_timezone_locale = user_timezone_locale_prefs(self.request)
         return user_timezone_locale['user_timezone']
 
+    @property
+    def mfe_short_url_is_active(self):
+        """
+        Returns a boolean on if the course exit page is active
+        """
+        return settings.ENABLE_SHORT_MFE_URL
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -423,7 +435,9 @@ class CoursewareInformation(RetrieveAPIView):
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
-        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course.
+        * mfe_short_url_is_active: Flag for the learning mfe on whether or not
+            the url will contain the block id or hash key.
 
     **Parameters:**
 
@@ -522,8 +536,18 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
+        if settings.ENABLE_SHORT_MFE_URL:
+            try:
+                decoded_hash_string = urlsafe_b64decode(usage_key_string)
+                usage_key_hash = decoded_hash_string.decode('utf-8')
+                usage_key_string = str(CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData,
+                                                                                   hash_key=usage_key_hash))
+            except binascii.Error:
+                get_usage_key_hash(usage_key_string)
+
         try:
             usage_key = UsageKey.from_string(usage_key_string)
+
         except InvalidKeyError:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -533,7 +557,6 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             staff_access=has_access(request.user, 'staff', usage_key.course_key),
             reset_masquerade_data=True,
         )
-
         sequence, _ = get_module_by_usage_id(
             self.request,
             str(usage_key.course_key),
@@ -544,8 +567,13 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         view = STUDENT_VIEW
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
-
-        return Response(sequence.get_metadata(view=view))
+        metadata = sequence.get_metadata(view=view)
+        metadata['decoded_id'] = metadata['item_id']
+        metadata['hash_key'] = get_usage_key_hash(metadata['item_id'])
+        for item in metadata['items']:
+            item['decoded_id'] = item['id']
+            item['hash_key'] = get_usage_key_hash(item['id'])
+        return Response(metadata)
 
 
 class Resume(DeveloperErrorViewMixin, APIView):
@@ -596,9 +624,14 @@ class Resume(DeveloperErrorViewMixin, APIView):
         try:
             block_key = get_key_to_last_completed_block(request.user, course_id)
             path = path_to_location(modulestore(), block_key, request, full_path=True)
-            resp['section_id'] = str(path[2])
-            resp['unit_id'] = str(path[3])
-            resp['block_id'] = str(block_key)
+            if settings.ENABLE_SHORT_MFE_URL:
+                resp['section_id'] = get_usage_key_hash(path[2])
+                resp['unit_id'] = get_usage_key_hash(path[3])
+                resp['block_id'] = str(block_key)
+            else:
+                resp['section_id'] = str(path[2])
+                resp['unit_id'] = str(path[3])
+                resp['block_id'] = str(block_key)
 
         except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
             pass  # leaving all the IDs as None indicates a redirect to the first unit in the course, as a backup

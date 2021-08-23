@@ -2,7 +2,6 @@
 CourseBlocks API views
 """
 
-
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
@@ -14,6 +13,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.features.course_experience.url_helpers import get_usage_key_hash
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -240,6 +240,17 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             # case we add the usual caching headers to the response.
             if params.cleaned_data.get('username', None) == '':
                 patch_response_headers(response)
+
+            if 'blocks' in response.data:
+                blocks = response.data['blocks']
+            else:
+                blocks = response.data
+
+            for block in blocks:
+                current_block = block
+                if isinstance(blocks, dict):
+                    current_block = blocks[block]
+                current_block['hash_key'] = get_usage_key_hash(current_block['id'])
             return response
         except ItemNotFoundError as exception:
             raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from

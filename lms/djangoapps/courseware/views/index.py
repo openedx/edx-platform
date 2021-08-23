@@ -205,6 +205,7 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
+
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,

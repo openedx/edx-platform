@@ -6,6 +6,8 @@ because the Studio course outline may need these utilities.
 """
 from enum import Enum
 from typing import Optional
+from base64 import urlsafe_b64encode
+from hashlib import blake2b
 
 import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
@@ -18,6 +20,8 @@ from six.moves.urllib.parse import urlencode, urlparse
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
+from openedx.core.djangoapps.content.learning_sequences.data import CourseLearningSequenceData
+
 
 User = get_user_model()
 
@@ -65,7 +69,7 @@ def get_courseware_url(
         get_url_fn = _get_new_courseware_url
     else:
         get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request)
+    return get_url_fn(usage_key=usage_key, request=request,)
 
 
 def _get_legacy_courseware_url(
@@ -144,6 +148,26 @@ def _get_new_courseware_url(
     )
 
 
+def get_usage_key_hash(usage_key):
+    '''
+    Get the blake2b hash key for the given usage_key and encode the value. The
+    hash key will be added to the usage key's mapping dictionary for decoding
+    in LMS.
+
+    Args:
+        usage_key: :class:`UsageKey` the id of the location to which to generate the path
+
+    Returns:
+        The string of the encoded hash key.
+    '''
+
+    short_key = blake2b(bytes(str(usage_key), 'utf-8'), digest_size=6)
+    encoded_hash = urlsafe_b64encode(bytes(short_key.hexdigest(), 'utf-8'))
+    CourseLearningSequenceData.short_id_mapping(CourseLearningSequenceData, hash_key=short_key.hexdigest(),
+                                                usage_key=usage_key)
+    return str(encoded_hash, 'utf-8')
+
+
 def make_learning_mfe_courseware_url(
         course_key: CourseKey,
         sequence_key: Optional[UsageKey] = None,
@@ -172,17 +196,25 @@ def make_learning_mfe_courseware_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+
+    If `settings.ENABLE_SHORT_MFE_URL` is set to True, the URL will be built
+    like this:
+
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
-
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/c/{course_key}'
     if sequence_key:
+        if settings.ENABLE_SHORT_MFE_URL:
+            sequence_key = get_usage_key_hash(sequence_key)
         mfe_link += f'/{sequence_key}'
 
         if unit_key:
+            if settings.ENABLE_SHORT_MFE_URL:
+                unit_key = get_usage_key_hash(unit_key)
             mfe_link += f'/{unit_key}'
 
     return mfe_link
@@ -196,12 +228,12 @@ def get_learning_mfe_home_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
+    http://localhost:2000/c/course-v1:edX+DemoX+Demo_Course/dates
 
     `course_key` can be either an OpaqueKey or a string.
     `view_name` is an optional string.
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/c/{course_key}'
 
     if view_name:
         mfe_link += f'/{view_name}'

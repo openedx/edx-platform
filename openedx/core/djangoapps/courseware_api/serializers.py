@@ -119,6 +119,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     is_mfe_special_exams_enabled = serializers.BooleanField()
     is_mfe_proctored_exams_enabled = serializers.BooleanField()
     user_needs_integrity_signature = serializers.BooleanField()
+    mfe_short_url_is_active = serializers.BooleanField()
 
     def __init__(self, *args, **kwargs):
         """
