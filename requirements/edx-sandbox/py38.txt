@@ -71,7 +71,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.8.3
+regex==2021.8.21
     # via nltk
 scipy==1.7.1
     # via
@@ -88,5 +88,5 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   symmath
-tqdm==4.62.1
+tqdm==4.62.2
     # via nltk
