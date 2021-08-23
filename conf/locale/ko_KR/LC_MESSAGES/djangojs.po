@@ -43,13 +43,14 @@
 # eddie94 <myeddie@naver.com>, 2018
 # a9eb828b2ee54fcf461b952290dc7714_32c3f02 <c5f53f2352e5f1df5429a18a23b721aa_268690>, 2015
 # kmooc <shevious@gmail.com>, 2016-2017
+# Wonjae Choi <juniorleo651@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-08 20:44+0000\n"
-"PO-Revision-Date: 2020-12-13 11:55+0000\n"
-"Last-Translator: 김수연 <amelia9981@ajou.ac.kr>\n"
+"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"PO-Revision-Date: 2021-08-19 04:25+0000\n"
+"Last-Translator: Wonjae Choi <juniorleo651@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "Language: ko_KR\n"
 "MIME-Version: 1.0\n"

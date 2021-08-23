@@ -289,7 +289,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-08 20:44+0000\n"
+"POT-Creation-Date: 2021-08-22 20:44+0000\n"
 "PO-Revision-Date: 2019-04-03 14:12+0000\n"
 "Last-Translator: willyedoo <willyedoo@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -5658,8 +5658,8 @@ msgstr "Prendre des cours gratuits en ligne sur edX.org"
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
-"and their respective logos are registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -6309,6 +6309,7 @@ msgstr ""
 "de traiter cette demande, svp visiter le ou les liens ci-dessous."
 
 #: lms/djangoapps/course_goals/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
 msgstr ""
 
@@ -6741,6 +6742,15 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide an in-course calculator for simple and complex calculations."
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid ""
+"Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
@@ -9976,6 +9986,50 @@ msgstr ""
 msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created, but not queued to run."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created and queued to run."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task is running."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished, but some blocks failed to import."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished successfully."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "state"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The state of the block import task."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "progress"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "A float from 0.0 to 1.0 representing the task progress."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "course ID"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "ID of the imported course."
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
 msgstr ""
@@ -11284,6 +11338,10 @@ msgid "Full Name cannot contain the following characters: < >"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
 msgstr "Une adresse e-mail valide est requise"
 
@@ -11883,6 +11941,7 @@ msgid ""
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
+#: lms/templates/course_modes/track_selection.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "Continuer"
@@ -11893,10 +11952,17 @@ msgid "Shift due dates"
 msgstr ""
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
 msgid ""
-"To participate in this assignment, the suggested schedule for your course "
-"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
-"won’t lose any of your progress."
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
 msgstr ""
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
@@ -13278,12 +13344,6 @@ msgstr ""
 msgid ""
 " Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
 msgstr ""
 
 #: lms/templates/dates_banner.html
@@ -15572,6 +15632,80 @@ msgstr ""
 "n'offre pas d'attestations aux apprenants qui aurant la note de "
 "passage.{b_end}"
 
+#: lms/templates/course_modes/track_selection.html
+msgid "Enroll In {course_name} | Upgrade Now"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Choose a path for your course in"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Showcase a {link_start}verified certificate{link_end} of completion on your "
+"resumé to advance your career"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}access to all course activities{end_bold}, including both "
+"graded and non-graded assignments, while the course is running"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Show more"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"{start_bold}Full access{end_bold} to course content and materials, even "
+"after the course ends"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "{link_start}Learn more{link_end} about course access"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Support our {start_bold}non-profit mission{end_bold} to increase access to "
+"high-quality education for everyone, everywhere"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Studies show that those who choose this option are  {start_bold}more engaged"
+" and motivated{end_bold} to complete their courses"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "FREE"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access this course"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
+"including discussion forums and non-graded assignments"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}temporary access{end_bold} to the course material, including"
+" videos and readings"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost on"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost"
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "chapitre en cours {chapter}"
@@ -15594,10 +15728,6 @@ msgstr "{section_format} à terminer avant le {{date}}"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "Ce contenu est noté"
-
-#: lms/templates/courseware/course_about.html
-msgid "An error has occurred. Please ensure that you are logged in to enroll."
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
@@ -16325,6 +16455,18 @@ msgstr ""
 "votre part lorsque votre {cert_name_long} a été généré, nous n'avons pas pu "
 "vous octroyer un certificat vérifié {cert_name_short}. Un certificat sur "
 "l'honneur {cert_name_short} vous a été délivré en remplacement. "
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "You are not eligible for a certificate."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "This link will open the course progress page"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "View grades"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"

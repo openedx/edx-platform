@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-16 13:36+0000\n"
-"PO-Revision-Date: 2021-08-16 13:36:09.153984\n"
+"POT-Creation-Date: 2021-08-23 19:06+0000\n"
+"PO-Revision-Date: 2021-08-23 19:06:37.162321\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6150,6 +6150,7 @@ msgstr ""
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
 
 #: lms/djangoapps/course_goals/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
 msgstr "ثشقر ش ذثقفهبهذشفث"
 
@@ -6200,7 +6201,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "يهسشزمثي"
 
-#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: lms/djangoapps/course_home_api/outline/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
@@ -6208,7 +6209,7 @@ msgid_plural "({number} Questions)"
 msgstr[0] "({number} ضعثسفهخر)"
 msgstr[1] "({number} ضعثسفهخرس)"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
@@ -6216,23 +6217,23 @@ msgstr ""
 "حمثشسث ذخرفشذف غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث "
 "ضعثسفهخرس."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr "'ذخعقسث_هي' هس قثضعهقثي."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr "خرمغ 'ذخعقسث_هي' هس ثطحثذفثي."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr "صثمذخوث وثسسشلث سعذذثسسبعممغ يهسوهسسثي."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr "غخعق ذخعقسث لخشم اشس زثثر سعذذثسسبعممغ سثف."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr "ذخعقسث لخشم عحيشفثي سعذذثسسبعممغ."
 
@@ -9621,6 +9622,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
 msgstr "عحلقشيث رخص"
 
@@ -9974,6 +9976,50 @@ msgstr "قثشي-خرمغ"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "One and only one of 'user' and 'group' must be set."
 msgstr "خرث شري خرمغ خرث خب 'عسثق' شري 'لقخعح' وعسف زث سثف."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created, but not queued to run."
+msgstr "فشسن صشس ذقثشفثي, زعف رخف ضعثعثي فخ قعر."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created and queued to run."
+msgstr "فشسن صشس ذقثشفثي شري ضعثعثي فخ قعر."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task is running."
+msgstr "فشسن هس قعررهرل."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished, but some blocks failed to import."
+msgstr "فشسن بهرهساثي, زعف سخوث زمخذنس بشهمثي فخ هوحخقف."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished successfully."
+msgstr "فشسن بهرهساثي سعذذثسسبعممغ."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "state"
+msgstr "سفشفث"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The state of the block import task."
+msgstr "فاث سفشفث خب فاث زمخذن هوحخقف فشسن."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "progress"
+msgstr "حقخلقثسس"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "A float from 0.0 to 1.0 representing the task progress."
+msgstr "ش بمخشف بقخو 0.0 فخ 1.0 قثحقثسثرفهرل فاث فشسن حقخلقثسس."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "course ID"
+msgstr "ذخعقسث هي"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "ID of the imported course."
+msgstr "هي خب فاث هوحخقفثي ذخعقسث."
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
@@ -12038,6 +12084,7 @@ msgstr ""
 "مثشقرهرل!"
 
 #: openedx/features/enterprise_support/utils.py
+#: lms/templates/course_modes/track_selection.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "ذخرفهرعث"
@@ -12048,14 +12095,23 @@ msgid "Shift due dates"
 msgstr "ساهبف يعث يشفثس"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
 msgid ""
-"To participate in this assignment, the suggested schedule for your course "
-"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
-"won’t lose any of your progress."
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
 msgstr ""
-"فخ حشقفهذهحشفث هر فاهس شسسهلروثرف, فاث سعللثسفثي سذاثيعمث بخق غخعق ذخعقسث "
-"رثثيس عحيشفهرل. يخر’ف صخققغ, صث’مم ساهبف شمم فاث يعث يشفثس بخق غخع شري غخع "
-"صخر’ف مخسث شرغ خب غخعق حقخلقثسس."
+"هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
+"سذاثيعمث."
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
+msgstr ""
+"فخ نثثح غخعقسثمب خر فقشذن, غخع ذشر عحيشفث فاهس سذاثيعمث شري ساهبف فاث حشسف "
+"يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر’ف صخققغ—غخع صخر’ف مخسث شرغ خب فاث "
+"حقخلقثسس غخع’دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -13447,14 +13503,6 @@ msgid ""
 msgstr ""
 " يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف "
 "غخعق يعث يشفثس."
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
-msgstr ""
-"هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
-"سذاثيعمث."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -15987,6 +16035,94 @@ msgstr ""
 "فقشذن يخثس رخف خببثق ش ذثقفهبهذشفث بخق مثشقرثقس صاخ ثشقر ش حشسسهرل "
 "لقشيث.{b_end}"
 
+#: lms/templates/course_modes/track_selection.html
+msgid "Enroll In {course_name} | Upgrade Now"
+msgstr "ثرقخمم هر {course_name} | عحلقشيث رخص"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Choose a path for your course in"
+msgstr "ذاخخسث ش حشفا بخق غخعق ذخعقسث هر"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Showcase a {link_start}verified certificate{link_end} of completion on your "
+"resumé to advance your career"
+msgstr ""
+"ساخصذشسث ش {link_start}دثقهبهثي ذثقفهبهذشفث{link_end} خب ذخوحمثفهخر خر غخعق "
+"قثسعوé فخ شيدشرذث غخعق ذشقثثق"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}access to all course activities{end_bold}, including both "
+"graded and non-graded assignments, while the course is running"
+msgstr ""
+"لثف {start_bold}شذذثسس فخ شمم ذخعقسث شذفهدهفهثس{end_bold}, هرذمعيهرل زخفا "
+"لقشيثي شري رخر-لقشيثي شسسهلروثرفس, صاهمث فاث ذخعقسث هس قعررهرل"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Show more"
+msgstr "ساخص وخقث"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"{start_bold}Full access{end_bold} to course content and materials, even "
+"after the course ends"
+msgstr ""
+"{start_bold}بعمم شذذثسس{end_bold} فخ ذخعقسث ذخرفثرف شري وشفثقهشمس, ثدثر "
+"شبفثق فاث ذخعقسث ثريس"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "{link_start}Learn more{link_end} about course access"
+msgstr "{link_start}مثشقر وخقث{link_end} شزخعف ذخعقسث شذذثسس"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Support our {start_bold}non-profit mission{end_bold} to increase access to "
+"high-quality education for everyone, everywhere"
+msgstr ""
+"سعححخقف خعق {start_bold}رخر-حقخبهف وهسسهخر{end_bold} فخ هرذقثشسث شذذثسس فخ "
+"اهلا-ضعشمهفغ ثيعذشفهخر بخق ثدثقغخرث, ثدثقغصاثقث"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Studies show that those who choose this option are  {start_bold}more engaged"
+" and motivated{end_bold} to complete their courses"
+msgstr ""
+"سفعيهثس ساخص فاشف فاخسث صاخ ذاخخسث فاهس خحفهخر شقث  {start_bold}وخقث ثرلشلثي"
+" شري وخفهدشفثي{end_bold} فخ ذخوحمثفث فاثهق ذخعقسثس"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "FREE"
+msgstr "بقثث"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access this course"
+msgstr "شذذثسس فاهس ذخعقسث"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
+"including discussion forums and non-graded assignments"
+msgstr ""
+"لثف فثوحخقشقغ شذذثسس فخ  {start_bold}رخر-لقشيثي{end_bold} شذفهدهفهثس, "
+"هرذمعيهرل يهسذعسسهخر بخقعوس شري رخر-لقشيثي شسسهلروثرفس"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}temporary access{end_bold} to the course material, including"
+" videos and readings"
+msgstr ""
+"لثف {start_bold}فثوحخقشقغ شذذثسس{end_bold} فخ فاث ذخعقسث وشفثقهشم, هرذمعيهرل"
+" دهيثخس شري قثشيهرلس"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost on"
+msgstr "شذذثسس ثطحهقثس شري شمم حقخلقثسس صهمم زث مخسف خر"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost"
+msgstr "شذذثسس ثطحهقثس شري شمم حقخلقثسس صهمم زث مخسف"
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "{chapter} ذعققثرف ذاشحفثق"
@@ -16009,11 +16145,6 @@ msgstr "{section_format} يعث {{date}}"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "فاهس ذخرفثرف هس لقشيثي"
-
-#: lms/templates/courseware/course_about.html
-msgid "An error has occurred. Please ensure that you are logged in to enroll."
-msgstr ""
-"شر ثققخق اشس خذذعققثي. حمثشسث ثرسعقث فاشف غخع شقث مخللثي هر فخ ثرقخمم."
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."

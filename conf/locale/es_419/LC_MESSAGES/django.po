@@ -262,7 +262,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-08 20:44+0000\n"
+"POT-Creation-Date: 2021-08-22 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -3346,7 +3346,7 @@ msgstr ""
 "Ingrese true para permitir que los estudiantes descarguen sus certificados "
 "antes del fin del curso, cuando hayan cumplido con todos los requisitos."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Certificates Display Behavior"
 msgstr "Opciones de publicación de los certificados"
 
@@ -5835,8 +5835,8 @@ msgstr "Hacer cursos gratuitos en línea en edX.org"
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
-"and their respective logos are registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -6481,6 +6481,7 @@ msgstr ""
 "esta solicitud, visite el vínculo(s) a continuación."
 
 #: lms/djangoapps/course_goals/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
 msgstr "Obtén un certificado"
 
@@ -6945,6 +6946,15 @@ msgstr "Calculadora"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide an in-course calculator for simple and complex calculations."
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Proctoring"
+msgstr "Supervisión"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid ""
+"Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
@@ -9962,6 +9972,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
 msgstr "Cambia ahora a la opción con Certificado Verificado"
 
@@ -10315,6 +10326,50 @@ msgstr "Solo Lectura"
 msgid "One and only one of 'user' and 'group' must be set."
 msgstr "Se debe establecer uno y solo uno de 'usuario' y 'grupo'."
 
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created, but not queued to run."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task was created and queued to run."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task is running."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished, but some blocks failed to import."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Task finished successfully."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "state"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The state of the block import task."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "progress"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "A float from 0.0 to 1.0 representing the task progress."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "course ID"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "ID of the imported course."
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
 msgstr ""
@@ -10553,7 +10608,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "technical support"
-msgstr ""
+msgstr "soporte técnico"
 
 #: openedx/core/djangoapps/discussions/models.py
 #, python-brace-format
@@ -11186,7 +11241,7 @@ msgstr "\"{email}\" no es un correo electrónico válido."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
-msgstr ""
+msgstr "Introduce una dirección de correo electrónico válida"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -11740,6 +11795,10 @@ msgstr "El access_token suministrado no es válido."
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Full Name cannot contain the following characters: < >"
 msgstr "El Nombre Completo no puede contener los siguientes caracteres: < >"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
@@ -12403,6 +12462,7 @@ msgstr ""
 " aprender!"
 
 #: openedx/features/enterprise_support/utils.py
+#: lms/templates/course_modes/track_selection.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "Continuar"
@@ -12412,11 +12472,19 @@ msgstr "Continuar"
 msgid "Shift due dates"
 msgstr "Cambiar fechas de vencimiento"
 
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+"Parece que no cumplió algunos plazos importantes según nuestro calendario "
+"sugerido."
+
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 msgid ""
-"To participate in this assignment, the suggested schedule for your course "
-"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
-"won’t lose any of your progress."
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
 msgstr ""
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
@@ -13762,7 +13830,7 @@ msgstr "Información de estado de la cuenta"
 
 #: lms/templates/dashboard.html
 msgid "Activate your account so you can log back in"
-msgstr ""
+msgstr "Activa tu cuenta para poder volver a conectarte"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -13818,14 +13886,6 @@ msgid ""
 msgstr ""
 "No te preocupes — no perderás ningún progreso que hayas logrado cuando "
 "cambios tus fechas de entrega."
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
-msgstr ""
-"Parece que no cumplió algunos plazos importantes según nuestro calendario "
-"sugerido."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -16409,6 +16469,96 @@ msgstr ""
 " ofrece la oportunidad de recibir un certificado al finalizar el curso, "
 "aunque se obtenga la calificación necesaria para aprobar.{b_end}"
 
+#: lms/templates/course_modes/track_selection.html
+msgid "Enroll In {course_name} | Upgrade Now"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Choose a path for your course in"
+msgstr "Elige un camino para tu curso en el"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Showcase a {link_start}verified certificate{link_end} of completion on your "
+"resumé to advance your career"
+msgstr ""
+"Comparte un {link_start}certificado verificado{link_end} de finalización en "
+"tu currículum para avanzar en tu carrera"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}access to all course activities{end_bold}, including both "
+"graded and non-graded assignments, while the course is running"
+msgstr ""
+"Obtén {start_bold}acceso a todas las actividades del curso{end_bold}, "
+"incluidas las tareas calificadas y no calificadas, mientras el curso esté "
+"activo"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Show more"
+msgstr "Mostrar más"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"{start_bold}Full access{end_bold} to course content and materials, even "
+"after the course ends"
+msgstr ""
+"{start_bold}Acceso completo{end_bold} al contenido y los materiales del "
+"curso, incluso después de que finalice el curso"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "{link_start}Learn more{link_end} about course access"
+msgstr ""
+"{link_start}Obtén más información{link_end} sobre el acceso a los cursos"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Support our {start_bold}non-profit mission{end_bold} to increase access to "
+"high-quality education for everyone, everywhere"
+msgstr ""
+"Apoya nuestra {start_bold}misión sin fines de lucro{end_bold} de aumentar el"
+" acceso a la educación de alta calidad para todos, en todas partes"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Studies show that those who choose this option are  {start_bold}more engaged"
+" and motivated{end_bold} to complete their courses"
+msgstr ""
+"Los estudios demuestran que quienes eligen esta opción están {start_bold}más"
+" comprometidos y motivados{end_bold} para completar sus cursos"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "FREE"
+msgstr "GRATIS"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access this course"
+msgstr "Accede a este curso"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
+"including discussion forums and non-graded assignments"
+msgstr ""
+"Obtén acceso temporal a actividades {start_bold}no calificadas{end_bold}, "
+"incluidos foros de discusión y tareas no calificadas"
+
+#: lms/templates/course_modes/track_selection.html
+msgid ""
+"Get {start_bold}temporary access{end_bold} to the course material, including"
+" videos and readings"
+msgstr ""
+"Obtén {start_bold}acceso temporal{end_bold} al material del curso, incluidos"
+" videos y lecturas"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost on"
+msgstr "El acceso expira y todo el progreso se perderá el"
+
+#: lms/templates/course_modes/track_selection.html
+msgid "Access expires and all progress will be lost"
+msgstr "El acceso expira y todo el progreso se perderá"
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "{chapter} capítulo actual"
@@ -16431,12 +16581,6 @@ msgstr "{section_format} fecha límite {{date}}"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "Este contenido es calificable"
-
-#: lms/templates/courseware/course_about.html
-msgid "An error has occurred. Please ensure that you are logged in to enroll."
-msgstr ""
-"Ha ocurrido un error. Por favor asegúrese que ha iniciado sesión para "
-"inscribirse."
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
@@ -17072,7 +17216,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Congratulations! Your certificate is ready."
-msgstr ""
+msgstr "¡Felicitaciones!. Tu certificado está listo."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -17171,6 +17315,18 @@ msgstr ""
 " el momento de generación de tu {cert_name_long}, no hemos podido otorgarte "
 "un {cert_name_short} verificado. En su lugar, se le ha generado un "
 "{cert_name_short} de código de honor."
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "You are not eligible for a certificate."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "This link will open the course progress page"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "View grades"
+msgstr "Ver calificaciones"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
