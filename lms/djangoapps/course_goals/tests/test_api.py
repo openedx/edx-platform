@@ -11,6 +11,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_goals.models import CourseGoal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -31,7 +32,7 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(emit_signals=True)
 
-        self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'password')
+        self.user = UserFactory.create(username='john', email='lennon@thebeatles.com', password='password')
         CourseEnrollment.enroll(self.user, self.course.id)
 
         self.client = APIClient(enforce_csrf_checks=True)

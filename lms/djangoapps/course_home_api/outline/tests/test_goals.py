@@ -39,7 +39,9 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(emit_signals=True)
 
-        self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'password')
+        self.user = UserFactory.create(
+            username='john', email='lennon@thebeatles.com', password='password',
+        )
         CourseEnrollment.enroll(self.user, self.course.id)
 
         self.client = APIClient(enforce_csrf_checks=True)

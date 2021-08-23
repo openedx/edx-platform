@@ -6,12 +6,12 @@ Tests for validate Internationalization and Module i18n service.
 import gettext
 from unittest import mock, skip
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import translation
 from django.utils.translation import get_language
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.views.preview import _preview_module_system
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.lib.edx_six import get_gettext
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -192,7 +192,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.password = 'foo'
 
         # Create the use so we can log them in.
-        self.user = User.objects.create_user(self.uname, self.email, self.password)
+        self.user = UserFactory.create(username=self.uname, email=self.email, password=self.password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.

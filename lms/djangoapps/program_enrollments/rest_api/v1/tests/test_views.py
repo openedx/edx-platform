@@ -10,7 +10,6 @@ from uuid import UUID, uuid4
 
 import ddt
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
@@ -499,7 +498,7 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
                 'curriculum_uuid': str(self.curriculum_uuid)
             }
         ]
-        user = User.objects.create_user('test_user', 'test@example.com', 'password')
+        user = UserFactory.create(username='test_user', email='test@example.com', password='password')
         url = self.get_url()
         with mock.patch(
                 _get_users_patch_path,

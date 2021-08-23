@@ -715,7 +715,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment(self):
-        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        user = UserFactory.create(username="joe", email="joe@joe.com", password="password")
         course_id = CourseKey.from_string("edX/Test101/2013")
         course_id_partial = CourseKey.from_string("edX/Test101/")
         course = CourseOverviewFactory.create(id=course_id)

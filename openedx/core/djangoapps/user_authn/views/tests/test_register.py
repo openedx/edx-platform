@@ -2324,7 +2324,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         Test if username '{0}' and email '{1}' have conflicts with
         username 'user' and email 'user@email.com'.
         """
-        user = User.objects.create_user(username='user', email='user@email.com')
+        user = UserFactory.create(username='user', email='user@email.com')
         self.assertValidationDecision(
             {
                 'username': username,
@@ -2460,7 +2460,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         Test that if `is_authn_mfe` is provided in request along with form_field_key, only
         error message for that field is returned.
         """
-        User.objects.create_user(username='user', email='user@email.com')
+        UserFactory.create(username='user', email='user@email.com')
         # using username and email that have conflicts but sending form_field_key will return
         # validation for only email
         self.assertValidationDecision(

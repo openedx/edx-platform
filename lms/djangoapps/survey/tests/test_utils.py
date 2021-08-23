@@ -5,9 +5,9 @@ Python tests for the Survey models
 
 from collections import OrderedDict
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.survey.models import SurveyForm
 from lms.djangoapps.survey.utils import check_survey_required_and_unanswered, is_survey_required_for_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,10 +29,16 @@ class SurveyModelsTests(ModuleStoreTestCase):
 
         # Create two accounts
         self.password = 'abc'
-        self.student = User.objects.create_user('student', 'student@test.com', self.password)
-        self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
+        self.student = UserFactory.create(
+            username='student', email='student@test.com', password=self.password,
+        )
+        self.student2 = UserFactory.create(
+            username='student2', email='student2@test.com', password=self.password,
+        )
 
-        self.staff = User.objects.create_user('staff', 'staff@test.com', self.password)
+        self.staff = UserFactory.create(
+            username='staff', email='staff@test.com', password=self.password,
+        )
         self.staff.is_staff = True
         self.staff.save()
 

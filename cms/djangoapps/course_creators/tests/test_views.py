@@ -5,7 +5,6 @@ Tests course_creators.views.py.
 
 from unittest import mock
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
@@ -19,6 +18,7 @@ from cms.djangoapps.course_creators.views import (
 )
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class CourseCreatorView(TestCase):
@@ -29,8 +29,16 @@ class CourseCreatorView(TestCase):
     def setUp(self):
         """ Test case setup """
         super().setUp()
-        self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
-        self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
+        self.user = UserFactory.create(
+            username='test_user',
+            email='test_user+courses@edx.org',
+            password='foo',
+        )
+        self.admin = UserFactory.create(
+            username='Mark',
+            email='admin+courses@edx.org',
+            password='foo',
+        )
         self.admin.is_staff = True
 
     def test_staff_permission_required(self):

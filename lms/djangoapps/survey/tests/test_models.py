@@ -7,11 +7,11 @@ from collections import OrderedDict
 
 import ddt
 import pytest
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 
@@ -31,8 +31,12 @@ class SurveyModelsTests(TestCase):
 
         # Create two accounts
         self.password = 'abc'
-        self.student = User.objects.create_user('student', 'student@test.com', self.password)
-        self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
+        self.student = UserFactory.create(
+            username='student', email='student@test.com', password=self.password,
+        )
+        self.student2 = UserFactory.create(
+            username='student2', email='student2@test.com', password=self.password,
+        )
 
         self.test_survey_name = 'TestForm'
         self.test_form = '<li><input name="field1" /></li><li><input name="field2" /></li><li><select name="ddl"><option>1</option></select></li>'  # lint-amnesty, pylint: disable=line-too-long

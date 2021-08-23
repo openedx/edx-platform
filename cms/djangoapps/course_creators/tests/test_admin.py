@@ -6,7 +6,6 @@ Tests course_creators.admin.py.
 from unittest import mock
 
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
@@ -15,6 +14,7 @@ from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 def mock_render_to_string(template_name, context):
@@ -30,11 +30,19 @@ class CourseCreatorAdminTest(TestCase):
     def setUp(self):
         """ Test case setup """
         super().setUp()
-        self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
+        self.user = UserFactory.create(
+            username='test_user',
+            email='test_user+courses@edx.org',
+            password='foo',
+        )
         self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()
 
-        self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
+        self.admin = UserFactory.create(
+            username='Mark',
+            email='admin+courses@edx.org',
+            password='foo',
+        )
         self.admin.is_staff = True
 
         self.request = HttpRequest()
