@@ -3,6 +3,8 @@ CourseOverview api
 """
 import logging
 
+from django.http.response import Http404
+
 from openedx.core.djangoapps.catalog.api import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.serializers import (
@@ -23,6 +25,18 @@ def get_course_overview_or_none(course_id):
     except CourseOverview.DoesNotExist:
         log.warning(f"Course overview does not exist for {course_id}")
         return None
+
+
+def get_course_overview_or_404(course_id):
+    """
+    Retrieve and return course overview data for the provided course id.
+
+    If the course overview does not exist, raises Http404.
+    """
+    try:
+        return CourseOverview.get_from_id(course_id)
+    except CourseOverview.DoesNotExist as e:
+        raise Http404(f"Course overview does not exist for {course_id}") from e
 
 
 def get_pseudo_course_overview(course_id):

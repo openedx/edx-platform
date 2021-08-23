@@ -13,6 +13,7 @@ class CourseGoalsConfig(AppConfig):
     Application Configuration for Course Goals.
     """
     name = 'lms.djangoapps.course_goals'
+    verbose_name = 'Course Goals'
 
     def ready(self):
         """

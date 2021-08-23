@@ -29,7 +29,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     """
     def setUp(self):
         super().setUp()
-        self.url = reverse('course-home-course-metadata', args=[self.course.id])
+        self.url = reverse('course-home:course-metadata', args=[self.course.id])
         self.staff_user = UserFactory(
             username='staff',
             email='staff@example.com',
@@ -79,7 +79,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert self.client.get(self.url).data['username'] == self.user.username
 
     def test_get_unknown_course(self):
-        url = reverse('course-home-course-metadata', args=['course-v1:unknown+course+2T2020'])
+        url = reverse('course-home:course-metadata', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 

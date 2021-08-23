@@ -1,6 +1,6 @@
 # pylint: disable=abstract-method
 """
-Course Home Mixins.
+Course Home Serializers.
 """
 
 from opaque_keys.edx.keys import CourseKey
@@ -13,7 +13,16 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 
-class DatesBannerSerializerMixin(serializers.Serializer):
+class ReadOnlySerializer(serializers.Serializer):
+    """Serializers have an abstract create & update, but we often don't need them. So this silences the linter."""
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+
+class DatesBannerSerializer(ReadOnlySerializer):
     """
     Serializer Mixin for displaying the dates banner.
     Can be added to any serializer who's tab wants to display it.
@@ -44,7 +53,7 @@ class DatesBannerSerializerMixin(serializers.Serializer):
         return info
 
 
-class VerifiedModeSerializerMixin(serializers.Serializer):
+class VerifiedModeSerializer(ReadOnlySerializer):
     """
     Serializer Mixin for displaying verified mode upgrade information.
 

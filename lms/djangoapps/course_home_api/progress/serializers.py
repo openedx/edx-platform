@@ -7,10 +7,10 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from pytz import UTC
 
-from lms.djangoapps.course_home_api.mixins import VerifiedModeSerializerMixin
+from lms.djangoapps.course_home_api.serializers import ReadOnlySerializer, VerifiedModeSerializer
 
 
-class CourseGradeSerializer(serializers.Serializer):
+class CourseGradeSerializer(ReadOnlySerializer):
     """
     Serializer for course grade
     """
@@ -19,7 +19,7 @@ class CourseGradeSerializer(serializers.Serializer):
     is_passing = serializers.BooleanField(source='passed')
 
 
-class SubsectionScoresSerializer(serializers.Serializer):
+class SubsectionScoresSerializer(ReadOnlySerializer):
     """
     Serializer for subsections in section_scores
     """
@@ -40,6 +40,7 @@ class SubsectionScoresSerializer(serializers.Serializer):
         return str(subsection.location)
 
     def get_problem_scores(self, subsection):
+        """Problem scores for this subsection"""
         problem_scores = [
             {
                 'earned': score.earned,
@@ -54,7 +55,7 @@ class SubsectionScoresSerializer(serializers.Serializer):
         Returns the URL for the subsection while taking into account if the course team has
         marked the subsection's visibility as hide after due.
         """
-        hide_url_date = (subsection.self_paced and subsection.end) or subsection.due
+        hide_url_date = subsection.end if subsection.self_paced else subsection.due
         if (not self.context['staff_access'] and subsection.hide_after_due and hide_url_date
                 and datetime.now(UTC) > hide_url_date):
             return None
@@ -71,7 +72,7 @@ class SubsectionScoresSerializer(serializers.Serializer):
         return not course_blocks.get_xblock_field(subsection.location, 'contains_gated_content', False)
 
 
-class SectionScoresSerializer(serializers.Serializer):
+class SectionScoresSerializer(ReadOnlySerializer):
     """
     Serializer for sections in section_scores
     """
@@ -79,7 +80,7 @@ class SectionScoresSerializer(serializers.Serializer):
     subsections = SubsectionScoresSerializer(source='sections', many=True)
 
 
-class GradingPolicySerializer(serializers.Serializer):
+class GradingPolicySerializer(ReadOnlySerializer):
     """
     Serializer for grading policy
     """
@@ -96,7 +97,7 @@ class GradingPolicySerializer(serializers.Serializer):
         } for assignment_policy in grading_policy['GRADER']]
 
 
-class CertificateDataSerializer(serializers.Serializer):
+class CertificateDataSerializer(ReadOnlySerializer):
     """
     Serializer for certificate data
     """
@@ -106,7 +107,7 @@ class CertificateDataSerializer(serializers.Serializer):
     certificate_available_date = serializers.DateTimeField()
 
 
-class VerificationDataSerializer(serializers.Serializer):
+class VerificationDataSerializer(ReadOnlySerializer):
     """
     Serializer for verification data object
     """
@@ -115,7 +116,7 @@ class VerificationDataSerializer(serializers.Serializer):
     status_date = serializers.DateTimeField()
 
 
-class ProgressTabSerializer(VerifiedModeSerializerMixin):
+class ProgressTabSerializer(VerifiedModeSerializer):
     """
     Serializer for progress tab
     """

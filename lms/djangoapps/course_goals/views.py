@@ -52,7 +52,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
     queryset = CourseGoal.objects.all()
     serializer_class = CourseGoalSerializer
 
-    # Another version of this endpoint exists in ../course_home_api/outline/v1/views.py
+    # Another version of this endpoint exists in ../course_home_api/outline/views.py
     # This version is used by the legacy frontend and is deprecated
     def create(self, post_data):  # lint-amnesty, pylint: disable=arguments-differ
         """ Create a new goal if one does not exist, otherwise update the existing goal. """

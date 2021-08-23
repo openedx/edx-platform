@@ -45,7 +45,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
     def setUp(self):
         super().setUp()
-        self.url = reverse('course-home-outline-tab', args=[self.course.id])
+        self.url = reverse('course-home:outline-tab', args=[self.course.id])
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -158,7 +158,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert self.client.get(self.url).data['handouts_html'] == '<p>Hi</p>'
 
     def test_get_unknown_course(self):
-        url = reverse('course-home-outline-tab', args=['course-v1:unknown+course+2T2020'])
+        url = reverse('course-home:outline-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         assert response.status_code == 404
 
@@ -228,7 +228,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             'course_id': self.course.id,
             'goal_key': 'certify'
         }
-        post_course_goal_response = self.client.post(reverse('course-home-save-course-goal'), post_data)
+        post_course_goal_response = self.client.post(reverse('course-home:save-course-goal'), post_data)
         assert post_course_goal_response.status_code == 200
 
         response = self.client.get(self.url)
@@ -251,7 +251,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             'subscribed_to_reminders': True,
         })
         post_course_goal_response = self.client.post(
-            reverse('course-home-save-course-goal'),
+            reverse('course-home:save-course-goal'),
             post_data,
             content_type='application/json',
         )
@@ -299,7 +299,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             'short_description': 'My Exam',
             'suggested_icon': 'fa-foo-bar',
         }
-        url = reverse('course-home-outline-tab', args=[course.id])
+        url = reverse('course-home:outline-tab', args=[course.id])
 
         CourseEnrollment.enroll(self.user, course.id)
         response = self.client.get(url)
@@ -323,7 +323,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
                                              parent_location=chapter.location)
             ItemFactory.create(category='problem', parent_location=sequential2.location)
-        url = reverse('course-home-outline-tab', args=[course.id])
+        url = reverse('course-home:outline-tab', args=[course.id])
 
         CourseEnrollment.enroll(self.user, course.id)
         response = self.client.get(url)
@@ -338,8 +338,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert ungraded_data['icon'] is None
 
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_data', new=Mock(return_value={'a': 1}))
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.get_access_expiration_data', new=Mock(return_value={'b': 1}))
+    @patch('lms.djangoapps.course_home_api.outline.views.generate_offer_data', new=Mock(return_value={'a': 1}))
+    @patch('lms.djangoapps.course_home_api.outline.views.get_access_expiration_data', new=Mock(return_value={'b': 1}))
     @ddt.data(*itertools.product([True, False], [True, False],
                                  [None, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE]))
     @ddt.unpack

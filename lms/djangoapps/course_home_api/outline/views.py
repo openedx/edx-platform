@@ -6,8 +6,8 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
 from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_django_utils import monitoring as monitoring_utils
@@ -22,7 +22,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.json_request import expect_json
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,
@@ -32,8 +31,9 @@ from lms.djangoapps.course_goals.api import (
     has_course_goal_permission,
     valid_course_goals_ordered
 )
+from lms.djangoapps.course_goals.models import CourseGoal
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
-from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
+from lms.djangoapps.course_home_api.outline.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
 )
@@ -47,7 +47,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import (
     get_user_course_outline,
     public_api_available as learning_sequences_api_available,
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_404
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, ENABLE_COURSE_GOALS
@@ -192,7 +192,7 @@ class OutlineTabView(RetrieveAPIView):
 
         user_is_masquerading = is_masquerading(request.user, course_key, course_masquerade=masquerade_object)
 
-        course_overview = CourseOverview.get_from_id(course_key)
+        course_overview = get_course_overview_or_404(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         enrollment_mode = getattr(enrollment, 'mode', None)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
@@ -443,3 +443,34 @@ def save_course_goal(request):
             })
         except Exception:
             raise UnableToSaveCourseGoal
+
+
+@api_view(['POST'])
+def unsubscribe_from_course_goal_by_token(request, token):
+    """
+    API calls to unsubscribe from course goal reminders.
+
+    Note that this does not require authentication - this view may be hit from an email on a different device than
+    normal or whatever. We should still be able to unsubscribe the user. Instead, we use a token in the email to
+    validate that they have permission to unsubscribe.
+
+    This endpoint is very tightly scoped (only unsubscribe: no subscribing, no PII) because it is unauthenticated.
+
+    **Example Requests**
+        POST api/course_home/v1/unsubscribe_from_course_goal/{token}
+
+    **Example Response Data**
+        {'course_title': 'Cats & Dogs In Canadian Media'}
+
+    Returns a 404 response if the token was not found. Otherwise, returns some basic course info. But no PII.
+    """
+    # First update the goal
+    goal = get_object_or_404(CourseGoal, unsubscribe_token=token)
+    goal.subscribed_to_reminders = False
+    goal.save()
+
+    # Now generate a response
+    course_overview = get_course_overview_or_404(goal.course_key)
+    return Response({
+        'course_title': course_overview.display_name,
+    })

@@ -2,8 +2,8 @@
 Progress Tab Views
 """
 
+from django.contrib.auth import get_user_model
 from django.http.response import Http404
-from django.contrib.auth.models import User
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -14,14 +14,16 @@ from rest_framework.response import Response
 
 from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
+from lms.djangoapps.course_home_api.progress.serializers import ProgressTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers import start_date
 
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary, get_course_with_access, get_studio_url
+from lms.djangoapps.courseware.courses import (
+    get_course_blocks_completion_summary, get_course_with_access, get_studio_url,
+)
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
 
@@ -33,6 +35,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
+
+User = get_user_model()
 
 
 class ProgressTabView(RetrieveAPIView):
@@ -78,7 +82,8 @@ class ProgressTabView(RetrieveAPIView):
                 learner_has_access: (bool) whether the learner has access to the subsection (could be FBE gated)
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
                 num_points_possible: (int) the total amount of points possible for the given subsection
-                percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
+                percent_graded: (float) the percentage of total points the user has received a grade for in a given
+                                subsection
                 problem_scores: List of objects that represent individual problem scores with the following fields:
                     earned: (float) number of earned points
                     possible: (float) number of possible points
@@ -86,18 +91,19 @@ class ProgressTabView(RetrieveAPIView):
                                   ('always', 'never', 'past_due', values defined in
                                    common/lib/xmodule/xmodule/modulestore/inheritance.py)
                 show_grades: (bool) a bool for whether to show grades based on the access the user has
-                url: (str or None) the absolute path url to the Subsection or None if the Subsection is no longer accessible
-                    to the learner due to a hide_after_due course team setting
+                url: (str or None) the absolute path url to the Subsection or None if the Subsection is no longer
+                     accessible to the learner due to a hide_after_due course team setting
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
         grading_policy:
             assignment_policies: List of serialized assignment grading policy objects, each has the following fields:
-                num_droppable: (int) the number of lowest scored assignments that will not be counted towards the final grade
+                num_droppable: (int) the number of lowest scored assignments that will not be counted towards the final
+                               grade
                 short_label: (str) the abbreviated name given to the assignment type
                 type: (str) the assignment type
                 weight: (float) the percent weight the given assigment type has on the overall grade
             grade_range: an object containing the grade range cutoffs. The exact keys in the object can vary, but they
-                         range from just 'Pass', to a combination of 'A', 'B', 'C', and 'D'. If a letter grade is present,
-                         'Pass' is not included.
+                         range from just 'Pass', to a combination of 'A', 'B', 'C', and 'D'. If a letter grade is
+                         present, 'Pass' is not included.
         studio_url: (str) a str of the link to the grading in studio for the course
         verification_data: an object containing
             link: (str) the link to either start or retry ID verification
@@ -119,15 +125,44 @@ class ProgressTabView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ProgressTabSerializer
 
+    def _get_student_user(self, request, course_key, student_id, is_staff):
+        """Gets the student User object, either from coaching, masquerading, or normal actual request"""
+        if student_id:
+            try:
+                student_id = int(student_id)
+            except ValueError as e:
+                raise Http404 from e
+
+        if student_id is None or student_id == request.user.id:
+            _, student = setup_masquerade(
+                request,
+                course_key,
+                staff_access=is_staff,
+                reset_masquerade_data=True
+            )
+            return student
+
+        # When a student_id is passed in, we display the progress page for the user
+        # with the provided user id, rather than the requesting user
+        try:
+            coach_access = has_ccx_coach_role(request.user, course_key)
+        except CCXLocatorValidationException:
+            coach_access = False
+
+        has_access_on_students_profiles = is_staff or coach_access
+        # Requesting access to a different student's profile
+        if not has_access_on_students_profiles:
+            raise Http404
+
+        try:
+            return User.objects.get(id=student_id)
+        except User.DoesNotExist as exc:
+            raise Http404 from exc
+
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
         student_id = kwargs.get('student_id')
-        if student_id:
-            try:
-                student_id = int(student_id)
-            except ValueError:
-                raise Http404
 
         if not course_home_mfe_progress_tab_is_active(course_key):
             raise Http404
@@ -138,30 +173,7 @@ class ProgressTabView(RetrieveAPIView):
         monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
         is_staff = bool(has_access(request.user, 'staff', course_key))
 
-        if student_id is None or student_id == request.user.id:
-            _, student = setup_masquerade(
-                request,
-                course_key,
-                staff_access=is_staff,
-                reset_masquerade_data=True
-            )
-        else:
-            # When a student_id is passed in, we display the progress page for the user
-            # with the provided user id, rather than the requesting user
-            try:
-                coach_access = has_ccx_coach_role(request.user, course_key)
-            except CCXLocatorValidationException:
-                coach_access = False
-
-            has_access_on_students_profiles = is_staff or coach_access
-            # Requesting access to a different student's profile
-            if not has_access_on_students_profiles:
-                raise Http404
-            try:
-                student = User.objects.get(id=student_id)
-            except User.DoesNotExist as exc:
-                raise Http404 from exc
-
+        student = self._get_student_user(request, course_key, student_id, is_staff)
         username = get_enterprise_learner_generic_name(request) or student.username
 
         course = get_course_with_access(student, 'load', course_key, check_if_enrolled=False)
@@ -219,7 +231,7 @@ class ProgressTabView(RetrieveAPIView):
             'completion_summary': get_course_blocks_completion_summary(course_key, student),
             'course_grade': course_grade,
             'has_scheduled_content': has_scheduled_content,
-            'section_scores': course_grade.chapter_grades.values(),
+            'section_scores': list(course_grade.chapter_grades.values()),
             'enrollment_mode': enrollment_mode,
             'grading_policy': grading_policy,
             'studio_url': get_studio_url(course, 'settings/grading'),
@@ -229,7 +241,7 @@ class ProgressTabView(RetrieveAPIView):
         context['staff_access'] = is_staff
         context['course_blocks'] = course_blocks
         context['course_key'] = course_key
-        # course_overview and enrollment will be used by VerifiedModeSerializerMixin
+        # course_overview and enrollment will be used by VerifiedModeSerializer
         context['course_overview'] = course_overview
         context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
