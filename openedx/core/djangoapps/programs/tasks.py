@@ -22,6 +22,7 @@ from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.data import CertificatesDisplayBehaviors
 
 LOGGER = get_task_logger(__name__)
 # Maximum number of retries before giving up on awarding credentials.
@@ -726,10 +727,13 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
     # update the course certificate with the new certificate available date if:
-    # - The course is self paced
-    # - The certificates_display_behavior is not "end"
+    # - The course is not self paced
+    # - The certificates_display_behavior is not "end_with_date"
     course_overview = CourseOverview.get_from_id(course_key)
-    if course_overview.self_paced is False and course_overview.certificates_display_behavior == 'end':
+    if (
+        course_overview.self_paced is False and
+        course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+    ):
         update_credentials_course_certificate_configuration_available_date.delay(
             str(course_key),
             certificate_available_date
