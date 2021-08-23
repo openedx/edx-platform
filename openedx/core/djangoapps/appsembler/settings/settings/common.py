@@ -42,6 +42,20 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.analytics.context_processors.mixpanel',
     )
 
+    # Tahoe: fix: "Invalid type for parameter ContentType" error on js upload
+    #
+    #    This fix is useless in the Maple release.
+    #    The upstream Open edX fix is https://github.com/edx/edx-platform/pull/25957
+    #    For more details see: https://github.com/jazzband/django-pipeline/pull/715
+    #
+    settings.PIPELINE['MIMETYPES'] = (
+        (str('text/coffeescript'), str('.coffee')),
+        (str('text/less'), str('.less')),
+        (str('text/javascript'), str('.js')),
+        (str('text/x-sass'), str('.sass')),
+        (str('text/x-scss'), str('.scss')),
+    )
+
     settings.SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
     settings.CLONE_COURSE_FOR_NEW_SIGNUPS = False
