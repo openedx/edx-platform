@@ -37,6 +37,11 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.edly.utils import (
+    create_user_link_with_edly_sub_organization,
+    user_can_login_on_requested_edly_organization
+)
+from openedx.features.edly.validators import is_edly_user_allowed_to_login
 from openedx.core.lib.api.view_utils import require_post_params
 from student.helpers import get_next_url_for_login_page
 from student.models import LoginFailures, AllowedAuthUser, UserProfile
@@ -423,6 +428,12 @@ def login_user(request):
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
             _handle_failed_authentication(user, possibly_authenticated_user)
+
+        if not is_edly_user_allowed_to_login(request, possibly_authenticated_user):
+            if user_can_login_on_requested_edly_organization(request, possibly_authenticated_user):
+                create_user_link_with_edly_sub_organization(request, possibly_authenticated_user)
+            else:
+                raise AuthFailedError(_('You are not allowed to login on this site.'))
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
