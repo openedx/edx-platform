@@ -939,6 +939,20 @@ DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 
 COURSE_PROGRESS_REMINDER_EMAIL_DAYS = ENV_TOKENS.get('COURSE_PROGRESS_REMINDER_EMAIL_DAYS', 5)
 
+####################################### SENTRY ###########################################
+SENTRY_DSN = ENV_TOKENS.get('SENTRY_DSN', None)
+
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded

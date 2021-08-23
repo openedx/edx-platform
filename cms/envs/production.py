@@ -510,6 +510,20 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
 
+####################################### SENTRY ###########################################
+SENTRY_DSN = ENV_TOKENS.get('SENTRY_DSN', None)
+
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )
+
 ####################### Enterprise Settings ######################
 
 # A default dictionary to be used for filtering out enterprise customer catalog.
