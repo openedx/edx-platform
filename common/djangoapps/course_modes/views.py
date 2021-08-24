@@ -261,7 +261,7 @@ class ChooseModeView(View):
 
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
-        if waffle.flag_is_active(request, 'course_modes.use_new_track_selection'):
+        if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
             # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
             # technically considered happy path, old Track Selection page will be displayed.
             if not error:
