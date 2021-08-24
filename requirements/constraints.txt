@@ -99,11 +99,3 @@ jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
 # a testing requirement. Installing it would cause a bunch of new tool packages to become base
 # requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
 edxval<2.1
-
-# django-ipware==4.0.0 contains a critical change related to ip-handling which needs to be tested on sandbox
-# This constraint will be removed in https://openedx.atlassian.net/browse/BOM-2747
-django-ipware<4.0.0
-
-# pylint>=2.10.0 introduced a lot of new pylint warnings.
-# A separate PR will be needed to remove the pin and fix all the pylint warnings
-pylint<2.10.0
