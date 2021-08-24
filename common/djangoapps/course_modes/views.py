@@ -27,6 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -42,6 +43,24 @@ from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 LOG = logging.getLogger(__name__)
+
+# Namespace for course_modes waffle flags.
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_modes')
+
+# .. toggle_name: course_modes.use_new_track_selection
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new track selection template for testing purposes before full rollout
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-8-23
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REV-2133
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+VALUE_PROP_TRACK_SELECTION_FLAG = LegacyWaffleFlag(
+    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
+    flag_name='use_new_track_selection',
+    module_name=__name__,
+)
 
 
 class ChooseModeView(View):
