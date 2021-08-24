@@ -8,7 +8,16 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 
 class CourseOverviewContent(TimeStampedModel):
+    NORMAL = 0
+    VIDEO = 1
+
+    COURSE_EXPERIENCES = (
+        (NORMAL, 'Normal'),
+        (VIDEO, 'Video')
+    )
+
     body_html = models.TextField(blank=True, default='')
+    course_experience = models.PositiveSmallIntegerField(default=NORMAL, choices=COURSE_EXPERIENCES)
     course = models.OneToOneField(CourseOverview, related_name='custom_settings', on_delete=models.CASCADE)
 
     class Meta:

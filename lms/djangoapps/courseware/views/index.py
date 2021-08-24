@@ -435,7 +435,11 @@ class CoursewareIndex(View):
         staff_access = self.is_staff
         staff_title = self.course.display_name
         rtl_class = get_rtl_class(staff_title)
-
+        course_overview = CourseOverview.get_from_id(self.course.id)
+        course_experience = 'Normal'
+        if hasattr(course_overview, 'custom_settings'):
+            custom_settings = course_overview.custom_settings
+            course_experience = custom_settings.get_course_experience_display()
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -478,12 +482,14 @@ class CoursewareIndex(View):
         course_block_tree = get_course_outline_block_tree(
             request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
         )
+
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,
             course_block_tree,
             self.chapter_url_name,
-            self.section_url_name
+            self.section_url_name,
+            course_experience
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -585,7 +591,8 @@ class CoursewareIndex(View):
         return section_context
 
 
-def render_accordion(request, course, table_of_contents, active_section, active_subsection):
+def render_accordion(request, course, table_of_contents, active_section, active_subsection,
+                     course_experience='Normal'):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -600,6 +607,7 @@ def render_accordion(request, course, table_of_contents, active_section, active_
             ('action_section', active_section),
             ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
+            ('course_experience', course_experience)
         ] + list(TEMPLATE_IMPORTS.items())
     )
     return render_to_string('courseware/accordion.html', context)

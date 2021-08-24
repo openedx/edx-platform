@@ -48,7 +48,7 @@ class CourseCustomSettingsView(LoginRequiredMixin, View):
         )
         context = {
             'context_course': context_course,
-            'default_content': course_overview_content.body_html,
+            'overview_content': course_overview_content,
             'course_overview_url': course_overview_url,
             'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': course_key})
         }
@@ -60,9 +60,11 @@ class CourseCustomSettingsView(LoginRequiredMixin, View):
         """
         course_key = CourseKey.from_string(course_key_string)
         course_overview = request.POST['course-overview']
+        course_experience = request.POST.get('course_experience', 0)
         if course_overview is not None:
             CourseOverviewContent.objects.update_or_create(
-                course_id=course_key, defaults={'body_html': course_overview}
+                course_id=course_key, defaults={'body_html': course_overview,
+                                                'course_experience': course_experience}
             )
 
         return redirect(reverse('custom_settings', kwargs={'course_key_string': course_key}))
