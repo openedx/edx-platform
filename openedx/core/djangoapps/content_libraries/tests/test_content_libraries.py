@@ -22,6 +22,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
+from openedx.core.djangolib.blockstore_cache import cache
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -744,6 +745,94 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         assert links_created[1]['version'] == 1
         assert links_created[1]['latest_version'] == 2
         assert links_created[1]['opaque_key'] == bank_lib_id
+
+    def test_library_blocks_with_deleted_links(self):
+        """
+        Test that libraries can handle deleted links to bundles
+        """
+        # Create a problem bank:
+        bank_lib = self._create_library(slug="problem_bank1X", title="Problem Bank")
+        bank_lib_id = bank_lib["id"]
+        # Add problem1 to the problem bank:
+        p1 = self._add_block_to_library(bank_lib_id, "problem", "problem1X")
+        self._set_library_block_olx(p1["id"], """
+            <problem><multiplechoiceresponse>
+                    <p>What is an even number?</p>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="false">3</choice>
+                        <choice correct="true">2</choice>
+                    </choicegroup>
+            </multiplechoiceresponse></problem>
+        """)
+        # Commit the changes, creating version 1:
+        self._commit_library_changes(bank_lib_id)
+
+        # Create another problem bank:
+        bank_lib2 = self._create_library(slug="problem_bank2", title="Problem Bank 2")
+        bank_lib2_id = bank_lib2["id"]
+        # Add problem1 to the problem bank:
+        p2 = self._add_block_to_library(bank_lib2_id, "problem", "problem1X")
+        self._set_library_block_olx(p2["id"], """
+            <problem><multiplechoiceresponse>
+                    <p>What is an odd number?</p>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="true">3</choice>
+                        <choice correct="false">2</choice>
+                    </choicegroup>
+            </multiplechoiceresponse></problem>
+        """)
+        # Commit the changes, creating version 1:
+        self._commit_library_changes(bank_lib2_id)
+
+        lib = self._create_library(slug="problem_bank2X", title="Link Test Library")
+        lib_id = lib["id"]
+        # Link to the other libraries:
+        self._link_to_library(lib_id, "problem_bank", bank_lib_id)
+        self._link_to_library(lib_id, "problem_bank_v1", bank_lib2_id)
+
+        # check the API for retrieving links:
+        links_created = self._get_library_links(lib_id)
+        links_created.sort(key=lambda link: link["id"])
+        assert len(links_created) == 2
+
+        assert links_created[0]['id'] == 'problem_bank'
+        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
+        assert links_created[0]['version'] == 1
+        assert links_created[0]['latest_version'] == 1
+        assert links_created[0]['opaque_key'] == bank_lib_id
+
+        assert links_created[1]['id'] == 'problem_bank_v1'
+        assert links_created[1]['bundle_uuid'] == bank_lib2['bundle_uuid']
+        assert links_created[1]['version'] == 1
+        assert links_created[1]['latest_version'] == 1
+        assert links_created[1]['opaque_key'] == bank_lib2_id
+
+        # Delete one of the linked bundles/libraries
+        self._delete_library(bank_lib2_id)
+
+        # update the cache so we're not getting cached links in the next step
+        cache_key = 'bundle_version:{}:'.format(bank_lib['bundle_uuid'])
+        cache.delete(cache_key)
+        cache_key = 'bundle_version:{}:'.format(bank_lib2['bundle_uuid'])
+        cache.delete(cache_key)
+
+        links_created = self._get_library_links(lib_id)
+        links_created.sort(key=lambda link: link["id"])
+        assert len(links_created) == 2
+
+        assert links_created[0]['id'] == 'problem_bank'
+        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
+        assert links_created[0]['version'] == 1
+        assert links_created[0]['latest_version'] == 1
+        assert links_created[0]['opaque_key'] == bank_lib_id
+
+        # If a link has been deleted, the latest version will be 0,
+        # and the opaque key will be `None`.
+        assert links_created[1]['id'] == 'problem_bank_v1'
+        assert links_created[1]['bundle_uuid'] == bank_lib2['bundle_uuid']
+        assert links_created[1]['version'] == 1
+        assert links_created[1]['latest_version'] == 0
+        assert links_created[1]['opaque_key'] is None
 
     def test_library_blocks_limit(self):
         """
