@@ -11,6 +11,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from opaque_keys.edx.locator import LibraryLocator
 
+from organizations.models import Organization
+
 from student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
@@ -79,8 +81,9 @@ def get_user_permissions(user, course_key, org=None):
     """
     if org is None:
         org = course_key.org
+        organization = Organization.objects.get(short_name=org)
         try:
-            edly_sub_org = org.edlysuborganization
+            edly_sub_org = organization.edx_organizations.first().slug
         except ObjectDoesNotExist:
             edly_sub_org = None
 
