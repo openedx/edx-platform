@@ -332,9 +332,8 @@ django-filter==2.4.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==3.0.7
+django-ipware==4.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
@@ -370,7 +369,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==3.12.0
+django-mysql==4.0.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -1161,7 +1160,7 @@ semantic-version==2.8.5
     #   edx-drf-extensions
 shapely==1.7.1
     # via -r requirements/edx/base.txt
-simplejson==3.17.4
+simplejson==3.17.5
     # via
     #   -r requirements/edx/base.txt
     #   sailthru-client
