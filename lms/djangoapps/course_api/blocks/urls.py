@@ -38,3 +38,11 @@ urlpatterns = [
         name="blocks_in_course"
     ),
 ]
+
+if getattr(settings, 'PROVIDER_STATES_URL', None):
+    from .tests.pacts.views import provider_state
+    urlpatterns.append(url(
+        r'^pact/provider_states/$',
+        provider_state,
+        name='provider-state-view'
+    ))
