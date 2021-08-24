@@ -39,7 +39,7 @@ from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
 from student.helpers import get_next_url_for_login_page
-from student.models import LoginFailures, AllowedAuthUser, UserProfile
+from student.models import AllowedAuthUser, LoginFailures, Registration, UserProfile
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 import third_party_auth
@@ -176,6 +176,9 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(
             unauthenticated_user.username)
         )
+
+    if unauthenticated_user.last_login or not Registration.objects.filter(user=unauthenticated_user).exists():
+        raise AuthFailedError(_('This account has been deactivated.'))
 
     profile = UserProfile.objects.get(user=unauthenticated_user)
     compose_and_send_activation_email(unauthenticated_user, profile)
