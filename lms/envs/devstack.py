@@ -30,6 +30,8 @@ LMS_BASE = 'localhost:18000'
 CMS_BASE = 'localhost:18010'
 SITE_NAME = LMS_BASE
 
+SESSION_COOKIE_NAME = 'lms_sessionid'
+
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
@@ -41,6 +43,7 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
     'http://localhost:18150/logout/',  # credentials
     'http://localhost:18381/logout/',  # discovery
+    'http://localhost:18010/logout/',  # studio
 ]
 
 ################################ LOGGERS ######################################
