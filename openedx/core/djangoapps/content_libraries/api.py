@@ -109,6 +109,7 @@ from openedx.core.lib.blockstore_api import (
     set_draft_link,
     commit_draft,
     delete_draft,
+    BundleNotFound,
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
@@ -1001,12 +1002,16 @@ def get_bundle_links(library_key):
             opaque_key = libraries_linked[link_data.bundle_uuid].library_key
         except KeyError:
             opaque_key = None
-        # Append the link information:
+        try:
+            latest_version = blockstore_cache.get_bundle_version_number(link_data.bundle_uuid)
+        except BundleNotFound:
+            # if the bundle doesn't exist, it's a broken link, so ignore it
+            continue
         results.append(LibraryBundleLink(
             id=link_name,
             bundle_uuid=link_data.bundle_uuid,
             version=link_data.version,
-            latest_version=blockstore_cache.get_bundle_version_number(link_data.bundle_uuid),
+            latest_version=latest_version,
             opaque_key=opaque_key,
         ))
     return results
