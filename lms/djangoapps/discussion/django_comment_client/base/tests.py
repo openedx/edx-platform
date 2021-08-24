@@ -241,7 +241,7 @@ class ViewsTestCaseMixin:
             self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)
+            self.student = UserFactory.create(username=uname, email=email, password=self.password)
             self.student.is_active = True
             self.student.save()
 
@@ -464,7 +464,7 @@ class ViewsTestCase(
             self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)
+            self.student = UserFactory.create(username=uname, email=email, password=self.password)
             self.student.is_active = True
             self.student.save()
 
