@@ -1,0 +1,20 @@
+name: Push CI Runner Docker Image
+
+on: workflow_dispatch
+jobs:
+  push:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build and Push docker image
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run : |
+          docker build -f .ci/Dockerfile
+          docker tag openedx/edx-platform-ci-runner
+          make docker_auth
+          docker push 'openedx/edx-platform-ci-runner:latest'
