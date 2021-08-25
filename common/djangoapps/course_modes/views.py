@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -44,9 +44,6 @@ from xmodule.modulestore.django import modulestore
 
 LOG = logging.getLogger(__name__)
 
-# Namespace for course_modes waffle flags.
-WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_modes')
-
 # .. toggle_name: course_modes.use_new_track_selection
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -56,11 +53,7 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_modes')
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-2133
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-VALUE_PROP_TRACK_SELECTION_FLAG = LegacyWaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name='use_new_track_selection',
-    module_name=__name__,
-)
+VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 
 class ChooseModeView(View):
@@ -261,7 +254,7 @@ class ChooseModeView(View):
 
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
-        if waffle.flag_is_active(request, 'course_modes.use_new_track_selection'):
+        if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
             # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
             # technically considered happy path, old Track Selection page will be displayed.
             if not error:
