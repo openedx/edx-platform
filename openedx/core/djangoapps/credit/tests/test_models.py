@@ -227,3 +227,10 @@ class CreditRequestTest(RetirementTestCase):
 
         assert not was_retired
         assert credit_request_before_retire.parameters == test_parameters
+
+    def test_django_version(self):
+        """
+        Make sure the main UserTaskStatus admin page loads.
+        """
+        import django
+        self.assertEqual('3.1', django.get_version())
