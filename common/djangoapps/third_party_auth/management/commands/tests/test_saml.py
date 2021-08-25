@@ -6,17 +6,17 @@ existing data accordingly.
 
 import os
 import unittest
-
+from io import StringIO
 from unittest import mock
+
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.utils.six import StringIO
 from requests import exceptions
 from requests.models import Response
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 def mock_get(status_code=200):

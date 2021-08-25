@@ -525,7 +525,7 @@ edx-drf-extensions==6.6.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.27.27
+git+https://github.com/edx/edx-enterprise.git@f5d6588993b8022e23bfbc0dcdc0654a5b3c9f2d#edx-enterprise==3.30
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
