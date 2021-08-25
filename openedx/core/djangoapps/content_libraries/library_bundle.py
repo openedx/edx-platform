@@ -2,10 +2,10 @@
 Helper code for working with Blockstore bundles that contain OLX
 """
 
-import dateutil.parser
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
+from functools import lru_cache
 
-from django.utils.lru_cache import lru_cache
+import dateutil.parser
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.plugin import PluginMissingError
@@ -15,14 +15,14 @@ from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import xml_for_de
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
     BundleFormatException,
     definition_for_include,
-    parse_xblock_include,
+    parse_xblock_include
 )
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,
     get_bundle_direct_links_with_cache,
-    get_bundle_files_cached,
     get_bundle_file_metadata_with_cache,
-    get_bundle_version_number,
+    get_bundle_files_cached,
+    get_bundle_version_number
 )
 from openedx.core.lib import blockstore_api
 

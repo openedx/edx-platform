@@ -3,22 +3,25 @@ Common base classes for all new XBlock runtimes.
 """
 
 import logging
+from functools import lru_cache
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.services import CompletionService
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.utils.lru_cache import lru_cache
 from eventtracking import tracker
 from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
+from xmodule.errortracker import make_error_tracker
+from xmodule.modulestore.django import ModuleI18nService
 
+from common.djangoapps.static_replace import process_static_urls
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
@@ -29,9 +32,6 @@ from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import Ephemera
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
-from common.djangoapps.static_replace import process_static_urls
-from xmodule.errortracker import make_error_tracker
-from xmodule.modulestore.django import ModuleI18nService
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
