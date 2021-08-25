@@ -74,6 +74,7 @@ class ProgramDetailsView extends Backbone.View {
       remainingCount,
       completedCount,
       completeProgramURL: buyButtonUrl,
+      programDiscussionEnabled: this.options.programDiscussionEnabled,
     };
     data = $.extend(data, this.programModel.toJSON());
     HtmlUtils.setHtml(this.$el, this.tpl(data));
