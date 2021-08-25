@@ -63,7 +63,7 @@ jobs:
 
       - name: Push to test-expiry
         run: |
-          docker push ghcr.io/eol-uchile/edx-platform:15e45d9303d655948995cb7ab8bc937233f5d415
+          docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
 
       - name: Move cache
         run: |
