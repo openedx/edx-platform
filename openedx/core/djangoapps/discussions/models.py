@@ -324,7 +324,7 @@ class DiscussionsConfiguration(TimeStampedModel):
     Associates a learning context with discussion provider and configuration
     """
 
-    context_key = LearningContextKeyField(
+    context_key = models.CharField(
         primary_key=True,
         db_index=True,
         unique=True,
@@ -360,13 +360,11 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     def clean(self):
         """
-        Validate the model
-
-        Currently, this only support courses, this can be extended
-        whenever discussions are available in other contexts
+        Validate only if the context key is a course key.
+        Program uuid is not validated because it is expected to be added via django admin
         """
-        if not CourseOverview.course_exists(self.context_key):
-            raise ValidationError('Context Key should be an existing learning context.')
+        if "course" in self.context_key and not CourseOverview.course_exists(self.context_key):
+            raise ValidationError('Course with this key does not exist')
 
     def __str__(self):
         return "DiscussionsConfiguration(context_key='{context_key}', provider='{provider}', enabled={enabled})".format(
@@ -384,9 +382,9 @@ class DiscussionsConfiguration(TimeStampedModel):
         return has_support
 
     @classmethod
-    def is_enabled(cls, context_key: CourseKey) -> bool:
+    def is_enabled(cls, context_key) -> bool:
         """
-        Check if there is an active configuration for a given course key
+        Check if there is an active configuration for a given context key
 
         Default to False, if no configuration exists
         """
@@ -395,7 +393,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     # pylint: disable=undefined-variable
     @classmethod
-    def get(cls, context_key: CourseKey) -> cls:
+    def get(cls, context_key) -> cls:
         """
         Lookup a model by context_key
         """
