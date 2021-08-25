@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
+from edx_name_affirmation.toggles import is_verified_name_enabled
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -22,6 +23,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
+from lms.djangoapps.certificates.api import get_certificates_for_user
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (
@@ -240,6 +242,7 @@ def _validate_name_change(user_profile, data, field_errors):
         return None
 
     old_name = user_profile.name
+
     try:
         validate_name(data['name'])
     except ValidationError as err:
@@ -249,7 +252,26 @@ def _validate_name_change(user_profile, data, field_errors):
         }
         return None
 
+    if _does_name_change_require_verification(user_profile.user, old_name, data['name']):
+        err_msg = 'This name change requires ID verification.'
+        field_errors['name'] = {
+            'developer_message': err_msg,
+            'user_message': err_msg
+        }
+        return None
+
     return old_name
+
+
+def _does_name_change_require_verification(user, old_name, new_name):
+    """
+    If name change requires verification, do not update it through this API.
+    """
+    return (
+        is_verified_name_enabled()
+        and old_name != new_name
+        and len(get_certificates_for_user(user.username)) > 0
+    )
 
 
 def _get_old_language_proficiencies_if_updating(user_profile, data):

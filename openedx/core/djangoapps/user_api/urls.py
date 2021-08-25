@@ -16,6 +16,7 @@ from .accounts.views import (
     AccountViewSet,
     DeactivateLogoutView,
     LMSAccountRetirementView,
+    NameChangeView,
     UsernameReplacementView
 )
 from . import views as user_api_views
@@ -116,6 +117,11 @@ urlpatterns = [
         r'^v1/accounts/deactivate_logout/$',
         DeactivateLogoutView.as_view(),
         name='deactivate_logout'
+    ),
+    url(
+        r'^v1/accounts/name_change/$',
+        NameChangeView.as_view(),
+        name='name_change'
     ),
     url(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/verification_status/$',

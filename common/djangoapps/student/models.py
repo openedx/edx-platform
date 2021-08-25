@@ -924,7 +924,7 @@ class Registration(models.Model):
 
 class PendingNameChange(DeletableByUserValue, models.Model):
     """
-    This model keeps track of pending requested changes to a user's email address.
+    This model keeps track of pending requested changes to a user's name.
 
     .. pii: Contains new_name, retired in LMSAccountRetirementView
     .. pii_types: name

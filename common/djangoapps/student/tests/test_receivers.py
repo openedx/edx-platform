@@ -1,9 +1,18 @@
 """ Tests for student signal receivers. """
 
+from edx_name_affirmation.signals import VERIFIED_NAME_APPROVED
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.toggles import COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES
-from common.djangoapps.student.models import CourseEnrollmentCelebration
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.models import (
+    CourseEnrollmentCelebration,
+    PendingNameChange,
+    UserProfile
+)
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory,
+    UserProfileFactory
+)
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
@@ -33,3 +42,23 @@ class ReceiversTest(SharedModuleStoreTestCase):
         """ Test we don't make a celebration if the MFE redirect waffle flag is off """
         CourseEnrollmentFactory()
         assert CourseEnrollmentCelebration.objects.count() == 0
+
+    def test_listen_for_verified_name_approved(self):
+        """
+        Test that profile name is updated when a pending name change is approved
+        """
+        user = UserFactory(email='email@test.com', username='jdoe')
+        UserProfileFactory(user=user)
+
+        new_name = 'John Doe'
+        PendingNameChange.objects.create(user=user, new_name=new_name)
+        assert PendingNameChange.objects.count() == 1
+
+        # Send a VERIFIED_NAME_APPROVED signal where the profile name matches the name
+        # change request
+        VERIFIED_NAME_APPROVED.send(sender=None, user_id=user.id, profile_name=new_name)
+
+        # Assert that the pending name change was deleted and the profile name was updated
+        assert PendingNameChange.objects.count() == 0
+        profile = UserProfile.objects.get(user=user)
+        assert profile.name == new_name
