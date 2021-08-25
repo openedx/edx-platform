@@ -50,7 +50,7 @@
                 {% blocktrans trimmed asvar assist_msg %}
                 If you need help, please use our web form at {start_anchor_web}{{ support_url }}{end_anchor}.
                 {% endblocktrans %}
-                {% interpolate_html assist_msg start_anchor_web='<a href="'|add:support_url|add:'">'|safe %}
+                {% interpolate_html assist_msg start_anchor_web='<a href="'|add:support_url|add:'">'|safe end_anchor='</a>'|safe %}
                 <br />
             </p>
         </td>
