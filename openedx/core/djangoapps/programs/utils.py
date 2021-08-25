@@ -33,7 +33,6 @@ from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_programs,
 )
-from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
@@ -331,7 +330,10 @@ class ProgramProgressMeter:
                 # Grab the available date and keep it if it's the earliest one for this catalog course.
                 if modes_match and CertificateStatuses.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
-                    available_date = available_date_for_certificate(course_overview, certificate)
+                    available_date = certificate_api.available_date_for_certificate(
+                        course_overview,
+                        certificate
+                    )
                     earliest_course_run_date = min(
                         [date for date in [available_date, earliest_course_run_date] if date]
                     )
@@ -444,9 +446,12 @@ class ProgramProgressMeter:
             }
 
             try:
-                may_certify = CourseOverview.get_from_id(course_key).may_certify()
+                course_overview = CourseOverview.get_from_id(course_key)
             except CourseOverview.DoesNotExist:
                 may_certify = True
+            else:
+                may_certify = certificate_api.certificates_viewable_for_course(course_overview)
+
             if (
                 CertificateStatuses.is_passing_status(certificate['status'])
                 and may_certify
@@ -583,7 +588,7 @@ class ProgramDataExtender:
             run_mode['upgrade_url'] = None
 
     def _attach_course_run_may_certify(self, run_mode):
-        run_mode['may_certify'] = self.course_overview.may_certify()
+        run_mode['may_certify'] = certificate_api.certificates_viewable_for_course(self.course_overview)
 
     def _attach_course_run_is_mobile_only(self, run_mode):
         run_mode['is_mobile_only'] = self.mobile_only

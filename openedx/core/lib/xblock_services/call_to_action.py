@@ -19,7 +19,7 @@ class CallToActionService(PluginManager):
         See the CallToActionService class constants for a list of recognized categories.
 
         Returns: list of dictionaries, describing the calls to action, with the following keys:
-                 link, link_name, form_values, and description.
+                 link, link_name, form_values, and description (which can include html tags).
                  If the category is not recognized, an empty list is returned.
 
         An example of a returned list:
@@ -32,7 +32,7 @@ class CallToActionService(PluginManager):
             # A long-form description to be associated with the CTA
             'description': "If you don't want to do this problem, just skip it!",
             # A data set we include if the CTA is being rendered within an iframe. For example,
-            # we do this in Learning MFE. This dictionary is passed to its's parent container via
+            # we do this in Learning MFE. This dictionary is passed to its parent container via
             # parent.postMessage.  Parent containers should use window.onmessage event handler to
             # catch this dataset.
             'event_data': {

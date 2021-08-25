@@ -7,7 +7,7 @@ from unittest.mock import patch
 import unittest
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser
 from django.db.models import signals
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -25,7 +25,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.signals import update_masters_access_course
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
-from common.djangoapps.student.tests.factories import BetaTesterFactory
+from common.djangoapps.student.tests.factories import BetaTesterFactory, UserFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
 )
@@ -90,37 +90,31 @@ class PublicApiAvailableTestCase(django.test.TestCase):
         )
         replace_course_outline(cls.course_outline)
 
-        cls.global_staff = User.objects.create_user(
-            'global_staff', email='gstaff@example.com', is_staff=True
+        cls.global_staff = UserFactory.create(
+            username='global_staff', email='gstaff@example.com', is_staff=True
         )
-        cls.student = User.objects.create_user(
-            'student', email='student@example.com', is_staff=False
+        cls.student = UserFactory.create(
+            username='student', email='student@example.com', is_staff=False
         )
         cls.fake_course_1 = CourseKey.from_string("course-v1:Not+Really+Here")
         cls.fake_course_2 = CourseKey.from_string("Also/Not/Here")
 
     def test_flag_inactive(self):
         # Old Mongo and non-existent courses are always unavailable
-        for user in [self.global_staff, self.student]:
-            assert not public_api_available(self.fake_course_1, user)
-            assert not public_api_available(self.fake_course_2, user)
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
 
-        # Since the waffle flag is off, only global staff can use the Learning
-        # Sequences API.
-        assert public_api_available(self.course_key, self.global_staff)
-        assert not public_api_available(self.course_key, self.student)
+        # Waffle-flag controlled
+        assert not public_api_available(self.course_key)
 
     @override_waffle_flag(USE_FOR_OUTLINES, active=True)
     def test_flag_active(self):
         # Old Mongo and non-existent courses are always unavailable
-        for user in [self.global_staff, self.student]:
-            assert not public_api_available(self.fake_course_1, user)
-            assert not public_api_available(self.fake_course_2, user)
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
 
-        # Since the waffle flag is on, both global staff and students can use
-        # the Learning Sequences API.
-        assert public_api_available(self.course_key, self.global_staff)
-        assert public_api_available(self.course_key, self.student)
+        # Waffle-flag controlled
+        assert public_api_available(self.course_key)
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
@@ -219,11 +213,11 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
     def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
         # Users...
-        cls.global_staff = User.objects.create_user(
-            'global_staff', email='gstaff@example.com', is_staff=True
+        cls.global_staff = UserFactory.create(
+            username='global_staff', email='gstaff@example.com', is_staff=True
         )
-        cls.student = User.objects.create_user(
-            'student', email='student@example.com', is_staff=False
+        cls.student = UserFactory.create(
+            username='student', email='student@example.com', is_staff=False
         )
         cls.beta_tester = BetaTesterFactory(course_key=course_key)
         cls.anonymous_user = AnonymousUser()
@@ -286,11 +280,11 @@ class OutlineProcessorTestCase(CacheIsolationTestCase):  # lint-amnesty, pylint:
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
 
         # Users...
-        cls.global_staff = User.objects.create_user(
-            'global_staff', email='gstaff@example.com', is_staff=True
+        cls.global_staff = UserFactory.create(
+            username='global_staff', email='gstaff@example.com', is_staff=True
         )
-        cls.student = User.objects.create_user(
-            'student', email='student@example.com', is_staff=False
+        cls.student = UserFactory.create(
+            username='student', email='student@example.com', is_staff=False
         )
         cls.beta_tester = BetaTesterFactory(course_key=cls.course_key)
         cls.anonymous_user = AnonymousUser()
@@ -1243,9 +1237,11 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        cls.global_staff = User.objects.create_user('global_staff', email='gstaff@example.com', is_staff=True)
-        cls.student = User.objects.create_user('student', email='student@example.com', is_staff=False)
-        cls.unenrolled_student = User.objects.create_user('unenrolled', email='unenrolled@example.com', is_staff=False)
+        cls.global_staff = UserFactory.create(username='global_staff', email='gstaff@example.com', is_staff=True)
+        cls.student = UserFactory.create(username='student', email='student@example.com', is_staff=False)
+        cls.unenrolled_student = UserFactory.create(
+            username='unenrolled', email='unenrolled@example.com', is_staff=False,
+        )
         cls.anonymous_user = AnonymousUser()
 
         # Handy variable as we almost always need to test with all types of users
@@ -1392,8 +1388,8 @@ class EnrollmentTrackPartitionGroupsTestCase(OutlineProcessorTestCase):  # lint-
         mode.
         Returns created learner
         """
-        learner = User.objects.create_user(
-            username, email='{}@example.com'.format(username), is_staff=is_staff
+        learner = UserFactory.create(
+            username=username, email='{}@example.com'.format(username), is_staff=is_staff
         )
         learner.courseenrollment_set.create(course_id=self.course_key, is_active=True, mode=mode)
         return learner

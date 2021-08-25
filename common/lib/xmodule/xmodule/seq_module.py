@@ -78,6 +78,12 @@ class SequenceFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         help=_("Enter the date by which problems are due."),
         scope=Scope.settings,
     )
+    # This attribute is for custom pacing in self paced courses for Studio if CUSTOM_RELATIVE_DATES flag is active
+    relative_weeks_due = Integer(
+        display_name=_("Number of Relative Weeks Due By"),
+        help=_("Enter the number of weeks the problems are due by relative to the learner's enrollment date"),
+        scope=Scope.settings,
+    )
 
     hide_after_due = Boolean(
         display_name=_("Hide sequence content After Due Date"),
@@ -531,6 +537,7 @@ class SequenceBlock(
 
     def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
         if prereq_met and not self._is_gate_fulfilled():
+            _ = self.runtime.service(self, "i18n").ugettext
             banner_text = _(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )
@@ -631,7 +638,7 @@ class SequenceBlock(
 
         return None
 
-    def descendants_are_gated(self):
+    def descendants_are_gated(self, context):
         """
         Sequences do their own access gating logic as to whether their content
         should be viewable, based on things like pre-reqs and time exam starts.
@@ -657,7 +664,7 @@ class SequenceBlock(
             comes to determining whether a student is allowed to access this,
             with other checks being done in has_access calls.
         """
-        if self.runtime.user_is_staff:
+        if self.runtime.user_is_staff or context.get('specific_masquerade', False):
             return False
 
         # We're not allowed to see it because of pre-reqs that haven't been

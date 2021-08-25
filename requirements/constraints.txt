@@ -27,16 +27,13 @@ django-config-models>=1.0.0
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
-# It seems like django-countries > 5.5 may cause performance issues for us.
-django-countries==5.5
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.26.17
+edx-enterprise==3.27.24
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -55,6 +52,10 @@ django-oauth-toolkit<=1.3.2
 python-dateutil==2.4.0
 # matplotlib>=3.4.0 requires python-dateutil>=2.7
 matplotlib<3.4.0
+# pandas>0.22.0 requires python-dateutil>=2.5.0
+pandas==0.22.0
+# networkx>=2.6 requires pandas>=1.1
+networkx<2.6
 
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
@@ -91,8 +92,18 @@ click<8.0.0
 
 # constraints present due to Python35 support. Need to be tested and removed independently.
 
-joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
+# jsonfield2 will be replaced with jsonfield in https://openedx.atlassian.net/browse/BOM-1917.
 jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
-kiwisolver<1.2.0        # kiwisolver 1.2.0 requires Python 3.6+
-matplotlib<3.1          # Matplotlib 3.1 requires Python 3.6
-zipp==1.0.0             # zipp 2.0.0 requires Python >= 3.6
+
+# Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
+# a testing requirement. Installing it would cause a bunch of new tool packages to become base
+# requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
+edxval<2.1
+
+# django-ipware==4.0.0 contains a critical change related to ip-handling which needs to be tested on sandbox
+# This constraint will be removed in https://openedx.atlassian.net/browse/BOM-2747
+django-ipware<4.0.0
+
+# pylint>=2.10.0 introduced a lot of new pylint warnings.
+# A separate PR will be needed to remove the pin and fix all the pylint warnings
+pylint<2.10.0

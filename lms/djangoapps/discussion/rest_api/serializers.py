@@ -1,13 +1,13 @@
 """
 Discussion API serializers
 """
+from typing import Dict
+from urllib.parse import urlencode, urlunparse
 
-
-from django.contrib.auth.models import User as DjangoUser  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
-from six.moves.urllib.parse import urlencode, urlunparse
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.utils import (
@@ -16,12 +16,12 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_name,
     get_group_names_by_id,
-    is_comment_too_deep
+    is_comment_too_deep,
 )
 from lms.djangoapps.discussion.rest_api.permissions import (
     NON_UPDATABLE_COMMENT_FIELDS,
     NON_UPDATABLE_THREAD_FIELDS,
-    get_editable_fields
+    get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
 from lms.djangoapps.discussion.views import get_divided_discussions
@@ -34,8 +34,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
-    Role
+    Role,
 )
+
+User = get_user_model()
 
 
 def get_context(course, request, thread=None):
@@ -82,6 +84,24 @@ def validate_not_blank(value):
     """
     if not value.strip():
         raise ValidationError("This field may not be blank.")
+
+
+def _validate_privileged_access(context: Dict) -> bool:
+    """
+    Return the field specified by ``field_name`` if requesting user is privileged.
+
+    Checks that the course exists in the context, and that the user has privileged
+    access.
+
+    Args:
+        context (Dict): The serializer context.
+
+    Returns:
+        bool: Course exists and the user has privileged access.
+    """
+    course = context.get('course', None)
+    is_requester_privileged = context.get('is_requester_privileged')
+    return course and is_requester_privileged
 
 
 class _ContentSerializer(serializers.Serializer):
@@ -208,6 +228,7 @@ class ThreadSerializer(_ContentSerializer):
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
+    abuse_flagged_count = serializers.SerializerMethodField(required=False)
     title = serializers.CharField(validators=[validate_not_blank])
     pinned = serializers.SerializerMethodField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
@@ -229,6 +250,13 @@ class ThreadSerializer(_ContentSerializer):
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
             self.instance["pinned"] = False
+
+    def get_abuse_flagged_count(self, obj):
+        """
+        Returns the number of users that flagged content as abusive only if user has staff permissions
+        """
+        if _validate_privileged_access(self.context):
+            return obj.get("abuse_flagged_count")
 
     def get_pinned(self, obj):
         """
@@ -325,6 +353,7 @@ class CommentSerializer(_ContentSerializer):
     endorsed_at = serializers.SerializerMethodField()
     child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
+    abuse_flagged_any_user = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
@@ -351,7 +380,7 @@ class CommentSerializer(_ContentSerializer):
                     self._is_anonymous(self.context["thread"]) and
                     not self._is_user_privileged(endorser_id)
             ):
-                return DjangoUser.objects.get(id=endorser_id).username
+                return User.objects.get(id=endorser_id).username
         return None
 
     def get_endorsed_by_label(self, obj):
@@ -389,6 +418,14 @@ class CommentSerializer(_ContentSerializer):
             data["parent_id"] = None
 
         return data
+
+    def get_abuse_flagged_any_user(self, obj):
+        """
+        Returns a boolean indicating whether any user has flagged the
+        content as abusive.
+        """
+        if _validate_privileged_access(self.context):
+            return len(obj.get("abuse_flaggers", [])) > 0
 
     def validate(self, attrs):
         """
@@ -566,7 +603,7 @@ class DiscussionRolesSerializer(serializers.Serializer):
         try:
             self.user = get_user_by_username_or_email(user_id)
             return user_id
-        except DjangoUser.DoesNotExist:
+        except User.DoesNotExist:
             raise ValidationError(f"'{user_id}' is not a valid student identifier")  # lint-amnesty, pylint: disable=raise-missing-from
 
     def validate(self, attrs):

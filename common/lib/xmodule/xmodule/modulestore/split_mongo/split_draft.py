@@ -1,8 +1,7 @@
 """
 Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
-
-
+from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
 
 from xmodule.exceptions import InvalidVersionError
@@ -56,6 +55,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
             return item
 
+    @function_trace('get_course.split_modulestore')
     def get_course(self, course_id, depth=0, **kwargs):
         course_id = self._map_revision_to_branch(course_id)
         return super().get_course(course_id, depth=depth, **kwargs)
@@ -519,22 +519,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         course_locator = self._map_revision_to_branch(course_locator)
         return super().get_course_history_info(course_locator)
-
-    def get_course_successors(self, course_locator, version_history_depth=1):
-        """
-        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_successors`
-        """
-        course_locator = self._map_revision_to_branch(course_locator)
-        return super().get_course_successors(
-            course_locator, version_history_depth=version_history_depth
-        )
-
-    def get_block_generations(self, block_locator):
-        """
-        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_block_generations`
-        """
-        block_locator = self._map_revision_to_branch(block_locator)
-        return super().get_block_generations(block_locator)
 
     def has_published_version(self, xblock):
         """

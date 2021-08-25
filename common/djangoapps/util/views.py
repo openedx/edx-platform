@@ -207,8 +207,12 @@ def reset_course_deadlines(request):
         has_access(request.user, 'staff', course_key)
     )
 
-    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
-    if missed_deadlines and not missed_gated_content:
+    # We ignore the missed_deadlines because this endpoint could be used for
+    # learners who have remaining attempts on a problem and reset their due dates in order to
+    # submit additional attempts. This can apply for 'completed' (submitted) content that would
+    # not be marked as past_due
+    _missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
+    if not missed_gated_content:
         reset_self_paced_schedule(user, course_key)
 
     referrer = request.META.get('HTTP_REFERER')

@@ -134,40 +134,6 @@ def course_start_date_is_default(start, advertised_start):
     return advertised_start is None and start == DEFAULT_START_DATE
 
 
-def may_certify_for_course(
-        certificates_display_behavior,
-        certificates_show_before_end,
-        has_ended,
-        certificate_available_date,
-        self_paced
-):
-    """
-    Returns whether it is acceptable to show the student a certificate download
-    link for a course, based on provided attributes of the course.
-
-    Arguments:
-        certificates_display_behavior (str): string describing the course's
-            certificate display behavior.
-            See CourseFields.certificates_display_behavior.help for more detail.
-        certificates_show_before_end (bool): whether user can download the
-            course's certificates before the course has ended.
-        has_ended (bool): Whether the course has ended.
-        certificate_available_date (datetime): the date the certificate is available on for the course.
-        self_paced (bool): Whether the course is self-paced.
-    """
-    show_early = (
-        certificates_display_behavior in ('early_with_info', 'early_no_info')
-        or certificates_show_before_end
-    )
-    past_available_date = (
-        certificate_available_date
-        and certificate_available_date < datetime.now(utc)
-    )
-    ended_without_available_date = (certificate_available_date is None) and has_ended
-
-    return any((self_paced, show_early, past_available_date, ended_without_available_date))
-
-
 def sorting_score(start, advertised_start, announcement):
     """
     Returns a tuple that can be used to sort the courses according

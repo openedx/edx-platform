@@ -71,7 +71,8 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
         logger.info(f"Sent grade for course {course_run_key} to user {username}")
 
     except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable
-        error_msg = f"Failed to send grade for course {course_run_key} to user {username}."
+        grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
+        error_msg = f'Failed to send grade{grade_str} for course {course_run_key} to user {username}.'
         logger.exception(error_msg)
         exception = MaxRetriesExceededError(
             f"Failed to send grade to credentials. Reason: {error_msg}"
@@ -397,6 +398,52 @@ def backfill_date_for_all_course_runs():
                     "course_id": course_key,
                     "certificate_type": modes[0],
                     "certificate_available_date": course_run.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "is_active": True,
+                })
+                logger.info(f"certificate_available_date updated for course {course_key}")
+            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable,W0703
+                error_msg = f"Failed to send certificate_available_date for course {course_key}."
+                logger.exception(error_msg)
+        if index % 10 == 0:
+            time.sleep(3)
+
+
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
+def clean_certificate_available_date():
+    """
+    This task will clean out the misconfigured certificate available date. When courses Change their
+    certificates_display_behavior, the certificate_available_date was not updating properly. This is
+    command is meant to be ran one time to clean up any courses that were not supposed to have
+    certificate_available_date
+    """
+    course_run_list = CourseOverview.objects.exclude(
+        self_paced=0,
+        certificates_display_behavior="end",
+        certificate_available_date__isnull=False
+    )
+    for index, course_run in enumerate(course_run_list):
+        logger.info(
+            f"removing certificate_available_date for course {course_run.id}"
+        )
+        course_key = str(course_run.id)
+        course_modes = CourseMode.objects.filter(course_id=course_key)
+        # There should only ever be one certificate relevant mode per course run
+        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        if len(modes) != 1:
+            logger.exception(
+                f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
+            )
+        # if there is only one relevant mode, post to credentials
+        else:
+            try:
+                credentials_client = get_credentials_api_client(
+                    User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+                )
+                credentials_client.course_certificates.post({
+                    "course_id": course_key,
+                    "certificate_type": modes[0],
+                    "certificate_available_date": None,
                     "is_active": True,
                 })
                 logger.info(f"certificate_available_date updated for course {course_key}")

@@ -6,6 +6,7 @@ Tests for Discussion API views
 import json
 from datetime import datetime
 from unittest import mock
+from urllib.parse import urlparse
 
 import ddt
 import httpretty
@@ -14,7 +15,10 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
-from six.moves.urllib.parse import urlparse
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -25,7 +29,7 @@ from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
     config_course_discussions,
-    topic_name_to_id
+    topic_name_to_id,
 )
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
@@ -33,7 +37,7 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     ProfileImageTestMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response
+    make_paginated_api_response,
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -42,10 +46,6 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
@@ -549,6 +549,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "voted": True,
             "author": self.author.username,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "abuse_flagged_count": None,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": str(self.course.id), "following": ""})
@@ -1112,6 +1113,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1499,6 +1501,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1583,6 +1586,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1642,6 +1646,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_response_data({
             'abuse_flagged': value,
+            "abuse_flagged_any_user": None,
             'editable_fields': ['abuse_flagged']
         })
 
@@ -1768,6 +1773,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "voted": False,
             "vote_count": 0,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": None,
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
         }

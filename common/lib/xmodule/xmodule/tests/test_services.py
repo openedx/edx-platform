@@ -59,15 +59,19 @@ class TestSettingsService(unittest.TestCase):
         with pytest.raises(ValueError):
             self.settings_service.get_settings_bucket(None)
 
+    @override_settings()
     def test_get_return_default_if_xblock_settings_is_missing(self):
         """ Test that returns default (or None if default not set) if XBLOCK_SETTINGS is not set """
-        assert not hasattr(settings, 'XBLOCK_SETTINGS')
+        # Per django docs, using override_settings() plus 'del' is how to test the absence of a setting:
+        del settings.XBLOCK_SETTINGS
         # precondition check
         assert self.settings_service.get_settings_bucket(self.xblock_mock, 'zzz') == 'zzz'
 
+    @override_settings()
     def test_get_return_empty_dictionary_if_xblock_settings_and_default_is_missing(self):
         """ Test that returns default (or None if default not set) if XBLOCK_SETTINGS is not set """
-        assert not hasattr(settings, 'XBLOCK_SETTINGS')
+        # Per django docs, using override_settings() plus 'del' is how to test the absence of a setting:
+        del settings.XBLOCK_SETTINGS
         # precondition check
         assert self.settings_service.get_settings_bucket(self.xblock_mock) == {}
 

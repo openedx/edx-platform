@@ -245,7 +245,7 @@ def create_account_with_params(request, params):
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
-    _track_user_registration(user, profile, params, third_party_provider)
+    _track_user_registration(user, profile, params, third_party_provider, registration)
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
@@ -321,7 +321,7 @@ def _link_user_to_third_party_provider(
     return third_party_provider, running_pipeline
 
 
-def _track_user_registration(user, profile, params, third_party_provider):
+def _track_user_registration(user, profile, params, third_party_provider, registration):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         identity_args = [
@@ -354,6 +354,7 @@ def _track_user_registration(user, profile, params, third_party_provider):
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
+            'activation_key': registration.activation_key if registration else None,
         }
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary

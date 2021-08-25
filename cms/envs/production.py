@@ -207,6 +207,10 @@ if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
     SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
 
+# This is the domain that is used to set shared cookies between various sub-domains.
+# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
+SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
+
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,
 # but it is highly recommended that this is True for environments accessed
@@ -272,8 +276,13 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 # Heartbeat
 HEARTBEAT_CELERY_ROUTING_KEY = ENV_TOKENS.get('HEARTBEAT_CELERY_ROUTING_KEY', HEARTBEAT_CELERY_ROUTING_KEY)
 
-LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
-
+# Sometimes, OAuth2 clients want the user to redirect back to their site after logout. But to determine if the given
+# redirect URL/path is safe for redirection, the following variable is used by edX.
+LOGIN_REDIRECT_WHITELIST = ENV_TOKENS.get(
+    'LOGIN_REDIRECT_WHITELIST',
+    LOGIN_REDIRECT_WHITELIST
+)
+LOGIN_REDIRECT_WHITELIST.extend([reverse_lazy('home')])
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:

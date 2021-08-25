@@ -801,9 +801,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
-    # Whether course goals is enabled.
-    'ENABLE_COURSE_GOALS': True,
-
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
 
@@ -939,6 +936,17 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
+
+    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
+    # .. settings. Will eventually become the default.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-07-26
+    # .. toggle_target_removal_date: 2021-10-01
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
+    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1624,6 +1632,9 @@ SESSION_COOKIE_NAME = 'sessionid'
 # django-session-cookie middleware
 DCS_SESSION_COOKIE_SAMESITE = 'None'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = ""
 
 # CMS base
 CMS_BASE = 'localhost:18010'
@@ -3087,6 +3098,7 @@ INSTALLED_APPS = [
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
+    'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
 
     'lms.djangoapps.experiments',
 
@@ -3364,6 +3376,10 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
+# .. setting_name: LOGIN_REDIRECT_WHITELIST
+# .. setting_default: empty list ([])
+# .. setting_description: While logout, if logout request has a redirect-url as query strings,
+#   then the redirect-url is validated through LOGIN_REDIRECT_WHITELIST.
 LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
@@ -3474,6 +3490,16 @@ BADGR_TOKENS_CACHE_KEY = None
 # .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.
 # .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
+
+# .. toggle_name: BADGR_ENABLE_NOTIFICATIONS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Optional setting for enabling email notifications. When set to "True",
+#    learners will be notified by email when they earn a badge.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-07-29
+# .. toggle_warnings: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_ENABLE_NOTIFICATIONS = False
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
@@ -3965,6 +3991,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "year_of_birth",
         "phone_number",
         "activation_key",
+        "is_verified_name_enabled",
     ]
 )
 
@@ -4220,10 +4247,6 @@ APP_UPGRADE_CACHE_TIMEOUT = 3600
 # records before you have deployed the app to write to coursewarehistoryextended.StudentModuleHistoryExtended
 # if you want to avoid an overlap in ids while searching for history across the two tables.
 STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
-
-# Cutoff date for granting audit certificates
-
-AUDIT_CERT_CUTOFF_DATE = None
 
 ################################ Settings for Credentials Service ################################
 
@@ -4760,3 +4783,18 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
+
+################# Settings for Chrome-specific origin trials ########
+# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
+CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
+
+################# Documentation links for course apps #################
+
+# pylint: disable=line-too-long
+CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
+DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
+EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
+PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
+TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
+TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
+WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"

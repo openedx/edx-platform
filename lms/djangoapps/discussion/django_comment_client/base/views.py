@@ -39,7 +39,8 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_comments_service,
     get_user_group_ids,
     is_comment_too_deep,
-    prepare_content
+    prepare_content,
+    sanitize_body,
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -263,7 +264,7 @@ def create_thread(request, course_id, commentable_id):
         'course_id': str(course_key),
         'user_id': user.id,
         'thread_type': post["thread_type"],
-        'body': post["body"],
+        'body': sanitize_body(post["body"]),
         'title': post["title"],
     }
 
@@ -326,7 +327,7 @@ def update_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     # Get thread context first in order to be safe from reseting the values of thread object later
     thread_context = getattr(thread, "context", "course")
-    thread.body = request.POST["body"]
+    thread.body = sanitize_body(request.POST["body"])
     thread.title = request.POST["title"]
     user = request.user
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
@@ -381,7 +382,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         course_id=str(course_key),
         thread_id=thread_id,
         parent_id=parent_id,
-        body=post["body"]
+        body=sanitize_body(post["body"]),
     )
     comment.save()
 
@@ -441,7 +442,7 @@ def update_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
-    comment.body = request.POST["body"]
+    comment.body = sanitize_body(request.POST["body"])
     comment.save()
 
     comment_edited.send(sender=None, user=request.user, post=comment)

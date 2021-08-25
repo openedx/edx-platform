@@ -1,0 +1,30 @@
+<div id="relative_date_input">
+    <ul class="list-fields list-input date-setter">
+        <li class="field field-text field-due-in">
+            <!-- Translators: Please use a generic pluralization that makes sense in most contexts for the second half of the sentence "weeks from learner enrollment date" which is preceded by "Due in: [input entry]" -->
+            <label for="due_in"><%- gettext('Due in:') %></label>
+            <input type="number" id="due_in" name="due_in" value=""
+                placeholder="" autocomplete="off" min="1" max="18" style="width:20%"/>
+            <%- gettext('weeks from learner enrollment date')%>
+        </li>
+    </ul>
+
+    <div id="relative_weeks_due_projected" class="message">
+        <%= edx.HtmlUtils.interpolateHtml(
+            gettext('If a learner starts on {startDate}, this subsection will be due on {projectedDueIn}.'),
+            {
+                startDate: edx.HtmlUtils.HTML('<span id="relative_weeks_due_start_date"></span>'),
+                projectedDueIn: edx.HtmlUtils.HTML('<span id="relative_weeks_due_projected_due_in"></span>')
+            })
+        %>
+    </div>
+
+    <div id="relative_weeks_due_warning_max" class="message-status error">
+        <%- gettext('The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.') %>
+    </div>
+
+    <div id="relative_weeks_due_warning_min" class="message-status error">
+        <%- gettext('The minimum number of weeks this subsection can be due in is 1 week from the learner enrollment date.') %>
+    </div>
+</div>
+

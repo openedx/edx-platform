@@ -114,6 +114,7 @@ class RequestUtilTestCase(unittest.TestCase):
             "b.": "." * 13,
             "b_a": "." * 15,
             "b_c": "." * 15,
+            "d": "." * 3,
         }
 
         middleware.process_request(mock_request)
@@ -129,6 +130,12 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.4.size', 13),
             call('cookies.5.name', '_c_'),
             call('cookies.5.size', 13),
+            call('cookies.6.name', 'b.'),
+            call('cookies.6.size', 13),
+            call('cookies.7.name', 'a.b'),
+            call('cookies.7.size', 10),
+            call('cookies.8.name', 'a.c'),
+            call('cookies.8.size', 10),
             call('cookies.group.1.name', 'b'),
             call('cookies.group.1.size', 43),
             call('cookies.group.2.name', 'a'),
@@ -137,7 +144,9 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.max.size', 100),
             call('cookies.max.group.name', 'a'),
             call('cookies.max.group.size', 100),
-            call('cookies_total_size', 189),
+            call('cookies_total_size', 192),
+            call('cookies_unaccounted_size', 3),
+            call('cookies_total_num', 9),
         ], any_order=True)
 
     @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")

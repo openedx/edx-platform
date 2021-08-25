@@ -52,7 +52,7 @@ def get_course_enrollment(user, course_run_key):
 
 def get_phone_number(user_id):
     """
-    Get a users phone number from the profile, if
+    Get a user's phone number from the profile, if
     one exists. Otherwise, return None.
     """
     try:
@@ -61,6 +61,18 @@ def get_phone_number(user_id):
         log.exception(exception)
         return None
     return student.phone_number or None
+
+
+def get_name(user_id):
+    """
+    Get a user's name from their profile, if one exists. Otherwise, return None.
+    """
+    try:
+        student = _UserProfile.objects.get(user_id=user_id)
+    except _UserProfile.DoesNotExist:
+        log.exception(f'Could not find UserProfile for id {user_id}')
+        return None
+    return student.name or None
 
 
 def get_course_access_role(user, org, course_id, role):

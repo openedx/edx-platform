@@ -21,6 +21,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -222,7 +223,8 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         """
         # add new course with certificate_available_date is future date.
         course = CourseFactory.create(
-            certificate_available_date=datetime.datetime.now() + datetime.timedelta(days=5)
+            certificate_available_date=datetime.datetime.now() + datetime.timedelta(days=5),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
 
         cert = self._create_certificate(course_key=course.id)

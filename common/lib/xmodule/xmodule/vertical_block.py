@@ -101,7 +101,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         completed = self.is_block_complete_for_assignments(completion_service)
         past_due = completed is False and self.due and self.due < datetime.now(pytz.UTC)
         cta_service = self.runtime.service(self, 'call_to_action')
-        vertical_banner_ctas = (cta_service and cta_service.get_ctas(self, 'vertical_banner', completed)) or []  # lint-amnesty, pylint: disable=consider-using-ternary
+        vertical_banner_ctas = cta_service.get_ctas(self, 'vertical_banner', completed) if cta_service else []
 
         fragment_context = {
             'items': contents,

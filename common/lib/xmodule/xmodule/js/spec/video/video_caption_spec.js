@@ -754,6 +754,7 @@
             it(msg, function() {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 spyOn(Caption, 'fetchCaption').and.callThrough();
+                spyOn(Caption, 'hideClosedCaptions').and.callThrough();
                 $.ajax.and.callFake(function(settings) {
                     _.result(settings, 'error');
                 });
@@ -764,11 +765,10 @@
                 Caption.fetchCaption();
 
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
-                expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
-                    .toEqual({videoId: 'Z5KLxerq05Y'});
                 expect(Caption.hideCaptions.calls.mostRecent().args[0]).toEqual(true);
                 expect(Caption.fetchCaption.calls.mostRecent().args[0]).toEqual(true);
                 expect(Caption.fetchCaption.calls.count()).toEqual(2);
+                expect(Caption.hideClosedCaptions.calls.count()).toEqual(1);
             });
 
             msg = 'on success: when fetchCaption called with fetch_with_youtubeId to ' +

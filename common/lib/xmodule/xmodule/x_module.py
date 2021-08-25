@@ -8,7 +8,7 @@ from collections import namedtuple
 from functools import partial
 
 import yaml
-from django.utils.encoding import python_2_unicode_compatible
+
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
@@ -917,7 +917,6 @@ class XModuleToXBlockMixin:
 
 
 @XBlock.needs("i18n")
-@python_2_unicode_compatible
 class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
     """ Implements a generic learning module.
 

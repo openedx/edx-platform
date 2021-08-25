@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -45,7 +45,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_names_by_id,
     is_commentable_divided,
-    strip_none
+    strip_none,
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -683,7 +683,7 @@ def followed_threads(request, course_key, user_id):
                 #                'content': content,
             }
 
-            return render_to_response('discussion/user_profile.html', context)
+            return render(request, 'discussion/user_profile.html', context)
     except User.DoesNotExist:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 

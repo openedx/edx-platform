@@ -1,6 +1,8 @@
 """Course app config for courseware apps."""
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from typing import Dict, Optional
 
+from django import urls
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_noop as _
@@ -23,7 +25,10 @@ class ProgressCourseApp(CourseApp):
 
     app_id = "progress"
     name = _("Progress")
-    description = _("Allow students to track their progress throughout the course.")
+    description = _("Keep learners engaged and on track throughout the course.")
+    documentation_links = {
+        "learn_more_configuration": settings.PROGRESS_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -67,7 +72,10 @@ class TextbooksCourseApp(CourseApp):
 
     app_id = "textbooks"
     name = _("Textbooks")
-    description = _("Provide links to applicable resources for your course.")
+    description = _("Create and manage a library of course readings, textbooks, and chapters.")
+    documentation_links = {
+        "learn_more_configuration": settings.TEXTBOOKS_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
@@ -103,6 +111,10 @@ class TextbooksCourseApp(CourseApp):
             "configure": True,
         }
 
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return urls.reverse('textbooks_list_handler', kwargs={'course_key_string': course_key})
+
 
 class CalculatorCourseApp(CourseApp):
     """
@@ -111,7 +123,10 @@ class CalculatorCourseApp(CourseApp):
 
     app_id = "calculator"
     name = _("Calculator")
-    description = _("Provide an in-browser calculator that supports simple and complex calculations.")
+    description = _("Provide an in-course calculator for simple and complex calculations.")
+    documentation_links = {
+        "learn_more_configuration": settings.CALCULATOR_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -147,3 +162,53 @@ class CalculatorCourseApp(CourseApp):
             # There is nothing to configure for calculator yet.
             "configure": False,
         }
+
+
+class ProctoringCourseApp(CourseApp):
+    """
+    Course App config for proctoring app.
+    """
+
+    app_id = "proctoring"
+    name = _("Proctoring")
+    description = _("Maintain exam integrity by enabling a proctoring solution for your course")
+    documentation_links = {
+        "learn_more_configuration": settings.PROCTORING_SETTINGS.get(
+            'LINK_URLS', {}
+        ).get('course_authoring_faq', ''),
+    }
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:
+        """
+        Proctoring is available for all courses.
+        """
+        return settings.FEATURES.get("ENABLE_SPECIAL_EXAMS", False)
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Get proctoring enabled status from course overview model.
+        """
+        return CourseOverview.get_from_id(course_key).enable_proctored_exams
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+        """
+        Don't allow proctored exam settings to be enabled from the card
+        """
+        raise ValueError("Proctoring cannot be enabled/disabled via this API.")
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Get allowed operations for proctoring app.
+        """
+        return {
+            "enable": False,
+            "configure": True,
+        }
+
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return get_proctored_exam_settings_url(course_key)

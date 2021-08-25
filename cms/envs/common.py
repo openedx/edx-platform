@@ -451,6 +451,17 @@ FEATURES = {
     # .. toggle_creation_date: 2021-03-05
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
+
+    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
+    # .. settings. Will eventually become the default.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-07-26
+    # .. toggle_target_removal_date: 2021-10-01
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
+    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
 ENABLE_JASMINE = False
@@ -976,6 +987,9 @@ SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = ""
 
 # Site info
 SITE_NAME = "localhost"
@@ -2438,3 +2452,14 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = None
 ################# show account activate cta after register ########################
 SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 SHOW_ACCOUNT_ACTIVATION_CTA = False
+
+################# Documentation links for course apps #################
+
+# pylint: disable=line-too-long
+CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
+DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
+EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
+PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
+TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
+TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
+WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"

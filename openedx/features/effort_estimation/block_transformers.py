@@ -13,7 +13,7 @@ from edxval.api import get_videos_for_course
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
-from .toggles import EFFORT_ESTIMATION_LOCATION_FLAG
+from .toggles import EFFORT_ESTIMATION_DISABLED_FLAG
 
 
 class EffortEstimationTransformer(BlockStructureTransformer):
@@ -121,6 +121,10 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             block_structure.set_transformer_block_field(block_key, cls, cls.VIDEO_CLIP_DURATION, clip_duration)
 
     def transform(self, usage_info, block_structure):
+        # Early exit if our per-course opt-out flag is enabled
+        if EFFORT_ESTIMATION_DISABLED_FLAG.is_enabled(block_structure.root_block_usage_key.course_key):
+            return
+
         # Skip any transformation if our collection phase said to
         cls = EffortEstimationTransformer
         if block_structure.get_transformer_data(cls, cls.DISABLE_ESTIMATION, default=False):
@@ -153,28 +157,6 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
             if activities is not None:
                 block_structure.override_xblock_field(block_key, self.EFFORT_ACTIVITIES, activities)
-
-        # Get bucket for this experiment. 0 is no estimate. 1 is only on sections. 2 is only on subsections.
-        # For cleanup ticket AA-659: remove everything below.
-
-        # We only want to get the bucket if there is data available - i.e. there is something to actually experiment
-        # on. This helps avoid rollout issues where we don't want to claim a user is in bucket 1 if we haven't even
-        # re-published the course so that it has any estimation data available.
-        root_key = block_structure.root_block_usage_key
-        total_activities = block_structure.get_xblock_field(root_key, self.EFFORT_ACTIVITIES)
-        total_time = block_structure.get_xblock_field(root_key, self.EFFORT_TIME)
-        if not total_activities and not total_time:
-            return
-
-        # Second pass to clear out collected estimate on levels we don't want to share. Just an easy way to test
-        # estimates at different levels, per the experiment.
-        bucket = EFFORT_ESTIMATION_LOCATION_FLAG.get_bucket(course_key=block_structure.root_block_usage_key.course_key)
-        for block_key in block_structure.post_order_traversal():
-            category = block_structure.get_xblock_field(block_key, 'category')
-            allowed = (bucket == 1 and category == 'chapter') or (bucket == 2 and category == 'sequential')
-            if not allowed:
-                block_structure.override_xblock_field(block_key, self.EFFORT_TIME, None)
-                block_structure.override_xblock_field(block_key, self.EFFORT_ACTIVITIES, None)
 
     @cached_property
     def _is_on_mobile(self):

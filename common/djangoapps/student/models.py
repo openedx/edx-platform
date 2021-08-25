@@ -38,7 +38,7 @@ from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
@@ -974,7 +974,6 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-@python_2_unicode_compatible
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1203,7 +1202,6 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
-@python_2_unicode_compatible
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1377,7 +1375,7 @@ class CourseEnrollment(models.Model):
         from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
         return not user.has_perm(ENROLL_IN_COURSE, course)
 
-    def update_enrollment(self, mode=None, is_active=None, skip_refund=False):
+    def update_enrollment(self, mode=None, is_active=None, skip_refund=False, enterprise_uuid=None):
         """
         Updates an enrollment for a user in a class.  This includes options
         like changing the mode, toggling is_active True/False, etc.
@@ -1413,7 +1411,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed:
             if self.is_active:
-                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED, enterprise_uuid=enterprise_uuid)
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
@@ -1457,7 +1455,7 @@ class CourseEnrollment(models.Model):
                                   mode=mode, course_id=course_id,
                                   cost=cost, currency=currency)
 
-    def emit_event(self, event_name):
+    def emit_event(self, event_name, enterprise_uuid=None):
         """
         Emits an event to explicitly track course enrollment and unenrollment.
         """
@@ -1465,12 +1463,17 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+            if enterprise_uuid:
+                context["enterprise_uuid"] = enterprise_uuid
             assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
                 'course_id': str(self.course_id),
                 'mode': self.mode,
             }
+            if enterprise_uuid and 'username' not in context:
+                data['username'] = self.user.username
+
             segment_properties = {
                 'category': 'conversion',
                 'label': str(self.course_id),
@@ -1511,7 +1514,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False, enterprise_uuid=None):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1539,6 +1542,8 @@ class CourseEnrollment(models.Model):
                 if enrollment is closed. This is a special case for entitlements
                 while selecting a session. The default is set to False to avoid
                 breaking the orignal course enroll code.
+
+        enterprise_uuid (str): Add course enterprise uuid
 
         Exceptions that can be raised: NonExistentCourseError,
         EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
@@ -1590,7 +1595,7 @@ class CourseEnrollment(models.Model):
 
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
-        enrollment.update_enrollment(is_active=True, mode=mode)
+        enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         return enrollment
@@ -2252,7 +2257,6 @@ class CourseEnrollment(models.Model):
         )
 
 
-@python_2_unicode_compatible
 class FBEEnrollmentExclusion(models.Model):
     """
     Disable FBE for enrollments in this table.
@@ -2369,7 +2373,6 @@ class ManualEnrollmentAudit(models.Model):
         return True
 
 
-@python_2_unicode_compatible
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
@@ -2430,7 +2433,6 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
 
 @total_ordering
-@python_2_unicode_compatible
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -2792,7 +2794,6 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
 
-@python_2_unicode_compatible
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
@@ -2900,7 +2901,6 @@ class SocialLink(models.Model):
     social_link = models.CharField(max_length=100, blank=True)
 
 
-@python_2_unicode_compatible
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
@@ -3008,7 +3008,6 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
 
 
-@python_2_unicode_compatible
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
@@ -3057,7 +3056,6 @@ class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     )
 
 
-@python_2_unicode_compatible
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.

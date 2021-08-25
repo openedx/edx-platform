@@ -77,7 +77,7 @@ from lms.djangoapps.courseware.courses import (
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
-from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.masquerade import setup_masquerade, is_masquerading_as_specific_student
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import (  # lint-amnesty, pylint: disable=unused-import
@@ -95,7 +95,6 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
-from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -1289,14 +1288,14 @@ def get_cert_data(student, course, enrollment_mode, course_grade=None):
     if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
         return cert_data
 
-    certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
+    certificates_enabled_for_course = certs_api.has_self_generated_certificates_enabled(course.id)
     if course_grade is None:
         course_grade = CourseGradeFactory().read(student, course)
 
-    if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
+    if not certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
         return
 
-    if not certs_api.get_active_web_certificate(course) and not auto_certs_api.is_valid_pdf_certificate(cert_data):
+    if not certs_api.get_active_web_certificate(course) and not certs_api.is_valid_pdf_certificate(cert_data):
         return
 
     return cert_data
@@ -1764,9 +1763,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # timed exam started?").
         ancestor_sequence_block = enclosing_sequence_for_gating_checks(block)
         if ancestor_sequence_block:
+            context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, course_key)}
             # If the SequenceModule feels that gating is necessary, redirect
             # there so we can have some kind of error message at any rate.
-            if ancestor_sequence_block.descendants_are_gated():
+            if ancestor_sequence_block.descendants_are_gated(context):
                 return redirect(
                     reverse(
                         'render_xblock',

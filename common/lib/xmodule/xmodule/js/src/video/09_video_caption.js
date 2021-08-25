@@ -598,10 +598,12 @@
                             } else {
                                 self.hideCaptions(true);
                                 self.languageChooserEl.hide();
+                                self.hideClosedCaptions();
                             }
                         } else {
                             self.hideCaptions(true);
                             self.languageChooserEl.hide();
+                            self.hideClosedCaptions();
                         }
                     }
                 });

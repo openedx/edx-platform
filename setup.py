@@ -42,6 +42,7 @@ setup(
             "calculator = lms.djangoapps.courseware.plugins:CalculatorCourseApp",
             "discussion = openedx.core.djangoapps.discussions.plugins:DiscussionCourseApp",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseApp",
+            "proctoring = lms.djangoapps.courseware.plugins:ProctoringCourseApp",
             "progress = lms.djangoapps.courseware.plugins:ProgressCourseApp",
             "teams = lms.djangoapps.teams.plugins:TeamsCourseApp",
             "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",

@@ -23,7 +23,7 @@ from datetime import datetime
 from xml.sax.saxutils import unescape
 
 import six
-from django.utils.encoding import python_2_unicode_compatible
+
 from lxml import etree
 from pytz import UTC
 
@@ -128,7 +128,6 @@ class LoncapaSystem(object):
         self.matlab_api_key = matlab_api_key
 
 
-@python_2_unicode_compatible
 class LoncapaProblem(object):
     """
     Main class for capa Problems.

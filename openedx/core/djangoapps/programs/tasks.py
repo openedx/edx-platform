@@ -9,13 +9,14 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute
 from edx_rest_api_client import exceptions
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
@@ -32,6 +33,7 @@ MAX_RETRIES = 11
 PROGRAM_CERTIFICATE = 'program'
 COURSE_CERTIFICATE = 'course-run'
 VISIBLE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+DATE_OVERRIDE_FORMAT = '%Y-%m-%d'
 
 
 def get_completed_programs(site, student):
@@ -293,7 +295,7 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     })
 
 
-def post_course_certificate(client, username, certificate, visible_date):
+def post_course_certificate(client, username, certificate, visible_date, date_override=None):
     """
     POST a certificate that has been updated to Credentials
     """
@@ -305,6 +307,7 @@ def post_course_certificate(client, username, certificate, visible_date):
             'mode': certificate.mode,
             'type': COURSE_CERTIFICATE,
         },
+        'date_override': {'date': date_override.strftime(DATE_OVERRIDE_FORMAT)} if date_override else None,
         'attributes': [
             {
                 'name': 'visible_date',
@@ -458,7 +461,19 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
                 "Task award_course_certificate will award certificate for course "
                 f"{course_key} with a visible date of {visible_date}"
             )
-            post_course_certificate(credentials_client, username, certificate, visible_date)
+
+            # If the certificate has an associated CertificateDateOverride, send
+            # it along
+            try:
+                date_override = certificate.date_override.date
+                LOGGER.info(
+                    "Task award_course_certificate will award certificate for  "
+                    f"course {course_key} with a date override of {date_override}"
+                )
+            except ObjectDoesNotExist:
+                date_override = None
+
+            post_course_certificate(credentials_client, username, certificate, visible_date, date_override)
 
             LOGGER.info(f"Awarded certificate for course {course_key} to user {username}")
     except Exception as exc:
@@ -710,11 +725,15 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
             f"Failed to update certificate availability date for course {course_key}. Reason: {error_msg}"
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
-    # Always update the course certificate with the new certificate available date
-    update_credentials_course_certificate_configuration_available_date.delay(
-        str(course_key),
-        certificate_available_date
-    )
+    # update the course certificate with the new certificate available date if:
+    # - The course is self paced
+    # - The certificates_display_behavior is not "end"
+    course_overview = CourseOverview.get_from_id(course_key)
+    if course_overview.self_paced is False and course_overview.certificates_display_behavior == 'end':
+        update_credentials_course_certificate_configuration_available_date.delay(
+            str(course_key),
+            certificate_available_date
+        )
     users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
         course_id=course_key
     ).values_list('user__username', flat=True)

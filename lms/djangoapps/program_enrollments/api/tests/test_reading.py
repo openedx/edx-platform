@@ -22,7 +22,6 @@ from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatus
 from lms.djangoapps.program_enrollments.exceptions import (
     OrganizationDoesNotExistException,
     ProgramDoesNotExistException,
-    ProviderConfigurationException,
     ProviderDoesNotExistException
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
@@ -568,10 +567,11 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
             provider=provider.backend_name,
         )
 
-    def test_happy_path(self):
+    def test_single_saml_provider(self):
         """
         Test that get_users_by_external_keys returns the expected
-        mapping of external keys to users.
+        mapping of external keys to users when a single saml provider
+        is configured.
         """
         organization = OrganizationFactory.create(short_name=self.organization_key)
         provider = SAMLProviderConfigFactory.create(organization=organization)
@@ -581,6 +581,35 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         requested_keys = {'ext-user-1', 'ext-user-2', 'ext-user-3'}
         actual = get_users_by_external_keys(self.program_uuid, requested_keys)
         # ext-user-0 not requested, ext-user-3 doesn't exist
+        expected = {
+            'ext-user-1': self.user_1,
+            'ext-user-2': self.user_2,
+            'ext-user-3': None,
+        }
+        assert actual == expected
+
+    def test_multiple_saml_providers(self):
+        """
+        Test that get_users_by_external_keys returns the expected
+        mapping of external keys to users when multiple saml providers
+        are configured.
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        provider_1 = SAMLProviderConfigFactory.create(organization=organization)
+        provider_2 = SAMLProviderConfigFactory.create(
+            organization=organization,
+            slug='test-shib-2',
+            enabled=True
+        )
+        self.create_social_auth_entry(self.user_0, provider_1, 'ext-user-0')
+        self.create_social_auth_entry(self.user_1, provider_1, 'ext-user-1')
+        self.create_social_auth_entry(self.user_1, provider_2, 'ext-user-1')
+        self.create_social_auth_entry(self.user_2, provider_2, 'ext-user-2')
+        requested_keys = {'ext-user-1', 'ext-user-2', 'ext-user-3'}
+        actual = get_users_by_external_keys(self.program_uuid, requested_keys)
+        # ext-user-0 not requested, ext-user-3 doesn't exist,
+        # ext-user-2 is authorized with secondary provider
+        # ext-user-1 has an entry in both providers
         expected = {
             'ext-user-1': self.user_1,
             'ext-user-2': self.user_2,
@@ -650,20 +679,6 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
             organization=organization, slug='foox', enabled=False
         )
         get_users_by_external_keys(self.program_uuid, [])
-
-    def test_extra_saml_provider_enabled(self):
-        """
-        If multiple enabled samlprovider records exist with the same organization
-        an exception is raised.
-        """
-        organization = OrganizationFactory.create(short_name=self.organization_key)
-        SAMLProviderConfigFactory.create(organization=organization)
-        # create a second active config for the same organizationm, IS enabled
-        SAMLProviderConfigFactory.create(
-            organization=organization, slug='foox', enabled=True
-        )
-        with pytest.raises(ProviderConfigurationException):
-            get_users_by_external_keys(self.program_uuid, [])
 
 
 @ddt.ddt

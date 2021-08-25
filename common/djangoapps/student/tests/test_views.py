@@ -40,6 +40,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -131,7 +132,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
     def test_cant_unenroll_status(self):
         """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
         with patch(
-            'lms.djangoapps.certificates.models.certificate_status_for_student',
+            'lms.djangoapps.certificates.api.certificate_status_for_student',
             return_value={'status': 'downloadable'},
         ):
             response = self.client.get(reverse('dashboard'))
@@ -154,10 +155,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_course_run_refund_status_invalid_course_key(self):
         """ Assert that view:course_run_refund_status returns correct Json for Invalid Course Key ."""
-        with patch('opaque_keys.edx.keys.CourseKey.from_string') as mock_method:
-            mock_method.side_effect = InvalidKeyError('CourseKey', 'The course key used to get refund status caused \
-                                                        InvalidKeyError during look up.')
-            response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
+        test_url = reverse('course_run_refund_status', kwargs={'course_id': self.course.id})
+        with patch('common.djangoapps.student.views.management.CourseKey.from_string') as mock_method:
+            mock_method.side_effect = InvalidKeyError(
+                'CourseKey',
+                'The course key used to get refund status caused InvalidKeyError during look up.'
+            )
+            response = self.client.get(test_url)
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': ''}
         assert response.status_code == 406
@@ -227,9 +231,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=THREE_YEARS_AGO,
             certificate_available_date=TOMORROW,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )
@@ -242,9 +247,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=TOMORROW,
             certificate_available_date=TOMORROW,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )
@@ -257,9 +263,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=ONE_WEEK_AGO,
             certificate_available_date=now(),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
-        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=CourseMode.VERIFIED)
         GeneratedCertificateFactory(
             status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
         )

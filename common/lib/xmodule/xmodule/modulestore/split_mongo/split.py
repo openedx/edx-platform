@@ -72,7 +72,6 @@ from opaque_keys.edx.locator import (
     DefinitionLocator,
     LibraryLocator,
     LocalId,
-    VersionTree
 )
 from path import Path as path
 from pytz import UTC
@@ -622,67 +621,6 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                     structures.append(structure)
 
         structures.extend(self.db_connection.find_structures_by_id(list(ids)))
-        return structures
-
-    def find_structures_derived_from(self, ids):
-        """
-        Return all structures that were immediately derived from a structure listed in ``ids``.
-
-        Arguments:
-            ids (list): A list of structure ids
-        """
-        found_structure_ids = set()
-        structures = []
-
-        for _, record in self._active_records:
-            for structure in record.structures.values():
-                if structure.get('previous_version') in ids:
-                    structures.append(structure)
-                    if '_id' in structure:
-                        found_structure_ids.add(structure['_id'])
-
-        structures.extend(
-            structure
-            for structure in self.db_connection.find_structures_derived_from(ids)
-            if structure['_id'] not in found_structure_ids
-        )
-        return structures
-
-    def find_ancestor_structures(self, original_version, block_key):
-        """
-        Find all structures that originated from ``original_version`` that contain ``block_key``.
-
-        Any structure found in the cache will be preferred to a structure with the same id from the database.
-
-        Arguments:
-            original_version (str or ObjectID): The id of a structure
-            block_key (BlockKey): The id of the block in question
-        """
-        found_structure_ids = set()
-        structures = []
-
-        for _, record in self._active_records:
-            for structure in record.structures.values():
-                if 'original_version' not in structure:
-                    continue
-
-                if structure['original_version'] != original_version:
-                    continue
-
-                if block_key not in structure.get('blocks', {}):
-                    continue
-
-                if 'update_version' not in structure['blocks'][block_key].get('edit_info', {}):
-                    continue
-
-                structures.append(structure)
-                found_structure_ids.add(structure['_id'])
-
-        structures.extend(
-            structure
-            for structure in self.db_connection.find_ancestor_structures(original_version, block_key)
-            if structure['_id'] not in found_structure_ids
-        )
         return structures
 
 
@@ -1517,94 +1455,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if definition is None:
             return None
         return definition['edit_info']
-
-    def get_course_successors(self, course_locator, version_history_depth=1):
-        """
-        Find the version_history_depth next versions of this course. Return as a VersionTree
-        Mostly makes sense when course_locator uses a version_guid, but because it finds all relevant
-        next versions, these do include those created for other courses.
-        :param course_locator:
-        """
-        if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_locator)
-
-        if version_history_depth < 1:
-            return None
-        if course_locator.version_guid is None:
-            course = self._lookup_course(course_locator)
-            version_guid = course.structure['_id']
-            course_locator = course_locator.for_version(version_guid)
-        else:
-            version_guid = course_locator.version_guid
-
-        # TODO if depth is significant, it may make sense to get all that have the same original_version
-        # and reconstruct the subtree from version_guid
-        next_entries = self.find_structures_derived_from([version_guid])
-        # must only scan cursor's once
-        next_versions = [struct for struct in next_entries]  # lint-amnesty, pylint: disable=unnecessary-comprehension
-        result = {version_guid: [CourseLocator(version_guid=struct['_id']) for struct in next_versions]}
-        depth = 1
-        while depth < version_history_depth and len(next_versions) > 0:
-            depth += 1
-            next_entries = self.find_structures_derived_from([struct['_id'] for struct in next_versions])
-            next_versions = [struct for struct in next_entries]  # lint-amnesty, pylint: disable=unnecessary-comprehension
-            for course_structure in next_versions:
-                result.setdefault(course_structure['previous_version'], []).append(
-                    CourseLocator(version_guid=next_entries[-1]['_id']))
-        return VersionTree(course_locator, result)
-
-    def get_block_generations(self, block_locator):
-        """
-        Find the history of this block. Return as a VersionTree of each place the block changed (except
-        deletion).
-
-        The block's history tracks its explicit changes but not the changes in its children starting
-        from when the block was created.
-
-        """
-        # course_agnostic means we don't care if the head and version don't align, trust the version
-        course_struct = self._lookup_course(block_locator.course_key.course_agnostic()).structure
-        block_key = BlockKey.from_usage_key(block_locator)
-        all_versions_with_block = self.find_ancestor_structures(
-            original_version=course_struct['original_version'],
-            block_key=block_key
-        )
-        # find (all) root versions and build map {previous: {successors}..}
-        possible_roots = []
-        result = {}
-        for version in all_versions_with_block:
-            block_payload = self._get_block_from_structure(version, block_key)
-            if version['_id'] == block_payload.edit_info.update_version:
-                if block_payload.edit_info.previous_version is None:
-                    # this was when this block was created
-                    possible_roots.append(block_payload.edit_info.update_version)
-                else:  # map previous to {update..}
-                    result.setdefault(block_payload.edit_info.previous_version, set()).add(
-                        block_payload.edit_info.update_version)
-
-        # more than one possible_root means usage was added and deleted > 1x.
-        if len(possible_roots) > 1:
-            # find the history segment including block_locator's version
-            element_to_find = self._get_block_from_structure(course_struct, block_key).edit_info.update_version
-            if element_to_find in possible_roots:
-                possible_roots = [element_to_find]
-            for possibility in possible_roots:
-                if self._find_local_root(element_to_find, possibility, result):
-                    possible_roots = [possibility]
-                    break
-        elif len(possible_roots) == 0:
-            return None
-        # convert the results value sets to locators
-        for k, versions in result.items():
-            result[k] = [
-                block_locator.for_version(version)
-                for version in versions
-            ]
-        return VersionTree(
-            block_locator.for_version(possible_roots[0]),
-            result
-        )
 
     def get_definition_successors(self, definition_locator, version_history_depth=1):
         """

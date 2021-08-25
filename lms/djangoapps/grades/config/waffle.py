@@ -150,10 +150,8 @@ def is_writable_gradebook_enabled(course_key):
     return waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key)
 
 
-def gradebook_can_see_bulk_management(course_key):
+def gradebook_bulk_management_enabled(course_key):
     """
-    Returns whether bulk management features should be visible for the given course.
-
-    (provided that course contains a masters track, as of this writing)
+    Returns whether bulk management features should be specially enabled for a given course.
     """
     return waffle_flags()[BULK_MANAGEMENT].is_enabled(course_key)

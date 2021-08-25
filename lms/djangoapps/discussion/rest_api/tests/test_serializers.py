@@ -2,14 +2,17 @@
 Tests for Discussion API serializers
 """
 
-
 import itertools
 from unittest import mock
+from urllib.parse import urlparse
 
 import ddt
 import httpretty
 from django.test.client import RequestFactory
-from six.moves.urllib.parse import urlparse
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
@@ -18,7 +21,7 @@ from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, Th
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
-    make_minimal_cs_thread
+    make_minimal_cs_thread,
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -28,12 +31,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role
+    Role,
 )
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -186,6 +185,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comment_count": 3,
             "pinned": True,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "abuse_flagged_count": None,
         })
         assert self.serialize(thread) == expected
 
@@ -306,12 +306,14 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 4,
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
         }
+
         assert self.serialize(comment) == expected
 
     @ddt.data(

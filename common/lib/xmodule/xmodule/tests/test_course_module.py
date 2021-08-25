@@ -18,6 +18,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_module
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import InvalidProctoringProvider
 
@@ -105,47 +106,43 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         super().setUp()
 
         system = DummySystem(load_error_modules=True)  # lint-amnesty, pylint: disable=unused-variable
-        #sample_xml = """
-        # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"  # lint-amnesty, pylint: disable=line-too-long
-        #        graceperiod="1 day" url_name="test"
-        #        start="2012-01-01T12:00"
-        #        {end}
-        #        certificates_show_before_end={cert}>
-        #    <chapter url="hi" url_name="ch" display_name="CH">
-        #        <html url_name="h" display_name="H">Two houses, ...</html>
-        #    </chapter>
-        # </course>
-        #""".format(org=ORG, course=COURSE)
+
         past_end = (datetime.now() - timedelta(days=12)).strftime("%Y-%m-%dT%H:%M:00")
         future_end = (datetime.now() + timedelta(days=12)).strftime("%Y-%m-%dT%H:%M:00")
-        self.past_show_certs = get_dummy_course("2012-01-01T12:00", end=past_end, certs='early_with_info')
-        self.past_show_certs_no_info = get_dummy_course("2012-01-01T12:00", end=past_end, certs='early_no_info')
-        self.past_noshow_certs = get_dummy_course("2012-01-01T12:00", end=past_end, certs='end')
-        self.future_show_certs = get_dummy_course("2012-01-01T12:00", end=future_end, certs='early_with_info')
-        self.future_show_certs_no_info = get_dummy_course("2012-01-01T12:00", end=future_end, certs='early_no_info')
-        self.future_noshow_certs = get_dummy_course("2012-01-01T12:00", end=future_end, certs='end')
-        #self.past_show_certs = system.process_xml(sample_xml.format(end=past_end, cert=True))
-        #self.past_noshow_certs = system.process_xml(sample_xml.format(end=past_end, cert=False))
-        #self.future_show_certs = system.process_xml(sample_xml.format(end=future_end, cert=True))
-        #self.future_noshow_certs = system.process_xml(sample_xml.format(end=future_end, cert=False))
+        self.past_show_certs = get_dummy_course(
+            "2012-01-01T12:00",
+            end=past_end,
+            certs=CertificatesDisplayBehaviors.EARLY_NO_INFO
+        )
+        self.past_show_certs_no_info = get_dummy_course(
+            "2012-01-01T12:00",
+            end=past_end,
+            certs=CertificatesDisplayBehaviors.EARLY_NO_INFO
+        )
+        self.past_noshow_certs = get_dummy_course(
+            "2012-01-01T12:00",
+            end=past_end,
+            certs=CertificatesDisplayBehaviors.END
+        )
+
+        self.future_show_certs_no_info = get_dummy_course(
+            "2012-01-01T12:00",
+            end=future_end,
+            certs=CertificatesDisplayBehaviors.EARLY_NO_INFO
+        )
+        self.future_noshow_certs = get_dummy_course(
+            "2012-01-01T12:00",
+            end=future_end,
+            certs=CertificatesDisplayBehaviors.END
+        )
 
     def test_has_ended(self):
         """Check that has_ended correctly tells us when a course is over."""
         assert self.past_show_certs.has_ended()
         assert self.past_show_certs_no_info.has_ended()
         assert self.past_noshow_certs.has_ended()
-        assert not self.future_show_certs.has_ended()
         assert not self.future_show_certs_no_info.has_ended()
         assert not self.future_noshow_certs.has_ended()
-
-    def test_may_certify(self):
-        """Check that may_certify correctly tells us when a course may wrap."""
-        assert self.past_show_certs.may_certify()
-        assert self.past_noshow_certs.may_certify()
-        assert self.past_show_certs_no_info.may_certify()
-        assert self.future_show_certs.may_certify()
-        assert self.future_show_certs_no_info.may_certify()
-        assert not self.future_noshow_certs.may_certify()
 
 
 class CourseSummaryHasEnded(unittest.TestCase):
@@ -411,14 +408,6 @@ class CourseBlockTestCase(unittest.TestCase):
         """
         assert self.course.number == COURSE
 
-    def test_set_default_certificate_available_date(self):
-        """
-        The certificate_available_date field should default to two days
-        after the course end date.
-        """
-        expected_certificate_available_date = self.course.end + timedelta(days=2)
-        assert expected_certificate_available_date == self.course.certificate_available_date
-
 
 class ProctoringProviderTestCase(unittest.TestCase):
     """
@@ -443,6 +432,13 @@ class ProctoringProviderTestCase(unittest.TestCase):
         # since there are no validation errors or missing data
         assert self.proctoring_provider.from_json(default_provider) == default_provider
 
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'mock',
+            'mock': {},
+            'mock_proctoring_without_rules': {}
+        }
+    )
     def test_from_json_with_invalid_provider(self):
         """
         Test that an invalid provider (i.e. not one configured at the platform level)
@@ -462,7 +458,8 @@ class ProctoringProviderTestCase(unittest.TestCase):
         Test that a value with no provider will inherit the default provider
         from the platform defaults.
         """
-        default_provider = 'mock'
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+        assert default_provider is not None
 
         assert self.proctoring_provider.from_json(None) == default_provider
 

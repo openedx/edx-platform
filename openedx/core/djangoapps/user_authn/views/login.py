@@ -172,8 +172,14 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, str(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
+        # Increment the lockout counter to safguard from further brute force requests
+        # if user's password has been compromised.
+        if LoginFailures.is_feature_enabled():
+            LoginFailures.increment_lockout_counter(user)
+
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
+
         # Prevent the login attempt.
         raise AuthFailedError(HTML(str(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 

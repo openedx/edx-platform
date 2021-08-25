@@ -17,19 +17,18 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
-from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 
@@ -494,6 +493,7 @@ class PostCourseCertificateTestCase(TestCase):
                 'mode': self.certificate.mode,
                 'type': tasks.COURSE_CERTIFICATE,
             },
+            'date_override': None,
             'attributes': [{
                 'name': 'visible_date',
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
@@ -505,9 +505,9 @@ class PostCourseCertificateTestCase(TestCase):
 
 @skip_unless_lms
 @ddt.ddt
+@mock.patch("lms.djangoapps.certificates.api.auto_certificate_generation_enabled", mock.Mock(return_value=True))
 @mock.patch(TASKS_MODULE + '.post_course_certificate')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-@override_switch(waffle.WAFFLE_NAMESPACE + '.' + waffle.AUTO_CERTIFICATE_GENERATION, True)
 class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
     Test the award_course_certificate celery task
@@ -520,6 +520,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.course = CourseOverviewFactory.create(
             self_paced=True,  # Any option to allow the certificate to be viewable for the course
             certificate_available_date=self.available_date,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         self.student = UserFactory.create(username='test-student')
         # Instantiate the Certificate first so that the config doesn't execute issuance
@@ -535,6 +536,15 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
 
         ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+
+    def _add_certificate_date_override(self):
+        """
+        Creates a mock CertificateDateOverride and adds it to the certificate
+        """
+        self.certificate.date_override = CertificateDateOverrideFactory.create(
+            generated_certificate=self.certificate,
+            overridden_by=UserFactory.create(username='test-admin'),
+        )
 
     @ddt.data(
         'verified',
@@ -563,6 +573,18 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
         assert call_args[3] == self.available_date
+
+    def test_award_course_certificates_override_date(self, mock_post_course_certificate):
+        """
+        Tests the API POST method is called with date override when present
+        """
+        self._add_certificate_date_override()
+        tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
+        call_args, _ = mock_post_course_certificate.call_args
+        assert call_args[1] == self.student.username
+        assert call_args[2] == self.certificate
+        assert call_args[3] == self.certificate.modified_date
+        assert call_args[4] == self.certificate.date_override.date.date()
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """

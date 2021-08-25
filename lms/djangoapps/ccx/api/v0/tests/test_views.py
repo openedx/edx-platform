@@ -13,7 +13,6 @@ import pytest
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import Resolver404, resolve, reverse
 from django.utils.timezone import now
 from oauth2_provider import models as dot_models
@@ -760,7 +759,9 @@ class CcxDetailTest(CcxRestApiTest):
         Check authorization for staff users logged in without oauth
         """
         # create a staff user
-        staff_user = User.objects.create_user('test_staff_user', 'test_staff_user@openedx.org', 'test')
+        staff_user = UserFactory.create(
+            username='test_staff_user', email='test_staff_user@openedx.org', password='test',
+        )
         # add staff role to the staff user
         CourseStaffRole(self.master_course_key).add_users(staff_user)
 
@@ -777,7 +778,9 @@ class CcxDetailTest(CcxRestApiTest):
         Check authorization for users logged in without oauth
         """
         # create an instructor user
-        instructor_user = User.objects.create_user('test_instructor_user', 'test_instructor_user@openedx.org', 'test')
+        instructor_user = UserFactory.create(
+            username='test_instructor_user', email='test_instructor_user@openedx.org', password='test',
+        )
         # add instructor role to the instructor user
         CourseInstructorRole(self.master_course_key).add_users(instructor_user)
 
@@ -794,7 +797,9 @@ class CcxDetailTest(CcxRestApiTest):
         Check authorization for other coach users logged in without oauth
         """
         # create an coach user
-        coach_user = User.objects.create_user('test_coach_user', 'test_coach_user@openedx.org', 'test')
+        coach_user = UserFactory.create(
+            username='test_coach_user', email='test_coach_user@openedx.org', password='test',
+        )
         # add coach role to the coach user
         CourseCcxCoachRole(self.master_course_key).add_users(coach_user)
 

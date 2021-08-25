@@ -141,12 +141,14 @@ ${HTML(fragment.foot_html())}
             // required for proper scrolling.
             $('a').on("click", function(event){
               if ($(this).attr('href')[0] === "#") {
-                event.preventDefault();
                 var targetId = $(this).attr('href');
                 var targetName = $(this).attr('href').slice(1);
                 // Checks if the target uses an id or name to focus and gets offset.
                 var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
-                window.parent.postMessage({"offset": targetOffset.top}, document.referrer);
+                if (targetOffset) {
+                  event.preventDefault();
+                  window.parent.postMessage({"offset": targetOffset.top}, document.referrer);
+                }
               }
             })
           return;

@@ -49,8 +49,12 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.data import CertificatesDisplayBehaviors
+
 
 log = logging.getLogger(__name__)
+
+BETA_TESTER_METHOD = 'common.djangoapps.student.helpers.access.is_beta_tester'
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -75,7 +79,8 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2)
         )
         cert = GeneratedCertificateFactory.create(
             user=user,
@@ -85,25 +90,28 @@ class CourseEndingTest(ModuleStoreTestCase):
             grade='67',
             download_url='http://s3.edx/cert'
         )
+        enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
 
-        assert _cert_info(user, course, None) ==\
+        assert _cert_info(user, enrollment, None) ==\
                {'status': 'processing', 'show_survey_button': False, 'can_unenroll': True}
 
         cert_status = {'status': 'unavailable', 'mode': 'honor', 'uuid': None}
-        assert _cert_info(user, course, cert_status) == {'status': 'processing', 'show_survey_button': False,
-                                                         'mode': 'honor', 'linked_in_url': None, 'can_unenroll': True}
+        assert _cert_info(user, enrollment, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                             'mode': 'honor', 'linked_in_url': None,
+                                                             'can_unenroll': True}
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor', 'uuid': None}
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=1.0)
-            assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
-                                                             'survey_url': survey_url, 'grade': '1.0', 'mode': 'honor',
-                                                             'linked_in_url': None, 'can_unenroll': False}
+            assert _cert_info(user, enrollment, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                                 'survey_url': survey_url, 'grade': '1.0',
+                                                                 'mode': 'honor', 'linked_in_url': None,
+                                                                 'can_unenroll': False}
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor', 'uuid': None}
-        assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
-                                                         'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
-                                                         'linked_in_url': None, 'can_unenroll': False}
+        assert _cert_info(user, enrollment, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                             'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
+                                                             'linked_in_url': None, 'can_unenroll': False}
 
         cert_status = {
             'status': 'downloadable',
@@ -112,10 +120,11 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine',
         }
-        assert _cert_info(user, course, cert_status) == {'status': 'downloadable', 'download_url': cert.download_url,
-                                                         'show_survey_button': True, 'survey_url': survey_url,
-                                                         'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
-                                                         'can_unenroll': False}
+        assert _cert_info(user, enrollment, cert_status) == {'status': 'downloadable',
+                                                             'download_url': cert.download_url,
+                                                             'show_survey_button': True, 'survey_url': survey_url,
+                                                             'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
+                                                             'can_unenroll': False}
 
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
@@ -123,25 +132,35 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine',
         }
-        assert _cert_info(user, course, cert_status) == {'status': 'notpassing', 'show_survey_button': True,
-                                                         'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
-                                                         'linked_in_url': None, 'can_unenroll': True}
+        assert _cert_info(user, enrollment, cert_status) == {'status': 'notpassing', 'show_survey_button': True,
+                                                             'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
+                                                             'linked_in_url': None, 'can_unenroll': True}
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
+        course2 = CourseOverviewFactory.create(
+            end_of_course_survey_url=None,
+            certificates_display_behavior='end',
+        )
+        enrollment2 = CourseEnrollmentFactory(user=user, course_id=course2.id, mode=CourseMode.VERIFIED)
+
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
             'download_url': cert.download_url, 'mode': 'honor', 'uuid': 'fakeuuidbutitsfine'
         }
-        assert _cert_info(user, course2, cert_status) == {'status': 'notpassing', 'show_survey_button': False,
-                                                          'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
-                                                          'can_unenroll': True}
+        assert _cert_info(user, enrollment2, cert_status) == {'status': 'notpassing', 'show_survey_button': False,
+                                                              'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
+                                                              'can_unenroll': True}
 
+        course3 = CourseOverviewFactory.create(
+            end_of_course_survey_url=None,
+            certificates_display_behavior='early_no_info',
+        )
+        enrollment3 = CourseEnrollmentFactory(user=user, course_id=course3.id, mode=CourseMode.VERIFIED)
         # test when the display is unavailable or notpassing, we get the correct results out
-        course2.certificates_display_behavior = 'early_no_info'
+        course2.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
         cert_status = {'status': 'unavailable', 'mode': 'honor', 'uuid': None}
-        assert _cert_info(user, course2, cert_status) == {'status': 'processing', 'show_survey_button': False,
-                                                          'can_unenroll': True}
+        assert _cert_info(user, enrollment3, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                              'can_unenroll': True}
 
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
@@ -149,8 +168,47 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine'
         }
-        assert _cert_info(user, course2, cert_status) == {'status': 'processing', 'show_survey_button': False,
-                                                          'can_unenroll': True}
+        assert _cert_info(user, enrollment3, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                              'can_unenroll': True}
+
+    def test_cert_info_beta_tester(self):
+        user = UserFactory.create()
+        course = CourseOverviewFactory.create()
+        mode = CourseMode.VERIFIED
+        grade = '0.67'
+        status = CertificateStatuses.downloadable
+        cert = GeneratedCertificateFactory.create(
+            user=user,
+            course_id=course.id,
+            status=status,
+            mode=mode
+        )
+        enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=mode)
+
+        cert_status = {
+            'status': status,
+            'grade': grade,
+            'download_url': cert.download_url,
+            'mode': mode,
+            'uuid': 'blah',
+        }
+        with patch(BETA_TESTER_METHOD, return_value=False):
+            assert _cert_info(user, enrollment, cert_status) == {
+                'status': status,
+                'download_url': cert.download_url,
+                'show_survey_button': False,
+                'grade': grade,
+                'mode': mode,
+                'linked_in_url': None,
+                'can_unenroll': False
+            }
+
+        with patch(BETA_TESTER_METHOD, return_value=True):
+            assert _cert_info(user, enrollment, cert_status) == {
+                'status': 'processing',
+                'show_survey_button': False,
+                'can_unenroll': True
+            }
 
     @ddt.data(
         (0.70, 0.60),
@@ -173,8 +231,10 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2),
         )
+        enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
 
         if cert_grade is not None:
             cert_status = {'status': 'generating', 'grade': str(cert_grade), 'mode': 'honor', 'uuid': None}
@@ -183,10 +243,10 @@ class CourseEndingTest(ModuleStoreTestCase):
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=persisted_grade)
-            assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
-                                                             'survey_url': survey_url, 'grade': str(expected_grade),
-                                                             'mode': 'honor', 'linked_in_url': None,
-                                                             'can_unenroll': False}
+            assert _cert_info(user, enrollment, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                                 'survey_url': survey_url, 'grade': str(expected_grade),
+                                                                 'mode': 'honor', 'linked_in_url': None,
+                                                                 'can_unenroll': False}
 
     def test_cert_grade_no_grades(self):
         """
@@ -198,14 +258,16 @@ class CourseEndingTest(ModuleStoreTestCase):
         survey_url = "http://a_survey.com"
         course = CourseOverviewFactory.create(
             end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            end=datetime.now(pytz.UTC) - timedelta(days=2),
         )
         cert_status = {'status': 'generating', 'mode': 'honor', 'uuid': None}
+        enrollment = CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = None
-            assert _cert_info(user, course, cert_status) == {'status': 'processing', 'show_survey_button': False,
-                                                             'can_unenroll': True}
+            assert _cert_info(user, enrollment, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                                 'can_unenroll': True}
 
 
 @ddt.ddt
@@ -653,7 +715,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment(self):
-        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        user = UserFactory.create(username="joe", email="joe@joe.com", password="password")
         course_id = CourseKey.from_string("edX/Test101/2013")
         course_id_partial = CourseKey.from_string("edX/Test101/")
         course = CourseOverviewFactory.create(id=course_id)
@@ -802,7 +864,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
-        # Now deactive
+        # Now deactivate
         enrollment.deactivate()
         assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_unenrollment_event_was_emitted(user, course_id, course, enrollment)

@@ -878,7 +878,7 @@ def _update_and_import_module(
     if block.location.block_type == 'library_content':
         # If library exists, update source_library_version and children
         # according to this existing library and library content block.
-        if store.get_library(block.source_library_key):
+        if block.source_library_id and store.get_library(block.source_library_key):
             # If the library content block is already in the course, then don't
             # refresh the children when we re-import it. This lets us address
             # TNL-7507 (Randomized Content Block Settings Lost in Course Import)
@@ -1051,7 +1051,7 @@ def allowed_metadata_by_category(category):
     return {
         'vertical': [],
         'chapter': ['start'],
-        'sequential': ['due', 'format', 'start', 'graded']
+        'sequential': ['due', 'relative_weeks_due', 'format', 'start', 'graded']
     }.get(category, ['*'])
 
 

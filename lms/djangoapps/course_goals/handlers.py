@@ -18,6 +18,8 @@ def emit_course_goal_event(sender, instance, **kwargs):  # lint-amnesty, pylint:
     properties = {
         'courserun_key': str(instance.course_key),
         'goal_key': instance.goal_key,
+        'days_per_week': instance.days_per_week,
+        'subscribed_to_reminders': instance.subscribed_to_reminders,
     }
     tracker.emit(name, properties)
     segment.track(instance.user.id, name, properties)

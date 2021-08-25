@@ -9,7 +9,7 @@ import markupsafe
 from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+
 from opaque_keys.edx.django.models import CourseKeyField
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -58,7 +58,6 @@ EMAIL_TARGET_CHOICES = list(zip(
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
 
-@python_2_unicode_compatible
 class Target(models.Model):
     """
     A way to refer to a particular group (within a course) as a "Send to:" target.
@@ -142,7 +141,6 @@ class Target(models.Model):
             raise ValueError(f"Unrecognized target type {self.target_type}")
 
 
-@python_2_unicode_compatible
 class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
@@ -188,7 +186,6 @@ class CohortTarget(Target):
         return cohort
 
 
-@python_2_unicode_compatible
 class CourseModeTarget(Target):
     """
     Subclass of Target, specifically for course modes.
@@ -236,7 +233,6 @@ class CourseModeTarget(Target):
             )
 
 
-@python_2_unicode_compatible
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
@@ -431,7 +427,6 @@ class CourseEmailTemplate(models.Model):
         return CourseEmailTemplate._render(self.html_template, htmltext, context)
 
 
-@python_2_unicode_compatible
 class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
@@ -465,7 +460,6 @@ class CourseAuthorization(models.Model):
         return f"Course '{str(self.course_id)}': Instructor Email {not_en}Enabled"
 
 
-@python_2_unicode_compatible
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.

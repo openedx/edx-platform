@@ -10,7 +10,6 @@ from uuid import UUID, uuid4
 
 import ddt
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
@@ -499,7 +498,7 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
                 'curriculum_uuid': str(self.curriculum_uuid)
             }
         ]
-        user = User.objects.create_user('test_user', 'test@example.com', 'password')
+        user = UserFactory.create(username='test_user', email='test@example.com', password='password')
         url = self.get_url()
         with mock.patch(
                 _get_users_patch_path,
@@ -2409,6 +2408,25 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         mock_call_command.assert_has_calls([
             mock.call(self.reset_users_cmd, self.provider.slug, force=True),
+            mock.call(self.reset_enrollments_cmd, ','.join(programs), force=True),
+        ])
+
+    @override_settings(FEATURES=FEATURES_WITH_ENABLED)
+    @patch_call_command
+    def test_reset_with_multiple_idp(self, mock_call_command):
+        programs = [str(uuid4()), str(uuid4())]
+        self.set_org_in_catalog_cache(self.organization, programs)
+        provider_2 = SAMLProviderConfigFactory(
+            organization=self.organization,
+            slug='test-shib-2',
+            enabled=True,
+        )
+
+        response = self.request(self.organization.short_name)
+        assert response.status_code == status.HTTP_200_OK
+        mock_call_command.assert_has_calls([
+            mock.call(self.reset_users_cmd, self.provider.slug, force=True),
+            mock.call(self.reset_users_cmd, provider_2.slug, force=True),
             mock.call(self.reset_enrollments_cmd, ','.join(programs), force=True),
         ])
 

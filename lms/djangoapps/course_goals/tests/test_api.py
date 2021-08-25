@@ -11,6 +11,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_goals.models import CourseGoal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -31,7 +32,7 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(emit_signals=True)
 
-        self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'password')
+        self.user = UserFactory.create(username='john', email='lennon@thebeatles.com', password='password')
         CourseEnrollment.enroll(self.user, self.course.id)
 
         self.client = APIClient(enforce_csrf_checks=True)
@@ -46,7 +47,10 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         """ Ensures a correctly formatted post succeeds."""
         response = self.post_course_goal(valid=True, goal_key='certify')
         segment_call.assert_called_once_with(self.user.id, EVENT_NAME_ADDED, {
-            'courserun_key': str(self.course.id), 'goal_key': 'certify'
+            'courserun_key': str(self.course.id),
+            'goal_key': 'certify',
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         assert response.status_code == 201
 
@@ -79,13 +83,19 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         self.post_course_goal(valid=True, goal_key='unsure')
 
         segment_call.assert_any_call(self.user.id, EVENT_NAME_ADDED, {
-            'courserun_key': str(self.course.id), 'goal_key': 'explore'
+            'courserun_key': str(self.course.id), 'goal_key': 'explore',
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         segment_call.assert_any_call(self.user.id, EVENT_NAME_UPDATED, {
-            'courserun_key': str(self.course.id), 'goal_key': 'certify'
+            'courserun_key': str(self.course.id), 'goal_key': 'certify',
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         segment_call.assert_any_call(self.user.id, EVENT_NAME_UPDATED, {
-            'courserun_key': str(self.course.id), 'goal_key': 'unsure'
+            'courserun_key': str(self.course.id), 'goal_key': 'unsure',
+            'days_per_week': 0,
+            'subscribed_to_reminders': False,
         })
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
         assert len(current_goals) == 1

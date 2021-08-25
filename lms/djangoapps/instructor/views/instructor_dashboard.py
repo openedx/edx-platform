@@ -330,7 +330,7 @@ def _section_certificates(course):
         'section_display_name': _('Certificates'),
         'example_certificate_status': example_cert_status,
         'can_enable_for_course': can_enable_for_course,
-        'enabled_for_course': certs_api.cert_generation_enabled(course.id),
+        'enabled_for_course': certs_api.has_self_generated_certificates_enabled(course.id),
         'is_self_paced': course.self_paced,
         'instructor_generation_enabled': instructor_generation_enabled,
         'html_cert_enabled': html_cert_enabled,
@@ -340,10 +340,6 @@ def _section_certificates(course):
         'certificate_generation_history':
             CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
-            'generate_example_certificates': reverse(
-                'generate_example_certificates',
-                kwargs={'course_id': course.id}
-            ),
             'enable_certificate_generation': reverse(
                 'enable_certificate_generation',
                 kwargs={'course_id': course.id}

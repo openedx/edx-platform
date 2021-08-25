@@ -3,6 +3,7 @@
 
 import json
 from unittest.mock import patch
+from unittest import mock
 
 import ddt
 import pytest
@@ -11,9 +12,15 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.statuses import VerifiedNameStatus
+from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
@@ -35,6 +42,9 @@ from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+ENROLLMENT_METHOD = 'common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user'
+PROFILE_METHOD = 'common.djangoapps.student.models_api.get_name'
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -354,6 +364,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         assert mock_revoke_task.call_args[0] == (self.user.username, str(self.course_id))
 
 
+@ddt.ddt
 class GeneratedCertificateTest(SharedModuleStoreTestCase):
     """
     Test GeneratedCertificates
@@ -384,23 +395,124 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.course_key
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT,
+            name='Fuzzy Hippo'
         )
+        mode = CourseMode.VERIFIED
         source = 'invalidated_test'
-        cert.invalidate(source=source)
+        cert.invalidate(mode=mode, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        profile = UserProfile.objects.get(user=self.user)
         assert cert.status == CertificateStatuses.unavailable
+        assert cert.mode == mode
+        assert cert.name == profile.name
 
         expected_event_data = {
             'user_id': self.user.id,
             'course_id': str(self.course_key),
             'certificate_id': cert.verify_uuid,
-            'enrollment_mode': cert.mode,
+            'enrollment_mode': mode,
             'source': source,
         }
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_invalidate_find_mode(self, mock_emit_certificate_event):
+        """
+        Test the invalidate method when mode is retrieved from the enrollment
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT
+        )
+
+        mode = CourseMode.MASTERS
+        source = 'invalidated_test'
+        with mock.patch(ENROLLMENT_METHOD, return_value=(mode, None)):
+            cert.invalidate(source=source)
+
+            cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+            assert cert.status == CertificateStatuses.unavailable
+            assert cert.mode == mode
+
+            expected_event_data = {
+                'user_id': self.user.id,
+                'course_id': str(self.course_key),
+                'certificate_id': cert.verify_uuid,
+                'enrollment_mode': mode,
+                'source': source,
+            }
+
+            self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_invalidate_no_mode(self, mock_emit_certificate_event):
+        """
+        Test the invalidate method when there is no enrollment mode
+        """
+        initial_mode = CourseMode.AUDIT
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key,
+            mode=initial_mode
+        )
+
+        source = 'invalidated_test'
+        with mock.patch(ENROLLMENT_METHOD, return_value=(None, None)):
+            cert.invalidate(source=source)
+
+            cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+            assert cert.status == CertificateStatuses.unavailable
+            assert cert.mode == initial_mode
+
+            expected_event_data = {
+                'user_id': self.user.id,
+                'course_id': str(self.course_key),
+                'certificate_id': cert.verify_uuid,
+                'enrollment_mode': initial_mode,
+                'source': source,
+            }
+
+            self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_invalidate_no_profile(self, mock_emit_certificate_event):
+        """
+        Test the invalidate method when there is no user profile
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT,
+            name='Squeaky Frog'
+        )
+
+        mode = CourseMode.VERIFIED
+        source = 'invalidated_test'
+        with mock.patch(PROFILE_METHOD, return_value=None):
+            cert.invalidate(mode=mode, source=source)
+
+            cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+            assert cert.status == CertificateStatuses.unavailable
+            assert cert.mode == mode
+            assert cert.name == ''
+
+            expected_event_data = {
+                'user_id': self.user.id,
+                'course_id': str(self.course_key),
+                'certificate_id': cert.verify_uuid,
+                'enrollment_mode': cert.mode,
+                'source': source,
+            }
+
+            self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
     @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
     def test_notpassing(self, mock_emit_certificate_event):
@@ -410,25 +522,59 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.course_key
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT
         )
+        mode = CourseMode.VERIFIED
         grade = '.3'
         source = "notpassing_test"
-        cert.mark_notpassing(grade, source=source)
+        cert.mark_notpassing(mode=mode, grade=grade, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
         assert cert.status == CertificateStatuses.notpassing
+        assert cert.mode == mode
         assert cert.grade == grade
 
         expected_event_data = {
             'user_id': self.user.id,
             'course_id': str(self.course_key),
             'certificate_id': cert.verify_uuid,
-            'enrollment_mode': cert.mode,
+            'enrollment_mode': mode,
             'source': source,
         }
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
+    @ddt.data((True, VerifiedNameStatus.APPROVED),
+              (True, VerifiedNameStatus.DENIED),
+              (False, VerifiedNameStatus.PENDING))
+    @ddt.unpack
+    def test_invalidate_with_verified_name(self, should_use_verified_name_for_certs, status):
+        """
+        Test the invalidate method with verified name turned on for the user's certificates
+        """
+        verified_name = 'Jonathan Doe'
+        profile = UserProfile.objects.get(user=self.user)
+        create_verified_name(self.user, verified_name, profile.name, status=status)
+        create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
+
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT,
+            name='Fuzzy Hippo'
+        )
+        mode = CourseMode.VERIFIED
+        source = 'invalidated_test'
+        cert.invalidate(mode=mode, source=source)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
+            assert cert.name == verified_name
+        else:
+            assert cert.name == profile.name
 
     @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
     def test_unverified(self, mock_emit_certificate_event):
@@ -438,19 +584,22 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.course_key
+            course_id=self.course_key,
+            mode=CourseMode.AUDIT
         )
+        mode = CourseMode.VERIFIED
         source = "unverified_test"
-        cert.mark_unverified(source=source)
+        cert.mark_unverified(mode=mode, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
         assert cert.status == CertificateStatuses.unverified
+        assert cert.mode == mode
 
         expected_event_data = {
             'user_id': self.user.id,
             'course_id': str(self.course_key),
             'certificate_id': cert.verify_uuid,
-            'enrollment_mode': cert.mode,
+            'enrollment_mode': mode,
             'source': source,
         }
 

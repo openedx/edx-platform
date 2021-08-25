@@ -1,0 +1,63 @@
+{
+  "consumer": {
+    "name": "frontend-app-learning"
+  },
+  "provider": {
+    "name": "lms"
+  },
+  "interactions": [
+    {
+      "description": "a request to set sequence position against activeUnitIndex",
+      "providerState": "sequence position data exists for course_id course-v1:edX+DemoX+Demo_Course, sequence_id block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions and activeUnitIndex 0",
+      "request": {
+        "method": "POST",
+        "path": "/courses/course-v1:edX+DemoX+Demo_Course/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions/handler/goto_position",
+        "body": {
+          "position": 1
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "success": true
+        },
+        "matchingRules": {
+          "$.body.success": {
+            "match": "type"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request to get completion block",
+      "providerState": "completion block data exists for course_id course-v1:edX+DemoX+Demo_Course, sequence_id block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions and usageId block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
+      "request": {
+        "method": "POST",
+        "path": "/courses/course-v1:edX+DemoX+Demo_Course/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions/handler/get_completion",
+        "body": {
+          "usage_key": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "complete": true
+        },
+        "matchingRules": {
+          "$.body.complete": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

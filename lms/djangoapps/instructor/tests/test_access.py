@@ -10,6 +10,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
+    is_beta_tester,
     revoke_access,
     update_forum_role
 )
@@ -46,6 +47,12 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
         beta_testers_alternative = list_with_level(self.course.id, 'beta')
         assert set(beta_testers) == set(self.beta_testers)
         assert set(beta_testers_alternative) == set(self.beta_testers)
+
+    def test_is_beta(self):
+        beta_tester = self.beta_testers[0]
+        user = UserFactory.create()
+        assert is_beta_tester(beta_tester, self.course.id)
+        assert not is_beta_tester(user, self.course.id)
 
 
 class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase):

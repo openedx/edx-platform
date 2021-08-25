@@ -7,8 +7,10 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
@@ -16,7 +18,7 @@ from rest_framework.views import APIView
 
 from openedx.core.lib.api.view_utils import validate_course_key
 from .api import get_user_course_outline_details
-from .api.permissions import can_call_public_api
+from .api.permissions import can_call_public_api, can_see_content_as_other_users
 from .data import CourseOutlineData
 
 User = get_user_model()
@@ -158,12 +160,24 @@ class CourseOutlineView(APIView):
         course_key = validate_course_key(course_key_str)
         at_time = datetime.now(timezone.utc)
 
-        if not can_call_public_api(request.user, course_key):
+        # We use can_call_public_api to slowly roll this feature out, and be
+        # able to turn it off for a course. But it's not really a permissions
+        # thing in that it doesn't give them elevated access. If I had it to do
+        # over again, I'd call it something else, but all this code is supposed
+        # to go away when rollout is completed anyway.
+        #
+        # The force_on param just means, "Yeah, never mind whether you're turned
+        # on by default for the purposes of the MFE. I want to see production
+        # data using this API." The MFE should _never_ pass this parameter. It's
+        # just a way to peek at the API while it's techincally dark for rollout
+        # purposes. TODO: REMOVE THIS PARAM AFTER FULL ROLLOUT OF THIS FEATURE.
+        force_on = request.GET.get("force_on")
+        if (not force_on) and (not can_call_public_api(course_key)):
             raise PermissionDenied()
 
         try:
             # Grab the user's outline and send our response...
-            outline_user = self._determine_user(request)
+            outline_user = self._determine_user(request, course_key)
             user_course_outline_details = get_user_course_outline_details(course_key, outline_user, at_time)
         except CourseOutlineData.DoesNotExist as does_not_exist_err:
             raise NotFound() from does_not_exist_err
@@ -171,27 +185,52 @@ class CourseOutlineView(APIView):
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
-    def _determine_user(self, request):
+    def _determine_user(self, request, course_key: CourseKey) -> User:
         """
-        Requesting for a different user (easiest way to test for students)
-        while restricting access to only global staff. This is a placeholder
-        until we have more full fledged permissions/masquerading.
-        """
-        requested_username = request.GET.get("user")
+        For which user should we get an outline?
 
-        # Simple case: No username passed in, so it's just the request.user
-        if not requested_username:
+        Uses a combination of the user on the request object and a manually
+        passed in "user" parameter. Ensures that the requesting user has
+        permission to view course outline of target user. Raise request-level
+        exceptions otherwise.
+
+        The "user" querystring param is expected to be a username, with a blank
+        value being interpreted as the anonymous user.
+        """
+        target_username = request.GET.get("user")
+
+        # Sending no "user" querystring param at all defaults us to the user who
+        # is making the request.
+        if target_username is None:
             return request.user
 
-        # If we're here, then the requesting user is asking for someone else's
-        # course outline. Right now, only global staff is allowed to do that.
-        if request.user.is_staff:
-            try:
-                user = User.objects.get(username=requested_username)
-                return user
-            except User.DoesNotExist as err:
-                raise NotFound("User {requested_username} does not exist.") from err
+        # Users can always see the outline as themselves.
+        if target_username == request.user.username:
+            return request.user
 
-        raise PermissionDenied(
-            "User {request.user.username} does not have permission to view course outline as {requested_username}"
-        )
+        # Otherwise, do a permission check to see if they're allowed to view as
+        # other users.
+        if not can_see_content_as_other_users(request.user, course_key):
+            display_username = "the anonymous user" if target_username == "" else target_username
+            raise PermissionDenied(
+                f"User {request.user.username} does not have permission to "
+                f"view course outline for {course_key} as {display_username}."
+            )
+
+        # If we've gotten this far, their permissions are fine. Now we handle
+        # the masquerade use case...
+
+        # Having a "user" querystring that is a blank string is interpreted as
+        # "show me this outline as an anonymous user".
+        if target_username == "":
+            return AnonymousUser()
+
+        # Finally, the actual work of looking up a user to masquerade as.
+        try:
+            target_user = User.objects.get(username=target_username)
+        except User.DoesNotExist as err:
+            # We throw this only after we've passed the permission check, to
+            # make it harder for crawlers to get a list of our usernames.
+            raise NotFound(f"User {target_username} does not exist.") from err
+
+        return target_user

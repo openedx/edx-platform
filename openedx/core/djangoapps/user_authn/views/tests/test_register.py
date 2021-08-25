@@ -237,6 +237,27 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             }
         )
 
+    def test_register_fullname_url_validation_error(self):
+        """
+        Test for catching invalid full name errors
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "Bob Smith http://test.com",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
     @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
     def test_registration_failure_logging(self):
         # Register a user
@@ -2303,7 +2324,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         Test if username '{0}' and email '{1}' have conflicts with
         username 'user' and email 'user@email.com'.
         """
-        user = User.objects.create_user(username='user', email='user@email.com')
+        user = UserFactory.create(username='user', email='user@email.com')
         self.assertValidationDecision(
             {
                 'username': username,
@@ -2439,7 +2460,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         Test that if `is_authn_mfe` is provided in request along with form_field_key, only
         error message for that field is returned.
         """
-        User.objects.create_user(username='user', email='user@email.com')
+        UserFactory.create(username='user', email='user@email.com')
         # using username and email that have conflicts but sending form_field_key will return
         # validation for only email
         self.assertValidationDecision(

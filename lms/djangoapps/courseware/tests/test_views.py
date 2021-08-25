@@ -99,6 +99,7 @@ from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_uge
 from common.djangoapps.util.url import reload_django_url_config
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1288,6 +1289,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
             grade_cutoffs={'çü†øƒƒ': 0.75, 'Pass': 0.5},
             end=datetime.now(),
             certificate_available_date=datetime.now(UTC),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             **options
         )
 
@@ -1543,8 +1545,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Download Your Certificate")
 
     @ddt.data(
-        (True, 54),
-        (False, 54),
+        (True, 55),
+        (False, 55),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1557,8 +1559,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 62, 45),
-        (True, 54, 39)
+        (False, 63, 46),
+        (True, 55, 40)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -3131,6 +3133,47 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         # The Sequence itself 200s (or we risk infinite redirect loops).
         assert self.get_response(usage_key=self.sequence.location).status_code == 200
+
+    def test_rendering_descendant_of_gated_sequence_with_masquerade(self):
+        """
+        Test that if we are masquerading as a specific student, we do not redirect if content is gated
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            # pylint:disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(**self.course_options())
+            self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+            self.sequence = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence',
+                is_time_limited=True,
+            )
+            self.vertical_block = ItemFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name="Vertical",
+            )
+            self.html_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='html',
+                data="<p>Test HTML Content<p>"
+            )
+            self.problem_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+        CourseOverview.load_from_module_store(self.course.id)
+        self.setup_user(admin=True, enroll=True, login=True)
+
+        student = UserFactory()
+        CourseEnrollment.enroll(student, self.course.id)
+        self.update_masquerade(role='student', username=student.username)
+
+        # Problem and Vertical response should both render successfully
+        for block in [self.problem_block, self.vertical_block]:
+            response = self.get_response(usage_key=block.location)
+            assert response.status_code == 200
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests

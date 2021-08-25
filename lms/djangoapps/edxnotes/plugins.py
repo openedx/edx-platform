@@ -53,7 +53,10 @@ class EdxNotesCourseApp(CourseApp):
 
     app_id = "edxnotes"
     name = _("Notes")
-    description = _("Allow students to take notes.")
+    description = _("Allow learners to highlight passages and make notes right in the course.")
+    documentation_links = {
+        "learn_more_configuration": settings.EDXNOTES_HELP_URL,
+    }
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument

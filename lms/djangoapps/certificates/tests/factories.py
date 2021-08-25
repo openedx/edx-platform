@@ -3,6 +3,7 @@ Certificates factories
 """
 
 
+import datetime
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
@@ -10,6 +11,7 @@ from factory.django import DjangoModelFactory
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
+    CertificateDateOverride,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
@@ -104,3 +106,14 @@ class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
 
     enabled = True
     company_identifier = "1337"
+
+
+class CertificateDateOverrideFactory(DjangoModelFactory):
+    """
+    CertificateDateOverride factory
+    """
+    class Meta:
+        model = CertificateDateOverride
+
+    date = datetime.datetime(2021, 5, 11)
+    reason = "Learner really wanted this on their birthday"

@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from organizations.api import get_organizations
 
 from lms.djangoapps.certificates.models import (
+    CertificateDateOverride,
     CertificateGenerationConfiguration,
     CertificateGenerationCommandConfiguration,
     CertificateGenerationCourseSetting,
@@ -96,9 +97,23 @@ class CertificateGenerationCommandConfigurationAdmin(ConfigurationModelAdmin):
     pass
 
 
+class CertificateDateOverrideAdmin(admin.ModelAdmin):
+    """
+    # Django admin customizations for CertificateDateOverride model
+    """
+    list_display = ('generated_certificate', 'date', 'reason', 'overridden_by')
+    raw_id_fields = ('generated_certificate',)
+    readonly_fields = ('overridden_by',)
+
+    def save_model(self, request, obj, form, change):
+        obj.overridden_by = request.user
+        super().save_model(request, obj, form, change)
+
+
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
 admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)
+admin.site.register(CertificateDateOverride, CertificateDateOverrideAdmin)

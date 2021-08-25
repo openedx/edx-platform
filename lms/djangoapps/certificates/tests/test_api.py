@@ -15,16 +15,17 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from edx_toggles.toggles.testutils import override_waffle_switch
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from testfixtures import LogCapture
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     GlobalStaffFactory,
@@ -32,14 +33,17 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import (
+    auto_certificate_generation_enabled,
+    available_date_for_certificate,
     can_be_added_to_allowlist,
-    cert_generation_enabled,
+    can_show_certificate_available_date_field,
+    can_show_certificate_message,
+    certificate_status_for_student,
     certificate_downloadable_status,
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
-    example_certificates_status,
-    generate_example_certificates,
-    generate_user_certificates,
+    display_date_for_certificate,
+    generate_certificate_task,
     get_allowlist_entry,
     get_allowlisted_users,
     get_certificate_footer_context,
@@ -50,29 +54,28 @@ from lms.djangoapps.certificates.api import (
     get_certificate_url,
     get_certificates_for_user,
     get_certificates_for_user_by_course_keys,
+    has_self_generated_certificates_enabled,
     is_certificate_invalidated,
     is_on_allowlist,
     remove_allowlist_entry,
-    set_cert_generation_enabled
+    set_cert_generation_enabled,
 )
+from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
-    ExampleCertificate,
     GeneratedCertificate,
-    certificate_status_for_student
 )
-from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import (
     CertificateAllowlistFactory,
     GeneratedCertificateFactory,
     CertificateInvalidationFactory
 )
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from lms.djangoapps.certificates.tests.test_generation_handler import ID_VERIFIED_METHOD, PASSING_GRADE_METHOD
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
-CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_v2_certificate'
+CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
@@ -81,20 +84,6 @@ class WebCertificateTestMixin:
     """
     Mixin with helpers for testing Web Certificates.
     """
-    @contextmanager
-    def _mock_queue(self, is_successful=True):
-        """
-        Mock the "send to XQueue" method to return either success or an error.
-        """
-        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
-        with patch(symbol) as mock_send_to_queue:
-            if is_successful:
-                mock_send_to_queue.return_value = (0, "Successfully queued")
-            else:
-                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
-
-            yield mock_send_to_queue
-
     def _setup_course_certificate(self):
         """
         Creates certificate configuration for course
@@ -230,13 +219,49 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
+    @patch.dict(settings.FEATURES, {'ENABLE_V2_CERT_DISPLAY_SETTINGS': False})
+    def test_cert_api_return_v1(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
         """
         Test 'downloadable status'
         """
         cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
         self.course.self_paced = self_paced
         self.course.certificate_available_date = cert_avail_date
+        self.course.save()
+
+        self._setup_course_certificate()
+
+        downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+        assert downloadable_status['is_downloadable'] == cert_downloadable_status
+        assert downloadable_status.get('earned_but_not_available') == earned_but_not_available
+
+    @ddt.data(
+        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True),
+    )
+    @ddt.unpack
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_V2_CERT_DISPLAY_SETTINGS': True})
+    def test_cert_api_return_v2(
+        self,
+        self_paced,
+        cert_avail_delta,
+        certificates_display_behavior,
+        cert_downloadable_status,
+        earned_but_not_available
+    ):
+        """
+        Test 'downloadable status'
+        """
+        cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
+        self.course.self_paced = self_paced
+        self.course.certificate_available_date = cert_avail_date
+        self.course.certificates_display_behavior = certificates_display_behavior
         self.course.save()
 
         self._setup_course_certificate()
@@ -539,51 +564,81 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert get_certificate_for_user(self.student.username, self.nonexistent_course_id) is None
 
 
-@override_settings(CERT_QUEUE='certificates')
-class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
+class GenerateUserCertificatesTest(ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
-    ERROR_REASON = "Kaboom!"
-    ENABLED_SIGNALS = ['course_published']
+    def setUp(self):
+        super().setUp()
 
-    def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.certificates.utils.tracker')
-
-        self.student = UserFactory.create(
-            email='joe_user@edx.org',
-            username='joeuser',
-            password='foo'
+        self.user = UserFactory()
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
         )
-        self.student_no_cert = UserFactory()
-        self.course = CourseFactory.create(
-            org='edx',
-            number='verified',
-            display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
-        )
-        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.request_factory = RequestFactory()
-
-    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_new_cert_request_for_html_certificate(self):
-        """
-        Test generate_user_certificates with HTML certificates
-        """
-        self._setup_course_certificate()
-        with mock_passing_grade():
-            generate_user_certificates(self.student, self.course.id)
-
-        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
-        assert cert.status == CertificateStatuses.downloadable
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_url_empty_with_invalid_certificate(self):
         """
         Test certificate url is empty if html view is not enabled and certificate is not yet generated
         """
-        url = get_certificate_url(self.student.id, self.course.id)
+        url = get_certificate_url(self.user.id, self.course_run_key)
         assert url == ''
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation(self):
+        """
+        Test that a cert is successfully generated
+        """
+        cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+        assert not cert
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=True):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=True):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.downloadable
+                assert cert.mode == CourseMode.VERIFIED
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation_unverified(self):
+        """
+        Test that a cert is successfully generated with a status of unverified
+        """
+        cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+        assert not cert
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=True):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=False):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.unverified
+                assert cert.mode == CourseMode.VERIFIED
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_generation_notpassing(self):
+        """
+        Test that a cert is successfully generated with a status of notpassing
+        """
+        GeneratedCertificateFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            status=CertificateStatuses.unavailable,
+            mode=CourseMode.AUDIT
+        )
+
+        with mock.patch(PASSING_GRADE_METHOD, return_value=False):
+            with mock.patch(ID_VERIFIED_METHOD, return_value=True):
+                generate_certificate_task(self.user, self.course_run_key)
+
+                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                assert cert.status == CertificateStatuses.notpassing
+                assert cert.mode == CourseMode.VERIFIED
 
 
 @ddt.ddt
@@ -649,71 +704,8 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
 
     def _assert_enabled_for_course(self, course_key, expect_enabled):
         """Check that self-generated certificates are enabled or disabled for the course. """
-        actual_enabled = cert_generation_enabled(course_key)
+        actual_enabled = has_self_generated_certificates_enabled(course_key)
         assert expect_enabled == actual_enabled
-
-
-class GenerateExampleCertificatesTest(ModuleStoreTestCase):
-    """Test generation of example certificates. """
-
-    COURSE_KEY = CourseLocator(org='test', course='test', run='test')
-
-    def test_generate_example_certs(self):
-        # Generate certificates for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 1)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status({
-            'description': 'honor',
-            'status': 'started'
-        })
-
-    def test_generate_example_certs_with_verified_mode(self):
-        # Create verified and honor modes for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='honor')
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='verified')
-
-        # Generate certificates for the course
-        with self._mock_xqueue() as mock_queue:
-            generate_example_certificates(self.COURSE_KEY)
-
-        # Verify that the appropriate certs were added to the queue
-        self._assert_certs_in_queue(mock_queue, 2)
-
-        # Verify that the certificate status is "started"
-        self._assert_cert_status(
-            {
-                'description': 'verified',
-                'status': 'started'
-            },
-            {
-                'description': 'honor',
-                'status': 'started'
-            }
-        )
-
-    @contextmanager
-    def _mock_xqueue(self):
-        """Mock the XQueue method for adding a task to the queue. """
-        with patch.object(XQueueCertInterface, 'add_example_cert') as mock_queue:
-            yield mock_queue
-
-    def _assert_certs_in_queue(self, mock_queue, expected_num):
-        """Check that the certificate generation task was added to the queue. """
-        certs_in_queue = [call_args[0] for (call_args, __) in mock_queue.call_args_list]
-        assert len(certs_in_queue) == expected_num
-        for cert in certs_in_queue:
-            assert isinstance(cert, ExampleCertificate)
-
-    def _assert_cert_status(self, *expected_statuses):
-        """Check the example certificate status. """
-        actual_status = example_certificates_status(self.COURSE_KEY)
-        assert list(expected_statuses) == actual_status
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -1121,3 +1113,152 @@ class CertificateInvalidationTests(ModuleStoreTestCase):
 
         for index, message in enumerate(expected_messages):
             assert message in log.records[index].getMessage()
+
+BETA_TESTER_METHOD = 'lms.djangoapps.certificates.api.access.is_beta_tester'
+CERTS_VIEWABLE_METHOD = 'lms.djangoapps.certificates.api.certificates_viewable_for_course'
+PASSED_OR_ALLOWLISTED_METHOD = 'lms.djangoapps.certificates.api._has_passed_or_is_allowlisted'
+
+
+class MockGeneratedCertificate:
+    """
+    We can't import GeneratedCertificate from LMS here, so we roll
+    our own minimal Certificate model for testing.
+    """
+    def __init__(self, user=None, course_id=None, mode=None, status=None):
+        self.user = user
+        self.course_id = course_id
+        self.mode = mode
+        self.status = status
+        self.created_date = datetime.now(pytz.UTC)
+        self.modified_date = datetime.now(pytz.UTC)
+        self.date_override = None
+
+    def is_valid(self):
+        """
+        Return True if certificate is valid else return False.
+        """
+        return self.status == CertificateStatuses.downloadable
+
+
+class MockCertificateDateOverride:
+    def __init__(self, date=None):
+        self.date = date or datetime.now(pytz.UTC)
+
+
+@contextmanager
+def configure_waffle_namespace(feature_enabled):
+    """
+    Context manager to configure the certs flags
+    """
+    with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=feature_enabled):
+        yield
+
+
+@ddt.ddt
+class CertificatesApiTestCase(TestCase):
+    """
+    API tests
+    """
+    def setUp(self):
+        super().setUp()
+        self.course = CourseOverviewFactory.create(
+            start=datetime(2017, 1, 1, tzinfo=pytz.UTC),
+            end=datetime(2017, 1, 31, tzinfo=pytz.UTC),
+            certificate_available_date=None
+        )
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode='audit',
+        )
+        self.certificate = MockGeneratedCertificate(
+            user=self.user,
+            course_id=self.course.id
+        )
+
+    @ddt.data(True, False)
+    def test_auto_certificate_generation_enabled(self, feature_enabled):
+        with configure_waffle_namespace(feature_enabled):
+            assert feature_enabled == auto_certificate_generation_enabled()
+
+    @ddt.data(
+        (True, True, False),  # feature enabled and self-paced should return False
+        (True, False, True),  # feature enabled and instructor-paced should return True
+        (False, True, False),  # feature not enabled and self-paced should return False
+        (False, False, False),  # feature not enabled and instructor-paced should return False
+    )
+    @ddt.unpack
+    def test_can_show_certificate_available_date_field(
+            self, feature_enabled, is_self_paced, expected_value
+    ):
+        self.course.self_paced = is_self_paced
+        with configure_waffle_namespace(feature_enabled):
+            assert expected_value == can_show_certificate_available_date_field(self.course)
+
+    @ddt.data(
+        (True, True, False),  # feature enabled and self-paced should return False
+        (True, False, True),  # feature enabled and instructor-paced should return True
+        (False, True, False),  # feature not enabled and self-paced should return False
+        (False, False, False),  # feature not enabled and instructor-paced should return False
+    )
+    @ddt.unpack
+    def test_available_vs_display_date(
+            self, feature_enabled, is_self_paced, uses_avail_date
+    ):
+        self.course.self_paced = is_self_paced
+        with configure_waffle_namespace(feature_enabled):
+
+            # With no available_date set, both return modified_date
+            assert self.certificate.modified_date == available_date_for_certificate(self.course, self.certificate)
+            assert self.certificate.modified_date == display_date_for_certificate(self.course, self.certificate)
+
+            # With an available date set in the past, both return the available date (if configured)
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+            maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
+            assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
+            assert maybe_avail == display_date_for_certificate(self.course, self.certificate)
+
+            # With a future available date, they each return a different date
+            self.course.certificate_available_date = datetime.max.replace(tzinfo=pytz.UTC)
+            maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
+            assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
+            assert self.certificate.modified_date == display_date_for_certificate(self.course, self.certificate)
+
+            # With a certificate date override, display date returns the override, available date ignores it
+            self.certificate.date_override = MockCertificateDateOverride()
+            date = self.certificate.date_override.date
+            assert date == display_date_for_certificate(self.course, self.certificate)
+            assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
+
+
+@ddt.ddt
+class CertificatesMessagingTestCase(ModuleStoreTestCase):
+    """
+    API tests for certificate messaging
+    """
+    def setUp(self):
+        super().setUp()
+        self.course = CourseOverviewFactory.create()
+        self.course_run_key = self.course.id
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
+        )
+
+    def test_beta_tester(self):
+        grade = None
+        certs_enabled = True
+
+        with patch(PASSED_OR_ALLOWLISTED_METHOD, return_value=True):
+            with patch(CERTS_VIEWABLE_METHOD, return_value=True):
+                with patch(BETA_TESTER_METHOD, return_value=False):
+                    assert can_show_certificate_message(self.course, self.user, grade, certs_enabled)
+
+                with patch(BETA_TESTER_METHOD, return_value=True):
+                    assert not can_show_certificate_message(self.course, self.user, grade, certs_enabled)
