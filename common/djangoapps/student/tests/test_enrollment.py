@@ -10,6 +10,7 @@ import ddt
 import pytest
 from django.conf import settings
 from django.urls import reverse
+from openedx_events.tests.utils import OpenEdxEventsTestCase
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -30,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
+class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase, OpenEdxEventsTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
