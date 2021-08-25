@@ -54,6 +54,7 @@ Cleanup
 Config and code changes to be performed after all environments are using OAuth flow for Studio.
 
 - Set ``LOGIN_URL`` to ``'/login/'`` in ``cms/envs/common.py``
+- Add Studio's logout URI to ``IDA_LOGOUT_URI_LIST`` in ``lms/envs/common.py``
 - Deploy
 - Remove ``LOGIN_URL`` overrides from all environments (devstack and others)
 - Remove remaining ``ARCH-1253`` detritus (login redirect)
