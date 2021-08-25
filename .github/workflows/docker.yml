@@ -61,12 +61,9 @@ jobs:
           username: eolito
           password: ${{ secrets.CR_PAT }}
 
-      - name: Push to koa
-        if: github.ref == 'refs/heads/eol/koa.master'
+      - name: Push to test-expiry
         run: |
-          docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
-          docker push ghcr.io/eol-uchile/edx-platform:koa
-          docker push ghcr.io/eol-uchile/edx-platform:testing-koa
+          docker push ghcr.io/eol-uchile/edx-platform:15e45d9303d655948995cb7ab8bc937233f5d415
 
       - name: Move cache
         run: |
