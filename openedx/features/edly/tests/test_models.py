@@ -125,3 +125,14 @@ class EdlyUserProfileTests(TestCase):
         edly_user_profile = EdlyUserProfile.objects.filter(user=edly_user)
         assert edly_user_profile.count() == 1
         assert edly_user_profile[0].user == edly_user
+
+    def test_edly_user_profile_is_blocked_attr(self):
+        """
+        Test "EdlyUserProfile" attr "is_blocked" bool.
+        """
+
+        edly_user_profile = EdlyUserProfileFactory()
+        assert not edly_user_profile.is_blocked
+
+        edly_user_profile.is_blocked = True
+        assert edly_user_profile.is_blocked

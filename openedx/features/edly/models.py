@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
 from organizations.models import Organization
@@ -60,6 +61,11 @@ class EdlyUserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='edly_profile', on_delete=models.CASCADE)
     edly_sub_organizations = models.ManyToManyField(EdlySubOrganization)
     course_activity_date = models.DateTimeField(blank=True, null=True)
+    is_blocked = models.BooleanField(
+        default=False,
+        verbose_name='Blocked',
+        help_text=_('Block/Unblock user from logging in to the platform.')
+    )
 
     @property
     def get_linked_edly_sub_organizations(self):
