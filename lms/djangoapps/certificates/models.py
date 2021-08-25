@@ -1240,12 +1240,7 @@ class CertificateDateOverride(TimeStampedModel):
         return "Certificate %s, date overridden to %s by %s on %s." % \
                (self.generated_certificate, self.date, self.overridden_by, self.created)
 
-    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
-        """
-        After the base save() method finishes, fire the COURSE_CERT_CHANGED
-        signal.
-        """
-        super().save(*args, **kwargs)
+    def _send_course_cert_changed_signal(self):
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,
             user=self.generated_certificate.user,
@@ -1254,16 +1249,18 @@ class CertificateDateOverride(TimeStampedModel):
             status=self.generated_certificate.status,
         )
 
+    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
+        """
+        After the base save() method finishes, fire the COURSE_CERT_CHANGED
+        signal.
+        """
+        super().save(*args, **kwargs)
+        transaction.on_commit(self._send_course_cert_changed_signal)
+
     def delete(self, *args, **kwargs):  # pylint: disable=signature-differs
         """
         After the base delete() method finishes, fire the COURSE_CERT_CHANGED
         signal.
         """
         super().delete(*args, **kwargs)
-        COURSE_CERT_CHANGED.send_robust(
-            sender=self.__class__,
-            user=self.generated_certificate.user,
-            course_key=self.generated_certificate.course_id,
-            mode=self.generated_certificate.mode,
-            status=self.generated_certificate.status,
-        )
+        transaction.on_commit(self._send_course_cert_changed_signal)
