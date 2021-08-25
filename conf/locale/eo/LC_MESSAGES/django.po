@@ -18321,7 +18321,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
 "{b_start}Éäsïlý Shäräßlé: {b_end}Àdd thé çértïfïçäté tö ýöür ÇV ör résümé, "
@@ -18345,7 +18345,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
+"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 "{b_start}Éäsïlý shäréäßlé:{b_end} Àdd thé çértïfïçäté tö ýöür ÇV ör résümé, "
@@ -18379,7 +18379,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 "{b_start}Éäsïlý shäréäßlé: {b_end}Àdd thé çértïfïçäté tö ýöür ÇV ör résümé, "
@@ -19645,7 +19645,7 @@ msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
-"showcase on your resume."
+"showcase on your resumé."
 msgstr ""
 "{start_bold}Gét thé möst öüt öf ýöür çöürsé!{end_bold} Ûpgrädé tö gét füll "
 "äççéss tö thé çöürsé mätérïäl, ünlöçk ßöth grädéd änd nön-grädéd "
@@ -23403,7 +23403,7 @@ msgstr "édX Léärnér Störïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
 "My certificate has helped me showcase my knowledge on my"
-"                             resume - I feel like this certificate could "
+"                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
 "Mý çértïfïçäté häs hélpéd mé shöwçäsé mý knöwlédgé ön mý"
@@ -23422,7 +23422,7 @@ msgstr "{learner_name}, édX Léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"I wanted to include a verified certificate on my resume and my profile to"
+"I wanted to include a verified certificate on my resumé and my profile to"
 "                             illustrate that I am working towards this goal "
 "I have and that I have                             achieved something while "
 "I was unemployed."

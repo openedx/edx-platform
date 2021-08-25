@@ -15469,7 +15469,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
 "{b_start}Mudah Dibagi: {b_end}Tambahkan sertifikat ke CV atau resume Anda, "
@@ -15492,7 +15492,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
+"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 "{b_start}Mudah dibagikan:{b_end} Menambah sertifikat pada CV anda atau "
@@ -15522,7 +15522,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 "{b_start}Mudah dibagikan: {b_end}Tambahkan sertifikat pada CV anda atau "
@@ -16624,7 +16624,7 @@ msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
-"showcase on your resume."
+"showcase on your resumé."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -19836,7 +19836,7 @@ msgstr "Cerita Peserta Didik edX"
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
 "My certificate has helped me showcase my knowledge on my"
-"                             resume - I feel like this certificate could "
+"                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
 "Sertifikat saya telah membantu saya menunjukkan pengetahuan saya di resume "
@@ -19849,7 +19849,7 @@ msgstr "{learner_name}, peserta edX "
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"I wanted to include a verified certificate on my resume and my profile to"
+"I wanted to include a verified certificate on my resumé and my profile to"
 "                             illustrate that I am working towards this goal "
 "I have and that I have                             achieved something while "
 "I was unemployed."
