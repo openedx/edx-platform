@@ -277,7 +277,9 @@ class CourseOrgGroupTest(TestCase):
         """ Test case setup """
         super().setUp()
         self.global_admin = AdminFactory()
-        self.user = User.objects.create_user('test', 'test+courses@edx.org', 'foo')
+        self.user = UserFactory.create(
+            username='test', email='test+courses@edx.org', password='foo'
+        )
         self.org = 'mitx'
         self.course_key = CourseLocator(self.org, '101', 'test')
 
