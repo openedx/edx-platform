@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint:
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id, program_discussions_is_enabled
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
@@ -136,6 +136,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
+            'program_discussions_enabled': program_discussions_is_enabled()
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)

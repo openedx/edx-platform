@@ -1,5 +1,31 @@
 <header class="js-program-header program-header full-width-banner"></header>
 <!-- TODO: consider if article is the most appropriate element here -->
+
+<% if (programDiscussionEnabled) { %>
+<div class="program-detail-nav">
+    <ul class="nav nav-tabs program-detail-nav-list" id="programTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-link active" id="home-tab" data-toggle="tab" data-target="#journey" type="button" role="tab" aria-controls="journey" aria-selected="true">Journey</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-link" id="profile-tab" data-toggle="tab" data-target="#community" type="button" role="tab" aria-controls="community" aria-selected="false">Community</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#live" type="button" role="tab" aria-controls="live" aria-selected="false">Live</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#pathways" type="button" role="tab" aria-controls="pathways" aria-selected="false">Pathways</button>
+      </li>
+    </ul>
+</div>
+<div class="tab-content" id="ProgramTabContent">
+  <div class="tab-pane fade show active" id="journey" role="tabpanel" aria-labelledby="journey-tab">Journey tab content</div>
+  <div class="tab-pane fade" id="community" role="tabpanel" aria-labelledby="community-tab">Community tab content</div>
+  <div class="tab-pane fade" id="live" role="tabpanel" aria-labelledby="live-tab">Live tab content</div>
+  <div class="tab-pane fade" id="pathways" role="tabpanel" aria-labelledby="pathaways-tab">Pathways tab content</div>
+</div>
+<% } %>
+
 <article class="program-details-content">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
