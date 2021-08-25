@@ -26,6 +26,26 @@ class MockGraph:
         """
         return MockTransaction(self)
 
+    def commit(self, transaction):
+        """
+        Takes elements in the mock transaction's temporary storage and adds them
+        to this mock graph's storage. Throws an error if this graph's
+        transaction_errors param is set to True.
+        """
+        if self.transaction_errors:
+            raise Exception("fake exception while trying to commit")
+        for element in transaction.temp:
+            self.nodes.add(element)
+        transaction.temp.clear()
+        self.number_commits += 1
+
+    def rollback(self, transaction):
+        """
+        Clears the transactions temporary storage
+        """
+        transaction.temp.clear()
+        self.number_rollbacks += 1
+
 
 class MockTransaction:
     """
@@ -63,38 +83,18 @@ class MockTransaction:
         if isinstance(element, Node):
             self.temp.add(element)
 
-    def commit(self):
-        """
-        Takes elements in the transaction's temporary storage and adds them
-        to the mock graph's storage. Throws an error if the graph's
-        transaction_errors param is set to True.
-        """
-        if self.graph.transaction_errors:
-            raise Exception("fake exception while trying to commit")
-        for element in self.temp:
-            self.graph.nodes.add(element)
-        self.temp.clear()
-        self.graph.number_commits += 1
 
-    def rollback(self):
-        """
-        Clears the transactions temporary storage
-        """
-        self.temp.clear()
-        self.graph.number_rollbacks += 1
-
-
-class MockNodeSelector:
+class MockNodeMatcher:
     """
-    Mocks out py2neo's NodeSelector class. Used to select a node from a graph.
-    py2neo's NodeSelector expects a real graph object to run queries against,
+    Mocks out py2neo's NodeMatcher class. Used to match a node from a graph.
+    py2neo's NodeMatcher expects a real graph object to run queries against,
     so, rather than have to mock out MockGraph to accommodate those queries,
-    it seemed simpler to mock out NodeSelector as well.
+    it seemed simpler to mock out NodeMatcher as well.
     """
     def __init__(self, graph):
         self.graph = graph
 
-    def select(self, label, course_key):
+    def match(self, label, course_key):
         """
         Selects nodes that match a label and course_key
         Args:
@@ -107,13 +107,13 @@ class MockNodeSelector:
         for node in self.graph.nodes:
             if node.has_label(label) and node["course_key"] == course_key:
                 nodes.append(node)
-        return MockNodeSelection(nodes)
+        return MockNodeMatch(nodes)
 
 
-class MockNodeSelection(list):
+class MockNodeMatch(list):
     """
-    Mocks out py2neo's NodeSelection class: this is the type of what
-    MockNodeSelector's `select` method returns.
+    Mocks out py2neo's NodeMatch class: this is the type of what
+    MockNodeMatcher's `match` method returns.
     """
     def first(self):
         """

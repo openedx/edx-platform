@@ -124,6 +124,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
+py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
 pycountry
 pycryptodomex
 pygments                            # Used to support colors in paver command output
