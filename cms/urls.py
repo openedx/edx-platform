@@ -7,6 +7,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
@@ -43,7 +44,7 @@ COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
-urlpatterns = [
+urlpatterns = oauth2_urlpatterns + [
     url(r'', include('openedx.core.djangoapps.user_authn.urls_common')),
     url(r'', include('common.djangoapps.student.urls')),
     url(r'^transcripts/upload$', contentstore_views.upload_transcripts, name='upload_transcripts'),
