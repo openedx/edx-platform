@@ -237,7 +237,8 @@ div.problem {
 
   input[type="radio"],
   input[type="checkbox"] {
-    @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+    @include margin($baseline/4);
+    @include margin-right($baseline/2);
   }
 
   input {
