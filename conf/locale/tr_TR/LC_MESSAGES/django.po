@@ -3160,7 +3160,7 @@ msgstr ""
 "öğrenciler sertifika için gereklilikleri sağlıyorlarsa ders bitiminden önce "
 "sertifikalarını indirebilirler. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Certificates Display Behavior"
 msgstr "Sertifikalar Gösterim Davranışı"
 
@@ -5646,6 +5646,8 @@ msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
+"© {org_name}.  Belirtilen yerler dışında tüm hakları saklıdır. edX, Open edX"
+" ve ilgili logoları edX Inc'in tescilli ticari markalarıdır."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -6288,6 +6290,7 @@ msgstr ""
 "isteği işleme koymak için, lütfen aşağıdaki bağlantı(ları) ziyaret edin."
 
 #: lms/djangoapps/course_goals/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
 msgstr "Bir sertifika kazanın"
 
@@ -6758,7 +6761,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Proctoring"
-msgstr ""
+msgstr "Gözetmenli"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
@@ -7490,11 +7493,11 @@ msgstr "Celery görevinin bilinen son durumu."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task duration information, if known"
-msgstr ""
+msgstr "Eğer biliniyorsa, işlem süresi bilgisi"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User-friendly task status information, if available."
-msgstr ""
+msgstr "Eğer mevcutsa, kullanıcı dostu işlem durum bilgisi"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "List of instructor tasks."
@@ -9766,6 +9769,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
 msgstr "Şimdi Yükselt"
 
@@ -10397,7 +10401,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "technical support"
-msgstr ""
+msgstr "teknik destek"
 
 #: openedx/core/djangoapps/discussions/models.py
 #, python-brace-format
@@ -12243,6 +12247,7 @@ msgstr "Devam et"
 msgid "Shift due dates"
 msgstr "Son tarihleri değiştirin"
 
+#: openedx/features/personalized_learner_schedules/call_to_action.py
 #: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
@@ -16050,7 +16055,7 @@ msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Show more"
-msgstr ""
+msgstr "Daha fazla göster"
 
 #: lms/templates/course_modes/track_selection.html
 msgid ""
@@ -16076,7 +16081,7 @@ msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
 msgid "FREE"
-msgstr ""
+msgstr "ÜCRETSİZ"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
@@ -16850,7 +16855,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View grades"
-msgstr ""
+msgstr "Notları göster"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
@@ -16974,6 +16979,7 @@ msgstr "Bir sertifika almak için kimliğinizi doğrulamalısınız"
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
 msgstr[0] ""
+"Bu derse yönelik kimliğinizi doğrulamak için sadece {days} gününüz kaldı."
 msgstr[1] ""
 "Bu derse yönelik kimliğinizi doğrulamak için sadece {days} gününüz kaldı."
 
@@ -24988,7 +24994,7 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Upload replacement"
-msgstr ""
+msgstr "Yenisini yükle"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add file to"
@@ -25361,7 +25367,7 @@ msgstr "madde,maddeler"
 
 #: wiki/templates/wiki/dir.html
 msgid "matches,match"
-msgstr ""
+msgstr "eşleşenler,eşleşen"
 
 #: wiki/templates/wiki/dir.html
 #, python-format

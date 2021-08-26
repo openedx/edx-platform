@@ -16471,7 +16471,7 @@ msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Enroll In {course_name} | Upgrade Now"
-msgstr ""
+msgstr "Inscribirse en {course_name} | Cámbiate a la opción verificada"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Choose a path for your course in"
