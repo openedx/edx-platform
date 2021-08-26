@@ -106,3 +106,14 @@ SUBSECTION_OVERRIDE_CHANGED = Signal(
                            # score that was created.
     ]
 )
+
+
+# This Signal indicates that the user has received a passing grade in the course for the first time.
+# Any subsequent grade changes that may vary the passing/failing status will not re-trigger this event.
+# Emits course grade passed first time event
+COURSE_GRADE_PASSED_FIRST_TIME = Signal(
+    providing_args=[
+        'course_id',  # Course object id
+        'user_id',  # User object id
+    ]
+)
