@@ -3,13 +3,11 @@ Signal handlers for course apps.
 """
 from django.dispatch import receiver
 from opaque_keys.edx.keys import CourseKey
-
-from openedx.core.djangoapps.course_apps.models import CourseAppStatus
-
-from openedx.core.djangoapps.course_apps.plugins import CourseAppsPluginManager
 from xmodule.modulestore.django import SignalHandler
 
+from .models import CourseAppStatus
 from .signals import COURSE_APP_STATUS_INIT
+from .tasks import update_course_apps_status
 
 
 @receiver(SignalHandler.course_published)
@@ -18,14 +16,7 @@ def update_course_apps(sender, course_key, **kwargs):  # pylint: disable=unused-
     Whenever the course is published, update the status of course apps in the
     django models to match their status in the course.
     """
-    course_apps = CourseAppsPluginManager.get_apps_available_for_course(course_key)
-    for course_app in course_apps:
-        is_enabled = course_app.is_enabled(course_key=course_key)
-        CourseAppStatus.update_status_for_course_app(
-            course_key=course_key,
-            app_id=course_app.app_id,
-            enabled=is_enabled,
-        )
+    update_course_apps_status.delay(course_key)
 
 
 # pylint: disable=unused-argument
