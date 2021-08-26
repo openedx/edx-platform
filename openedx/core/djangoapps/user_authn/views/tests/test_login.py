@@ -21,7 +21,7 @@ from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from openedx_events.tests.utils import OpenEdxEventsTestCase
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -45,7 +45,7 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
-class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestCase):
+class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view
     """
@@ -955,7 +955,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestCase):
 
 @ddt.ddt
 @skip_unless_lms
-class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestCase):
+class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
     """Tests for the login end-points of the user API. """
 
     USERNAME = "bob"

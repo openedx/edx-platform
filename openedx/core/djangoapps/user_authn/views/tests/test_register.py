@@ -17,7 +17,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
-from openedx_events.tests.utils import OpenEdxEventsTestCase
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -71,7 +71,7 @@ from common.djangoapps.util.password_policy_validators import (
 @ddt.ddt
 @skip_unless_lms
 class RegistrationViewValidationErrorTest(
-    ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase, OpenEdxEventsTestCase
+    ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase, OpenEdxEventsTestMixin
 ):
     """
     Tests for catching duplicate email and username validation errors within
@@ -427,7 +427,7 @@ class RegistrationViewValidationErrorTest(
 @ddt.ddt
 @skip_unless_lms
 class RegistrationViewTestV1(
-    ThirdPartyAuthTestMixin, UserAPITestCase, OpenEdxEventsTestCase
+    ThirdPartyAuthTestMixin, UserAPITestCase, OpenEdxEventsTestMixin
 ):
     """Tests for the registration end-points of the User API. """
 
@@ -1812,7 +1812,7 @@ class RegistrationViewTestV1(
 
 
 @ddt.ddt
-class RegistrationViewTestV2(RegistrationViewTestV1, OpenEdxEventsTestCase):
+class RegistrationViewTestV2(RegistrationViewTestV1, OpenEdxEventsTestMixin):
     """
     Test for registration api V2
 
@@ -2049,7 +2049,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1, OpenEdxEventsTestCase):
 @httpretty.activate
 @ddt.ddt
 class ThirdPartyRegistrationTestMixin(
-    ThirdPartyOAuthTestMixin, CacheIsolationTestCase, OpenEdxEventsTestCase
+    ThirdPartyOAuthTestMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin
 ):
     """
     Tests for the User API registration endpoint with 3rd party authentication.
@@ -2216,7 +2216,7 @@ class ThirdPartyRegistrationTestMixin(
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestFacebookRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase, OpenEdxEventsTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase, OpenEdxEventsTestMixin
 ):
     """Tests the User API registration endpoint with Facebook authentication."""
     __test__ = True
@@ -2234,14 +2234,14 @@ class TestFacebookRegistrationView(
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestGoogleRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase, OpenEdxEventsTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase, OpenEdxEventsTestMixin
 ):
     """Tests the User API registration endpoint with Google authentication."""
     __test__ = True
 
 
 @ddt.ddt
-class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestCase):
+class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestMixin):
     """
     Tests for validity of user data in registration forms.
     """
