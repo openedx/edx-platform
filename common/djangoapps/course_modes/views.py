@@ -27,6 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.util.date_utils import strftime_localized_html
 from edx_toggles.toggles import WaffleFlag
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -249,7 +250,9 @@ class ChooseModeView(View):
 
         duration = get_user_course_duration(request.user, course)
         deadline = duration and get_user_course_expiration_date(request.user, course)
-        context['audit_access_deadline'] = deadline
+        if deadline:
+            formatted_audit_access_date = strftime_localized_html(deadline, 'SHORT_DATE')
+            context['audit_access_deadline'] = formatted_audit_access_date
         fbe_is_on = deadline and gated_content
 
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
