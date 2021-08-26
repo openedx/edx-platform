@@ -437,9 +437,11 @@ class CoursewareIndex(View):
         rtl_class = get_rtl_class(staff_title)
         course_overview = CourseOverview.get_from_id(self.course.id)
         course_experience = 'Normal'
+        content_class = ''
         if hasattr(course_overview, 'custom_settings'):
             custom_settings = course_overview.custom_settings
             course_experience = custom_settings.get_course_experience_display()
+            content_class = 'video-course-content' if course_experience == 'Video' else ''
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -448,6 +450,7 @@ class CoursewareIndex(View):
             'chapter': self.chapter,
             'section': self.section,
             'init': '',
+            'course_experience': content_class,
             'rtl_class': rtl_class,
             'fragment': Fragment(),
             'staff_access': staff_access,
