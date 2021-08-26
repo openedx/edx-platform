@@ -16,8 +16,9 @@ from common.djangoapps.student.models import UserPasswordToggleHistory
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
-from openedx.core.djangoapps.user_authn.utils import generate_password
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
+
+from edx_django_utils.user import generate_password
 
 
 class ManageUserSupportView(View):
