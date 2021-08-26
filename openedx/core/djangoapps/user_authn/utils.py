@@ -3,7 +3,6 @@ Utility functions used during user authentication.
 """
 
 import random
-import string
 from urllib.parse import urlparse  # pylint: disable=import-error
 from uuid import uuid4  # lint-amnesty, pylint: disable=unused-import
 
@@ -47,20 +46,6 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
         redirect_to, allowed_hosts=login_redirect_whitelist, require_https=require_https
     )
     return is_safe_url
-
-
-def generate_password(length=12, chars=string.ascii_letters + string.digits):
-    """Generate a valid random password"""
-    if length < 8:
-        raise ValueError("password must be at least 8 characters")
-
-    choice = random.SystemRandom().choice
-
-    password = ''
-    password += choice(string.digits)
-    password += choice(string.ascii_letters)
-    password += ''.join([choice(chars) for _i in range(length - 2)])
-    return password
 
 
 def is_registration_api_v1(request):

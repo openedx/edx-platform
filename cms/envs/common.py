@@ -1620,6 +1620,9 @@ INSTALLED_APPS = [
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
+    # User and group management via edx-django-utils
+    'edx_django_utils.user',
+
     # Allow Studio to use LMS for SSO
     'social_django',
 ]
