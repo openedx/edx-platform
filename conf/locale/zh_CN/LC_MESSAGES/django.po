@@ -14746,7 +14746,7 @@ msgstr "{b_start}分级作业:{b_end}通过分级作业和项目建立您的技�
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr "{b_start}轻松分享:{b_end} 在您的简历中添加这份证书，或者直接将它传至领英Linkedln。"
 
@@ -14765,7 +14765,7 @@ msgstr "{b_start}官方:{b_end} 获取带有机构徽章和导师签名的证书
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
+"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr "{b_start}轻松分享:{b_end} 在您的简历中加入这份证书，或者直接将它传至领英Linkedln"
 
@@ -14787,7 +14787,7 @@ msgstr "{b_start}官方:{b_end} 获取带有机构徽章和导师签名的证书
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
+"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr "{b_start}轻松分享:{b_end} 在您的简历中加入这份证书，或者直接将它传至领英Linkedln"
 
@@ -15809,7 +15809,7 @@ msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
-"showcase on your resume."
+"showcase on your resumé."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -18722,7 +18722,7 @@ msgstr "edX学员故事"
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
 "My certificate has helped me showcase my knowledge on my"
-"                             resume - I feel like this certificate could "
+"                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr "证书在我的简历上添了一笔 - 努力的收获让我离梦想的事业更近一部！"
 
@@ -18732,7 +18732,7 @@ msgstr "{learner_name}，edX学员"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"I wanted to include a verified certificate on my resume and my profile to"
+"I wanted to include a verified certificate on my resumé and my profile to"
 "                             illustrate that I am working towards this goal "
 "I have and that I have                             achieved something while "
 "I was unemployed."
