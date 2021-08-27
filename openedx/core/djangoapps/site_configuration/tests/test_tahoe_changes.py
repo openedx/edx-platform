@@ -74,6 +74,8 @@ class SiteConfigurationTests(TestCase):
                          self.expected_site_root_url)
         self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK'))
         self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help'))
+        self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK'))
+        self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help'))
 
     def test_get_value_for_org(self):
         """
