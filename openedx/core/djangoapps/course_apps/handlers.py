@@ -16,7 +16,7 @@ def update_course_apps(sender, course_key, **kwargs):  # pylint: disable=unused-
     Whenever the course is published, update the status of course apps in the
     django models to match their status in the course.
     """
-    update_course_apps_status.delay(course_key)
+    update_course_apps_status.delay(str(course_key))
 
 
 # pylint: disable=unused-argument
