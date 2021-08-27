@@ -253,3 +253,8 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS'] = True
+
+############## Credentials CONFIGURATION SETTINGS ###############
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'

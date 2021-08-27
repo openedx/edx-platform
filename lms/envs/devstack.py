@@ -436,3 +436,4 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS'] = True
