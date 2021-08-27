@@ -1150,7 +1150,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'waffle_enabled': False,
             'youtube': '3_yD_cEKoCk',
             'hls': [],
-            'result': 'false'
+            'result': 'true'
         },
         {
             'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
