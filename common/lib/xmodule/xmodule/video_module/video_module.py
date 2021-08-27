@@ -218,7 +218,7 @@ class VideoBlock(
         If only either youtube or hls is present then play whichever is present
         """
         yt_present = bool(youtube_streams.strip()) if youtube_streams else False
-        hls_present = any(source for source in html5_sources if source.strip().endswith('.m3u8'))
+        hls_present = any(source for source in html5_sources)
 
         if yt_present and hls_present:
             return self.youtube_deprecated
