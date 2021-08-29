@@ -23,6 +23,13 @@ class VideoFields:
         scope=Scope.settings
     )
 
+    metadata = String(
+        help=_("Meta data to be embeded in the component"),
+        display_name=_("Metadata"),
+        default="",
+        scope=Scope.settings
+    )
+
     saved_video_position = RelativeTime(
         help=_("Current position in the video."),
         scope=Scope.user_state,
