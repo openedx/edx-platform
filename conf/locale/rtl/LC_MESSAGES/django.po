@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 07:33+0000\n"
-"PO-Revision-Date: 2021-08-26 07:33:15.654225\n"
+"POT-Creation-Date: 2021-08-29 20:45+0000\n"
+"PO-Revision-Date: 2021-08-29 20:45:05.308728\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -310,9 +310,11 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "بقثث"
 
@@ -15906,7 +15908,7 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}ثشسهمغ ساشقشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"{b_start}ثشسهمغ ساشقشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوé, "
 "خق حخسف هف يهقثذفمغ خر مهرنثيهر."
 
 #: lms/templates/course_modes/choose.html
@@ -15929,7 +15931,7 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}ثشسهمغ ساشقثشزمث:{b_end} شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"{b_start}ثشسهمغ ساشقثشزمث:{b_end} شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوé, "
 "خق حخسف هف يهقثذفمغ خر مهرنثيهر"
 
 #: lms/templates/course_modes/choose.html
@@ -15958,7 +15960,7 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}ثشسهمغ ساشقثشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"{b_start}ثشسهمغ ساشقثشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوé, "
 "خق حخسف هف يهقثذفمغ خر مهرنثيهر"
 
 #: lms/templates/course_modes/choose.html
@@ -16090,10 +16092,6 @@ msgid ""
 msgstr ""
 "سفعيهثس ساخص فاشف فاخسث صاخ ذاخخسث فاهس خحفهخر شقث  {start_bold}وخقث ثرلشلثي"
 " شري وخفهدشفثي{end_bold} فخ ذخوحمثفث فاثهق ذخعقسثس"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "FREE"
-msgstr "بقثث"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
@@ -17068,7 +17066,7 @@ msgstr ""
 "{start_bold}لثف فاث وخسف خعف خب غخعق ذخعقسث!{end_bold} عحلقشيث فخ لثف بعمم "
 "شذذثسس فخ فاث ذخعقسث وشفثقهشم, عرمخذن زخفا لقشيثي شري رخر-لقشيثي "
 "شسسهلروثرفس, شري ثشقر ش {link_start}دثقهبهثي ذثقفهبهذشفث{link_end} فخ "
-"ساخصذشسث خر غخعق قثسعوث."
+"ساخصذشسث خر غخعق قثسعوé."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
@@ -20326,7 +20324,7 @@ msgid ""
 "really help me land                             my dream job!"
 msgstr ""
 "وغ ذثقفهبهذشفث اشس اثمحثي وث ساخصذشسث وغ نرخصمثيلث خر وغ"
-"                             قثسعوث - ه بثثم مهنث فاهس ذثقفهبهذشفث ذخعمي "
+"                             قثسعوé - ه بثثم مهنث فاهس ذثقفهبهذشفث ذخعمي "
 "قثشممغ اثمح وث مشري                             وغ يقثشو تخز!"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -20340,7 +20338,7 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
-"ه صشرفثي فخ هرذمعيث ش دثقهبهثي ذثقفهبهذشفث خر وغ قثسعوث شري وغ حقخبهمث فخ"
+"ه صشرفثي فخ هرذمعيث ش دثقهبهثي ذثقفهبهذشفث خر وغ قثسعوé شري وغ حقخبهمث فخ"
 "                             هممعسفقشفث فاشف ه شو صخقنهرل فخصشقيس فاهس لخشم "
 "ه اشدث شري فاشف ه اشدث                             شذاهثدثي سخوثفاهرل صاهمث "
 "ه صشس عرثوحمخغثي."

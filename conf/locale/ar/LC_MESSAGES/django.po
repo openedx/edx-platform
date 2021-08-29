@@ -244,7 +244,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"POT-Creation-Date: 2021-08-26 19:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -6453,7 +6453,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "معطل"
 
-#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: lms/djangoapps/course_home_api/outline/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
@@ -6465,29 +6465,29 @@ msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
 msgstr "يرجى الاتصال بمسؤول الشهادة أو دعم edX إذا كانت لديك أية أسئلة."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr "'course_id' مطلوب"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr "يتوقع إدراج 'course_id' فقط"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr "تم تجاهل رسالة الترحيب بنجاح"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr "تم ضبط هدف مساقك بنجاح"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr "تم تحديث هدف المساق بنجاح"
 
@@ -16034,8 +16034,6 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}يمكن مشاركتها بسهولة: {b_end}أضِف الشهادة إلى سيرتك الذاتية أو "
-"أنشرها مباشرة على موقع لينكد إن."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16057,8 +16055,6 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start} من السهل مشاركتها:{b_end} أضِف الشهادة إلى سيرتك الذاتية أو أضفها "
-"مباشرةً  إلى صفحتك على موقع لينكد إن."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16086,8 +16082,6 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}يسهل مشاركتها: {b_end}أضِف الشهادة إلى سيرتك الذاتية أو ضعها مباشرة"
-" على موقع لينكد إن."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -20361,9 +20355,6 @@ msgid ""
 "                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
-"ساعدتني شهادتي في إظهار معرفتي في                               سيرتي "
-"الذاتية - أشعر أن هذه الشهادة يمكن أن تساعدني حقاً في الحصول على"
-"                              وظيفة أحلامي!"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "{learner_name}, edX Learner"
@@ -20376,9 +20367,6 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
-"كنت أرغب في تضمين شهادة تم التحقق منها في سيرتي الذاتية وملف التعريف الخاص "
-"بي                               لتوضيح أنني أعمل من أجل هذا الهدف وأنني"
-"                              حققت شيئاً بينما كنت عاطلاً عن العمل."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"
