@@ -90,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"POT-Creation-Date: 2021-08-26 19:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/open-edx/teams/6205/el/)\n"
@@ -5690,29 +5690,29 @@ msgid_plural "({number} Questions)"
 msgstr[0] "(Το Τεστ περιλαμβάνει {number} ενότητα) "
 msgstr[1] "(Το Τεστ περιλαμβάνει {number} ενότητες) "
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr ""
 
@@ -6088,7 +6088,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py
 msgid "Dates"
-msgstr ""
+msgstr "Ημερομηνίες"
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
@@ -10000,7 +10000,7 @@ msgstr "Το όνομα χρήστη πρέπει να έχει από {min} έ�
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid "Enter a valid email address that contains at least {min} characters."
-msgstr "Το email που εισάγετε θα πρέπει να έχει τουλάχιστον {min}χαρακτήρες."
+msgstr "Το email που εισάγετε θα πρέπει να έχει τουλάχιστον {min} χαρακτήρες."
 
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
@@ -14866,7 +14866,7 @@ msgstr ""
 
 #: lms/templates/courseware/dates.html
 msgid "Important Dates"
-msgstr ""
+msgstr "Σημαντικές ημερομηνίες"
 
 #: lms/templates/courseware/dates.html
 msgid "Today"

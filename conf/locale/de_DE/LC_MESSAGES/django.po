@@ -173,7 +173,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"POT-Creation-Date: 2021-08-26 19:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -6512,29 +6512,29 @@ msgid_plural "({number} Questions)"
 msgstr[0] "({number} Frage)"
 msgstr[1] "({number} Fragen)"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr ""
 
@@ -16391,8 +16391,6 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}Erfolge teilen: {b_end}Fügen Sie das Zertifikat zu Ihrem Lebenslauf"
-" hinzu oder veröffentlichen Sie es direkt auf LinkedIn."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16414,8 +16412,6 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Einfach teilbar: {b_end}  Füge das Zertifikat an deinen Lebenslauf "
-"oder dein Bewerbungsschreiben an oder poste es direkt auf LinkedIn"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16443,8 +16439,6 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Einfach teilbar {b_end}  Füge das Zertifikat an deinen Lebenslauf "
-"oder dein Bewerbungsschreiben an oder poste es direkt auf LinkedIn"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -20868,9 +20862,6 @@ msgid ""
 "                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
-"Mein Zertifikat hat mir geholfen, mein Wissen in meinem Lebenslauf zu "
-"präsentieren - ich habe das Gefühl, dass dieses Zertifikat mir wirklich "
-"helfen könnte, meinen Traumjob zu finden!"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "{learner_name}, edX Learner"
@@ -20883,9 +20874,6 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
-"Ich wollte ein verifiziertes Zertifikat in meinen Lebenslauf und mein Profil"
-" aufnehmen, um zu verdeutlichen, dass ich auf dieses Ziel hinarbeite und "
-"dass ich während meiner Arbeitslosigkeit etwas erreicht habe."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"

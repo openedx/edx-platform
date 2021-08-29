@@ -131,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"POT-Creation-Date: 2021-08-26 19:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -6335,7 +6335,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "Devre dışı"
 
-#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: lms/djangoapps/course_home_api/outline/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
@@ -6343,7 +6343,7 @@ msgid_plural "({number} Questions)"
 msgstr[0] "({number} Soru)"
 msgstr[1] "({number} Soru)"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
@@ -6351,23 +6351,23 @@ msgstr ""
 "Eğer herhangi bir sorunuz varsa lütfen akademik yöneticiniz ya da edX destek"
 " ekibiyle iletişime geçiniz."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr "'course_id' gerekli."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr "Sadece 'course_id' isteniyor."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr "Hoş geldiniz iletisi başarıyla kaldırıldı."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr "Ders hedefiniz başarıyla belirlendi."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr "Ders hedefiniz başarıyla güncellendi."
 
@@ -15908,8 +15908,6 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}Kolayca Paylaşılabilir: {b_end}Sertifikayı CV'nize veya "
-"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15930,8 +15928,6 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Kolayca paylaşılabilir:{b_end} Sertifikayı CV'nize veya "
-"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15958,8 +15954,6 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Kolayca paylaşılabilir: {b_end} Sertifikayı CV'nize veya "
-"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -20317,8 +20311,6 @@ msgid ""
 "                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
-"Sertifikam bilgi dağarcığımı özgeçmişimde göstermeme yardımcı oldu - Bu "
-"sertifika hayallerimdeki işi bulmamda bana yardımcı olacak!"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "{learner_name}, edX Learner"
@@ -20331,9 +20323,6 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
-"Özgeçmişime ve profilime onaylı bir sertifikayı dâhil etmek istedim ve bu "
-"hedefe doğru çalıştığımı ve işsizken bir şeylere ulaştığımı göstermeyi "
-"istedim."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"

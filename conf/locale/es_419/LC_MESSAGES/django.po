@@ -262,7 +262,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-22 20:44+0000\n"
+"POT-Creation-Date: 2021-08-26 19:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -6527,7 +6527,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "Invalidar"
 
-#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: lms/djangoapps/course_home_api/outline/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
@@ -6535,29 +6535,29 @@ msgid_plural "({number} Questions)"
 msgstr[0] "({number} Pregunta)"
 msgstr[1] "({number} Preguntas)"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
 "questions."
 msgstr ""
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
 msgstr "'course_id' es obligatorio."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Only 'course_id' is expected."
 msgstr "Sólo se esperaba 'course_id'."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Welcome message successfully dismissed."
 msgstr "Mensaje de bienvenida descartado exitosamente."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Your course goal has been successfully set."
 msgstr "Tu objetivo del curso ha sido definido exitosamente."
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
+#: lms/djangoapps/course_home_api/outline/views.py
 msgid "Course goal updated successfully."
 msgstr "Objetivo del curso actualizado exitosamente."
 
@@ -16339,8 +16339,6 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}Fácil de compartir: {b_end}Agrega el certificado a tu CV o "
-"publícalo directamente en LinkedIn."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16362,8 +16360,6 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Comparte fácilmente:{b_end} Agrega el certificado a tu CV, o "
-"publícalo directamente en LinkedIn"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16392,8 +16388,6 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
-"{b_start}Comparte fácilmente:{b_end} Agrega el certificado a su CV, o "
-"publícalo directamente en LinkedIn"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -17519,11 +17513,6 @@ msgid ""
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
 msgstr ""
-"{start_bold}¡Aprovecha al máximo tu curso!{end_bold} Cámbiate a la opción "
-"con certificado para obtener acceso completo al material del curso, "
-"desbloquear tareas calificadas y no calificadas y obtener un "
-"{link_start}certificado verificado{link_end} para compartirlo en tu "
-"currículum."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
@@ -20800,9 +20789,6 @@ msgid ""
 "                             resumé - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
-"Mi certificado me ha ayudado a mostrar mi conocimiento en el currículum - "
-"¡Siento que este certificado realmente podría ayudarme a alcanzar mi trabajo"
-" soñado!"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "{learner_name}, edX Learner"
@@ -20815,9 +20801,6 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
-"Quiero incluir un Certificado Verificado en mi currículum y en mi perfil "
-"para demostrar que estoy trabajando para alcanzar este objetivo y que he "
-"logrado algo mientras estaba desempleado."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"

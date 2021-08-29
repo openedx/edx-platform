@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 07:33+0000\n"
-"PO-Revision-Date: 2021-08-26 07:33:15.654225\n"
+"POT-Creation-Date: 2021-08-29 20:45+0000\n"
+"PO-Revision-Date: 2021-08-29 20:45:05.308728\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -336,9 +336,11 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price} Ⱡ'σяєм ιρѕυ#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Fréé Ⱡ'σяєм ι#"
 
@@ -18540,10 +18542,6 @@ msgid ""
 msgstr ""
 "Stüdïés shöw thät thösé whö çhöösé thïs öptïön äré  {start_bold}möré éngägéd"
 " änd mötïvätéd{end_bold} tö çömplété théïr çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "FREE"
-msgstr "FRÉÉ Ⱡ'σяєм ι#"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
