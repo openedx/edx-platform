@@ -13,18 +13,49 @@ class CookieNameChange:
         Changes the names of a cookie in request.COOKIES
 
         For this middleware to run:
-        - set COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE =  True
+        - set COOKIE_NAME_CHANGE_ACTIVATE =  True
         - COOKIE_NAME_CHANGE_EXPAND_INFO is a dict and has following info:
-            "old_name": Previous name of cookie
-            "new_name": New name of cookie
+          - "current": Cookie name that will be used by relying code
+          - "alternate": Other cookie name, to be renamed to current name if present
 
-        Actions taken by middleware:
-            - will delete any cookie with "old_name"
-            - if create a new cookie with "new_name" and set its value to value of "old_name" cookie
-                + it will not modify cookie with "new_name" if it already exists in request.COOKIES
+        Actions taken by middleware, during request phase:
+        - Delete alternate-name cookie from request.COOKIES
+        - Preserve any cookie with current name, or create one with value of
+          cookie with alternate name (if alt cookie was present)
+
+        To perform a seamless name change for a cookie, follow this
+        expand-contract procedure:
+
+        1. Baseline configuration::
+
+             SOME_COOKIE_NAME: old
+
+        2. Enable servers to understand both names by renaming the *new* name
+           to the *old* (current) name, which should have no immediate effect::
+
+             COOKIE_NAME_CHANGE_ACTIVATE: True
+             COOKIE_NAME_CHANGE_EXPAND_INFO:
+               current: old
+               alternate: new
+             SOME_COOKIE_NAME: old
+
+        3. Change the current name, both in the main cookie setting and in the
+           name-change dictionary, now that all servers are capable of reading
+           either name::
+
+             COOKIE_NAME_CHANGE_ACTIVATE: True
+             COOKIE_NAME_CHANGE_EXPAND_INFO:
+               current: new
+               alternate: old
+             SOME_COOKIE_NAME: new
+
+        4. After some time period to allow old cookies to age out, remove the
+           transition settings::
+
+             SOME_COOKIE_NAME: new
         """
 
-        # .. toggle_name: COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE
+        # .. toggle_name: COOKIE_NAME_CHANGE_ACTIVATE
         # .. toggle_implementation: DjangoSetting
         # .. toggle_default: False
         # .. toggle_description: Used to enable CookieNameChange middleware which changes a cookie name in request.COOKIES
@@ -33,26 +64,26 @@ class CookieNameChange:
         # .. toggle_creation_date: 2021-08-04
         # .. toggle_target_removal_date: 2021-10-01
         # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1872
-        if getattr(settings, "COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE", False):
-            old_cookie_in_request = False
+        if getattr(settings, "COOKIE_NAME_CHANGE_ACTIVATE", False):
+            alt_cookie_in_request = False
             expand_settings = getattr(settings, "COOKIE_NAME_CHANGE_EXPAND_INFO", None)
 
             if (
                 expand_settings is not None
                 and isinstance(expand_settings, dict)
-                and "new_name" in expand_settings
-                and "old_name" in expand_settings
+                and "current" in expand_settings
+                and "alternate" in expand_settings
             ):
-                if expand_settings["old_name"] in request.COOKIES:
-                    old_cookie_in_request = True
-                    old_cookie_value = request.COOKIES[expand_settings["old_name"]]
-                    del request.COOKIES[expand_settings["old_name"]]
+                if expand_settings["alternate"] in request.COOKIES:
+                    alt_cookie_in_request = True
+                    alt_cookie_value = request.COOKIES[expand_settings["alternate"]]
+                    del request.COOKIES[expand_settings["alternate"]]
 
                 if (
-                    expand_settings["new_name"] not in request.COOKIES
-                    and old_cookie_in_request
+                    expand_settings["current"] not in request.COOKIES
+                    and alt_cookie_in_request
                 ):
-                    request.COOKIES[expand_settings["new_name"]] = old_cookie_value
+                    request.COOKIES[expand_settings["current"]] = alt_cookie_value
 
         response = self.get_response(request)
         return response
