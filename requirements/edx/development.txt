@@ -354,9 +354,8 @@ django-filter==2.4.0
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==3.0.7
+django-ipware==4.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
@@ -1288,7 +1287,7 @@ semantic-version==2.8.5
     #   edx-drf-extensions
 shapely==1.7.1
     # via -r requirements/edx/testing.txt
-simplejson==3.17.4
+simplejson==3.17.5
     # via
     #   -r requirements/edx/testing.txt
     #   sailthru-client
