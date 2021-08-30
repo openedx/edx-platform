@@ -212,3 +212,55 @@ class ProctoringCourseApp(CourseApp):
     @staticmethod
     def legacy_link(course_key: CourseKey):
         return get_proctored_exam_settings_url(course_key)
+
+
+class CustomPagesCourseApp(CourseApp):
+    """
+    Course app config for custom pages app.
+    """
+
+    app_id = "custom_pages"
+    name = _("Custom pages")
+    description = _("Provide additional course content and resources with custom pages")
+    documentation_links = {
+        "learn_more_configuration": settings.CUSTOM_PAGES_HELP_URL,
+    }
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
+        """
+        The custom pages app is available for all courses.
+        """
+        return True
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
+        """
+        Returns if the custom pages app is enabled.
+        For now this feature is enabled without any manual setup
+        """
+        return True
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+        """
+        The custom pages app can be globally enabled/disabled.
+
+        Currently, it isn't possible to enable/disable this app on a per-course basis.
+        """
+        raise ValueError("The custom pages app can not be enabled/disabled for a single course.")
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Returns the allowed operations for the app.
+        """
+        return {
+            # Either the app is available and configurable or not. You cannot disable it from the API yet.
+            "enable": False,
+            "configure": True,
+        }
+
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return urls.reverse('tabs_handler', kwargs={'course_key_string': course_key})
