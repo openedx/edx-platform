@@ -16,7 +16,6 @@ from lms.djangoapps.courseware.toggles import (
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
 
 
