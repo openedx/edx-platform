@@ -11,7 +11,9 @@ from unittest.mock import patch
 
 from django.conf import settings
 
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
+from openedx.core.djangoapps.models.utils import subtract_deadline_delta
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -227,3 +229,18 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         assert CourseDetails.validate_certificate_settings(
             stored_date, stored_behavior
         ) == (expected_date, expected_behavior)
+
+    def test_course_end_update_changes_upgrade_deadline(self):
+        """
+        Test that if end date is updated, then course upgrade deadline is
+        changed automatically.
+        """
+        json_details = CourseDetails.fetch(self.course.id)
+        json_details.end_date = datetime.datetime(2021, 10, 11, 0, tzinfo=UTC)
+        verified_mode = CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            CourseDetails.update_from_json(self.course.id, json_details.__dict__, self.user, verified_mode)
+
+        deadline = subtract_deadline_delta(json_details.end_date, settings.PUBLISHER_UPGRADE_DEADLINE_DAYS)
+        assert verified_mode.expiration_datetime == deadline

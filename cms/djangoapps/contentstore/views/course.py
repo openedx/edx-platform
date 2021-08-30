@@ -1103,6 +1103,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
     """
     course_key = CourseKey.from_string(course_key_string)
     credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
+    verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -1135,8 +1136,6 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             )
             sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
             # self_paced_enabled = SelfPacedConfiguration.current().enabled
-
-            verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
             settings_context = {
@@ -1248,9 +1247,13 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                     elif not entrance_exam_enabled and course_entrance_exam_present:
                         delete_entrance_exam(request, course_key)
 
+                # 'course', 'mode_slug' and 'currency' are unique together in CourseMode
+                verified_course_mode = CourseMode.objects.get(
+                    course=course_key, mode_slug=verified_mode.slug, currency=verified_mode.currency
+                ) if verified_mode else None
                 # Perform the normal update workflow for the CourseDetails model
                 return JsonResponse(
-                    CourseDetails.update_from_json(course_key, request.json, request.user),
+                    CourseDetails.update_from_json(course_key, request.json, request.user, verified_course_mode),
                     encoder=CourseSettingsEncoder
                 )
 

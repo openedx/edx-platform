@@ -7,13 +7,14 @@ import logging
 import re
 
 from django.conf import settings
-
-from openedx.core.djangolib.markup import HTML
-from openedx.core.lib.courses import course_image_url
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from openedx.core.djangoapps.models.utils import subtract_deadline_delta
+from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.courses import course_image_url
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
@@ -192,7 +193,7 @@ class CourseDetails:
         cls.update_about_item(course, 'video', recomposed_video_tag, user_id)
 
     @classmethod
-    def update_from_json(cls, course_key, jsondict, user):  # pylint: disable=too-many-statements
+    def update_from_json(cls, course_key, jsondict, user, verified_mode=None):  # pylint: disable=too-many-statements
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
@@ -218,6 +219,11 @@ class CourseDetails:
 
         if 'end_date' in jsondict:
             converted = date.from_json(jsondict['end_date'])
+            if verified_mode:
+                verified_mode.expiration_datetime = subtract_deadline_delta(
+                    converted, settings.PUBLISHER_UPGRADE_DEADLINE_DAYS
+                )
+                verified_mode.save()
         else:
             converted = None
 

@@ -2429,6 +2429,8 @@ VERIFY_STUDENT = {
     "EXPIRING_SOON_WINDOW": 28,
 }
 
+PUBLISHER_UPGRADE_DEADLINE_DAYS = 10
+
 ######################## Organizations ########################
 
 # .. toggle_name: ORGANIZATIONS_AUTOCREATE
