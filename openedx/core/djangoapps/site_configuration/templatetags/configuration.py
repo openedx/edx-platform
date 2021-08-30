@@ -6,7 +6,7 @@ based on the current site.
 
 from django import template
 from django.conf import settings
-from django.templatetags.static import static
+from django.conf.urls.static import static
 
 from lms.djangoapps.branding.api import get_favicon_url
 from openedx.core.djangoapps.theming import helpers as theming_helpers
