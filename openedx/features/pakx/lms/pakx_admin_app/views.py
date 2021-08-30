@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
-from django.db.models import Count, ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
+from django.db.models import ExpressionWrapper, F, IntegerField, Prefetch, Q, Sum
 from django.http import Http404
 from django.middleware import csrf
 from django.utils.decorators import method_decorator
@@ -18,7 +18,6 @@ from rest_framework.response import Response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from student.models import CourseAccessRole, CourseEnrollment, LanguageProficiency
 
 from .constants import (
@@ -44,17 +43,13 @@ from .serializers import (
 from .tasks import enroll_users
 from .utils import (
     get_available_course_qs,
+    get_completed_course_count_filters,
     get_learners_filter,
     get_org_users_qs,
     get_roles_q_filters,
     get_user_org_filter,
     send_registration_email
 )
-
-COMPLETED_COURSE_COUNT = Count("courseenrollment", filter=Q(
-    courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED))
-IN_PROGRESS_COURSE_COUNT = Count("courseenrollment", filter=Q(
-    courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED))
 
 
 class UserCourseEnrollmentsListAPI(generics.ListAPIView):
@@ -129,6 +124,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_superuser:
             user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
 
+        completed_count, in_progress_count = get_completed_course_count_filters()
         user_obj = user_qs.filter(
             id=self.kwargs['pk']
         ).select_related(
@@ -138,8 +134,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         ).prefetch_related(
             Prefetch('groups', to_attr='staff_groups', queryset=group_qs),
         ).annotate(
-            completed=COMPLETED_COURSE_COUNT,
-            in_prog=IN_PROGRESS_COURSE_COUNT).first()
+            completed=completed_count,
+            in_prog=in_progress_count
+        ).first()
 
         if user_obj:
             return user_obj
@@ -312,14 +309,20 @@ class AnalyticsStats(views.APIView):
         """
         user_qs = get_org_users_qs(self.request.user)
         user_ids = user_qs.values_list('id', flat=True)
-        course_stats = user_qs.annotate(passed=ExpressionWrapper(COMPLETED_COURSE_COUNT,
-                                                                 output_field=IntegerField()),
-                                        in_progress=ExpressionWrapper(
-                                            IN_PROGRESS_COURSE_COUNT, output_field=IntegerField())).aggregate(
-            completions=Sum(F('passed')), pending=Sum(F('in_progress')))
-        data = {'learner_count': len(user_ids), 'course_in_progress': course_stats.get('pending', 0),
-                'completed_course_count': course_stats.get('completions', 0)}
 
+        completed_count, in_progress_count = get_completed_course_count_filters()
+        course_stats = user_qs.annotate(
+            passed=ExpressionWrapper(completed_count, output_field=IntegerField()),
+            in_progress=ExpressionWrapper(in_progress_count, output_field=IntegerField())
+        ).aggregate(
+            completions=Sum(F('passed')), pending=Sum(F('in_progress'))
+        )
+
+        data = {
+            'learner_count': len(user_ids),
+            'course_in_progress': course_stats.get('pending', 0),
+            'completed_course_count': course_stats.get('completions', 0)
+        }
         data['course_assignment_count'] = data['course_in_progress'] + data['completed_course_count']
         return Response(status=status.HTTP_200_OK, data=data)
 
@@ -361,9 +364,10 @@ class CourseStatsListAPI(generics.ListAPIView):
     serializer_class = CourseStatsListSerializer
 
     def get_queryset(self):
+        completed_count, in_progress_count = get_completed_course_count_filters(True)
         return CourseOverview.objects.all().annotate(
-            in_progress=IN_PROGRESS_COURSE_COUNT,
-            completed=COMPLETED_COURSE_COUNT
+            in_progress=in_progress_count,
+            completed=completed_count
         )
 
 
