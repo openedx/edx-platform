@@ -17,36 +17,43 @@ Migration
 
 Most of the configuration is already in place, and Studio and LMS just need to be configured in each environment to enable the new flow. (Devstack and sandboxes will autoconfigure for OAuth.)
 
+Migration involves simultaneously enabling OAuth and separating the session cookies for LMS and Studio. This effectively causes a logout for Studio users, although they'll still be logged into LMS and aside from a brief disruption during the mixed-config interval they should not experience many problems.
+
 For each deployed environment (stage, production, etc.):
 
 #. Register an SSO OAuth2 client in LMS:
 
-  - Add OAuth2 client:
+   - Add OAuth2 client:
 
-    - Go to ``/admin/oauth2_provider/application/add/`` in LMS admin
-    - Copy the prepopulated client ID and secret to a secure place
-    - Leave the user field empty
-    - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/``
-    - Set client type to ``Confidential``
-    - Set authorization grant type to ``Authorization code``
-    - Set the name to ``studio-sso``
-    - Select the "Skip authorization" checkbox
+     - Go to ``/admin/oauth2_provider/application/add/`` in LMS admin
+     - Copy the prepopulated client ID and secret to a secure place
+     - Leave the user field empty
+     - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/``
+     - Set client type to ``Confidential``
+     - Set authorization grant type to ``Authorization code``
+     - Set the name to ``studio-sso``
+     - Select the "Skip authorization" checkbox
 
-  - Configure the client's scope:
+   - Configure the client's scope:
 
-    - Go to ``/admin/oauth_dispatch/applicationaccess/add/`` in LMS admin
-    - Select application ``studio-sso``
-    - Set scopes to ``user_id``
+     - Go to ``/admin/oauth_dispatch/applicationaccess/add/`` in LMS admin
+     - Select application ``studio-sso``
+     - Set scopes to ``user_id``
 
-#. Configure Studio:
+#. Configure LMS to log out Studio when logging out by adding ``<public Studio root>/logout/`` to the LMS ``IDA_LOGOUT_URI_LIST``.
 
-  - ``SOCIAL_AUTH_EDX_OAUTH2_KEY = '...client id...'``
-  - ``SOCIAL_AUTH_EDX_OAUTH2_SECRET = '...client secret...'``
-  - ``SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = '...server-to-server LMS root URL...'``
-  - ``SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = '...public LMS root URL...``
+#. Configure Studio to allow completion of OAuth flow::
 
-#. Set ``LOGIN_URL`` for Studio to ``'/login/'`` and verify that it causes logins to use OAuth. Existing sessions should continue to work.
+    SOCIAL_AUTH_EDX_OAUTH2_KEY: <client id>
+    SOCIAL_AUTH_EDX_OAUTH2_SECRET: <client secret>
+    SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT: <server-to-server LMS root URL>  # possibly same as public LMS root URL
+    SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT: <public LMS root URL>
 
+#. Configure Studio to initiative OAuth flow and use a separate session cookie::
+
+    LOGIN_URL: /login/  # to activate OAuth functionality
+    SESSION_COOKIE_DOMAIN: <studio domain>  # since no longer using root domain to share with LMS
+    SESSION_COOKIE_NAME: studio_sessionid
 
 Cleanup
 -------
@@ -54,7 +61,6 @@ Cleanup
 Config and code changes to be performed after all environments are using OAuth flow for Studio.
 
 - Set ``LOGIN_URL`` to ``'/login/'`` in ``cms/envs/common.py``
-- Add Studio's logout URI to ``IDA_LOGOUT_URI_LIST`` in ``lms/envs/common.py``
 - Deploy
 - Remove ``LOGIN_URL`` overrides from all environments (devstack and others)
 - Remove remaining ``ARCH-1253`` detritus (login redirect)
