@@ -9,11 +9,12 @@
             userFromEdxUserCookie: function() {
                 var hostname = this.getHostname();
                 var isLocalhost = hostname.indexOf('localhost') >= 0;
+                var isSandbox = hostname.indexOf('sandbox') >=0;
                 var isStage = hostname.indexOf('stage') >= 0;
                 var isEdge = hostname.indexOf('edge') >= 0;
                 var cookie, edxUserCookie, prefix, user, userCookie;
 
-                if (isLocalhost) {
+                if (isLocalhost || isSandbox) {
                     // localhost doesn't have prefixes
                     edxUserCookie = 'edx-user-info';
                 } else {
