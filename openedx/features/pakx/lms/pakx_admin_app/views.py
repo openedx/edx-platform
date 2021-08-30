@@ -2,6 +2,7 @@
 Views for Admin Panel API
 """
 from itertools import groupby
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
@@ -153,11 +154,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         if request.data.get('profile'):
             request.data['profile']['organization'] = self.request.user.profile.organization_id
-
+        password = uuid4().hex[:8]
+        request.data['password'] = password
         user_serializer = UserSerializer(data=request.data)
         if user_serializer.is_valid():
             user = user_serializer.save()
-            send_registration_email(user, user.profile, request.scheme)
+            send_registration_email(user, password, request.scheme)
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
         return Response({**user_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

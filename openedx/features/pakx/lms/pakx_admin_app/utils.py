@@ -6,16 +6,15 @@ from datetime import datetime
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.db.models.query_utils import Q
 from django.urls import reverse
-from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from student.models import Registration
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
 from .message_types import RegistrationNotification
@@ -65,11 +64,12 @@ def specify_user_role(user, role):
         user.groups.remove(g_admin, g_tm)
 
 
-def get_registration_email_message_context(user, user_profile, protocol):
+def get_registration_email_message_context(user, password, protocol):
     """
     return context for registration notification email body
     """
     site = Site.objects.get_current()
+    activation_key = Registration.objects.get(user=user).activation_key
     message_context = {
         'site_name': site.domain
     }
@@ -77,17 +77,15 @@ def get_registration_email_message_context(user, user_profile, protocol):
     message_context.update({
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'username': user.username,
+        'password': password,
         'profile_name': (user.profile.name or user.username).title(),
         'email': user.email,
-        'employee_id': user_profile.employee_id,
-        'language': user_profile.language,
-        'reset_password_link': '{protocol}://{site}{link}'.format(
+        'employee_id': user.profile.employee_id,
+        'language': user.profile.language,
+        'account_activation_link': '{protocol}://{site}{link}'.format(
             protocol=protocol,
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('password_reset_confirm', kwargs={
-                'uidb36': int_to_base36(user.id),
-                'token': default_token_generator.make_token(user),
-            }),
+            link=reverse('activate', kwargs={'key': activation_key}),
         )
     })
     return message_context
@@ -122,13 +120,13 @@ def get_available_course_qs():
     )
 
 
-def send_registration_email(user, user_profile, protocol):
+def send_registration_email(user, password, protocol):
     """
     send a registration notification via email
     """
     message = RegistrationNotification().personalize(
         recipient=Recipient(user.username, user.email),
-        language=user_profile.language,
-        user_context=get_registration_email_message_context(user, user_profile, protocol),
+        language=user.profile.language,
+        user_context=get_registration_email_message_context(user, password, protocol),
     )
     ace.send(message)
