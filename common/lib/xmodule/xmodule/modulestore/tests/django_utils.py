@@ -11,7 +11,7 @@ from enum import Enum
 from unittest.mock import patch
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser
 from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -525,7 +525,7 @@ class ModuleStoreTestCase(
 
         if self.CREATE_USER:
             # Create the user so we can log them in.
-            self.user = User.objects.create_user(uname, email, self.user_password)
+            self.user = UserFactory.create(username=uname, email=email, password=self.user_password)
 
             # Note that we do not actually need to do anything
             # for registration if we directly mark them active.
@@ -542,7 +542,7 @@ class ModuleStoreTestCase(
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+        nonstaff_user = UserFactory.create(username=uname, email='test+student@edx.org', password=password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.

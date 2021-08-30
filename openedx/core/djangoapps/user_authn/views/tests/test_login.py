@@ -70,7 +70,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.url = reverse('login_api')
 
     def _create_user(self, username, user_email):
-        user = UserFactory.build(username=username, email=user_email)
+        user = UserFactory.create(username=username, email=user_email)
         user.set_password(self.password)
         user.save()
         return user
