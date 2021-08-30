@@ -32,7 +32,7 @@ from student.models import CourseEnrollment
 log = getLogger(__name__)
 
 
-def _get_email_message_context(data):
+def _get_email_message_context(data, user):
     """
     get basic context for email
 
@@ -43,6 +43,7 @@ def _get_email_message_context(data):
     message_context = get_base_template_context(site)
     message_context.update({
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'full_name': (user.profile.name or user.username).title(),
         'course_name': data.get('course_name'),
         'completed': data.get('completed'),
         'status_message': data.get('status_message')
@@ -67,8 +68,8 @@ def send_reminder_email(data, course_key):
         path=reverse('course_root', kwargs={'course_id': course_key})
     )
     data['course_url'] = course_url
-    message_context = _get_email_message_context(data)
     user = User.objects.get(username=data.get('username'), email=data.get('email'))
+    message_context = _get_email_message_context(data, user)
     log.info("**** user:{} message_context:{}".format(user, message_context))
     with emulate_http_request(site, user):
         msg = CourseProgress().personalize(

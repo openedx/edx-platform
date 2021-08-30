@@ -15,6 +15,7 @@ from edx_ace.recipient import Recipient
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
+from student.models import Registration
 
 from .constants import GROUP_ORGANIZATION_ADMIN, GROUP_TRAINING_MANAGERS, LEARNER, ORG_ADMIN, TRAINING_MANAGER
 from .message_types import RegistrationNotification
@@ -78,7 +79,7 @@ def get_registration_email_message_context(user, password, protocol):
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'username': user.username,
         'password': password,
-        'profile_name': (user.profile.name or user.username).title(),
+        'full_name': (user.profile.name or user.username).title(),
         'email': user.email,
         'employee_id': user.profile.employee_id,
         'language': user.profile.language,
