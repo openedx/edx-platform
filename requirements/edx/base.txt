@@ -321,7 +321,7 @@ django-pyfs==3.1.0
     # via -r requirements/edx/base.in
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
-git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5
+git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a6#egg=django-ratelimit-backend==2.0.1a6
     # via -r requirements/edx/github.in
 django-require==1.0.11
     # via -r requirements/edx/base.in
