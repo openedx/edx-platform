@@ -680,7 +680,9 @@ idna==3.2
     #   requests
     #   yarl
 importlib-metadata==4.8.1
-    # via pytest-randomly
+    # via
+    #   -r requirements/edx/base.txt
+    #   pytest-randomly
 inflect==5.3.0
     # via
     #   -r requirements/edx/coverage.txt
@@ -1135,6 +1137,7 @@ requests==2.26.0
     #   analytics-python
     #   coreapi
     #   django-oauth-toolkit
+    #   docker
     #   edx-analytics-data-api-client
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1450,7 +1453,9 @@ yarl==1.6.3
     #   -r requirements/edx/base.txt
     #   aiohttp
 zipp==3.5.0
-    # via importlib-metadata
+    # via
+    #   -r requirements/edx/base.txt
+    #   importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

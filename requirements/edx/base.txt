@@ -560,6 +560,8 @@ idna==3.2
     #   -r requirements/edx/paver.txt
     #   requests
     #   yarl
+importlib-metadata==4.8.1
+    # via -r requirements/edx/base.in
 inflection==0.5.1
     # via drf-yasg
 interchange==2021.0.3
@@ -1098,6 +1100,8 @@ xss-utils==0.3.0
     # via -r requirements/edx/base.in
 yarl==1.6.3
     # via aiohttp
+zipp==3.5.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
