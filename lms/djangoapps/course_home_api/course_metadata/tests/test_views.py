@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
-from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
+from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
 
 
 @ddt.ddt
@@ -86,12 +86,12 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        with override_experiment_waffle_flag(STREAK_DISCOUNT_EXPERIMENT_FLAG, active=True):
+        with override_experiment_waffle_flag(STREAK_DISCOUNT_FLAG, active=True):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
-                assert celebrations['streak_discount_experiment_enabled'] is True
+                assert celebrations['streak_discount_enabled'] is True
 
     @ddt.data(
         # Who has access to MFE courseware?

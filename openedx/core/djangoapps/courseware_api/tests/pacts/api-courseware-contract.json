@@ -88,7 +88,7 @@
           "celebrations": {
             "first_section": false,
             "streak_length_to_celebrate": null,
-            "streak_discount_experiment_enabled": false
+            "streak_discount_enabled": false
           },
           "user_has_passing_grade": false,
           "course_exit_page_is_active": false,
@@ -223,7 +223,7 @@
           "$.body.celebrations.irst_section": {
             "match": "type"
           },
-          "$.body.celebrations.streak_discount_experiment_enabled": {
+          "$.body.celebrations.streak_discount_enabled": {
             "match": "type"
           },
           "$.body.user_has_passing_grade": {

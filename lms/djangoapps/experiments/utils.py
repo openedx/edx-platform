@@ -17,7 +17,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
-from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -74,20 +73,19 @@ UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
 )
 # TODO END: Clean up as part of REV-1205 (End)
 
-# .. toggle_name: streak_celebration.discount_experiment_AA759
-# .. toggle_implementation: ExperimentWaffleFlag
+# .. toggle_name: streak_celebration.discount
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This experiment flag enables an engagement discount incentive message.
+# .. toggle_description: This flag enables an engagement discount incentive message.
 # .. toggle_warnings: This flag depends on the streak celebration feature being enabled
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-05-05
-# .. toggle_target_removal_date: 2021-07-05
-# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-759
-STREAK_DISCOUNT_EXPERIMENT_FLAG = ExperimentWaffleFlag(
-    LegacyWaffleFlagNamespace(name='streak_celebration'),
-    'discount_experiment_AA759',
-    __name__,
-    use_course_aware_bucketing=False
+# .. toggle_creation_date: 2021-08-26
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
+STREAK_DISCOUNT_FLAG = LegacyWaffleFlag(
+    waffle_namespace='streak_celebration',
+    flag_name='discount_enabled',
+    module_name=__name__,
 )
 
 
