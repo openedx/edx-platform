@@ -901,9 +901,17 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             duplicate_metadata['display_name'] = display_name
         else:
             if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _(u"Duplicate of {0}").format(source_item.category)
+                duplicate_metadata['display_name'] = (u"(1) {0}").format(source_item.category)
             else:
-                duplicate_metadata['display_name'] = _(u"Duplicate of '{0}'").format(source_item.display_name)
+                if source_item.display_name[0] == '(' and source_item.display_name.find(')') != -1:
+                    if source_item.display_name[1: source_item.display_name.find(')')].isnumeric():
+                        number_copy = int(source_item.display_name[1: source_item.display_name.find(')')]) + 1
+                        index_str = source_item.display_name.find(')') + 1
+                        duplicate_metadata['display_name'] = (u"({}) {}").format(number_copy, source_item.display_name[index_str:].strip())
+                    else:
+                        duplicate_metadata['display_name'] = (u"(1) {0}").format(source_item.display_name)
+                else:
+                    duplicate_metadata['display_name'] = (u"(1) {0}").format(source_item.display_name)
 
         asides_to_create = []
         for aside in source_item.runtime.get_asides(source_item):
