@@ -4,6 +4,7 @@ import logging
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -509,6 +510,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         if LoginFailures.is_feature_enabled():
             LoginFailures.clear_lockout_counter(updated_user)
 
+        update_session_auth_hash(request, updated_user)
         send_password_reset_success_email(updated_user, request)
         return response
 
@@ -773,6 +775,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                     LoginFailures.clear_lockout_counter(user)
 
                 send_password_reset_success_email(user, request)
+                update_session_auth_hash(request, user)
         except ValidationError as err:
             AUDIT_LOG.exception("Password validation failed")
             error_status = {
