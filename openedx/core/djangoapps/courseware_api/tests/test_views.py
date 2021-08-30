@@ -302,7 +302,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        with override_experiment_waffle_flag(STREAK_DISCOUNT_FLAG, active=True):
+        with override_waffle_flag(STREAK_DISCOUNT_FLAG, active=True):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
