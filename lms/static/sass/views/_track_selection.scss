@@ -35,7 +35,7 @@
 }
 
 .certificate-container {
-    background-color: $info-100;
+    background-color: #EFF8FA;
     border: 1px solid $gray-500;
     height: auto;
     position: relative;
@@ -43,7 +43,7 @@
 
 .trophy-icon {
     padding: 10px;
-    color: $info-100;
+    color: #EFF8FA;
     position: absolute;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .upgrade-button button {
-    background: $primary-500;
+    background: #00262B;
     width: 90%;
     height: 40px;
     font-size: 16px;
@@ -63,7 +63,7 @@
 }
 
 #track_selection_upgrade:hover {
-    background: $primary-300;
+    background: #2D494E;
     border-color: transparent;
     color: #fff;
 }
@@ -73,7 +73,7 @@
 }
 
 .audit-button button {
-    color: $primary-500;
+    color: #00262B;
     width: 90%;
     height: 40px;
     font-size: 16px;
@@ -86,8 +86,8 @@
 }
 
 #track_selection_audit:hover {
-    background: $primary-500;
-    border-color: $primary-500;
+    background: #00262B;
+    border-color: #00262B;
     color: #fff;
     border-radius: 0px;
 }
@@ -144,7 +144,7 @@ a:not(.btn), a:visited:not(.btn) {
 }
 
 .triangle-overlay {
-    border-color: $primary-700 transparent transparent $primary-700;
+    border-color: #002121 transparent transparent #002121;
     border-style: solid;
     border-width: 45px;
     height: 0;
@@ -165,12 +165,12 @@ a:not(.btn), a:visited:not(.btn) {
 .collapsible {
     display: none;
     text-decoration: underline;
-    color: $primary-500;
+    color: #00262B;
     cursor: pointer;
 }
 
 .popover-icon {
-    color: $primary-500;
+    color: #00262B;
     position: relative;
 }
 
