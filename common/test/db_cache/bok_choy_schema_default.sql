@@ -1954,8 +1954,10 @@ CREATE TABLE `course_goals_coursegoal` (
   `user_id` int(11) NOT NULL,
   `days_per_week` int(10) unsigned NOT NULL,
   `subscribed_to_reminders` tinyint(1) NOT NULL,
+  `unsubscribe_token` char(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_goals_coursegoal_user_id_course_key_052bc0d3_uniq` (`user_id`,`course_key`),
+  UNIQUE KEY `unsubscribe_token` (`unsubscribe_token`),
   KEY `course_goals_coursegoal_course_key_5585ca51` (`course_key`),
   CONSTRAINT `course_goals_coursegoal_user_id_0a07e3db_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1975,11 +1977,13 @@ CREATE TABLE `course_goals_historicalcoursegoal` (
   `user_id` int(11) DEFAULT NULL,
   `days_per_week` int(10) unsigned NOT NULL,
   `subscribed_to_reminders` tinyint(1) NOT NULL,
+  `unsubscribe_token` char(32) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` (`history_user_id`),
   KEY `course_goals_historicalcoursegoal_id_ae96ee01` (`id`),
   KEY `course_goals_historicalcoursegoal_course_key_a8e29f00` (`course_key`),
   KEY `course_goals_historicalcoursegoal_user_id_3aef8b4b` (`user_id`),
+  KEY `course_goals_historicalcoursegoal_unsubscribe_token_96b31785` (`unsubscribe_token`),
   CONSTRAINT `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3170,7 +3174,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=926 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=930 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3935,7 +3939,7 @@ CREATE TABLE `enterprise_enterpriseenrollmentsource` (
   `slug` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enterprisefeaturerole`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
