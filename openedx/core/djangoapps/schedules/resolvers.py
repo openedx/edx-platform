@@ -7,7 +7,7 @@ from itertools import groupby
 import attr
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from edx_ace.recipient import Recipient
