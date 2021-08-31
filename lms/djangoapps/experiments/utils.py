@@ -73,7 +73,7 @@ UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
 )
 # TODO END: Clean up as part of REV-1205 (End)
 
-# .. toggle_name: streak_celebration.discount
+# .. toggle_name: streak_celebration.streak_discount_enabled
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables an engagement discount incentive message.
@@ -84,7 +84,7 @@ UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
 STREAK_DISCOUNT_FLAG = LegacyWaffleFlag(
     waffle_namespace='streak_celebration',
-    flag_name='discount_enabled',
+    flag_name='streak_discount_enabled',
     module_name=__name__,
 )
 

@@ -83,7 +83,7 @@ def get_discount_expiration_date(user, course):
     return discount_expiration_date
 
 
-def can_show_streak_discount_experiment_coupon(user, course):
+def can_show_streak_discount_coupon(user, course):
     """
     Check whether this combination of user and course
     can receive the streak discount.
