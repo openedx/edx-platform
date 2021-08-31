@@ -64,7 +64,7 @@ beautifulsoup4==4.9.3
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach==4.0.0
+bleach==4.1.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -142,7 +142,6 @@ cryptography==3.4.8
     #   -r requirements/edx/base.in
     #   django-fernet-fields
     #   edx-enterprise
-    #   py2neo
     #   pyjwt
     #   social-auth-core
 cssutils==2.3.0
@@ -244,7 +243,7 @@ django-config-models==2.2.0
     #   lti-consumer-xblock
 django-cookies-samesite==0.9.0
     # via -r requirements/edx/base.in
-django-cors-headers==2.5.3
+django-cors-headers==3.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -299,7 +298,7 @@ django-model-utils==4.1.1
     #   edxval
     #   ora2
     #   super-csv
-django-mptt==0.13.1
+django-mptt==0.13.2
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -380,8 +379,6 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-docker==5.0.0
-    # via py2neo
 docopt==0.6.2
     # via xmodule
 docutils==0.17.1
@@ -453,7 +450,7 @@ edx-i18n-tools==0.7.0
     # via ora2
 edx-milestones==0.3.2
     # via -r requirements/edx/base.in
-edx-name-affirmation==0.8.0
+edx-name-affirmation==0.8.1
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.2
     # via
@@ -518,8 +515,6 @@ elasticsearch==7.13.4
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   edx-search
-english==2020.7.0
-    # via py2neo
 enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.1.0
@@ -565,8 +560,12 @@ idna==3.2
     #   -r requirements/edx/paver.txt
     #   requests
     #   yarl
+importlib-metadata==4.8.1
+    # via -r requirements/edx/base.in
 inflection==0.5.1
     # via drf-yasg
+interchange==2021.0.3
+    # via py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.in
 isodate==0.6.0
@@ -675,9 +674,7 @@ multidict==5.1.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.in
-neotime==1.7.4
-    # via py2neo
-newrelic==6.8.0.163
+newrelic==6.8.1.164
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -702,7 +699,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.19
+ora2==3.6.20
     # via -r requirements/edx/base.in
 packaging==21.0
     # via
@@ -737,13 +734,11 @@ pillow==8.3.1
     #   edx-organizations
 polib==1.1.1
     # via edx-i18n-tools
-prompt-toolkit==3.0.20
-    # via py2neo
 psutil==5.8.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
-py2neo==2021.1.5
+py2neo==2021.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -848,10 +843,9 @@ pytz==2021.1
     #   event-tracking
     #   fs
     #   icalendar
-    #   neotime
+    #   interchange
     #   olxcleaner
     #   ora2
-    #   py2neo
     #   tincan
     #   xblock
 pyuca==1.2
@@ -869,7 +863,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==3.5.3
     # via -r requirements/edx/base.in
-regex==2021.8.21
+regex==2021.8.28
     # via nltk
 requests==2.26.0
     # via
@@ -877,7 +871,6 @@ requests==2.26.0
     #   analytics-python
     #   coreapi
     #   django-oauth-toolkit
-    #   docker
     #   edx-analytics-data-api-client
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -901,7 +894,7 @@ rest-condition==1.0.3
     # via
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
-ruamel.yaml==0.17.13
+ruamel.yaml==0.17.16
     # via drf-yasg
 ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
@@ -947,14 +940,13 @@ six==1.16.0
     #   edx-i18n-tools
     #   edx-milestones
     #   edx-rbac
-    #   english
     #   event-tracking
     #   fs
     #   fs-s3fs
     #   html5lib
+    #   interchange
     #   isodate
     #   libsass
-    #   neotime
     #   pansi
     #   paver
     #   py2neo
@@ -1022,7 +1014,7 @@ tincan==1.0.0
     # via edx-event-routing-backends
 tqdm==4.62.2
     # via nltk
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via aiohttp
 ua-parser==0.10.0
     # via django-cookies-samesite
@@ -1051,8 +1043,6 @@ voluptuous==0.12.1
     # via ora2
 watchdog==2.1.5
     # via -r requirements/edx/paver.txt
-wcwidth==0.2.5
-    # via prompt-toolkit
 web-fragments==1.1.0
     # via
     #   -r requirements/edx/base.in
@@ -1069,8 +1059,6 @@ webob==1.8.7
     # via
     #   xblock
     #   xmodule
-websocket-client==1.2.1
-    # via docker
 wrapt==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1112,8 +1100,8 @@ xss-utils==0.3.0
     # via -r requirements/edx/base.in
 yarl==1.6.3
     # via aiohttp
+zipp==3.5.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
-
-importlib-metadata==4.6.4
