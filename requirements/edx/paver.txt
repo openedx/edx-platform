@@ -54,4 +54,3 @@ wrapt==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
-importlib-metadata==4.6.4
