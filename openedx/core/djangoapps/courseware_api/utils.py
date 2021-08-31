@@ -10,6 +10,7 @@ from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_coupon
+from common.djangoapps.track import segment
 
 
 def get_celebrations_dict(user, enrollment, course, browser_timezone):
@@ -37,6 +38,21 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
         # if the course has not ended, is upgradeable and the user is not an enterprise learner
         if can_show_streak_discount_coupon(user, course):
             celebrations['streak_discount_enabled'] = STREAK_DISCOUNT_FLAG.is_enabled()
+
+            # Send course streak coupon event
+            course_key = str(course.id)
+            modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
+            verified_mode = modes_dict.get('verified', None)
+            if verified_mode:
+                segment.track(
+                    user_id=user.id,
+                    event_name='edx.bi.course.streak_discount_enabled',
+                    properties={
+                        'course_id': str(course_key),
+                        'sku': verified_mode.sku,
+                    }
+                )
+
     return celebrations
 
 

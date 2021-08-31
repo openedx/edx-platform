@@ -266,21 +266,6 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[session_key] = True
 
-            # Send course streak coupon event
-            if course_key and self._flag_name == 'streak_discount_enabled':
-                modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
-                verified_mode = modes_dict.get('verified', None)
-                if verified_mode:
-                    segment.track(
-                        user_id=user.id,
-                        event_name='edx.bi.course.streak_discount_enabled',
-                        properties={
-                            'course_id': str(course_key),
-                            'bucket': bucket,
-                            'sku': verified_mode.sku,
-                        }
-                    )
-
         return self._cache_bucket(experiment_name, bucket)
 
     def is_enabled(self, course_key=None):
