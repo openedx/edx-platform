@@ -17,6 +17,7 @@ import os
 from uuid import uuid4
 
 from django.utils.translation import ugettext_lazy
+from importlib_metadata import version
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
@@ -337,3 +338,12 @@ RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 ############### Settings for proctoring  ###############
 PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
+
+CORS_ORIGIN_WHITELIST = ('sandbox.edx.org',)
+CORS_ORIGIN_WHITELIST_WITH_SCHEME = ('https://sandbox.edx.org',)
+
+# values are already updated above with default CORS_ORIGIN_WHITELIST values but in
+# case of new version django_cors_headers they will get override.
+cors_major_version = int(version('django_cors_headers').split('.')[0])
+if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST_WITH_SCHEME:
+    CORS_ORIGIN_WHITELIST = CORS_ORIGIN_WHITELIST_WITH_SCHEME
