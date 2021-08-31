@@ -108,6 +108,11 @@ class SiteConfiguration(models.Model):
             root_url=self.site_values['LMS_ROOT_URL'],
         )
 
+        # RED-2471: Use Multi-tenant `/help` URL for password reset emails.
+        self.site_values['PASSWORD_RESET_SUPPORT_LINK'] = '{root_url}/help'.format(
+            root_url=self.site_values['LMS_ROOT_URL'],
+        )
+
         super(SiteConfiguration, self).save(**kwargs)
 
         # recompile SASS on every save
