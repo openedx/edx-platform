@@ -113,8 +113,7 @@ class CapaFactory:
             # since everything else is a string.
             field_data['attempts'] = int(attempts)
 
-        system = get_test_system(course_id=location.course_key)
-        system.user_is_staff = kwargs.get('user_is_staff', False)
+        system = get_test_system(course_id=location.course_key, user_is_staff=kwargs.get('user_is_staff', False))
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         module = ProblemBlock(
             system,
