@@ -8,7 +8,7 @@
 }
 
 .verification-process h3 {
-    color: $gray-700;
+    color: #454545;
     font-size: 1.4rem;
     text-align: center;
     font-weight: 700;
@@ -21,7 +21,7 @@
 
 .track-selection-audit {
     background-color: white;
-    border: 1px solid $gray-500;
+    border: 1px solid #707070;
     position: relative;
     float: right;
 }
@@ -36,7 +36,7 @@
 
 .certificate-container {
     background-color: #EFF8FA;
-    border: 1px solid $gray-500;
+    border: 1px solid #707070;
     height: auto;
     position: relative;
 }
@@ -79,7 +79,7 @@
     font-size: 16px;
     box-shadow: none;
     border-radius: 0px;
-    border-color: $light-300;
+    border-color: #F2F0EF;
     background: white;
     position: relative;
     margin-bottom: 1.5rem;
@@ -93,7 +93,7 @@
 }
 
 .certificate-container-bottom {
-    border: 1px solid $gray-500;
+    border: 1px solid #707070;
     display: flex;
     margin-top: -1px;
     padding: 18px;
@@ -114,11 +114,11 @@
 }
 
 a:not(.btn), a:visited:not(.btn) {
-    color: $gray-700;
+    color: #454545;
 }
 
 .choice-bullets li {
-    color: $gray-700;
+    color: #454545;
 }
 
 .choice-title {
@@ -129,7 +129,7 @@ a:not(.btn), a:visited:not(.btn) {
 .choice-title h4 {
     text-align: center;
     font-weight: 700;
-    color: $gray-700;
+    color: #454545;
     line-height: 28px;
     font-size: 22px;
 }
@@ -140,7 +140,7 @@ a:not(.btn), a:visited:not(.btn) {
     line-height: 20px;
     float: right;
     margin: 0.75rem;
-    color: $gray-700;
+    color: #454545;
 }
 
 .triangle-overlay {
@@ -178,7 +178,7 @@ a:not(.btn), a:visited:not(.btn) {
     visibility: hidden;
     width: 132px;
     background-color: #fff;
-    color: $gray-700;
+    color: #454545;
     border: 1px solid #B9BABE;
     border-radius: 6px;
     text-align: left;
