@@ -272,5 +272,6 @@ def course_about(request, category, course_id):
         return render_to_response('courseware/course_about.html', context)
 
 
-class BusinessView(TemplateView):
-    template_name = 'overrides/business.html'
+def business_view(request, *args, **kwargs):
+    """Business View"""
+    return render_to_response('overrides/business.html', {})
