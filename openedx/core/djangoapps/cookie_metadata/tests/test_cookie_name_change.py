@@ -32,8 +32,8 @@ class TestCookieNameChange(TestCase):
         }
 
         self.expand_settings = {
-            "old_name": self.old_key,
-            "new_name": "b",
+            "alternate": self.old_key,
+            "current": "b",
         }
 
     def test_cookie_swap(self):
@@ -44,26 +44,26 @@ class TestCookieNameChange(TestCase):
         self.mock_request.COOKIES = self.old_dict.copy()
 
         with self.settings(
-            COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE=True
+            COOKIE_NAME_CHANGE_ACTIVATE=True
         ), self.settings(COOKIE_NAME_CHANGE_EXPAND_INFO=self.expand_settings):
             self.cookie_name_change_middleware(self.mock_request)
 
-        assert self.expand_settings["old_name"] not in self.mock_request.COOKIES.keys()
-        assert self.expand_settings["new_name"] in self.mock_request.COOKIES.keys()
-        assert self.mock_request.COOKIES[self.expand_settings["new_name"]] == self.old_value
+        assert self.expand_settings["alternate"] not in self.mock_request.COOKIES.keys()
+        assert self.expand_settings["current"] in self.mock_request.COOKIES.keys()
+        assert self.mock_request.COOKIES[self.expand_settings["current"]] == self.old_value
         test_dict = self.extra_cookies.copy()
-        test_dict[self.expand_settings['new_name']] = self.old_value
+        test_dict[self.expand_settings['current']] = self.old_value
         assert self.mock_request.COOKIES == test_dict
 
         # make sure response function is called once
         self.mock_response.assert_called_once()
 
     def test_cookie_no_swap(self):
-        """Make sure self.cookie_name_change_middleware does not change cookie if new_name cookie is already present"""
+        """Make sure self.cookie_name_change_middleware does not change cookie if current cookie is already present"""
 
         new_value = "." * 13
         no_change_cookies = {
-            self.expand_settings['new_name']: new_value,
+            self.expand_settings['current']: new_value,
             "_c_": "." * 13,
             "a.b": "." * 10,
         }
@@ -73,13 +73,13 @@ class TestCookieNameChange(TestCase):
         self.mock_request.COOKIES = self.old_dict.copy()
 
         with self.settings(
-            COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE=True
+            COOKIE_NAME_CHANGE_ACTIVATE=True
         ), self.settings(COOKIE_NAME_CHANGE_EXPAND_INFO=self.expand_settings):
             self.cookie_name_change_middleware(self.mock_request)
 
-        assert self.expand_settings["old_name"] not in self.mock_request.COOKIES.keys()
-        assert self.expand_settings["new_name"] in self.mock_request.COOKIES.keys()
-        assert self.mock_request.COOKIES[self.expand_settings["new_name"]] == new_value
+        assert self.expand_settings["alternate"] not in self.mock_request.COOKIES.keys()
+        assert self.expand_settings["current"] in self.mock_request.COOKIES.keys()
+        assert self.mock_request.COOKIES[self.expand_settings["current"]] == new_value
         assert self.mock_request.COOKIES == no_change_cookies
 
         # make sure response function is called once
@@ -90,7 +90,7 @@ class TestCookieNameChange(TestCase):
 
         new_value = "." * 13
         no_change_cookies = {
-            self.expand_settings['new_name']: new_value,
+            self.expand_settings['current']: new_value,
             "_c_": "." * 13,
             "a.b": "." * 10,
         }
@@ -99,7 +99,7 @@ class TestCookieNameChange(TestCase):
         self.mock_request.COOKIES = self.old_dict.copy()
 
         with self.settings(
-            COOKIE_NAME_CHANGE_ACTIVATE_EXPAND_PHASE=False
+            COOKIE_NAME_CHANGE_ACTIVATE=False
         ), self.settings(COOKIE_NAME_CHANGE_EXPAND_INFO=self.expand_settings):
             self.cookie_name_change_middleware(self.mock_request)
 
