@@ -142,12 +142,11 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
-    def __init__(self, **kwargs):
+    def __init__(self, user=None, **kwargs):
         request_cache_dict = DEFAULT_REQUEST_CACHE.data
         store = modulestore()
 
         services = kwargs.setdefault('services', {})
-        user = kwargs.get('user')
         if user and user.is_authenticated:
             services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()

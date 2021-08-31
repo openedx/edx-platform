@@ -2557,3 +2557,95 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         item = self.store.get_item(item_id)
         assert item.__class__.__name__ == descriptor
         return item_id
+
+
+@ddt.ddt
+class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
+    """
+    Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the course and descriptor used to instantiate the runtime.
+        """
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+        cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
+
+    def setUp(self):
+        """
+        Set up the user and other fields that will be used to instantiate the runtime.
+        """
+        super().setUp()
+        self.user = UserFactory(id=232)
+        self.student_data = Mock()
+        self.track_function = Mock()
+        self.xqueue_callback_url_prefix = Mock()
+        self.request_token = Mock()
+
+    @ddt.data(
+        ('seed', 232),
+        ('user_id', 232),
+        ('user_is_staff', False),
+    )
+    @ddt.unpack
+    def test_user_service_attributes(self, attribute, expected_value):
+        """
+        Tests that the deprecated attributes provided by the user service match expected values.
+        """
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert getattr(runtime, attribute) == expected_value
+
+    @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+    def test_user_is_staff(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.user_is_staff
+
+    def test_anonymous_student_id(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+
+    def test_user_service_with_anonymous_user(self):
+        runtime, _ = render.get_module_system_for_user(
+            AnonymousUser(),
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.anonymous_student_id is None
+        assert runtime.seed == 0
+        assert runtime.user_id is None
+        assert not runtime.user_is_staff

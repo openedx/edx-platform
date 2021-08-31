@@ -35,7 +35,6 @@ from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
@@ -97,7 +96,6 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.x_module import XModuleDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -539,6 +537,24 @@ def get_module_system_for_user(
             })
         return handlers.get(event_type)
 
+    # These modules store data using the anonymous_student_id as a key.
+    # To prevent loss of data, we will continue to provide old modules with
+    # the per-student anonymized id (as we have in the past),
+    # while giving selected modules a per-course anonymized id.
+    # As we have the time to manually test more modules, we can add to the list
+    # of modules that get the per-course anonymized id.
+    if getattr(descriptor, 'requires_per_student_anonymous_id', False):
+        anonymous_student_id = anonymous_id_for_user(user, None)
+    else:
+        anonymous_student_id = anonymous_id_for_user(user, course_id)
+
+    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
+    user_service = DjangoXBlockUserService(
+        user,
+        user_is_staff=user_is_staff,
+        anonymous_user_id=anonymous_student_id,
+    )
+
     def publish(block, event_type, event):
         """
         A function that allows XModules to publish events.
@@ -746,22 +762,8 @@ def get_module_system_for_user(
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
-    # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide old modules with
-    # the per-student anonymized id (as we have in the past),
-    # while giving selected modules a per-course anonymized id.
-    # As we have the time to manually test more modules, we can add to the list
-    # of modules that get the per-course anonymized id.
-    is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
-    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)):
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, None)
-
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
-
-    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -794,7 +796,6 @@ def get_module_system_for_user(
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=anonymous_student_id,
         course_id=course_id,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
@@ -806,7 +807,7 @@ def get_module_system_for_user(
         services={
             'fs': FSService(),
             'field-data': field_data,
-            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+            'user': user_service,
             'verification': XBlockVerificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
