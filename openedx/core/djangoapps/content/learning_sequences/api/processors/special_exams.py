@@ -28,7 +28,7 @@ class SpecialExamsOutlineProcessor(OutlineProcessor):
     """
     Responsible for applying all outline processing related to special exams.
     """
-    def load_data(self):
+    def load_data(self, full_course_outline):
         """
         Check if special exams are enabled
         """

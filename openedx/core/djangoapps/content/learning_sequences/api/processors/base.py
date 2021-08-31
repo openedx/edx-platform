@@ -8,6 +8,8 @@ from datetime import datetime
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 from openedx.core import types
 
+from ...data import CourseOutlineData
+
 log = logging.getLogger(__name__)
 
 
@@ -44,7 +46,7 @@ class OutlineProcessor:
         self.user = user
         self.at_time = at_time
 
-    def load_data(self):
+    def load_data(self, full_course_outline: CourseOutlineData):  # pylint: disable=unused-argument
         """
         Fetch whatever data you need about the course and user here.
 
@@ -59,7 +61,7 @@ class OutlineProcessor:
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    def inaccessible_sequences(self, full_course_outline):  # lint-amnesty, pylint: disable=unused-argument
+    def inaccessible_sequences(self, full_course_outline: CourseOutlineData):  # pylint: disable=unused-argument
         """
         Return a set/frozenset of Sequence UsageKeys that are not accessible.
 
@@ -68,7 +70,7 @@ class OutlineProcessor:
         """
         return frozenset()
 
-    def usage_keys_to_remove(self, full_course_outline):  # lint-amnesty, pylint: disable=unused-argument
+    def usage_keys_to_remove(self, full_course_outline: CourseOutlineData):  # pylint: disable=unused-argument
         """
         Return a set/frozenset of UsageKeys to remove altogether.
 
