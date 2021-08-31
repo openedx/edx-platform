@@ -29,7 +29,6 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
 )
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
 from lms.djangoapps.verify_student.services import IDVerificationService
 from common.djangoapps.student.models import (

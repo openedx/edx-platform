@@ -11,7 +11,6 @@ from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.track import segment
-from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
