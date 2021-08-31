@@ -1240,7 +1240,7 @@ class CertificateDateOverride(TimeStampedModel):
         return "Certificate %s, date overridden to %s by %s on %s." % \
                (self.generated_certificate, self.date, self.overridden_by, self.created)
 
-    def _send_course_cert_changed_signal(self):
+    def send_course_cert_changed_signal(self):
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,
             user=self.generated_certificate.user,
@@ -1255,12 +1255,18 @@ class CertificateDateOverride(TimeStampedModel):
         signal.
         """
         super().save(*args, **kwargs)
-        transaction.on_commit(self._send_course_cert_changed_signal)
+        transaction.on_commit(self.send_course_cert_changed_signal)
 
-    def delete(self, *args, **kwargs):  # pylint: disable=signature-differs
-        """
-        After the base delete() method finishes, fire the COURSE_CERT_CHANGED
-        signal.
-        """
-        super().delete(*args, **kwargs)
-        transaction.on_commit(self._send_course_cert_changed_signal)
+
+@receiver(models.signals.post_delete, sender=CertificateDateOverride)
+def handle_certificate_date_override_delete(sender, instance, **kwargs):    # pylint: disable=unused-argument
+    """
+    After a CertificateDateOverride is deleted, fire the COURSE_CERT_CHANGED
+    signal.
+
+    We do this in a signal handler instead of overriding the
+    CertificateDateOverride delete method so that this will be executed for both
+    individual and bulk deletes from the Django admin. (The delete() method for
+    an object is not necessarily called when deleting objects in bulk.)
+    """
+    transaction.on_commit(instance.send_course_cert_changed_signal)
