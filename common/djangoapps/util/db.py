@@ -52,8 +52,7 @@ class OuterAtomic(transaction.Atomic):
     """
     ALLOW_NESTED = False
 
-    def __init__(self, using, savepoint, read_committed=False, name=None):
-        self.read_committed = read_committed
+    def __init__(self, using, savepoint, name=None):
         self.name = name
         super().__init__(using, savepoint)
 
@@ -82,16 +81,10 @@ class OuterAtomic(transaction.Atomic):
             if not self.ALLOW_NESTED and connection.in_atomic_block:
                 raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
 
-            # This will set the transaction isolation level to READ COMMITTED for the next transaction.
-            if self.read_committed is True:
-                if connection.vendor == 'mysql':
-                    cursor = connection.cursor()
-                    cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-
         super().__enter__()
 
 
-def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):
+def outer_atomic(using=None, savepoint=True, name=None):
     """
     A variant of Django's atomic() which cannot be nested inside another atomic.
 
@@ -119,23 +112,18 @@ def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):
     automatic transaction management disabled and other callers are not
     affected.
 
-    Additionally, some views need to use READ COMMITTED isolation level.
-    For this add @transaction.non_atomic_requests and
-    @outer_atomic(read_committed=True) decorators on it.
-
     Arguments:
         using (str): the name of the database.
-        read_committed (bool): Whether to use read committed isolation level.
         name (str): the name to give to this outer_atomic instance.
 
     Raises:
         TransactionManagementError: if already inside an atomic block.
     """
     if callable(using):
-        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint, read_committed)(using)
+        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint)(using)
     # Decorator: @outer_atomic(...) or context manager: with outer_atomic(...): ...
     else:
-        return OuterAtomic(using, savepoint, read_committed, name)
+        return OuterAtomic(using, savepoint, name)
 
 
 def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
