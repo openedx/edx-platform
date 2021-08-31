@@ -324,7 +324,7 @@ class DiscussionsConfiguration(TimeStampedModel):
     Associates a learning context with discussion provider and configuration
     """
 
-    context_key = models.CharField(
+    context_key = LearningContextKeyField(
         primary_key=True,
         db_index=True,
         unique=True,
@@ -360,11 +360,12 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     def clean(self):
         """
-        Validate only if the context key is a course key.
-        Program uuid is not validated because it is expected to be added via django admin
+        Validate the model.
+        Currently, this only support courses, this can be extended
+        whenever discussions are available in other contexts
         """
-        if "course" in self.context_key and not CourseOverview.course_exists(self.context_key):
-            raise ValidationError('Course with this key does not exist')
+        if not CourseOverview.course_exists(self.context_key):
+            raise ValidationError('Context Key should be an existing learning context.')
 
     def __str__(self):
         return "DiscussionsConfiguration(context_key='{context_key}', provider='{provider}', enabled={enabled})".format(
@@ -382,9 +383,9 @@ class DiscussionsConfiguration(TimeStampedModel):
         return has_support
 
     @classmethod
-    def is_enabled(cls, context_key) -> bool:
+    def is_enabled(cls, context_key: CourseKey) -> bool:
         """
-        Check if there is an active configuration for a given context key
+        Check if there is an active configuration for a given course key
 
         Default to False, if no configuration exists
         """
@@ -393,7 +394,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     # pylint: disable=undefined-variable
     @classmethod
-    def get(cls, context_key) -> cls:
+    def get(cls, context_key: CourseKey) -> cls:
         """
         Lookup a model by context_key
         """
@@ -416,3 +417,50 @@ class DiscussionsConfiguration(TimeStampedModel):
     @classmethod
     def get_available_providers(cls, context_key: CourseKey) -> list[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
+
+
+class ProgramDiscussionsConfiguration(TimeStampedModel):
+    """
+    Associates a program with a discussion provider and configuration
+    """
+
+    program_uuid = models.CharField(
+        primary_key=True,
+        db_index=True,
+        max_length=50,
+        verbose_name=_("Program UUID"),
+    )
+    enabled = models.BooleanField(
+        default=True,
+        help_text=_("If disabled, the discussions in the associated program will be disabled.")
+    )
+    lti_configuration = models.ForeignKey(
+        LtiConfiguration,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("The LTI configuration data for this program/provider."),
+    )
+    provider_type = models.CharField(
+        blank=False,
+        max_length=50,
+        verbose_name=_("Discussion provider"),
+        help_text=_("The discussion provider's id"),
+    )
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f"ProgramDiscussionConfiguration(uuid='{self.uuid}', provider='{self.provider}', enabled={self.enabled})"
+
+    @classmethod
+    def is_enabled(cls, program_uuid) -> bool:
+        """
+        Check if there is an active configuration for a given program uuid
+
+        Default to False, if no configuration exists
+        """
+        try:
+            configuration = cls.objects.get(program_uuid=program_uuid)
+            return configuration.enabled
+        except cls.DoesNotExist:
+            return False
