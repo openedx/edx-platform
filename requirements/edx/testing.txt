@@ -1137,7 +1137,6 @@ requests==2.26.0
     #   analytics-python
     #   coreapi
     #   django-oauth-toolkit
-    #   docker
     #   edx-analytics-data-api-client
     #   edx-bulk-grades
     #   edx-drf-extensions
