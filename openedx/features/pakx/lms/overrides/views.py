@@ -7,6 +7,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -269,3 +270,7 @@ def course_about(request, category, course_id):
         }
 
         return render_to_response('courseware/course_about.html', context)
+
+
+class BusinessView(TemplateView):
+    template_name = 'overrides/business.html'
