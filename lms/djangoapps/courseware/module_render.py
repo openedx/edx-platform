@@ -41,6 +41,7 @@ from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
 from common.djangoapps import static_replace
+from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -564,8 +565,10 @@ def get_module_system_for_user(
             handle_event(block, event)
         else:
             context = contexts.course_context_from_course_id(course_id)
-            if block.runtime.user_id:
-                context['user_id'] = block.runtime.user_id
+            user_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+            if user_id:
+                context['user_id'] = user_id
+
             context['asides'] = {}
             for aside in block.runtime.get_asides(block):
                 if hasattr(aside, 'get_event_context'):

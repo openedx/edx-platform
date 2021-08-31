@@ -45,6 +45,7 @@ from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, py
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -1923,7 +1924,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         if hasattr(xblock_class, 'module_class'):
             descriptor.module_class = xblock_class.module_class
 
-        return render.get_module_for_descriptor_internal(
+        module = render.get_module_for_descriptor_internal(
             user=self.user,
             descriptor=descriptor,
             student_data=Mock(spec=FieldData, name='student_data'),
@@ -1932,7 +1933,9 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             xqueue_callback_url_prefix=Mock(name='xqueue_callback_url_prefix'),  # XQueue Callback Url Prefix
             request_token='request_token',
             course=self.course,
-        ).xmodule_runtime.anonymous_student_id
+        )
+        current_user = module.xmodule_runtime.service(module, 'user').get_current_user()
+        return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
     def test_per_student_anonymized_id(self, descriptor_class):

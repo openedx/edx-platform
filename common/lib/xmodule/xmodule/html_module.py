@@ -17,6 +17,7 @@ from path import Path as path
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
@@ -42,6 +43,7 @@ _ = lambda text: text
 
 
 @XBlock.needs("i18n")
+@XBlock.needs("user")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
     XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
@@ -117,8 +119,9 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            if getattr(self.runtime, 'anonymous_student_id', None):
-                data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+            if user_id:
+                data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
             return data
         return self.data
