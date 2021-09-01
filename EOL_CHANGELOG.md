@@ -1,5 +1,9 @@
 # Changelog EOL
 
+## 01/09/2021 Always show welcome message
+- Comment get_course_tag (openedx/features/course_experience/views/welcome_message.py)
+- Update tests (openedx/features/course_experience/tests/views/test_welcome_message.py)
+
 ## 13/04/2021 Changes on Gradebook api
 - Page number in integer format (lms/djangoapps/instructor/views/gradebook_api.py)
 
