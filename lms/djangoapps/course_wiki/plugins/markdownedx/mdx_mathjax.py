@@ -1,5 +1,8 @@
-# Source: https://github.com/mayoff/python-markdown-mathjax  # lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Add MathJax Markdown support
 
+Source: https://github.com/mayoff/python-markdown-mathjax
+"""
 
 import markdown
 from markdown.util import etree, AtomicString
