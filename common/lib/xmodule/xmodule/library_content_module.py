@@ -8,6 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext
+from rest_framework import status
 
 import bleach
 from django.conf import settings
@@ -21,7 +22,7 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Integer, List, Scope, String
+from xblock.fields import Integer, List, Scope, String, Boolean
 
 from capa.responsetypes import registry
 from xmodule.mako_module import MakoTemplateBlockBase
@@ -177,6 +178,14 @@ class LibraryContentBlock(
         # which random/first set of matching blocks was selected per user
         default=[],
         scope=Scope.user_state,
+    )
+    # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
+    allow_resetting_children = Boolean(
+        display_name=_("Show Reset Button"),
+        help=_("Determines whether a 'Reset Problems' button is shown, so users may reset their answers and reshuffle "
+               "selected items."),
+        scope=Scope.settings,
+        default=False
     )
 
     @property
@@ -348,6 +357,27 @@ class LibraryContentBlock(
 
         return self.selected
 
+    @XBlock.handler
+    def reset_selected_children(self, _, __):
+        """
+        Resets the XBlock's state for a user.
+
+        This resets the state of all `selected` children and then clears the `selected` field
+        so that the new blocks are randomly chosen for this user.
+        """
+        if not self.allow_resetting_children:
+            return Response('"Resetting selected children" is not allowed for this XBlock',
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        for block_type, block_id in self.selected_children():
+            block = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            if hasattr(block, 'reset_problem'):
+                block.reset_problem(None)
+                block.save()
+
+        self.selected = []
+        return Response(json.dumps(self.student_view({}).content))
+
     def _get_selected_child_blocks(self):
         """
         Generator returning XBlock instances of the children selected for the
@@ -385,7 +415,11 @@ class LibraryContentBlock(
             'show_bookmark_button': False,
             'watched_completable_blocks': set(),
             'completion_delay_ms': None,
+            'reset_button': self.allow_resetting_children,
         }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_reset.js'))
+        fragment.initialize_js('LibraryContentReset')
         return fragment
 
     def author_view(self, context):
