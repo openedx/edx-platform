@@ -134,18 +134,21 @@ def get_value(val_name, default=None, **kwargs):  # lint-amnesty, pylint: disabl
     else:
         configuration_value = default
 
-    # Attempt to perform a dictionary update using the provided default
-    # This will fail if the default value is not a dictionary
-    try:
-        value = dict(default)
-        value.update(configuration_value)
-
-    # If the dictionary update fails, just use the configuration value
-    # TypeError: default is not iterable (simple value or None)
-    # ValueError: default is iterable but not a dict (list, not dict)
-    # AttributeError: default does not have an 'update' method
-    except (TypeError, ValueError, AttributeError):
+    if default == '':
         value = configuration_value
+    else:
+        # Attempt to perform a dictionary update using the provided default
+        # This will fail if the default value is not a dictionary
+        try:
+            value = dict(default)
+            value.update(configuration_value)
+
+        # If the dictionary update fails, just use the configuration value
+        # TypeError: default is not iterable (simple value or None)
+        # ValueError: default is iterable but not a dict (list, not dict)
+        # AttributeError: default does not have an 'update' method
+        except (TypeError, ValueError, AttributeError):
+            value = configuration_value
 
     # Return the end result to the caller
     return value
