@@ -74,7 +74,7 @@ UPSELL_TRACKING_FLAG = WaffleFlag(
 # .. toggle_default: False
 # .. toggle_description: This flag enables an engagement discount incentive message.
 # .. toggle_warnings: This flag depends on the streak celebration feature being enabled
-# .. toggle_use_cases: opt-out, open_edx
+# .. toggle_use_cases: opt_out, open_edx
 # .. toggle_creation_date: 2021-08-26
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
