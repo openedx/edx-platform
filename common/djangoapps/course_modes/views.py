@@ -269,6 +269,9 @@ class ChooseModeView(View):
             # Happy path conditions.
             if verified_mode and fbe_is_on and not enterprise_customer:
                 return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
+            elif verified_mode and not fbe_is_on and not enterprise_customer:
+                return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
+        # failover: old choose.html page
         #return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
