@@ -33,7 +33,12 @@ from .signals import (
     PROBLEM_WEIGHTED_SCORE_CHANGED,
     SCORE_PUBLISHED,
     SUBSECTION_OVERRIDE_CHANGED,
-    SUBSECTION_SCORE_CHANGED
+    SUBSECTION_SCORE_CHANGED,
+    COURSE_GRADE_PASSED_FIRST_TIME
+)
+from openedx.core.djangoapps.signals.signals import (
+    COURSE_GRADE_NOW_FAILED,
+    COURSE_GRADE_NOW_PASSED
 )
 
 log = getLogger(__name__)
@@ -264,3 +269,33 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, countdown
             course_key=str(course_key)
         )
     )
+
+
+@receiver(COURSE_GRADE_NOW_PASSED)
+def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a signal indicating that the user has passed a course run.
+
+    Emits an edx.course.grade.now_passed event
+    """
+    events.course_grade_now_passed(user, course_id)
+
+
+@receiver(COURSE_GRADE_NOW_FAILED)
+def listen_for_failing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a signal indicating that the user has failed a course run.
+
+    Emits an edx.course.grade.now_failed event
+    """
+    events.course_grade_now_failed(user, course_id)
+
+
+@receiver(COURSE_GRADE_PASSED_FIRST_TIME)
+def listen_for_course_grade_passed_first_time(sender, user_id, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a signal indicating that the user has passed course grade first time.
+
+    Emits an event edx.course.grade.passed.first_time
+    """
+    events.course_grade_passed_first_time(user_id, course_id)
