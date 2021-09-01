@@ -118,4 +118,6 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
         self.client.post(dismiss_message_url(self.course))
         response = self.client.get(welcome_message_url(self.course))
         self.assertNotIn('First Update', response)
-        self.assertEqual(response.status_code, 204)
+        ### EOL UPDATE: Always show welcome message
+        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 204)

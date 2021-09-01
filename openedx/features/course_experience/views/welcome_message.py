@@ -46,11 +46,12 @@ class WelcomeMessageFragmentView(EdxFragmentView):
             'welcome_message_html': welcome_message_html,
         }
 
-        if get_course_tag(request.user, course_key, PREFERENCE_KEY) == 'False':
-            return None
-        else:
-            html = render_to_string('course_experience/welcome-message-fragment.html', context)
-            return Fragment(html)
+        ### EOL: Always show welcome message
+        # if get_course_tag(request.user, course_key, PREFERENCE_KEY) == 'False':
+        #     return None
+        # else:
+        html = render_to_string('course_experience/welcome-message-fragment.html', context)
+        return Fragment(html)
 
     @classmethod
     def welcome_message_html(cls, request, course):
