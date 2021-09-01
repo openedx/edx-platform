@@ -22,7 +22,7 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     __test__ = True
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def _user(self, user_idx):  # lint-amnesty, pylint: disable=arguments-differ
         return self.users[user_idx].username
