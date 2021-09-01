@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3132 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3148 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1646,6 +1646,20 @@ CREATE TABLE `content_libraries_contentlibrary` (
   CONSTRAINT `content_libraries_co_org_id_b945a402_fk_organizat` FOREIGN KEY (`org_id`) REFERENCES `organizations_organization` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `content_libraries_contentlibrary_authorized_lti_configs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `content_libraries_contentlibrary_authorized_lti_configs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `contentlibrary_id` int(11) NOT NULL,
+  `ltitool_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_libraries_conten_contentlibrary_id_ltitoo_5bb55a86_uniq` (`contentlibrary_id`,`ltitool_id`),
+  KEY `content_libraries_co_ltitool_id_38e2ba78_fk_lti1p3_to` (`ltitool_id`),
+  CONSTRAINT `content_libraries_co_contentlibrary_id_75800081_fk_content_l` FOREIGN KEY (`contentlibrary_id`) REFERENCES `content_libraries_contentlibrary` (`id`),
+  CONSTRAINT `content_libraries_co_ltitool_id_38e2ba78_fk_lti1p3_to` FOREIGN KEY (`ltitool_id`) REFERENCES `lti1p3_tool` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `content_libraries_contentlibraryblockimporttask`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1681,6 +1695,38 @@ CREATE TABLE `content_libraries_contentlibrarypermission` (
   CONSTRAINT `content_libraries_co_group_id_c2a4b6a1_fk_auth_grou` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
   CONSTRAINT `content_libraries_co_library_id_51247096_fk_content_l` FOREIGN KEY (`library_id`) REFERENCES `content_libraries_contentlibrary` (`id`),
   CONSTRAINT `content_libraries_co_user_id_b071c54d_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `content_libraries_ltigradedresource`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `content_libraries_ltigradedresource` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usage_key` varchar(255) NOT NULL,
+  `resource_id` varchar(255) NOT NULL,
+  `resource_title` varchar(255) DEFAULT NULL,
+  `ags_lineitem` varchar(255) NOT NULL,
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_libraries_ltigra_usage_key_profile_id_20a2f94c_uniq` (`usage_key`,`profile_id`),
+  KEY `content_libraries_lt_profile_id_a46c16cc_fk_content_l` (`profile_id`),
+  CONSTRAINT `content_libraries_lt_profile_id_a46c16cc_fk_content_l` FOREIGN KEY (`profile_id`) REFERENCES `content_libraries_ltiprofile` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `content_libraries_ltiprofile`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `content_libraries_ltiprofile` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `platform_id` varchar(255) NOT NULL,
+  `client_id` varchar(255) NOT NULL,
+  `subject_id` varchar(255) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_libraries_ltipro_platform_id_client_id_su_9b6cf002_uniq` (`platform_id`,`client_id`,`subject_id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `content_libraries_ltiprofile_user_id_a54fb7a1_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `content_type_gating_contenttypegatingconfig`;
@@ -1954,8 +2000,10 @@ CREATE TABLE `course_goals_coursegoal` (
   `user_id` int(11) NOT NULL,
   `days_per_week` int(10) unsigned NOT NULL,
   `subscribed_to_reminders` tinyint(1) NOT NULL,
+  `unsubscribe_token` char(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_goals_coursegoal_user_id_course_key_052bc0d3_uniq` (`user_id`,`course_key`),
+  UNIQUE KEY `unsubscribe_token` (`unsubscribe_token`),
   KEY `course_goals_coursegoal_course_key_5585ca51` (`course_key`),
   CONSTRAINT `course_goals_coursegoal_user_id_0a07e3db_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1975,11 +2023,13 @@ CREATE TABLE `course_goals_historicalcoursegoal` (
   `user_id` int(11) DEFAULT NULL,
   `days_per_week` int(10) unsigned NOT NULL,
   `subscribed_to_reminders` tinyint(1) NOT NULL,
+  `unsubscribe_token` char(32) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` (`history_user_id`),
   KEY `course_goals_historicalcoursegoal_id_ae96ee01` (`id`),
   KEY `course_goals_historicalcoursegoal_course_key_a8e29f00` (`course_key`),
   KEY `course_goals_historicalcoursegoal_user_id_3aef8b4b` (`user_id`),
+  KEY `course_goals_historicalcoursegoal_unsubscribe_token_96b31785` (`unsubscribe_token`),
   CONSTRAINT `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3159,7 +3209,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=883 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=887 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3170,7 +3220,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=926 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=936 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3729,11 +3779,12 @@ CREATE TABLE `enterprise_enterprisecatalogquery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
-  `title` varchar(255) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
   `content_filter` longtext,
   `uuid` char(32) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `enterprise_enterprisecatalogquery_uuid_4fdf5c5a_uniq` (`uuid`)
+  UNIQUE KEY `enterprise_enterprisecatalogquery_uuid_4fdf5c5a_uniq` (`uuid`),
+  UNIQUE KEY `enterprise_enterprisecatalogquery_title_7a5a0a9d_uniq` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enterprisecourseenrollment`;
@@ -3935,7 +3986,7 @@ CREATE TABLE `enterprise_enterpriseenrollmentsource` (
   `slug` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enterprisefeaturerole`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5083,6 +5134,42 @@ CREATE TABLE `lms_xblock_xblockasidesconfig` (
   PRIMARY KEY (`id`),
   KEY `lms_xblock_xblockasi_changed_by_id_71928be3_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `lms_xblock_xblockasi_changed_by_id_71928be3_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti1p3_tool`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti1p3_tool` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `issuer` varchar(255) NOT NULL,
+  `client_id` varchar(255) NOT NULL,
+  `use_by_default` tinyint(1) NOT NULL,
+  `auth_login_url` varchar(1024) NOT NULL,
+  `auth_token_url` varchar(1024) NOT NULL,
+  `auth_audience` varchar(1024) DEFAULT NULL,
+  `key_set_url` varchar(1024) DEFAULT NULL,
+  `key_set` longtext,
+  `deployment_ids` longtext NOT NULL,
+  `tool_key_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lti1p3_tool_issuer_client_id_b3116be4_uniq` (`issuer`,`client_id`),
+  KEY `lti1p3_tool_tool_key_id_608be89f_fk_lti1p3_tool_key_id` (`tool_key_id`),
+  CONSTRAINT `lti1p3_tool_tool_key_id_608be89f_fk_lti1p3_tool_key_id` FOREIGN KEY (`tool_key_id`) REFERENCES `lti1p3_tool_key` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti1p3_tool_key`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti1p3_tool_key` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `private_key` longtext NOT NULL,
+  `public_key` longtext,
+  `public_jwk` longtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `lti_consumer_ltiagslineitem`;
