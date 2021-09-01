@@ -2,11 +2,9 @@
 Test helpers for Site Configuration.
 """
 
-
-from functools import wraps
 import contextlib
 
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from django.contrib.sites.models import Site
 
@@ -32,7 +30,6 @@ def with_site_configuration(domain="test.localhost", configuration=None):
             site=site,
             defaults={"enabled": True},
         )
-        apply_appsembler_theme_configs(site_configuration, configuration)
         return site_configuration
 
     def _decorator(test_class_or_func):
