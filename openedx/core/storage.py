@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
 from django.utils.deconstruct import deconstructible
-from django.utils.lru_cache import lru_cache
+from functools import lru_cache
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
 from storages.backends.s3boto3 import S3Boto3Storage
