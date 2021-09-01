@@ -7,9 +7,10 @@ from babel.numbers import get_currency_symbol
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollmentCelebration, UserCelebration
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
-from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
+from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from openedx.features.discounts.applicability import can_show_streak_discount_experiment_coupon
+from openedx.features.discounts.applicability import can_show_streak_discount_coupon
+from common.djangoapps.track import segment
 
 
 def get_celebrations_dict(user, enrollment, course, browser_timezone):
@@ -20,7 +21,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
         return {
             'first_section': False,
             'streak_length_to_celebrate': None,
-            'streak_discount_experiment_enabled': False,
+            'streak_discount_enabled': False,
         }
 
     streak_length_to_celebrate = UserCelebration.perform_streak_updates(
@@ -29,15 +30,29 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
     celebrations = {
         'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(enrollment),
         'streak_length_to_celebrate': streak_length_to_celebrate,
-        'streak_discount_experiment_enabled': False,
+        'streak_discount_enabled': False,
     }
 
-    # We only want to bucket people into the AA-759 experiment if they are going to see the streak celebration
     if streak_length_to_celebrate:
-        # We only want to bucket people into the AA-759 experiment
+        # We only want to offer the streak discount
         # if the course has not ended, is upgradeable and the user is not an enterprise learner
-        if can_show_streak_discount_experiment_coupon(user, course):
-            celebrations['streak_discount_experiment_enabled'] = STREAK_DISCOUNT_EXPERIMENT_FLAG.is_enabled(course.id)
+        if can_show_streak_discount_coupon(user, course):
+            celebrations['streak_discount_enabled'] = STREAK_DISCOUNT_FLAG.is_enabled()
+
+            # Send course streak coupon event
+            course_key = str(course.id)
+            modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
+            verified_mode = modes_dict.get('verified', None)
+            if verified_mode:
+                segment.track(
+                    user_id=user.id,
+                    event_name='edx.bi.course.streak_discount_enabled',
+                    properties={
+                        'course_id': str(course_key),
+                        'sku': verified_mode.sku,
+                    }
+                )
+
     return celebrations
 
 
