@@ -402,7 +402,7 @@ class SharedModuleStoreTestCase(
     for Django ORM models that will get cleaned up properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     @classmethod
     @contextmanager
@@ -491,7 +491,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     @classmethod
     def setUpClass(cls):
