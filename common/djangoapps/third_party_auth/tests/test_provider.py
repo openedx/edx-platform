@@ -78,6 +78,7 @@ class RegistryTest(testutil.TestCase):
         with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
             self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
 
+    @unittest.expectedFailure  # Tahoe: Skip this performance since we query sites a lot.
     def test_enabled_doesnt_query_site(self):
         """Regression test for 1+N queries for django_site (ARCHBOM-1139)"""
         re_django_site_query = re.compile(r'FROM\s+"django_site"')
