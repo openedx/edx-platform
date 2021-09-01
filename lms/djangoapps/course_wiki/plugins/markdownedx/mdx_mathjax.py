@@ -3,9 +3,10 @@ Add MathJax Markdown support
 
 Source: https://github.com/mayoff/python-markdown-mathjax
 """
+from xml.etree import ElementTree
 
 import markdown
-from markdown.util import etree, AtomicString
+from markdown.util import AtomicString
 
 
 class MathJaxPattern(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -14,7 +15,7 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: 
         markdown.inlinepatterns.Pattern.__init__(self, r'(?<!\\)(\$\$?)(.+?)\2')
 
     def handleMatch(self, m):
-        el = etree.Element('span')
+        el = ElementTree.Element('span')
         el.text = AtomicString(m.group(2) + m.group(3) + m.group(2))
         return el
 
