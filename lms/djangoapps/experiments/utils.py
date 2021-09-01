@@ -69,20 +69,6 @@ UPSELL_TRACKING_FLAG = WaffleFlag(
 )
 # TODO END: Clean up as part of REV-1205 (End)
 
-# .. toggle_name: streak_celebration.streak_discount_enabled
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables an engagement discount incentive message.
-# .. toggle_warnings: This flag depends on the streak celebration feature being enabled
-# .. toggle_use_cases: opt_out, open_edx
-# .. toggle_creation_date: 2021-08-26
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
-STREAK_DISCOUNT_FLAG = WaffleFlag(
-    'streak_celebration.streak_discount_enabled',
-    __name__,
-)
-
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     """
