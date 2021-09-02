@@ -771,7 +771,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         post_request = self._get_login_post_request(strategy)
         with self._patch_edxmako_current_request(post_request):
-            self.assert_json_failure_response_is_inactive_account(login_user(post_request))
+            with mock.patch('openedx.core.djangoapps.theming.helpers.get_current_site',
+                            return_value=strategy.request.site):
+                self.assert_json_failure_response_is_inactive_account(login_user(post_request))
 
     def test_signin_fails_if_no_account_associated(self):
         _, strategy = self.get_request_and_strategy(
@@ -860,7 +862,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # ...but when we invoke create_account the existing edX view will make
         # it, but not social auths. The pipeline creates those later.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_json_success_response_looks_correct(create_account(strategy.request), verify_redirect_url=False)
+            with mock.patch('openedx.core.djangoapps.theming.helpers.get_current_site',
+                            return_value=strategy.request.site):
+                create_response = create_account(strategy.request)
+                self.assert_json_success_response_looks_correct(create_response, verify_redirect_url=False)
         # We've overridden the user's password, so authenticate() with the old
         # value won't work:
         created_user = self.get_user_by_email(strategy, email)
@@ -919,7 +924,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         with self._patch_edxmako_current_request(strategy.request):
             strategy.request.POST = self.get_registration_post_vars()
             # Create twice: once successfully, and once causing a collision.
-            create_account(strategy.request)
+
+            with mock.patch('openedx.core.djangoapps.theming.helpers.get_current_site',
+                            return_value=request.site):
+                create_account(strategy.request)
         self.assert_json_failure_response_is_username_collision(create_account(strategy.request))
 
     def test_pipeline_raises_auth_entry_error_if_auth_entry_invalid(self):
