@@ -108,6 +108,11 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         # Location should be "/login".
         assert response._headers.get('location')[1] == '/login'  # pylint: disable=protected-access
 
+    @override_settings(GOOGLE_ANALYTICS_ACCOUNT="UA-1234")
+    def test_google_analytics_account_present(self):
+        response = self.client.get('/')
+        self.assertContains(response, "UA-1234")
+
 
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
