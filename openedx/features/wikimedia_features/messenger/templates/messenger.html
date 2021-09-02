@@ -1,0 +1,52 @@
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+%>
+
+<%inherit file="main.html"/>
+<%namespace name="static" file="static_content.html"/>
+
+<%block name="title">
+    <title>
+        ${_("Messenger - {platform_name}").format(platform_name=platform_name)}
+    </title>
+</%block>
+
+<%block name="body">
+    <div id="root" class="container">
+    </div>
+    <%static:webpack entry="Messenger">
+        var context = {
+            "PLATFORM_NAME": "${platform_name | n, js_escaped_string}",
+            "LOGIN_USER": "${login_user_username | n, js_escaped_string}",
+            "LOGIN_USER_IMG": "${login_user_img | n, js_escaped_string}",
+
+
+            "MESSAGE_URL": "${reverse(
+                'messenger:messenger_api_v0:message_create'
+            ) | n, js_escaped_string}",
+
+
+            "BULK_MESSAGE_URL": "${reverse(
+                'messenger:messenger_api_v0:bulk_message'
+            ) | n, js_escaped_string}",
+
+
+            "INBOX_URL": "${reverse(
+                'messenger:messenger_api_v0:user_inbox_list'
+            ) | n, js_escaped_string}",
+
+            "CONVERSATION_URL": "${reverse(
+                'messenger:messenger_api_v0:conversation_list'
+            ) | n, js_escaped_string}",
+
+            "USER_SEARCH_URL": "${reverse(
+                'messenger:messenger_api_v0:user_search'
+            ) | n, js_escaped_string}",
+        }
+
+        new Messenger(context);
+    </%static:webpack>
+</%block>

@@ -95,6 +95,8 @@ setup(
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
             "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
             "admin_dashboard = openedx.features.wikimedia_features.admin_dashboard.apps:AdminDashboardConfig",
+            "messenger = openedx.features.wikimedia_features.messenger.apps:MessengerConfig",
+
         ],
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
