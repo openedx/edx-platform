@@ -10,9 +10,22 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from common.djangoapps.student.models import CourseEnrollmentAllowed
-from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
+
+from openedx_events.learning.data import (
+    CourseData,
+    CourseEnrollmentData,
+    UserData,
+    UserPersonalData,
+)
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -179,3 +192,87 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         # CEAs shouldn't have been affected
         assert CourseEnrollmentAllowed.objects.count() == 1
         assert CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count() == 1
+
+
+@skip_unless_lms
+class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
+    """
+    Tests for the Open edX Events associated with the enrollment process through the enroll method.
+
+    This class guarantees that the following events are sent during the user's enrollment, with
+    the exact Data Attributes as the event definition stated:
+
+        - COURSE_ENROLLMENT_CREATED: sent after the user's enrollment.
+    """
+
+    ENABLED_OPENEDX_EVENTS = ["org.openedx.learning.course.enrollment.created.v1"]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(
+            username="test",
+            email="test@example.com",
+            password="password",
+        )
+        self.user_profile = UserProfileFactory.create(user=self.user, name="Test Example")
+        self.receiver_called = False
+
+    def _event_receiver_side_effect(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Used show that the Open edX Event was called by the Django signal handler.
+        """
+        self.receiver_called = True
+
+    def test_enrollment_created_event_emitted(self):
+        """
+        Test whether the student enrollment event is sent after the user's
+        enrollment process.
+
+        Expected result:
+            - COURSE_ENROLLMENT_CREATED is sent and received by the mocked receiver.
+            - The arguments that the receiver gets are the arguments sent by the event
+            except the metadata generated on the fly.
+        """
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_ENROLLMENT_CREATED.connect(event_receiver)
+
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_ENROLLMENT_CREATED,
+                "sender": None,
+                "enrollment": CourseEnrollmentData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=enrollment.is_active,
+                    creation_date=enrollment.created,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )

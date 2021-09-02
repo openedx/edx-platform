@@ -68,6 +68,7 @@ attrs==21.2.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   edx-ace
+    #   openedx-events
     #   pytest
 babel==2.9.1
     # via
@@ -283,6 +284,7 @@ distlib==0.3.2
     #   help-tokens
     #   jsonfield2
     #   lti-consumer-xblock
+    #   openedx-events
     #   ora2
     #   rest-condition
     #   super-csv
@@ -556,6 +558,7 @@ edx-opaque-keys[django]==2.2.2
     #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
+    #   openedx-events
     #   ora2
     #   xmodule
 edx-organizations==6.10.0
@@ -876,6 +879,8 @@ oauthlib==3.0.1
     #   requests-oauthlib
     #   social-auth-core
 openedx-calc==2.0.1
+    # via -r requirements/edx/base.txt
+openedx-events==0.5.1
     # via -r requirements/edx/base.txt
 ora2==3.6.20
     # via -r requirements/edx/base.txt
