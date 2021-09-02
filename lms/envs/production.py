@@ -25,6 +25,7 @@ import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
+from importlib.metadata import version
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -356,6 +357,13 @@ CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
+
+    # values are already updated above with default CORS_ORIGIN_WHITELIST values but in
+    # case of new version of django_cors_headers they will get override.
+    cors_major_version = int(version('django_cors_headers').split('.')[0])
+    if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME'):
+        CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME')
+
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
