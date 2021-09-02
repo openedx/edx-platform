@@ -360,6 +360,7 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
 
     if language == settings.LANGUAGE_CODE:
         links.append(('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
+        # Translators: 'Open edX' is a trademark, please keep this untranslated
         links.append(('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
         links.append(('careers', (marketing_link("CAREERS"), _("Careers"))))
         links.append(("news", (marketing_link("NEWS"), _("News"))))

@@ -1795,6 +1795,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(True))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
+    @override_settings(PLATFORM_NAME='edX')
     def test_course_details_with_enabled_setting_non_global_staff(self):
         """
         Test that user enrollment end date is not editable in response.

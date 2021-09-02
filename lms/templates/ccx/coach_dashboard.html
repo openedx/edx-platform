@@ -2,6 +2,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from openedx.core.djangolib.js_utils import (
@@ -47,7 +48,7 @@ from openedx.core.djangolib.js_utils import (
                   <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
                 </div>
                 <div class="field">
-                  <button id="create-ccx" type="submit">${_('Create a new Custom Course for edX')}</button>
+                  <button id="create-ccx" type="submit">${_('Create a new Custom Course for {platform_name}').format(platform_name=settings.PLATFORM_NAME)}</button>
                 </div>
               </form>
           </div>

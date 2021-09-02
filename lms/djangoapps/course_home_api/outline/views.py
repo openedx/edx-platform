@@ -6,6 +6,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -300,8 +301,10 @@ class OutlineTabView(RetrieveAPIView):
         if not show_enrolled:
             if CourseMode.is_masters_only(course_key):
                 enroll_alert['can_enroll'] = False
-                enroll_alert['extra_text'] = _('Please contact your degree administrator or '
-                                               'edX Support if you have questions.')
+                enroll_alert['extra_text'] = _(
+                    'Please contact your degree administrator or '
+                    '{platform_name} Support if you have questions.'
+                ).format(platform_name=settings.PLATFORM_NAME)
             elif course.invitation_only:
                 enroll_alert['can_enroll'] = False
 
