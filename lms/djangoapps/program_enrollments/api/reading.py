@@ -5,7 +5,10 @@ Outside of this subpackage, import these functions
 from `lms.djangoapps.program_enrollments.api`.
 """
 
+from functools import reduce
+from operator import or_
 
+from django.db.models import Q
 from organizations.models import Organization
 from social_django.models import UserSocialAuth
 
@@ -257,7 +260,7 @@ def fetch_program_enrollments_by_student(
         )
     filters = {
         "user": user,
-        "external_user_key": external_user_key,
+        "external_user_key__iexact": external_user_key,
         "program_uuid__in": program_uuids,
         "curriculum_uuid__in": curriculum_uuids,
         "status__in": program_enrollment_statuses,
@@ -412,11 +415,14 @@ def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
             saml_provider.get_social_auth_uid(external_user_key)
             for external_user_key in external_user_keys
         }
-        social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
-        found_users_by_external_keys.update({
-            saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
-            for social_auth in social_auths
-        })
+        if social_auth_uids:
+            # Filter should be case insensitive
+            query_filter = reduce(or_, [Q(uid__iexact=uid) for uid in social_auth_uids])
+            social_auths = UserSocialAuth.objects.filter(query_filter)
+            found_users_by_external_keys.update({
+                saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
+                for social_auth in social_auths
+            })
 
     # Default all external keys to None, because external keys
     # without a User will not appear in `found_users_by_external_keys`.

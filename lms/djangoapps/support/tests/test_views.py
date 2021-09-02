@@ -1069,6 +1069,38 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         render_call_dict = mocked_render.call_args[0][1]
         assert expected_error == render_call_dict['error']
 
+    @patch_render
+    def test_search_external_user_case_insensitive(self, mocked_render):
+        external_user_key = 'AbCdEf123'
+        requested_external_user_key = 'aBcDeF123'
+
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            external_user_key
+        )
+
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            external_user_key,
+            created_user
+        )
+        id_verified = self._construct_id_verification(created_user)
+
+        self.client.get(self.url, data={
+            'external_user_key': requested_external_user_key,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified,
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
 
 class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
