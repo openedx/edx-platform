@@ -205,7 +205,8 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         'pakx_flashcard',
         'image-explorer',
         'adventure',
-        'pakx_feedback'
+        'pakx_feedback',
+        'pakx_video'
     ]
     all_blocks = get_blocks(
         request,
@@ -224,7 +225,10 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
             'weight',
             'special_exam_info',
             'show_gated_sections',
-            'format'
+            'format',
+            'video_title',
+            'thumbnail_url',
+            'video_duration',
         ],
         block_types_filter=block_types_filter,
         allow_start_dates_in_future=allow_start_dates_in_future,

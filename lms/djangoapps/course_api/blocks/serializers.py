@@ -52,6 +52,9 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('contains_gated_content'),
     SupportedFieldType('has_score'),
     SupportedFieldType('weight'),
+    SupportedFieldType('video_title'),
+    SupportedFieldType('thumbnail_url'),
+    SupportedFieldType('video_duration'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
