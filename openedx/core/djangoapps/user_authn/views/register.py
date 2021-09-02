@@ -35,6 +35,7 @@ from common.djangoapps import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
+from common.djangoapps.util.braze_email import BrazeCreateUser
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -229,6 +230,9 @@ def create_account_with_params(request, params):
     if not preferences_api.has_user_preference(user, LANGUAGE_KEY):
         preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
+    BrazeCreateUser.create_user(user)
+    _track_user_registration(user, profile, params, third_party_provider, registration)
+
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
         user, running_pipeline, third_party_provider,
@@ -246,8 +250,6 @@ def create_account_with_params(request, params):
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Enable discussion notifications failed for user {user.id}.")
-
-    _track_user_registration(user, profile, params, third_party_provider, registration)
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)

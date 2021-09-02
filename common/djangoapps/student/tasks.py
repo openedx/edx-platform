@@ -37,6 +37,11 @@ def send_activation_email(self, msg_string, from_address=None):
         )
     msg.options['from_address'] = from_address
 
+    # This option is used to send account activation's transactional email through Braze.
+    if settings.USE_ACE_CHANNEL_DEFAULT_EMAIL:
+        msg.options['use_ace_channel_default_email'] = settings.USE_ACE_CHANNEL_DEFAULT_EMAIL
+        msg.options['from_address'] = settings.ACTIVATION_EMAIL_FROM_ADDRESS
+
     dest_addr = msg.recipient.email_address
 
     site = Site.objects.get_current()

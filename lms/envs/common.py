@@ -4658,6 +4658,7 @@ ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
 ACE_CHANNEL_SAILTHRU_API_KEY = ""
 ACE_CHANNEL_SAILTHRU_API_SECRET = ""
+USE_ACE_CHANNEL_DEFAULT_EMAIL = False
 
 ############### Settings swift #####################################
 SWIFT_USERNAME = None
