@@ -20,7 +20,11 @@ from openedx_events.learning.data import (
     UserData,
     UserPersonalData,
 )
-from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
+from openedx_events.learning.signals import (
+    COURSE_ENROLLMENT_CHANGED,
+    COURSE_ENROLLMENT_CREATED,
+    COURSE_UNENROLLMENT_COMPLETED,
+)
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -203,9 +207,15 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     the exact Data Attributes as the event definition stated:
 
         - COURSE_ENROLLMENT_CREATED: sent after the user's enrollment.
+        - COURSE_ENROLLMENT_CHANGED: sent after the enrollment update.
+        - COURSE_UNENROLLMENT_COMPLETED: sent after the user's unenrollment.
     """
 
-    ENABLED_OPENEDX_EVENTS = ["org.openedx.learning.course.enrollment.created.v1"]
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.learning.course.enrollment.created.v1",
+        "org.openedx.learning.course.enrollment.changed.v1",
+        "org.openedx.learning.course.unenrollment.completed.v1",
+    ]
 
     @classmethod
     def setUpClass(cls):
@@ -271,6 +281,92 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                     ),
                     mode=enrollment.mode,
                     is_active=enrollment.is_active,
+                    creation_date=enrollment.created,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_enrollment_changed_event_emitted(self):
+        """
+        Test whether the student enrollment changed event is sent after the enrollment
+        update process ends.
+
+        Expected result:
+            - COURSE_ENROLLMENT_CHANGED is sent and received by the mocked receiver.
+            - The arguments that the receiver gets are the arguments sent by the event
+            except the metadata generated on the fly.
+        """
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_ENROLLMENT_CHANGED.connect(event_receiver)
+
+        enrollment.update_enrollment(mode="verified")
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_ENROLLMENT_CHANGED,
+                "sender": None,
+                "enrollment": CourseEnrollmentData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=enrollment.is_active,
+                    creation_date=enrollment.created,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_unenrollment_completed_event_emitted(self):
+        """
+        Test whether the student un-enrollment completed event is sent after the
+        user's unenrollment process.
+
+        Expected result:
+            - COURSE_UNENROLLMENT_COMPLETED is sent and received by the mocked receiver.
+            - The arguments that the receiver gets are the arguments sent by the event
+            except the metadata generated on the fly.
+        """
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_UNENROLLMENT_COMPLETED.connect(event_receiver)
+
+        CourseEnrollment.unenroll(self.user, self.course.id)
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_UNENROLLMENT_COMPLETED,
+                "sender": None,
+                "enrollment": CourseEnrollmentData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=False,
                     creation_date=enrollment.created,
                 ),
             },

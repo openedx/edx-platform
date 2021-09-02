@@ -17,6 +17,7 @@ from edx_name_affirmation.statuses import VerifiedNameStatus
 from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseKey, CourseLocator
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from path import Path as path
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -55,7 +56,7 @@ PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
 
 
-class ExampleCertificateTest(TestCase):
+class ExampleCertificateTest(TestCase, OpenEdxEventsTestMixin):
     """Tests for the ExampleCertificate model. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -64,6 +65,19 @@ class ExampleCertificateTest(TestCase):
     TEMPLATE = 'test.pdf'
     DOWNLOAD_URL = 'https://www.example.com'
     ERROR_REASON = 'Kaboom!'
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -112,10 +126,24 @@ class ExampleCertificateTest(TestCase):
         assert result is None
 
 
-class CertificateHtmlViewConfigurationTest(TestCase):
+class CertificateHtmlViewConfigurationTest(TestCase, OpenEdxEventsTestMixin):
     """
     Test the CertificateHtmlViewConfiguration model.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
     def setUp(self):
         super().setUp()
         self.configuration_string = """{
@@ -205,11 +233,24 @@ class CertificateTemplateAssetTest(TestCase):
         assert certificate_template_asset.asset == 'certificate_template_assets/1/picture2.jpg'
 
 
-class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
+class EligibleCertificateManagerTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test the GeneratedCertificate model's object manager for filtering
     out ineligible certs.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -250,10 +291,24 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestCertificateGenerationHistory(TestCase):
+class TestCertificateGenerationHistory(TestCase, OpenEdxEventsTestMixin):
     """
     Test the CertificateGenerationHistory model's methods
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
     @ddt.data(
         ({"student_set": "allowlisted_not_generated"}, "For exceptions", True),
         ({"student_set": "allowlisted_not_generated"}, "For exceptions", False),
@@ -308,10 +363,23 @@ class TestCertificateGenerationHistory(TestCase):
         assert certificate_generation_history.get_task_name() == expected
 
 
-class CertificateInvalidationTest(SharedModuleStoreTestCase):
+class CertificateInvalidationTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test for the Certificate Invalidation model.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -365,10 +433,23 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class GeneratedCertificateTest(SharedModuleStoreTestCase):
+class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test GeneratedCertificates
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -606,10 +687,23 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
 
-class CertificateAllowlistTest(SharedModuleStoreTestCase):
+class CertificateAllowlistTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Tests for the CertificateAllowlist model.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
