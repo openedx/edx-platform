@@ -179,7 +179,7 @@ class UserSerializer(serializers.ModelSerializer):
         if qs.exists():
             raise serializers.ValidationError('Email already exists')
 
-        return value
+        return value.lower()
 
     @transaction.atomic()
     def create(self, validated_data):

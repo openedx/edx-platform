@@ -560,12 +560,12 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            request_password_change(email, request.is_secure())
             user = user if user.is_authenticated else _get_user_from_email(email=email)
             # pkx-449 - preventing disabled user from resetting password
-            if not user.is_active and not user.last_login:
+            if not user.is_active:
                 return HttpResponseBadRequest(_('This account has been deactivated.'))
 
+            request_password_change(email, request.is_secure())
             destroy_oauth_tokens(user)
         except errors.UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
