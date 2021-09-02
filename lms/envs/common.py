@@ -4001,6 +4001,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "year_of_birth",
         "phone_number",
         "activation_key",
+        "pending_name_change",
         "is_verified_name_enabled",
     ]
 )
