@@ -263,8 +263,8 @@ class ExperimentCrossDomainTests(APITestCase):
 
     def test_white_list_contents_with_cors_header_version(self, *args):  # pylint: disable=unused-argument
         """ Verify that with django-cor-header<3 it loads list without scheme. """
-        assert settings.CORS_ORIGIN_WHITELIST == ['sandbox.edx.org']
-        assert int(version('django_cors_headers').split('.')[0]) == 2
+        assert settings.CORS_ORIGIN_WHITELIST == ['https://sandbox.edx.org']
+        assert int(version('django_cors_headers').split('.')[0]) == 3
 
 
 class ExperimentKeyValueViewSetTests(APITestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
