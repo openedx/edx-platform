@@ -52,6 +52,14 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
           </a>
       </div>
     % endif
+    % if user.is_staff:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="tab-nav-link discover-new-link" href="${reverse('admin_dashboard:course_reports')}"
+          aria-current="${'page' if '/courses' in request.path else 'false'}">
+          ${_('Reports')}
+        </a>
+      </div>
+    % endif
   </div>
   <div class="secondary">
     % if enable_help_link:
