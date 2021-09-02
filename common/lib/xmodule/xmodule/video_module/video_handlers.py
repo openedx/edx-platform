@@ -348,8 +348,13 @@ class VideoStudentViewHandlers(object):
                     mimetype,
                     add_attachment_header=False
                 )
-            except NotFoundError:
-                log.exception('[Translation Dispatch] %s', self.location)
+            except NotFoundError as exc:
+                edx_video_id = clean_video_id(self.edx_video_id)
+                log.warning(
+                    '[Translation Dispatch] %s: %s',
+                    self.location,
+                    exc if is_bumper else f'Transcript not found for {edx_video_id}, lang: {self.transcript_language}',
+                )
                 response = self.get_static_transcript(request, transcripts)
 
         elif dispatch == 'download':
