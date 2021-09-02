@@ -20,6 +20,7 @@ from uuid import uuid4
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.plugins import add_plugins
+from importlib.metadata import version
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -597,3 +598,12 @@ REGISTRATION_RATELIMIT = '5/minute'
 
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
 RESET_PASSWORD_API_RATELIMIT = '2/m'
+
+CORS_ORIGIN_WHITELIST = ['sandbox.edx.org']
+CORS_ORIGIN_WHITELIST_WITH_SCHEME = ['https://sandbox.edx.org']
+
+# values are already updated above with default CORS_ORIGIN_WHITELIST values but in
+# case of new version django_cors_headers they will get override.
+cors_major_version = int(version('django_cors_headers').split('.')[0])
+if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and CORS_ORIGIN_WHITELIST_WITH_SCHEME:
+    CORS_ORIGIN_WHITELIST = CORS_ORIGIN_WHITELIST_WITH_SCHEME
