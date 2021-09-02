@@ -482,7 +482,8 @@ class CourseListAPI(generics.ListAPIView):
 
         user_id = self.request.query_params.get('user_id', '').strip().lower()
         if user_id:
-            queryset = queryset.exclude(courseenrollment__user_id=user_id, courseenrollment__is_active=True)
+            courses_keys = CourseEnrollment.objects.filter(user_id=user_id, is_active=True)
+            queryset = queryset.exclude(id__in=courses_keys.values_list('course', flat=True))
 
         search_text = self.request.query_params.get('name', '').strip().lower()
         if search_text:

@@ -93,8 +93,14 @@ def get_registration_email_message_context(user, password, protocol):
 
 
 def get_completed_course_count_filters(exclude_staff_superuser=False):
-    completed = Q(courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED)
-    in_progress = Q(courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED)
+    completed = Q(
+        Q(courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED) &
+        Q(courseenrollment__is_active=True)
+    )
+    in_progress = Q(
+        Q(courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED) &
+        Q(courseenrollment__is_active=True)
+    )
 
     if exclude_staff_superuser:
         learners = Q(courseenrollment__user__is_staff=False) & Q(courseenrollment__user__is_superuser=False)
