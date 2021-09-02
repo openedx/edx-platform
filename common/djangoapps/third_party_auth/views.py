@@ -1,8 +1,7 @@
 """
 Extra views required for SSO
 """
-
-
+import beeline
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect, render
@@ -25,6 +24,7 @@ from .models import SAMLConfiguration, SAMLProviderConfig
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
 
+@beeline.traced(name='third_party_auth.inactive_user_view')
 def inactive_user_view(request):
     """
     A newly or recently registered user has completed the social auth pipeline.
@@ -44,17 +44,22 @@ def inactive_user_view(request):
     user = request.user
     profile = UserProfile.objects.get(user=user)
     activated = user.is_active
+    beeline.add_context_field('user_is_active', activated)
+    beeline.add_context_field('username', user.username)
     # If the user is registering via 3rd party auth, track which provider they use
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        beeline.add_context_field('skip_email_verification', third_party_provider.skip_email_verification)
         if third_party_provider.skip_email_verification and not activated:
             user.is_active = True
             user.save()
             activated = True
             USER_ACCOUNT_ACTIVATED.send_robust(None, user=user)
+            beeline.add_context_field('activation_signal_sent', True)
     if not activated:
         compose_and_send_activation_email(user, profile)
+        beeline.add_context_field('activation_email_sent', True)
 
     return redirect(request.GET.get('next', 'dashboard'))
 
