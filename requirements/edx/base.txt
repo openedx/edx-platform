@@ -276,6 +276,7 @@ django-filter==2.4.0
     #   lti-consumer-xblock
 django-ipware==4.0.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
