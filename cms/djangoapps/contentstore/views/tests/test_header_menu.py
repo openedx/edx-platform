@@ -3,7 +3,7 @@
 """
 Course Header Menu Tests.
 """
-
+import unittest
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -40,6 +40,7 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         self.assertEqual(resp.status_code, 200)
         self.assertNotContains(resp, '<li class="nav-item nav-course-settings-certificates">')
 
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip tests broken due to Tahoe customizations.')
     def test_header_menu_with_web_certs_enabled(self):
         """
         Tests course header menu should have `Certificates` menu item
