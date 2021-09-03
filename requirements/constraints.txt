@@ -24,8 +24,8 @@ django-celery-results<2.1
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
 
-# The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
-django-cors-headers<3.0.0
+# greater version has breaking changes. check configuration changes as well when upgrade.
+django-cors-headers==3.2.0
 
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
