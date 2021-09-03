@@ -330,7 +330,7 @@ django-config-models==2.2.0
     #   lti-consumer-xblock
 django-cookies-samesite==0.9.0
     # via -r requirements/edx/testing.txt
-django-cors-headers==2.5.3
+django-cors-headers==3.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
