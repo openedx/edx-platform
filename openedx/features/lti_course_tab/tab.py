@@ -209,7 +209,7 @@ class LtiCourseTab(LtiCourseLaunchMixin, EnrolledTab):
         self.lti_config_id = tab_dict.get('lti_config_id') if tab_dict else lti_config_id
 
         if tab_dict is None:
-            tab_dict = dict()
+            tab_dict = {}
 
         if name is not None:
             tab_dict['name'] = name

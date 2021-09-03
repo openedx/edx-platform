@@ -718,7 +718,7 @@ class CourseGradingTest(CourseTestCase):
                     'event_transaction_id': 'mockUUID',
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                 }
-            ) for policy_hash in {grading_policy_2, grading_policy_3}
+            ) for policy_hash in [grading_policy_2, grading_policy_3]
         ], any_order=True)
 
     @mock.patch('common.djangoapps.track.event_transaction_utils.uuid4')

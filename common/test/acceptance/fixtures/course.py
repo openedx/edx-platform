@@ -354,7 +354,7 @@ class CourseFixture(XBlockContainerFixture):
             'children': None,
             'data': handouts_html,
             'id': self._handouts_loc,
-            'metadata': dict(),
+            'metadata': {},
         })
 
         response = self.session.post(url, data=payload, headers=self.headers)

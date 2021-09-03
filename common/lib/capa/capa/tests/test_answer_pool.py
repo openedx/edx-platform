@@ -55,7 +55,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed1(self):
         problem = new_loncapa_problem(self.common_question_xml, seed=723)
         the_html = problem.get_html()
-        # [('choice_3', u'wrong-3'), ('choice_5', u'correct-2'), ('choice_1', u'wrong-2'), ('choice_4', u'wrong-4')]
+        # [('choice_3', 'wrong-3'), ('choice_5', 'correct-2'), ('choice_1', 'wrong-2'), ('choice_4', 'wrong-4')]
         self.assertRegex(the_html, r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>")
         self.assertRegex(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
         assert the_html == problem.get_html(), 'should be able to call get_html() twice'
@@ -68,7 +68,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed2(self):
         problem = new_loncapa_problem(self.common_question_xml, seed=9)
         the_html = problem.get_html()
-        # [('choice_0', u'wrong-1'), ('choice_4', u'wrong-4'), ('choice_3', u'wrong-3'), ('choice_2', u'correct-1')]
+        # [('choice_0', 'wrong-1'), ('choice_4', 'wrong-4'), ('choice_3', 'wrong-3'), ('choice_2', 'correct-1')]
         self.assertRegex(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>")
         self.assertRegex(the_html, r"<div>\{.*'1_solution_1'.*\}</div>")
         # Check about masking

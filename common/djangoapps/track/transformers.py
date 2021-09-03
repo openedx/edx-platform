@@ -219,7 +219,7 @@ class EventTransformer(dict):
 
     def load_payload(self):
         """
-        Create a data version of self[u'event'] at self.event
+        Create a data version of self['event'] at self.event
         """
         if 'event' in self:
             if isinstance(self['event'], str):
@@ -229,7 +229,7 @@ class EventTransformer(dict):
 
     def dump_payload(self):
         """
-        Write self.event back to self[u'event'].
+        Write self.event back to self['event'].
 
         Keep the same format we were originally given.
         """

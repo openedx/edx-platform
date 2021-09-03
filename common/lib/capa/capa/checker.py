@@ -92,7 +92,7 @@ def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-doc
 
 def check_that_blanks_fail(problem):
     """Leaving it blank should never work. Neither should a space."""
-    blank_answers = dict((answer_id, u"")
+    blank_answers = dict((answer_id, "")
                          for answer_id in problem.get_question_answers())
     grading_results = problem.grade_answers(blank_answers)
     try:

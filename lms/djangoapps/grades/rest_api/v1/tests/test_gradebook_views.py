@@ -1383,7 +1383,7 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_filter_course_roles(self, excluded_course_roles):
         """ Test that excluded_course_roles=all filters out any user with a course role """
         # Create test users, enroll them in the course, and give them roles.
-        role_user_usernames = dict()
+        role_user_usernames = {}
         course_roles_to_create = [
             CourseInstructorRole,
             CourseStaffRole,

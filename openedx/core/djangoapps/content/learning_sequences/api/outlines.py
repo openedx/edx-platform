@@ -348,7 +348,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
 
     # Run each OutlineProcessor in order to figure out what items we have to
     # remove from the CourseOutline.
-    processors = dict()
+    processors = {}
     usage_keys_to_remove = set()
     inaccessible_sequences = set()
     for name, processor_cls in processor_classes:

@@ -61,11 +61,11 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         if tolerance == default_tolerance:
             relative_tolerance = True
         if tolerance.endswith('%'):
-            tolerance = evaluator(dict(), dict(), tolerance[:-1]) * 0.01
+            tolerance = evaluator(dict(), {}, tolerance[:-1]) * 0.01
             if not relative_tolerance:
                 tolerance = tolerance * abs(instructor_complex)
         else:
-            tolerance = evaluator(dict(), dict(), tolerance)
+            tolerance = evaluator(dict(), {}, tolerance)
 
     if relative_tolerance:
         tolerance = tolerance * max(abs(student_complex), abs(instructor_complex))
@@ -133,7 +133,7 @@ def convert_files_to_filenames(answers):
     Check for File objects in the dict of submitted answers,
         convert File objects to their filename (string)
     """
-    new_answers = dict()
+    new_answers = {}
     for answer_id in answers.keys():
         answer = answers[answer_id]
         # Files are stored as a list, even if one file
@@ -216,9 +216,9 @@ def remove_markup(html):
     Return html with markup stripped and text HTML-escaped.
 
     >>> bleach.clean("<b>Rock & Roll</b>", tags=[], strip=True)
-    u'Rock &amp; Roll'
+    'Rock &amp; Roll'
     >>> bleach.clean("<b>Rock &amp; Roll</b>", tags=[], strip=True)
-    u'Rock &amp; Roll'
+    'Rock &amp; Roll'
     """
     return HTML(bleach.clean(html, tags=[], strip=True))
 

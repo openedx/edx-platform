@@ -302,7 +302,7 @@ class BadgrBackend(BadgeBackend):
         Headers to send along with the request-- used for authentication.
         """
         access_token = self._get_access_token()
-        return {'Authorization': u'Bearer {}'.format(access_token)}
+        return {'Authorization': 'Bearer {}'.format(access_token)}
 
     def _ensure_badge_created(self, badge_class):
         """

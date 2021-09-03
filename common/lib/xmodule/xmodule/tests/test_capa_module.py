@@ -3155,7 +3155,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         </problem>
         """)
 
-        data = dict()
+        data = {}
         problem = CapaFactory.create(showanswer='always', xml=problem_xml)
         problem.runtime.replace_jump_to_id_urls = Mock()
         problem.get_answer(data)

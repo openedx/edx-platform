@@ -89,7 +89,7 @@ def get_all_theme_template_dirs():
         (list): list of directories containing theme templates.
     """
     themes = get_themes()
-    template_paths = list()
+    template_paths = []
 
     for theme in themes:
         template_paths.extend(theme.template_dirs)

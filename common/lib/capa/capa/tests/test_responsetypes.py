@@ -675,11 +675,11 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "|", "incorrect")
 
         # test unicode
-        problem = self.build_problem(answer=u"æ", case_sensitive=False, regexp=True, additional_answers=[u'ö'])
-        self.assert_grade(problem, u"æ", "correct")
-        self.assert_grade(problem, u"ö", "correct")
-        self.assert_grade(problem, u"î", "incorrect")
-        self.assert_grade(problem, u"o", "incorrect")
+        problem = self.build_problem(answer="æ", case_sensitive=False, regexp=True, additional_answers=['ö'])
+        self.assert_grade(problem, "æ", "correct")
+        self.assert_grade(problem, "ö", "correct")
+        self.assert_grade(problem, "î", "incorrect")
+        self.assert_grade(problem, "o", "incorrect")
 
     def test_backslash_and_unicode_regexps(self):
         r"""
@@ -697,19 +697,19 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             b) regexp is saved to xml and is read in python as repr of that string
             So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
         """
-        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\\æ", "correct")
+        problem = self.build_problem(answer="5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "5\\æ", "correct")
 
-        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\\æ", "correct")
+        problem = self.build_problem(answer="5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "5\\æ", "correct")
 
     def test_backslash(self):
-        problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"a\\c1", "correct")
+        problem = self.build_problem(answer="a\\\\c1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "a\\c1", "correct")
 
     def test_special_chars(self):
-        problem = self.build_problem(answer=u"a \\s1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"a  1", "correct")
+        problem = self.build_problem(answer="a \\s1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "a  1", "correct")
 
     def test_case_sensitive(self):
         # Test single answer
@@ -751,13 +751,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         """
         We now adding ^ and $ around regexp, so no bogus escape error will be raised.
         """
-        problem = self.build_problem(answer=u"\\", case_sensitive=False, regexp=True)
+        problem = self.build_problem(answer="\\", case_sensitive=False, regexp=True)
 
-        self.assert_grade(problem, u"\\", "incorrect")
+        self.assert_grade(problem, "\\", "incorrect")
 
         # right way to search for \
-        problem = self.build_problem(answer=u"\\\\", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"\\", "correct")
+        problem = self.build_problem(answer="\\\\", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "\\", "correct")
 
     def test_case_insensitive(self):
         # Test single answer
@@ -930,7 +930,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         Tests that problem should be graded incorrect if blank space is chosen as answer
         """
         problem = self.build_problem(answer=" ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u" ", "incorrect")
+        self.assert_grade(problem, " ", "incorrect")
 
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -1080,7 +1080,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         Test whether LoncapaProblem._parse_score_msg correcly parses valid HTML5 html.
         """
         valid_grader_msgs = [
-            u'<span>MESSAGE</span>',  # Valid XML
+            '<span>MESSAGE</span>',  # Valid XML
             textwrap.dedent("""
                 <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
                 <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
@@ -1125,7 +1125,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 self.problem.correct_map.update(old_cmap)
 
                 output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
-                assert output[answer_id]['msg'] == u'Invalid grader reply. Please contact the course staff.'
+                assert output[answer_id]['msg'] == 'Invalid grader reply. Please contact the course staff.'
 
 
 class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring

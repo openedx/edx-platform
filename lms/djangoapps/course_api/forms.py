@@ -67,7 +67,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         cleaned_data = super().clean()
 
         # create a filter for all supported filter fields
-        filter_ = dict()
+        filter_ = {}
         for supported_filter in self.supported_filters:
             if cleaned_data.get(supported_filter.param_name) is not None:
                 filter_[supported_filter.field_name] = cleaned_data[supported_filter.param_name]

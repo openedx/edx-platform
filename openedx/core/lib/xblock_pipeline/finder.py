@@ -116,7 +116,7 @@ class XBlockPipelineFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstrac
         """
         The XBlockPipelineFinder creates a separate XBlockPackageStorage for
         every installed XBlock package when its initialized. After that
-        initialization happens, we just proxy all list()/find() requests by
+        initialization happens, we just proxy all []/find() requests by
         iterating through the XBlockPackageStorage objects.
         """
         super().__init__(*args, **kwargs)

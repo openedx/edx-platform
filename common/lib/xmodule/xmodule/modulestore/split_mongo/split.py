@@ -2424,7 +2424,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         new_blocks = set()
 
-        new_children = list()  # ordered list of the new children of new_parent_block_key
+        new_children = []  # ordered list of the new children of new_parent_block_key
 
         for usage_key in source_keys:
             src_course_key = usage_key.course_key

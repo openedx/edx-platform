@@ -71,7 +71,7 @@ def _parse_config_args(args):
 
     Returns a dictionary with the configuration keys and values.
     """
-    config_dict = dict()
+    config_dict = {}
     for config_str in args:
         try:
             components = config_str.split('=')

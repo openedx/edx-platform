@@ -212,7 +212,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
             self.answer_id = self.answer_ids[0]
 
         # map input_id -> maxpoints
-        self.maxpoints = dict()
+        self.maxpoints = {}
         for inputfield in self.inputfields:
             # By default, each answerfield is worth 1 point
             maxpoints = inputfield.get('points', '1')
@@ -264,7 +264,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
 
         response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
-        response_label = _(u'Question {index}').format(index=response_index)
+        response_label = _('Question {index}').format(index=response_index)
 
         # wrap the content inside a section
         tree = etree.Element('div')
@@ -367,13 +367,13 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct:')
+                label = _('Correct:')
             else:
-                label = _(u'Incorrect:')
+                label = _('Incorrect:')
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
-        event_info = dict()
+        event_info = {}
         event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
@@ -580,7 +580,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         pass
 
     def __str__(self):
-        return u'LoncapaProblem Response %s' % self.xml.tag
+        return 'LoncapaProblem Response %s' % self.xml.tag
 
     def _render_response_msg_html(self, response_msg):
         """ Render a <div> for a message that applies to the entire response.
@@ -1599,7 +1599,7 @@ class NumericalResponse(LoncapaResponse):
 
         _ = edx_six.get_gettext(self.capa_system.i18n)
         general_exception = StudentInputError(
-            _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=html.escape(student_answer))
+            _("Could not interpret '{student_answer}' as a number.").format(student_answer=html.escape(student_answer))
         )
 
         # Begin `evaluator` block
@@ -1628,7 +1628,7 @@ class NumericalResponse(LoncapaResponse):
                 raise general_exception  # lint-amnesty, pylint: disable=raise-missing-from
         except ParseException:
             raise StudentInputError(  # lint-amnesty, pylint: disable=raise-missing-from
-                _(u"Invalid math syntax: '{student_answer}'").format(student_answer=html.escape(student_answer))
+                _("Invalid math syntax: '{student_answer}'").format(student_answer=html.escape(student_answer))
             )
         except Exception:
             raise general_exception  # lint-amnesty, pylint: disable=raise-missing-from
@@ -1659,7 +1659,7 @@ class NumericalResponse(LoncapaResponse):
 
         if self.range_tolerance:
             if isinstance(student_float, complex):
-                raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
+                raise StudentInputError(_("You may not use complex numbers in range tolerance problems"))
             boundaries = []
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
@@ -1778,7 +1778,7 @@ class NumericalResponse(LoncapaResponse):
         Returns whether this answer is in a valid form.
         """
         try:
-            evaluator(dict(), dict(), answer)
+            evaluator(dict(), {}, answer)
             return True
         except (StudentInputError, UndefinedVariable, UnmatchedParenthesis):
             return False
@@ -2046,7 +2046,7 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                msg = '[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
                     message=text_type(err)
                 )
@@ -2190,7 +2190,7 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
+            msg = "[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
                 message=_("error getting student answer from {student_answers}").format(
                     student_answers=student_answers,
                 ),
@@ -2215,7 +2215,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = (HTML(u'<span class="inline-error">{0}</span>').format(_(u'No answer entered!'))
+            msg = (HTML('<span class="inline-error">{0}</span>').format(_('No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
@@ -2563,7 +2563,7 @@ class SymbolicResponse(CustomResponse):
             log.error(traceback.format_exc())
             _ = edx_six.get_gettext(self.capa_system.i18n)
             # Translators: 'SymbolicResponse' is a problem type and should not be translated.
-            msg = _(u"An error occurred with SymbolicResponse. The error was: {error_msg}").format(
+            msg = _("An error occurred with SymbolicResponse. The error was: {error_msg}").format(
                 error_msg=err,
             )
             raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -2659,7 +2659,7 @@ class CodeResponse(LoncapaResponse):
             codeparam, 'initial_display', '')
         _ = edx_six.get_gettext(self.capa_system.i18n)
         self.answer = find_with_default(codeparam, 'answer_display',
-                                        _(u'No answer provided.'))
+                                        _('No answer provided.'))
 
     def get_score(self, student_answers):
         _ = edx_six.get_gettext(self.capa_system.i18n)
@@ -2678,7 +2678,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_(u'Error: No grader has been set up for this problem.'))
+                     msg=_('Error: No grader has been set up for this problem.'))
             return cmap
 
         # Prepare xqueue request
@@ -3099,7 +3099,7 @@ class FormulaResponse(LoncapaResponse):
             try:
                 out.append(evaluator(
                     var_dict,
-                    dict(),
+                    {},
                     answer,
                     case_sensitive=self.case_sensitive,
                 ))

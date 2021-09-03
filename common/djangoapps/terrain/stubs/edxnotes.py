@@ -300,7 +300,7 @@ class StubEdxNotesService(StubHttpService):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.notes = list()
+        self.notes = []
 
     def get_all_notes(self):
         """
@@ -348,7 +348,7 @@ class StubEdxNotesService(StubHttpService):
         """
         Removes all notes to the stub EdxNotes service.
         """
-        self.notes = list()
+        self.notes = []
 
     def filter_by_id(self, data, note_id):
         """

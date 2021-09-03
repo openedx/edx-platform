@@ -652,7 +652,7 @@ class UserProfile(models.Model):
     def get_meta(self):  # pylint: disable=missing-function-docstring
         js_str = self.meta
         if not js_str:
-            js_str = dict()
+            js_str = {}
         else:
             js_str = json.loads(self.meta)
 

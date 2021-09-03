@@ -229,7 +229,7 @@ class TabsAPITests(CourseTestCase):
     @ddt.data(
         dict(is_hidden=None),
         dict(is_hidden="abc"),
-        dict(),
+        {},
     )
     def test_toggle_tab_invalid_visibility(self, invalid_visibility):
         """

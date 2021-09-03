@@ -88,7 +88,7 @@ def delete_rows(model_mgr,
             try:
                 list(model_mgr.raw(delete_sql))
             except TypeError:
-                # The list() above is simply to get the RawQuerySet to be evaluated.
+                # The [] above is simply to get the RawQuerySet to be evaluated.
                 # Without evaluation, the raw DELETE SQL will *not* actually execute.
                 # But - it will cause a "TypeError: 'NoneType' object is not iterable" to be ignored.
                 pass

@@ -540,7 +540,7 @@ def get_certificate_footer_context():
     Return data to be used in Certificate Footer,
     data returned should be customized according to the site configuration.
     """
-    data = dict()
+    data = {}
 
     # get Terms of Service and Honor Code page url
     terms_of_service_and_honor_code = branding_api.get_tos_and_honor_code_url()

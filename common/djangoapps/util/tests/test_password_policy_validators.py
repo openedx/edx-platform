@@ -68,7 +68,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         assert len(not_normalized_password) == 3
 
         # When we normalize we expect the not_normalized password to fail
-        # because it should be normalized to u'\u1E69' -> ṩ
+        # because it should be normalized to '\u1E69' -> ṩ
         self.validation_errors_checker(not_normalized_password,
                                        'This password is too short. It must contain at least 2 characters.')
 

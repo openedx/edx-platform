@@ -808,7 +808,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
         """DELETE /api/team/v0/teams/{team_id}"""
         team = get_object_or_404(CourseTeam, team_id=team_id)
         self.check_object_permissions(request, team)
-        # Note: list() forces the queryset to be evualuated before delete()
+        # Note: [] forces the queryset to be evualuated before delete()
         memberships = list(CourseTeamMembership.get_memberships(team_ids=[team_id]))
 
         # Note: also deletes all team memberships associated with this team

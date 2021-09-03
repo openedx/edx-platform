@@ -269,7 +269,7 @@ class VideoComponentPage(VideoPage):
         """
         Download handout at `url`
         """
-        kwargs = dict()
+        kwargs = {}
         session_id = [{i['name']: i['value']} for i in self.browser.get_cookies() if i['name'] == 'sessionid']
         if session_id:
             kwargs.update({

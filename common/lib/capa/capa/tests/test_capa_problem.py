@@ -587,7 +587,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         with patch.object(problem, 'problem_data', mock_problem_data):
             assert problem.find_question_label(answer_id) == stripped_label
 
-    @ddt.data(None, dict(), [None])
+    @ddt.data(None, {}, [None])
     def test_find_answer_test_not_implemented(self, current_answer):
         problem = new_loncapa_problem('<problem/>')
         self.assertRaises(NotImplementedError, problem.find_answer_text, '', current_answer)

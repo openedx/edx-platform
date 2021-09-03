@@ -306,7 +306,7 @@ class LibraryContentBlock(
 
     def selected_children(self):
         """
-        Returns a list() of block_ids indicating which of the possible children
+        Returns a [] of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.

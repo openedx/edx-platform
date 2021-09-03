@@ -36,7 +36,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
     """
 
     @ddt.data(
-        dict(),
+        {},
         dict(FEATURES={}),
         dict(FEATURES=dict(ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA=False))
     )
