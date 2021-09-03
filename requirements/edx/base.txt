@@ -1075,6 +1075,7 @@ wrapt==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
+    #   deprecated
 xblock==1.5.0
     # via
     #   -r requirements/edx/base.in

@@ -267,7 +267,6 @@ distlib==0.3.2
     #   edx-enterprise
     #   edx-event-routing-backends
     #   edx-i18n-tools
-    #   edx-lint
     #   edx-milestones
     #   edx-name-affirmation
     #   edx-organizations
@@ -538,7 +537,7 @@ edx-i18n-tools==0.7.0
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   ora2
-edx-lint==5.0.0
+edx-lint==5.1.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.2
     # via -r requirements/edx/base.txt
@@ -754,7 +753,7 @@ jsonfield2==3.0.3
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jwcrypto==0.9.1
+jwcrypto==1.0
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
@@ -925,9 +924,8 @@ pillow==8.3.1
     #   edx-organizations
 platformdirs==2.3.0
     # via virtualenv
-pluggy==0.13.1
+pluggy==1.0.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/edx/coverage.txt
     #   diff-cover
     #   pytest
@@ -1250,7 +1248,6 @@ six==1.16.0
     #   httpretty
     #   interchange
     #   isodate
-    #   jwcrypto
     #   libsass
     #   pact-python
     #   pansi
@@ -1427,6 +1424,7 @@ wrapt==1.11.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   astroid
+    #   deprecated
 xblock==1.5.0
     # via
     #   -r requirements/edx/base.txt
