@@ -256,23 +256,28 @@ class ChooseModeView(View):
         if deadline:
             formatted_audit_access_date = strftime_localized_html(deadline, 'SHORT_DATE')
             context['audit_access_deadline'] = formatted_audit_access_date
-        fbe_is_on = deadline and gated_content
+        full_fbe_is_on = deadline and gated_content
+        partial_fbe_is_on = deadline or gated_content
 
+        # Route to correct Track Selection page.
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
-        #if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
-        # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
-        # technically considered happy path, old Track Selection page will be displayed.
-        LOG.info('verified mode: [%s], fbe_is_on: [%s], enterprise_customer: [%s]', verified_mode, fbe_is_on, enterprise_customer)
-        LOG.info('deadline: [%s], gated_content: [%s], duration: [%s], get_user_course_expiration_date: [%s]', deadline, gated_content, duration, get_user_course_expiration_date(request.user, course))
-        if not error:
-            # Happy path conditions.
-            if verified_mode and fbe_is_on and not enterprise_customer:
-                return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
-            elif verified_mode and not fbe_is_on and not enterprise_customer:
-                return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
-        # failover: old choose.html page
-        #return render_to_response("course_modes/choose.html", context)
+        if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
+            if not error: # TODO: Remove by executing REV-2355
+                if not enterprise_customer: # TODO: Remove by executing REV-2342
+                    if verified_mode:
+                        if full_fbe_is_on:
+                            return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
+                        elif partial_fbe_is_on:
+                            return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
+                        else:
+                            # If the course has started redirect to course home instead
+                            if course.has_started():
+                                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+                            return redirect(reverse('dashboard'))
+
+        # If error, enterprise_customer, or not verified_mode, failover to old choose.html page
+        return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
