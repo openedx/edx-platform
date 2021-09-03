@@ -18,6 +18,7 @@ from ..middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
 SENTINEL = object()
 
 
+@ddt.ddt
 class TestCorsMiddlewareProcessRequest(TestCase):
     """
     Test processing a request through the middleware
@@ -64,35 +65,41 @@ class TestCorsMiddlewareProcessRequest(TestCase):
         assert res is SENTINEL
         assert request.is_secure()
 
-    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
-    def test_enabled(self):
-        request = self.get_request(is_secure=True, http_referer='https://foo.com/bar')
+    @override_settings(CORS_ORIGIN_WHITELIST=[
+        'https://foo.com', 'https://www.foo.com', 'https://learning.edge.foo.bar']
+    )
+    @ddt.data(
+        'https://foo.com/bar/', 'https://foo.com/bar/baz/', 'https://www.foo.com/bar/baz/',
+        'https://learning.edge.foo.bar', 'https://learning.edge.foo.bar/foo'
+    )
+    def test_enabled(self, http_referer):
+        request = self.get_request(is_secure=True, http_referer=http_referer)
         self.check_enabled(request)
 
     @override_settings(
         FEATURES={'ENABLE_CORS_HEADERS': False},
-        CORS_ORIGIN_WHITELIST=['foo.com']
+        CORS_ORIGIN_WHITELIST=['https://foo.com']
     )
     def test_disabled_no_cors_headers(self):
         with pytest.raises(MiddlewareNotUsed):
             CorsCSRFMiddleware()
 
-    @override_settings(CORS_ORIGIN_WHITELIST=['bar.com'])
+    @override_settings(CORS_ORIGIN_WHITELIST=['https://bar.com'])
     def test_disabled_wrong_cors_domain(self):
         request = self.get_request(is_secure=True, http_referer='https://foo.com/bar')
         self.check_not_enabled(request)
 
-    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    @override_settings(CORS_ORIGIN_WHITELIST=['https://foo.com'])
     def test_disabled_wrong_cors_domain_reversed(self):
         request = self.get_request(is_secure=True, http_referer='https://bar.com/bar')
         self.check_not_enabled(request)
 
-    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    @override_settings(CORS_ORIGIN_WHITELIST=['https://foo.com'])
     def test_disabled_http_request(self):
         request = self.get_request(is_secure=False, http_referer='https://foo.com/bar')
         self.check_not_enabled(request)
 
-    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    @override_settings(CORS_ORIGIN_WHITELIST=['https://foo.com'])
     def test_disabled_http_referer(self):
         request = self.get_request(is_secure=True, http_referer='http://foo.com/bar')
         self.check_not_enabled(request)
@@ -220,7 +227,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
     @override_settings(
         CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
         CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
-        CORS_ORIGIN_WHITELIST=['www.example.com']
+        CORS_ORIGIN_WHITELIST=['https://www.example.com']
     )
     def test_set_cross_domain_cookie(self):
         response = self._get_response()

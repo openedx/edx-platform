@@ -48,9 +48,14 @@ def is_cross_domain_request_allowed(request):
             log.debug("Referer '%s' must have the scheme 'https'")
             return False
 
+    scheme_with_host = referer
+    # if url is like `https://www.foo.bar/baz/` following check will return `https://www.foo.bar`
+    if referer and referer_parts.scheme and referer_parts.path:
+        scheme_with_host = referer.replace(referer_parts.path, '')
+
     domain_is_whitelisted = (
         getattr(settings, 'CORS_ORIGIN_ALLOW_ALL', False) or
-        referer_hostname in getattr(settings, 'CORS_ORIGIN_WHITELIST', [])
+        scheme_with_host in getattr(settings, 'CORS_ORIGIN_WHITELIST', [])
     )
     if not domain_is_whitelisted:
         if referer_hostname is None:
