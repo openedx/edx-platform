@@ -72,8 +72,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         <section class="wrapper m-4 mb-5 m-md-0">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
-                    <header class="page-header content-main">
-                        <h3 class="py-3">
+                    <header class="page-header">
+                        <h3 class="py-md-3">
                             ${_("Choose a path for your course in")} ${_(course_name)}
                         </h3>
                     </header>
@@ -101,7 +101,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                                 start_bold=HTML('<b>'),
                                                 end_bold=HTML('</b>'),
                                             )}</li>
-                                            <div class="collapsible">${_("Show more")}</div>
+                                            <button class="btn btn-link collapsible">${_("Show more")}</button>
                                             <li class="collapsible-item">
                                                 ${Text(_("{start_bold}Full access{end_bold} to course content and materials, even after the course ends")).format(
                                                     start_bold=HTML('<b>'),
@@ -123,8 +123,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                             )}</li>
                                         </ul>
                                     </div>
+
                                     <ul class="list-actions">
-                                        <li class="action action-select upgrade-button">
+                                        <li class="action action-select track-selection-button">
                                             <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
                                                 <button id="track_selection_upgrade" type="submit" name="verified_mode" class="mt-2">
                                                     <span>${_('Upgrade Now')}</span>
@@ -143,7 +144,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </%static:require_module_async>
                                 </div>
                                 <div class="certificate-container-bottom">
-                                    <span class="mt-1"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
+                                    <span><i class="fa fa-lightbulb-o fa-lg icon-info" aria-hidden="true"></i></span>
                                     <div class="extra-verified-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
                                         start_bold=HTML('<b>'),
                                         end_bold=HTML('</b>'),
@@ -172,7 +173,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </ul>
                                 </div>
                                 <ul class="list-actions">
-                                    <li class="action action-select audit-button">
+                                    <li class="action action-select track-selection-button">
                                         <input type="hidden" name="contribution" />
                                         <button id="track_selection_audit" type="submit" name="audit_mode">
                                             <span>${_('Continue')}</span>

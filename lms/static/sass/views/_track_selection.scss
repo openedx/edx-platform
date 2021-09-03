@@ -7,6 +7,10 @@
     margin: 0 auto;
 }
 
+.page-header h3 {
+    color: #001B1E;
+}
+
 .verification-process h3 {
     color: #454545;
     font-size: 1.4rem;
@@ -47,19 +51,22 @@
     position: absolute;
 }
 
-.upgrade-button {
-    text-align: center
+.track-selection-button {
+    text-align: center;
 }
 
-.upgrade-button button {
-    background: #00262B;
+.track-selection-button button {
     width: 90%;
-    height: 40px;
     font-size: 16px;
     box-shadow: none;
     border-radius: 0px;
     position: relative;
     margin-bottom: 1.5rem;
+    padding: 8px;
+}
+
+#track_selection_upgrade {
+    background: #00262B;
 }
 
 #track_selection_upgrade:hover {
@@ -68,21 +75,13 @@
     color: #fff;
 }
 
-.audit-button {
-    text-align: center;
-}
-
-.audit-button button {
+#track_selection_audit {
     color: #00262B;
-    width: 90%;
-    height: 40px;
-    font-size: 16px;
-    box-shadow: none;
-    border-radius: 0px;
     border-color: #F2F0EF;
     background: white;
-    position: relative;
-    margin-bottom: 1.5rem;
+    position: absolute;
+    bottom: 0;
+    left: 5%;
 }
 
 #track_selection_audit:hover {
@@ -98,6 +97,13 @@
     margin-top: -1px;
     padding: 18px;
     float: left;
+}
+
+.icon-info {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
 .extra-verified-info {
