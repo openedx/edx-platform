@@ -837,7 +837,7 @@ def user_post_save_callback(sender, **kwargs):
 
     # Ensure the user has a profile when run via management command
     _called_by_management_command = getattr(user, '_called_by_management_command', None)
-    if _called_by_management_command and kwargs['created']:
+    if _called_by_management_command:
         try:
             __ = user.profile
         except UserProfile.DoesNotExist:
