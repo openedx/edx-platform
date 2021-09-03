@@ -265,18 +265,17 @@ class ChooseModeView(View):
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
             if not error: # TODO: Remove by executing REV-2355
                 if not enterprise_customer: # TODO: Remove by executing REV-2342
-                    if verified_mode:
-                        if full_fbe_is_on:
-                            return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
-                        elif partial_fbe_is_on:
-                            return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
-                        else:
-                            # If the course has started redirect to course home instead
-                            if course.has_started():
-                                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-                            return redirect(reverse('dashboard'))
+                    if full_fbe_is_on:
+                        return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
+                    elif partial_fbe_is_on:
+                        return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
+                    else:
+                        # If the course has started redirect to course home instead
+                        if course.has_started():
+                            return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+                        return redirect(reverse('dashboard'))
 
-        # If error, enterprise_customer, or not verified_mode, failover to old choose.html page
+        # If error or enterprise_customer, failover to old choose.html page
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
