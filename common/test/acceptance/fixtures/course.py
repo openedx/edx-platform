@@ -14,7 +14,7 @@ from path import Path
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
 from common.test.acceptance.fixtures.base import FixtureError, XBlockContainerFixture
-from xmodule.contentstore.utils import course_location_from_key
+from common.djangoapps.util.course import course_location_from_key
 
 
 class XBlockFixtureDesc:

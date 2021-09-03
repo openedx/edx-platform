@@ -7,6 +7,7 @@ import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -70,3 +71,12 @@ def has_certificates_enabled(course):
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         return False
     return course.cert_html_view_enabled
+
+
+def course_location_from_key(course_key: CourseKey) -> UsageKey:
+    """Creates a usage key for the toplevel course item, handling differences between mongo and newer keys"""
+    if getattr(course_key, 'deprecated', False):
+        block_id = course_key.run
+    else:
+        block_id = 'course'
+    return course_key.make_usage_key('course', block_id)
