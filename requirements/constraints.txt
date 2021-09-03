@@ -100,10 +100,6 @@ jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
 # requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
 edxval<2.1
 
-# pylint>=2.10.0 introduced a lot of new pylint warnings.
-# A separate PR will be needed to remove the pin and fix all the pylint warnings
-pylint<2.10.0
-
 # At the time of writing this comment, we do not know whether py2neo>=2022
 # will support our currently-deployed Neo4j version (3.5).
 # Feel free to loosen this constraint if/when it is confirmed that a later
