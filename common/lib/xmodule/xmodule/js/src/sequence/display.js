@@ -419,10 +419,13 @@
 
         function update_unit_title(element, is_active) {
           var element_title = element.getAttribute("data-page-title");
-          var accordionElementID = "#"+$(element).attr('data-index') + "_" + element_title.replace(" ", "_");
+          var accordionElementID = "#"+$(element).attr('data-index') + "_" + element_title.replace(/[&\/\\#,+!()$~%.'":*?<>{}]/g, "-").replace(/ /g, "-");
           // Update selected in Accordion
-          $(".menu-item").removeClass("active");
-          $(accordionElementID).addClass('active');
+          var videoElement = $(accordionElementID)
+          if (typeof videoElement[0] !== "undefined") {
+            $(".menu-item").removeClass("active");
+            $(videoElement).addClass('active');
+          }
           var updated_title = get_formatting_char(element_title) + element.getAttribute("data-element") +". "
           if (is_active) {
             updated_title += element_title
