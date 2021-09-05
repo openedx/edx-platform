@@ -29,6 +29,7 @@
 # Bill Y <stsu3lu@gmail.com>, 2015
 # Dimitris Agelakis <minoan07@gmail.com>, 2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
+# Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
 # Elisabeth Georgiado <almanean@yahoo.gr>, 2014
 # Giannoulis Thanasis <thanasis@giannoulis.net>, 2015
 # jimkar02 <jimkar02@gmail.com>, 2015
@@ -82,7 +83,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-08-29 20:44+0000\n"
 "PO-Revision-Date: 2021-08-01 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)\n"
@@ -5413,7 +5414,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr ""
+msgstr "Ρυθμίσεις Λογαριασμού."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""
@@ -5861,7 +5862,7 @@ msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Supported file types: {supportedVideoTypes}"
-msgstr ""
+msgstr "Συμβατοί τύποι αρχείων: {supportedVideoTypes}"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -7274,7 +7275,7 @@ msgstr "ΑΡΧΙΚΗ ΣΕΛΙΔΑ ΤΟΥ ΦΟΡΟΥΜ ΣΥΖΗΤΗΣΕΩΝ"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr ""
+msgstr "Πώς να χρησιμοποιείτε το φόρουμ συζητήσεων του%(platform_name)s"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Find discussions"
@@ -8839,7 +8840,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Activate Your Account"
-msgstr ""
+msgstr "Ενεργοποιήστε τον Λογαριασμό σας"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore

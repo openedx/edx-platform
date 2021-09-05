@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-29 20:45+0000\n"
-"PO-Revision-Date: 2021-08-29 20:45:05.308728\n"
+"POT-Creation-Date: 2021-09-05 20:51+0000\n"
+"PO-Revision-Date: 2021-09-05 20:51:43.669409\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -451,126 +451,6 @@ msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 "Àn äççöünt wïth thé Püßlïç Ûsérnämé '{username}' älréädý éxïsts. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Removed group: \"{}\""
-msgstr "Rémövéd gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Did not find a group with name \"{}\" - skipping."
-msgstr ""
-"Dïd nöt fïnd ä gröüp wïth nämé \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Invalid group name: \"{group_name}\". {messages}"
-msgstr ""
-"Ìnvälïd gröüp nämé: \"{group_name}\". {messages} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Created new group: \"{}\""
-msgstr "Çréätéd néw gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Found existing group: \"{}\""
-msgstr "Föünd éxïstïng gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Adding {codenames} permissions to group \"{group}\""
-msgstr ""
-"Àddïng {codenames} pérmïssïöns tö gröüp \"{group}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Removing {codenames} permissions from group \"{group}\""
-msgstr ""
-"Rémövïng {codenames} pérmïssïöns fröm gröüp \"{group}\" Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid ""
-"Invalid permission option: \"{}\". Please specify permissions using the "
-"format: app_label:model_name:permission_codename."
-msgstr ""
-"Ìnvälïd pérmïssïön öptïön: \"{}\". Pléäsé spéçïfý pérmïssïöns üsïng thé "
-"förmät: äpp_läßél:mödél_nämé:pérmïssïön_çödénämé. Ⱡ'σяєм ιρѕυм#"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid ""
-"Invalid permission codename: \"{codename}\".  No such permission exists for "
-"the model {module}.{model_name}."
-msgstr ""
-"Ìnvälïd pérmïssïön çödénämé: \"{codename}\".  Nö süçh pérmïssïön éxïsts för "
-"thé mödél {module}.{model_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
-msgstr ""
-"Séttïng {attribute} för üsér \"{username}\" tö \"{new_value}\" Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid ""
-"Skipping user \"{}\" because the specified and existing email addresses do "
-"not match."
-msgstr ""
-"Skïppïng üsér \"{}\" ßéçäüsé thé spéçïfïéd änd éxïstïng émäïl äddréssés dö "
-"nöt mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Did not find a user with username \"{}\" - skipping."
-msgstr ""
-"Dïd nöt fïnd ä üsér wïth üsérnämé \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Removing user: \"{}\""
-msgstr "Rémövïng üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new user: \"{}\""
-msgstr "Çréätéd néw üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Found existing user: \"{}\""
-msgstr "Föünd éxïstïng üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Setting unusable password for user \"{}\""
-msgstr ""
-"Séttïng ünüsäßlé pässwörd för üsér \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new profile for user: \"{}\""
-msgstr ""
-"Çréätéd néw pröfïlé för üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Could not find a group named \"{}\" - skipping."
-msgstr ""
-"Çöüld nöt fïnd ä gröüp näméd \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Adding user \"{username}\" to groups {group_names}"
-msgstr ""
-"Àddïng üsér \"{username}\" tö gröüps {group_names} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Removing user \"{username}\" from groups {group_names}"
-msgstr ""
-"Rémövïng üsér \"{username}\" fröm gröüps {group_names} Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/djangoapps/student/middleware.py
 #, python-brace-format
@@ -11626,6 +11506,76 @@ msgstr "çöürsé ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
 msgid "ID of the imported course."
 msgstr "ÌD öf thé ïmpörtéd çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "open edx user"
+msgstr "öpén édx üsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "lti platform identifier"
+msgstr "ltï plätförm ïdéntïfïér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform identifier to which this profile belongs to."
+msgstr ""
+"Thé LTÌ plätförm ïdéntïfïér tö whïçh thïs pröfïlé ßélöngs tö. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "client identifier"
+msgstr "çlïént ïdéntïfïér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI client identifier generated by the LTI platform."
+msgstr ""
+"Thé LTÌ çlïént ïdéntïfïér générätéd ßý thé LTÌ plätförm. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "subject identifier"
+msgstr "süßjéçt ïdéntïfïér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"Identifies the entity that initiated the launch request, commonly a user."
+msgstr ""
+"Ìdéntïfïés thé éntïtý thät ïnïtïätéd thé läünçh réqüést, çömmönlý ä üsér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The authorized LTI profile that launched the resource (identifies the user)."
+msgstr ""
+"Thé äüthörïzéd LTÌ pröfïlé thät läünçhéd thé résöürçé (ïdéntïfïés thé üsér)."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The usage key string of the blockstore resource serving the content of this "
+"launch."
+msgstr ""
+"Thé üsägé kéý strïng öf thé ßlöçkstöré résöürçé sérvïng thé çöntént öf thïs "
+"läünçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The LTI platform unique identifier of this resource, also known as the "
+"\"resource link id\"."
+msgstr ""
+"Thé LTÌ plätförm ünïqüé ïdéntïfïér öf thïs résöürçé, älsö knöwn äs thé "
+"\"résöürçé lïnk ïd\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform descriptive title for this resource."
+msgstr ""
+"Thé LTÌ plätförm désçrïptïvé tïtlé för thïs résöürçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "If AGS was enabled during launch, this should hold the lineitem ID."
+msgstr ""
+"Ìf ÀGS wäs énäßléd dürïng läünçh, thïs shöüld höld thé lïnéïtém ÌD. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
 msgstr ""
@@ -11992,6 +11942,27 @@ msgstr "Dïsçüssïön prövïdér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 msgid "The discussion tool/provider's id"
 msgstr ""
 "Thé dïsçüssïön tööl/prövïdér's ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Program UUID"
+msgstr "Prögräm ÛÛÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated program will be disabled."
+msgstr ""
+"Ìf dïsäßléd, thé dïsçüssïöns ïn thé ässöçïätéd prögräm wïll ßé dïsäßléd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this program/provider."
+msgstr ""
+"Thé LTÌ çönfïgürätïön dätä för thïs prögräm/prövïdér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion provider's id"
+msgstr "Thé dïsçüssïön prövïdér's ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -14385,6 +14356,96 @@ msgid ""
 msgstr ""
 "Täké thé spéçïfïéd çöürsé änd ättémpt tö éxpört ït tö ä gït répösïtörý\n"
 ". Çöürsé dïréçtörý müst älréädý ßé ä gït répösïtörý. Ûsägé:  gït_éxpört <course_loc> <git_url> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Marks a field as deprecated."
+msgstr "Märks ä fïéld äs dépréçätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "User-friendly display name for the field"
+msgstr ""
+"Ûsér-frïéndlý dïspläý nämé för thé fïéld Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Help text that describes the setting."
+msgstr ""
+"Hélp téxt thät désçrïßés thé séttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Tab type"
+msgstr "Täß týpé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Default name for the tab displayed to users"
+msgstr ""
+"Défäült nämé för thé täß dïspläýéd tö üsérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to hide the tab for a course"
+msgstr ""
+"Trüé ïf ït's pössïßlé tö hïdé thé täß för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True the tab is hidden for the course"
+msgstr ""
+"Trüé thé täß ïs hïddén för thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to reorder the tab in the list of tabs"
+msgstr ""
+"Trüé ïf ït's pössïßlé tö réördér thé täß ïn thé lïst öf täßs Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if this tab should be displayed only for instructors"
+msgstr ""
+"Trüé ïf thïs täß shöüld ßé dïspläýéd önlý för ïnstrüçtörs Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Name of the tab displayed to users. Overrides title."
+msgstr ""
+"Nämé öf thé täß dïspläýéd tö üsérs. Övérrïdés tïtlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Additional settings specific to the tab"
+msgstr ""
+"Àddïtïönäl séttïngs spéçïfïç tö thé täß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "ID of tab to update"
+msgstr "ÌD öf täß tö üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Location (Usage Key) of tab to update"
+msgstr ""
+"Löçätïön (Ûsägé Kéý) öf täß tö üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Need to supply either a valid tab_id or a tab_location."
+msgstr ""
+"Nééd tö süpplý éïthér ä välïd täß_ïd ör ä täß_löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True to hide the tab, and False to show it."
+msgstr ""
+"Trüé tö hïdé thé täß, änd Fälsé tö shöw ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
+msgid "Change the visibility of tabs in a course."
+msgstr ""
+"Çhängé thé vïsïßïlïtý öf täßs ïn ä çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"

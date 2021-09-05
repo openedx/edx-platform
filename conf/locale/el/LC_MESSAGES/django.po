@@ -90,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-08-29 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/open-edx/teams/6205/el/)\n"
@@ -345,9 +345,11 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr ""
 
@@ -4626,7 +4628,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Account activation"
-msgstr ""
+msgstr "Ενεργοποίηση λογαριασμού"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4644,7 +4646,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate your account"
-msgstr ""
+msgstr "Ενεργοποιήστε τον λογαριασμό σας"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4822,6 +4824,8 @@ msgid ""
 "                    Hello %(full_name)s,\n"
 "                "
 msgstr ""
+"\n"
+"Αγαπητέ/αγαπητή %(full_name)s,"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -4892,7 +4896,7 @@ msgstr ""
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s"
-msgstr ""
+msgstr "Αγαπητέ/αγαπητή %(full_name)s"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
@@ -8213,7 +8217,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s,"
-msgstr ""
+msgstr "Αγαπητέ/αγαπητή %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -10136,6 +10140,9 @@ msgid ""
 "\"{url_stub}\". To remove the link from your edX profile, leave this field "
 "blank."
 msgstr ""
+"Βεβαιωθείτε ότι παρέχετε ένα έγκυρο όνομα χρήστη ή ένα URL που περιλαμβάνει "
+"\"{url_stub}\". Για να αφαιρέστε τον σύνδεσμο από το προφίλ σας, αφήστε κενό"
+" αυτό το πεδίο."
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
@@ -10297,7 +10304,7 @@ msgstr "Επιτυχής αλλαγή του κωδικού σας"
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #, python-format
 msgid "Hello %(name)s,"
-msgstr ""
+msgstr "Αγαπητέ/αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
@@ -10312,7 +10319,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
 #, python-format
 msgid "Hello %(name)s, "
-msgstr ""
+msgstr "Αγαπητέ/αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
 #, python-format
@@ -14633,10 +14640,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
-msgid "FREE"
-msgstr ""
-
-#: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
 msgstr ""
 
@@ -15815,7 +15818,7 @@ msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
-msgstr "ΑΠΟΤΕΛΕΣΜΑΤΑ"
+msgstr "Αποτελέσματα:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Topic:"
@@ -16164,7 +16167,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr ""
+msgstr "Αγαπητέ/αγαπητή {full_name},"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
