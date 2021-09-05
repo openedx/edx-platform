@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-08-29 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Lithuanian (Lithuania) (https://www.transifex.com/open-edx/teams/6205/lt_LT/)\n"
@@ -304,9 +304,11 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr ""
 
@@ -14404,10 +14406,6 @@ msgstr ""
 msgid ""
 "Studies show that those who choose this option are  {start_bold}more engaged"
 " and motivated{end_bold} to complete their courses"
-msgstr ""
-
-#: lms/templates/course_modes/track_selection.html
-msgid "FREE"
 msgstr ""
 
 #: lms/templates/course_modes/track_selection.html

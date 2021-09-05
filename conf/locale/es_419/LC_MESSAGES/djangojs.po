@@ -10,6 +10,7 @@
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
+# Carolina De Mares <carolina.demares@edunext.co>, 2021
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2015
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
@@ -169,7 +170,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-08-29 20:44+0000\n"
 "PO-Revision-Date: 2021-08-01 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1888,6 +1889,8 @@ msgstr ""
 msgid ""
 "An answer option has been left blank. Please review and edit the component."
 msgstr ""
+"Una de las preguntas esta sin respuesta. Por favor revisa y edita el "
+"componente"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -2544,15 +2547,15 @@ msgstr "Seleccione una sección o problema"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Create a report of problem responses"
-msgstr ""
+msgstr "Crea un reporte de respuestas de problemas"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "Your report is being generated..."
-msgstr ""
+msgstr "Tu reporte ha sido generado..."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "Your report has been successfully generated."
-msgstr ""
+msgstr "Tu reporte se ha generado exitosamente."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "View Report"
@@ -2560,19 +2563,19 @@ msgstr "Ver el reporte"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
 msgid "There was an error generating the report link."
-msgstr ""
+msgstr "Ha ocurrido un error en la generación del enlace de reporte."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
 msgid "There was an error generating your report."
-msgstr ""
+msgstr "Ha ocurrido un error generando tu reporte."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
 msgid "Unable to get report generation status."
-msgstr ""
+msgstr "No se pudo obtener el estado de la generación del reporte."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
 msgid "Unable to submit request to generate report."
-msgstr ""
+msgstr "No se puede enviar la solicitud para generar reporte."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -2969,7 +2972,7 @@ msgstr "Ocurrió un error. Intenta nuevamente."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "No assignments for team"
-msgstr ""
+msgstr "No hay actividades asignadas para el equipo"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
@@ -3161,6 +3164,8 @@ msgstr ""
 msgid ""
 "An error occurred while looking up team membership. Try refreshing the page."
 msgstr ""
+"Ocurrio un error al buscar la membresia del equipo. Intenta refrescar la "
+"pagina."
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
@@ -3328,6 +3333,9 @@ msgid ""
 "You have been logged out of your account. Click Okay to log in again now. "
 "Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
+"Se ha cerrado la sesión de tu cuenta. Presiona en Okay para iniciar sesión "
+"nuevamente. Presiona Cancelar para permanecer en esta pagina (debes ingresar"
+" nuevamente a tu sesión para guardar tu trabajo)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3398,12 +3406,15 @@ msgstr ""
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid "Student Removed from certificate allowlist successfully."
 msgstr ""
+"El estudiante fue eliminado exitosamente de la lista blanca de certificados."
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid ""
 "Could not find Certificate Exception in the allowlist. Please refresh the "
 "page and try again"
 msgstr ""
+"No se pudo hallar Invalidación del Certificado en la lista. Por favor, "
+"actualiza la página e intenta nuevamente."
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
@@ -3413,85 +3424,105 @@ msgstr "Error de servidor, por favor recarga la página e intenta nuevamente."
 
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
 msgid "<%- user %> already in exception list."
-msgstr ""
+msgstr "<%- user %> se encuentra en la lista de excepción."
 
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
 msgid ""
 "<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
+"<%- user %> ha sido agregado exitosamente a la lista de excepción. Haz clic "
+"en Generar Certificado de Excepción para enviar el certificado."
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners were successfully added to exception list"
-msgstr ""
+msgstr "estudiantes fueron exitosamente añadidos a la lista de excepción."
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner was successfully added to the exception list"
-msgstr ""
+msgstr "estudiante fue agregado a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " records are not in the correct format and have not been added to the "
 "exception list"
 msgstr ""
+"registros no están en el formato correcto, por lo tanto no fueron añadidos a"
+" la lista de excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " record is not in the correct format and has not been added to the exception"
 " list"
 msgstr ""
+"registro no está en el formato correcto y no se añadió a la lista de "
+"excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner accounts cannot be found and have not been added to the exception "
 "list"
 msgstr ""
+"cuentas de estudiante no han sido encontradas, por lo tanto no se han "
+"añadido a la lista de excepciones. "
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner account cannot be found and has not been added to the exception "
 "list"
 msgstr ""
+"La cuenta del estudiante no ha sido encontrada, por lo tanto no se ha "
+"añadido a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners already appear on the exception list in this course"
 msgstr ""
+"estudiantes ya aparecen registrados en la lista de excepción de este curso"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner already appears on the exception list in this course"
 msgstr ""
+"estudiante ya aparece registrado en la lista de excepción de este curso"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners are not enrolled in this course and have not added to the "
 "exception list"
 msgstr ""
+"estudiantes no están inscritos en el curso y no se añadieron a la lista de "
+"excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner is not enrolled in this course and has not been added to the "
 "exception list"
 msgstr ""
+"estudiante no está inscrito en el curso y no se añadió a la lista de "
+"excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners have an active certificate invalidation in this course and have "
 "not been added to the exception list"
 msgstr ""
+"estudiantes tienen una invalidación de certificado activa en este curso y "
+"por lo tanto no han sido añadidos a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner has an active certificate invalidation in this course and has not "
 "been added to the exception list"
 msgstr ""
+"estudiante tiene una invalidación de certificado activa en este curso y por "
+"lo tanto no ha sido añadido a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners encountered unknown errors"
-msgstr ""
+msgstr "estudiantes tuvieron errores desconocidos "
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner encountered an unknown error"
-msgstr ""
+msgstr "estudiante encontró un error desconocido"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
@@ -3624,7 +3655,7 @@ msgstr "Comenzar"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Help make edX better for everyone!"
-msgstr ""
+msgstr "¡Ayuda a edX a ser mejor para todos!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
@@ -3635,28 +3666,37 @@ msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Se produjo un error al intentar recuperar recuperar o guardar la información"
+" a continuación. Por favor intenta de nuevo mas tarde. "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
 msgstr ""
+"¿Cual fue el ingreso total combinado, durante los ultimo 12 meses, de todos "
+"los miembros de tu familia? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"¿Alguna vez has servido en un deber activo en las Fuerzas Armadas de Estados"
+" Unidos de America, Reservas, o Guardia Nacional? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
+"¿Cual es el nivel mas alto de educación que has obtenido hasta la fecha?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"¿Cual es el nivel de educación mas alto que alguno de tus padres o "
+"responsables ha adquirido? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
@@ -3664,11 +3704,11 @@ msgstr "Seleccionar estatus laboral"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "¿En que industria trabajas actualmente?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "¿En que industria te gustaría trabajar?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -3676,11 +3716,11 @@ msgstr "Borrar todo"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "demographics questionnaire"
-msgstr ""
+msgstr "questionario demografico"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "close questionnaire"
-msgstr ""
+msgstr "questionario cerrado"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
@@ -3688,11 +3728,11 @@ msgstr "terminar despues"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Volver a mi panel de control"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Terminar despues"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
@@ -3835,6 +3875,8 @@ msgstr "Actividad Reciente"
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
+"No se encontrarón resultados para \"{query_string}\". Por favor intenta "
+"realizar la busqueda nuevamente."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -4087,6 +4129,7 @@ msgstr "Error al obtener la lista de certificados emitidos."
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating anonymous IDs. Please try again."
 msgstr ""
+"Error al generar Indentificaciónes anonimas. Por favor intenta de nuevo."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
@@ -4508,6 +4551,9 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
+"Error al reiniciar los intentos de problemas para el problema '<%- "
+"problem_id %>' y estudiante '<%- student_id %>'. Asegurate que la "
+"indentificación del problema y el estudiante esten correctas."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -5452,6 +5498,8 @@ msgid ""
 "Enter your {platform_display_name} username or the URL to your "
 "{platform_display_name} page. Delete the URL to remove the link."
 msgstr ""
+"Ingresa tu nombre de usuario {platform_display_name}  o la URL de tu pagina "
+"{platform_display_name}. Borra la URL para remover el enlace."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js

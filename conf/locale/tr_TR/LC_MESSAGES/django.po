@@ -131,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-09-05 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -500,107 +500,6 @@ msgstr "Bu '{email}' e-posta adresine ait bir hesap zaten bulunmaktadır."
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "Bu kullanıcı  '{username}' adı ile zaten mevcut."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Removed group: \"{}\""
-msgstr "Silinen grup: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Did not find a group with name \"{}\" - skipping."
-msgstr "\"{}\" adında bir grup bulunamadı - atlanıyor."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Invalid group name: \"{group_name}\". {messages}"
-msgstr "Geçersiz grup adı: \"{group_name}\". {messages}"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Created new group: \"{}\""
-msgstr "Yeni grup oluşturuldu: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Found existing group: \"{}\""
-msgstr "Mevcut grup bulundu: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Adding {codenames} permissions to group \"{group}\""
-msgstr "\"{group}\" grubuna {codenames} izinleri veriliyor"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Removing {codenames} permissions from group \"{group}\""
-msgstr "{codenames} izinleri \"{group}\" grubundan siliniyor"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid ""
-"Invalid permission option: \"{}\". Please specify permissions using the "
-"format: app_label:model_name:permission_codename."
-msgstr ""
-"Geçersiz izin seçeneği: \"{}\". Lütfen izinleri şu formatta tanımlayın: "
-"app_label:model_name:permission_codename."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid ""
-"Invalid permission codename: \"{codename}\".  No such permission exists for "
-"the model {module}.{model_name}."
-msgstr ""
-"Geçersiz izin kodadı: \"{codename}\".  {module}.{model_name} modeli için "
-"herhangi bir izin verilmemiş."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
-msgstr ""
-"\"{username}\" kullanıcısının {attribute} değeri \"{new_value}\" olarak "
-"ayarlanıyor"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid ""
-"Skipping user \"{}\" because the specified and existing email addresses do "
-"not match."
-msgstr ""
-"Belirtilen ve mevcut e-posta adresleri eşleşmediği için \"{}\" kullanıcısı "
-"atlanıyor."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Did not find a user with username \"{}\" - skipping."
-msgstr "\"{}\" adında bir kullanıcı bulunamadı - atlanıyor."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Removing user: \"{}\""
-msgstr "Kullanıcı siliniyor: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new user: \"{}\""
-msgstr "Yeni kullanıcı oluşturuldu: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Found existing user: \"{}\""
-msgstr "Mevcut kullanıcı bulundu: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Setting unusable password for user \"{}\""
-msgstr "\"{}\" kullanıcısı için uygun olmayan bir parola ayarlanmış"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new profile for user: \"{}\""
-msgstr "\"{}\" kullanıcısı için yeni profil oluşturuldu"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Could not find a group named \"{}\" - skipping."
-msgstr "\"{}\" adında bir grup bulunamadı - atlanıyor."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Adding user \"{username}\" to groups {group_names}"
-msgstr "\"{username}\" kullanıcısı {group_names} gruplarına ekleniyor"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Removing user \"{username}\" from groups {group_names}"
-msgstr "\"{username}\" kullanıcısı {group_names} gruplarından çıkarılıyor"
 
 #: common/djangoapps/student/middleware.py
 #, python-brace-format
@@ -10168,6 +10067,60 @@ msgstr ""
 msgid "ID of the imported course."
 msgstr ""
 
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "open edx user"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "lti platform identifier"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform identifier to which this profile belongs to."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "client identifier"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI client identifier generated by the LTI platform."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "subject identifier"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"Identifies the entity that initiated the launch request, commonly a user."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The authorized LTI profile that launched the resource (identifies the user)."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The usage key string of the blockstore resource serving the content of this "
+"launch."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The LTI platform unique identifier of this resource, also known as the "
+"\"resource link id\"."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform descriptive title for this resource."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "If AGS was enabled during launch, this should hold the lineitem ID."
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
 msgstr "Bu e-posta adresine sahip bir kullanıcıyı bulamadık."
@@ -10453,6 +10406,23 @@ msgstr "Forum sağlayıcısı"
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion tool/provider's id"
 msgstr "Forum aracı/sağlayıcısı kimliği"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Program UUID"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated program will be disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this program/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion provider's id"
+msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -12511,6 +12481,70 @@ msgid ""
 msgstr ""
 "Belirlenmiş dersi alın ve git deposuna aktarmayı deneyin\n"
 ". Ders dizini aynı zamanda git deposu olmalıdır. Kullanım: git_export <course_loc> <git_url>"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Marks a field as deprecated."
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "User-friendly display name for the field"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Help text that describes the setting."
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Tab type"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Default name for the tab displayed to users"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to hide the tab for a course"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True the tab is hidden for the course"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to reorder the tab in the list of tabs"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if this tab should be displayed only for instructors"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Name of the tab displayed to users. Overrides title."
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Additional settings specific to the tab"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "ID of tab to update"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Location (Usage Key) of tab to update"
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Need to supply either a valid tab_id or a tab_location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True to hide the tab, and False to show it."
+msgstr ""
+
+#: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
+msgid "Change the visibility of tabs in a course."
+msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
@@ -16072,10 +16106,6 @@ msgid ""
 "Studies show that those who choose this option are  {start_bold}more engaged"
 " and motivated{end_bold} to complete their courses"
 msgstr ""
-
-#: lms/templates/course_modes/track_selection.html
-msgid "FREE"
-msgstr "ÜCRETSİZ"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"

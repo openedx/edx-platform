@@ -131,6 +131,7 @@
 # Ben Holt <bholt@edx.org>, 2019
 # Benjy Malca Bautista <bnmalcabis@gmail.com>, 2015
 # Carlos Rojas <carlos.rojas.dousdebes@gmail.com>, 2019
+# Carolina De Mares <carolina.demares@edunext.co>, 2021
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2016
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
@@ -262,7 +263,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-26 19:44+0000\n"
+"POT-Creation-Date: 2021-08-29 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -534,9 +535,11 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Gratis"
 
@@ -5838,6 +5841,9 @@ msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
+"© {org_name}.  Todos los derechos reservados, excepto donde se indique lo "
+"contrario. edX, Open edX y sus respectivos logos son marcas registradas de "
+"edX Inc."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -12472,6 +12478,7 @@ msgstr "Continuar"
 msgid "Shift due dates"
 msgstr "Cambiar fechas de vencimiento"
 
+#: openedx/features/personalized_learner_schedules/call_to_action.py
 #: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
@@ -12486,6 +12493,10 @@ msgid ""
 "due assignments into the future. Don’t worry—you won’t lose any of the "
 "progress you’ve made when you shift your due dates."
 msgstr ""
+"Para mantener el ritmo y alcanzar tus metas, puedes actualizar este "
+"calendario y mover las tareas vencidas hacia el futuro. No te preocupes, no "
+"perderás nada de lo que ya has avanzado cuando cambies las fechas de "
+"entrega."
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -16520,10 +16531,6 @@ msgid ""
 msgstr ""
 "Los estudios demuestran que quienes eligen esta opción están {start_bold}más"
 " comprometidos y motivados{end_bold} para completar sus cursos"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "FREE"
-msgstr "GRATIS"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
