@@ -45,8 +45,8 @@
     position: relative;
 }
 
-.trophy-icon {
-    padding: 10px;
+.award-icon {
+    padding: 12px;
     color: #EFF8FA;
     position: absolute;
 }
@@ -99,18 +99,16 @@
     float: left;
 }
 
-.icon-info {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-}
-
-.extra-verified-info {
+.verified-info {
     float: right;
     font-size: 14px;
     margin-left: 12px;
     line-height: 24px;
+}
+
+.verified-info-icon {
+    display: grid;
+    place-items: center;
 }
 
 .choice-bullets {
@@ -149,7 +147,7 @@ a:not(.btn), a:visited:not(.btn) {
     color: #454545;
 }
 
-.triangle-overlay {
+.corner-overlay {
     border-color: #002121 transparent transparent #002121;
     border-style: solid;
     border-width: 45px;
@@ -158,21 +156,13 @@ a:not(.btn), a:visited:not(.btn) {
     position: absolute;
 }
 
-.info-icon {
-    margin-left: 0.1rem;
-    width: 1rem;
-    vertical-align: middle;
+.collapsible {
+    color: #00688d;
+    font-weight: 700;
 }
 
 .collapsible-item {
     letter-spacing: -0.3px;
-}
-
-.collapsible {
-    display: none;
-    text-decoration: underline;
-    color: #00262B;
-    cursor: pointer;
 }
 
 .popover-icon {
@@ -232,6 +222,22 @@ a:not(.btn), a:visited:not(.btn) {
 
     .collapsible {
         margin-bottom: 1.3rem;
+    }
+
+    .corner-overlay {
+        border-width: 35px !important;
+    }
+
+    .award-icon {
+        padding: 6px !important;
+    }
+
+    .award-icon svg {
+        width: 25px !important;
+    }
+
+    .price-display {
+        font-size: 14px;
     }
 }
 

@@ -50,7 +50,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             };
         });
         $(function(){
-            $('.collapsible').click(function(){
+            $('.collapsible').click(function(e){
+                e.preventDefault();
                 $('.collapsible').css({"display":"none"});
             $('.collapsible-item').css({"display":"list-item"});
             }); 
@@ -83,8 +84,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                             % if "verified" in modes:
                             <div class="track-selection-choice track-selection-certificate col-6 mb-5">
                                 <div class="certificate-container">
-                                    <div class="triangle-overlay"></div>
-                                    <span class="trophy-icon">
+                                    <div class="corner-overlay"></div>
+                                    <span class="award-icon">
                                         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M26.6667 3.33333H23.3333V0H6.66667V3.33333H3.33333C1.5 3.33333 0 4.83333 0 6.66667V8.33333C0 12.5833 3.2 16.05 7.31667 16.5667C8.36667 19.0667 10.6167 20.95 13.3333 21.5V26.6667H6.66667V30H23.3333V26.6667H16.6667V21.5C19.3833 20.95 21.6333 19.0667 22.6833 16.5667C26.8 16.05 30 12.5833 30 8.33333V6.66667C30 4.83333 28.5 3.33333 26.6667 3.33333ZM3.33333 8.33333V6.66667H6.66667V13.0333C4.73333 12.3333 3.33333 10.5 3.33333 8.33333ZM26.6667 8.33333C26.6667 10.5 25.2667 12.3333 23.3333 13.0333V6.66667H26.6667V8.33333Z" fill="#EFF8FA"/>
                                         </svg>
@@ -144,8 +145,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </%static:require_module_async>
                                 </div>
                                 <div class="certificate-container-bottom">
-                                    <span><i class="fa fa-lightbulb-o fa-lg icon-info" aria-hidden="true"></i></span>
-                                    <div class="extra-verified-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
+                                    <span class="verified-info-icon"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
+                                    <div class="verified-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
                                         start_bold=HTML('<b>'),
                                         end_bold=HTML('</b>'),
                                     )}</div>
@@ -153,7 +154,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                             </div>
                             % endif
                             <div class="track-selection-choice track-selection-audit col-6">
-                                <p class="float-right m-3 text-uppercase font-weight-bold">${_("Free")}</p>
+                                <p class="float-right m-3 text-uppercase price-display">${_("Free")}</p>
                                 <div class="choice-title"><h4>${_("Access this course")}</h4></div>
                                 <div class="choice-bullets">
                                     <ul>
