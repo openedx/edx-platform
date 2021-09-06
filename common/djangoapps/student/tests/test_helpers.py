@@ -4,7 +4,6 @@
 import logging
 
 import ddt
-import unittest
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
@@ -13,22 +12,6 @@ from django.test.utils import override_settings
 from mock import patch
 from mock import Mock
 from testfixtures import LogCapture
-
-from student.tests.factories import UserFactory
-
-if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:  # TODO: Refactor or fix in RED-1674
-    # TODO: Fix broken imports See https://openedx.atlassian.net/browse/DEPR-47
-    from edx_oauth2_provider.models import TrustedClient
-    from edx_oauth2_provider.tests.factories import (
-        TrustedClientFactory,
-        AccessTokenFactory,
-        ClientFactory,
-        RefreshTokenFactory,
-    )
-
-    from provider.constants import CONFIDENTIAL, PUBLIC
-    from oauth2_provider.models import AccessToken, RefreshToken
-    from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from student.helpers import get_next_url_for_login_page
@@ -173,72 +156,3 @@ class TestLoginHelper(TestCase):
             'LOGIN_REDIRECT_URL': ''  # Falsy or empty URLs should not be used
         }):
             assert '/dashboard' == get_next_url_for_login_page(request), 'Falsy url should default to dashboard'
-
-
-@unittest.skipIf(
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Refactor or fix in RED-1674
-    'edX removed TrustedClient See https://openedx.atlassian.net/browse/DEPR-47'
-)
-class TestDestroyOAuthTokensHelper(TestCase):
-    def setUp(self):
-        super(TestDestroyOAuthTokensHelper, self).setUp()
-        self.user = UserFactory.create()
-        self.client = ClientFactory(logout_uri='https://amc.example.com/logout/', client_type=CONFIDENTIAL)
-        access_token = AccessTokenFactory.create(user=self.user, client=self.client)
-        RefreshTokenFactory.create(user=self.user, client=self.client, access_token=access_token)
-
-    def assert_destroy_behaviour(self, should_be_kept, message):
-        """
-        Helper to test the `destroy_oauth_tokens` behaviour.
-        """
-        assert AccessToken.objects.count()  # Sanity check
-        assert RefreshToken.objects.count()  # Sanity check
-        destroy_oauth_tokens(self.user)
-        assert should_be_kept == AccessToken.objects.count(), message
-        assert should_be_kept == RefreshToken.objects.count(), message
-
-    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': False})
-    def test_confidential_trusted_client_feature_disabled(self):
-        """
-        Tokens that have a confidential TrustedClient should be removed if the feature is disabled
-        """
-        TrustedClientFactory.create(client=self.client)
-        self.assert_destroy_behaviour(
-            should_be_kept=False,
-            message='Tokens of a trusted confidential client should be deleted if the feature is disabled',
-        )
-
-    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
-    def test_confidential_trusted_client(self):
-        """
-        Tokens that have a confidential TrustedClient shouldn't be removed.
-        """
-        TrustedClientFactory.create(client=self.client)
-        self.assert_destroy_behaviour(
-            should_be_kept=True,
-            message='Tokens of a trusted confidential client should be kept',
-        )
-
-    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
-    def test_no_trusted_client(self):
-        """
-        Only tokens that don't have a TrustedClient should be removed.
-        """
-        assert not TrustedClient.objects.count()  # 'Sanity check, there should not be a client'
-        self.assert_destroy_behaviour(
-            should_be_kept=False,
-            message='Tokens of an untrusted client should be deleted',
-        )
-
-    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
-    def test_public_trusted_client(self):
-        """
-        Tokens for public clients are removed, even if they're trusted.
-        """
-        self.client.client_type = PUBLIC
-        self.client.save()
-        TrustedClientFactory.create(client=self.client)
-        self.assert_destroy_behaviour(
-            should_be_kept=False,
-            message='Tokens of a public trusted client should be deleted',
-        )

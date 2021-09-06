@@ -17,7 +17,6 @@ def plugin_settings(settings):
         getenv('TEST_APPSEMBLER_MULTI_TENANT_EMAILS', 'false') == 'true'
 
     settings.TAHOE_SILENT_MISSING_CSS_CONFIG = True  # see ./common.py
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True  # see ./common.py
 
     settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = False  # see ./common.py
     settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}

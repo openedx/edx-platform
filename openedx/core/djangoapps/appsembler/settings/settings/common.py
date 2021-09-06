@@ -68,7 +68,6 @@ def plugin_settings(settings):
     # This flag should be removed when we fully migrate all of Tahoe fork to Juniper
     # until then, instead of commenting out code, this flag should be used so we can easily find
     # and fix test issues
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = False
 
     settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = True  # Use the Django default error page during testing
     settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {
