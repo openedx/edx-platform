@@ -2,6 +2,8 @@ from django.db import models
 
 from oauth2_provider.models import Application
 
+# TODO: RED-2490 Delete this file
+
 
 class TrustedApplication(models.Model):
     """Identify that an OAuth2 application is a trusted application.

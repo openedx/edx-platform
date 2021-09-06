@@ -1,18 +1,25 @@
 """ OAuth related Python apis. """
 
+from django.conf import settings
 
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from oauth2_provider.settings import oauth2_settings as dot_settings
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 
+from openedx.core.djangoapps.appsembler.auth.oauth import destroy_oauth_tokens_excluding_amc_tokens
+
 
 def destroy_oauth_tokens(user):
     """
     Destroys ALL OAuth access and refresh tokens for the given user.
     """
-    dot_access_token.objects.filter(user=user.id).delete()
-    dot_refresh_token.objects.filter(user=user.id).delete()
+    if settings.FEATURES.get('KEEP_AMC_TOKENS_ON_PASSWORD_RESET', False):
+        # Tahoe: Use amc-aware version of this function
+        destroy_oauth_tokens_excluding_amc_tokens(user)
+    else:
+        dot_access_token.objects.filter(user=user.id).delete()
+        dot_refresh_token.objects.filter(user=user.id).delete()
 
 
 def create_dot_access_token(request, user, client, expires_in=None, scopes=None):
