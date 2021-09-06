@@ -1,9 +1,12 @@
 """
 Test CRUD for authorization.
 """
+
+
 import copy
 
 from django.contrib.auth.models import User
+from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import reverse_course_url, reverse_url
@@ -124,9 +127,9 @@ class TestCourseAccess(ModuleStoreTestCase):
                 if hasattr(user, '_roles'):
                     del user._roles
 
-                self.assertTrue(auth.has_course_author_access(user, copy_course_key), "{} no copy access".format(user))
+                self.assertTrue(auth.has_course_author_access(user, copy_course_key), u"{} no copy access".format(user))
                 if (role is OrgStaffRole) or (role is OrgInstructorRole):
                     auth.remove_users(self.user, role(self.course_key.org), user)
                 else:
                     auth.remove_users(self.user, role(self.course_key), user)
-                self.assertFalse(auth.has_course_author_access(user, self.course_key), "{} remove didn't work".format(user))
+                self.assertFalse(auth.has_course_author_access(user, self.course_key), u"{} remove didn't work".format(user))

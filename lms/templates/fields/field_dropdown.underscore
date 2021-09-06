@@ -32,7 +32,7 @@
                 <% }); %>
             <% }); %>
         </select>
-        <button class="u-field-value-display">
+        <button class="u-field-value-display" aria-haspopup="true">
             <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
             <span class="u-field-value-readonly"></span>
             <span class="sr">&nbsp; <%- gettext('Click to edit') %></span>

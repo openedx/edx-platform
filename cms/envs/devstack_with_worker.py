@@ -8,18 +8,16 @@ of tasks onto the appropriate workers.
 
 In two separate processes on devstack:
     paver devstack studio --settings=devstack_with_worker
-    ./manage.py cms celery worker --settings=devstack_with_worker
+    DJANGO_SETTINGS_MODULE=cms.envs.devstack_with_worker celery worker --app=cms.celery:APP
 """
+
 
 import os
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-if 'BOK_CHOY_HOSTNAME' in os.environ:
-    from cms.envs.devstack_docker import *
-else:
-    from cms.envs.devstack import *
+from cms.envs.devstack import *
 
 # Require a separate celery worker
 CELERY_ALWAYS_EAGER = False

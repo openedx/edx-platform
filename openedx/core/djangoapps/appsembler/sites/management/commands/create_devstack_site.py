@@ -28,6 +28,12 @@ class Command(BaseCommand):
             nargs=1,
             type=str,
         )
+        parser.add_argument(
+            'base-domain',
+            help='The base domain set to either `localhost` or something like `devstack.tahoe`',
+            nargs=1,
+            type=str,
+        )
 
     def congrats(self, **kwargs):
         """
@@ -60,6 +66,7 @@ class Command(BaseCommand):
             raise CommandError('This only works on devstack.')
 
         name = options['name'][0].lower()
+        base_domain = options['base-domain'][0].lower()
         try:
             validate_slug(name)
         except ValidationError:
@@ -68,8 +75,8 @@ class Command(BaseCommand):
         if User.objects.filter(username=name).exists():
             raise CommandError('User exists with the username: "{}". Please choose another name.'.format(name))
 
-        domain = '{}.localhost'.format(name)
-        site_name = '{}:18000'.format(domain)
+        domain = '{name}.{base_domain}'.format(name=name, base_domain=base_domain)
+        site_name = '{domain}:18000'.format(domain=domain)
 
         user = User.objects.create_user(
             username=name,
@@ -81,7 +88,7 @@ class Command(BaseCommand):
 
         # Calculated access tokens to the AMC devstack can have them without needing to communicate with the LMS.
         # Just making it easier to automate this without having cross-dependency in devstack
-        fake_token = hashlib.md5(user.username).hexdigest()
+        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()
         reset_amc_tokens(user, access_token=fake_token, refresh_token=fake_token)
 
         data = {
@@ -89,7 +96,7 @@ class Command(BaseCommand):
                 'domain': site_name,
                 'name': site_name,
             },
-            'user_email': user.email,
+            'username': user.username,
             'organization': {
                 'name': name,
                 'short_name': name,

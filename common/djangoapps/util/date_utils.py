@@ -2,9 +2,11 @@
 Convenience methods for working with datetime objects
 """
 
+
 import re
 from datetime import datetime, timedelta
 
+import six
 from django.utils.translation import pgettext, ugettext
 from pytz import UnknownTimeZoneError, timezone, utc
 
@@ -57,7 +59,7 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
     try:
-        return unicode(strftime_localized(dtime, format_string))
+        return six.text_type(strftime_localized(dtime, format_string))
     except ValueError:
         return get_default_time_display(dtime)
 

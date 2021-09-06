@@ -2,8 +2,6 @@
 Tests for the tiers integration in Studio.
 """
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 from django.test import TestCase, override_settings
 from rest_framework import status
@@ -36,7 +34,7 @@ class SiteUnavailableStudioViewTest(TestCase):
         """
         response = self.client.get(self.url)
         assert response.status_code == status.HTTP_302_FOUND, response.content
-        assert response['Location'] == '/signin?next=/site-unavailable/', response.content
+        assert response['Location'] == '/signin_redirect_to_lms?next=/site-unavailable/', response.content
 
     def test_site_unavailable_page(self):
         """
@@ -45,4 +43,4 @@ class SiteUnavailableStudioViewTest(TestCase):
         assert self.client.login(username=self.admin.username, password=self.PASSWORD), 'Admin should log in'
         response = self.client.get(self.url)
         message = 'The trial site of {} has expired.'.format(self.BLUE)
-        assert message in response.content, 'Trial page works.'
+        assert message in response.content.decode(response.charset), 'Trial page works.'

@@ -2,6 +2,7 @@
 Implementation of "Instructor" service
 """
 
+
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,7 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import lms.djangoapps.instructor.enrollment as enrollment
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from student import auth
@@ -44,7 +45,7 @@ class InstructorService(object):
         except ObjectDoesNotExist:
             err_msg = (
                 'Error occurred while attempting to reset student attempts for user '
-                '{student_identifier} for content_id {content_id}. '
+                u'{student_identifier} for content_id {content_id}. '
                 'User does not exist!'.format(
                     student_identifier=student_identifier,
                     content_id=content_id
@@ -57,7 +58,7 @@ class InstructorService(object):
             module_state_key = UsageKey.from_string(content_id)
         except InvalidKeyError:
             err_msg = (
-                'Invalid content_id {content_id}!'.format(content_id=content_id)
+                u'Invalid content_id {content_id}!'.format(content_id=content_id)
             )
             log.error(err_msg)
             return
@@ -74,7 +75,7 @@ class InstructorService(object):
             except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
                 err_msg = (
                     'Error occurred while attempting to reset student attempts for user '
-                    '{student_identifier} for content_id {content_id}.'.format(
+                    u'{student_identifier} for content_id {content_id}.'.format(
                         student_identifier=student_identifier,
                         content_id=content_id
                     )
@@ -88,7 +89,7 @@ class InstructorService(object):
         """
         return auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
 
-    def send_support_notification(self, course_id, exam_name, student_username, review_status):
+    def send_support_notification(self, course_id, exam_name, student_username, review_status, review_url=None):
         """
         Creates a Zendesk ticket for an exam attempt review from the proctoring system.
         Currently, it sends notifications for 'Suspicious" status, but additional statuses can be supported
@@ -103,15 +104,17 @@ class InstructorService(object):
         if course.create_zendesk_tickets:
             requester_name = "edx-proctoring"
             email = "edx-proctoring@edx.org"
-            subject = _("Proctored Exam Review: {review_status}").format(review_status=review_status)
+            subject = _(u"Proctored Exam Review: {review_status}").format(review_status=review_status)
             body = _(
-                "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} "
-                "was reviewed as {review_status} by the proctored exam review provider."
+                u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} "
+                u"was reviewed as {review_status} by the proctored exam review provider.\n"
+                u"Review link: {review_url}"
             ).format(
                 exam_name=exam_name,
                 course_name=course.display_name,
                 student_username=student_username,
-                review_status=review_status
+                review_status=review_status,
+                review_url=review_url or u'not available',
             )
             tags = ["proctoring"]
             create_zendesk_ticket(requester_name, email, subject, body, tags)

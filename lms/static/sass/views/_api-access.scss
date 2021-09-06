@@ -78,7 +78,8 @@
         display: inline-block;
       }
 
-      input, textarea {
+      input,
+      textarea {
         @extend %t-copy-base;
 
         font-family: 'Open Sans';
@@ -117,7 +118,8 @@
         }
       }
 
-      #api-access-submit, .preview-query {
+      #api-access-submit,
+      .preview-query {
         @extend %t-copy-base;
 
         border-radius: 3px;

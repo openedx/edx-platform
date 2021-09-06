@@ -118,7 +118,8 @@
 
     margin-top: ($baseline/2);
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       border-color: #222;
     }
   }

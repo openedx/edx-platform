@@ -86,11 +86,11 @@ def patched_clear_site_cache(sender, **kwargs):
 
 
 class AlternativeDomain(models.Model):
-    site = models.OneToOneField(Site, related_name='alternative_domain')
+    site = models.OneToOneField(Site, related_name='alternative_domain', on_delete=models.CASCADE)
     domain = models.CharField(max_length=500)
 
-    def __unicode__(self):
-        return self.domain
+    def __str__(self):
+        return 'AlternativeDomain <{domain}>'.format(domain=self.domain)
 
     @beeline.traced(name="switch_with_active")
     def switch_with_active(self):

@@ -2,7 +2,7 @@
 """
 Django management command for changing an enterprise user's username.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 

@@ -2,6 +2,7 @@
 Management command `create_video_pipeline_integration` is used to create video pipeline integration record.
 """
 
+
 from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
 from django.core.management.base import BaseCommand
 

@@ -1,7 +1,7 @@
 """
 Utilities for testing the dump_to_neo4j management command
 """
-from __future__ import unicode_literals
+
 
 from py2neo import Node
 

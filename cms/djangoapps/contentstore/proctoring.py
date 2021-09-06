@@ -2,8 +2,10 @@
 Code related to the handling of Proctored Exams in Studio
 """
 
+
 import logging
 
+import six
 from django.conf import settings
 from edx_proctoring.api import (
     create_exam,
@@ -30,14 +32,13 @@ def register_special_exams(course_key):
     subsystem. Likewise, if formerly registered exams are unmarked, then those
     registered exams are marked as inactive
     """
-
     if not settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         # if feature is not enabled then do a quick exit
         return
 
     course = modulestore().get_course(course_key)
     if course is None:
-        raise ItemNotFoundError("Course {} does not exist", unicode(course_key))
+        raise ItemNotFoundError(u"Course {} does not exist", six.text_type(course_key))
 
     if not course.enable_proctored_exams and not course.enable_timed_exams:
         # likewise if course does not have these features turned on
@@ -66,59 +67,55 @@ def register_special_exams(course_key):
     # add/update any exam entries in edx-proctoring
     for timed_exam in timed_exams:
         msg = (
-            'Found {location} as a timed-exam in course structure. Inspecting...'.format(
-                location=unicode(timed_exam.location)
+            u'Found {location} as a timed-exam in course structure. Inspecting...'.format(
+                location=six.text_type(timed_exam.location)
             )
         )
         log.info(msg)
 
+        exam_metadata = {
+            'exam_name': timed_exam.display_name,
+            'time_limit_mins': timed_exam.default_time_limit_minutes,
+            'due_date': timed_exam.due if not course.self_paced else None,
+            'is_proctored': timed_exam.is_proctored_exam,
+            # backends that support onboarding exams will treat onboarding exams as practice
+            'is_practice_exam': timed_exam.is_practice_exam or timed_exam.is_onboarding_exam,
+            'is_active': True,
+            'hide_after_due': timed_exam.hide_after_due,
+            'backend': course.proctoring_provider,
+        }
+
         try:
-            exam = get_exam_by_content_id(unicode(course_key), unicode(timed_exam.location))
+            exam = get_exam_by_content_id(six.text_type(course_key), six.text_type(timed_exam.location))
             # update case, make sure everything is synced
-            exam_id = update_exam(
-                exam_id=exam['id'],
-                exam_name=timed_exam.display_name,
-                time_limit_mins=timed_exam.default_time_limit_minutes,
-                due_date=timed_exam.due,
-                is_proctored=timed_exam.is_proctored_exam,
-                is_practice_exam=timed_exam.is_practice_exam,
-                is_active=True,
-                hide_after_due=timed_exam.hide_after_due,
-            )
-            msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
+            exam_metadata['exam_id'] = exam['id']
+
+            exam_id = update_exam(**exam_metadata)
+            msg = u'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
             log.info(msg)
 
         except ProctoredExamNotFoundException:
-            exam_id = create_exam(
-                course_id=unicode(course_key),
-                content_id=unicode(timed_exam.location),
-                exam_name=timed_exam.display_name,
-                time_limit_mins=timed_exam.default_time_limit_minutes,
-                due_date=timed_exam.due,
-                is_proctored=timed_exam.is_proctored_exam,
-                is_practice_exam=timed_exam.is_practice_exam,
-                is_active=True,
-                hide_after_due=timed_exam.hide_after_due,
-            )
-            msg = 'Created new timed exam {exam_id}'.format(exam_id=exam_id)
+            exam_metadata['course_id'] = six.text_type(course_key)
+            exam_metadata['content_id'] = six.text_type(timed_exam.location)
+
+            exam_id = create_exam(**exam_metadata)
+            msg = u'Created new timed exam {exam_id}'.format(exam_id=exam_id)
             log.info(msg)
 
+        exam_review_policy_metadata = {
+            'exam_id': exam_id,
+            'set_by_user_id': timed_exam.edited_by,
+            'review_policy': timed_exam.exam_review_rules,
+        }
+
         # only create/update exam policy for the proctored exams
-        if timed_exam.is_proctored_exam and not timed_exam.is_practice_exam:
+        if timed_exam.is_proctored_exam and not timed_exam.is_practice_exam and not timed_exam.is_onboarding_exam:
             try:
-                update_review_policy(
-                    exam_id=exam_id,
-                    set_by_user_id=timed_exam.edited_by,
-                    review_policy=timed_exam.exam_review_rules
-                )
+                update_review_policy(**exam_review_policy_metadata)
             except ProctoredExamReviewPolicyNotFoundException:
                 if timed_exam.exam_review_rules:  # won't save an empty rule.
-                    create_exam_review_policy(
-                        exam_id=exam_id,
-                        set_by_user_id=timed_exam.edited_by,
-                        review_policy=timed_exam.exam_review_rules
-                    )
-                    msg = 'Created new exam review policy with exam_id {exam_id}'.format(exam_id=exam_id)
+                    create_exam_review_policy(**exam_review_policy_metadata)
+                    msg = u'Created new exam review policy with exam_id {exam_id}'.format(exam_id=exam_id)
                     log.info(msg)
         else:
             try:
@@ -137,12 +134,12 @@ def register_special_exams(course_key):
 
             search = [
                 timed_exam for timed_exam in timed_exams if
-                unicode(timed_exam.location) == exam['content_id']
+                six.text_type(timed_exam.location) == exam['content_id']
             ]
             if not search:
                 # This means it was turned off in Studio, we need to mark
                 # the exam as inactive (we don't delete!)
-                msg = 'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
+                msg = u'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
                 log.info(msg)
                 update_exam(
                     exam_id=exam['id'],

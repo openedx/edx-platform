@@ -1,8 +1,9 @@
 <%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url" expression_filter="h"/>
 
 <%!
-import urllib
+import six
 
+from django.utils.http import urlencode, urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
@@ -33,6 +34,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
   billing_email = settings.PAYMENT_SUPPORT_EMAIL
+
+  is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -60,13 +63,13 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         % endif
       >
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
-  <% course_target = reverse(course_home_url_name(course_overview.id), args=[unicode(course_overview.id)]) %>
+  <% course_target = reverse(course_home_url_name(course_overview.id), args=[six.text_type(course_overview.id)]) %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link and not is_unfulfilled_entitlement:
-        % if not is_course_blocked:
-            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" tabindex="-1">
+        % if not is_course_blocked and not is_course_expired:
+            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
               <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:
@@ -92,8 +95,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       <div class="wrapper-course-details">
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
-            % if not is_course_blocked:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}">${course_overview.display_name_with_default}</a>
+            % if not is_course_blocked and not is_course_expired:
+              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
             % else:
               <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
             % endif
@@ -105,6 +108,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
           <%
+            enrollment_date = course_overview.self_paced and enrollment and enrollment.created
             if course_overview.start_date_is_still_default:
                 container_string = _("Coming Soon")
                 course_date = None
@@ -115,7 +119,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = enrollment_date or course_overview.dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
                     course_date = course_overview.dashboard_start_display
@@ -128,7 +132,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           %>
 
             <span class="info-date-block-container">
-                % if is_unfulfilled_entitlement:
+                % if not is_unfulfilled_entitlement and is_course_expired:
+                  <span class="info-date-block" data-course-key="${enrollment.course_id}">
+                    ${show_courseware_link.user_message}
+                    <span class="sr">
+                      &nbsp;${_('for {course_display_name}').format(course_display_name=course_overview.display_name_with_default)}
+                    </span>
+                  </span>
+                % elif is_unfulfilled_entitlement:
                     <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
                         % if not entitlement_expired_at:
@@ -140,7 +151,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                         % endif
                     </span>
                 % else:
-                    % if isinstance(course_date, basestring):
+                    % if isinstance(course_date, six.string_types):
                         <span class="info-date-block">${container_string.format(date=course_date)}</span>
                     % elif course_date is not None:
                         <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${course_date.strftime('%Y-%m-%dT%H:%M:%S%z')}" data-format=${format} data-string="${container_string}"></span>
@@ -165,42 +176,16 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
-            % if show_courseware_link or is_unfulfilled_entitlement:
+            % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
               % if course_overview.has_ended():
-                % if not is_course_blocked:
-                  <a href="${course_target}" class="enter-course archived" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
-                % else:
-                  <a class="enter-course-blocked archived" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                % if is_course_blocked:
+                    <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                % elif not is_unfulfilled_entitlement:
+                  <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
 
               % else:
-                % if resume_button_url != '':
-                  <a href="${resume_button_url}"
-                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
-                     data-course-key="${enrollment.course_id}">
-                    ${_('Resume Course')}
-                    <span class="sr">
-                      &nbsp;${course_overview.display_name_with_default}
-                    </span>
-                  </a>
-                % elif not is_course_blocked:
-                  <a href="${course_target}" 
-                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}" 
-                     data-course-key="${enrollment.course_id}">
-                    ${_('View Course')}
-                    <span class="sr">
-                      &nbsp;${course_overview.display_name_with_default}
-                    </span>
-                  </a>
-                % else:
-                  <a class="enter-course-blocked"
-                     data-course-key="${enrollment.course_id}">
-                    ${_('View Course')}
-                    <span class="sr">
-                      &nbsp;${course_overview.display_name_with_default}
-                    </span>
-                  </a>
-                % endif
+                <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_course_blocked=is_course_blocked, course_target=course_target, related_programs=related_programs"/>
               % endif
             % endif
 
@@ -215,9 +200,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     %>
                     % if share_settings.get('DASHBOARD_FACEBOOK', False):
                         <%
-                          facebook_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['facebook'])
+                          facebook_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['facebook'])
                           share_text = _("I'm taking {course_name} online with {facebook_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, facebook_brand=share_settings.get('FACEBOOK_BRAND', 'edX.org'))
-                          query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
+                          query_params = urlencode((('u', facebook_share_url), ('quote', share_text),))
                           facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
                           share_msg = _("Share {course_name} on Facebook").format(course_name=course_overview.display_name_with_default)
                         %>
@@ -226,20 +211,21 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                           data-trigger="focus hover"
                           class="action action-facebook"
                           href="${facebook_url}"
+                          rel="noopener"
                           target="_blank"
                           title="${_('Share on Facebook')}"
                           data-course-id="${course_overview.id}"
-                          onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          onclick="var popupWindow = window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); popupWindow.opener = null; return false;">
                           <span class="sr">${share_msg}</span>
                           <span class="fa fa-facebook" aria-hidden="true"></span>
                         </a>
                     % endif
                     % if share_settings.get('DASHBOARD_TWITTER', False):
                         <%
-                          twitter_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['twitter'])
+                          twitter_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
                           default_share_text = _("I'm taking {course_name} online with {twitter_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, twitter_brand=share_settings.get('TWITTER_BRAND', '@edxonline'))
-                          share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
-                          twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
+                          share_text = urlquote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
+                          twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + urlquote_plus(twitter_share_url)
                           share_msg = _("Share {course_name} on Twitter").format(course_name=course_overview.display_name_with_default)
                         %>
                         <a
@@ -247,10 +233,11 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                           data-trigger="focus hover"
                           class="action action-twitter"
                           href="${twitter_url}"
+                          rel="noopener"
                           target="_blank"
                           title="${_('Share on Twitter')}"
                           data-course-id="${course_overview.id}"
-                          onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          onclick="var popupWindow = window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); popupWindow.opener = null; return false;">
                           <span class="sr">${share_msg}</span>
                           <span class="fa fa-twitter" aria-hidden="true"></span>
                         </a>
@@ -276,7 +263,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                       % if can_unenroll:
                         <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
-                          <% course_refund_url = reverse('course_run_refund_status', args=[unicode(course_overview.id)]) %>
+                          <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
                               % if not is_course_blocked:
                               <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
                                  data-course-id="${course_overview.id}"
@@ -416,14 +403,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % endif
               </div>
               <div class="verification-cta">
-                <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
+                <a href="${reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
               </div>
             % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
               <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
-              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
             % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
               <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
-              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
             % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
               <h4 class="message-title">${_('You have successfully verified your ID with edX')}</h4>
               % if verification_status.get('verification_good_until') is not None:
@@ -446,7 +433,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         % if course_mode_info and course_mode_info['show_upsell'] and not entitlement:
           <div class="message message-upsell has-actions is-shown">
             <div class="wrapper-extended">
-              <p class="message-copy" align="justify">
+              <p class="message-copy" align="auto">
                 <b class="message-copy-bold">
                   ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
                 </b><br>
@@ -466,7 +453,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
                   <a class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                 % else:
-                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
+                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
                 % endif
                     <span class="action-upgrade-icon" aria-hidden="true"></span>
                   <span class="wrapper-copy">
@@ -482,7 +469,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
 
         % if course_requirements:
         ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
-        <% prc_target = reverse('about_course', args=[unicode(course_requirements['courses'][0]['key'])]) %>
+        <% prc_target = reverse('about_course', args=[six.text_type(course_requirements['courses'][0]['key'])]) %>
         <div class="prerequisites">
           <p class="tip">
             ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(

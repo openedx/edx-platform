@@ -2,11 +2,13 @@
 Instructor Application Configuration
 """
 
+
 from django.apps import AppConfig
 from django.conf import settings
 from edx_proctoring.runtime import set_runtime_service
+
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class InstructorConfig(AppConfig):
@@ -19,14 +21,14 @@ class InstructorConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'',
-                PluginURLs.REGEX: u'courses/{}/instructor/api/'.format(COURSE_ID_PATTERN),
+                PluginURLs.REGEX: u'^courses/{}/instructor/api/'.format(COURSE_ID_PATTERN),
                 PluginURLs.RELATIVE_PATH: u'views.api_urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
             }

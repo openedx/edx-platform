@@ -1,29 +1,30 @@
 """Tests for self-paced course due date overrides."""
-# pylint: disable=missing-docstring
+
 import datetime
 
 import pytz
 from django.test.utils import override_settings
 from mock import patch
 
-from courseware.access import has_access
-from courseware.tests.factories import BetaTesterFactory
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
-from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
+from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.self_paced_overrides.SelfPacedDateOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[
+        'lms.djangoapps.courseware.self_paced_overrides.SelfPacedDateOverrideProvider'
+    ],
 )
 class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
     Tests for self-paced due date overrides.
     """
-    shard = 4
 
     def setUp(self):
         self.reset_setting_cache_variables()
@@ -82,7 +83,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
         self.assertIsNone(sp_section.due)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_access_to_beta_users(self):
         """
         Test that beta testers can access `self_paced` course prior to start date.
@@ -110,7 +111,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         self.assertTrue(has_access(beta_tester, 'load', self_paced_course))
         self.assertTrue(has_access(beta_tester, 'load', self_paced_section, self_paced_course.id))
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_instructor_paced_discussion_xblock_visibility(self):
         """
         Verify that discussion xblocks scheduled for release in the future are
@@ -125,7 +126,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
             all(xblock.display_name == 'released' for xblock in xblocks)
         )
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_self_paced_discussion_xblock_visibility(self):
         """
         Regression test. Verify that discussion xblocks scheduled for release

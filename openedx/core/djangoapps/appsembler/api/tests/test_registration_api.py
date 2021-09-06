@@ -4,14 +4,17 @@ Tests for openedx.core.djangoapps.appsembler.api.views.RegistrationViewSet
 These tests adapted from Appsembler enterprise `appsembler_api` tests
 
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 import ddt
 from mock import patch
+
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
@@ -26,6 +29,7 @@ APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 class RegistrationApiViewTests(TestCase):
     def setUp(self):
 
+        self.site = SiteFactory()
         # The DRF Router appends '-list' to the base 'registrations' name when
         # registering the endpoint
         self.url = reverse('tahoe-api:v1:registrations-list')
@@ -42,22 +46,20 @@ class RegistrationApiViewTests(TestCase):
 
     def test_duplicate_identifiers(self):
         self.client.post(self.url, self.sample_user_data)
-
         res = self.client.post(self.url, {
             'username': self.sample_user_data['username'],
             'password': 'Another Password!',
             'email': 'me@example.com',
             'name': 'The Boss'
         })
-        self.assertContains(res, 'User already exists', status_code=409)
-
+        self.assertContains(res, 'User already exists', status_code=status.HTTP_409_CONFLICT)
         res = self.client.post(self.url, {
             'username': 'world_changer',
             'password': 'Yet Another Password!',
             'email': self.sample_user_data['email'],
             'name': 'World Changer'
         })
-        self.assertContains(res, 'User already exists', status_code=409)
+        self.assertContains(res, 'User already exists', status_code=status.HTTP_409_CONFLICT)
 
     def test_without_password_field(self):
         params = {
@@ -65,8 +67,10 @@ class RegistrationApiViewTests(TestCase):
             'email': 'mr_potato_head@example.com',
             'name': 'Mr Potato Head',
         }
-        res = self.client.post(self.url, params)
-        self.assertContains(res, 'user_id', status_code=200)
+        with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
+                   return_value=self.site):
+            res = self.client.post(self.url, params)
+        self.assertContains(res, 'user_id', status_code=status.HTTP_200_OK)
 
     @ddt.data(True, False, 'True', 'False', 'true', 'false')
     def test_send_activation_email_with_password(self, send_activation_email):

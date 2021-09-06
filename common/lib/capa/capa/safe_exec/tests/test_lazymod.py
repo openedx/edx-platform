@@ -1,5 +1,6 @@
 """Test lazymod.py"""
 
+
 import sys
 import unittest
 

@@ -1,21 +1,28 @@
 """
 CourseGrade Class
 """
+
+
 from abc import abstractmethod
 from collections import OrderedDict, defaultdict
 
+import six
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 
-from ccx_keys.locator import CCXLocator
+from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule import block_metadata_utils
+from lms.djangoapps.courseware.access import has_access
 
 from .config import assume_zero_if_absent
+from .scores import compute_percent
 from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
-from .scores import compute_percent
 
 
+@python_2_unicode_compatible
 class CourseGradeBase(object):
     """
     Base class for Course Grades.
@@ -31,9 +38,9 @@ class CourseGradeBase(object):
         self.letter_grade = letter_grade or None
         self.force_update_subsections = force_update_subsections
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
-            unicode(self.percent),
+            six.text_type(self.percent),
             self.letter_grade,
             self.passed,
         )
@@ -63,12 +70,13 @@ class CourseGradeBase(object):
         Returns grades for the subsections in the course in
         a dict keyed by subsection format types.
         """
+        staff_access = bool(has_access(self.user, 'staff', self.course_data.course))
         subsections_by_format = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
-                    if graded_total.possible > 0:
+                    if graded_total.possible > 0 and subsection_grade.show_grades(staff_access):
                         subsections_by_format[subsection_grade.format][subsection_grade.location] = subsection_grade
         return subsections_by_format
 
@@ -93,7 +101,7 @@ class CourseGradeBase(object):
         keyed by subsection location.
         """
         subsection_grades = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 subsection_grades[subsection_grade.location] = subsection_grade
         return subsection_grades
@@ -104,7 +112,7 @@ class CourseGradeBase(object):
         Returns a dict of problem scores keyed by their locations.
         """
         problem_scores = {}
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 problem_scores.update(subsection_grade.problem_scores)
         return problem_scores
@@ -205,6 +213,7 @@ class CourseGradeBase(object):
         """
         chapter_subsection_grades = self._get_subsection_grades(course_structure, chapter.location)
         return {
+            # xss-lint: disable=python-deprecated-display-name
             'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
             'url_name': block_metadata_utils.url_name_for_block(chapter),
             'sections': chapter_subsection_grades,
@@ -271,7 +280,7 @@ class CourseGrade(CourseGradeBase):
         if assume_zero_if_absent(self.course_data.course_key):
             return True
 
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 if subsection_grade.all_total.first_attempted:
                     return True
@@ -290,7 +299,9 @@ class CourseGrade(CourseGradeBase):
         Computes and returns the grade percentage from the given
         result from the grader.
         """
-        return round(grader_result['percent'] * 100 + 0.05) / 100
+
+        # Confused about the addition of .05 here?  See https://openedx.atlassian.net/browse/TNL-6972
+        return round_away_from_zero(grader_result['percent'] * 100 + 0.05) / 100
 
     @staticmethod
     def _compute_letter_grade(grade_cutoffs, percent):
@@ -322,4 +333,4 @@ class CourseGrade(CourseGradeBase):
 
 
 def _uniqueify_and_keep_order(iterable):
-    return OrderedDict([(item, None) for item in iterable]).keys()
+    return list(OrderedDict([(item, None) for item in iterable]).keys())

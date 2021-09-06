@@ -1,16 +1,18 @@
 """
 Tests for testing the modulestore settings migration code.
 """
+
+
 import copy
+from unittest import TestCase
+
 import ddt
 
 from openedx.core.lib.tempdir import mkdtemp_clean
-
-from unittest import TestCase
 from xmodule.modulestore.modulestore_settings import (
     convert_module_store_setting_if_needed,
-    update_module_store_settings,
     get_mixed_stores,
+    update_module_store_settings
 )
 
 
@@ -19,7 +21,6 @@ class ModuleStoreSettingsMigration(TestCase):
     """
     Tests for the migration code for the module store settings
     """
-    shard = 2
 
     OLD_CONFIG = {
         "default": {
@@ -150,9 +151,9 @@ class ModuleStoreSettingsMigration(TestCase):
         split_settings = [store for store in stores if store['ENGINE'].endswith('.DraftVersioningModuleStore')]
         if len(split_settings):
             # there should only be one setting for split
-            self.assertEquals(len(split_settings), 1)
+            self.assertEqual(len(split_settings), 1)
             # verify name
-            self.assertEquals(split_settings[0]['NAME'], 'split')
+            self.assertEqual(split_settings[0]['NAME'], 'split')
             # verify split config settings equal those of mongo
             self.assertStoreValuesEqual(
                 split_settings[0],
@@ -194,7 +195,7 @@ class ModuleStoreSettingsMigration(TestCase):
         old_mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
         self.assertTrue(self.is_split_configured(new_mixed_setting))
-        self.assertEquals(old_mixed_setting, new_mixed_setting)
+        self.assertEqual(old_mixed_setting, new_mixed_setting)
 
     @ddt.data('draft', 'split')
     def test_update_settings(self, default_store):

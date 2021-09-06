@@ -1,6 +1,7 @@
 """
 URL definitions for api access request API v1.
 """
+
 from django.conf.urls import url
 
 from openedx.core.djangoapps.api_admin.api.v1 import views

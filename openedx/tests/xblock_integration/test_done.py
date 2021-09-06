@@ -4,6 +4,7 @@ Tests for the DoneXBlock.
 This is nice as a simple example of the edX XBlock test framework.
 '''
 
+
 from openedx.tests.xblock_integration.xblock_testcase import XBlockTestCase
 
 
@@ -54,7 +55,6 @@ class TestDone(XBlockTestCase):
         """
         resp = self.ajax('toggle_button', block, data)
         self.assertEqual(resp.status_code, 200)
-        # pylint: disable=no-member
         self.assertEqual(resp.data, {"state": desired_state})
 
     # pylint: disable=unused-argument

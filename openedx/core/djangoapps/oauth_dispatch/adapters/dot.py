@@ -2,6 +2,7 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
+from edx_django_utils.monitoring import set_custom_metric
 from oauth2_provider import models
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
@@ -67,13 +68,17 @@ class DOTAdapter(object):
         """
         return models.AccessToken.objects.get(token=token_string)
 
-    def normalize_scopes(self, scopes):
+    def create_access_token_for_test(self, token_string, client, user, expires):
         """
-        Given a list of scopes, return a space-separated list of those scopes.
+        Returns a new AccessToken object created from the given arguments.
+        This method is currently used only by tests.
         """
-        if not scopes:
-            scopes = ['default']
-        return ' '.join(scopes)
+        return models.AccessToken.objects.create(
+            token=token_string,
+            application=client,
+            user=user,
+            expires=expires,
+        )
 
     def get_token_scope_names(self, token):
         """
@@ -81,25 +86,45 @@ class DOTAdapter(object):
         """
         return list(token.scopes)
 
-    def is_client_restricted(self, client_id):
+    def is_client_restricted(self, client):
         """
         Returns true if the client is set up as a RestrictedApplication.
         """
-        application = self.get_client(client_id=client_id)
-        return RestrictedApplication.objects.filter(application=application).exists()
+        return RestrictedApplication.objects.filter(application=client).exists()
 
-    def get_authorization_filters(self, client_id):
+    def get_authorization_filters(self, client):
         """
         Get the authorization filters for the given client application.
         """
-        application = self.get_client(client_id=client_id)
-        filters = [org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()]
+        application = client
+
+        filter_set = set()
+        if hasattr(application, 'access') and application.access.filters:
+            filter_set.update(application.access.filters)
+        filter_set = self._add_org_relation_filters_to_set(application, filter_set)
 
         # Allow applications configured with the client credentials grant type to access
         # data for all users. This will enable these applications to fetch data in bulk.
         # Applications configured with all other grant types should only have access
         # to data for the request user.
         if application.authorization_grant_type != application.GRANT_CLIENT_CREDENTIALS:
-            filters.append(self.FILTER_USER_ME)
+            filter_set.add(self.FILTER_USER_ME)
 
-        return filters
+        return list(filter_set)
+
+    def _add_org_relation_filters_to_set(self, application, filter_set):
+        """
+        Adds Organization related filters to the filter_set.
+
+        TODO: BOM-1292: Retire Application Organizations once all filters have been migrated
+          to Application Access. When retiring, this entire function can be deleted.
+
+        """
+        filter_set_before_orgs = filter_set.copy()
+        filter_set.update([org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()])
+
+        set_custom_metric('filter_set_before_orgs', list(filter_set_before_orgs))
+        set_custom_metric('filter_set_after_orgs', list(filter_set))
+        set_custom_metric('filter_set_difference', list(filter_set.difference(filter_set_before_orgs)))
+
+        return filter_set

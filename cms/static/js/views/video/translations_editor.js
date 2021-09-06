@@ -133,7 +133,7 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload
                     value: value,
                     url: self.model.get('urlRoot')
                 }));
-                HtmlUtils.append($html, dropdown.clone().val(newLang));
+                HtmlUtils.prepend($html, HtmlUtils.HTML(dropdown.clone().val(newLang)));
                 frag.appendChild($html[0]);
             });
 

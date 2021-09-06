@@ -21,16 +21,16 @@
   
   var newcatalog = {
     "%(sel)s of %(cnt)s selected": [
-      "Izabran %(sel)s od %(cnt)s", 
-      "Izabrano %(sel)s od %(cnt)s", 
+      "Izabran %(sel)s od %(cnt)s",
+      "Izabrano %(sel)s od %(cnt)s",
       "Izabrano %(sel)s od %(cnt)s"
-    ], 
-    "Available %s": "Dostupno %s", 
-    "Choose all": "Odaberi sve", 
-    "Chosen %s": "Odabrani %s", 
-    "Filter": "Filter", 
-    "Remove": "Ukloni", 
-    "Today": "Danas", 
+    ],
+    "Available %s": "Dostupno %s",
+    "Choose all": "Odaberi sve",
+    "Chosen %s": "Odabrani %s",
+    "Filter": "Filter",
+    "Remove": "Ukloni",
+    "Today": "Danas",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Imate nespa\u0161ene izmjene na pojedinim ure\u0111enim poljima. Ako pokrenete ovu akciju, te izmjene \u0107e biti izgubljene."
   };
   for (var key in newcatalog) {
@@ -53,7 +53,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -87,48 +87,48 @@
     /* formatting library */
 
     django.formats = {
-    "DATETIME_FORMAT": "j. N. Y. G:i T", 
+    "DATETIME_FORMAT": "j. N. Y. G:i T",
     "DATETIME_INPUT_FORMATS": [
-      "%Y-%m-%d %H:%M:%S", 
-      "%Y-%m-%d %H:%M:%S.%f", 
-      "%Y-%m-%d %H:%M", 
-      "%Y-%m-%d", 
-      "%m/%d/%Y %H:%M:%S", 
-      "%m/%d/%Y %H:%M:%S.%f", 
-      "%m/%d/%Y %H:%M", 
-      "%m/%d/%Y", 
-      "%m/%d/%y %H:%M:%S", 
-      "%m/%d/%y %H:%M:%S.%f", 
-      "%m/%d/%y %H:%M", 
+      "%Y-%m-%d %H:%M:%S",
+      "%Y-%m-%d %H:%M:%S.%f",
+      "%Y-%m-%d %H:%M",
+      "%Y-%m-%d",
+      "%m/%d/%Y %H:%M:%S",
+      "%m/%d/%Y %H:%M:%S.%f",
+      "%m/%d/%Y %H:%M",
+      "%m/%d/%Y",
+      "%m/%d/%y %H:%M:%S",
+      "%m/%d/%y %H:%M:%S.%f",
+      "%m/%d/%y %H:%M",
       "%m/%d/%y"
-    ], 
-    "DATE_FORMAT": "j. N Y.", 
+    ],
+    "DATE_FORMAT": "j. N Y.",
     "DATE_INPUT_FORMATS": [
-      "%Y-%m-%d", 
-      "%m/%d/%Y", 
-      "%m/%d/%y", 
-      "%b %d %Y", 
-      "%b %d, %Y", 
-      "%d %b %Y", 
-      "%d %b, %Y", 
-      "%B %d %Y", 
-      "%B %d, %Y", 
-      "%d %B %Y", 
+      "%Y-%m-%d",
+      "%m/%d/%Y",
+      "%m/%d/%y",
+      "%b %d %Y",
+      "%b %d, %Y",
+      "%d %b %Y",
+      "%d %b, %Y",
+      "%B %d %Y",
+      "%B %d, %Y",
+      "%d %B %Y",
       "%d %B, %Y"
-    ], 
-    "DECIMAL_SEPARATOR": ",", 
-    "FIRST_DAY_OF_WEEK": "0", 
-    "MONTH_DAY_FORMAT": "j. F", 
-    "NUMBER_GROUPING": "0", 
-    "SHORT_DATETIME_FORMAT": "m/d/Y P", 
-    "SHORT_DATE_FORMAT": "Y M j", 
-    "THOUSAND_SEPARATOR": ".", 
-    "TIME_FORMAT": "G:i", 
+    ],
+    "DECIMAL_SEPARATOR": ",",
+    "FIRST_DAY_OF_WEEK": 0,
+    "MONTH_DAY_FORMAT": "j. F",
+    "NUMBER_GROUPING": 0,
+    "SHORT_DATETIME_FORMAT": "m/d/Y P",
+    "SHORT_DATE_FORMAT": "Y M j",
+    "THOUSAND_SEPARATOR": ".",
+    "TIME_FORMAT": "G:i",
     "TIME_INPUT_FORMATS": [
-      "%H:%M:%S", 
-      "%H:%M:%S.%f", 
+      "%H:%M:%S",
+      "%H:%M:%S.%f",
       "%H:%M"
-    ], 
+    ],
     "YEAR_MONTH_FORMAT": "F Y."
   };
 

@@ -3,6 +3,7 @@
 Module for Certificates pages.
 """
 
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.lms import BASE_URL

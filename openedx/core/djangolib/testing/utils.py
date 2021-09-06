@@ -8,6 +8,7 @@ Utility classes for testing django applications.
     A TestCase baseclass that has per-test isolated caches.
 """
 
+
 import copy
 import re
 from unittest import skipUnless
@@ -19,13 +20,13 @@ from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from edx_django_utils.cache import RequestCache
 
 
 class CacheIsolationMixin(object):
     """
     This class can be used to enable specific django caches for
-    specific the TestCase that it's mixed into.
+    the specific TestCase that it's mixed into.
 
     Usage:
 
@@ -46,6 +47,22 @@ class CacheIsolationMixin(object):
 
     __settings_overrides = []
     __old_settings = []
+
+    @classmethod
+    def setUpClass(cls):
+        super(CacheIsolationMixin, cls).setUpClass()
+        cls.start_cache_isolation()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.end_cache_isolation()
+        super(CacheIsolationMixin, cls).tearDownClass()
+
+    def setUp(self):
+        super(CacheIsolationMixin, self).setUp()
+
+        self.clear_caches()
+        self.addCleanup(self.clear_caches)
 
     @classmethod
     def start_cache_isolation(cls):
@@ -73,6 +90,9 @@ class CacheIsolationMixin(object):
                     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
                     'LOCATION': cache_name,
                     'KEY_FUNCTION': 'util.memcache.safe_key',
+                    'OPTIONS': {
+                        'MAX_ENTRIES': 1000,
+                    },
                 } for cache_name in cls.ENABLED_CACHES
             })
 
@@ -118,7 +138,7 @@ class CacheIsolationMixin(object):
         # Clear that.
         sites.models.SITE_CACHE.clear()
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
 
 class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
@@ -127,21 +147,6 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
     :py:class:`CacheIsolationMixin`) at class setup, and flushes the cache
     between every test.
     """
-    @classmethod
-    def setUpClass(cls):
-        super(CacheIsolationTestCase, cls).setUpClass()
-        cls.start_cache_isolation()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.end_cache_isolation()
-        super(CacheIsolationTestCase, cls).tearDownClass()
-
-    def setUp(self):
-        super(CacheIsolationTestCase, self).setUp()
-
-        self.clear_caches()
-        self.addCleanup(self.clear_caches)
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
@@ -187,7 +192,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         executed = len(filtered_queries)
         self.test_case.assertEqual(
             executed, self.num,
-            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+            u"%d queries executed, %d expected\nCaptured queries were:\n%s" % (
                 executed, self.num,
                 '\n'.join(
                     query['sql'] for query in filtered_queries

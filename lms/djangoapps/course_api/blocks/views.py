@@ -1,6 +1,9 @@
 """
 CourseBlocks API views
 """
+
+
+import six
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from opaque_keys import InvalidKeyError
@@ -183,7 +186,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             Returned only if "show_correctness" is included in the "requested_fields" parameter.
     """
 
-    def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
+    def list(self, request, usage_key_string, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         REST API endpoint for listing all the blocks information in the course,
         while regarding user access and roles.
@@ -213,10 +216,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data.get('student_view_data', []),
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
+                    hide_access_denials=hide_access_denials,
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(text_type(exception)))
+            raise Http404(u"Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()
@@ -260,7 +264,7 @@ class BlocksInCourseView(BlocksView):
         with a message indicating that the course_id is not valid.
     """
 
-    def list(self, request):  # pylint: disable=arguments-differ
+    def list(self, request, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         Retrieves the usage_key for the requested course, and then returns the
         same information that would be returned by BlocksView.list, called with
@@ -279,5 +283,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(unicode(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key)
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
+        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)

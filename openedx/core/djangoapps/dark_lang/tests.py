@@ -1,17 +1,19 @@
 """
 Tests of DarkLangMiddleware
 """
+
+
 import unittest
 
 import ddt
 from django.http import HttpRequest
-from django.test import TestCase
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from mock import Mock
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 
 UNSET = object()
@@ -27,7 +29,7 @@ def set_if_set(dct, key, value):
 
 
 @ddt.ddt
-class DarkLangMiddlewareTests(TestCase):
+class DarkLangMiddlewareTests(CacheIsolationTestCase):
     """
     Tests of DarkLangMiddleware
     """
@@ -75,7 +77,7 @@ class DarkLangMiddlewareTests(TestCase):
         Assert that the HTML_ACCEPT_LANGUAGE header in request
         is equal to value
         """
-        self.assertEquals(
+        self.assertEqual(
             value,
             request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
         )
@@ -203,6 +205,7 @@ class DarkLangMiddlewareTests(TestCase):
             changed_by=self.user,
             enabled=True
         ).save()
+
         self.assertAcceptEquals(
             expected,
             self.process_middleware_request(accept=accept_header)
@@ -227,14 +230,14 @@ class DarkLangMiddlewareTests(TestCase):
 
         self.assertAcceptEquals(
             'es-419;q=1.0',
-            self.process_middleware_request(accept='{};q=1.0, pt;q=0.5'.format(latin_america_code))
+            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))
         )
 
     def assert_session_lang_equals(self, value, session):
         """
         Assert that the LANGUAGE_SESSION_KEY set in session is equal to value
         """
-        self.assertEquals(
+        self.assertEqual(
             value,
             session.get(LANGUAGE_SESSION_KEY, UNSET)
         )

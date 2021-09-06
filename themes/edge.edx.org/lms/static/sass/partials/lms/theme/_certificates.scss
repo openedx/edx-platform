@@ -4,7 +4,8 @@
   // Note: edx.org no longer supports audit certificates, but there are
   // legacy certificates that might be rendered. In this situation, they
   // are styled as honor certificates.
-  &.mode-honor, &.mode-audit {
+  &.mode-honor,
+  &.mode-audit {
     border-color: $honor-mode-color;
 
     .card-logo {

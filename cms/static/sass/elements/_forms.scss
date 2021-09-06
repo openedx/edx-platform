@@ -33,7 +33,8 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include linear-gradient($gray-l5, $white);
 
   @extend %t-copy-sub2;
@@ -143,7 +144,7 @@ form {
   }
 
   .note {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     // note with actions
     &.has-actions {
@@ -395,7 +396,7 @@ form {
 
     display: inline-block;
     vertical-align: middle;
-    max-width: 80%;
+    max-width: 70%;
   }
 
   .incontext-editor-open-action,
@@ -448,9 +449,7 @@ form {
 // ====================
 input.search {
   padding: 6px 15px 8px 30px;
-
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   border: 1px solid $darkGrey;
   border-radius: 20px;
   background: url('#{$static-path}/images/search-icon.png') no-repeat 8px 7px #edf1f5;
@@ -485,9 +484,7 @@ code {
   width: 100%;
   min-height: 80px;
   padding: 10px;
-
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   border: 1px solid $mediumGrey;
 
   @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));

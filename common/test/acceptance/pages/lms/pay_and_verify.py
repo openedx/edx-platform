@@ -1,5 +1,6 @@
 """Payment and verification pages"""
 
+
 import re
 
 from bok_choy.page_object import PageObject
@@ -153,8 +154,11 @@ class FakePaymentPage(PageObject):
 
     def is_browser_on_page(self):
         """Check if a step in the payment and verification flow has loaded."""
-        message = self.q(css='BODY').text[0]
-        match = re.search('Payment page', message)
+        message = self.q(css='BODY').text
+        if not message:
+            return False
+
+        match = re.search('Payment page', message[0])
         return True if match else False
 
     def submit_payment(self):
@@ -162,34 +166,3 @@ class FakePaymentPage(PageObject):
         self.q(css="input[value='Submit']").click()
 
         return PaymentAndVerificationFlow(self.browser, self._course_id, entry_point='payment-confirmation').wait_for_page()
-
-
-class FakeSoftwareSecureVerificationPage(PageObject):
-    """
-    This page is a page used for testing that allows the user to change the status of their most recent
-    verification.
-    """
-
-    url = BASE_URL + '/verify_student/software-secure-fake-response'
-
-    def is_browser_on_page(self):
-        """ Determine if browser is on the page. """
-        message = self.q(css='BODY').text[0]
-        match = re.search('Fake Software Secure page', message)
-        return True if match else False
-
-    def mark_approved(self):
-        """ Mark the latest verification attempt as passing. """
-        self.q(css='#btn_pass').click()
-
-    def mark_denied(self):
-        """ Mark the latest verification attempt as denied. """
-        self.q(css='#btn_denied').click()
-
-    def mark_error(self):
-        """ Mark the latest verification attempt as an error. """
-        self.q(css='#btn_error').click()
-
-    def mark_unkown_error(self):
-        """ Mark the latest verification attempt as an unknown error. """
-        self.q(css='#btn_unkonwn_error').click()

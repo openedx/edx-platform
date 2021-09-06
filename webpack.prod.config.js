@@ -4,10 +4,13 @@
 
 var Merge = require('webpack-merge');
 var webpack = require('webpack');
+var BundleTracker = require('webpack-bundle-tracker');
+var _ = require('underscore');
 
 var commonConfig = require('./webpack.common.config.js');
 
 var optimizedConfig = Merge.smart(commonConfig, {
+  web: {
     output: {
         filename: '[name].[chunkhash].js'
     },
@@ -28,7 +31,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
             minChunks: 3
         })
     ]
-});
+}});
 
 // requireCompatConfig only exists so that you can use RequireJS to require a
 // Webpack bundle (but try not to do that if you can help it). RequireJS knows
@@ -44,6 +47,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
 
 // Step 1: Alter the bundle output names to omit the chunkhash.
 var requireCompatConfig = Merge.smart(optimizedConfig, {
+  web: {
     output: {
         filename: '[name].js'
     },
@@ -56,14 +60,12 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
             minChunks: 3
         })
     ]
-});
+}});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files
 // that Django needs to look up resources. We never want to accidentally
 // overwrite those because it means that we'll be serving assets with shorter
 // cache times. RequireJS never looks at the webpack-stats.json file.
-requireCompatConfig.plugins = requireCompatConfig.plugins.filter(
-    function(plugin) { return !plugin.options || (plugin.options && plugin.options.filename !== 'webpack-stats.json'); }
-);
+requireCompatConfig.web.plugins = requireCompatConfig.web.plugins.filter((plugin) => !(plugin instanceof BundleTracker));
 
-module.exports = [optimizedConfig, requireCompatConfig];
+module.exports = [..._.values(optimizedConfig), ..._.values(requireCompatConfig)];

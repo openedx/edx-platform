@@ -1,4 +1,6 @@
 """Organizations views for use with Studio."""
+
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator

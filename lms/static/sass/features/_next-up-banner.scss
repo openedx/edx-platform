@@ -1,0 +1,29 @@
+// Up next banner
+.next-up-banner {
+  display: none; // Required to be none for Optimizely experiment in AA-29
+  background-color: #d8edf8;
+  color: #393f43;
+  font-size: 16px;
+  border: 1px solid #bbdff2;
+  border-radius: 4px;
+  box-sizing: border-box;
+  line-height: 1.5;
+  margin: $baseline auto;
+  padding: 20px;
+
+  a:not(.btn) {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #006ea9;
+
+    &:hover {
+      color: darken(#006ea9, 15%);
+      text-decoration: underline;
+    }
+  }
+
+  & + .page-content {
+    margin-top: 0;
+    padding-top: 0;
+  }
+}

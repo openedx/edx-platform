@@ -70,8 +70,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         save: function(event) {
+            var requestData;
+
             event.preventDefault();
-            var requestData = this.getRequestData();
+            requestData = this.getRequestData();
             if (!_.isEqual(requestData, {metadata: {}})) {
                 XBlockViewUtils.updateXBlockFields(this.model, requestData, {
                     success: this.options.onSave
@@ -122,10 +124,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         initializeEditors: function() {
+            var tabsTemplate;
             var tabs = this.options.tabs;
             if (tabs && tabs.length > 0) {
                 if (tabs.length > 1) {
-                    var tabsTemplate = this.loadTemplate('settings-modal-tabs');
+                    tabsTemplate = this.loadTemplate('settings-modal-tabs');
                     HtmlUtils.setHtml(this.$('.modal-section'), HtmlUtils.HTML(tabsTemplate({tabs: tabs})));
                     _.each(this.options.tabs, function(tab) {
                         this.options.editors.push.apply(
@@ -411,9 +414,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-timed-examination',
         events: {
             'change input.no_special_exam': 'notTimedExam',
-            'change input.timed_exam': 'setTimedExam',
-            'change input.practice_exam': 'setPracticeExam',
+            'change input.timed_exam': 'setSpecialExamWithoutRules',
+            'change input.practice_exam': 'setSpecialExamWithoutRules',
             'change input.proctored_exam': 'setProctoredExam',
+            'change input.onboarding_exam': 'setSpecialExamWithoutRules',
             'focusout .field-time-limit input': 'timeLimitFocusout'
         },
         notTimedExam: function(event) {
@@ -433,11 +437,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 this.$('.field-exam-review-rules').hide();
             }
         },
-        setTimedExam: function(event) {
-            event.preventDefault();
-            this.selectSpecialExam(false);
-        },
-        setPracticeExam: function(event) {
+        setSpecialExamWithoutRules: function(event) {
             event.preventDefault();
             this.selectSpecialExam(false);
         },
@@ -446,8 +446,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.selectSpecialExam(true);
         },
         timeLimitFocusout: function(event) {
+            var selectedTimeLimit;
+
             event.preventDefault();
-            var selectedTimeLimit = $(event.currentTarget).val();
+            selectedTimeLimit = $(event.currentTarget).val();
             if (!this.isValidTimeLimit(selectedTimeLimit)) {
                 $(event.currentTarget).val('00:30');
             }
@@ -462,24 +464,26 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
 
             this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
-                            this.model.get('is_practice_exam'));
+                            this.model.get('is_practice_exam'), this.model.get('is_onboarding_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
 
             this.setReviewRules(this.model.get('exam_review_rules'));
         },
-        setExamType: function(is_time_limited, is_proctored_exam, is_practice_exam) {
+        setExamType: function(isTimeLimited, isProctoredExam, isPracticeExam, isOnboardingExam) {
             this.$('.field-time-limit').hide();
             this.$('.field-exam-review-rules').hide();
 
-            if (!is_time_limited) {
+            if (!isTimeLimited) {
                 this.$('input.no_special_exam').prop('checked', true);
                 return;
             }
 
             this.$('.field-time-limit').show();
 
-            if (this.options.enable_proctored_exams && is_proctored_exam) {
-                if (is_practice_exam) {
+            if (this.options.enable_proctored_exams && isProctoredExam) {
+                if (isOnboardingExam) {
+                    this.$('input.onboarding_exam').prop('checked', true);
+                } else if (isPracticeExam) {
                     this.$('input.practice_exam').prop('checked', true);
                 } else {
                     this.$('input.proctored_exam').prop('checked', true);
@@ -499,9 +503,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         setReviewRules: function(value) {
             this.$('.field-exam-review-rules textarea').val(value);
         },
-        isValidTimeLimit: function(time_limit) {
+        isValidTimeLimit: function(timeLimit) {
             var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
-            return pattern.test(time_limit) && time_limit !== '00:00';
+            return pattern.test(timeLimit) && timeLimit !== '00:00';
         },
         getExamTimeLimit: function() {
             return this.$('.field-time-limit input').val();
@@ -513,48 +517,32 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             actualMinutesStr = '00'.substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
             return hoursStr + ':' + actualMinutesStr;
         },
-        convertTimeLimitToMinutes: function(time_limit) {
-            var time = time_limit.split(':');
-            var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
-            return total_time;
+        convertTimeLimitToMinutes: function(timeLimit) {
+            var time = timeLimit.split(':');
+            var totalTime = (parseInt(time[0], 10) * 60) + parseInt(time[1], 10);
+            return totalTime;
         },
         getRequestData: function() {
-            var is_time_limited;
-            var is_practice_exam;
-            var is_proctored_exam;
-            var time_limit = this.getExamTimeLimit();
-            var exam_review_rules = this.$('.field-exam-review-rules textarea').val();
-
-            if (this.$('input.no_special_exam').is(':checked')) {
-                is_time_limited = false;
-                is_practice_exam = false;
-                is_proctored_exam = false;
-            } else if (this.$('input.timed_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = false;
-                is_proctored_exam = false;
-            } else if (this.$('input.proctored_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = false;
-                is_proctored_exam = true;
-            } else if (this.$('input.practice_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = true;
-                is_proctored_exam = true;
-            }
+            var isNoSpecialExamChecked = this.$('input.no_special_exam').is(':checked');
+            var isProctoredExamChecked = this.$('input.proctored_exam').is(':checked');
+            var isPracticeExamChecked = this.$('input.practice_exam').is(':checked');
+            var isOnboardingExamChecked = this.$('input.onboarding_exam').is(':checked');
+            var timeLimit = this.getExamTimeLimit();
+            var examReviewRules = this.$('.field-exam-review-rules textarea').val();
 
             return {
                 metadata: {
-                    is_practice_exam: is_practice_exam,
-                    is_time_limited: is_time_limited,
-                    exam_review_rules: exam_review_rules,
+                    is_practice_exam: isPracticeExamChecked,
+                    is_time_limited: !isNoSpecialExamChecked,
+                    exam_review_rules: examReviewRules,
                     // We have to use the legacy field name
                     // as the Ajax handler directly populates
                     // the xBlocks fields. We will have to
                     // update this call site when we migrate
                     // seq_module.py to use 'is_proctored_exam'
-                    is_proctored_enabled: is_proctored_exam,
-                    default_time_limit_minutes: this.convertTimeLimitToMinutes(time_limit)
+                    is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
+                    default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
+                    is_onboarding_exam: isOnboardingExamChecked
                 }
             };
         }
@@ -569,10 +557,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             'keyup #prereq_min_score': 'validateScoreAndCompletion'
         },
         afterRender: function() {
+            var prereq, prereqMinScore, prereqMinCompletion;
+
             AbstractEditor.prototype.afterRender.call(this);
-            var prereq = this.model.get('prereq') || '';
-            var prereqMinScore = this.model.get('prereq_min_score') || '100';
-            var prereqMinCompletion = this.model.get('prereq_min_completion') || '100';
+            prereq = this.model.get('prereq') || '';
+            prereqMinScore = this.model.get('prereq_min_score') || '100';
+            prereqMinCompletion = this.model.get('prereq_min_completion') || '100';
             this.$('#is_prereq').prop('checked', this.model.get('is_prereq'));
             this.$('#prereq option[value="' + prereq + '"]').prop('selected', true);
             this.$('#prereq_min_score').val(prereqMinScore);
@@ -853,9 +843,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         toggleUnlockWarning: function() {
+            var display;
             var warning = this.$('.staff-lock .tip-warning');
             if (warning) {
-                var display;
                 if (this.currentVisibility() !== 'staff_only') {
                     display = 'block';
                 } else {
@@ -868,8 +858,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            var metadata;
+
             if (this.hasChanges()) {
-                var metadata = {};
+                metadata = {};
                 if (this.currentVisibility() === 'staff_only') {
                     metadata.visible_to_staff_only = true;
                     metadata.hide_after_due = null;

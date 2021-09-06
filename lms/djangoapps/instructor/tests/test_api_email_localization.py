@@ -3,14 +3,14 @@
 Unit tests for the localization of emails sent by instructor.api methods.
 """
 
+
 from django.core import mail
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 from six import text_type
 
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference, set_user_preference
 from student.models import CourseEnrollment
@@ -19,7 +19,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
 @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
 class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
@@ -27,6 +26,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     Test whether the enroll, unenroll and beta role emails are sent in the
     proper language, i.e: the student's language.
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestInstructorAPIEnrollmentEmailLocalization, cls).setUpClass()
@@ -36,14 +36,14 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
 
         # Platform language is English, instructor's language is Chinese,
-        # student's language is French, so the emails should all be sent in
-        # French.
+        # student's language is Esperanto, so the emails should all be sent in
+        # Esperanto.
         self.instructor = InstructorFactory(course_key=self.course.id)
         set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory.create()
-        set_user_preference(self.student, LANGUAGE_KEY, 'fr')
+        set_user_preference(self.student, LANGUAGE_KEY, 'eo')
 
     def update_enrollement(self, action, student_email):
         """
@@ -54,12 +54,12 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         response = self.client.post(url, args)
         return response
 
-    def check_outbox_is_french(self):
+    def check_outbox_is_esperanto(self):
         """
         Check that the email outbox contains exactly one message for which both
-        the message subject and body contain a certain French string.
+        the message subject and body contain a certain Esperanto string.
         """
-        return self.check_outbox(u"Vous avez été")
+        return self.check_outbox(u"Ýöü hävé ßéén")
 
     def check_outbox(self, expected_message):
         """
@@ -74,7 +74,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         mock_get_user.return_value = self.student
         self.update_enrollement("enroll", self.student.email)
 
-        self.check_outbox_is_french()
+        self.check_outbox_is_esperanto()
 
     def test_unenroll(self, mock_get_user):
         mock_get_user.return_value = self.student
@@ -84,14 +84,14 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         )
         self.update_enrollement("unenroll", self.student.email)
 
-        self.check_outbox_is_french()
+        self.check_outbox_is_esperanto()
 
     def test_set_beta_role(self, mock_get_user):
         mock_get_user.return_value = self.student
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
         self.client.post(url, {'identifiers': self.student.email, 'action': 'add', 'email_students': 'true'})
 
-        self.check_outbox_is_french()
+        self.check_outbox_is_esperanto()
 
     def test_enroll_unsubscribed_student(self, mock_get_user):
         mock_get_user.return_value = None
@@ -100,11 +100,11 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
             self.update_enrollement("enroll", "newuser@hotmail.com")
         self.check_outbox("You have been")
 
-    @override_settings(LANGUAGE_CODE="fr")
+    @override_settings(LANGUAGE_CODE="eo")
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
-    def test_user_without_preference_receives_email_in_french(self, mock_get_user):
+    def test_user_without_preference_receives_email_in_esperanto(self, mock_get_user):
         mock_get_user.return_value = self.student
         delete_user_preference(self.student, LANGUAGE_KEY)
         self.update_enrollement("enroll", self.student.email)
 
-        self.check_outbox_is_french()
+        self.check_outbox_is_esperanto()

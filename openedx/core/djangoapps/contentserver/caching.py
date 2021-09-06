@@ -1,6 +1,10 @@
 """
 Helper functions for caching course assets.
 """
+
+
+import six
+
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from opaque_keys import InvalidKeyError
@@ -19,14 +23,14 @@ def set_cached_content(content):
     """
     Stores the given piece of content in the cache, using its location as the key.
     """
-    CONTENT_CACHE.set(unicode(content.location).encode("utf-8"), content, version=STATIC_CONTENT_VERSION)
+    CONTENT_CACHE.set(six.text_type(content.location).encode("utf-8"), content, version=STATIC_CONTENT_VERSION)
 
 
 def get_cached_content(location):
     """
     Retrieves the given piece of content by its location if cached.
     """
-    return CONTENT_CACHE.get(unicode(location).encode("utf-8"), version=STATIC_CONTENT_VERSION)
+    return CONTENT_CACHE.get(six.text_type(location).encode("utf-8"), version=STATIC_CONTENT_VERSION)
 
 
 def del_cached_content(location):
@@ -38,7 +42,7 @@ def del_cached_content(location):
     """
     def location_str(loc):
         """Force the location to a Unicode string."""
-        return unicode(loc).encode("utf-8")
+        return six.text_type(loc).encode("utf-8")
 
     locations = [location_str(location)]
     try:

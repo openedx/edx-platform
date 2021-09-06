@@ -6,9 +6,13 @@ Settings for Bok Choy tests that are used when running Studio in Docker-based de
 # noinspection PyUnresolvedReferences
 from .bok_choy import *  # pylint: disable=wildcard-import
 
-CMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ['BOK_CHOY_CMS_PORT'])
-LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ['BOK_CHOY_LMS_PORT'])
+CMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_CHOY_CMS_PORT', 8031))
+LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_CHOY_LMS_PORT', 8003))
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
+
+COMMENTS_SERVICE_URL = 'http://{}:4567'.format(os.environ['BOK_CHOY_HOSTNAME'])
+EDXNOTES_PUBLIC_API = 'http://{}:8042/api/v1'.format(os.environ['BOK_CHOY_HOSTNAME'])
 
 # Docker does not support the syslog socket at /dev/log. Rely on the console.
 LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {

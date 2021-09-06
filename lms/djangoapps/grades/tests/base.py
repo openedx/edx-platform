@@ -1,3 +1,9 @@
+"""
+Base file for Grades tests
+"""
+
+from crum import set_current_request
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
@@ -72,6 +78,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self._set_grading_policy()
@@ -91,7 +98,14 @@ class GradeTestBase(SharedModuleStoreTestCase):
                     "min_count": 1,
                     "drop_count": 0,
                     "short_label": "HW",
-                    "weight": 1.0,
+                    "weight": 0.5,
+                },
+                {
+                    "type": "FinalExam",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "FE",
+                    "weight": 0.5,
                 },
                 {
                     "type": "NoCredit",

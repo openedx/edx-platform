@@ -3,7 +3,6 @@ Appsembler's signals to customize certificates and course behaviour
 """
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch.dispatcher import receiver
 from xmodule.modulestore.django import SignalHandler
 
@@ -20,9 +19,12 @@ def set_default_mode_on_course_publish(sender, course_key, **kwargs):  # pylint:
     default_mode, created = CourseMode.objects.get_or_create(
         course_id=course_key,
         mode_slug=settings.DEFAULT_COURSE_MODE_SLUG,
-        mode_display_name=settings.DEFAULT_MODE_NAME_FROM_SLUG
+        defaults=dict(mode_display_name=settings.DEFAULT_MODE_NAME_FROM_SLUG)
     )
-    from lms.djangoapps.certificates.models import CertificateGenerationCourseSetting  # Importing locally to avoid potential cross-system import issues
+    # Importing locally to avoid potential cross-system import issues
+    from lms.djangoapps.certificates.models import (
+        CertificateGenerationCourseSetting
+    )
     CertificateGenerationCourseSetting.set_self_generatation_enabled_for_course(
         course_key,
         True

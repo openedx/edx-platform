@@ -1,12 +1,14 @@
 """
 Unit tests for user_management management commands.
 """
+
+
 import sys
 
 import ddt
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 TEST_EMAIL = 'test@example.com'
@@ -40,7 +42,7 @@ class TestManageGroupCommand(TestCase):
             group = Group.objects.create(name=group_name)
             for codename in permission_codenames:
                 group.permissions.add(
-                    Permission.objects.get(content_type=content_type, codename=codename)  # pylint: disable=no-member
+                    Permission.objects.get(content_type=content_type, codename=codename)
                 )
 
     def check_group_permissions(self, group_permissions):
@@ -48,7 +50,7 @@ class TestManageGroupCommand(TestCase):
         Checks that the current state of the database matches the specified groups and
         permissions.
         """
-        self.check_groups(group_permissions.keys())
+        self.check_groups(list(group_permissions.keys()))
         for group_name, permission_codenames in group_permissions.items():
             self.check_permissions(group_name, permission_codenames)
 
@@ -56,7 +58,7 @@ class TestManageGroupCommand(TestCase):
         """
         DRY helper.
         """
-        self.assertEqual(set(group_names), {g.name for g in Group.objects.all()})  # pylint: disable=no-member
+        self.assertEqual(set(group_names), {g.name for g in Group.objects.all()})
 
     def check_permissions(self, group_name, permission_codenames):
         """
@@ -64,7 +66,7 @@ class TestManageGroupCommand(TestCase):
         """
         self.assertEqual(
             set(permission_codenames),
-            {p.codename for p in Group.objects.get(name=group_name).permissions.all()}  # pylint: disable=no-member
+            {p.codename for p in Group.objects.get(name=group_name).permissions.all()}
         )
 
     @ddt.data(
@@ -73,7 +75,7 @@ class TestManageGroupCommand(TestCase):
             for data in TEST_DATA
             for args, exception in (
                 ((), 'too few arguments' if sys.version_info.major == 2 else 'required: group_name'),  # no group name
-                (('x' * 81,), 'invalid group name'),  # invalid group name
+                (('x' * 151,), 'invalid group name'),  # invalid group name
                 ((TEST_GROUP, 'some-other-group'), 'unrecognized arguments'),  # multiple arguments
                 ((TEST_GROUP, '--some-option', 'dummy'), 'unrecognized arguments')  # unexpected option name
             )

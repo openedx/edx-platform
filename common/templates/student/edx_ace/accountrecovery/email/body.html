@@ -1,0 +1,45 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Create Password" as tmsg %}{{ tmsg | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}You're receiving this e-mail because you requested to create a password for your user account at {{ platform_name }}.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}We've restored access to your {{ platform_name }} account using the recovery email you provided at registration.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}Once you've created a password [below], you will be able to log in to {{ platform_name }} with this email ({{ email }}) and your new password.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." as tmsg %}{{ tmsg | force_escape }}
+                <br />
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Create Password{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=reset_link %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

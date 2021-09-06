@@ -1,10 +1,13 @@
 """
 Support for converting a django user to an XBlock user
 """
+
+
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
+from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
 
@@ -31,6 +34,16 @@ class DjangoXBlockUserService(UserService):
         Returns the currently-logged in user, as an instance of XBlockUser
         """
         return self._convert_django_user_to_xblock_user(self._django_user)
+
+    def get_external_user_id(self, type_name):
+        """
+        Returns an external user id of the given type.
+        Raises ValueError if the type doesn't exist.
+        """
+        external_id, _ = ExternalId.add_new_user_id(self._django_user, type_name)
+        if not external_id:
+            raise ValueError("External ID type: %s does not exist" % type_name)
+        return str(external_id.external_user_id)
 
     def get_anonymous_user_id(self, username, course_id):
         """

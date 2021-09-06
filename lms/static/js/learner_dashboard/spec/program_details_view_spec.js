@@ -59,6 +59,7 @@ describe('Program Details Header View', () => {
       full_program_price: 300,
       card_image_url: 'some image',
       faq: [],
+      pathway_ids: [2],
       price_ranges: [
         {
           max: 378,
@@ -460,9 +461,6 @@ describe('Program Details Header View', () => {
           ],
         },
       ],
-      grades: {
-        'course-v1:Testx+DOGx002+1T2016': 0.9,
-      },
     },
     urls: {
       program_listing_url: '/dashboard/programs/',
@@ -473,6 +471,28 @@ describe('Program Details Header View', () => {
     userPreferences: {
       'pref-lang': 'en',
     },
+    creditPathways: [
+      {
+        org_name: 'Test Org Name',
+        email: 'test@test.com',
+        name: 'Name of Test Pathway',
+        program_uuids: ['0ffff5d6-0177-4690-9a48-aa2fecf94610'],
+        description: 'Test credit pathway description',
+        id: 2,
+        destination_url: 'edx.org',
+      },
+    ],
+    industryPathways: [
+      {
+        org_name: 'Test Org Name',
+        email: 'test@test.com',
+        name: 'Name of Test Pathway',
+        program_uuids: ['0ffff5d6-0177-4690-9a48-aa2fecf94610'],
+        description: 'Test industry pathway description',
+        id: 3,
+        destination_url: 'industry.com',
+      },
+    ],
   };
   const data = options.programData;
 

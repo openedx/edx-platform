@@ -1,3 +1,5 @@
+
+
 import logging
 import textwrap
 
@@ -5,6 +7,7 @@ from lxml import etree
 from pkg_resources import resource_string
 from xblock.fields import Scope, String
 
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import XModule
 
@@ -19,11 +22,11 @@ class AnnotatableFields(object):
     data = String(
         help=_("XML data for the annotation"),
         scope=Scope.content,
-        default=textwrap.dedent("""
+        default=textwrap.dedent(HTML(u"""
         <annotatable>
             <instructions>
                 <p>Enter your (optional) instructions for the exercise in HTML format.</p>
-                <p>Annotations are specified by an <code>&lt;annotation&gt;</code> tag which may may have the following attributes:</p>
+                <p>Annotations are specified by an <code>{}annotation{}</code> tag which may may have the following attributes:</p>
                 <ul class="instructions-template">
                     <li><code>title</code> (optional). Title of the annotation. Defaults to <i>Commentary</i> if omitted.</li>
                     <li><code>body</code> (<b>required</b>). Text of the annotation.</li>
@@ -35,7 +38,7 @@ class AnnotatableFields(object):
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <annotation title="My title" body="My comment" highlight="yellow" problem="0">Ut sodales laoreet est, egestas gravida felis egestas nec.</annotation> Aenean at volutpat erat. Cras commodo viverra nibh in aliquam.</p>
             <p>Nulla facilisi. <annotation body="Basic annotation example." problem="1">Pellentesque id vestibulum libero.</annotation> Suspendisse potenti. Morbi scelerisque nisi vitae felis dictum mattis. Nam sit amet magna elit. Nullam volutpat cursus est, sit amet sagittis odio vulputate et. Curabitur euismod, orci in vulputate imperdiet, augue lorem tempor purus, id aliquet augue turpis a est. Aenean a sagittis libero. Praesent fringilla pretium magna, non condimentum risus elementum nec. Pellentesque faucibus elementum pharetra. Pellentesque vitae metus eros.</p>
         </annotatable>
-        """)
+        """).format(Text('<'), Text('>')))
     )
     display_name = String(
         display_name=_("Display Name"),

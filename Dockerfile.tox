@@ -1,0 +1,5 @@
+FROM edxops/edxapp:latest
+RUN apt-get update \
+    && apt-get install -y \
+    mongodb
+WORKDIR /edx/app/edxapp/edx-platform

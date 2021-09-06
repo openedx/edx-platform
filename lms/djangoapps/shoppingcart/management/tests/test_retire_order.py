@@ -1,5 +1,7 @@
 """Tests for the retire_order command"""
 
+
+from six import text_type
 from tempfile import NamedTemporaryFile
 
 from django.core.management import call_command
@@ -13,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestRetireOrder(ModuleStoreTestCase):
     """Test the retire_order command"""
-    shard = 4
 
     def setUp(self):
         super(TestRetireOrder, self).setUp()
@@ -74,7 +75,7 @@ class TestRetireOrder(ModuleStoreTestCase):
         "retire_order" command on the tempfile
         """
         with NamedTemporaryFile() as temp:
-            temp.write("\n".join(str(order_id) for order_id in order_ids))
+            temp.write("\n".join(text_type(order_id) for order_id in order_ids).encode('utf-8'))
             temp.seek(0)
             call_command('retire_order', temp.name)
 

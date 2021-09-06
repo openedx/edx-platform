@@ -2,6 +2,7 @@
 Test helpers for Site Configuration.
 """
 
+
 from functools import wraps
 import contextlib
 
@@ -23,7 +24,7 @@ def apply_appsembler_theme_configs(site_configuration, values):
     """
     appsembler_configs = site_configuration.get_initial_microsite_values()
     appsembler_configs.update(values or {})
-    site_configuration.values = appsembler_configs
+    site_configuration.site_values = appsembler_configs
     site_configuration.save()
     return site_configuration
 

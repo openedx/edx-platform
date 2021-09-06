@@ -1,7 +1,7 @@
 {% extends "wiki/article.html" %}
 {% load wiki_tags i18n sekizai_tags %}
 
-{% block pagetitle %}{% trans "History" %}: {{ article.current_revision.title }}{% endblock %}
+{% block pagetitle %}{% trans "History" as tmsg%}{{tmsg|force_escape}}: {{ article.current_revision.title }}{% endblock %}
 
 {% block wiki_contents_tab %}
 
@@ -91,7 +91,7 @@
 {% endaddtoblock %}
 
 <p class="lead">
-  {% trans "Click each revision to see a list of edited lines. Click the Preview button to see how the article looked at this stage. At the bottom of this page, you can change to a particular revision or merge an old revision with the current one." %}
+  {% trans "Click each revision to see a list of edited lines. Click the Preview button to see how the article looked at this stage. At the bottom of this page, you can change to a particular revision or merge an old revision with the current one." as tmsg%}{{tmsg|force_escape}}
 </p>
 
 <form method="GET" name="revisions_form">
@@ -110,7 +110,7 @@
                 {% elif revision.automatic_log %}
                   {{ revision.automatic_log }}
                 {% else %}
-                  {% trans "(no log message)" %}
+                  {% trans "(no log message)" as tmsg%}{{tmsg|force_escape}}
                 {% endif %}
                 </small>
               </div>
@@ -130,7 +130,7 @@
                       $('#previewRevisionModal .switch-to-revision').attr('href', '{% url 'wiki:change_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}');
                       document.revisions_form.submit();">
                   <span class="icon fa fa-eye" aria-hidden="true"></span>
-                  {% trans "Preview this revision" %}
+                  {% trans "Preview this revision" as tmsg%}{{tmsg|force_escape}}
                 </a>
 
                 {% if article|can_write:user %}
@@ -149,7 +149,7 @@
           <div id="collapse{{ revision.revision_number }}" class="accordion-body collapse" tabindex="0">
             <div class="accordion-inner diff-container" style="padding: 0;">
               <dl class="dl-horizontal">
-                <dt>{% trans "Auto log:" %}</dt>
+                <dt>{% trans "Auto log:" as tmsg%}{{tmsg|force_escape}}</dt>
                 <dd>{{ revision.automatic_log|default:"-"|linebreaksbr }}</dd>
               </dl>
               <table class="table table-condensed" style="margin: 0; border-collapse: collapse;">
@@ -157,7 +157,7 @@
                   <tr>
                     <th scope="col" class="linenumber">{% if revision.previous_revision %}#{{revision.previous_revision.revision_number}}{% endif %}</th>
                     <th scope="col" class="linenumber">#{{revision.revision_number}}</th>
-                    <th scope="col">{% trans "Change" %}</th>
+                    <th scope="col">{% trans "Change" as tmsg%}{{tmsg|force_escape}}</th>
                   </tr>
                 </thead>
               </table>
@@ -180,17 +180,17 @@
               $('.merge-revision-commit').attr('href', $('input[type=radio]:checked').attr('merge-button-commit-href'));
               document.revisions_form.submit();">
             <span class="icon fa fa-random" aria-hidden="true"></span>
-            {% trans "Merge selected with current..." %}
+            {% trans "Merge selected with current..." as tmsg%}{{tmsg|force_escape}}
           </a>
         {% else %}
           <button type="submit" disabled="true" name="preview" value="1" class="btn btn-large">
             <span class="icon fa fa-lock" aria-hidden="true"></span>
-            {% trans "Merge selected with current..." %}
+            {% trans "Merge selected with current..." as tmsg%}{{tmsg|force_escape}}
           </button>
         {% endif %}
         <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.action=$('input[type=radio]:checked').attr('switch-button-href')">
           <span class="icon fa fa-flag" aria-hidden="true"></span>
-          {% trans "Switch to selected version" %}
+          {% trans "Switch to selected version" as tmsg%}{{tmsg|force_escape}}
         </button>
       </div>
     </div>
@@ -200,10 +200,10 @@
   <input type="hidden" name="r" value="" />
   <div id="previewRevisionModal" class="modal" aria-hidden="true">
     <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title" aria-modal=true>
-      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' as tmsg%}{{tmsg|force_escape}}</span></button>
 
       <header>
-        <h2 id="preview-title">{% trans "Wiki Revision Preview" %}<span class="sr">, {% trans "window open" %}</span></h2>
+        <h2 id="preview-title">{% trans "Wiki Revision Preview" as tmsg%}{{tmsg|force_escape}}<span class="sr">, {% trans "window open" as tmsg%}{{tmsg|force_escape}}</span></h2>
         <hr/>
       </header>
       <div class="modal-body">
@@ -212,17 +212,17 @@
       <div class="modal-footer">
       <a id="previewRevisionModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
         <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
-        {% trans "Back to history view" %}
+        {% trans "Back to history view" as tmsg %}{{tmsg|force_escape}}
       </a>
       {% if article|can_write:user %}
         <button type="button" class="btn btn-large btn-primary switch-to-revision">
           <span class="icon fa fa-flag" aria-hidden="true"></span>
-          {% trans "Switch to this version" %}
+          {% trans "Switch to this version" as tmsg %}{{tmsg|force_escape}}
         </button>
       {% else %}
         <button type="button" class="btn btn-large btn-primary disabled">
           <span class="icon fa fa-lock" aria-hidden="true"></span>
-          {% trans "Switch to this version" %}
+          {% trans "Switch to this version" as tmsg%}{{tmsg|force_escape}}
         </button>
       {% endif %}
       </div>
@@ -231,15 +231,15 @@
 
   <div id="mergeModal" class="modal" aria-hidden="true">
     <div class="inner-wrapper" role="dialog" aria-labelledby="merge-title" aria-modal=true>
-      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' as tmsg%}{{tmsg|force_escape}}</span></button>
 
       <header>
-        <h2 id="merge-title">{% trans "Merge Revision" %}<span class="sr">, {% trans "window open" %}</span></h2>
+        <h2 id="merge-title">{% trans "Merge Revision" as tmsg %}{{tmsg|force_escape}}<span class="sr">, {% trans "window open" as tmsg%}{{tmsg|force_escape}}</span></h2>
         <hr/>
       </header>
       <div class="modal-header">
-        <h1>{% trans "Merge with current" %}</h1>
-        <p class="lead"><span class="icon fa fa-info-circle" aria-hidden="true"></span> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." %} <strong>{% trans "After this, it's important to do a manual review." %}</strong></p>
+        <h1>{% trans "Merge with current" as tmsg%}{{tmsg|force_escape}}</h1>
+        <p class="lead"><span class="icon fa fa-info-circle" aria-hidden="true"></span> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." as tmsg %}{{tmsg|force_escape}} <strong>{% trans "After this, it's important to do a manual review." as tmsg%}{{tmsg|force_escape}}</strong></p>
       </div>
       <div class="modal-body">
         <iframe name="mergeWindow"></iframe>
@@ -247,17 +247,17 @@
       <div class="modal-footer">
         <a id="mergeModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
           <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
-          {% trans "Back to history view" %}
+          {% trans "Back to history view" as tmsg%}{{tmsg|force_escape}}
         </a>
         {% if article|can_write:user %}
         <button type="button" class="btn btn-large btn-primary merge-revision-commit">
           <span class="icon fa fa-file" aria-hidden="true"></span>
-          {% trans "Create new merged version" %}
+          {% trans "Create new merged version" as tmsg%}{{tmsg|force_escape}}
         </button>
         {% else %}
           <button type="button" class="btn btn-large btn-primary disabled">
             <span class="icon fa fa-lock" aria-hidden="true"></span>
-            {% trans "Create new merged version" %}
+            {% trans "Create new merged version" as tmsg%}{{tmsg|force_escape}}
           </button>
         {% endif %}
       </div>

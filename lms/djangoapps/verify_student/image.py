@@ -1,6 +1,9 @@
 """
 Image encoding helpers for the verification app.
 """
+
+
+import base64
 import logging
 
 log = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ def decode_image_data(data):
 
     """
     try:
-        return (data.split(",")[1]).decode("base64")
+        return base64.b64decode(data.split(",")[1])
     except (IndexError, UnicodeEncodeError):
         log.exception("Could not decode image data")
         raise InvalidImageData

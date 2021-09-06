@@ -1,9 +1,9 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-import re
 
-from nose.plugins.attrib import attr
+
+import re
 
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
@@ -12,11 +12,12 @@ from common.test.acceptance.tests.helpers import skip_if_browser
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=22)
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.
     """
+    shard = 22
+
     def setUp(self):  # pylint: disable=arguments-differ
         super(CertificatesTest, self).setUp(is_staff=True, test_xss=False)
         self.certificates_page = CertificatesPage(
@@ -44,9 +45,9 @@ class CertificatesTest(StudioCourseTest):
         Makes signatory dict which can be used in the tests to create certificates
         """
         return {
-            'name': '{prefix} Signatory Name'.format(prefix=prefix),
-            'title': '{prefix} Signatory Title'.format(prefix=prefix),
-            'organization': '{prefix} Signatory Organization'.format(prefix=prefix),
+            'name': u'{prefix} Signatory Name'.format(prefix=prefix),
+            'title': u'{prefix} Signatory Title'.format(prefix=prefix),
+            'organization': u'{prefix} Signatory Organization'.format(prefix=prefix),
         }
 
     def create_and_verify_certificate(self, course_title_override, existing_certs, signatories):

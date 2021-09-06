@@ -164,7 +164,8 @@
           display: block;
           color: #8f0e0e;
 
-          + input, + textarea {
+          + input,
+          + textarea {
             border: 1px solid #ca1111;
             color: #8f0e0e;
           }
@@ -349,7 +350,8 @@
 .modal-settings-language {
 
   // general reset
-  .list-input, .list-actions {
+  .list-input,
+  .list-actions {
     @extend %ui-no-list;
   }
 

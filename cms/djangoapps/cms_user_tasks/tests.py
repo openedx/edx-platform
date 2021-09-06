@@ -2,7 +2,6 @@
 Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 from uuid import uuid4
@@ -53,14 +52,14 @@ def _context(response):
     """
     Get a context dictionary for a serializer appropriate for the given response.
     """
-    return {'request': response.wsgi_request}  # pylint: disable=no-member
+    return {'request': response.wsgi_request}
 
 
 def _data(response):
     """
     Get the serialized data dictionary from the given REST API test response.
     """
-    return response.data  # pylint: disable=no-member
+    return response.data
 
 
 @override_settings(BROKER_URL='memory://localhost/')

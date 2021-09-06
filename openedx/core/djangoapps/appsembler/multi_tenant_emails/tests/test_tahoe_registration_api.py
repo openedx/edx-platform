@@ -3,7 +3,7 @@ Tests to ensure the Tahoe Registration API end-point allows multi-tenant emails.
 """
 
 from mock import patch
-from unittest import skipUnless
+from unittest import skipUnless, skipIf
 
 from django.conf import settings
 from django.urls import reverse

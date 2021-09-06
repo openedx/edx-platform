@@ -1,12 +1,16 @@
 """
 Common utilities for tests in block_structure module
 """
+
+
 from contextlib import contextmanager
-from mock import patch
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from uuid import uuid4
 
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+import six
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..api import get_cache
 from ..block_structure import BlockStructureBlockData
@@ -303,8 +307,8 @@ class ChildrenMapTestMixin(object):
             self.assertEqual(
                 self.block_key_factory(block_key) in block_structure,
                 block_key not in missing_blocks,
-                'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
-                    unicode(block_key)
+                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
+                    six.text_type(block_key)
                 ),
             )
 
@@ -333,10 +337,10 @@ class UsageKeyFactoryMixin(object):
     """
     def setUp(self):
         super(UsageKeyFactoryMixin, self).setUp()
-        self.course_key = CourseLocator('org', 'course', unicode(uuid4()))
+        self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
 
     def block_key_factory(self, block_id):
         """
         Returns a block key object for the given block_id.
         """
-        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=unicode(block_id))
+        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=six.text_type(block_id))

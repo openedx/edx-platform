@@ -1,11 +1,11 @@
 """ Credit API Serializers """
 
-from __future__ import unicode_literals
 
 import datetime
 import logging
 
 import pytz
+import six
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -47,7 +47,7 @@ class CreditEligibilitySerializer(serializers.ModelSerializer):
 
     def get_course_key(self, obj):
         """ Returns the course key associated with the course. """
-        return unicode(obj.course.course_key)
+        return six.text_type(obj.course.course_key)
 
     class Meta(object):
         model = CreditEligibility

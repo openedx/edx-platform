@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 """ Tests for the language API. """
 
-from mock import patch
-from django.test import TestCase
+
+import ddt
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.utils import translation
-from django.contrib.auth.models import User
-import ddt
-
+from mock import patch
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import api as language_api
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 EN = language_api.Language('en', 'English')
 ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
+LT_LT = language_api.Language('lt-lt', u'Lietuvių (Lietuva)')
 
 
 @ddt.ddt
-class LanguageApiTest(TestCase):
+class LanguageApiTest(CacheIsolationTestCase):
     """
     Tests of the language APIs.
     """
@@ -98,3 +99,22 @@ class LanguageApiTest(TestCase):
         self.assertEqual("cs", all_languages[1][0])
         self.assertEqual(u"Hollandais", all_languages[0][1])
         self.assertEqual(u"Tchèque", all_languages[1][1])
+
+    def test_beta_languages(self):
+        """
+        Tests for the beta languages.
+        """
+        with override_settings(LANGUAGES=[EN, ES_419, LT_LT], LANGUAGE_CODE='en'):
+            user = User()
+            user.save()
+            DarkLangConfig(
+                released_languages='es-419',
+                changed_by=user,
+                enabled=True,
+                beta_languages='lt-lt',
+                enable_beta_languages=True
+            ).save()
+
+            released_languages = language_api.released_languages()
+            expected_languages = [EN, ES_419, LT_LT]
+            self.assertEqual(released_languages, expected_languages)

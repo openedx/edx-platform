@@ -1,10 +1,13 @@
 """
 Utilities for instructor unit tests
 """
+
+
 import datetime
 import json
 import random
 
+import six
 from pytz import UTC
 
 from util.date_utils import get_default_time_display
@@ -55,7 +58,7 @@ class FakeEmail(FakeInfo):
 
     def __init__(self, email_id):
         super(FakeEmail, self).__init__()
-        self.id = unicode(email_id)  # pylint: disable=invalid-name
+        self.id = six.text_type(email_id)  # pylint: disable=invalid-name
         # Select a random data for create field
         year = random.randint(1950, 2000)
         month = random.randint(1, 12)

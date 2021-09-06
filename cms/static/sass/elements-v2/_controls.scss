@@ -4,19 +4,22 @@
   @extend %ui-btn;
   @extend %ui-btn-pill;
 
-  padding:($baseline/4) ($baseline/2);
+  padding: ($baseline/4) ($baseline/2);
   border-width: 1px;
   border-style: solid;
   border-color: transparent;
   text-align: center;
 
-  &:hover, &:active {
+  &:hover,
+  &:active {
     @extend %ui-fake-link;
 
     border-color: $gray-l3;
   }
 
-  &.current, &.active, &.is-selected {
+  &.current,
+  &.active,
+  &.is-selected {
     box-shadow: inset 0 1px 2px 1px $shadow-l1;
     border-color: $gray-l3;
   }
@@ -31,16 +34,19 @@
   border-color: $white;
   color: $gray-d1;
 
-  &:hover, &:active {
+  &:hover,
+  &:active {
     background: $white;
     color: $blue-s1;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     background: $white;
     color: $gray-d4;
 
-    &:hover, &:active {
+    &:hover,
+    &:active {
       color: $blue-s1;
     }
   }

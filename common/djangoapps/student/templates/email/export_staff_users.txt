@@ -1,0 +1,7 @@
+Dear Admin,
+
+  Please find the attached CSV containing a list of all staff users who have logged in within the last {{ time_period }} days
+
+
+Thanks,
+The edX Team

@@ -1,4 +1,6 @@
 """Django admin interface for the shopping cart models. """
+
+
 from django.contrib import admin
 
 from shoppingcart.models import (
@@ -31,7 +33,8 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
 
     def get_actions(self, request):
         actions = super(SoftDeleteCouponAdmin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
         return actions
 
     def really_delete_selected(self, request, queryset):
@@ -43,8 +46,8 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
         if queryset.count() == 1:
             message_bit = "1 coupon entry was"
         else:
-            message_bit = "%s coupon entries were" % queryset.count()
-        self.message_user(request, "%s successfully deleted." % message_bit)
+            message_bit = u"%s coupon entries were" % queryset.count()
+        self.message_user(request, u"%s successfully deleted." % message_bit)
 
     def delete_model(self, request, obj):
         """override the default behavior of single instance of model delete method"""

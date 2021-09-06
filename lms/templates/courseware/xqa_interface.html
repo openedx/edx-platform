@@ -1,4 +1,8 @@
+## xss-lint: disable=mako-missing-default
 <%namespace name='static' file='/static_content.html'/>
+<%!
+import six
+%>
 
 <script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.js')}"></script>
 <script type="text/javascript" src="${static.url('js/staff_debug_actions.js')}"></script>
@@ -23,8 +27,8 @@ function setup_debug(element_id, edit_link, staff_context){
         function () {
             var username = $("#" + element_id + "_history_student_username").val();
             var location = $("#" + element_id + "_history_location").val();
-
-            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id) | u}" +
+            // xss-lint: disable=mako-invalid-js-filter
+            $("#" + element_id + "_history_text").load('/courses/' + "${six.text_type(getattr(course,'id','')) | u}" +
                 "/submission_history/" + username + "/" + location);
             return false;
         }
@@ -71,6 +75,7 @@ function sendlog(element_id, edit_link, staff_context){
         };
 
     $.ajax({
+        //# xss-lint: disable=mako-invalid-js-filter
         url: '${xqa_server}/log',
         type: 'GET',
         contentType: 'application/json',
@@ -81,6 +86,7 @@ function sendlog(element_id, edit_link, staff_context){
             xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
         timeout : 1000,
         success: function(result) {
+                // xss-lint: disable=javascript-jquery-html
                 $('#' + element_id + '_xqa_log_data').html(result);
         },
         error: function() {
@@ -100,6 +106,7 @@ function getlog(element_id, staff_context){
     };
 
     $.ajax({
+        // xss-lint: disable=mako-invalid-js-filter
         url: '${xqa_server}/query',
         type: 'GET',
         contentType: 'application/json',
@@ -108,6 +115,7 @@ function getlog(element_id, staff_context){
         dataType: 'jsonp',
         timeout : 1000,
         success: function(result) {
+            // xss-lint: disable=javascript-jquery-html
             $('#' + element_id + '_xqa_log_data').html(result);
         },
         error: function() {

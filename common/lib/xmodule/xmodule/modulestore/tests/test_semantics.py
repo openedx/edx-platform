@@ -2,30 +2,31 @@
 Tests of modulestore semantics: How do the interfaces methods of ModuleStore relate to each other?
 """
 
-import ddt
+
 import itertools
 from collections import namedtuple
-from xmodule.course_module import CourseSummary
-from mock import patch
 
-from xmodule.modulestore.tests.utils import (
-    PureModulestoreTestCase, MongoModulestoreBuilder,
-    SPLIT_MODULESTORE_SETUP
-)
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+import ddt
+from mock import patch
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
+
+from xmodule.course_module import CourseSummary
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder, PureModulestoreTestCase
 
 DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 
 # These tests won't work with courses, since they're creating blocks inside courses
 TESTABLE_BLOCK_TYPES = set(DIRECT_ONLY_CATEGORIES)
 TESTABLE_BLOCK_TYPES.discard('course')
+TESTABLE_BLOCK_TYPES = list(TESTABLE_BLOCK_TYPES)
+TESTABLE_BLOCK_TYPES.sort()
 
 TestField = namedtuple('TestField', ['field_name', 'initial', 'updated'])
 
@@ -43,7 +44,6 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     Verify the behavior of Direct Only items
     blocks intended to store snippets of course content.
     """
-    shard = 1
 
     __test__ = False
 
@@ -108,22 +108,22 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
                     self.assertIsNotNone(aside)
-                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
                     self.assertIsNotNone(aside)
-                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
 
     def assertParentOf(self, parent_usage_key, child_usage_key, draft=None):
         """
@@ -234,7 +234,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
 
-        aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))   # pylint: disable=abstract-class-instantiated
+        aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))
         aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.initial)
         return [aside]
 
@@ -313,7 +313,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             test_data = self.DATA_FIELDS[block_type]
 
             updated_field_value = test_data.updated
-            self.assertNotEquals(updated_field_value, block.fields[test_data.field_name].read_from(block))
+            self.assertNotEqual(updated_field_value, block.fields[test_data.field_name].read_from(block))
 
             block.fields[test_data.field_name].write_to(block, updated_field_value)
 
@@ -416,7 +416,6 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
-    shard = 1
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
 
@@ -451,6 +450,5 @@ class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
-    shard = 1
     MODULESTORE = MongoModulestoreBuilder()
     __test__ = True

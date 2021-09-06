@@ -1,6 +1,10 @@
 """
 Student progress page
 """
+
+
+from six.moves import map
+
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
@@ -122,7 +126,7 @@ class ProgressPage(CoursePage):
             # CSS indices are 1-indexed, so add one to the list index
             return chapter_titles.index(title.lower()) + 1
         except ValueError:
-            self.warning("Could not find chapter '{0}'".format(title))
+            self.warning(u"Could not find chapter '{0}'".format(title))
             return None
 
     def _section_index(self, chapter_index, title):
@@ -134,7 +138,7 @@ class ProgressPage(CoursePage):
         # This is a hideous CSS selector that means:
         # Get the links containing the section titles in `chapter_index`.
         # The link text is the section title.
-        section_css = '.chapters>section:nth-of-type({0}) .sections div .hd a'.format(chapter_index)
+        section_css = u'.chapters>section:nth-of-type({0}) .sections div .hd a'.format(chapter_index)
         section_titles = self.q(css=section_css).map(lambda el: el.text.lower().strip()).results
 
         # The section titles also contain "n of m possible points" on the second line
@@ -148,7 +152,7 @@ class ProgressPage(CoursePage):
             # CSS indices are 1-indexed, so add one to the list index
             return section_titles.index(title.lower()) + 1
         except ValueError:
-            self.warning("Could not find section '{0}'".format(title))
+            self.warning(u"Could not find section '{0}'".format(title))
             return None
 
     def _aggregate_section_score(self, chapter_index, section_index):
@@ -156,7 +160,7 @@ class ProgressPage(CoursePage):
         Return a tuple of the form `(points, max_points)` representing
         the aggregate score for the specified chapter and section.
         """
-        score_css = ".chapters>section:nth-of-type({0}) .sections>div:nth-of-type({1}) .hd>span".format(
+        score_css = u".chapters>section:nth-of-type({0}) .sections>div:nth-of-type({1}) .hd>span".format(
             chapter_index, section_index
 
         )
@@ -183,7 +187,7 @@ class ProgressPage(CoursePage):
         # This is CSS selector means:
         # Get the scores for the chapter at `chapter_index` and the section at `section_index`
         # Example text of the retrieved elements: "0/1"
-        score_css = ".chapters>section:nth-of-type({0}) .sections>div:nth-of-type({1}) .scores>dd".format(
+        score_css = u".chapters>section:nth-of-type({0}) .sections>div:nth-of-type({1}) .scores>dd".format(
             chapter_index, section_index
         )
 

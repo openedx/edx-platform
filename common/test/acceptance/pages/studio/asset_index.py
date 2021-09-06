@@ -2,26 +2,29 @@
 The Files and Uploads page for a course in Studio
 """
 
-import os
-import urllib
-from path import Path
 
+import os
+
+import six
 from bok_choy.javascript import wait_for_js
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
+from path import Path
+from six.moves import zip
+
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.course_page import CoursePage
 
 # file path found from CourseFixture logic
 UPLOAD_SUFFIX = '/data/uploads/studio-uploads/'
-UPLOAD_FILE_DIR = Path(__file__).abspath().dirname().dirname().dirname().dirname() + UPLOAD_SUFFIX  # pylint: disable=no-value-for-parameter
+UPLOAD_FILE_DIR = Path(__file__).abspath().dirname().dirname().dirname().dirname() + UPLOAD_SUFFIX
 
 
 class AssetIndexPageStudioFrontend(CoursePage):
     """The Files and Uploads page for a course in Studio"""
 
-    PAGINATION_PAGE_ELEMENT = ".pagination li"
+    PAGINATION_PAGE_ELEMENT = ".pagination .page-item"
     TABLE_SORT_BUTTONS = 'th.sortable button.btn-header'
     TYPE_FILTER_ELEMENT = 'div[data-identifier="asset-filters"] .form-group'
     URL_PATH = "assets"
@@ -37,7 +40,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        url = "/".join([BASE_URL, self.URL_PATH, urllib.quote_plus(unicode(course_key))])
+        url = "/".join([BASE_URL, self.URL_PATH, six.moves.urllib.parse.quote_plus(six.text_type(course_key))])
         return url if url[-1] == '/' else url + '/'
 
     @wait_for_js
@@ -219,9 +222,9 @@ class AssetIndexPageStudioFrontend(CoursePage):
         """Delete the asset with the specified name."""
         names = self.asset_files_names
         if name not in names:
-            raise LookupError('Asset with filename {} not found.'.format(name))
+            raise LookupError(u'Asset with filename {} not found.'.format(name))
         delete_buttons = self.asset_delete_buttons
-        assets = dict(zip(names, delete_buttons))
+        assets = dict(list(zip(names, delete_buttons)))
         # Now click the link in that row
         assets.get(name).click()
         self.confirm_asset_deletion()
@@ -249,7 +252,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
             # Make file input field visible.
             self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
             self.wait_for_element_visibility(file_input_css, "Input is visible")
-            #Send file to upload
+            # Send file to upload
             self.q(css=file_input_css).results[0].send_keys(
                 UPLOAD_FILE_DIR + file_name)
             self.q(css=file_input_css).results[0].clear()
@@ -289,27 +292,23 @@ class AssetIndexPageStudioFrontend(CoursePage):
     @wait_for_js
     def is_previous_button_on_page(self):
         """Note: the two conditions cover when the button is and is not disabled."""
-        return 'previous' in self.q(css=self.PAGINATION_PAGE_ELEMENT).first.text \
-            or 'previous' in self.q(css=self.PAGINATION_PAGE_ELEMENT + ' span').first.text
+        return 'previous' in self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .previous').text
 
     @property
     @wait_for_js
     def is_next_button_on_page(self):
         """Note: the two conditions cover when the button is and is not disabled."""
-        return 'next' in self.q(css=self.PAGINATION_PAGE_ELEMENT).nth(
-            self.number_of_pagination_buttons - 1).text \
-            or 'next' in self.q(css=self.PAGINATION_PAGE_ELEMENT + ' span').nth(
-                self.number_of_pagination_buttons - 1).text
+        return 'next' in self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .next').text
 
     @wait_for_js
     def click_pagination_page_button(self, index):
         """
-        Click pagination previous button.
+        Click pagination page button.
         Return False if no pagination page button at specified index.
         """
         self.wait_for_ajax()
-        if index < self.number_of_pagination_page_buttons:
-            self.q(css=self.PAGINATION_PAGE_ELEMENT + '.page-item').nth(index).click()
+        if index <= self.number_of_pagination_buttons:
+            self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .page-link').nth(index)[0].click()
             self.wait_for_ajax()
             return True
         return False
@@ -322,8 +321,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
         """
         self.wait_for_ajax()
         if self.is_next_button_enabled:
-            self.q(css=self.PAGINATION_PAGE_ELEMENT).nth(
-                self.number_of_pagination_buttons - 1).click()
+            self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .next.page-link')[0].click()
             self.wait_for_ajax()
             return True
         return False
@@ -336,22 +334,16 @@ class AssetIndexPageStudioFrontend(CoursePage):
         """
         self.wait_for_ajax()
         if self.is_previous_button_enabled:
-            self.q(css=self.PAGINATION_PAGE_ELEMENT).first.click()
+            self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .previous.page-link')[0].click()
             self.wait_for_ajax()
             return True
         return False
 
     @property
     @wait_for_js
-    def number_of_pagination_page_buttons(self):
-        """Return the number of pagination pages."""
-        return len(self.q(css=self.PAGINATION_PAGE_ELEMENT + '.page-item'))
-
-    @property
-    @wait_for_js
     def number_of_pagination_buttons(self):
         """Return the number of total pagination page buttons, including previous, pages, and next buttons."""
-        return len(self.q(css=self.PAGINATION_PAGE_ELEMENT))
+        return len(self.q(css=self.PAGINATION_PAGE_ELEMENT + ' .page-link'))
 
     @wait_for_js
     def is_selected_page(self, index):
@@ -360,11 +352,11 @@ class AssetIndexPageStudioFrontend(CoursePage):
         Return false if the pagination page at the current index does not exist
         or is not selected.
 
-        Note: this does not include the 'previous' and 'next' buttons
+        Note: this *does* include the 'previous' and 'next' buttons
         Note: 0-indexed
         """
-        if index < self.number_of_pagination_page_buttons:
-            return 'active' in self.q(css=self.PAGINATION_PAGE_ELEMENT + '.page-item').nth(index).attrs('class')[0]
+        if index < self.number_of_pagination_buttons:
+            return 'active' in self.q(css=self.PAGINATION_PAGE_ELEMENT).nth(index)[0].get_attribute('class')
         return False
 
     @wait_for_js

@@ -1,9 +1,13 @@
 """
 Test course discovery.
 """
+
+
 import datetime
 import json
 import uuid
+
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -16,6 +20,7 @@ class CourseDiscoveryTest(AcceptanceTest):
     """
     Test searching for courses.
     """
+    shard = 20
 
     STAFF_USERNAME = "STAFF_TESTER"
     STAFF_EMAIL = "staff101@example.com"
@@ -36,7 +41,7 @@ class CourseDiscoveryTest(AcceptanceTest):
 
         for i in range(12):
             org = 'test_org'
-            number = "{}{}".format(str(i), str(uuid.uuid4().get_hex().upper()[0:6]))
+            number = "{}{}".format(str(i), str(uuid.uuid4().hex.upper()[0:6]))
             run = "test_run"
             name = "test course" if i < 10 else "grass is always greener"
             settings = {'enrollment_start': datetime.datetime(1970, 1, 1).isoformat()}

@@ -40,13 +40,6 @@ from openedx.core.djangolib.js_utils import (
         }
 
         var onComplete = function() {};
-        if(options.notesEnabled) {
-            onComplete = function(url) {
-                return function() {
-                    $('#viewerContainer').trigger('notes:init', [url, "${storage | n, js_escaped_string}", "${token | n, js_escaped_string}"]);
-                }
-            };
-        }
 
         loadUrl = function htmlViewLoadUrl(url) {
             // clear out previous load, if any:
@@ -103,11 +96,6 @@ from openedx.core.djangolib.js_utils import (
         %endif
         %if chapter is not None:
             options.chapterNum = ${int(chapter) | n, dump_js_escaped_json};
-        %endif
-
-        options.notesEnabled = false;
-        %if notes_enabled is not UNDEFINED and notes_enabled:
-            options.notesEnabled = true;
         %endif
 
         $('#outerContainer').myHTMLViewer(options);

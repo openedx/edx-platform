@@ -1,27 +1,30 @@
 """
 Tests for send_upgrade_reminder management command.
 """
+
+
 import logging
 from unittest import skipUnless
 
 import ddt
+import six
 from django.conf import settings
 from edx_ace import Message
 from edx_ace.utils.date import serialize
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
-    ScheduleSendEmailTestMixin,
     ExperienceTest,
+    ScheduleSendEmailTestMixin
 )
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
-
 
 LOG = logging.getLogger(__name__)
 
@@ -31,7 +34,6 @@ LOG = logging.getLogger(__name__)
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
-    shard = 6
     __test__ = True
 
     resolver = resolvers.UpgradeReminderResolver
@@ -85,7 +87,8 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
             messages = [Message.from_string(m) for m in sent_messages]
             self.assertEqual(len(messages), 1)
             message = messages[0]
-            self.assertItemsEqual(
+            six.assertCountEqual(
+                self,
                 message.context['course_ids'],
                 [str(schedules[i].enrollment.course.id) for i in (1, 2, 4)]
             )

@@ -40,7 +40,7 @@ define([
                 expect(currentCard.text()).toMatch(topic.description);
                 expect(currentCard.text()).toMatch(topic.team_count + ' Teams');
             });
-            expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2');
+            expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2'); // eslint-disable-line no-useless-escape
             expect(footerEl).not.toHaveClass('hidden');
         });
 

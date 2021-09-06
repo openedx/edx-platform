@@ -1,6 +1,8 @@
 """
 Unit Tests for the Certificate service
 """
+
+
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -13,7 +15,6 @@ class CertificateServiceTests(ModuleStoreTestCase):
     """
     Tests for the Certificate service
     """
-    shard = 4
 
     def setUp(self):
         super(CertificateServiceTests, self).setUp()

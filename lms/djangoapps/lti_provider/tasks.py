@@ -2,6 +2,7 @@
 Asynchronous tasks for the LTI provider app.
 """
 
+
 import logging
 
 from django.contrib.auth.models import User
@@ -9,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 import lti_provider.outcomes as outcomes
 from lms import CELERY_APP
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lti_provider.models import GradedAssignment
 from xmodule.modulestore.django import modulestore
 
@@ -45,7 +46,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     assignment = GradedAssignment.objects.get(id=assignment_id)
     if version != assignment.version_number:
         log.info(
-            "Score passback for GradedAssignment %s skipped. More recent score available.",
+            u"Score passback for GradedAssignment %s skipped. More recent score available.",
             assignment.id
         )
         return

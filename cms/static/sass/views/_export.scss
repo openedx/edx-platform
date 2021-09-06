@@ -4,8 +4,9 @@
 .view-export {
 
   // UI: basic layout
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -26,7 +27,7 @@
 
   // UI: export controls
   .export-controls {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     @extend %ui-window;
 
@@ -68,7 +69,8 @@
 
     margin: ($baseline*2) 0;
 
-    .export-includes, .export-excludes {
+    .export-includes,
+    .export-excludes {
       width: flex-grid(4, 9);
 
       .item-detail {
@@ -210,7 +212,7 @@
 
         // STATE: started
         &.is-started {
-          .fa-warning  {
+          .fa-warning {
             visibility: hidden;
             opacity: 0;
           }
@@ -264,7 +266,8 @@
             color: $red;
           }
 
-          .status-detail .title, .status-detail .copy {
+          .status-detail .title,
+          .status-detail .copy {
             color: $red;
           }
         }

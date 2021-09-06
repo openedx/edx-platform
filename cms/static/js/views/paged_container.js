@@ -96,15 +96,21 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     data: this.getRenderParameters(options.page_number, options.force_render),
                     headers: {Accept: 'application/json'},
                     success: function(fragment) {
-                        self.handleXBlockFragment(fragment, options);
-                        self.processPaging({requested_page: options.page_number});
-                        self.page.updatePreviewButton(self.collection.showChildrenPreviews);
-                        self.page.renderAddXBlockComponents();
-                        if (options.force_render) {
-                            var $target = $('.studio-xblock-wrapper[data-locator="' + options.force_render + '"]');
-                            // Scroll us to the element with a little buffer at the top for context.
-                            ViewUtils.setScrollOffset($target, ($(window).height() * 0.10));
+                        var originalDone = options.done;
+                        options.done = function() {
+                            self.processPaging({ requested_page: options.page_number });
+                            self.page.updatePreviewButton(self.collection.showChildrenPreviews);
+                            self.page.renderAddXBlockComponents();
+                            if (options.force_render) {
+                                var $target = $('.studio-xblock-wrapper[data-locator="' + options.force_render + '"]');
+                                // Scroll us to the element with a little buffer at the top for context.
+                                ViewUtils.setScrollOffset($target, ($(window).height() * 0.10));
+                            }
+                            if (originalDone) {
+                                originalDone();
+                            }
                         }
+                        self.handleXBlockFragment(fragment, options);
                     }
                 });
             },

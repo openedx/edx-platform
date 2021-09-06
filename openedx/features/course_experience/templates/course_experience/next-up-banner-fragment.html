@@ -1,0 +1,13 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<div class="next-up-banner">
+    <b>${_("Get started on what's next: ")}</b>
+    <a href="${resume_course_url}">${assignment_title}</a>
+    (${assignment_duration})
+</div>

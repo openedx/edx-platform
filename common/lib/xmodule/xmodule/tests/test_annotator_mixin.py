@@ -2,17 +2,18 @@
 This test will run for annotator_mixin.py
 """
 
+
 import unittest
+
 from lxml import etree
 
-from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
+from xmodule.annotator_mixin import get_extension, get_instructions, html_to_text
 
 
 class HelperFunctionTest(unittest.TestCase):
     """
     Tests to ensure that the following helper functions work for the annotation tool
     """
-    shard = 1
     sample_xml = '''
         <annotatable>
             <instructions><p>Helper Test Instructions.</p></instructions>

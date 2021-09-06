@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
+
 
 from django.db import migrations, models
 import model_utils.fields
@@ -24,7 +25,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_key', CourseKeyField(max_length=255, db_index=True)),
                 ('usage_key', UsageKeyField(max_length=255, db_index=True)),
-                ('_path', jsonfield.fields.JSONField(help_text=b'Path in course tree to the block', db_column=b'path')),
+                ('_path', jsonfield.fields.JSONField(help_text='Path in course tree to the block', db_column='path')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
@@ -36,8 +37,8 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_key', CourseKeyField(max_length=255, db_index=True)),
                 ('usage_key', UsageKeyField(unique=True, max_length=255, db_index=True)),
-                ('display_name', models.CharField(default=b'', max_length=255)),
-                ('_paths', jsonfield.fields.JSONField(default=[], help_text=b'All paths in course tree to the corresponding block.', db_column=b'paths')),
+                ('display_name', models.CharField(default='', max_length=255)),
+                ('_paths', jsonfield.fields.JSONField(default=[], help_text='All paths in course tree to the corresponding block.', db_column='paths')),
             ],
             options={
                 'abstract': False,

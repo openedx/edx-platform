@@ -1,16 +1,17 @@
 """
 Test cases to cover Accounts-related serializers of the User API application
 """
+
+
 import logging
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from testfixtures import LogCapture
 
+from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from student.models import UserProfile
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
-
 
 LOGGER_NAME = "openedx.core.djangoapps.user_api.accounts.serializers"
 
@@ -24,11 +25,6 @@ class UserReadOnlySerializerTest(TestCase):
         self.user.save()
         self.config = {
             "default_visibility": "public",
-
-            "shareable_fields": [
-                'name',
-            ],
-
             "public_fields": [
                 'email', 'name', 'username'
             ],

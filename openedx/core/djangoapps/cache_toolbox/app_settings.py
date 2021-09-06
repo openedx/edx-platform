@@ -2,6 +2,7 @@
 Settings for cache_toolbox.
 """
 
+
 from django.conf import settings
 
 # Default cache timeout

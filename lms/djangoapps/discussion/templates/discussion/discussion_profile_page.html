@@ -6,11 +6,13 @@
 
 <%!
 import json
+import six
+
 from django.utils.translation import ugettext as _, ungettext
 from django.template.defaultfilters import escapejs
 from django.urls import reverse
 
-from django_comment_client.permissions import has_permission
+from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
@@ -19,7 +21,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 <%static:require_module module_name="discussion/js/discussion_profile_page_factory" class_name="DiscussionProfilePageFactory">
     profile_page_context = {
         'courseSettings': ${course_settings | n, dump_js_escaped_json},
-        'courseId': '${unicode(course.id) | n, js_escaped_string}',
+        'courseId': '${six.text_type(course.id) | n, js_escaped_string}',
         'courseName': '${course.display_name_with_default | n, js_escaped_string}',
         'contentInfo': ${annotated_content_info | n, dump_js_escaped_json},
         'userInfo': ${user_info | n, dump_js_escaped_json},

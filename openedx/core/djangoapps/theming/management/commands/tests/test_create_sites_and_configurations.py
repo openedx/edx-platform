@@ -2,15 +2,15 @@
 Test cases for create_sites_and_configurations command.
 """
 
-import mock
 
-from django.test import TestCase
+import mock
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
+from django.test import TestCase
 
-from provider.oauth2.models import Client
-from edx_oauth2_provider.models import TrustedClient
+from oauth2_provider.models import Application
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from openedx.core.djangoapps.theming.models import SiteTheme
 from student.models import UserProfile
 
@@ -86,7 +86,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.assertTrue(service_user[0].is_staff)
         self.assertTrue(service_user[0].is_superuser)
 
-        user_profile = UserProfile.objects.filter(user=service_user)
+        user_profile = UserProfile.objects.filter(user=service_user[0])
         self.assertEqual(len(user_profile), 1)
         return service_user
 
@@ -96,7 +96,8 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         service_user = self._assert_service_user_is_valid("ecommerce_worker")
 
-        clients = Client.objects.filter(user=service_user)
+        clients = Application.objects.filter(user=service_user[0])
+
         self.assertEqual(len(clients), len(SITES))
 
         if devstack:
@@ -106,27 +107,23 @@ class TestCreateSiteAndConfiguration(TestCase):
 
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)
-            site_name = client.name[:6]
+            site_name = [name for name in SITES if name in client.name][0]
             ecommerce_url = ecommerce_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
-            self.assertEqual(client.url, ecommerce_url)
             self.assertEqual(
-                client.redirect_uri,
-                "{ecommerce_url}complete/edx-oidc/".format(ecommerce_url=ecommerce_url)
+                client.redirect_uris,
+                "{ecommerce_url}complete/edx-oauth2/".format(ecommerce_url=ecommerce_url)
             )
             self.assertEqual(
                 client.client_id,
                 "ecommerce-key-{site_name}".format(site_name=site_name)
             )
+            access = ApplicationAccess.objects.filter(application_id=client.id).first()
             self.assertEqual(
-                client.client_secret,
-                "ecommerce-secret"
-            )
-            self.assertEqual(
-                len(TrustedClient.objects.filter(client=client)),
-                1
+                access.scopes,
+                ["user_id"]
             )
 
     def _assert_discovery_clients_are_valid(self, devstack=False):
@@ -135,7 +132,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         service_user = self._assert_service_user_is_valid("lms_catalog_service_user")
 
-        clients = Client.objects.filter(user=service_user)
+        clients = Application.objects.filter(user=service_user[0])
 
         self.assertEqual(len(clients), len(SITES))
 
@@ -146,28 +143,24 @@ class TestCreateSiteAndConfiguration(TestCase):
 
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)
-            site_name = client.name[:6]
+            site_name = [name for name in SITES if name in client.name][0]
             discovery_url = discovery_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
 
-            self.assertEqual(client.url, discovery_url)
             self.assertEqual(
-                client.redirect_uri,
-                "{discovery_url}complete/edx-oidc/".format(discovery_url=discovery_url)
+                client.redirect_uris,
+                "{discovery_url}complete/edx-oauth2/".format(discovery_url=discovery_url)
             )
             self.assertEqual(
                 client.client_id,
                 "discovery-key-{site_name}".format(site_name=site_name)
             )
+            access = ApplicationAccess.objects.filter(application_id=client.id).first()
             self.assertEqual(
-                client.client_secret,
-                "discovery-secret"
-            )
-            self.assertEqual(
-                len(TrustedClient.objects.filter(client=client)),
-                1
+                access.scopes,
+                ["user_id"]
             )
 
     def test_without_dns(self):

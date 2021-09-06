@@ -1,3 +1,5 @@
+"""Django App config for course_modes"""
+
 
 from django.apps import AppConfig
 

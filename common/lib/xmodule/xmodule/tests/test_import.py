@@ -1,37 +1,33 @@
 # -*- coding: utf-8 -*-
 
+
 import datetime
 from tempfile import mkdtemp
 
 import ddt
-
 from django.test import TestCase
-
 from fs.osfs import OSFS
 from lxml import etree
 from mock import Mock, patch
-
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
-
-from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import only_xmodules
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
-from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin
-from xmodule.fields import Date
-from xmodule.tests import DATA_DIR
-from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.keys import CourseKey
-
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Integer
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xblock.fields import Integer, Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from xmodule.fields import Date
+from xmodule.modulestore import only_xmodules
+from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
+from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import is_pointer_tag
 
 ORG = 'test_org'
 COURSE = 'test_course'
+RUN = 'test_run'
 
 
 class DummySystem(ImportSystem):
@@ -43,7 +39,7 @@ class DummySystem(ImportSystem):
             xmlstore = LibraryXMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
         else:
             xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
-        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
+        course_id = CourseKey.from_string('/'.join([ORG, COURSE, RUN]))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -63,7 +59,6 @@ class DummySystem(ImportSystem):
 
 class BaseCourseTestCase(TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
-    shard = 1
 
     @staticmethod
     def get_system(load_error_modules=True, library=False):
@@ -72,7 +67,7 @@ class BaseCourseTestCase(TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print "Importing {0}".format(name)
+        print("Importing {0}".format(name))
 
         modulestore = XMLModuleStore(
             DATA_DIR,
@@ -81,7 +76,7 @@ class BaseCourseTestCase(TestCase):
             xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
 
@@ -97,7 +92,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
     """
     Tests of import pure XBlocks (not XModules) from xml
     """
-    shard = 1
 
     def assert_xblocks_are_good(self, block):
         """Assert a number of conditions that must be true for `block` to be good."""
@@ -125,7 +119,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
 
 
 class ImportTestCase(BaseCourseTestCase):
-    shard = 1
     date = Date()
 
     def test_fallback(self):
@@ -197,12 +190,12 @@ class ImportTestCase(BaseCourseTestCase):
         # Now make sure the exported xml is a sequential
         self.assertEqual(node.tag, 'sequential')
 
-    def course_descriptor_inheritance_check(self, descriptor, from_date_string, unicorn_color, url_name):
+    def course_descriptor_inheritance_check(self, descriptor, from_date_string, unicorn_color, course_run=RUN):
         """
         Checks to make sure that metadata inheritance on a course descriptor is respected.
         """
         # pylint: disable=protected-access
-        print(descriptor, descriptor._field_data)
+        print((descriptor, descriptor._field_data))
         self.assertEqual(descriptor.due, ImportTestCase.date.from_json(from_date_string))
 
         # Check that the child inherits due correctly
@@ -221,14 +214,14 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor.add_xml_to_node(node)
 
         # Check that the exported xml is just a pointer
-        print("Exported xml:", etree.tostring(node))
+        print(("Exported xml:", etree.tostring(node)))
         self.assertTrue(is_pointer_tag(node))
         # but it's a special case course pointer
         self.assertEqual(node.attrib['course'], COURSE)
         self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with descriptor.runtime.export_fs.open(u'course/{url_name}.xml'.format(url_name=url_name)) as f:
+        with descriptor.runtime.export_fs.open(u'course/{course_run}.xml'.format(course_run=course_run)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
@@ -267,7 +260,7 @@ class ImportTestCase(BaseCourseTestCase):
         )
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
-        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color, url_name)
+        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 
     def test_library_metadata_import_export(self):
         """Two checks:
@@ -300,7 +293,7 @@ class ImportTestCase(BaseCourseTestCase):
         compute_inherited_metadata(descriptor)
         # Check the course module, since it has inheritance
         descriptor = descriptor.get_children()[0]
-        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color, url_name)
+        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 
     def test_metadata_no_inheritance(self):
         """
@@ -440,22 +433,22 @@ class ImportTestCase(BaseCourseTestCase):
               """]
 
         for xml_str in yes:
-            print "should be True for {0}".format(xml_str)
+            print("should be True for {0}".format(xml_str))
             self.assertTrue(is_pointer_tag(etree.fromstring(xml_str)))
 
         for xml_str in no:
-            print "should be False for {0}".format(xml_str)
+            print("should be False for {0}".format(xml_str))
             self.assertFalse(is_pointer_tag(etree.fromstring(xml_str)))
 
     def test_metadata_inherit(self):
         """Make sure that metadata is inherited properly"""
 
-        print "Starting import"
+        print("Starting import")
         course = self.get_course('toy')
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print "Checking {0}".format(text_type(node.location))
+            print("Checking {0}".format(text_type(node.location)))
             self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
                 check_for_key(key, c, value)
@@ -524,33 +517,33 @@ class ImportTestCase(BaseCourseTestCase):
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
 
-        print "Starting import"
+        print("Starting import")
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
-        print "course errors:"
+        print("course errors:")
         for (msg, err) in modulestore.get_course_errors(course.id):
-            print msg
-            print err
+            print(msg)
+            print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 5)
+        self.assertEqual(len(chapters), 5)
 
         ch2 = chapters[1]
-        self.assertEquals(ch2.url_name, "secret:magic")
+        self.assertEqual(ch2.url_name, "secret:magic")
 
-        print "Ch2 location: ", ch2.location
+        print("Ch2 location: ", ch2.location)
 
         also_ch2 = modulestore.get_item(ch2.location)
-        self.assertEquals(ch2, also_ch2)
+        self.assertEqual(ch2, also_ch2)
 
-        print "making sure html loaded"
+        print("making sure html loaded")
         loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
-        self.assertEquals(html.display_name, "Toy lab")
+        self.assertEqual(html.display_name, "Toy lab")
 
     def test_unicode(self):
         """Check that courses with unicode characters in filenames and in
@@ -559,18 +552,18 @@ class ImportTestCase(BaseCourseTestCase):
         loaded because of unicode filenames, there are appropriate
         exceptions/errors to that effect."""
 
-        print "Starting import"
+        print("Starting import")
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['test_unicode'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
-        print "course errors:"
+        print("course errors:")
 
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
         errors = [
-            (msg.encode("utf-8"), err.encode("utf-8"))
+            (msg, err)
             for msg, err
             in modulestore.get_course_errors(course.id)
         ]
@@ -601,7 +594,7 @@ class ImportTestCase(BaseCourseTestCase):
         for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
-            print "video {0} url_name: {1}".format(i, video.url_name)
+            print("video {0} url_name: {1}".format(i, video.url_name))
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
     def test_poll_and_conditional_import(self):

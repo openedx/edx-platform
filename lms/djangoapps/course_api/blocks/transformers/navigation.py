@@ -1,6 +1,10 @@
 """
 TODO
 """
+
+
+import six
+
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 from .block_depth import BlockDepthTransformer
@@ -72,7 +76,7 @@ class BlockNavigationTransformer(BlockStructureTransformer):
                 # add self to parent's descendants
                 for parent_desc_list in parents_descendants_list:
                     if parent_desc_list is not None:
-                        parent_desc_list.items.append(unicode(block_key))
+                        parent_desc_list.items.append(six.text_type(block_key))
 
                 if BlockDepthTransformer.get_block_depth(block_structure, block_key) > self.nav_depth:
                     children_descendants_list = parents_descendants_list

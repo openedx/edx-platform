@@ -1,4 +1,6 @@
 """ Commerce API v0 view tests. """
+
+
 import itertools
 import json
 from datetime import datetime, timedelta
@@ -7,17 +9,16 @@ from uuid import uuid4
 import ddt
 import mock
 import pytz
+import six
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_rest_api_client import exceptions
-from nose.plugins.attrib import attr
+from django.urls import reverse, reverse_lazy
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment.api import get_enrollment
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.tests import EnrollmentEventTestMixin
@@ -36,12 +37,12 @@ UTM_COOKIE_CONTENTS = {
 }
 
 
-@attr(shard=1)
 @ddt.ddt
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce Baskets view.
     """
+
     def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
         POST to the view being tested.
@@ -52,7 +53,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         :return: Response
         """
         payload = {
-            "course_id": unicode(course_id or self.course.id)
+            "course_id": six.text_type(course_id or self.course.id)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
@@ -64,7 +65,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
     def assertResponseMessage(self, response, expected_msg):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
-        actual = json.loads(response.content)['detail']
+        actual = json.loads(response.content.decode('utf-8'))['detail']
         self.assertEqual(actual, expected_msg)
 
     def setUp(self):
@@ -77,7 +78,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
-            sku_string = uuid4().hex.decode('ascii')
+            sku_string = six.text_type(uuid4().hex)
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
@@ -97,15 +98,15 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         with restrict_course(self.course.id) as redirect_url:
             response = self._post_to_view()
             self.assertEqual(403, response.status_code)
-            body = json.loads(response.content)
+            body = json.loads(response.content.decode('utf-8'))
             self.assertEqual(get_absolute_url(redirect_url), body['user_message_url'])
 
     def test_login_required(self):
         """
-        The view should return HTTP 403 status if the user is not logged in.
+        The view should return HTTP 401 status if the user is not logged in.
         """
         self.client.logout()
-        self.assertEqual(403, self._post_to_view().status_code)
+        self.assertEqual(401, self._post_to_view().status_code)
 
     @ddt.data('delete', 'get', 'put')
     def test_post_required(self, method):
@@ -136,7 +137,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         # Set user's active flag
         self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         response = self._post_to_view()
 
         # Validate the response content
@@ -158,7 +159,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         msg = Messages.NO_SKU_ENROLLED.format(
             enrollment_mode=enrollment_mode,
             course_id=self.course.id,
-            username=self.user.username
+            course_name=self.course.display_name,
+            username=self.user.username,
+            announcement=self.course.announcement
         )
         self.assertResponseMessage(response, msg)
 
@@ -197,7 +200,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
-        sku_string = uuid4().hex.decode('ascii')
+        sku_string = six.text_type(uuid4().hex)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
                                  sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
         response = self._post_to_view()
@@ -249,7 +252,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.unenroll(self.user, self.course.id, True)
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
+        self.assertIsNotNone(get_enrollment(self.user.username, six.text_type(self.course.id)))
 
     @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
@@ -276,11 +279,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         Verifies that the view returns HTTP 406 when a course is closed.
         """
         self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
-        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
+        modulestore().update_item(self.course, self.user.id)
         self.assertEqual(self._post_to_view().status_code, 406)
 
 
-@attr(shard=1)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'
@@ -298,7 +300,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
             response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         self.assertEqual(actual, self.MOCK_ORDER)
 
     def test_order_not_found(self):

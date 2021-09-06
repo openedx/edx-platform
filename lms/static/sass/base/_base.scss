@@ -145,7 +145,8 @@ a:visited:not(.btn) {
 
 .container {
   @include clearfix();
-  @include box-sizing(border-box);
+
+  box-sizing: border-box;
 
   @include media-breakpoint-up(md) {
     margin: 0 auto;
@@ -303,4 +304,39 @@ mark {
       width: 20%;
     }
   }
+}
+
+.dates-banner {
+    border-radius: 4px;
+    border: solid 1px #9cd2e6;
+    background-color: #eff8fa;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: $text-width-readability-max;
+
+    .dates-banner-text {
+        font-size: 16px;
+        line-height: 24px;
+        color: #414141;
+
+        a.mobile-dates-link {
+            color: #0075b4;
+        }
+    }
+
+    &.has-button {
+        .dates-banner-text {
+            flex: 1 1 20em;
+            max-width: 70%;
+        }
+    }
+
+    &.on-mobile {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
 }

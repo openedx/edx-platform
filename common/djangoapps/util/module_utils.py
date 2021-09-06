@@ -3,7 +3,7 @@ Utility library containing operations used/shared by multiple courseware modules
 """
 
 
-def yield_dynamic_descriptor_descendants(descriptor, user_id, module_creator=None):  # pylint: disable=invalid-name
+def yield_dynamic_descriptor_descendants(descriptor, user_id, module_creator=None):
     """
     This returns all of the descendants of a descriptor. If the descriptor
     has dynamic children, the module will be created using module_creator

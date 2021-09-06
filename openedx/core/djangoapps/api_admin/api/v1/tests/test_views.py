@@ -1,6 +1,7 @@
 """
 Tests for the `api_admin` api module.
 """
+
 import json
 
 from rest_framework.reverse import reverse
@@ -45,7 +46,7 @@ class ApiAccessRequestViewTests(TestCase):
         """
         Assert API response on `API Access Request` endpoint.
         """
-        json_content = json.loads(api_response.content)
+        json_content = json.loads(api_response.content.decode('utf-8'))
         self.assertEqual(api_response.status_code, 200)
         self.assertEqual(json_content['count'], expected_results_count)
 

@@ -1,4 +1,6 @@
 """Track selection page"""
+
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.lms import BASE_URL
@@ -47,7 +49,7 @@ class TrackSelectionPage(PageObject):
         if mode == "verified":
             # Check the first contribution option, then click the enroll button
             self.q(css=".contribution-option > input").first.click()
-            self.q(css="input[name='verified_mode']").click()
+            self.q(css="button[name='verified_mode']").click()
             return PaymentAndVerificationFlow(self.browser, self._course_id).wait_for_page()
 
         elif mode == "audit":

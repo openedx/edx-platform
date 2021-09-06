@@ -3,22 +3,26 @@ A set of built-in default checks for the platform heartbeat endpoint
 
 Other checks should be included in their respective modules/djangoapps
 """
+
+
 from datetime import datetime, timedelta
 from time import sleep, time
 
+import six
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.utils import DatabaseError
-from xmodule.modulestore.django import modulestore
+
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.django import modulestore
 
 from .tasks import sample_task
-
 
 # DEFAULT SYSTEM CHECKS
 
 # Modulestore
+
 
 def check_modulestore():
     """ Check the modulestore connection
@@ -37,7 +41,7 @@ def check_modulestore():
         modulestore().heartbeat()
         return 'modulestore', True, u'OK'
     except HeartbeatFailure as fail:
-        return 'modulestore', False, unicode(fail)
+        return 'modulestore', False, six.text_type(fail)
 
 
 def check_database():
@@ -54,7 +58,7 @@ def check_database():
         cursor.fetchone()
         return 'sql', True, u'OK'
     except DatabaseError as fail:
-        return 'sql', False, unicode(fail)
+        return 'sql', False, six.text_type(fail)
 
 
 # Caching
@@ -74,7 +78,7 @@ def check_cache_set():
         cache.set(CACHE_KEY, CACHE_VALUE, 30)
         return 'cache_set', True, u'OK'
     except Exception as fail:
-        return 'cache_set', False, unicode(fail)
+        return 'cache_set', False, six.text_type(fail)
 
 
 def check_cache_get():
@@ -92,7 +96,7 @@ def check_cache_get():
         else:
             return 'cache_get', False, u'value check failed'
     except Exception as fail:
-        return 'cache_get', False, unicode(fail)
+        return 'cache_get', False, six.text_type(fail)
 
 
 # Celery
@@ -113,8 +117,8 @@ def check_celery():
         while expires > datetime.now():
             if task.ready() and task.result:
                 finished = str(time() - now)
-                return 'celery', True, unicode({'time': finished})
+                return 'celery', True, six.text_type({'time': finished})
             sleep(0.25)
         return 'celery', False, "expired"
     except Exception as fail:
-        return 'celery', False, unicode(fail)
+        return 'celery', False, six.text_type(fail)

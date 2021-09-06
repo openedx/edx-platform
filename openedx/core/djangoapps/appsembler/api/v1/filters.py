@@ -1,7 +1,6 @@
 
 import django_filters
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import (
     CourseOverview,
 )
@@ -32,11 +31,11 @@ class CourseOverviewFilter(django_filters.FilterSet):
 
     display_name = django_filters.CharFilter(lookup_expr='icontains')
     org = django_filters.CharFilter(
-        name='display_org_with_default', lookup_expr='iexact')
+        field_name='display_org_with_default', lookup_expr='iexact')
     number = django_filters.CharFilter(
-        name='display_number_with_default', lookup_expr='iexact')
+        field_name='display_number_with_default', lookup_expr='iexact')
     number_contains = django_filters.CharFilter(
-        name='display_number_with_default', lookup_expr='icontains')
+        field_name='display_number_with_default', lookup_expr='icontains')
 
     class Meta:
         model = CourseOverview
@@ -48,9 +47,9 @@ class CourseEnrollmentFilter(django_filters.FilterSet):
 
     '''
     course_id = django_filters.CharFilter(method='filter_course_id')
-    is_active = django_filters.BooleanFilter(name='is_active',)
-    user_id = django_filters.CharFilter(name='user__id')
-    username = django_filters.CharFilter(name='user__username')
+    is_active = django_filters.BooleanFilter(field_name='is_active',)
+    user_id = django_filters.CharFilter(field_name='user__id')
+    username = django_filters.CharFilter(field_name='user__username')
 
     def filter_course_id(self, queryset, name, value):
         '''
@@ -76,7 +75,7 @@ class UserIndexFilter(django_filters.FilterSet):
 
     '''
 
-    email_exact = django_filters.CharFilter(name='email', lookup_expr='iexact')
+    email_exact = django_filters.CharFilter(field_name='email', lookup_expr='iexact')
 
     class Meta:
         model = get_user_model()

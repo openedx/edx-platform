@@ -3,12 +3,9 @@
 Utility functions, constants, etc. for testing.
 """
 
-from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH,
-    EMAIL_MAX_LENGTH,
-)
-from util.password_policy_validators import password_max_length, password_min_length
 
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 INVALID_NAMES = [
     None,
@@ -55,7 +52,7 @@ INVALID_PASSWORDS = [
     None,
     u'',
     u'a',
-    u'a' * (password_max_length() + 1)
+    u'a' * (DEFAULT_MAX_PASSWORD_LENGTH + 1),
 ]
 
 INVALID_COUNTRIES = [
@@ -92,9 +89,7 @@ VALID_EMAILS = [
 ]
 
 VALID_PASSWORDS = [
-    u'password',  # :)
-    u'a' * password_min_length(),
-    u'a' * password_max_length()
+    u'good_password_339',
 ]
 
 VALID_COUNTRIES = [

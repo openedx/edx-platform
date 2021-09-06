@@ -1,3 +1,8 @@
+"""
+Package of lms page objects for acceptance tests
+"""
+
+
 import os
 
 # Get the URL of the instance under test

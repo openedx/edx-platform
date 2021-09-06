@@ -10,6 +10,7 @@ This handles the one specific use case of the "print_settings" command from
 django-extensions that we were actually using.
 """
 
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -29,6 +30,6 @@ class Command(BaseCommand):
         setting = options.get('setting')
 
         if not hasattr(settings, setting):
-            raise CommandError('%s not found in settings.' % setting)
+            raise CommandError(u'%s not found in settings.' % setting)
 
         print(getattr(settings, setting))

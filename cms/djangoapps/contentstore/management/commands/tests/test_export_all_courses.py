@@ -1,11 +1,14 @@
 """
 Test for export all courses.
 """
+
+
 import shutil
 from tempfile import mkdtemp
 
-from contentstore.management.commands.export_all_courses import export_courses_to_output_path
+import six
 
+from contentstore.management.commands.export_all_courses import export_courses_to_output_path
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -47,4 +50,4 @@ class ExportAllCourses(ModuleStoreTestCase):
         courses, failed_export_courses = export_courses_to_output_path(self.temp_dir)
         self.assertEqual(len(courses), 2)
         self.assertEqual(len(failed_export_courses), 1)
-        self.assertEqual(failed_export_courses[0], unicode(second_course_id))
+        self.assertEqual(failed_export_courses[0], six.text_type(second_course_id))

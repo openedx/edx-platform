@@ -1,16 +1,17 @@
-# pylint: disable=no-member
 """
 Tests for CountryMiddleware.
 """
-from mock import patch
-import pygeoip
 
+
+import geoip2
+import maxminddb
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import MagicMock, PropertyMock, patch
 
 from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class CountryMiddlewareTests(TestCase):
@@ -24,13 +25,17 @@ class CountryMiddlewareTests(TestCase):
         self.authenticated_user = UserFactory.create()
         self.anonymous_user = AnonymousUserFactory.create()
         self.request_factory = RequestFactory()
-        self.patcher = patch.object(pygeoip.GeoIP, 'country_code_by_addr', self.mock_country_code_by_addr)
-        self.patcher.start()
-        self.addCleanup(self.patcher.stop)
+        patcher = patch.object(maxminddb, 'open_database')
+        patcher.start()
+        country_patcher = patch.object(geoip2.database.Reader, 'country', self.mock_country)
+        country_patcher.start()
+        self.addCleanup(patcher.stop)
+        self.addCleanup(country_patcher.stop)
 
-    def mock_country_code_by_addr(self, ip_addr):
+    def mock_country(self, ip_address):
         """
-        Gives us a fake set of IPs
+        :param ip_address:
+        :return:
         """
         ip_dict = {
             '117.79.83.1': 'CN',
@@ -38,7 +43,12 @@ class CountryMiddlewareTests(TestCase):
             '4.0.0.0': 'SD',
             '2001:da8:20f:1502:edcf:550b:4a9c:207d': 'CN',
         }
-        return ip_dict.get(ip_addr, 'US')
+
+        magic_mock = MagicMock()
+        magic_mock.country = MagicMock()
+        type(magic_mock.country).iso_code = PropertyMock(return_value=ip_dict.get(ip_address))
+
+        return magic_mock
 
     def test_country_code_added(self):
         request = self.request_factory.get(

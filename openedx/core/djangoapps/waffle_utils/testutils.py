@@ -2,6 +2,7 @@
 Test utilities for waffle utilities.
 """
 
+
 from waffle.testutils import override_flag
 
 # Can be used with FilteredQueryCountMixin.assertNumQueries() to blacklist

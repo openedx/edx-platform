@@ -1,6 +1,7 @@
 .wrapper-course-material {
   @include clearfix();
-  @include box-sizing(border-box);
+
+  box-sizing: border-box;
 
   @extend %ui-print-excluded;
 
@@ -103,9 +104,7 @@
       border: 1px solid transparent;
       border-color: theme-color("primary");
       border-radius: 3px;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
       color: theme-color("inverse");
       display: inline-block;

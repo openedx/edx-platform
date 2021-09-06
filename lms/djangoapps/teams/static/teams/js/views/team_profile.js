@@ -31,6 +31,7 @@
 
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages);
+                    this.topic = options.topic;
 
                     this.listenTo(this.model, 'change', this.render);
                 },
@@ -38,7 +39,12 @@
                 render: function() {
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
-                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username);
+                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
+                        isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
+                        isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
+                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
+
+                    var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
                     HtmlUtils.setHtml(
                         this.$el,
@@ -48,9 +54,10 @@
                             readOnly: !(this.context.userInfo.privileged || isMember),
                             country: this.countries[this.model.get('country')],
                             language: this.languages[this.model.get('language')],
-                            membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
+                            membershipText: TeamUtils.teamCapacityText(memberships.length, maxTeamSize),
                             isMember: isMember,
-                            hasCapacity: memberships.length < this.context.maxTeamSize,
+                            showLeaveLink: showLeaveLink,
+                            hasCapacity: maxTeamSize && (memberships.length < maxTeamSize),
                             hasMembers: memberships.length >= 1
                         })
                     );
@@ -87,16 +94,17 @@
 
                 leaveTeam: function(event) {
                     event.preventDefault();
-                    var view = this;
+                    var view = this; // eslint-disable-line vars-on-top
                     ViewUtils.confirmThenRunOperation(
                         gettext('Leave this team?'),
-                        gettext("If you leave, you can no longer post in this team's discussions. Your place will be available to another learner."),
+                        gettext("If you leave, you can no longer post in this team's discussions." +
+                            'Your place will be available to another learner.'),
                         gettext('Confirm'),
                         function() {
                             $.ajax({
                                 type: 'DELETE',
                                 url: view.context.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
-                            }).done(function(data) {
+                            }).done(function() {
                                 view.model.fetch()
                                     .done(function() {
                                         view.teamEvents.trigger('teams:update', {

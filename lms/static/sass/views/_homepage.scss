@@ -11,7 +11,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     @include row();
     @include float(left);
 
-    width:100%;
+    width: 100%;
 
     .courses-listing {
       @extend %ui-no-list;
@@ -23,7 +23,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     }
 
     .course {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include transition(all $tmg-f3 linear 0s);
 
       position: relative;
@@ -58,7 +59,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
         .learn-more {
           @include left($learn-more-horizontal-position);
-          @include box-sizing(border-box);
+
+          box-sizing: border-box;
 
           @extend %ui-depth2;
 
@@ -86,13 +88,17 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           font-family: $font-family-sans-serif;
         }
 
-        .course-organization, .course-code, .course-date {
+        .course-organization,
+        .course-code,
+        .course-date {
           @extend %t-icon6;
 
           color: $gray-d2;
         }
 
-        .course-organization, .course-code, .course-title {
+        .course-organization,
+        .course-code,
+        .course-title {
           display: block;
           text-transform: none;
         }

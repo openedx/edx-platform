@@ -1,0 +1,5 @@
+<a href="#" class="button action-button clipboard-button" data-tooltip="<%- gettext('Copy Component Location') %>">
+<i class="fa fa-link"></i>
+<%- gettext('Copy Component Location') %>
+<input class="sr" value="<%- location %>"/>
+</a>

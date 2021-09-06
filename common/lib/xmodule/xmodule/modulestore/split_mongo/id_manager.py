@@ -3,9 +3,11 @@ An implementation of IdReader and IdGenerator that manages ids for the SplitMong
 mechanism.
 """
 
-from opaque_keys.edx.locator import LocalId, DefinitionLocator
-from xmodule.x_module import OpaqueKeyReader, AsideKeyGenerator
+
+from opaque_keys.edx.locator import DefinitionLocator, LocalId
+
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.x_module import AsideKeyGenerator, OpaqueKeyReader
 
 
 # TODO: Migrate split_mongo to use this class for all key mapping/creation.

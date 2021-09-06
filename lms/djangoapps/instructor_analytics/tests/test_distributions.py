@@ -1,17 +1,18 @@
 """ Tests for analytics.distributions """
 
-from django.test import TestCase
-from nose.tools import raises
-from opaque_keys.edx.locator import CourseLocator
 
-from instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
+import pytest
+from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
+
+from lms.djangoapps.instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
@@ -21,16 +22,16 @@ class TestAnalyticsDistributions(TestCase):
             profile__gender=['m', 'f', 'o'][i % 3],
             profile__level_of_education=['a', 'hs', 'el'][i % 3],
             profile__year_of_birth=i + 1930
-        ) for i in xrange(30)]
+        ) for i in range(30)]
 
         self.ces = [CourseEnrollment.enroll(user, self.course_id)
                     for user in self.users]
 
-    @raises(ValueError)
     def test_profile_distribution_bad_feature(self):
         feature = 'robot-not-a-real-feature'
         self.assertNotIn(feature, AVAILABLE_PROFILE_FEATURES)
-        profile_distribution(self.course_id, feature)
+        with pytest.raises(ValueError):
+            profile_distribution(self.course_id, feature)
 
     def test_profile_distribution_easy_choice(self):
         feature = 'gender'
@@ -45,7 +46,7 @@ class TestAnalyticsDistributions(TestCase):
         feature = 'year_of_birth'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertEqual(distribution.choices_display_names, None)
@@ -75,7 +76,6 @@ class TestAnalyticsDistributions(TestCase):
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributionsNoData, self).setUp()
@@ -83,12 +83,12 @@ class TestAnalyticsDistributionsNoData(TestCase):
 
         self.users = [UserFactory(
             profile__year_of_birth=i + 1930,
-        ) for i in xrange(5)]
+        ) for i in range(5)]
 
         self.nodata_users = [UserFactory(
             profile__year_of_birth=None,
             profile__gender=[None, ''][i % 2]
-        ) for i in xrange(4)]
+        ) for i in range(4)]
 
         self.users += self.nodata_users
 
@@ -99,7 +99,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         feature = 'gender'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'EASY_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertNotEqual(distribution.choices_display_names, None)
@@ -110,7 +110,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         feature = 'year_of_birth'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertEqual(distribution.choices_display_names, None)

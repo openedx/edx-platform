@@ -1,27 +1,27 @@
 """Tests for display of certificates on the student dashboard. """
 
-import unittest
 
 import datetime
+import unittest
+
 import ddt
 import mock
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from pytz import UTC
-from unittest import skip
+from unittest import skipIf
 
-from lms.djangoapps.certificates.api import get_certificate_url  # pylint: disable=import-error
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import get_certificate_url
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 # pylint: disable=no-member
 
@@ -61,7 +61,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         else:
             self.assertNotContains(response, u'Add Certificate to LinkedIn Profile')
 
-    def _create_certificate(self, enrollment_mode):
+    def _create_certificate(self, enrollment_mode, download_url=DOWNLOAD_URL):
         """Simulate that the user has a generated certificate. """
         CourseEnrollmentFactory.create(
             user=self.user,
@@ -71,7 +71,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,
-            download_url=self.DOWNLOAD_URL,
+            download_url=download_url,
             status=CertificateStatuses.downloadable,
             grade=0.98,
         )
@@ -254,15 +254,15 @@ class CertificateDisplayTestHtmlView(CertificateDisplayTestBase):
     @ddt.data('verified', 'honor')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @skip('Appsembler: Broken because of our certificate customizations. Could not fix it myself -- Omar')
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken because of our certificate customizations. Could not fix it')
     def test_display_download_certificate_button(self, enrollment_mode):
         """
         Tests if CERTIFICATES_HTML_VIEW is True
         and course has enabled web certificates via cert_html_view_enabled setting
         and no active certificate configuration available
-        then any of the Download certificate button should not be visible.
+        then any of the web view certificate Download button should not be visible.
         """
-        self._create_certificate(enrollment_mode)
+        self._create_certificate(enrollment_mode, download_url='')
         self._check_can_not_download_certificate()
 
 
@@ -296,7 +296,7 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
     @ddt.data('verified')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @skip('Appsembler: Broken because of our certificate customizations. Could not fix it myself -- Omar')
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken because of our certificate customizations. Could not fix it')
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
 
         cert = self._create_certificate(enrollment_mode)

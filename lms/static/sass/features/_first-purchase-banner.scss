@@ -1,0 +1,30 @@
+// First purchase offer banner
+.first-purchase-offer-banner {
+  background-color: #dee3f1;
+  font-size: 16px;
+  border-radius: 7px;
+  padding: 20px;
+  margin: 20px auto;
+  box-sizing: border-box;
+  line-height: 1.5;
+
+  .first-purchase-offer-banner-bold {
+    font-weight: bold;
+    color: #393f43;
+  }
+
+  a {
+    color: #23419f !important;
+    text-decoration: underline !important;
+    font-weight: bold !important;
+    border-bottom: none;
+  }
+}
+
+#seq_content .first-purchase-offer-banner {
+  max-width: $text-width-readability-max;
+}
+
+body.view-in-mfe .first-purchase-offer-banner {
+  display: none;
+}

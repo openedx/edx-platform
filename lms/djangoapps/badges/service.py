@@ -1,6 +1,8 @@
 """
 Badging service for XBlocks
 """
+
+
 from badges.models import BadgeClass
 
 

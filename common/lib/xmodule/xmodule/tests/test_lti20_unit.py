@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 """Tests for LTI Xmodule LTIv2.0 functional logic."""
+
+
 import datetime
 import textwrap
 
-from pytz import UTC
 from mock import Mock
-from xmodule.lti_module import LTIDescriptor
+from pytz import UTC
+
 from xmodule.lti_2_util import LTIError
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 
 
 class LTI20RESTResultServiceTest(LogicTest):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
-    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):
@@ -53,7 +55,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         Input with bad content type
         """
-        with self.assertRaisesRegexp(LTIError, "Content-Type must be"):
+        with self.assertRaisesRegex(LTIError, "Content-Type must be"):
             request = Mock(headers={u'Content-Type': u'Non-existent'})
             self.xmodule.verify_lti_2_0_result_rest_headers(request)
 
@@ -63,7 +65,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         err_msg = "OAuth body verification failed"
         self.xmodule.verify_oauth_body_sign = Mock(side_effect=LTIError(err_msg))
-        with self.assertRaisesRegexp(LTIError, err_msg):
+        with self.assertRaisesRegex(LTIError, err_msg):
             request = Mock(headers={u'Content-Type': u'application/vnd.ims.lis.v2.result+json'})
             self.xmodule.verify_lti_2_0_result_rest_headers(request)
 
@@ -96,7 +98,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         fit the form user/<anon_id>
         """
         for einput in self.BAD_DISPATCH_INPUTS:
-            with self.assertRaisesRegexp(LTIError, "No valid user id found in endpoint URL"):
+            with self.assertRaisesRegex(LTIError, "No valid user id found in endpoint URL"):
                 self.xmodule.parse_lti_2_0_handler_suffix(einput)
 
     GOOD_DISPATCH_INPUTS = [
@@ -110,7 +112,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         fit the form user/<anon_id>
         """
         for ginput, expected in self.GOOD_DISPATCH_INPUTS:
-            self.assertEquals(self.xmodule.parse_lti_2_0_handler_suffix(ginput), expected)
+            self.assertEqual(self.xmodule.parse_lti_2_0_handler_suffix(ginput), expected)
 
     BAD_JSON_INPUTS = [
         # (bad inputs, error message expected)
@@ -157,7 +159,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         for error_inputs, error_message in self.BAD_JSON_INPUTS:
             for einput in error_inputs:
-                with self.assertRaisesRegexp(LTIError, error_message):
+                with self.assertRaisesRegex(LTIError, error_message):
                     self.xmodule.parse_lti_2_0_result_json(einput)
 
     GOOD_JSON_INPUTS = [
@@ -246,7 +248,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.xmodule.score_comment = COMMENT
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT_LIKE_DELETE)
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         # Now assert there's no score
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(self.xmodule.module_score)
@@ -267,9 +269,9 @@ class LTI20RESTResultServiceTest(LogicTest):
         COMMENT = u"ಠ益ಠ"  # pylint: disable=invalid-name
         self.xmodule.module_score = SCORE
         self.xmodule.score_comment = COMMENT
-        mock_request = self.get_signed_lti20_mock_request("", method=u'DELETE')
+        mock_request = self.get_signed_lti20_mock_request(b"", method=u'DELETE')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         # Now assert there's no score
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(self.xmodule.module_score)
@@ -288,7 +290,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         # Now assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.xmodule.module_score, 0.1)
@@ -305,9 +307,9 @@ class LTI20RESTResultServiceTest(LogicTest):
         The happy path for LTI 2.0 GET when there's no score
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
-        mock_request = self.get_signed_lti20_mock_request("", method=u'GET')
+        mock_request = self.get_signed_lti20_mock_request(b"", method=u'GET')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         # Now assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"@context": "http://purl.imsglobal.org/ctx/lis/v2/Result",
@@ -322,9 +324,9 @@ class LTI20RESTResultServiceTest(LogicTest):
         COMMENT = u"ಠ益ಠ"  # pylint: disable=invalid-name
         self.xmodule.module_score = SCORE
         self.xmodule.score_comment = COMMENT
-        mock_request = self.get_signed_lti20_mock_request("", method=u'GET')
+        mock_request = self.get_signed_lti20_mock_request(b"", method=u'GET')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         # Now assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"@context": "http://purl.imsglobal.org/ctx/lis/v2/Result",
@@ -342,7 +344,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         for bad_method in self.UNSUPPORTED_HTTP_METHODS:
             mock_request.method = bad_method
-            response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+            response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
             self.assertEqual(response.status_code, 404)
 
     def test_lti20_request_handler_bad_headers(self):
@@ -352,7 +354,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         self.xmodule.verify_lti_2_0_result_rest_headers = Mock(side_effect=LTIError())
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         self.assertEqual(response.status_code, 401)
 
     def test_lti20_request_handler_bad_dispatch_user(self):
@@ -371,7 +373,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         self.xmodule.parse_lti_2_0_result_json = Mock(side_effect=LTIError())
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         self.assertEqual(response.status_code, 404)
 
     def test_lti20_request_handler_bad_user(self):
@@ -381,7 +383,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         self.system.get_real_user = Mock(return_value=None)
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         self.assertEqual(response.status_code, 404)
 
     def test_lti20_request_handler_grade_past_due(self):
@@ -392,5 +394,5 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.xmodule.due = datetime.datetime.now(UTC)
         self.xmodule.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, u"user/abcd")
         self.assertEqual(response.status_code, 404)

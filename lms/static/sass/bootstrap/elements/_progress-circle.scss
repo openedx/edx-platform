@@ -1,0 +1,67 @@
+$progress-title-color: $primary-dark1 !default;
+$progress-complete-color: $primary-dark2 !default;
+$progress-incomplete-color: $gray-light2 !default;
+$progress-complete-number-color: $primary-dark1 !default;
+$progress-incomplete-number-color: $gray-600 !default;
+$progress-number-label-color: $gray-base !default;
+
+.program-progress {
+  width: 300px;
+  margin: 0 auto 30px;
+
+  @include media-breakpoint-up(md) {
+    margin-left: 0;
+  }
+}
+
+.progress-heading {
+  color: $progress-title-color;
+  text-align: center;
+  margin-bottom: 0;
+  font: {
+    size: 1.1em;
+    weight: 700;
+  }
+}
+
+.progress-circle-wrapper {
+  position: relative;
+  margin-top: -20px;
+  width: 300px;
+  height: 300px;
+
+  .progress-label {
+    position: absolute;
+    width: 100%;
+    top: 92px;
+    text-align: center;
+  }
+
+  .numbers {
+    font-size: 3em;
+    color: $progress-incomplete-number-color;
+
+    .complete {
+      color: $progress-complete-number-color;
+    }
+  }
+
+  .label {
+    font: {
+      size: 1.1em;
+      weight: 600;
+    }
+
+    color: $progress-number-label-color;
+  }
+}
+
+.progress-circle {
+  .complete {
+    stroke: $progress-complete-color;
+  }
+
+  .incomplete {
+    stroke: $progress-incomplete-color;
+  }
+}

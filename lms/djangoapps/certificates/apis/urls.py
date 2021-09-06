@@ -1,6 +1,8 @@
 """
 Certificates API URLs.
 """
+
+
 from django.conf.urls import include, url
 
 app_name = 'certificates'

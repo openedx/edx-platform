@@ -15,7 +15,7 @@
 
 // page set up - only available to modern browsers now
 @page {
-  size : landscape;
+  size: landscape;
 }
 
 @media print {
@@ -61,7 +61,8 @@
   }
 
   // prevent large elements from being split across multiple pages
-  ul, img {
+  ul,
+  img {
     page-break-inside: avoid;
   }
 
@@ -79,7 +80,6 @@
 
   .wrapper-view {
     margin-bottom: 0 !important;
-
   }
 }
 
@@ -87,7 +87,7 @@
 @media print and (color) {
   * {
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    print-color-adjust: exact; /* stylelint-disable-line */
   }
 }
 
@@ -297,7 +297,8 @@
         border-bottom: none !important;
         padding-bottom: 0 !important;
 
-        .label, .value {
+        .label,
+        .value {
           display: inline-block;
           vertical-align: baseline;
           font-size: font-size(x-small);
@@ -325,7 +326,6 @@
 
       @include text-align(right);
     }
-
   }
 }
 

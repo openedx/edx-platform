@@ -38,5 +38,5 @@ class BlockStructureNotFound(BlockStructureException):
     """
     def __init__(self, root_block_usage_key):
         super(BlockStructureNotFound, self).__init__(
-            'Block structure not found; data_usage_key: {}'.format(root_block_usage_key)
+            u'Block structure not found; data_usage_key: {}'.format(root_block_usage_key)
         )

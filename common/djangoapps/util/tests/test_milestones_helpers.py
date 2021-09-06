@@ -2,8 +2,10 @@
 Tests for the milestones helpers library, which is the integration point for the edx_milestones API
 """
 
+
 import ddt
 import pytest
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from milestones import api as milestones_api
@@ -78,16 +80,16 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         self.assertEqual(len(response), 0)
 
     def test_add_course_milestone_returns_none_when_app_disabled(self):
-        response = milestones_helpers.add_course_milestone(unicode(self.course.id), 'requires', self.milestone)
+        response = milestones_helpers.add_course_milestone(six.text_type(self.course.id), 'requires', self.milestone)
         self.assertIsNone(response)
 
     def test_get_course_milestones_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones(unicode(self.course.id))
+        response = milestones_helpers.get_course_milestones(six.text_type(self.course.id))
         self.assertEqual(len(response), 0)
 
     def test_add_course_content_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_course_content_milestone(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             'i4x://any/content/id',
             'requires',
             self.milestone
@@ -96,7 +98,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
 
     def test_get_course_content_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             'i4x://doesnt/matter/for/this/test',
             'requires'
         )
@@ -111,7 +113,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         self.assertIn('ENTRANCE_EXAM', response)
 
     def test_get_course_milestones_fulfillment_paths_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones_fulfillment_paths(unicode(self.course.id), self.user)
+        response = milestones_helpers.get_course_milestones_fulfillment_paths(six.text_type(self.course.id), self.user)
         self.assertIsNone(response)
 
     def test_add_user_milestone_returns_none_when_app_disabled(self):

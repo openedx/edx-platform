@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
+import datetime
 
 from django.db import migrations, models
 import django.db.models.deletion
-import coursewarehistoryextended.fields
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from django.conf import settings
 
 def bump_pk_start(apps, schema_editor):
@@ -46,7 +47,7 @@ class Migration(migrations.Migration):
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(null=True, blank=True)),
                 ('max_grade', models.FloatField(null=True, blank=True)),
-                ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
+                ('id', UnsignedBigIntAutoField(serialize=False, primary_key=True)),
                 ('student_module', models.ForeignKey(to='courseware.StudentModule', on_delete=django.db.models.deletion.DO_NOTHING, db_constraint=False)),
             ],
             options={

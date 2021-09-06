@@ -25,10 +25,13 @@
                 ext.$student_input = ext.$section.find("#set-extension input[name='student']");
                 ext.$url_input = ext.$section.find("#set-extension select[name='url']");
                 ext.$due_datetime_input = ext.$section.find("#set-extension input[name='due_datetime']");
+                ext.$reason_input = ext.$section.find("#set-extension input[name='reason']");
+
                 sendData = {
                     student: ext.$student_input.val(),
                     url: ext.$url_input.val(),
-                    due_datetime: ext.$due_datetime_input.val()
+                    due_datetime: ext.$due_datetime_input.val(),
+                    reason: ext.$reason_input.val()
                 };
                 return $.ajax({
                     type: 'POST',
@@ -48,9 +51,12 @@
                 ext.clear_display();
                 ext.$student_input = ext.$section.find("#reset-extension input[name='student']");
                 ext.$url_input = ext.$section.find("#reset-extension select[name='url']");
+                ext.$reason_input = ext.$section.find("#reset-extension input[name='reason']");
+
                 sendData = {
                     student: ext.$student_input.val(),
-                    url: ext.$url_input.val()
+                    url: ext.$url_input.val(),
+                    reason: ext.$reason_input.val()
                 };
                 return $.ajax({
                     type: 'POST',

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 
@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
             name='AppVersionConfig',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('platform', models.CharField(max_length=50, choices=[(b'Android', b'Android'), (b'iOS', b'iOS')])),
-                ('version', models.CharField(help_text=b'Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric', max_length=50)),
+                ('platform', models.CharField(max_length=50, choices=[(u'Android', u'Android'), (u'iOS', u'iOS')])),
+                ('version', models.CharField(help_text=u'Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric', max_length=50)),
                 ('major_version', models.IntegerField()),
                 ('minor_version', models.IntegerField()),
                 ('patch_version', models.IntegerField()),
-                ('expire_at', models.DateTimeField(null=True, verbose_name=b'Expiry date for platform version', blank=True)),
+                ('expire_at', models.DateTimeField(null=True, verbose_name=u'Expiry date for platform version', blank=True)),
                 ('enabled', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

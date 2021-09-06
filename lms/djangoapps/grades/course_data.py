@@ -1,3 +1,10 @@
+"""
+Code used to get and cache the requested course-data
+"""
+
+
+from django.utils.encoding import python_2_unicode_compatible
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from xmodule.modulestore.django import modulestore
@@ -5,6 +12,7 @@ from xmodule.modulestore.django import modulestore
 from .transformer import GradesTransformer
 
 
+@python_2_unicode_compatible
 class CourseData(object):
     """
     Utility access layer to intelligently get and cache the
@@ -96,7 +104,10 @@ class CourseData(object):
             course_block = structure[self.location]
             return getattr(course_block, 'subtree_edited_on', None)
 
-    def __unicode__(self):
+    def __str__(self):
+        """
+        Return human-readable string representation.
+        """
         return u'Course: course_key: {}'.format(self.course_key)
 
     def full_string(self):

@@ -15,7 +15,7 @@
     ),
     {
         linkStart: edx.HtmlUtils.interpolateHtml(
-            edx.HtmlUtils.HTML('<a href="{highlightsDocUrl}" target="_blank">'),
+            edx.HtmlUtils.HTML('<a href="{highlightsDocUrl}" rel="noopener" target="_blank">'),
             {highlightsDocUrl: xblockInfo.attributes.highlights_doc_url}
         ),
         linkEnd: edx.HtmlUtils.HTML('</a>')

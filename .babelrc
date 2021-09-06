@@ -17,5 +17,17 @@
       }
     ],
     "babel-preset-react"
-  ]
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "modules": "commonjs",
+          }
+        ]
+      ]
+    }
+  },
 }

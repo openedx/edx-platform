@@ -1,23 +1,23 @@
 """
 Tests for transformers.py
 """
-from mock import MagicMock, patch
-from nose.plugins.attrib import attr
+
+
 from unittest import TestCase
 
+from mock import MagicMock, patch
+
 from ..block_structure import BlockStructureModulestoreData
-from ..exceptions import TransformerException, TransformerDataIncompatible
+from ..exceptions import TransformerDataIncompatible, TransformerException
 from ..transformers import BlockStructureTransformers
-from .helpers import (
-    ChildrenMapTestMixin, MockTransformer, MockFilteringTransformer, mock_registered_transformers
-)
+from .helpers import ChildrenMapTestMixin, MockFilteringTransformer, MockTransformer, mock_registered_transformers
 
 
-@attr(shard=2)
 class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     """
     Test class for testing BlockStructureTransformers
     """
+
     class UnregisteredTransformer(MockTransformer):
         """
         Mock transformer that is not registered.
@@ -51,8 +51,8 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         with self.assertRaises(TransformerException):
             self.transformers += [self.UnregisteredTransformer()]
 
-        self.assertEquals(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
-        self.assertEquals(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
 
     def test_collect(self):
         with mock_registered_transformers(self.registered_transformers):

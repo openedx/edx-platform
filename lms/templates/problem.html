@@ -115,11 +115,14 @@ from openedx.core.djangolib.markup import HTML
       notification_message=save_message,
       is_hidden=not has_saved_answers"
     />
+    <%
+        notification_message=_('Answers are displayed within the problem')
+    %>
     <%include file="problem_notifications.html" args="
       notification_type='general',
       notification_icon='fa-info-circle',
       notification_name='show-answer',
-      notification_message=_('Answers are displayed within the problem'),
+      notification_message=notification_message,
       is_hidden=True"
     />
 </div>

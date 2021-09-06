@@ -2,7 +2,8 @@
 Tests throttling (rate limiting) for the Tahoe API
 """
 
-from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.urls import reverse
 from django.test.utils import override_settings
 
 from rest_framework import status
@@ -59,10 +60,10 @@ class TahoeApiThrotteTest(APITestCase):
         self.rate_limit = int(self.rate_limit)
         assert self.rate_limit_unit == 'minute'
 
-    @unittest.expectedFailure
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skipped due to unknown failures')
     def test_throttle_with_registration_api(self):
         """
-        This test is marked as `xfail` because it causes the following in the post:
+        This test is skipped because it causes the following in the post:
 
             TransactionManagementError: An error occurred in the current
             transaction. You can't execute queries until the end of the
@@ -70,7 +71,7 @@ class TahoeApiThrotteTest(APITestCase):
 
         This needs investigation.
         """
-        for attempt in xrange(self.rate_limit):
+        for attempt in range(self.rate_limit):
             post_data = make_post_data(attempt)
             response = self.client.post(self.url, post_data)
             self.assertEqual(response.status_code, status.HTTP_200_OK)

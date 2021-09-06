@@ -13,13 +13,14 @@ This functionality is also available as an export view in studio if the giturl
 attribute is set and the FEATURE['ENABLE_EXPORT_GIT'] is set.
 """
 
+
 import logging
-from six import text_type
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError

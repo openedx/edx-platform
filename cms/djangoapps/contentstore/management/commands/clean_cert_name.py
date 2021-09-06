@@ -3,11 +3,12 @@ A single-use management command that provides an interactive way to remove
 erroneous certificate names.
 """
 
+
 from collections import namedtuple
-from six.moves import input
-from six import text_type
 
 from django.core.management.base import BaseCommand
+from six import text_type
+from six.moves import input, range, zip
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -155,8 +156,8 @@ class Command(BaseCommand):
             max(len(text_type(result[col])) for result in results + [headers])
             for col in range(len(results[0]))
         ]
-        id_format = "{{:>{}}} |".format(len(text_type(len(results))))
-        col_format = "| {{:>{}}} |"
+        id_format = u"{{:>{}}} |".format(len(text_type(len(results))))
+        col_format = u"| {{:>{}}} |"
 
         self.stdout.write(id_format.format(""), ending='')
         for header, width in zip(headers, col_widths):

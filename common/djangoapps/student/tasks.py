@@ -1,32 +1,49 @@
 """
 This file contains celery tasks for sending email
 """
+
+
 import logging
 
-from boto.exception import NoAuthHandlerFound
 from celery.exceptions import MaxRetriesExceededError
-from celery.task import task  # pylint: disable=no-name-in-module, import-error
+from celery.task import task
 from django.conf import settings
-from django.core import mail
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from edx_ace import ace
+from edx_ace.errors import RecoverableChannelDeliveryError
+from edx_ace.message import Message
+
+from openedx.core.lib.celery.task_utils import emulate_http_request
 
 log = logging.getLogger('edx.celery.task')
 
 
 @task(bind=True)
-def send_activation_email(self, subject, message, from_address, dest_addr):
+def send_activation_email(self, msg_string, site_id, from_address):
     """
     Sending an activation email to the user.
     """
+    msg = Message.from_string(msg_string)
+
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
     retries = self.request.retries
+
+    msg.options['from_address'] = from_address
+
+    dest_addr = msg.recipient.email_address
+
+    user = User.objects.get(username=msg.recipient.username)
+
+    # Tahoe: `get_current_site()` don't work in celery tasks because there's no `request`.
+    #        Getting the `site` from the caller instead.
+    site = Site.objects.get(pk=site_id)
+
     try:
-        mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-        # Log that the Activation Email has been sent to user without an exception
-        log.info("Activation Email has been sent to User {user_email}".format(
-            user_email=dest_addr
-        ))
-    except NoAuthHandlerFound:  # pylint: disable=broad-except
-        log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'. format(
+        with emulate_http_request(site=site, user=user):
+            ace.send(msg)
+    except RecoverableChannelDeliveryError:
+        log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
             dest_addr=dest_addr,
             attempt=retries,
             max_attempts=max_retries
@@ -45,6 +62,5 @@ def send_activation_email(self, subject, message, from_address, dest_addr):
             'Unable to send activation email to user from "%s" to "%s"',
             from_address,
             dest_addr,
-            exc_info=True
         )
         raise e

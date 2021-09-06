@@ -2,23 +2,31 @@
 This module handles the detection of crawlers, so that we can handle them
 appropriately in other parts of the code.
 """
+
+
 import six
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class CrawlersConfig(ConfigurationModel):
-    """Configuration for the crawlers django app."""
+    """
+    Configuration for the crawlers django app.
+
+    .. no_pii:
+    """
     class Meta(object):
         app_label = "crawlers"
 
     known_user_agents = models.TextField(
         blank=True,
-        help_text="A comma-separated list of known crawler user agents.",
-        default='edX-downloader',
+        help_text=u"A comma-separated list of known crawler user agents.",
+        default=u'edX-downloader',
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u'CrawlersConfig("{}")'.format(self.known_user_agents)
 
     @classmethod

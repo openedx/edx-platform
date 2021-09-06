@@ -179,8 +179,8 @@
                 // Simulate a click on the reset password link
                     view.resetPassword();
 
-                // Verify that the login-anchor is hidden
-                    expect($('#login-anchor')).toHaveClass('hidden');
+                // Verify that the login-form is hidden
+                    expect($('#login-form')).toHaveClass('hidden');
 
                 // Verify that the password reset form is not hidden
                     expect($('#password-reset-form')).not.toHaveClass('hidden');
@@ -215,16 +215,6 @@
 
                 // Verify that we were redirected
                     expect(view.redirect).toHaveBeenCalledWith(FORWARD_URL);
-                });
-
-                it('ignores redirect to external URLs', function() {
-                    ajaxSpyAndInitialize(this, 'register', 'http://www.example.com');
-
-                // Trigger auth complete
-                    view.subview.register.trigger('auth-complete');
-
-                // Expect that we ignore the external URL and redirect to the dashboard
-                    expect(view.redirect).toHaveBeenCalledWith('/dashboard');
                 });
 
                 it('hides create an account section', function() {

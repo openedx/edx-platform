@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
+from django.db import transaction
 
 from openedx.core.djangoapps.appsembler.sites.utils import delete_site
 
@@ -25,7 +26,9 @@ class Command(BaseCommand):
         self.stdout.write('Removing "%s" in progress...' % organization_domain)
         organization = self._get_site(organization_domain)
 
-        delete_site(organization)
+        with transaction.atomic():
+            delete_site(organization)
+
         self.stdout.write(self.style.SUCCESS('Successfully removed site "%s"' % organization_domain))
 
     def _get_site(self, domain):

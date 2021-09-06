@@ -1,20 +1,22 @@
 """
 Provide tests for git_add_course management command.
 """
+
+
 import logging
 import os
 import shutil
-import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from six import StringIO
 
 import dashboard.git_import as git_import
 from dashboard.git_import import (
@@ -38,11 +40,7 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
-
-@attr(shard=3)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -53,8 +51,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
@@ -69,22 +66,25 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         """
         Convenience function for testing command failures
         """
-        with self.assertRaisesRegexp(CommandError, regex):
-            call_command('git_add_course', *args, stderr=StringIO.StringIO())
+        with self.assertRaisesRegex(CommandError, regex):
+            call_command('git_add_course', *args, stderr=StringIO())
 
     def test_command_args(self):
         """
         Validate argument checking
         """
         # No argument given.
-        self.assertCommandFailureRegexp('Error: too few arguments')
+        if six.PY2:
+            self.assertCommandFailureRegexp('Error: too few arguments')
+        else:
+            self.assertCommandFailureRegexp('Error: the following arguments are required: repository_url')
         # Extra/Un-named arguments given.
         self.assertCommandFailureRegexp(
             'Error: unrecognized arguments: blah blah blah',
             'blah', 'blah', 'blah', 'blah')
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
+            u'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.git_repo_dir):
@@ -207,7 +207,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             git_import.add_repo('file://{0}'.format(bare_repo), None, None)
 
         # Get logger for checking strings in logs
-        output = StringIO.StringIO()
+        output = StringIO()
         test_log_handler = logging.StreamHandler(output)
         test_log_handler.setLevel(logging.DEBUG)
         glog = git_import.log

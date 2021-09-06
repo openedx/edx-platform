@@ -7,9 +7,10 @@
       margin-bottom: 0;
     }
 
-    .wrapper-content-header, .wrapper-content-features, .wrapper-content-cta {
-      @include box-sizing(border-box);
-
+    .wrapper-content-header,
+    .wrapper-content-features,
+    .wrapper-content-cta {
+      box-sizing: border-box;
       margin: 0;
       padding: 0 $baseline;
       position: relative;
@@ -33,20 +34,13 @@
         margin-bottom: 0;
       }
 
-      h1, h2, h3, h4, h5, h6 {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
         color: $gray-d3;
-      }
-
-      h2 {
-
-      }
-
-      h3 {
-
-      }
-
-      h4 {
-
       }
     }
 
@@ -74,7 +68,8 @@
         color: $white;
       }
 
-      .wrapper-text-welcome, .logo {
+      .wrapper-text-welcome,
+      .logo {
         display: inline-block;
       }
 
@@ -98,7 +93,8 @@
       border: 4px solid $black;
     }
 
-    .arrow_box::after, .arrow_box::before {
+    .arrow_box::after,
+    .arrow_box::before {
       top: 100%;
       border: solid transparent;
       content: " ";
@@ -133,10 +129,6 @@
     }
 
     .content-features {
-      .list-features {
-
-      }
-
       // indiv features
       .feature {
         @include clearfix();
@@ -146,15 +138,13 @@
         padding: 0 0 ($baseline*2) 0;
 
         .img {
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           float: left;
           width: flex-grid(3, 12);
           margin-right: flex-gutter();
 
           a {
-            @include box-sizing(border-box);
-
+            box-sizing: border-box;
             box-shadow: 0 1px ($baseline/10) $shadow-l1;
             position: relative;
             top: 0;
@@ -235,7 +225,8 @@
             margin: ($baseline*1.5) 0 0 0;
 
             .proofpoint {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
+
               @include transition(all $tmg-f2 ease-in-out 0s);
 
               border-radius: ($baseline/4);

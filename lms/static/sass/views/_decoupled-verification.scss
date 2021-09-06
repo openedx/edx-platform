@@ -1,6 +1,8 @@
 // Updates for decoupled verification A/B test
 .verification-process {
-  .pay-and-verify, .incourse-reverify, .reverify {
+  .pay-and-verify,
+  .incourse-reverify,
+  .reverify {
     .review {
       .title.center-col {
         padding: 0 calc((100% - 750px) / 2) 10px;
@@ -151,13 +153,14 @@
 
     .retake-photos {
       color: $blue;
-      background:none!important;
-      border:0!important;
-      padding:0!important;
+      background: none !important;
+      border: 0 !important;
+      padding: 0 !important;
       box-shadow: none;
       cursor: pointer;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         text-decoration: underline;
       }
     }

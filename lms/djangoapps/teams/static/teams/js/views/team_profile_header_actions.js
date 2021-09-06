@@ -6,13 +6,15 @@
         'underscore',
         'gettext',
         'teams/js/views/team_utils',
-        'text!teams/templates/team-profile-header-actions.underscore'],
-        function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
+        'text!teams/templates/team-profile-header-actions.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'],
+        function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate, HtmlUtils) {
             return Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
-                alreadyMemberMessage: gettext('You already belong to another team.'),
+                alreadyTeamsetMemberMessage: gettext('You already belong to another team in this team set.'),
                 teamFullMessage: gettext('This team is full.'),
+                notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
                 events: {
                     'click .action-primary': 'joinTeam',
@@ -34,25 +36,32 @@
                         message,
                         showJoinButton,
                         teamHasSpace;
-                    this.getUserTeamInfo(username, this.context.maxTeamSize).done(function(info) {
+                    this.getUserTeamInfo(username, this.context.courseMaxTeamSize).done(function(info) {
                         teamHasSpace = info.teamHasSpace;
 
                         // if user is the member of current team then we wouldn't show anything
                         if (!info.memberOfCurrentTeam) {
-                            showJoinButton = !info.alreadyMember && teamHasSpace;
-
-                            if (info.alreadyMember) {
-                                message = info.memberOfCurrentTeam ? '' : view.alreadyMemberMessage;
+                            if (info.alreadyInTeamset) {
+                                showJoinButton = false;
+                                message = info.memberOfCurrentTeam ? '' : view.alreadyTeamsetMemberMessage;
                             } else if (!teamHasSpace) {
+                                showJoinButton = false;
                                 message = view.teamFullMessage;
+                            } else if (!info.isAdminOrStaff && info.isInstructorManagedTopic) {
+                                showJoinButton = false;
+                                message = view.notJoinInstructorManagedTeam;
+                            } else {
+                                showJoinButton = true;
                             }
                         }
-
-                        view.$el.html(view.template({
-                            showJoinButton: showJoinButton,
-                            message: message,
-                            showEditButton: view.showEditButton
-                        }));
+                        HtmlUtils.setHtml(
+                            view.$el,
+                            HtmlUtils.template(teamProfileHeaderActionsTemplate)({
+                                showJoinButton: showJoinButton,
+                                message: message,
+                                showEditButton: view.showEditButton
+                            })
+                        );
                     });
                     return view;
                 },
@@ -65,7 +74,7 @@
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
                         data: {username: view.context.userInfo.username, team_id: view.model.get('id')}
-                    }).done(function(data) {
+                    }).done(function() {
                         view.model.fetch()
                             .done(function() {
                                 view.teamEvents.trigger('teams:update', {
@@ -78,30 +87,43 @@
                     });
                 },
 
-                getUserTeamInfo: function(username, maxTeamSize) {
+                getUserTeamInfo: function(username, courseMaxTeamSize) {
                     var deferred = $.Deferred();
                     var info = {
-                        alreadyMember: false,
+                        alreadyInTeamset: false,
                         memberOfCurrentTeam: false,
-                        teamHasSpace: false
+                        teamHasSpace: false,
+                        isAdminOrStaff: false,
+                        isInstructorManagedTopic: false
                     };
 
+                    // this.topic.getMaxTeamSize() will return null for a managed team,
+                    // but the size is considered to be arbitarily large.
+                    var isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
+                    var teamHasSpace = isInstructorManagedTopic ||
+                        (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
+
                     info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
-                    var teamHasSpace = this.model.get('membership').length < maxTeamSize;
+                    info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
+                    info.isInstructorManagedTopic = isInstructorManagedTopic;
 
                     if (info.memberOfCurrentTeam) {
-                        info.alreadyMember = true;
+                        info.alreadyInTeamset = true;
                         info.memberOfCurrentTeam = true;
                         deferred.resolve(info);
                     } else {
                         if (teamHasSpace) {
-                            var view = this;
+                            var view = this; // eslint-disable-line vars-on-top
                             $.ajax({
                                 type: 'GET',
                                 url: view.context.teamMembershipsUrl,
-                                data: {username: username, course_id: view.context.courseID}
+                                data: {
+                                    username: username,
+                                    course_id: view.context.courseID,
+                                    teamset_id: view.model.get('topic_id')
+                                }
                             }).done(function(data) {
-                                info.alreadyMember = (data.count > 0);
+                                info.alreadyInTeamset = (data.count > 0);
                                 info.memberOfCurrentTeam = false;
                                 info.teamHasSpace = teamHasSpace;
                                 deferred.resolve(info);

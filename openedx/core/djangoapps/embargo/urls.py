@@ -1,5 +1,6 @@
 """URLs served by the embargo app. """
 
+
 from django.conf.urls import url
 
 from .views import CheckCourseAccessView, CourseAccessMessageView

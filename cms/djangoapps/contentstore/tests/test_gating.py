@@ -1,6 +1,8 @@
 """
 Unit tests for the gating feature in Studio
 """
+
+
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 

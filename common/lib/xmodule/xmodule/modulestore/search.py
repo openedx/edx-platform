@@ -1,12 +1,18 @@
 ''' useful functions for finding content and its position '''
+
+
 from logging import getLogger
 
-from .exceptions import (ItemNotFoundError, NoPathToItem)
+from six.moves import range
+
+from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
+from student.roles import GlobalStaff
+from .exceptions import ItemNotFoundError, NoPathToItem
 
 LOGGER = getLogger(__name__)
 
 
-def path_to_location(modulestore, usage_key, full_path=False):
+def path_to_location(modulestore, usage_key, request=None, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -15,6 +21,7 @@ def path_to_location(modulestore, usage_key, full_path=False):
     Args:
         modulestore: which store holds the relevant objects
         usage_key: :class:`UsageKey` the id of the location to which to generate the path
+        request: Request object containing information about user and masquerade settings, Default is None
         full_path: :class:`Bool` if True, return the full path to location. Default is False.
 
     Raises
@@ -100,6 +107,7 @@ def path_to_location(modulestore, usage_key, full_path=False):
         # (e.g. sequential and videosequence) currently deal with this form of
         # representing nested positions. This needs to happen before jumping to a
         # module nested in more than one positional module will work.
+
         if n > 3:
             position_list = []
             for path_index in range(2, n - 1):
@@ -108,18 +116,54 @@ def path_to_location(modulestore, usage_key, full_path=False):
                     section_desc = modulestore.get_item(path[path_index])
                     # this calls get_children rather than just children b/c old mongo includes private children
                     # in children but not in get_children
-                    child_locs = [c.location for c in section_desc.get_children()]
+                    child_locs = get_child_locations(section_desc, request, course_id)
                     # positions are 1-indexed, and should be strings to be consistent with
                     # url parsing.
-                    position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
+                    if path[path_index + 1] in child_locs:
+                        position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
             position = "_".join(position_list)
 
     return (course_id, chapter, section, vertical, position, path[-1])
 
 
+def get_child_locations(section_desc, request, course_id):
+    """
+    Returns all child locations for a section. If user is learner or masquerading as learner,
+    staff only blocks are excluded.
+    """
+    is_staff_user = GlobalStaff().has_user(request.user) if request else False
+
+    def is_masquerading_as_student():
+        """
+        Return True if user is masquerading as learner.
+        """
+        masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+        course_info = masquerade_settings.get(course_id)
+        return masquerade_settings and course_info and getattr(course_info, 'role', '') == 'student'
+
+    def is_user_staff_and_not_masquerading_learner():
+        """
+        Return True if user is staff and not masquerading as learner.
+        """
+        return is_staff_user and not is_masquerading_as_student()
+
+    def is_child_appendable(child_instance):
+        """
+        Return True if child is appendable based on request and request's user type.
+        """
+        return (request and is_user_staff_and_not_masquerading_learner()) or not child_instance.visible_to_staff_only
+
+    child_locs = []
+    for child in section_desc.get_children():
+        if not is_child_appendable(child):
+            continue
+        child_locs.append(child.location)
+    return child_locs
+
+
 def navigation_index(position):
     """
-    Get the navigation index from the position argument (where the position argument was recieved from a call to
+    Get the navigation index from the position argument (where the position argument was received from a call to
     path_to_location)
 
     Argument:

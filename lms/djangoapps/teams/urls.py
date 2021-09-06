@@ -2,6 +2,7 @@
 Defines the URL routes for this app.
 """
 
+
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 

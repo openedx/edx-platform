@@ -2,7 +2,7 @@
 """
 Custom migration script to add slug field to all ProviderConfig models.
 """
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 from django.utils.text import slugify
@@ -39,17 +39,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ltiproviderconfig',
             name='slug',
-            field=models.SlugField(default=b'default', help_text=b'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
+            field=models.SlugField(default=u'default', help_text=u'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
         ),
         migrations.AddField(
             model_name='oauth2providerconfig',
             name='slug',
-            field=models.SlugField(default=b'default', help_text=b'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
+            field=models.SlugField(default=u'default', help_text=u'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
         ),
         migrations.AddField(
             model_name='samlproviderconfig',
             name='slug',
-            field=models.SlugField(default=b'default', help_text=b'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
+            field=models.SlugField(default=u'default', help_text=u'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30),
         ),
         migrations.RunPython(fill_slug_field, reverse_code=migrations.RunPython.noop),
     ]

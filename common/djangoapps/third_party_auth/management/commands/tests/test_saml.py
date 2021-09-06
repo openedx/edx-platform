@@ -2,19 +2,20 @@
 Tests for `saml` management command, this command fetches saml metadata from providers and updates
 existing data accordingly.
 """
-import unittest
-import os
-import mock
 
-from django.test import TestCase
+
+import os
+import unittest
+
+import mock
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.conf import settings
 from django.utils.six import StringIO
-
 from requests import exceptions
 from requests.models import Response
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
 
 
@@ -46,7 +47,7 @@ def mock_get(status_code=200):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestSAMLCommand(TestCase):
+class TestSAMLCommand(CacheIsolationTestCase):
     """
     Test django management command for fetching saml metadata.
     """
@@ -130,7 +131,7 @@ class TestSAMLCommand(TestCase):
 
         expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-        with self.assertRaisesRegexp(CommandError, r"HTTPError: 404 Client Error"):
+        with self.assertRaisesRegex(CommandError, r"HTTPError: 404 Client Error"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
@@ -175,7 +176,7 @@ class TestSAMLCommand(TestCase):
         )
 
         expected = '\n3 provider(s) found in database.\n0 skipped and 3 attempted.\n2 updated and 1 failed.\n'
-        with self.assertRaisesRegexp(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
+        with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
@@ -198,7 +199,7 @@ class TestSAMLCommand(TestCase):
 
         # Four configurations -- one will be skipped and three attempted, with similar results.
         expected = '\nDone.\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n0 updated and 1 failed.\n'
-        with self.assertRaisesRegexp(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
+        with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
@@ -214,19 +215,19 @@ class TestSAMLCommand(TestCase):
 
         expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-        with self.assertRaisesRegexp(CommandError, "SSLError:"):
+        with self.assertRaisesRegex(CommandError, "SSLError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
         mocked_get.side_effect = exceptions.ConnectionError
 
-        with self.assertRaisesRegexp(CommandError, "ConnectionError:"):
+        with self.assertRaisesRegex(CommandError, "ConnectionError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
         mocked_get.side_effect = exceptions.HTTPError
 
-        with self.assertRaisesRegexp(CommandError, "HTTPError:"):
+        with self.assertRaisesRegex(CommandError, "HTTPError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
@@ -251,7 +252,7 @@ class TestSAMLCommand(TestCase):
 
         expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-        with self.assertRaisesRegexp(CommandError, "MetadataParseError: Can't find EntityDescriptor for entityID"):
+        with self.assertRaisesRegex(CommandError, "MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())
 
@@ -271,6 +272,6 @@ class TestSAMLCommand(TestCase):
 
         expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-        with self.assertRaisesRegexp(CommandError, "XMLSyntaxError:"):
+        with self.assertRaisesRegex(CommandError, "XMLSyntaxError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         self.assertIn(expected, self.stdout.getvalue())

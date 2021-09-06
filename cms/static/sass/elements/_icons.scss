@@ -37,7 +37,7 @@
 
   // OPTION: add this class for a visual hanging display
   &.is-hanging {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     @extend %ui-depth2;
 

@@ -2,13 +2,15 @@
 Defines concrete class for cybersource  Enrollment Report.
 
 """
+
+
 import collections
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import (
@@ -37,7 +39,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
         # check the user enrollment role
         if user.is_staff:
             platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
-            enrollment_role = _('{platform_name} Staff').format(platform_name=platform_name)
+            enrollment_role = _(u'{platform_name} Staff').format(platform_name=platform_name)
         elif is_course_staff:
             enrollment_role = _('Course Staff')
         else:
@@ -67,14 +69,14 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
                 manual_enrollment = ManualEnrollmentAudit.get_manual_enrollment(course_enrollment)
                 if manual_enrollment is not None:
                     enrollment_source = _(
-                        'manually enrolled by username: {username}'
+                        u'manually enrolled by username: {username}'
                     ).format(username=manual_enrollment.enrolled_by.username)
 
                     manual_enrollment_reason = manual_enrollment.reason
                 else:
                     enrollment_source = _('Manually Enrolled')
 
-        enrollment_date = course_enrollment.created.strftime("%B %d, %Y")
+        enrollment_date = course_enrollment.created.strftime(u"%B %d, %Y")
         currently_enrolled = course_enrollment.is_active
 
         course_enrollment_data = collections.OrderedDict()

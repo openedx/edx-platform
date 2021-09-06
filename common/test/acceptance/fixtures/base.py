@@ -1,9 +1,12 @@
 """
 Common code shared by course and library fixtures.
 """
+
+
 import json
 
 import requests
+import six
 from lazy import lazy
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -40,12 +43,12 @@ class StudioApiFixture(object):
             self.user = response.json()
 
             if not self.user:
-                raise StudioApiLoginError('Auto-auth failed. Response was: {}'.format(self.user))
+                raise StudioApiLoginError(u'Auto-auth failed. Response was: {}'.format(self.user))
 
             return session
 
         else:
-            msg = 'Could not log in to use Studio restful API.  Status code: {0}'.format(response.status_code)
+            msg = u'Could not log in to use Studio restful API.  Status code: {0}'.format(response.status_code)
             raise StudioApiLoginError(msg)
 
     @lazy
@@ -123,14 +126,14 @@ class XBlockContainerFixture(StudioApiFixture):
         )
 
         if not response.ok:
-            msg = "Could not create {0}.  Status was {1}".format(xblock_desc, response.status_code)
+            msg = u"Could not create {0}.  Status was {1}".format(xblock_desc, response.status_code)
             raise FixtureError(msg)
 
         try:
             loc = response.json().get('locator')
             xblock_desc.locator = loc
         except ValueError:
-            raise FixtureError("Could not decode JSON from '{0}'".format(response.content))
+            raise FixtureError(u"Could not decode JSON from '{0}'".format(response.content))
 
         # Configure the XBlock
         response = self.session.post(
@@ -142,7 +145,7 @@ class XBlockContainerFixture(StudioApiFixture):
         if response.ok:
             return loc
         else:
-            raise FixtureError("Could not update {0}.  Status code: {1}".format(xblock_desc, response.status_code))
+            raise FixtureError(u"Could not update {0}.  Status code: {1}".format(xblock_desc, response.status_code))
 
     def _update_xblock(self, locator, data):
         """
@@ -156,17 +159,14 @@ class XBlockContainerFixture(StudioApiFixture):
         )
 
         if not response.ok:
-            msg = "Could not update {} with data {}.  Status was {}".format(locator, data, response.status_code)
+            msg = u"Could not update {} with data {}.  Status was {}".format(locator, data, response.status_code)
             raise FixtureError(msg)
 
     def _encode_post_dict(self, post_dict):
         """
         Encode `post_dict` (a dictionary) as UTF-8 encoded JSON.
         """
-        return json.dumps({
-            k: v.encode('utf-8') if isinstance(v, basestring) else v
-            for k, v in post_dict.items()
-        })
+        return json.dumps(post_dict).encode('utf-8')
 
     def get_nested_xblocks(self, category=None):
         """

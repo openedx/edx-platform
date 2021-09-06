@@ -1,25 +1,28 @@
-import sys
-import logging
 
+
+import logging
+import sys
+
+import six
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
-from xblock.runtime import KvsFieldData, KeyValueStore
-from xblock.fields import ScopeIds
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, DefinitionLocator, LibraryLocator, LocalId
 from xblock.core import XBlock
-from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
+from xblock.fields import ScopeIds
+from xblock.runtime import KeyValueStore, KvsFieldData
 
-from xmodule.library_tools import LibraryToolsService
-from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
+from xmodule.library_tools import LibraryToolsService
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import inheriting_field_data, InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
-from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLazyLoader
+from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.x_module import XModuleMixin
 
@@ -88,7 +91,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     @contract(returns="dict(BlockKey: BlockKey)")
     def _parent_map(self):
         parent_map = {}
-        for block_key, block in self.course_entry.structure['blocks'].iteritems():
+        for block_key, block in six.iteritems(self.course_entry.structure['blocks']):
             for child in block.fields.get('children', []):
                 parent_map[child] = block_key
         return parent_map
@@ -382,7 +385,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         new_aside = super(CachingDescriptorSystem, self).get_aside_of_type(block, aside_type)
         new_aside._field_data = block._field_data  # pylint: disable=protected-access
 
-        for key, _ in new_aside.fields.iteritems():
+        for key, _ in six.iteritems(new_aside.fields):
             if isinstance(key, KeyValueStore.Key) and block._field_data.has(new_aside, key):  # pylint: disable=protected-access
                 try:
                     value = block._field_data.get(new_aside, key)  # pylint: disable=protected-access

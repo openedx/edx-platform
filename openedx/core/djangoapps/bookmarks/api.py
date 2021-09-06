@@ -1,9 +1,12 @@
 """
 Bookmarks Python API.
 """
-from django.conf import settings
 
+
+import six
+from django.conf import settings
 from eventtracking import tracker
+
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -71,7 +74,7 @@ def get_bookmarks(user, course_key=None, fields=None, serialized=True):
         else:
             bookmarks_queryset = bookmarks_queryset.select_related('user')
 
-        bookmarks_queryset = bookmarks_queryset.order_by('-created')
+        bookmarks_queryset = bookmarks_queryset.order_by('-id')
     else:
         bookmarks_queryset = Bookmark.objects.none()
 
@@ -167,9 +170,9 @@ def _track_event(event_name, bookmark):
     tracker.emit(
         event_name,
         {
-            'course_id': unicode(bookmark.course_key),
+            'course_id': six.text_type(bookmark.course_key),
             'bookmark_id': bookmark.resource_id,
             'component_type': bookmark.usage_key.block_type,
-            'component_usage_id': unicode(bookmark.usage_key),
+            'component_usage_id': six.text_type(bookmark.usage_key),
         }
     )

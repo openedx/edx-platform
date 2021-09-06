@@ -1,7 +1,10 @@
 """
 Tests for course welcome messages.
 """
+
+
 import ddt
+import six
 from django.urls import reverse
 
 from student.models import CourseEnrollment
@@ -23,7 +26,7 @@ def welcome_message_url(course):
     return reverse(
         'openedx.course_experience.welcome_message_fragment_view',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 
@@ -35,7 +38,7 @@ def latest_update_url(course):
     return reverse(
         'openedx.course_experience.latest_update_fragment_view',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 
@@ -47,7 +50,7 @@ def dismiss_message_url(course):
     return reverse(
         'openedx.course_experience.dismiss_welcome_message',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 
@@ -90,7 +93,7 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
     @ddt.data(welcome_message_url, latest_update_url)
     def test_replace_urls(self, url_generator):
         img_url = 'img.png'
-        create_course_update(self.course, self.user, "<img src='/static/{url}'>".format(url=img_url))
+        create_course_update(self.course, self.user, u"<img src='/static/{url}'>".format(url=img_url))
         response = self.client.get(url_generator(self.course))
         self.assertContains(response, "/asset-v1:{org}+{course}+{run}+type@asset+block/{url}".format(
             org=self.course.id.org,

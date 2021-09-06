@@ -1,10 +1,12 @@
 """ Management command to update libraries' search index """
-from __future__ import print_function
+
+
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from six.moves import map
 
 from contentstore.courseware_index import LibrarySearchIndexer
 from xmodule.modulestore.django import modulestore
@@ -58,8 +60,8 @@ class Command(BaseCommand):
             else:
                 return
         else:
-            library_keys = map(self._parse_library_key, options['library_ids'])
+            library_keys = list(map(self._parse_library_key, options['library_ids']))
 
         for library_key in library_keys:
-            print("Indexing library {}".format(library_key))
+            print(u"Indexing library {}".format(library_key))
             LibrarySearchIndexer.do_library_reindex(store, library_key)

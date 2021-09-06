@@ -6,7 +6,7 @@ These tests adapted from Appsembler enterprise `appsembler_api` tests
 """
 
 # from django.contrib.sites.models import Site
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
@@ -30,8 +30,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationCourseFactory,
     UserOrganizationMappingFactory,
 )
-
-from openedx.core.djangoapps.appsembler.api.v1.views import CourseViewSet
 
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'

@@ -39,6 +39,8 @@ define(['underscore'], function(_) {
             options: FIELD_OPTIONS
         }, language: {
             options: FIELD_OPTIONS
+        }, beta_language: {
+            options: []
         }, level_of_education: {
             options: FIELD_OPTIONS
         }, password: {

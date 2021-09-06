@@ -1,0 +1,21 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%inherit file="main.html" />
+
+<section class="container activation">
+
+  <section class="message">
+    <h1 class="invalid">${_("Secondary e-mail change failed")}</h1>
+    <hr class="horizontal-divider">
+
+    % if err_msg:
+    <p>${err_msg}</p>
+    % else:
+    <p>${_("We were unable to activate your secondary email {secondary_email}").format(secondary_email=secondary_email)}</p>
+    % endif
+    <p>${Text(_('Go back to the {link_start}home page{link_end}.')).format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
+  </section>
+</section>

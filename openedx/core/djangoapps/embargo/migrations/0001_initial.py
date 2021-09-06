@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 import django_countries.fields
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             name='CountryAccessRule',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('rule_type', models.CharField(default=b'blacklist', help_text='Whether to include or exclude the given course. If whitelist countries are specified, then ONLY users from whitelisted countries will be able to access the course.  If blacklist countries are specified, then users from blacklisted countries will NOT be able to access the course.', max_length=255, choices=[(b'whitelist', b'Whitelist (allow only these countries)'), (b'blacklist', b'Blacklist (block these countries)')])),
+                ('rule_type', models.CharField(default=u'blacklist', help_text='Whether to include or exclude the given course. If whitelist countries are specified, then ONLY users from whitelisted countries will be able to access the course.  If blacklist countries are specified, then users from blacklisted countries will NOT be able to access the course.', max_length=255, choices=[(u'whitelist', u'Whitelist (allow only these countries)'), (u'blacklist', u'Blacklist (block these countries)')])),
                 ('country', models.ForeignKey(help_text='The country to which this rule applies.', to='embargo.Country', on_delete=models.CASCADE)),
             ],
         ),
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('embargoed_countries', models.TextField(help_text=b'A comma-separated list of country codes that fall under U.S. embargo restrictions', blank=True)),
+                ('embargoed_countries', models.TextField(help_text=u'A comma-separated list of country codes that fall under U.S. embargo restrictions', blank=True)),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={
@@ -73,8 +73,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('whitelist', models.TextField(help_text=b'A comma-separated list of IP addresses that should not fall under embargo restrictions.', blank=True)),
-                ('blacklist', models.TextField(help_text=b'A comma-separated list of IP addresses that should fall under embargo restrictions.', blank=True)),
+                ('whitelist', models.TextField(help_text=u'A comma-separated list of IP addresses that should not fall under embargo restrictions.', blank=True)),
+                ('blacklist', models.TextField(help_text=u'A comma-separated list of IP addresses that should fall under embargo restrictions.', blank=True)),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={
@@ -87,8 +87,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('course_key', CourseKeyField(help_text='The course key for the restricted course.', unique=True, max_length=255, db_index=True)),
-                ('enroll_msg_key', models.CharField(default=b'default', help_text='The message to show when a user is blocked from enrollment.', max_length=255, choices=[(b'default', b'Default'), (b'embargo', b'Embargo')])),
-                ('access_msg_key', models.CharField(default=b'default', help_text='The message to show when a user is blocked from accessing a course.', max_length=255, choices=[(b'default', b'Default'), (b'embargo', b'Embargo')])),
+                ('enroll_msg_key', models.CharField(default=u'default', help_text=u'The message to show when a user is blocked from enrollment.', max_length=255, choices=[(u'default', u'Default'), (u'embargo', u'Embargo')])),
+                ('access_msg_key', models.CharField(default=u'default', help_text=u'The message to show when a user is blocked from accessing a course.', max_length=255, choices=[(u'default', u'Default'), (u'embargo', u'Embargo')])),
                 ('disable_access_check', models.BooleanField(default=False, help_text='Allow users who enrolled in an allowed country to access restricted courses from excluded countries.')),
             ],
         ),

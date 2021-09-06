@@ -1,10 +1,12 @@
 """
 Unit tests for courseware context_processor
 """
+
+
 from django.contrib.auth.models import AnonymousUser
 from mock import Mock
 
-from courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -14,7 +16,6 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for courseware context_processor
     """
-    shard = 4
 
     def setUp(self):
         super(UserPrefContextProcessorUnitTest, self).setUp()

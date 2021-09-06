@@ -1,5 +1,6 @@
 """Test Entitlements models"""
 
+
 import unittest
 from datetime import timedelta
 from uuid import uuid4
@@ -8,8 +9,6 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
 from mock import patch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -18,7 +17,9 @@ from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -300,3 +301,31 @@ class TestModels(TestCase):
         expired_at_datetime = entitlement.expired_at_datetime
         assert expired_at_datetime
         assert entitlement.expired_at
+
+    @patch("entitlements.models.get_course_uuid_for_course")
+    @patch("entitlements.models.CourseEntitlement.refund")
+    def test_unenroll_entitlement_with_audit_course_enrollment(self, mock_refund, mock_get_course_uuid):
+        """
+        Test that entitlement is not refunded if un-enroll is called on audit course un-enroll.
+        """
+        self.enrollment.mode = CourseMode.AUDIT
+        self.enrollment.user = self.user
+        self.enrollment.save()
+        entitlement = CourseEntitlementFactory.create(user=self.user)
+        mock_get_course_uuid.return_value = entitlement.course_uuid
+        CourseEnrollment.unenroll(self.user, self.course.id)
+
+        assert not mock_refund.called
+        entitlement.refresh_from_db()
+        assert entitlement.expired_at is None
+
+        self.enrollment.mode = CourseMode.VERIFIED
+        self.enrollment.is_active = True
+        self.enrollment.save()
+        entitlement.enrollment_course_run = self.enrollment
+        entitlement.save()
+        CourseEnrollment.unenroll(self.user, self.course.id)
+
+        assert mock_refund.called
+        entitlement.refresh_from_db()
+        assert entitlement.expired_at < now()

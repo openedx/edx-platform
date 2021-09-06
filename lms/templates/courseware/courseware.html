@@ -3,6 +3,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
+import six
 import waffle
 
 from django.conf import settings
@@ -15,8 +16,18 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_page_title, COURSE_OUTLINE_PAGE_FLAG
 %>
 <%
-  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
+   include_special_exams = (
+   request.user.is_authenticated and
+   settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+   (course.enable_proctored_exams or course.enable_timed_exams)
+   )
 %>
+
+% if display_reset_dates_banner:
+    <script type="text/javascript">
+        $('.reset-deadlines-banner').css('display', 'flex');
+    </script>
+% endif
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
@@ -69,7 +80,7 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
   <%static:js group='courseware'/>
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
-  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+  % if show_search:
     <%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
         var courseId = $('.courseware-results').data('courseId');
         CourseSearchFactory({
@@ -131,7 +142,7 @@ ${HTML(fragment.foot_html())}
               </a>
           </div>
 
-          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+          % if show_search:
             <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
               <form class="search-form">
                 <label for="course-search-input" class="sr">${_('Course Search')}</label>
@@ -174,13 +185,13 @@ ${HTML(fragment.foot_html())}
                             % endif
                             % if chapter:
                                 <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
-                                    <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
+                                    <a href="${course_url}#${six.text_type(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
                             % if section:
                                 <span class="nav-item nav-item-section">
-                                    <a href="${course_url}#${unicode(section.location)}">${section.display_name_with_default}</a>
+                                    <a href="${course_url}#${six.text_type(section.location)}">${section.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif

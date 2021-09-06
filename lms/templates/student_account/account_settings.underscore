@@ -1,5 +1,16 @@
 <main id="main" aria-label="Content" tabindex="-1">
 <div class="account-settings-container">
+    <% if (message) { %>
+        <div class="account-settings-message">
+            <div id="beta-language-message" class="alert-message warning" aria-live="assertive" role="alert">
+                <span><%= HtmlUtils.ensureHtml(message) %></span>
+                <div class="alert-actions">
+                    <button class="btn-alert-primary" data-old-lang-code="<%- oldLangCode %>"><%- gettext('Switch Language Back') %></button>
+                    <a href="<%- helpTranslateLink %>" rel="noopener" target="_blank" class="btn-alert-secondary"><%= HtmlUtils.ensureHtml(helpTranslateText) %></a>
+                </div>
+            </div>
+        </div>
+    <% } %>
     <div class="wrapper-header">
         <h2 class="header-title"><%- gettext("Account Settings") %></h2>
         <div class="left list-inline account-nav" role="tablist">

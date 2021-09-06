@@ -2,16 +2,14 @@
 Tests for the CCXCon celery tasks
 """
 
+
 import mock
-from nose.plugins.attrib import attr
-
 from django.test import TestCase
-
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.ccxcon import api, tasks
 
 
-@attr(shard=2)
 class CCXConTaskTestCase(TestCase):
     """
     Tests for CCXCon tasks.

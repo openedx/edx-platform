@@ -1,8 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <h2>${_("Manage student accounts")}</h2>
@@ -62,14 +64,14 @@ PLACEHOLDER_USERNAME = '__PLACEHOLDER_USERNAME'
 <script type="text/javascript">
 $(function() {
     var form = $(".manage-accounts-form"),
-        profileUrl = "${reverse('accounts_api', kwargs={'username': PLACEHOLDER_USERNAME})}",
-        removeProfileUrl = "${reverse('profile_image_remove', kwargs={'username': PLACEHOLDER_USERNAME})}",
+        profileUrl = "${reverse('accounts_api', kwargs={'username': PLACEHOLDER_USERNAME}) | n, js_escaped_string}",
+        removeProfileUrl = "${reverse('profile_image_remove', kwargs={'username': PLACEHOLDER_USERNAME}) | n, js_escaped_string}",
         refreshProfile;
 
     refreshProfile = function(username) {
         return $.ajax({
             type: "GET",
-            url: profileUrl.replace('${PLACEHOLDER_USERNAME}', username),
+            url: profileUrl.replace('${PLACEHOLDER_USERNAME | n, js_escaped_string}', username),
             success: function(response) {
                 var imageUrl = response["profile_image"]["image_url_medium"];
                 $("#profile-image", form).attr("src", imageUrl);
@@ -86,10 +88,10 @@ $(function() {
         var username = $('#username', form).val(),
             action = $("input:radio[name=account_action]:checked", form).val();
         if (action === 'remove_profile_image') {
-            $(".account-change-status").text("${_('working')}");
+            $(".account-change-status").text("${_('working') | n, js_escaped_string}");
             $.ajax({
                 type: "POST",
-                url: removeProfileUrl.replace('${PLACEHOLDER_USERNAME}', username),
+                url: removeProfileUrl.replace('${PLACEHOLDER_USERNAME  | n, js_escaped_string}', username),
                 success: function(response) {
                     refreshProfile(username).always(function() {
                         $("#profile-image", form).focus();
@@ -98,13 +100,13 @@ $(function() {
                 }
             });
         } else if (action) {
-            $(".account-change-status").text("${_('working')}");
+            $(".account-change-status").text("${_('working')  | n, js_escaped_string}");
             $.ajax({
                 type: "POST",
                 url: form.attr('action'),
                 data: form.serialize(),
                 success: function(response) {
-                    $(".account-change-status").html(response.message);
+                    $(".account-change-status").text(response.message);
                 }
             });
         } else {

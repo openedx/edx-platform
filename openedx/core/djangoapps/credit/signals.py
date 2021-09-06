@@ -2,8 +2,10 @@
 This file contains receivers of course publication signals.
 """
 
+
 import logging
 
+import six
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
@@ -27,7 +29,7 @@ def on_course_publish(course_key):
     from openedx.core.djangoapps.credit import api, tasks
 
     if api.is_credit_course(course_key):
-        tasks.update_credit_course_requirements.delay(unicode(course_key))
+        tasks.update_credit_course_requirements.delay(six.text_type(course_key))
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
 
 
@@ -49,7 +51,7 @@ def listen_for_grade_calculation(sender, user, course_grade, course_key, deadlin
     # This needs to be imported here to avoid a circular dependency
     # that can cause migrations to fail.
     from openedx.core.djangoapps.credit import api
-    course_id = CourseKey.from_string(unicode(course_key))
+    course_id = CourseKey.from_string(six.text_type(course_key))
     is_credit = api.is_credit_course(course_id)
     if is_credit:
         requirements = api.get_credit_requirements(course_id, namespace='grade')

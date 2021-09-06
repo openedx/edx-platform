@@ -27,13 +27,13 @@
         {% include "wiki/includes/article_menu.html" %}
       </ul>
       <div class="timestamp">
-        <span class="label">{% trans "Last modified:" %}</span><br />
+        <span class="label">{% trans "Last modified:" as tmsg %} {{ tmsg | force_escape}}</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
 
       {% if urlpath %}
       <div class="see-children">
-        <a href="{% url 'wiki:dir' path=urlpath.path %}">{% trans "See all children" %}</a>
+        <a href="{% url 'wiki:dir' path=urlpath.path %}">{% trans "See all children" as tmsg %} | {{ tmsg | force_escape}}</a>
       </div>
       {% endif %}
     </div>
@@ -44,5 +44,5 @@
 {% endblock %}
 
 {% block footer_prepend %}
-  <p><em>{% trans "This article was last modified:" %} {{ article.current_revision.modified }}</em></p>
+  <p><em>{% trans "This article was last modified:" as tmsg %} | {{tmsg | force_escape}} {{ article.current_revision.modified }}</em></p>
 {% endblock %}

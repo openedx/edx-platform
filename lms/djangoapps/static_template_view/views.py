@@ -1,7 +1,10 @@
+# pylint: disable=missing-module-docstring
+
 # View for semi-static templatized content.
 #
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
+
 
 import mimetypes
 
@@ -11,8 +14,8 @@ from django.shortcuts import redirect
 from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 from mako.exceptions import TopLevelLookupException
+
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
@@ -90,7 +93,8 @@ def render_press_release(request, slug):
 
 
 @fix_crum_request
-def render_404(request):
+def render_404(request, exception):
+    request.view_name = '404'
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
 

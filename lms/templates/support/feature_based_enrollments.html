@@ -1,0 +1,72 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">
+${_("Feature Based Enrollments")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Feature Based Enrollments")}</h1>
+  <div class="fb-enrollments-content">
+    <div class="fb-enrollments-search">
+        <form class="fb-enrollments-form">
+            <label class="sr" for="course-query-input">Search</label>
+            <input id="course-query-input" type="text" name="course_key" value="${course_key}" placeholder="Course Id">
+            <input type="submit" value="Search" class="btn-disable-on-submit">
+        </form>
+    </div>
+
+    <div class="fb-enrollments-results">
+      % if results:
+        <table id="fb-enrollments-table" class="fb-enrollments-table display compact nowrap">
+          <thead>
+            <tr>
+                <th>${_("Course ID")}</th>
+                <th>${_("Course Name")}</th>
+                <th class="fb-enrollments-gating-col" colspan=3>${_("Content Type Gating")}</th>
+                <th colspan=3>${_("Course Duration Limits")}</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th class="fb-enrollments-gating-col">${_("Is Enabled")}</th>
+                <th class="fb-enrollments-gating-col">${_("Enabled As Of")}</th>
+                <th class="fb-enrollments-gating-col">${_("Reason")}</th>
+                <th>${_("Is Enabled")}</th>
+                <th>${_("Enabled As Of")}</th>
+                <th>${_("Reason")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${results['course_id']}</td>
+              <td>${results['course_name']}</td>
+              <td class="fb-enrollments-gating-col">
+                ${results['gating_config']['enabled']}
+              </td>
+              <td class="fb-enrollments-gating-col">
+                ${results['gating_config'].get('enabled_as_of', 'N/A') if results['gating_config']['enabled'] else 'N/A'}
+              </td>
+              <td class="fb-enrollments-gating-col">
+                ${results['gating_config']['reason']}
+              </td>
+              <td>${results['duration_config']['enabled']}</td>
+              <td>${results['duration_config'].get('enabled_as_of', 'N/A') if results['duration_config']['enabled'] else 'N/A'}</td>
+              <td>${results['duration_config']['reason']}</td>
+            </tr>
+          </tbody>
+        </table>
+      % elif course_key:
+        <div>${_("No results found")}</div>
+      % endif
+    </div>
+  </div>
+</section>
+</%block>

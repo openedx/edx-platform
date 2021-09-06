@@ -1,12 +1,15 @@
 (function(define) {
     'use strict';
     define([
+        'underscore',
         'backbone',
         'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
         'teams/js/views/teams',
         'common/js/components/views/paging_header',
-        'text!teams/templates/team-actions.underscore'
-    ], function(Backbone, gettext, TeamsView, PagingHeader, teamActionsTemplate) {
+        'text!teams/templates/team-actions.underscore',
+        'teams/js/views/team_utils'
+    ], function(_, Backbone, gettext, HtmlUtils, TeamsView, PagingHeader, teamActionsTemplate, TeamUtils) {
         var TopicTeamsView = TeamsView.extend({
             events: {
                 'click a.browse-teams': 'browseTeams',
@@ -27,15 +30,19 @@
                     // that they create. This means that if multiple team membership is
                     // disabled that they cannot create a new team when they already
                     // belong to one.
-                return this.context.staff || this.context.privileged || this.myTeamsCollection.length === 0;
+                return this.context.userInfo.staff
+                    || this.context.userInfo.privileged
+                    || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
+                        && this.myTeamsCollection.length === 0);
             },
 
             render: function() {
                 var self = this;
                 this.collection.refresh().done(function() {
+                    var message;
                     TeamsView.prototype.render.call(self);
                     if (self.canUserCreateTeam()) {
-                        var message = interpolate_text(
+                        message = interpolate_text(  // eslint-disable-line no-undef
                                 // Translators: this string is shown at the bottom of the teams page
                                 // to find a team to join or else to create a new one. There are three
                                 // links that need to be included in the message:
@@ -44,7 +51,12 @@
                                 // 3. create a new team
                                 // Be careful to start each link with the appropriate start indicator
                                 // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
-                                _.escape(gettext("{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
+                                _.escape(gettext(
+                                    '{browse_span_start}Browse teams in other ' +
+                                    'topics{span_end} or {search_span_start}search teams{span_end} ' +
+                                    'in this topic. If you still can\'t find a team to join, ' +
+                                    '{create_span_start}create a new team in this topic{span_end}.'
+                                )),
                             {
                                 browse_span_start: '<a class="browse-teams" href="">',
                                 search_span_start: '<a class="search-teams" href="">',
@@ -52,7 +64,10 @@
                                 span_end: '</a>'
                             }
                             );
-                        self.$el.append(_.template(teamActionsTemplate)({message: message}));
+                        HtmlUtils.append(
+                            self.$el,
+                            HtmlUtils.template(teamActionsTemplate)({message: message})
+                        );
                     }
                 });
                 return this;
@@ -87,6 +102,12 @@
                     srInfo: this.srInfo,
                     showSortControls: this.showSortControls
                 });
+            },
+
+            getTopic: function(topicId) { // eslint-disable-line no-unused-vars
+                var deferred = $.Deferred();
+                deferred.resolve(this.model);
+                return deferred.promise();
             }
         });
 

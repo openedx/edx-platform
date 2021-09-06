@@ -2,9 +2,10 @@
 Unit tests for the VerificationDeadline signals
 """
 
-from datetime import datetime, timedelta
 
-from pytz import UTC
+from datetime import timedelta
+
+from django.utils.timezone import now
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
@@ -19,11 +20,10 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
     Tests for the VerificationDeadline signal
     """
-    shard = 4
 
     def setUp(self):
         super(VerificationDeadlineSignalTest, self).setUp()
-        self.end = datetime.now(tz=UTC).replace(microsecond=0) + timedelta(days=7)
+        self.end = now().replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         VerificationDeadline.objects.all().delete()
 
@@ -35,7 +35,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
 
     def test_deadline(self):
         """ Verify deadline is set to course end date by signal when changed. """
-        deadline = datetime.now(tz=UTC) - timedelta(days=7)
+        deadline = now() - timedelta(days=7)
         VerificationDeadline.set_deadline(self.course.id, deadline)
 
         _listen_for_course_publish('store', self.course.id)
@@ -43,7 +43,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
 
     def test_deadline_explicit(self):
         """ Verify deadline is unchanged by signal when explicitly set. """
-        deadline = datetime.now(tz=UTC) - timedelta(days=7)
+        deadline = now() - timedelta(days=7)
         VerificationDeadline.set_deadline(self.course.id, deadline, is_explicit=True)
 
         _listen_for_course_publish('store', self.course.id)
@@ -57,7 +57,6 @@ class RetirementSignalTest(ModuleStoreTestCase):
     """
     Tests for the VerificationDeadline signal
     """
-    shard = 4
 
     def _create_entry(self):
         """

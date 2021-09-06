@@ -54,6 +54,7 @@ instance::
     ... Foo.DoesNotExist
 """
 
+
 from django.db.models.signals import post_delete, post_save
 
 from .core import delete_instance, get_instance

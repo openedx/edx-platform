@@ -3,6 +3,7 @@ Zendesk Proxy Configuration
 
 """
 
+
 from django.apps import AppConfig
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
@@ -30,11 +31,11 @@ class ZendeskProxyConfig(AppConfig):
         PluginSettings.CONFIG: {
             ProjectType.CMS: {
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
             },
             ProjectType.LMS: {
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
             }
         }
     }

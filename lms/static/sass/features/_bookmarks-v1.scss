@@ -7,8 +7,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
   padding: ($baseline/4);
 
   > div {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     display: inline-block;
   }
 }

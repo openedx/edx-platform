@@ -52,7 +52,9 @@
 
       .logo {
         @include border-right(1px solid rgb(200, 200, 200));
-        @include box-sizing(border-box);
+
+        box-sizing: border-box;
+
         @include float(left);
 
         height: 115px;
@@ -70,7 +72,8 @@
       }
 
       h2.mission-quote {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
+
         @include float(right);
 
         font-style: italic;
@@ -107,8 +110,7 @@
       }
 
       .photo {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         background: rgb(255, 255, 255);
         border: 1px solid rgb(210, 210, 210);
         margin-top: 37px;
@@ -123,7 +125,8 @@
       }
 
       > article {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
+
         @include float(left);
         @include padding-left($baseline);
 
@@ -170,8 +173,8 @@
 
     nav.categories {
       border: 1px solid rgb(220, 220, 220);
+      box-sizing: border-box;
 
-      @include box-sizing(border-box);
       @include float(left);
       @include margin-left(flex-gutter());
 
@@ -244,8 +247,8 @@
       .article-cover {
         background: rgb(255, 255, 255);
         border: 1px solid rgb(120, 120, 120);
+        box-sizing: border-box;
 
-        @include box-sizing(border-box);
         @include float(left);
 
         height: 140px;
@@ -292,8 +295,7 @@
     margin: 0 auto;
 
     .photo {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       background: rgb(255, 255, 255);
       border: 1px solid rgb(210, 210, 210);
       padding: 1px;
@@ -308,7 +310,8 @@
     }
 
     .contacts {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include float(left);
       @include padding-left(40px);
 

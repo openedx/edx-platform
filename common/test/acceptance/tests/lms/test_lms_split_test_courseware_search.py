@@ -2,9 +2,8 @@
 Test courseware search
 """
 
-import json
 
-from nose.plugins.attrib import attr
+import json
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -16,11 +15,11 @@ from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from xmodule.partitions.partitions import Group
 
 
-@attr(shard=1)
 class SplitTestCoursewareSearchTest(ContainerBase):
     """
     Test courseware search on Split Test Module.
     """
+    shard = 1
     USERNAME = 'STUDENT_TESTER'
     EMAIL = 'student101@example.com'
 

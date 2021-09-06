@@ -2,17 +2,18 @@
 Tests for recalculate_learner_grades management command.
 """
 
+
 from tempfile import NamedTemporaryFile
 
 import mock
 
 from lms.djangoapps.grades.management.commands import recalculate_learner_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):
@@ -47,8 +48,11 @@ class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCa
     )
     def test_recalculate_grades(self, task_mock):
         with NamedTemporaryFile() as csv:
-            csv.write("course_id,user_id\n")
-            csv.writelines(course + "," + user + "\n" for user, course in self.user_course_pairs)
+            csv.write(b"course_id,user_id\n")
+            csv.writelines(
+                "{},{}\n".format(course, user).encode()
+                for user, course in self.user_course_pairs
+            )
             csv.seek(0)
 
             self.command.handle(csv=csv.name)

@@ -1,20 +1,20 @@
 """
 Tests for wiki middleware.
 """
+
+
 from unittest import skip
 
 from django.test.client import Client
-from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from course_wiki.views import get_or_create_root
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestComprehensiveTheming(ModuleStoreTestCase):
     """Tests for comprehensive theming of wiki pages."""
 

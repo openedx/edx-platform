@@ -1,12 +1,15 @@
 """
 django admin pages for certificates models
 """
+
+
 from operator import itemgetter
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -31,7 +34,7 @@ class CertificateTemplateForm(forms.ModelForm):
         self.fields['organization_id'] = forms.TypedChoiceField(
             choices=org_choices, required=False, coerce=int, empty_value=None
         )
-        languages = settings.CERTIFICATE_TEMPLATE_LANGUAGES.items()
+        languages = list(settings.CERTIFICATE_TEMPLATE_LANGUAGES.items())
         lang_choices = sorted(languages, key=itemgetter(1))
         lang_choices.insert(0, (None, 'All Languages'))
         self.fields['language'] = forms.ChoiceField(
@@ -55,8 +58,17 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplateAsset model
     """
+
     list_display = ('description', 'asset_slug',)
     prepopulated_fields = {"asset_slug": ("description",)}
+
+    # see PROD-1153 for the details
+    def changelist_view(self, request, extra_context=None):
+        if '.stage.edx.org' in request.get_host():
+            extra_context = {'title': mark_safe('Select Certificate Template Asset to change <br/><br/>'
+                                                '<div><strong style="color: red;"> Warning!</strong> Updating '
+                                                'stage asset would also update production asset</div>')}
+        return super(CertificateTemplateAssetAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):

@@ -38,23 +38,6 @@ class CourseCardModel extends Backbone.Model {
     return desiredCourseRun;
   }
 
-  getCourseRunWithHighestGrade(grades) {
-    const allEnrolledCourseRuns = this.context.course_runs.filter(run => run.is_enrolled);
-    if (allEnrolledCourseRuns.length <= 1) {
-      return null;
-    }
-
-    allEnrolledCourseRuns.sort((a, b) => (grades[a.key] || 0) - (grades[b.key] || 0));
-    return allEnrolledCourseRuns[allEnrolledCourseRuns.length - 1];
-  }
-
-  updateCourseRunWithHighestGrade(grades) {
-    const courseRunWithHighestGrade = this.getCourseRunWithHighestGrade(grades);
-    if (courseRunWithHighestGrade) {
-      this.setActiveCourseRun(courseRunWithHighestGrade, this.context.user_preferences);
-    }
-  }
-
   isEnrolledInSession() {
     // Returns true if the user is currently enrolled in a session of the course
     return this.context.course_runs.find(run => run.is_enrolled) !== undefined;
@@ -152,10 +135,18 @@ class CourseCardModel extends Backbone.Model {
   formatDateString(run) {
     const pacingType = run.pacing_type;
     let dateString;
-    const start = CourseCardModel.valueIsDefined(run.start_date) ?
+    let start = CourseCardModel.valueIsDefined(run.start_date) ?
       run.advertised_start || run.start_date :
       this.get('start_date');
-    const end = CourseCardModel.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date');
+    if (start === undefined) {
+      start = CourseCardModel.valueIsDefined(run.start) ?
+        run.advertised_start || CourseCardModel.formatDate(run.start) : undefined;
+    }
+    let end = CourseCardModel.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date');
+    if (end === undefined) {
+      end = CourseCardModel.valueIsDefined(run.end) ?
+        CourseCardModel.formatDate(run.end) : undefined;
+    }
     const now = new Date();
     const startDate = new Date(start);
     const endDate = new Date(end);

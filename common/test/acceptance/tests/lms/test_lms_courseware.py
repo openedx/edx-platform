@@ -3,23 +3,25 @@
 End-to-end tests for the LMS.
 """
 
+
 import json
 from datetime import datetime, timedelta
 
 import ddt
-from nose.plugins.attrib import attr
+from six.moves import range
+
+from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.course_home import CourseHomePage
-from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage, RenderXBlockPage
+from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
+from ...pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.lms.staff_view import StaffCoursewarePage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ..helpers import EventsTestMixin, UniqueCourseTest, auto_auth, create_multiple_choice_problem
@@ -113,9 +115,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = 'Test Section {}'.format(index)
-            test_subsection_title = 'Test Subsection {}'.format(index)
-            test_unit_title = 'Test Problem {}'.format(index)
+            test_section_title = u'Test Section {}'.format(index)
+            test_subsection_title = u'Test Subsection {}'.format(index)
+            test_unit_title = u'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
@@ -153,6 +155,9 @@ class ProctoredExamTest(UniqueCourseTest):
         course_fix.add_advanced_settings({
             "enable_proctored_exams": {"value": "true"}
         })
+        course_fix.add_advanced_settings({
+            "show_review_rules": {"value": "true"}
+        })
 
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
@@ -186,7 +191,14 @@ class ProctoredExamTest(UniqueCourseTest):
         login as a verififed user
         """
 
-        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        auto_auth(
+            self.browser,
+            self.USERNAME,
+            self.EMAIL,
+            False,
+            self.course_id,
+            should_manually_verify=True
+        )
 
         # the track selection page cannot be visited. see the other tests to see if any prereq is there.
         # Navigate to the track selection page
@@ -201,28 +213,6 @@ class ProctoredExamTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-    def _verify_user(self):
-        """
-        Takes user through the verification flow and then marks the verification as 'approved'.
-        """
-        # Immediately verify the user
-        self.immediate_verification_page.immediate_verification()
-
-        # Take face photo and proceed to the ID photo step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Take ID photo and proceed to the review photos step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Submit photos and proceed to the enrollment confirmation step
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Mark the verification as passing.
-        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
-        verification.mark_approved()
-
     def test_can_create_proctored_exam_in_studio(self):
         """
         Given that I am a staff member
@@ -236,6 +226,30 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.studio_course_outline.proctoring_items_are_displayed())
+
+    def test_proctored_exam_flow(self):
+        """
+        Given that I am a staff member on the exam settings section
+        select advanced settings tab
+        When I Make the exam proctored.
+        And I login as a verified student.
+        And I verify the user's ID.
+        And visit the courseware as a verified student.
+        Then I can see an option to take the exam as a proctored exam.
+        """
+        LogoutPage(self.browser).visit()
+        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog()
+
+        self.studio_course_outline.select_advanced_tab()
+        self.studio_course_outline.make_exam_proctored()
+
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+
+        self.courseware_page.visit()
+        self.assertTrue(self.courseware_page.can_start_proctored_exam)
 
     def _setup_and_take_timed_exam(self, hide_after_due=False):
         """
@@ -323,7 +337,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.select_proctored_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
-        self.assertTrue(self.studio_course_outline.exam_review_rules_field_visible())
 
         self.studio_course_outline.select_practice_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
@@ -509,58 +522,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
             sequence_ui_events
         )
 
-    # TODO: TNL-6546: Delete this whole test if these events are going away(?)
-    def test_outline_selected_events(self):
-        self.courseware_page.visit()
-
-        self.courseware_page.nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        # test UI events emitted by navigating via the course outline
-        filter_selected_events = lambda event: event.get('name', '') == 'edx.ui.lms.outline.selected'
-        selected_events = self.wait_for_events(event_filter=filter_selected_events, timeout=2)
-
-        # note: target_url is tested in unit tests, as the url changes here with every test (it includes GUIDs).
-        self.assert_events_match(
-            [
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 1,2 ',
-                        'widget_placement': 'accordion',
-                    }
-                },
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 2,1 ',
-                        'widget_placement': 'accordion',
-
-                    }
-                },
-            ],
-            selected_events
-        )
-
-    # TODO: Delete as part of TNL-6546 / LEARNER-71
-    def test_link_clicked_events(self):
-        """
-        Given that I am a user in the courseware
-        When I navigate via the left-hand nav
-        Then a link clicked event is logged
-        """
-        self.courseware_page.visit()
-
-        self.courseware_page.nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        filter_link_clicked = lambda event: event.get('name', '') == 'edx.ui.lms.link_clicked'
-        link_clicked_events = self.wait_for_events(event_filter=filter_link_clicked, timeout=2)
-        self.assertEqual(len(link_clicked_events), 2)
-
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
@@ -568,9 +529,9 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
         Verifies that the navigation state is as expected.
         """
         self.assertTrue(self.courseware_page.nav.is_on_section(section_title, subsection_title))
-        self.assertEquals(self.courseware_page.sequential_position, subsection_position)
-        self.assertEquals(self.courseware_page.is_next_button_enabled, next_enabled)
-        self.assertEquals(self.courseware_page.is_previous_button_enabled, prev_enabled)
+        self.assertEqual(self.courseware_page.sequential_position, subsection_position)
+        self.assertEqual(self.courseware_page.is_next_button_enabled, next_enabled)
+        self.assertEqual(self.courseware_page.is_previous_button_enabled, prev_enabled)
 
     def test_tab_position(self):
         # test that using the position in the url direct to correct tab in courseware
@@ -905,71 +866,3 @@ class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
-
-    def test_courseware_publish_completion_is_sent_on_view(self):
-        """
-        Test that when viewing courseware XBlocks are correctly marked as completed on view.
-        """
-        courseware_page = CoursewarePage(self.browser, self.course_id)
-        courseware_page.visit()
-        courseware_page.wait_for_page()
-
-        # Initially, the first two blocks in the first vertical should be marked as needing to be completed on view.
-        self.assertEqual(
-            courseware_page.xblock_components_mark_completed_on_view_value(),
-            [self.COMPLETION_BY_VIEWING_DELAY_MS, self.COMPLETION_BY_VIEWING_DELAY_MS, None],
-        )
-        # Wait and verify that the first block which is completely visible is marked as completed.
-        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
-        self.assertEqual(
-            courseware_page.xblock_components_mark_completed_on_view_value(),
-            ['0', self.COMPLETION_BY_VIEWING_DELAY_MS, None],
-        )
-
-        # Scroll to the bottom of the second block.
-        courseware_page.scroll_to_element('#html2-end', 'Scroll to end of html 2 block')
-        # Wait and verify that the second block is also now marked as completed.
-        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(1)
-        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', '0', None])
-
-        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
-        self.browser.refresh()
-        courseware_page.wait_for_page()
-        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None, None])
-
-        courseware_page.go_to_sequential_position(2)
-
-        # Initially, the first block in the second vertical should be marked as needing to be completed on view.
-        self.assertEqual(
-            courseware_page.xblock_components_mark_completed_on_view_value(),
-            [self.COMPLETION_BY_VIEWING_DELAY_MS, None],
-        )
-        # Wait and verify that the first block which is completely visible is marked as completed.
-        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
-        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', None])
-
-        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
-        self.browser.refresh()
-        courseware_page.wait_for_page()
-        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None])
-
-    def test_render_xblock_publish_completion_is_sent_on_view(self):
-        """
-        Test that when viewing a XBlock in render_xblock, it is correctly marked as completed on view.
-        """
-        block_page = RenderXBlockPage(self.browser, self.html_1_block.locator)
-        block_page.visit()
-        block_page.wait_for_page()
-
-        # Initially the block should be marked as needing to be completed on view.
-        self.assertEqual(
-            block_page.xblock_components_mark_completed_on_view_value(), [self.COMPLETION_BY_VIEWING_DELAY_MS]
-        )
-        # Wait and verify that the block is marked as completed on view.
-        block_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
-        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), ['0'])
-
-        # After page refresh, it should not be marked as needing to be completed on view.
-        self.browser.refresh()
-        block_page.wait_for_page()
-        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), [None])

@@ -82,4 +82,26 @@ describe('Welcome Message factory', () => {
       requests.restore();
     });
   });
+
+  describe('Shortened welcome message', () => {
+    const endpointUrl = '/course/course_id/dismiss_message/';
+
+    beforeEach(() => {
+      loadFixtures('course_experience/fixtures/welcome-message-fragment.html');
+      new WelcomeMessage({  // eslint-disable-line no-new
+        dismissUrl: endpointUrl,
+      });
+    });
+
+    it('Shortened message can be toggled', () => {
+      expect($('#welcome-message-content').text()).toContain('…');
+      expect($('#welcome-message-show-more').text()).toContain('Show More');
+      $('#welcome-message-show-more').click();
+      expect($('#welcome-message-content').text()).not.toContain('…');
+      expect($('#welcome-message-show-more').text()).toContain('Show Less');
+      $('#welcome-message-show-more').click();
+      expect($('#welcome-message-content').text()).toContain('…');
+      expect($('#welcome-message-show-more').text()).toContain('Show More');
+    });
+  });
 });

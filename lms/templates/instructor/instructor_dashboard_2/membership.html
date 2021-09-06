@@ -24,12 +24,14 @@ from openedx.core.djangolib.markup import HTML, Text
         </label>
     </div>
 
-    <label>
-        ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
-        ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
-        ${_("Therefore, please give enough detail to account for this action.")}
-        <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
-    </label>
+    % if section_data['is_reason_field_enabled']:
+        <label>
+            ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+            ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+            ${_("Therefore, please give enough detail to account for this action.")}
+            <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+        </label>
+    %endif
     <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
@@ -214,6 +216,17 @@ from openedx.core.djangolib.markup import HTML, Text
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Discussion Admin")}"
     ></div>
+
+    <div class="auth-list-container"
+      data-rolename="data_researcher"
+      data-display-name="${_("Course Data Researcher")}"
+      data-info-text="
+        ${_("Course Data Researchers can access the data download tab.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Course Data Researcher")}"
+    ></div>
+
   %endif
 
   %if section_data['access']['instructor'] or section_data['access']['forum_admin']:

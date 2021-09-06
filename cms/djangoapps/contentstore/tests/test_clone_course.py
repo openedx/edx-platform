@@ -1,8 +1,11 @@
 """
 Unit tests for cloning a course between the same and different module stores.
 """
+
+
 import json
 
+import six
 from django.conf import settings
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
@@ -82,8 +85,8 @@ class CloneCourseTest(CourseTestCase):
         split_rerun_id = CourseLocator(org=org, course=course_number, run="2012_Q2")
         CourseRerunState.objects.initiated(course.id, split_rerun_id, self.user, fields['display_name'])
         result = rerun_course.delay(
-            unicode(course.id),
-            unicode(split_rerun_id),
+            six.text_type(course.id),
+            six.text_type(split_rerun_id),
             self.user.id,
             json.dumps(fields, cls=EdxJSONEncoder)
         )
@@ -106,7 +109,7 @@ class CloneCourseTest(CourseTestCase):
         # Mark the action as initiated
         fields = {'display_name': 'rerun'}
         CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
-        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id,
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
         self.assertTrue(has_course_author_access(self.user, split_course3_id), "Didn't grant access")
@@ -114,7 +117,7 @@ class CloneCourseTest(CourseTestCase):
         self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 
         # try creating rerunning again to same name and ensure it generates error
-        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id)
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id)
         self.assertEqual(result.get(), "duplicate course")
         # the below will raise an exception if the record doesn't exist
         CourseRerunState.objects.find_first(
@@ -127,7 +130,7 @@ class CloneCourseTest(CourseTestCase):
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])
-            result = rerun_course.delay(unicode(split_course3_id), unicode(split_course4_id), self.user.id,
+            result = rerun_course.delay(six.text_type(split_course3_id), six.text_type(split_course4_id), self.user.id,
                                         json.dumps(fields, cls=EdxJSONEncoder))
             self.assertIn("exception: ", result.get())
             self.assertIsNone(self.store.get_course(split_course4_id), "Didn't delete course after error")

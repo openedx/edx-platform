@@ -3,7 +3,6 @@ Command for managing commerce configuration for lms.
 We can use this command to enable/disable commerce configuration or disable checkout to E-Commerce service.
 """
 
-from __future__ import unicode_literals
 
 import logging
 
@@ -54,7 +53,7 @@ class Command(BaseCommand):
         checkout_on_ecommerce = options.get('checkout_on_ecommerce')
 
         # We are keeping id=1, because as of now, there are only one commerce configuration for the system.
-        CommerceConfiguration.objects.update_or_create(  # pylint: disable=no-member
+        CommerceConfiguration.objects.update_or_create(
             id=1,
             defaults={
                 'enabled': not disable,

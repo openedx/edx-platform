@@ -23,7 +23,8 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 ]),
                 showGroups: false,
                 editing: false,
-                usage: []
+                usage: [],
+                read_only: false
             };
         },
 
@@ -78,7 +79,8 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 scheme: this.get('scheme'),
                 description: this.get('description'),
                 version: this.get('version'),
-                groups: this.get('groups').toJSON()
+                groups: this.get('groups').toJSON(),
+                read_only: this.get('read_only')
             };
         },
 

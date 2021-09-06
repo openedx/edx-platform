@@ -1,6 +1,7 @@
 """
 Mixins for JWT auth tests.
 """
+
 from time import time
 
 from django.conf import settings

@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}You have been invited to register for {{ course_name }}{% endblocktrans %}
+{% endautoescape %}

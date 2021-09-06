@@ -167,7 +167,8 @@ footer#footer-edx-v3 {
 
   .footer-content-wrapper {
     @include outer-container;
-    @include box-sizing(border-box);
+
+    box-sizing: border-box;
   }
 
   p {
@@ -179,6 +180,10 @@ footer#footer-edx-v3 {
 
   .copyright {
     margin-top: 30px;
+
+    a {
+      text-decoration: underline !important;
+    }
 
     @include margin-left(8px);
     @include font-size(16);
@@ -516,7 +521,7 @@ footer#footer-edx-v3 {
     .edx-footer-logo {
       display: inline-flex;
 
-      @include margin-left(20px);
+      @include margin-left(0);
 
       margin-top: 5px;
     }
@@ -602,7 +607,7 @@ footer#footer-edx-v3 {
       float: none;
       display: block;
 
-      @include margin-left($baseline);
+      @include margin-left(0);
     }
 
     ul.social li {
@@ -659,7 +664,7 @@ footer#footer-edx-v3 {
 
 
     .col-xl-2 .edx-footer-logo {
-      @include margin-left($baseline);
+      @include margin-left(0);
       @include padding(0, 0, $baseline, $baseline);
     }
 
@@ -726,6 +731,7 @@ footer#footer-edx-v3 {
     .col-xl-2 .footer-language-selector {
       display: inline-block;
       width: max-content;
+      margin-left: 0;
     }
 
     ul.social li {
@@ -841,6 +847,21 @@ footer#footer-edx-v3 {
       cursor: initial;
     }
   }
+
+  .select-lang-button {
+    padding: 3px;
+    color: $m-blue-d3 !important;
+    height: 30px;
+    margin-left: 0;
+
+    &:hover,
+    &:active,
+    &:focus {
+      background: $m-blue-d3 !important;
+      color: white !important;
+    }
+  }
+
 
   @extend %ui-print-excluded;
 }

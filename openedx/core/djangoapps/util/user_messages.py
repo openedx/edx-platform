@@ -14,12 +14,15 @@ There are two common use cases:
    used to show a success message to the use.
 """
 
+
 from abc import abstractmethod
 from enum import Enum
 
+import six
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from openedx.core.djangolib.markup import Text, HTML
+
+from openedx.core.djangolib.markup import HTML, Text
 
 
 class UserMessageType(Enum):
@@ -87,7 +90,7 @@ class UserMessageCollection():
         raise NotImplementedError('Subclasses must define a namespace for messages.')
 
     @classmethod
-    def get_message_html(self, body_html, title=None):
+    def get_message_html(cls, body_html, title=None, dismissable=False, **kwargs):  # pylint: disable=unused-argument
         """
         Returns the entire HTML snippet for the message.
 
@@ -105,7 +108,7 @@ class UserMessageCollection():
         return body_html
 
     @classmethod
-    def register_user_message(self, request, message_type, body_html, **kwargs):
+    def register_user_message(cls, request, message_type, body_html, once_only=False, **kwargs):
         """
         Register a message to be shown to the user in the next page.
 
@@ -114,10 +117,12 @@ class UserMessageCollection():
             body_html (str): body of the message in html format
             title (str): optional title for the message as plain text
             dismissable (bool): shows a dismiss button (defaults to no button)
+            once_only (bool): show the message only once per request
         """
         assert isinstance(message_type, UserMessageType)
-        message = Text(self.get_message_html(body_html, **kwargs))
-        messages.add_message(request, message_type.value, Text(message), extra_tags=self.get_namespace())
+        message = Text(cls.get_message_html(body_html, **kwargs))
+        if not once_only or message not in [m.message for m in messages.get_messages(request)]:
+            messages.add_message(request, message_type.value, Text(message), extra_tags=cls.get_namespace())
 
     @classmethod
     def register_info_message(self, request, message, **kwargs):
@@ -162,7 +167,7 @@ class UserMessageCollection():
             for __, type in UserMessageType.__members__.items():
                 if type.value is level:
                     return type
-            raise 'Unable to find UserMessageType for level {level}'.format(level=level)
+            raise Exception(u'Unable to find UserMessageType for level {level}'.format(level=level))
 
         def _create_user_message(message):
             """
@@ -170,7 +175,7 @@ class UserMessageCollection():
             """
             return UserMessage(
                 type=_get_message_type_for_level(message.level),
-                message_html=unicode(message.message),
+                message_html=six.text_type(message.message),
             )
 
         django_messages = messages.get_messages(request)
@@ -184,12 +189,12 @@ class PageLevelMessages(UserMessageCollection):
     NAMESPACE = 'page_level_messages'
 
     @classmethod
-    def get_message_html(self, body_html, title=None, dismissable=False):
+    def get_message_html(cls, body_html, title=None, dismissable=False, **kwargs):
         """
         Returns the entire HTML snippet for the message.
         """
         if title:
-            title_area = Text(_('{header_open}{title}{header_close}')).format(
+            title_area = Text(_(u'{header_open}{title}{header_close}')).format(
                 header_open=HTML('<div class="message-header">'),
                 title=title,
                 header_close=HTML('</div>')
@@ -198,11 +203,11 @@ class PageLevelMessages(UserMessageCollection):
             title_area = ''
         if dismissable:
             dismiss_button = HTML(
-                '<div class="message-actions">'
-                '<button class="btn-link action-dismiss">'
-                '<span class="sr">{dismiss_text}</span>'
-                '<span class="icon fa fa-times" aria-hidden="true"></span></button>'
-                '</div>'
+                u'<div class="message-actions">'
+                u'<button class="btn-link action-dismiss">'
+                u'<span class="sr">{dismiss_text}</span>'
+                u'<span class="icon fa fa-times" aria-hidden="true"></span></button>'
+                u'</div>'
             ).format(
                 dismiss_text=Text(_("Dismiss"))
             )
@@ -210,7 +215,7 @@ class PageLevelMessages(UserMessageCollection):
             dismiss_button = ''
         return Text('{title_area}{body_area}{dismiss_button}').format(
             title_area=title_area,
-            body_area=HTML('<div class="message-content">{body_html}</div>').format(
+            body_area=HTML(u'<div class="message-content">{body_html}</div>').format(
                 body_html=body_html,
             ),
             dismiss_button=dismiss_button,

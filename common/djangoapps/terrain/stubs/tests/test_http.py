@@ -2,10 +2,14 @@
 Unit tests for stub HTTP server base class.
 """
 
-import unittest
-import requests
+
 import json
-from terrain.stubs.http import StubHttpService, StubHttpRequestHandler, require_params
+import unittest
+
+import requests
+import six
+
+from terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
 
 
 class StubHttpServiceTest(unittest.TestCase):
@@ -35,7 +39,7 @@ class StubHttpServiceTest(unittest.TestCase):
             'test_boolean': False
         }
 
-        for key, val in params.iteritems():
+        for key, val in six.iteritems(params):
 
             # JSON-encode each parameter
             post_params = {key: json.dumps(val)}
@@ -43,7 +47,7 @@ class StubHttpServiceTest(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
         # Check that the expected values were set in the configuration
-        for key, val in params.iteritems():
+        for key, val in six.iteritems(params):
             self.assertEqual(self.server.config.get(key), val)
 
     def test_bad_json(self):

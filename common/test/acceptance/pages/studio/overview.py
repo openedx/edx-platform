@@ -1,6 +1,8 @@
 """
 Course Outline page in Studio.
 """
+
+
 import datetime
 
 from bok_choy.javascript import js_defined, wait_for_js
@@ -9,6 +11,7 @@ from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from six.moves import map, range
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.container import ContainerPage
@@ -30,7 +33,7 @@ class CourseOutlineItem(object):
     NAME_SELECTOR = '.item-title'
     NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
-    STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
+    STATUS_MESSAGE_SELECTOR = '> div[class$="-status"] .status-messages'
     CONFIGURATION_BUTTON_SELECTOR = '.action-item .configure-button'
 
     def __repr__(self):
@@ -38,9 +41,9 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)  # pylint: disable=no-member
+            return u"{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
         except AttributeError:
-            return "{}(<browser>)".format(self.__class__.__name__)
+            return u"{}(<browser>)".format(self.__class__.__name__)
 
     def _bounded_selector(self, selector):
         """
@@ -50,7 +53,7 @@ class CourseOutlineItem(object):
         # This happens in the context of the CourseOutlinePage
         # pylint: disable=no-member
         if self.BODY_SELECTOR and hasattr(self, 'locator'):
-            return '{}[data-locator="{}"] {}'.format(
+            return u'{}[data-locator="{}"] {}'.format(
                 self.BODY_SELECTOR,
                 self.locator,
                 selector
@@ -81,7 +84,8 @@ class CourseOutlineItem(object):
         """
         Returns the status message of this item.
         """
-        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]  # pylint: disable=no-member
+        selector = self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)
+        return self.q(css=selector).text[0]  # pylint: disable=no-member
 
     @property
     def has_staff_lock_warning(self):
@@ -153,7 +157,7 @@ class CourseOutlineItem(object):
             select_option_by_text(groups_select, partition_name)
 
             for group_id in group_ids:
-                checkbox = self.q(css='#content-group-{group_id}'.format(group_id=group_id))
+                checkbox = self.q(css=u'#content-group-{group_id}'.format(group_id=group_id))
                 checkbox.click()
             modal.save()
 
@@ -302,11 +306,11 @@ class CourseOutlineContainer(CourseOutlineItem):
         self.scroll_to_element(css_element)  # pylint: disable=no-member
         ele = self.browser.find_element_by_css_selector(css_element)  # pylint: disable=no-member
         ActionChains(self.browser).move_to_element_with_offset(ele, 8, 8).click().perform()  # pylint: disable=no-member
-        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
+        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), u'Subsection is expanded')
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
-            "Check that the container {} has been toggled".format(self.locator)
+            u"Check that the container {} has been toggled".format(self.locator)
         ).fulfill()
 
         enable_animations(self)
@@ -348,7 +352,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         """
         Return `selector`, but limited to this particular `CourseOutlineChild` context
         """
-        return '{}[data-locator="{}"] {}'.format(
+        return u'{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector
@@ -498,6 +502,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.q(css='div.ui-loading.is-hidden').present
         ])
 
+    def click_course_status_section_start_date_link(self):
+        self.course_start_date_link.click()
+
+    def click_course_status_section_checklists_link(self):
+        self.course_checklists_link.click()
+
     def view_live(self):
         """
         Clicks the "View Live" link and switches to the new tab
@@ -522,7 +532,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Find and click on first section name in course outline
         """
-        self.q(css='{} .section-name'.format(parent_css)).first.click()
+        self.q(css=u'{} .section-name'.format(parent_css)).first.click()
 
     def get_section_name(self, parent_css='', page_refresh=False):
         """
@@ -530,21 +540,21 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         if page_refresh:
             self.browser.refresh()
-        return self.q(css='{} .section-name'.format(parent_css)).text
+        return self.q(css=u'{} .section-name'.format(parent_css)).text
 
     def section_name_edit_form_present(self, parent_css=''):
         """
         Check that section name edit form present
         """
-        return self.q(css='{} .section-name input'.format(parent_css)).present
+        return self.q(css=u'{} .section-name input'.format(parent_css)).present
 
     def change_section_name(self, new_name, parent_css=''):
         """
         Change section name of first section present in course outline
         """
         self.click_section_name(parent_css)
-        self.q(css='{} .section-name input'.format(parent_css)).first.fill(new_name)
-        self.q(css='{} .section-name .save-button'.format(parent_css)).first.click()
+        self.q(css=u'{} .section-name input'.format(parent_css)).first.fill(new_name)
+        self.q(css=u'{} .section-name .save-button'.format(parent_css)).first.click()
         self.wait_for_ajax()
 
     def sections(self):
@@ -761,6 +771,20 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
         # The Prerequisites dropdown is visible
         return self.q(css="#prereq_min_score").visible
+
+    @property
+    def has_course_status_section(self):
+        # SFE and SFE-wrapper classes come from studio-frontend and
+        # wrap content provided by the studio-frontend package
+        return self.q(css='.course-status .SFE .SFE-wrapper').is_present()
+
+    @property
+    def course_start_date_link(self):
+        return self.q(css='.status-link').first
+
+    @property
+    def course_checklists_link(self):
+        return self.q(css='.status-link').nth(1)
 
     @property
     def bottom_add_section_button(self):
@@ -980,21 +1004,21 @@ class CourseOutlineModal(object):
         """
         Set `date` value to input pointed by `selector` and `property_name`.
         """
-        month, day, year = map(int, date.split('/'))
+        month, day, year = list(map(int, date.split('/')))
         self.click(input_selector)
         if getattr(self, property_name):
-            current_month, current_year = map(int, getattr(self, property_name).split('/')[1:])
+            current_month, current_year = list(map(int, getattr(self, property_name).split('/')[1:]))
         else:  # Use default timepicker values, which are current month and year.
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
-        selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
-        for __ in xrange(abs(date_diff)):
+        selector = u"a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
+        for __ in range(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
         self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")
         EmptyPromise(
             lambda: getattr(self, property_name) == u'{m}/{d}/{y}'.format(m=month, d=day, y=year),
-            "{} is updated in modal.".format(property_name)
+            u"{} is updated in modal.".format(property_name)
         ).fulfill()
 
     def set_time(self, input_selector, time):
@@ -1159,7 +1183,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
-    def is_explicitly_locked(self, value):  # pylint: disable=arguments-differ
+    def is_explicitly_locked(self, value):
         """
         Override - sets visibility to staff_only if True, else 'visible'.
 

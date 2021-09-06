@@ -8,6 +8,7 @@ Provides:
         as the `passthrough_options` argument to the decorated function
 """
 
+
 from optparse import BadOptionError, OptionParser
 
 import paver.tasks
@@ -58,9 +59,9 @@ class PassthroughOptionParser(OptionParser):
 
             if len(rargs) < nargs:
                 if nargs == 1:
-                    self.error("%s option requires an argument" % opt)
+                    self.error(u"%s option requires an argument" % opt)
                 else:
-                    self.error("%s option requires %d arguments"
+                    self.error(u"%s option requires %d arguments"
                                % (opt, nargs))
             elif nargs == 1:
                 value = rargs.pop(0)
@@ -69,7 +70,7 @@ class PassthroughOptionParser(OptionParser):
                 del rargs[0:nargs]
 
         elif had_explicit_value:
-            self.error("%s option does not take a value" % opt)
+            self.error(u"%s option does not take a value" % opt)
 
         else:
             value = None
@@ -103,9 +104,9 @@ class PassthroughOptionParser(OptionParser):
                 nargs = option.nargs
                 if len(rargs) < nargs:
                     if nargs == 1:
-                        self.error("%s option requires an argument" % opt)
+                        self.error(u"%s option requires an argument" % opt)
                     else:
-                        self.error("%s option requires %d arguments"
+                        self.error(u"%s option requires %d arguments"
                                    % (opt, nargs))
 
                 elif nargs == 1:

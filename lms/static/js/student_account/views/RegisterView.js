@@ -133,23 +133,24 @@
 
                 render: function(html) {
                     var fields = html || '',
-                        formErrorsTitle = gettext('An error occurred.');
+                        formErrorsTitle = gettext('An error occurred.'),
+                        renderHtml = _.template(this.tpl)({
+                            /* We pass the context object to the template so that
+                             * we can perform variable interpolation using sprintf
+                             */
+                            context: {
+                                fields: fields,
+                                currentProvider: this.currentProvider,
+                                syncLearnerProfileData: this.syncLearnerProfileData,
+                                providers: this.providers,
+                                hasSecondaryProviders: this.hasSecondaryProviders,
+                                platformName: this.platformName,
+                                autoRegisterWelcomeMessage: this.autoRegisterWelcomeMessage,
+                                registerFormSubmitButtonText: this.registerFormSubmitButtonText
+                            }
+                        });
 
-                    $(this.el).html(_.template(this.tpl)({
-                    /* We pass the context object to the template so that
-                     * we can perform variable interpolation using sprintf
-                     */
-                        context: {
-                            fields: fields,
-                            currentProvider: this.currentProvider,
-                            syncLearnerProfileData: this.syncLearnerProfileData,
-                            providers: this.providers,
-                            hasSecondaryProviders: this.hasSecondaryProviders,
-                            platformName: this.platformName,
-                            autoRegisterWelcomeMessage: this.autoRegisterWelcomeMessage,
-                            registerFormSubmitButtonText: this.registerFormSubmitButtonText
-                        }
-                    }));
+                    HtmlUtils.setHtml($(this.el), HtmlUtils.HTML(renderHtml));
 
                     this.postRender();
 
@@ -195,7 +196,9 @@
 
                             // Hide each input tip
                             $(this).children().each(function() {
-                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
+                                // This is a 1 instead of 0 so the error message for a field is not
+                                // hidden on blur and only the help tip is hidden.
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 1) {
                                     $(this).addClass('hidden');
                                 }
                             });
@@ -259,7 +262,7 @@
                     $('label a').click(function(ev) {
                         ev.stopPropagation();
                         ev.preventDefault();
-                        window.open($(this).attr('href'), $(this).attr('target'));
+                        window.open($(this).attr('href'), $(this).attr('target'), 'noopener');
                     });
                     $('.form-field').each(function() {
                         $(this).find('option:first').html('');
@@ -270,6 +273,9 @@
                         if ($input.length > 0 && !isCheckbox) {
                             handleInputBehavior($input);
                         }
+                    });
+                    $('#register-confirm_email').bind('cut copy paste', function(e) {
+                        e.preventDefault();
                     });
                     setTimeout(handleAutocomplete, 1000);
                 },
@@ -327,8 +333,10 @@
                         error = isCheckbox ? '' : decisions.validation_decisions[name];
 
                     if (hasError && this.negativeValidationEnabled) {
+                        this.addValidationErrorMsgForScreenReader($el);
                         this.renderLiveValidationError($el, $label, $requiredTextLabel, $icon, $errorTip, error);
                     } else if (this.positiveValidationEnabled) {
+                        this.removeValidationErrorMsgForScreenReader($el);
                         this.renderLiveValidationSuccess($el, $label, $requiredTextLabel, $icon, $errorTip);
                     }
                 },
@@ -339,6 +347,16 @@
 
                 getIcon: function($el) {
                     return $('#' + $el.attr('id') + '-validation-icon');
+                },
+
+                addValidationErrorMsgForScreenReader: function($el) {
+                    var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                    $validation_node.find('.sr-only').text('ERROR:');
+                },
+
+                removeValidationErrorMsgForScreenReader: function($el) {
+                    var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                    $validation_node.find('.sr-only').text('');
                 },
 
                 getErrorTip: function($el) {

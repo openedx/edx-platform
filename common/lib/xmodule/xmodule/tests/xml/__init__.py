@@ -1,18 +1,20 @@
 """
 Xml parsing tests for XModules
 """
+
+
 import pprint
+
 from django.test import TestCase
 from lxml import etree
 from mock import Mock
+from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.keys import CourseKey
-
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xmodule.x_module import XMLParsingSystem, policy_key
 
 
 class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable=abstract-method

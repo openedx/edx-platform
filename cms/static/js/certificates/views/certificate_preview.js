@@ -8,9 +8,10 @@ define([
     'js/views/baseview',
     'common/js/components/utils/view_utils',
     'common/js/components/views/feedback_notification',
-    'text!templates/certificate-web-preview.underscore'
+    'text!templates/certificate-web-preview.underscore',
+    'edx-ui-toolkit/js/utils/html-utils'
 ],
-function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate) {
+function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate, HtmlUtils) {
     'use strict';
     var CertificateWebPreview = BaseView.extend({
         el: $('.preview-certificate'),
@@ -27,7 +28,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         },
 
         render: function() {
-            this.$el.html(_.template(certificateWebPreviewTemplate)({
+            HtmlUtils.setHtml(this.$el, HtmlUtils.template(certificateWebPreviewTemplate)({
                 course_modes: this.course_modes,
                 certificate_web_view_url: this.certificate_web_view_url,
                 is_active: this.is_active
@@ -36,13 +37,8 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         },
 
         toggleCertificateActivation: function() {
-            var msg = 'Activating';
-            if (this.is_active) {
-                msg = 'Deactivating';
-            }
-
             var notification = new NotificationView.Mini({
-                title: gettext(msg)
+                title: gettext(this.is_active ? 'Deactivating' : 'Activating')
             });
 
             $.ajax({

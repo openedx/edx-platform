@@ -1,7 +1,7 @@
 """
 View decorator to add a maintenance banner configured in settings.
 """
-from __future__ import absolute_import
+
 
 from functools import wraps
 

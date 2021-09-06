@@ -2,9 +2,11 @@
 Tests to verify that CorrectMap behaves correctly
 """
 
-import unittest
-from capa.correctmap import CorrectMap
+
 import datetime
+import unittest
+
+from capa.correctmap import CorrectMap
 
 
 class CorrectMapTest(unittest.TestCase):

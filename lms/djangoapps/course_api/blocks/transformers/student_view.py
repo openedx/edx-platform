@@ -1,6 +1,8 @@
 """
 Student View Transformer
 """
+
+
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
@@ -47,9 +49,7 @@ class StudentViewTransformer(BlockStructureTransformer):
             # problem where your particular XModule explodes here (and don't
             # have the time to convert it to an XBlock), please try refactoring
             # so that you declare your student_view() method in a common
-            # ancestor class of both your Descriptor and Module classes. As an
-            # example, I changed the name of HtmlFields to HtmlBlock and moved
-            # student_view() from HtmlModuleMixin to HtmlBlock.
+            # ancestor class of both your Descriptor and Module classes.
             student_view = getattr(block.__class__, 'student_view', None)
             supports_multi_device = block.has_support(student_view, 'multi_device')
 

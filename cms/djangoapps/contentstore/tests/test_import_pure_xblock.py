@@ -2,6 +2,7 @@
 Integration tests for importing courses containing pure XBlocks.
 """
 
+
 from django.conf import settings
 from xblock.core import XBlock
 from xblock.fields import String
@@ -31,6 +32,7 @@ class StubXBlock(XBlock):
 
 
 class XBlockImportTest(ModuleStoreTestCase):
+    """Test class to verify xblock import operations"""
 
     @XBlock.register_temp_plugin(StubXBlock)
     def test_import_public(self):

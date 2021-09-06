@@ -1,5 +1,10 @@
+"""
+Experimentation routers
+"""
+
+
 from rest_framework import routers
-from rest_framework.routers import DynamicDetailRoute, DynamicListRoute, Route
+from rest_framework.routers import DynamicRoute, Route
 
 
 class DefaultRouter(routers.DefaultRouter):
@@ -14,14 +19,16 @@ class DefaultRouter(routers.DefaultRouter):
                 'put': 'create_or_update',
             },
             name='{basename}-list',
+            detail=False,
             initkwargs={'suffix': 'List'}
         ),
         # Dynamically generated list routes.
-        # Generated using @list_route decorator
+        # Generated using @action(detail=False) decorator
         # on methods of the viewset.
-        DynamicListRoute(
-            url=r'^{prefix}/{methodname}{trailing_slash}$',
-            name='{basename}-{methodnamehyphen}',
+        DynamicRoute(
+            url=r'^{prefix}/{lookup}{trailing_slash}$',
+            name='{basename}-list',
+            detail=False,
             initkwargs={}
         ),
         # Detail route.
@@ -34,13 +41,15 @@ class DefaultRouter(routers.DefaultRouter):
                 'delete': 'destroy'
             },
             name='{basename}-detail',
+            detail=True,
             initkwargs={'suffix': 'Instance'}
         ),
         # Dynamically generated detail routes.
-        # Generated using @detail_route decorator on methods of the viewset.
-        DynamicDetailRoute(
-            url=r'^{prefix}/{lookup}/{methodname}{trailing_slash}$',
-            name='{basename}-{methodnamehyphen}',
+        # Generated using @action(detail=True) decorator on methods of the viewset.
+        DynamicRoute(
+            url=r'^{prefix}/{lookup}{trailing_slash}$',
+            name='{basename}-detail',
+            detail=True,
             initkwargs={}
         ),
     ]

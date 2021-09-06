@@ -2,8 +2,8 @@
 End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
+
 from bok_choy.page_object import XSS_INJECTION
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -14,17 +14,18 @@ from common.test.acceptance.pages.studio.settings_group_configurations import Gr
 from common.test.acceptance.pages.studio.xblock_editor import XBlockVisibilityEditorView
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
-from studio.base_studio_test import ContainerBase
+
+from .studio.base_studio_test import ContainerBase
 
 AUDIT_TRACK = "Audit"
 VERIFIED_TRACK = "Verified"
 
 
-@attr(shard=5)
 class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
     """
     End-to-end of cohorted courseware.
     """
+    shard = 5
 
     def setUp(self, is_staff=True):
 
@@ -156,7 +157,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
         set_visibility(4, [AUDIT_TRACK], enrollment_group)
         set_visibility(5, [self.content_group_a, self.content_group_b])
 
-        container_page.publish_action.click()
+        container_page.publish()
 
     def create_cohorts_and_assign_students(self):
         """

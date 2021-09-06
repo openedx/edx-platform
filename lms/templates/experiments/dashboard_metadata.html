@@ -1,0 +1,14 @@
+<%page args="course_info" expression_filter="h"/>
+<%!
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+
+<!-- TODO START: Clean up REVEM-205.-->
+<%
+dashboard_metadata = { 'course_info': course_info }
+%>
+
+<script type="application/json" id="dashboard-metadata">
+    ${dashboard_metadata | n , dump_js_escaped_json}
+</script>
+<!-- TODO END: Clean up REVEM-205.-->

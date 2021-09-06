@@ -1,4 +1,6 @@
 """Tests for cross-domain CSRF decorators. """
+
+
 import json
 import mock
 from django.http import HttpResponse
@@ -21,6 +23,6 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         request.COOKIES = {}
         wrapped_view = ensure_csrf_cookie_cross_domain(fake_view)
         response = wrapped_view(request)
-        response_meta = json.loads(response.content)
+        response_meta = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'], True)
         self.assertEqual(response_meta['CSRF_COOKIE_USED'], True)

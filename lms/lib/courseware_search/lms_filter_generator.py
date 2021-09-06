@@ -3,6 +3,8 @@ This file contains implementation override of SearchFilterGenerator which will a
     * Filter by all courses in which the user is enrolled in
 """
 
+
+import six
 from search.filter_generator import SearchFilterGenerator
 
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
@@ -32,7 +34,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             field_dictionary['course'] = []
         elif not kwargs.get('course_id'):
             user_enrollments = self._enrollments_for_user(kwargs['user'])
-            field_dictionary['course'] = [unicode(enrollment.course_id) for enrollment in user_enrollments]
+            field_dictionary['course'] = [six.text_type(enrollment.course_id) for enrollment in user_enrollments]
 
         # if we have an org filter, only include results for this org filter
         course_org_filter = configuration_helpers.get_current_site_orgs()

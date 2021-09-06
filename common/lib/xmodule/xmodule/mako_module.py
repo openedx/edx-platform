@@ -1,6 +1,8 @@
 """
 Code to handle mako templating for XModules and XBlocks.
 """
+
+
 from web_fragments.fragment import Fragment
 
 from .x_module import DescriptorSystem, XModuleDescriptor, shim_xmodule_js
@@ -51,7 +53,7 @@ class MakoTemplateBlockBase(object):
         fragment = Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
-        shim_xmodule_js(self, fragment)
+        shim_xmodule_js(fragment, self.js_module_name)
         return fragment
 
 

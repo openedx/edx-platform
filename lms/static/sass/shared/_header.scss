@@ -95,9 +95,7 @@
       @include background-image($button-bg-image);
 
       background-color: $button-bg-color;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
       color: $body-color;
       display: inline-block;
@@ -264,9 +262,7 @@
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           color: $link-color;
           cursor: pointer;
           display: block;
@@ -401,8 +397,7 @@
   @extend %ui-depth1;
 
   /* Temp. fix until applied globally */
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   position: relative;
   width: 100%;
   border-bottom: 1px solid $gray-l1;
@@ -411,8 +406,8 @@
 
   .wrapper-header {
     @include clearfix();
-    @include box-sizing(border-box);
 
+    box-sizing: border-box;
     height: 74px;
     margin: 0 auto;
     padding: 17px 0;
@@ -519,9 +514,7 @@
       @include background-image($button-bg-image);
 
       background-color: $button-bg-color;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
       color: $body-color;
       font-family: $header-sans-serif;
@@ -679,9 +672,7 @@
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           color: $link-color;
           cursor: pointer;
           display: block;

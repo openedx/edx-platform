@@ -2,9 +2,10 @@
 Utility functions for course_wiki.
 """
 
+
 from django.core.exceptions import ObjectDoesNotExist
 
-import courseware
+import lms.djangoapps.courseware
 from xmodule import modulestore
 
 
@@ -45,7 +46,7 @@ def _has_wiki_staff_access(user, wiki_slug, modstore):
 
     for course_key in course_keys:
         course = modstore.get_course(course_key)
-        if courseware.access.has_access(user, 'staff', course, course_key):
+        if lms.djangoapps.courseware.access.has_access(user, 'staff', course, course_key):
             return True
     return False
 

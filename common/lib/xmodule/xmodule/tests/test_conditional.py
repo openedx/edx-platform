@@ -1,22 +1,26 @@
+
+
 import json
 import unittest
 
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
-from six import text_type
-
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
+from six import text_type
+from web_fragments.fragment import Fragment
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
 from xmodule.conditional_module import ConditionalDescriptor
-from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
-from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
+from xmodule.error_module import NonStaffErrorDescriptor
+from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
+from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
 from xmodule.validation import StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
@@ -85,7 +89,7 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
+        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
@@ -145,7 +149,6 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     Make sure that conditional module works, using mocks for
     other modules.
     """
-    shard = 1
 
     def setUp(self):
         super(ConditionalModuleBasicTest, self).setUp()
@@ -170,24 +173,24 @@ class ConditionalModuleBasicTest(unittest.TestCase):
             'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
         })
-        self.assertEquals(expected, html)
+        self.assertEqual(expected, html)
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
         modules['cond_module'].save()
         modules['source_module'].is_attempted = "false"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        print "ajax: ", ajax
-        html = ajax['html']
-        self.assertFalse(any(['This is a secret' in item for item in html]))
+        print("ajax: ", ajax)
+        fragments = ajax['fragments']
+        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
         # now change state of the capa problem to make it completed
         modules['source_module'].is_attempted = "true"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         modules['cond_module'].save()
-        print "post-attempt ajax: ", ajax
-        html = ajax['html']
-        self.assertTrue(any(['This is a secret' in item for item in html]))
+        print("post-attempt ajax: ", ajax)
+        fragments = ajax['fragments']
+        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
 
     def test_error_as_source(self):
         '''
@@ -197,8 +200,8 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
         modules['cond_module'].save()
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        html = ajax['html']
-        self.assertFalse(any(['This is a secret' in item for item in html]))
+        fragments = ajax['fragments']
+        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
     @patch('xmodule.conditional_module.log')
     def test_conditional_with_staff_only_source_module(self, mock_log):
@@ -218,7 +221,6 @@ class ConditionalModuleXmlTest(unittest.TestCase):
     """
     Make sure ConditionalModule works, by loading data in from an XML-defined course.
     """
-    shard = 1
 
     @staticmethod
     def get_system(load_error_modules=True):
@@ -231,22 +233,22 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print "Importing {0}".format(name)
+        print("Importing {0}".format(name))
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
     def test_conditional_module(self):
         """Make sure that conditional module works"""
 
-        print "Starting import"
+        print("Starting import")
         course = self.get_course('conditional_and_poll')
 
-        print "Course: ", course
-        print "id: ", course.id
+        print("Course: ", course)
+        print("id: ", course.id)
 
         def inner_get_module(descriptor):
             if isinstance(descriptor, BlockUsageLocator):
@@ -268,13 +270,13 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
-        print "module: ", module
-        print "module children: ", module.get_children()
-        print "module display items (children): ", module.get_display_items()
+        print("module: ", module)
+        print("module children: ", module.get_children())
+        print("module display items (children): ", module.get_display_items())
 
         html = module.render(STUDENT_VIEW).content
-        print "html type: ", type(html)
-        print "html: ", html
+        print("html type: ", type(html))
+        print("html: ", html)
         html_expect = module.xmodule_runtime.render_template(
             'conditional_ajax.html',
             {
@@ -287,13 +289,13 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.assertEqual(html, html_expect)
 
         gdi = module.get_display_items()
-        print "gdi=", gdi
+        print("gdi=", gdi)
 
         ajax = json.loads(module.handle_ajax('', ''))
         module.save()
-        print "ajax: ", ajax
-        html = ajax['html']
-        self.assertFalse(any(['This is a secret' in item for item in html]))
+        print("ajax: ", ajax)
+        fragments = ajax['fragments']
+        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
         # Now change state of the capa problem to make it completed
         inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
@@ -303,9 +305,9 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         ajax = json.loads(module.handle_ajax('', ''))
         module.save()
-        print "post-attempt ajax: ", ajax
-        html = ajax['html']
-        self.assertTrue(any(['This is a secret' in item for item in html]))
+        print("post-attempt ajax: ", ajax)
+        fragments = ajax['fragments']
+        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
 
     def test_conditional_module_with_empty_sources_list(self):
         """
@@ -382,7 +384,6 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
     """
     Unit tests for how conditional test interacts with Studio.
     """
-    shard = 1
 
     def setUp(self):
         super(ConditionalModuleStudioTest, self).setUp()

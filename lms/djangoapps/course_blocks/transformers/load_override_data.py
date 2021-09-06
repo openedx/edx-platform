@@ -1,11 +1,12 @@
 """
 Load Override Data Transformer
 """
+
+
 import json
 
+from lms.djangoapps.courseware.models import StudentFieldOverride
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
-
-from courseware.models import StudentFieldOverride
 
 # The list of fields are in support of Individual due dates and could be expanded for other use cases.
 REQUESTED_FIELDS = [

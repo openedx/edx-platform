@@ -1,3 +1,4 @@
+/* globals _ */
 (function() {
     'use strict';
     describe('Video Context Menu', function() {
@@ -172,6 +173,7 @@
         describe('when video is right-clicked', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
+                jasmine.mockFullscreenAPI();
                 openMenu();
             });
 

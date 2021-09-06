@@ -2,7 +2,7 @@
 Open edX Documentation Builder
 Ties into Sphinx to generate files at the specified location(s)
 """
-from __future__ import print_function
+
 
 import sys
 
@@ -22,7 +22,7 @@ def valid_doc_types():
     """
     Return a comma-separated string of valid doc types.
     """
-    return ", ".join(DOC_PATHS.keys())
+    return ", ".join(list(DOC_PATHS.keys()))
 
 
 def doc_path(options, allow_default=True):
@@ -40,8 +40,8 @@ def doc_path(options, allow_default=True):
 
     if doc_type == 'default' and not allow_default:
         print(
-            "You must specify a documentation type using '--type'.  "
-            "Valid options are: {options}".format(
+            u"You must specify a documentation type using '--type'.  "
+            u"Valid options are: {options}".format(
                 options=valid_doc_types()
             )
         )
@@ -49,8 +49,8 @@ def doc_path(options, allow_default=True):
 
     if path is None:
         print(
-            "Invalid documentation type '{doc_type}'.  "
-            "Valid options are: {options}".format(
+            u"Invalid documentation type '{doc_type}'.  "
+            u"Valid options are: {options}".format(
                 doc_type=doc_type, options=valid_doc_types()
             )
         )
@@ -73,7 +73,7 @@ def build_docs(options):
     """
     verbose = getattr(options, 'verbose', False)
 
-    cmd = "cd {dir}; make html quiet={quiet}".format(
+    cmd = u"cd {dir}; make html quiet={quiet}".format(
         dir=doc_path(options),
         quiet="false" if verbose else "true"
     )

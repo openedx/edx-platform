@@ -1,0 +1,32 @@
+# Packages to install in the Python sandbox for secured execution of code provided by course authors.
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should:
+#   * verify that the dependency has a license compatible with AGPLv3
+#   * confirm that it has no system requirements beyond what we already install
+#   * run "make upgrade" to update the detailed requirements files
+
+# We pin things specifically in this file beacuse we want to be very explicit about
+# updating dependencies to the sandbox since they can impact how custom response code is run.
+# We can then use constraints.txt to constrain any sub-dependencies that may need to be held back.
+
+
+-c ../constraints.txt
+
+-r shared.txt                       # Dependencies in common with LMS and Studio
+matplotlib==2.2.4                   # 2D plotting library
+networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
+numpy==1.16.5                       # Numeric array processing utilities; used by scipy
+pyparsing==2.2.0                    # Python Parsing module
+random2                             # Implementation of random module that works identically under Python 2 and 3
+scipy==1.2.1                        # Math, science, and engineering library
+sympy==1.4                          # Symbolic math library
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
+
+# Install these packages from the edx-platform working tree
+# NOTE: if you change code in these packages, you MUST change the version
+# number in its setup.py or the code WILL NOT be installed during deploy.
+-e common/lib/sandbox-packages
+-e common/lib/symmath

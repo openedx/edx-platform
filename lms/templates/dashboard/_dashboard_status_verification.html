@@ -10,6 +10,12 @@ from django.utils.translation import ugettext as _
         <li class="status status-verification is-accepted">
             <span class="title status-title">${_("Current Verification Status: Approved")}</span>
             <p class="status-note">${_("Your edX verification has been approved. Your verification is effective for one year after submission.")}</p>
+            %if verification_expiry:
+                <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_("Your photo verification expires on {verification_expiry}. Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.").format(verification_expiry=verification_expiry)}</i></p>
+                <div class="btn-reverify">
+                    <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
+                </div>
+            %endif
         </li>
     %elif verification_status == 'pending':
         <li class="status status-verification is-pending">
@@ -40,6 +46,7 @@ from django.utils.translation import ugettext as _
         <li class="status status-verification is-denied">
             <span class="title status-title">${_("Current Verification Status: Expired")}</span>
             <p class="status-note">${_("Your verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
+            <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_(" Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.")}</i></p>
             <div class="btn-reverify">
                 <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
             </div>

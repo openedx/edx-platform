@@ -1,5 +1,6 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
+
 import json
 import logging
 import uuid
@@ -153,10 +154,10 @@ class DefaultMultipleSegmentClient(object):
                 event_name = args[1]
             except IndexError:
                 event_name = '(unknown event name)'
-            logger.warn(
-                "Error retrieving Site SEGMENT_KEY. Cannot send event {} to "
+            logger.warning(
+                "Error retrieving Site SEGMENT_KEY. Cannot send event %s to "
                 "Site's Segment account. Sending only to main Segment client. "
-                "Error was {}".format(event_name, e.msg)
+                "Error was: ", event_name, exc_info=True
             )
         return site_segment_key
 

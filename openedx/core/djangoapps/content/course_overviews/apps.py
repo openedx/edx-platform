@@ -1,6 +1,8 @@
 """
 Configuration for course_overviews Django app
 """
+
+
 from django.apps import AppConfig
 
 
@@ -14,4 +16,4 @@ class CourseOverviewsConfig(AppConfig):
     def ready(self):
         # Import signals to activate signal handler which invalidates
         # the CourseOverview cache every time a course is published.
-        from . import signals  # pylint: disable=unused-import
+        from . import signals  # pylint: disable=unused-variable

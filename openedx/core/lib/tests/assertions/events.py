@@ -1,7 +1,9 @@
 """Assertions related to event validation"""
 
+
 import json
 import pprint
+import six
 
 
 def assert_event_matches(expected, actual, tolerate=None):
@@ -193,7 +195,7 @@ def parse_event_payload(event):
     Note that this may simply return the same event unchanged, or return a new copy of the event with the payload
     parsed. It will never modify the event in place.
     """
-    if 'event' in event and isinstance(event['event'], basestring):
+    if 'event' in event and isinstance(event['event'], six.string_types):
         event = event.copy()
         try:
             event['event'] = json.loads(event['event'])
@@ -217,22 +219,22 @@ def compare_structs(expected, actual, should_strict_compare=None, path=None):
     differences = []
 
     if isinstance(expected, dict) and isinstance(actual, dict):
-        expected_keys = frozenset(expected.keys())
-        actual_keys = frozenset(actual.keys())
+        expected_keys = frozenset(list(expected.keys()))
+        actual_keys = frozenset(list(actual.keys()))
 
         for key in expected_keys - actual_keys:
-            differences.append('{0}: not found in actual'.format(_path_to_string(path + [key])))
+            differences.append(u'{0}: not found in actual'.format(_path_to_string(path + [key])))
 
         if should_strict_compare is not None and should_strict_compare(path):
             for key in actual_keys - expected_keys:
-                differences.append('{0}: only defined in actual'.format(_path_to_string(path + [key])))
+                differences.append(u'{0}: only defined in actual'.format(_path_to_string(path + [key])))
 
         for key in expected_keys & actual_keys:
             child_differences = compare_structs(expected[key], actual[key], should_strict_compare, path + [key])
             differences.extend(child_differences)
 
     elif expected != actual:
-        differences.append('{path}: {a} != {b} (expected != actual)'.format(
+        differences.append(u'{path}: {a} != {b} (expected != actual)'.format(
             path=_path_to_string(path),
             a=repr(expected),
             b=repr(actual)

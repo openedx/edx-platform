@@ -1,5 +1,5 @@
 """Script for deleting orphans"""
-from __future__ import print_function
+
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError

@@ -82,7 +82,7 @@
 
             ThreadResponseView.prototype.render = function() {
                 this.$el.addClass('response_' + this.model.get('id'));
-                this.$el.html(this.renderTemplate());
+                edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.HTML(this.renderTemplate()));
                 this.delegateEvents();
                 this.renderShowView();
                 this.renderAttrs();
@@ -177,6 +177,7 @@
                 });
                 this.commentViews.push(view);
                 this.focusToTheCommentResponse(view.$el.closest('.forum-response'));
+                DiscussionUtil.typesetMathJax(view.$el.find('.response-body'));
                 return view;
             };
 
@@ -308,6 +309,7 @@
                 event.preventDefault();
                 this.createShowView();
                 this.renderShowView();
+                DiscussionUtil.typesetMathJax(this.$el.find('.response-body'));
                 return this.showCommentForm();
             };
 
@@ -341,6 +343,7 @@
                         });
                         self.createShowView();
                         self.renderShowView();
+                        DiscussionUtil.typesetMathJax(self.$el.find('.response-body'));
                         return self.showCommentForm();
                     }
                 });

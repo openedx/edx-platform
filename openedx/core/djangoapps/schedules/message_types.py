@@ -1,3 +1,7 @@
+"""
+ACE message types for the schedules module.
+"""
+
 import logging
 
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
@@ -21,4 +25,8 @@ class UpgradeReminder(ScheduleMessageType):
 
 
 class CourseUpdate(ScheduleMessageType):
+    pass
+
+
+class InstructorLedCourseUpdate(ScheduleMessageType):
     pass

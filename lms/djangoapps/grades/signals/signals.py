@@ -1,6 +1,8 @@
 """
 Grades related signals.
 """
+
+
 from django.dispatch import Signal
 
 # Signal that indicates that a user's grade for a course has been updated.

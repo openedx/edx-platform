@@ -1,18 +1,23 @@
+"""
+Tests for the CourseGradeFactory class.
+"""
+
+
 import itertools
-from nose.plugins.attrib import attr
+import datetime
 
 import ddt
-import django
-from courseware.access import has_access
 from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
-from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from six import text_type
 
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
 from ..course_grade import CourseGrade, ZeroCourseGrade
@@ -27,6 +32,35 @@ class TestCourseGradeFactory(GradeTestBase):
     """
     Test that CourseGrades are calculated properly
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseGradeFactory, cls).setUpClass()
+        # We add a new graded subsection, with a due date 10 days in the
+        # fugture and show_correcteness (AKA visibility) past_due. In
+        # test_course_grade_factory we will make sure the grade is 0,
+        # because the grade show not be displayed until the due date
+        # is completed.
+        with cls.store.bulk_operations(cls.course.id):
+            cls.sequence3 = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential B",
+                graded=True,
+                format="FinalExam",
+                metadata={'show_correctness': 'past_due', 'due': datetime.datetime.now() + datetime.timedelta(days=10)}
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 3',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            cls.problem3 = ItemFactory.create(
+                parent=cls.sequence3,
+                category="problem",
+                display_name="Test Problem",
+                data=problem_xml
+            )
+
     def _assert_zero_grade(self, course_grade, expected_grade_class):
         """
         Asserts whether the given course_grade is as expected with
@@ -91,38 +125,38 @@ class TestCourseGradeFactory(GradeTestBase):
             sections = course_grade.chapter_grades[self.chapter.location]['sections']
             self.assertEqual(
                 [section.display_name for section in sections],
-                [self.sequence.display_name, self.sequence2.display_name]
+                [self.sequence.display_name, self.sequence2.display_name, self.sequence3.display_name]
             )
 
-        with self.assertNumQueries(2), mock_get_score(1, 2):
+        with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 41
-        with self.assertNumQueries(num_queries), mock_get_score(1, 2):
-            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-
-        with self.assertNumQueries(2):
-            _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
-
-        num_queries = 7
-        with self.assertNumQueries(num_queries), mock_get_score(1, 4):
-            grade_factory.update(self.request.user, self.course, force_update_subsections=False)
-
-        with self.assertNumQueries(2):
-            _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
-
-        num_queries = 21
+        num_queries = 52
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(2):
-            _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
+        with self.assertNumQueries(3):
+            _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 24
+        num_queries = 6
+        with self.assertNumQueries(num_queries), mock_get_score(1, 4):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=False)
+
+        with self.assertNumQueries(3):
+            _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
+
+        num_queries = 28
+        with self.assertNumQueries(num_queries), mock_get_score(2, 2):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+
+        with self.assertNumQueries(3):
+            _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of 1.0
+
+        num_queries = 34
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=False, expected_percent=0.0)  # updated to grade of 0.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -143,12 +177,12 @@ class TestCourseGradeFactory(GradeTestBase):
             mocked_course_blocks.return_value = self.course_structure
             with mock_get_score(1, 2):
                 grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-                self.assertEquals(mocked_course_blocks.call_count, 1)
+                self.assertEqual(mocked_course_blocks.call_count, 1)
 
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
                 course_grade = grade_factory.read(self.request.user, self.course)
-                self.assertEqual(course_grade.percent, 0.5)  # make sure it's not a zero-valued course grade
+                self.assertEqual(course_grade.percent, 0.25)  # make sure it's not a zero-valued course grade
                 self.assertFalse(mocked_get_score.called)  # no calls to CSM/submissions tables
                 self.assertFalse(mocked_course_blocks.called)  # no user-specific transformer calculation
 
@@ -162,7 +196,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
     def test_subsection_type_graders(self):
         graders = CourseGrade.get_subsection_type_graders(self.course)
-        self.assertEqual(len(graders), 2)
+        self.assertEqual(len(graders), 3)
         self.assertEqual(graders["Homework"].type, "Homework")
         self.assertEqual(graders["NoCredit"].min_count, 0)
 
@@ -185,8 +219,10 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(mock_update.called, force_update)
 
     def test_course_grade_summary(self):
-        with mock_get_score(1, 2):
+        with mock_get_score(2, 2):
             self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
+        with mock_get_score(1, 1):
+            self.subsection_grade_factory.update(self.course_structure[self.sequence3.location])
         course_grade = CourseGradeFactory().update(self.request.user, self.course)
 
         actual_summary = course_grade.summary
@@ -199,7 +235,12 @@ class TestCourseGradeFactory(GradeTestBase):
                 'Homework': {
                     'category': 'Homework',
                     'percent': 0.25,
-                    'detail': 'Homework = 25.00% of a possible 100.00%',
+                    'detail': 'Homework = 25.00% of a possible 50.00%',
+                },
+                'FinalExam': {
+                    'category': 'FinalExam',
+                    'percent': 0.0,
+                    'detail': 'FinalExam = 0.00% of a possible 50.00%',
                 },
                 'NoCredit': {
                     'category': 'NoCredit',
@@ -211,9 +252,9 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential X - 50% (1/2)',
+                    'detail': u'Homework 1 - Test Sequential X - 100% (2/2)',
                     'label': u'HW 01',
-                    'percent': 0.5
+                    'percent': 1.0
                 },
                 {
                     'category': 'Homework',
@@ -223,10 +264,22 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework Average = 25%',
+                    'detail': u'Homework Average = 50%',
                     'label': u'HW Avg',
-                    'percent': 0.25,
+                    'percent': 0.5,
                     'prominent': True
+                },
+                # We want to make sure this grade is 0.0 and 0% since we
+                # competed the problem above, but the subsection has a due
+                # date and the visibiity of it is set to be shown after the
+                # due date is pass. So the grade is added and calculated but
+                # not displayed in the summary until the due date has pass.
+                {
+                    'category': 'FinalExam',
+                    'percent': 0.0,
+                    'prominent': True,
+                    'label': 'FE',
+                    'detail': 'FinalExam = 0%'
                 },
                 {
                     'category': 'NoCredit',
@@ -240,7 +293,6 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(expected_summary, actual_summary)
 
 
-@attr(shard=1)
 class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student course grades.
@@ -288,7 +340,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             wraps=BlockStructureFactory.create_from_store
         ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEquals(mock_create_from_store.call_count, 1)
+            self.assertEqual(mock_create_from_store.call_count, 1)
 
         self.assertEqual(len(all_errors), 0)
         for course_grade in all_course_grades.values():
@@ -308,12 +360,12 @@ class TestGradeIteration(SharedModuleStoreTestCase):
 
         student1, student2, student3, student4, student5 = self.students
         mock_course_grade.side_effect = [
-            Exception("Error for {}.".format(student.username))
+            Exception(u"Error for {}.".format(student.username))
             if student.username in ['student3', 'student4']
             else mock_course_grade.return_value
             for student in self.students
         ]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             {student: text_type(all_errors[student]) for student in all_errors},

@@ -6,7 +6,7 @@
             "name": "poll",
             "enabled": true,
             "deprecated": true,
-            "change_date": "2016-07-06"
+            "change_date": "2016-07-06T00:00:00Z"
         }
     },
     {
@@ -16,7 +16,7 @@
             "name": "survey",
             "enabled": true,
             "deprecated": true,
-            "change_date": "2016-07-06"
+            "change_date": "2016-07-06T00:00:00Z"
         }
     }
 ]

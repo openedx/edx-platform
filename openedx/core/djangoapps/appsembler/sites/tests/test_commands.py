@@ -1,9 +1,7 @@
 import hashlib
 import os
-import pkg_resources
-import uuid
 from mock import patch, mock_open
-from StringIO import StringIO
+from io import StringIO
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -13,8 +11,8 @@ from django.core.management.base import CommandError
 from django.test import override_settings, TestCase
 
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
-from openedx.core.djangoapps.appsembler.sites.management.commands.export_site import Command as ExportSiteCommand
 from openedx.core.djangoapps.appsembler.sites.management.commands.offboard import Command as OffboardSiteCommand
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration, SiteConfigurationHistory
 from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -25,6 +23,12 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationFactory,
     OrganizationCourseFactory,
     UserOrganizationMappingFactory,
+)
+from openedx.core.djangoapps.appsembler.sites.tests.factories import (
+    AlternativeDomainFactory,
+)
+from openedx.core.djangoapps.site_configuration.tests.factories import (
+    SiteFactory,
 )
 from student.models import (
     CourseAccessRole,
@@ -45,9 +49,10 @@ from student.tests.factories import (
     UserStandingFactory,
 )
 
-from organizations.models import Organization, OrganizationCourse
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+from organizations.models import Organization, OrganizationCourse, UserOrganizationMapping
+
+from oauth2_provider.models import AccessToken, RefreshToken, Application
+
 from student.roles import CourseCreatorRole
 
 
@@ -68,7 +73,8 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
 
     def test_no_sites(self):
         """
@@ -86,7 +92,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         Test that `create_devstack_site` and creates the required objects.
         """
         with patch.object(Command, 'congrats') as mock_congrats:
-            call_command('create_devstack_site', self.name)
+            call_command('create_devstack_site', self.name, 'localhost')
 
         mock_congrats.assert_called_once()  # Ensure that congrats message is printed
 
@@ -96,13 +102,48 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         user = get_user_model().objects.get()
         assert user.check_password(self.name)
         assert user.profile.name == self.name
+        assert UserOrganizationMapping.objects.get(organization__name=self.name, user=user)
 
         assert CourseCreatorRole().has_user(user), 'User should be a course creator'
 
-        fake_token = hashlib.md5(user.username).hexdigest()  # Using a fake token so AMC devstack can guess it
+        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()  # Using a fake token so AMC devstack can guess it
         assert fake_token == '80bfa968ffad007c79bfc603f3670c99', 'Ensure hash is identical to AMC'
         assert AccessToken.objects.get(user=user).token == fake_token, 'Access token is needed'
         assert RefreshToken.objects.get(user=user).token == fake_token, 'Refresh token is needed'
+
+
+@override_settings(
+    DEBUG=True,
+)
+class TestCandidateSitesCleanupCommand(TestCase):
+    """
+    Tests for the `danger_candidate_sites_cleanup` management command.
+    """
+    def setUp(self):
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
+        call_command('create_devstack_site', 'blue', 'oldlocalhost')
+        site_config = self.get_site().configuration
+        site_config.site_values.update({
+            'SEGMENT_KEY': 'test1',
+            'customer_gtm_id': 'test2',
+        })
+        site_config.save()
+
+    def get_site(self):
+        return Site.objects.get(domain__startswith='blue.')
+
+    def test_run(self):
+        assert self.get_site().domain == 'blue.oldlocalhost:18000'
+        active_orgs = Organization.objects.all()
+        active_orgs_function_path = 'openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations'
+        with patch(active_orgs_function_path, return_value=active_orgs):
+            # Side-step the `Tier` model.
+            call_command('danger_candidate_sites_cleanup', 'oldlocalhost:18000', 'newlocalhost:18000')
+        assert self.get_site().domain == 'blue.newlocalhost:18000'
+        assert not self.get_site().configuration.get_value('customer_gtm_id')
+        assert not self.get_site().configuration.get_value('SEGMENT_KEY')
+        assert self.get_site().configuration.get_value('SITE_NAME') == self.get_site().domain
 
 
 @override_settings(
@@ -119,14 +160,15 @@ class RemoveSiteCommandTestCase(TestCase):
     """
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
 
         self.to_be_deleted = 'delete'
         self.shall_remain = 'keep'
 
         # This command should be tested above
-        call_command('create_devstack_site', self.to_be_deleted)
-        call_command('create_devstack_site', self.shall_remain)
+        call_command('create_devstack_site', self.to_be_deleted, 'localhost')
+        call_command('create_devstack_site', self.shall_remain, 'localhost')
 
     def test_create_devstack_site(self):
         """
@@ -145,171 +187,6 @@ class RemoveSiteCommandTestCase(TestCase):
         assert SiteConfiguration.objects.get(site=site)
 
         assert SiteTheme.objects.filter(site=site).count() == site.themes.count()
-
-
-class TestExportSiteCommand(TestCase):
-    """
-    Test ./manage.py lms export_site somesite
-    """
-
-    def setUp(self):
-        self.site_name = 'site'
-        self.site_domain = '{}.localhost:18000'.format(self.site_name)
-        self.site = Site.objects.create(domain=self.site_domain, name=self.site_name)
-
-        self.command = ExportSiteCommand()
-
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.get_pip_packages', return_value={})
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.write_to_file', return_value='called')
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.check')
-    def test_handle(self, mock_check, mock_write_to_file, mock_get_pip_packages):
-        out = StringIO()
-        call_command('export_site', self.site_domain, stdout=out)
-
-        assert mock_check.called
-        assert mock_get_pip_packages.called
-        assert mock_write_to_file.called
-
-        assert 'Exporting "%s" in progress' % self.site_domain in out.getvalue()
-        assert 'Successfully exported' in out.getvalue()
-        assert 'Command output >>>' not in out.getvalue()
-
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.get_pip_packages', return_value={})
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.write_to_file', return_value='called')
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.check')
-    def test_handle_debug(self, mock_check, mock_write_to_file, mock_get_pip_packages):
-        out = StringIO()
-        call_command('export_site', self.site_domain, debug=True, stdout=out)
-
-        assert mock_check.called
-        assert mock_get_pip_packages.called
-        assert mock_write_to_file.called
-
-        assert 'Exporting "%s" in progress' % self.site_domain in out.getvalue()
-        assert 'Command output >>>' in out.getvalue()
-        assert 'Successfully exported' in out.getvalue()
-
-    def test_handle_system_check_fails(self):
-        """
-        According to Django, serious problems are raised as a CommandError wheb calling
-        this `check` function. Proccessing should stop in case we got a serious problem.
-
-        https://docs.djangoproject.com/en/1.11/howto/custom-management-commands/#django.core.management.BaseCommand.check
-        """
-
-        with patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.check', side_effect=CommandError()):
-            with self.assertRaises(CommandError):
-                call_command('export_site', self.site_domain, debug=True)
-            with self.assertRaises(CommandError):
-                call_command('export_site', self.site_domain)
-
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.process_instance')
-    def test_generate_objects_bfs(self, mock_process_instance):
-        """
-        To be able to test BFS we need a graph structure, this mimics database
-        relations to some extent.
-        """
-        mock_process_instance.side_effect = self.fake_process_instance
-        objects = self.command.generate_objects('microsite')
-
-        # Each assert is a level where its elements can be exchangeble.
-        assert objects[0] == 'microsite'
-        assert objects[1] == 'organization_1'
-        assert set(objects[2:5]) == {'user_1', 'user_2', 'tier'}
-        assert set(objects[5:8]) == {'user_terms_conditions_1', 'auth_token_1', 'user_terms_conditions_2'}
-        assert objects[8] == 'auth_token_2'
-        assert set(objects[9:]) == {'terms_1', 'terms_2'}
-
-    @patch('openedx.core.djangoapps.appsembler.sites.management.commands.export_site.Command.process_instance')
-    def test_generate_objects_integrity(self, mock_process_instance):
-        """
-        makes sure that:
-            - All required objects are processed.
-            - Unrelated objects are not included.
-            - No object appears more than once.
-        """
-        mock_process_instance.side_effect = self.fake_process_instance
-        objects = self.command.generate_objects('microsite')
-
-        # Test duplicates
-        assert len(objects) == len(set(objects))
-
-        # Test exact items
-        assert set(objects) == {
-            'microsite',
-            'organization_1',
-            'user_1',
-            'user_2',
-            'tier',
-            'user_terms_conditions_1',
-            'auth_token_1',
-            'user_terms_conditions_2',
-            'auth_token_2',
-            'terms_1',
-            'terms_2'
-        }
-
-    def test_get_pip_packages(self):
-        packages = self.command.get_pip_packages()
-        assert isinstance(packages, dict)
-
-        for package in pkg_resources.working_set:
-            assert packages.pop(package.project_name) == package.version
-
-    @patch('django.core.files.File.write')
-    def test_write_to_file(self, mock_write):
-        path = '/dummy/path.json'
-        content = '{"tetst": "contetnt"}'
-
-        with patch("__builtin__.open", mock_open()) as mock_file:
-            self.command.write_to_file(path, content)
-
-        mock_file.assert_called_once_with(path, 'w')
-        assert mock_write.called_with(content)
-
-    def test_generate_file_path(self):
-        # With output.json
-        output = 'new_file.json'
-        path = self.command.generate_file_path(self.site, output)
-        assert path == output
-
-        # With output
-        output = 'new_file'
-        path = self.command.generate_file_path(self.site, output)
-        assert path.endswith('.json')
-        assert path.startswith('%s/' % output)
-
-        # With no output
-        path = self.command.generate_file_path(self.site, None)
-        assert path.endswith('.json')
-        assert path.startswith('%s/' % os.getcwd())
-
-    @staticmethod
-    def fake_process_instance(instance):
-        """
-        Returns all this nodes relations; the ones that it points at, and the
-        ones they point at it.
-        """
-        graph = {
-            'microsite': ['organization_1', ],
-            'organization_1': ['user_1', 'user_2'],
-            'tier': ['organization_1', ],
-            'user_1': [],
-            'user_2': [],
-            'auth_token_1': ['user_1', ],
-            'auth_token_2': ['user_2', ],
-            'user_terms_conditions_1': ['user_1', 'terms_1', ],
-            'user_terms_conditions_2': ['user_1', 'terms_2', ],
-            'should_not_appear_1': ['object_not_used_1', 'object_not_used_2', ],
-            'should_not_appear_2': ['object_not_used_3', ]
-        }
-
-        objects = graph.get(instance, [])
-        for key, value in graph.items():
-            if instance in value:
-                objects.append(key)
-
-        return instance, objects
 
 
 class TestOffboardSiteCommand(ModuleStoreTestCase):
@@ -435,7 +312,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         new_user_count = 3
 
         assert organization.userorganizationmapping_set.count() == 0
-        users = self.create_org_users(org=organization, new_user_count=new_user_count)
+        self.create_org_users(org=organization, new_user_count=new_user_count)
         assert organization.userorganizationmapping_set.count() == new_user_count
 
         data = self.command.process_organization_users(organization)
@@ -451,7 +328,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
 
         assert data == {
             'enabled': site_configs.enabled,
-            'values': site_configs.values,
+            'values': site_configs.site_values,
             'sass_variables': site_configs.sass_variables,
             'page_elements': site_configs.page_elements,
         }
@@ -461,7 +338,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         assert data == [
             {
                 'enabled': record.enabled,
-                'values': record.values,
+                'values': record.site_values,
             } for record in SiteConfigurationHistory.objects.filter(site=self.site)
         ]
 
@@ -787,7 +664,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         path = '/dummy/path.json'
         content = '{"tetst": "contetnt"}'
 
-        with patch("__builtin__.open", mock_open()) as mock_file:
+        with patch("builtins.open", mock_open()) as mock_file:
             self.command.write_to_file(path, content)
 
         mock_file.assert_called_once_with(path, 'w')
@@ -796,4 +673,28 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
     @staticmethod
     def create_org_users(org, new_user_count):
         return [UserOrganizationMappingFactory(
-            organization=org).user for i in xrange(new_user_count)]
+            organization=org).user for i in range(new_user_count)]
+
+
+class DisableCustomDomainCommandTestCase(TestCase):
+    """
+    Test ./manage.py lms disable_custom_domain mysite.example.com
+    """
+    def test_disable_custom_domain(self):
+        disable_domain = "test-custom-domain.example.com"
+        subdomain = "test-custom-domain.tahoe.appsembler.com"
+
+        s = SiteFactory.create(domain=disable_domain)
+        AlternativeDomainFactory.create(domain=subdomain, site=s)
+
+        call_command('disable_custom_domain', disable_domain)
+
+        # we expect the Site now has `subdomain`
+        assert Site.objects.filter(domain=subdomain).exists()
+        # and that the AlternativeDomain is gone
+        assert not AlternativeDomain.objects.filter(domain=subdomain).exists()
+
+        # there shouldn't be an AlternativeDomain for
+        assert not AlternativeDomain.objects.filter(domain=disable_domain).exists()
+        # and there shouldn't be a lingering/duplicate Site for the old one either
+        assert not Site.objects.filter(domain=disable_domain).exists()

@@ -1,15 +1,17 @@
 """
 Course Goals Python API
 """
-import models
-from six import text_type
 
-from opaque_keys.edx.keys import CourseKey
+
 from django.conf import settings
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.reverse import reverse
+from six import text_type
 
 from course_modes.models import CourseMode
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+
+from . import models
 
 
 def add_course_goal(user, course_id, goal_key):
@@ -73,7 +75,7 @@ def has_course_goal_permission(request, course_id, user_access):
     can use this feature.
     """
     course_key = CourseKey.from_string(course_id)
-    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(unicode(course_id)))
+    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(course_key))
     return user_access['is_enrolled'] and has_verified_mode and ENABLE_COURSE_GOALS.is_enabled(course_key) \
         and settings.FEATURES.get('ENABLE_COURSE_GOALS')
 

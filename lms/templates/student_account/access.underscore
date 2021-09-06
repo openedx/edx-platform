@@ -7,7 +7,7 @@
 </section>
 
 <section id="password-reset-anchor" class="form-type">
-    <div id="password-reset-form" class="form-wrapper hidden"></div>
+    <div id="password-reset-form" class="form-wrapper <% if ( mode !== 'reset' ) { %>hidden<% } %>"></div>
 </section>
 
 <section id="institution_login-anchor" class="form-type">

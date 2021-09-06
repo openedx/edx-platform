@@ -1,14 +1,17 @@
 """
 Test for LMS instructor background task queue management
 """
+
+
 import ddt
+from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from common.test.utils import normalize_repr
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -44,7 +47,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -59,7 +61,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
         task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_KEY)]
-        self.assertEquals(set(task_ids), set(progress_task_ids))
+        self.assertEqual(set(task_ids), set(progress_task_ids))
 
     def test_get_instructor_task_history(self):
         # when fetching historical tasks, we get all tasks, including running tasks
@@ -70,7 +72,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             expected_ids.append(self._create_progress_entry().task_id)
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(TEST_COURSE_KEY, usage_key=self.problem_url)]
-        self.assertEquals(set(task_ids), set(expected_ids))
+        self.assertEqual(set(task_ids), set(expected_ids))
         # make the same call using explicit task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -78,7 +80,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='rescore_problem'
                     )]
-        self.assertEquals(set(task_ids), set(expected_ids))
+        self.assertEqual(set(task_ids), set(expected_ids))
         # make the same call using a non-existent task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -86,10 +88,9 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='dummy_type'
                     )]
-        self.assertEquals(set(task_ids), set())
+        self.assertEqual(set(task_ids), set())
 
 
-@attr(shard=3)
 @ddt.ddt
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
@@ -124,28 +125,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_student(request, problem_url, self.student)
         with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, problem_url)
-
-    def _test_submit_with_long_url(self, task_function, student=None):
-        problem_url_name = 'x' * 255
-        self.define_option_problem(problem_url_name)
-        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        with self.assertRaises(ValueError):
-            if student is not None:
-                task_function(self.create_task_request(self.instructor), location, student)
-            else:
-                task_function(self.create_task_request(self.instructor), location)
-
-    def test_submit_rescore_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
-
-    def test_submit_rescore_student_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_student, self.student)
-
-    def test_submit_reset_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_reset_problem_attempts_for_all_students)
-
-    def test_submit_delete_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
 
     @ddt.data(
         (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
@@ -196,11 +175,11 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
                 instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
 
             most_recent_task = InstructorTask.objects.latest('id')
-            self.assertEquals(most_recent_task.task_state, FAILURE)
+            self.assertEqual(most_recent_task.task_state, FAILURE)
 
         # successful submission
         instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
-        self.assertEquals(instructor_task.task_type, expected_task_type)
+        self.assertEqual(instructor_task.task_type, expected_task_type)
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
@@ -211,7 +190,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@attr(shard=3)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""

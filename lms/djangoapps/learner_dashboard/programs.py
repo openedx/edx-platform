@@ -1,17 +1,20 @@
 """
 Fragments for rendering programs.
 """
+
+
 import json
 
 from django.http import Http404
 from django.template.loader import render_to_string
-from django.utils.translation import get_language_bidi
 from django.urls import reverse
-
+from django.utils.translation import get_language_bidi, ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+from openedx.core.djangoapps.catalog.constants import PathwayType
+from openedx.core.djangoapps.catalog.utils import get_pathways
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -45,7 +48,7 @@ class ProgramsFragmentView(EdxFragmentView):
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
 
         context = {
-            'marketing_url': get_program_marketing_url(programs_config),
+            'marketing_url': get_program_marketing_url(programs_config, mobile_only),
             'programs': meter.engaged_programs,
             'progress': meter.progress()
         }
@@ -54,6 +57,12 @@ class ProgramsFragmentView(EdxFragmentView):
         self.add_fragment_resource_urls(programs_fragment)
 
         return programs_fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Return page title for the standalone page.
+        """
+        return _('Programs')
 
     def css_dependencies(self):
         """
@@ -106,6 +115,20 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         if not certificate_data:
             program_record_url = None
 
+        industry_pathways = []
+        credit_pathways = []
+        try:
+            for pathway_id in program_data['pathway_ids']:
+                pathway = get_pathways(request.site, pathway_id)
+                if pathway and pathway['email']:
+                    if pathway['pathway_type'] == PathwayType.CREDIT.value:
+                        credit_pathways.append(pathway)
+                    elif pathway['pathway_type'] == PathwayType.INDUSTRY.value:
+                        industry_pathways.append(pathway)
+        # if pathway caching did not complete fully (no pathway_ids)
+        except KeyError:
+            pass
+
         urls = {
             'program_listing_url': reverse('program_listing_view'),
             'track_selection_url': strip_course_id(
@@ -121,13 +144,21 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'user_preferences': get_user_preferences(request.user),
             'program_data': program_data,
             'course_data': course_data,
-            'certificate_data': certificate_data
+            'certificate_data': certificate_data,
+            'industry_pathways': industry_pathways,
+            'credit_pathways': credit_pathways,
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)
         program_details_fragment = Fragment(html)
         self.add_fragment_resource_urls(program_details_fragment)
         return program_details_fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Return page title for the standalone page.
+        """
+        return _('Program Details')
 
     def css_dependencies(self):
         """

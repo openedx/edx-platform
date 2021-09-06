@@ -13,6 +13,7 @@ request to the view with param "success"
 set to "success" or "failure".  The view defaults to payment success.
 """
 
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -75,7 +76,7 @@ class PaymentFakeView(View):
         Accepts one POST param "status" that can be either "success"
         or "failure".
         """
-        new_status = request.body
+        new_status = request.body.decode('utf-8')
 
         if new_status not in ["success", "failure", "decline"]:
             return HttpResponseBadRequest()
@@ -124,11 +125,11 @@ class PaymentFakeView(View):
             "req_amount": post_params.get('amount'),
             "auth_amount": post_params.get('amount'),
             "req_reference_number": post_params.get('reference_number'),
-            "req_transaction_uuid": post_params.get('transaction_uuid'),
+            "req_transaction_uuid": post_params.get('transaction_uuid', ''),
             "req_access_key": post_params.get('access_key'),
             "req_transaction_type": post_params.get('transaction_type'),
-            "req_override_custom_receipt_page": post_params.get('override_custom_receipt_page'),
-            "req_payment_method": post_params.get('payment_method'),
+            "req_override_custom_receipt_page": post_params.get('override_custom_receipt_page', ''),
+            "req_payment_method": post_params.get('payment_method', ''),
             "req_currency": post_params.get('currency'),
             "req_locale": post_params.get('locale'),
             "signed_date_time": post_params.get('signed_date_time'),

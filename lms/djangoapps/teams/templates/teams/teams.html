@@ -4,6 +4,8 @@
 
 <%! import json %>
 <%!
+import six
+
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
@@ -39,8 +41,11 @@ from openedx.core.djangolib.js_utils import (
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
-        courseID: '${unicode(course.id) | n, js_escaped_string}',
+        courseID: '${six.text_type(course.id) | n, js_escaped_string}',
         topics: ${topics | n, dump_js_escaped_json},
+        hasManagedTopic: ${has_managed_teamset | n, dump_js_escaped_json},
+        hasPublicManagedTopic: ${has_public_managed_teamset | n, dump_js_escaped_json},
+        hasOpenTopic: ${has_open_teamset | n, dump_js_escaped_json},
         userInfo: ${user_info | n, dump_js_escaped_json},
         topicUrl: '${topic_url | n, js_escaped_string}',
         topicsUrl: '${topics_url | n, js_escaped_string}',
@@ -49,7 +54,8 @@ from openedx.core.djangolib.js_utils import (
         teamMembershipsUrl: '${team_memberships_url | n, js_escaped_string}',
         teamMembershipDetailUrl: '${team_membership_detail_url | n, js_escaped_string}',
         myTeamsUrl: '${my_teams_url | n, js_escaped_string}',
-        maxTeamSize: ${course.teams_max_size | n, dump_js_escaped_json},
+        teamMembershipManagementUrl: '${team_membership_management_url | n, js_escaped_string}',
+        courseMaxTeamSize: ${course.teams_configuration.default_max_team_size | n, dump_js_escaped_json},
         languages: ${languages | n, dump_js_escaped_json},
         countries: ${countries | n, dump_js_escaped_json},
         teamsBaseUrl: '${teams_base_url | n, js_escaped_string}'

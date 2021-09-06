@@ -13,11 +13,7 @@ describe('Course Card View', () => {
   const setupView = (data, isEnrolled, collectionCourseStatus) => {
     const programData = $.extend({}, data);
     const context = {
-      courseData: {
-        grades: {
-          'course-v1:WageningenX+FFESx+1T2017': 0.8,
-        },
-      },
+      courseData: {},
       collectionCourseStatus,
     };
 
@@ -86,18 +82,6 @@ describe('Course Card View', () => {
 
   it('should exist', () => {
     expect(view).toBeDefined();
-  });
-
-  it('should render final grade if course is completed', () => {
-    view.remove();
-    setupView(course, true);
-    expect(view.$('.grade-display').text()).toEqual('80%');
-  });
-
-  it('should not render final grade if course has not been completed', () => {
-    view.remove();
-    setupView(course, true, 'in_progress');
-    expect(view.$('.final-grade').length).toEqual(0);
   });
 
   it('should render the course card based on the data not enrolled', () => {

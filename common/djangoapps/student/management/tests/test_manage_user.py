@@ -1,15 +1,17 @@
 """
 Unit tests for user_management management commands.
 """
+
+
 import itertools
 
 import ddt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 
 TEST_EMAIL = 'test@example.com'
 TEST_USERNAME = 'test-user'
@@ -25,7 +27,6 @@ class TestManageUserCommand(TestCase):
         """
         Ensures that users are created if they don't exist and reused if they do.
         """
-        # pylint: disable=no-member
         self.assertEqual([], list(User.objects.all()))
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
         user = User.objects.get(username=TEST_USERNAME)
@@ -41,7 +42,6 @@ class TestManageUserCommand(TestCase):
         """
         Ensures that users are removed if they exist and exit cleanly otherwise.
         """
-        # pylint: disable=no-member
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
@@ -106,7 +106,6 @@ class TestManageUserCommand(TestCase):
         Ensure that the operation is aborted if the username matches an
         existing user account but the supplied email doesn't match.
         """
-        # pylint: disable=no-member
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         with self.assertRaises(CommandError) as exc_context:
             call_command('manage_user', TEST_USERNAME, 'other@example.com')
@@ -148,7 +147,7 @@ class TestManageUserCommand(TestCase):
         expected_staff, expected_super = expected_bits
         args = [opt for bit, opt in ((expected_staff, '--staff'), (expected_super, '--superuser')) if bit]
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, *args)
-        user = User.objects.all().first()  # pylint: disable=no-member
+        user = User.objects.all().first()
         self.assertEqual(user.is_staff, expected_staff)
         self.assertEqual(user.is_superuser, expected_super)
 

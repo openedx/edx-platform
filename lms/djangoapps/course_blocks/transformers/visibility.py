@@ -1,6 +1,8 @@
 """
 Visibility Transformer implementation.
 """
+
+
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin

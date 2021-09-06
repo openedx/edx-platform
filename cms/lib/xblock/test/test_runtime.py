@@ -1,10 +1,12 @@
 """
 Tests of edX Studio runtime functionality
 """
+
+
 from unittest import TestCase
-from urlparse import urlparse
 
 from mock import Mock
+from six.moves.urllib.parse import urlparse
 
 from cms.lib.xblock.runtime import handler_url
 

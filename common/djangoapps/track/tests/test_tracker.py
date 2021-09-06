@@ -1,6 +1,9 @@
+
+
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from six.moves import range
 
 import track.tracker as tracker
 from track.backends import BaseBackend
@@ -70,18 +73,18 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         tracker.send({})
 
-        self.assertEqual(backends.values()[0].count, 1)
+        self.assertEqual(list(backends.values())[0].count, 1)
 
     @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS.copy())
     def test_django_multi_settings(self):
         """Test if multiple backends can be configured properly."""
 
-        backends = self._reload_backends().values()
+        backends = list(self._reload_backends().values())
 
         self.assertEqual(len(backends), 2)
 
         event_count = 10
-        for _ in xrange(event_count):
+        for _ in range(event_count):
             tracker.send({})
 
         self.assertEqual(backends[0].count, event_count)

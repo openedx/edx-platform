@@ -2,8 +2,10 @@
 LTI Provider view functions
 """
 
+
 import logging
 
+import six
 from django.conf import settings
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -76,7 +78,7 @@ def lti_launch(request, course_id, usage_id):
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
         log.error(
-            'Invalid course key %s or usage key %s from request %s',
+            u'Invalid course key %s or usage key %s from request %s',
             course_id,
             usage_id,
             request
@@ -143,8 +145,8 @@ def render_courseware(request, usage_key):
     context to render the courseware.
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
-    from courseware.views.views import render_xblock
-    return render_xblock(request, unicode(usage_key), check_if_enrolled=False)
+    from lms.djangoapps.courseware.views.views import render_xblock
+    return render_xblock(request, six.text_type(usage_key), check_if_enrolled=False)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):

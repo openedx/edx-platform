@@ -3,6 +3,7 @@
 Teams pages.
 """
 
+
 from common.test.acceptance.pages.common.paging import PaginatedUIMixin
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.lms.course_page import CoursePage
@@ -23,7 +24,7 @@ class TeamCardsMixin(object):
 
     def _bounded_selector(self, css):
         """Bind the CSS to a particular tabpanel (e.g. My Teams or Browse)."""
-        return '{tabpanel_id} {css}'.format(tabpanel_id=getattr(self, 'tabpanel_id', ''), css=css)
+        return u'{tabpanel_id} {css}'.format(tabpanel_id=getattr(self, 'tabpanel_id', ''), css=css)
 
     def view_first_team(self):
         """Click the 'view' button of the first team card on the page."""
@@ -189,14 +190,14 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         Show the teams list for `topic_name`.
         """
         self.q(css=TEAMS_LINK_CSS).filter(
-            text='View Teams in the {topic_name} Topic'.format(topic_name=topic_name)
+            text=u'View Teams in the {topic_name} Topic'.format(topic_name=topic_name)
         )[0].click()
         self.wait_for_ajax()
 
     def sort_topics_by(self, sort_order):
         """Sort the list of topics by the given `sort_order`."""
         self.q(
-            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+            css=u'#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
         ).click()
         self.wait_for_ajax()
 
@@ -273,7 +274,7 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMix
     def sort_teams_by(self, sort_order):
         """Sort the list of teams by the given `sort_order`."""
         self.q(
-            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+            css=u'#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
         ).click()
         self.wait_for_ajax()
 
@@ -520,6 +521,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
     def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
         leave_team_css = '.leave-team-link'
+        self.scroll_to_element(leave_team_css)
         self.wait_for_element_visibility(leave_team_css, 'Leave Team link is visible.')
         click_css(self, leave_team_css, require_notification=False)
         confirm_prompt(self, cancel, require_notification=False)
@@ -563,7 +565,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
 
     def format_capacity_text(self, num_members, max_size):
         """ Helper method to format the expected team capacity text. """
-        return '{num_members} / {max_size} {members_text}'.format(
+        return u'{num_members} / {max_size} {members_text}'.format(
             num_members=num_members,
             max_size=max_size,
             members_text='Member' if num_members == max_size else 'Members'

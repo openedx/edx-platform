@@ -1,12 +1,18 @@
+
+
 import copy
-from contracts import contract, new_contract
-from xblock.fields import Scope
 from collections import namedtuple
-from xblock.exceptions import InvalidScopeError
-from .definition_lazy_loader import DefinitionLazyLoader
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore
+
+import six
+from contracts import contract, new_contract
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlockAside
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Scope
+
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore
+
+from .definition_lazy_loader import DefinitionLazyLoader
 
 # id is a BlockUsageLocator, def_id is the definition's guid
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
@@ -186,7 +192,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
                 aside_fields_p = persisted_definition.get('aside_fields')
                 if aside_fields_p:
                     aside_fields = self._definition.field_converter(aside_fields_p)
-                    for aside_type, fields in aside_fields.iteritems():
+                    for aside_type, fields in six.iteritems(aside_fields):
                         self.aside_fields.setdefault(aside_type, {}).update(fields)
                 # do we want to cache any of the edit_info?
             self._definition = None  # already loaded

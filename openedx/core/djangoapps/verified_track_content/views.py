@@ -2,6 +2,7 @@
 View methods for verified track content.
 """
 
+
 from django.contrib.auth.decorators import login_required
 from opaque_keys.edx.keys import CourseKey
 

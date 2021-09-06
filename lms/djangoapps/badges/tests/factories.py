@@ -1,6 +1,8 @@
 """
 Factories for Badge tests
 """
+
+
 from random import random
 
 import factory

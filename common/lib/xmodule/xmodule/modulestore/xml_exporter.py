@@ -2,24 +2,26 @@
 Methods for exporting course data to XML
 """
 
+
 import logging
+import os
 from abc import abstractmethod
-from six import text_type
+from json import dumps
+
 import lxml.etree
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+import six
+from fs.osfs import OSFS
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from six import text_type
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+
+from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
-from xmodule.modulestore import LIBRARY_ROOT
-from fs.osfs import OSFS
-from json import dumps
-import os
-
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -166,6 +168,7 @@ class ExportManager(object):
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
                 xml_centric_courselike_key = self.get_key()
                 adapt_references(courselike, xml_centric_courselike_key, export_fs)
+                root.set('url_name', self.courselike_key.run)
                 courselike.add_xml_to_node(root)
 
             # Make any needed adjustments to the root node.
@@ -267,10 +270,6 @@ class CourseExportManager(ExportManager):
         )
 
         course_policy_dir_name = courselike.location.run
-        if courselike.url_name != courselike.location.run and courselike.url_name == 'course':
-            # Use url_name for split mongo because course_run is not used when loading policies.
-            course_policy_dir_name = courselike.url_name
-
         course_run_policy_dir = policies_dir.makedir(course_policy_dir_name, recreate=True)
 
         # export the grading policy
@@ -280,7 +279,7 @@ class CourseExportManager(ExportManager):
 
         # export all of the course metadata in policy.json
         with course_run_policy_dir.open(u'policy.json', 'wb') as course_policy:
-            policy = {'course/' + courselike.location.block_id: own_metadata(courselike)}
+            policy = {'course/' + courselike.location.run: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
@@ -358,7 +357,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
-    for field_name, field in subtree.fields.iteritems():
+    for field_name, field in six.iteritems(subtree.fields):
         if field.is_set_on(subtree):
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
@@ -375,7 +374,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
             elif isinstance(field, ReferenceValueDict):
                 field.write_to(
                     subtree, {
-                        key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).iteritems()
+                        key: ele.map_into_course(destination_course_key) for key, ele in six.iteritems(field.read_from(subtree))
                     }
                 )
 

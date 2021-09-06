@@ -1,16 +1,24 @@
 """
 Tests the simulate_publish management command.
 """
-from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import (
-    Command, name_from_fn
-)
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import openedx.core.djangoapps.content.course_overviews.signals
+
+
+import six
+
+from django.core.management import call_command
+from django.core.management.base import CommandError
+from testfixtures import LogCapture
+
 import lms.djangoapps.ccx.tasks
+import openedx.core.djangoapps.content.course_overviews.signals
+from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import Command, name_from_fn
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SimulateCoursePublishConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SwitchedSignal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+LOGGER_NAME = 'simulate_publish'
 
 
 class TestSimulatePublish(SharedModuleStoreTestCase):
@@ -95,6 +103,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
             delay=0,
             force_lms=False,
             skip_ccx=False,
+            args_from_database=False
         )
         default_options.update(kwargs)
         return default_options
@@ -103,7 +112,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """Test sending only to specific courses."""
         self.command.handle(
             **self.options(
-                courses=[unicode(self.course_key_1), unicode(self.course_key_2)]
+                courses=[six.text_type(self.course_key_1), six.text_type(self.course_key_2)]
             )
         )
         self.assertIn(self.course_key_1, self.received_1)
@@ -145,3 +154,35 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
     def sample_receiver_2(self, sender, course_key, **kwargs):  # pylint: disable=unused-argument
         """Custom receiver for testing."""
         self.received_2.append(course_key)
+
+    def test_args_from_database(self):
+        """Test management command arguments injected from config model."""
+        # Nothing in the database, should default to disabled
+        with self.assertRaisesRegex(CommandError, 'SimulateCourseConfigPublish is disabled.*'):
+            call_command('simulate_publish', '--args-from-database')
+
+        # Add a config
+        config = SimulateCoursePublishConfig.current()
+        config.arguments = '--delay 20 --dry-run'
+        config.enabled = True
+        config.save()
+
+        with LogCapture(LOGGER_NAME) as log:
+            call_command('simulate_publish')
+
+            log.check_present(
+                (
+                    LOGGER_NAME, 'INFO',
+                    u"simulate_publish starting, dry-run={}, delay={} seconds".format('False', '0')
+                ),
+            )
+
+        with LogCapture(LOGGER_NAME) as log:
+            call_command('simulate_publish', '--args-from-database')
+
+            log.check_present(
+                (
+                    LOGGER_NAME, 'INFO',
+                    u"simulate_publish starting, dry-run={}, delay={} seconds".format('True', '20')
+                ),
+            )

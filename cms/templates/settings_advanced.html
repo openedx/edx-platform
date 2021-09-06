@@ -25,7 +25,8 @@
     require(["js/factories/settings_advanced"], function(SettingsAdvancedFactory) {
         SettingsAdvancedFactory(
             ${advanced_dict | n, dump_js_escaped_json},
-            "${advanced_settings_url | n, js_escaped_string}"
+            "${advanced_settings_url | n, js_escaped_string}",
+            ${publisher_enabled | n, dump_js_escaped_json}
         );
     });
 </%block>

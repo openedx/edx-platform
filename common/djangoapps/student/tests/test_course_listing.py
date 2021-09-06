@@ -2,15 +2,18 @@
 Unit tests for getting the list of courses for a user through iterating all courses and
 by reversing group name formats.
 """
+
+
 import unittest
 
 import mock
+import six
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, DashboardConfiguration
 from student.roles import GlobalStaff
 from student.tests.factories import UserFactory
 from student.views import get_course_enrollments
@@ -82,6 +85,23 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 0)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_get_limited_number_of_courses_using_config(self):
+        course_location = self.store.make_course_key('Org0', 'Course0', 'Run0')
+        self._create_course_with_access_groups(course_location)
+
+        course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_location)
+
+        # get dashboard
+        courses_list = list(get_course_enrollments(self.student, None, []))
+        self.assertEqual(len(courses_list), 2)
+
+        with self.settings(DASHBOARD_COURSE_LIMIT=1):
+            course_limit = settings.DASHBOARD_COURSE_LIMIT
+            courses_list = list(get_course_enrollments(self.student, None, [], course_limit))
+            self.assertEqual(len(courses_list), 1)
+
     def test_errored_course_regular_access(self):
         """
         Test the course list for regular staff when get_course returns an ErrorDescriptor
@@ -133,8 +153,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(pre_requisite_course_location2)
         # create a course with pre_requisite_courses
         pre_requisite_courses = [
-            unicode(pre_requisite_course_location),
-            unicode(pre_requisite_course_location2),
+            six.text_type(pre_requisite_course_location),
+            six.text_type(pre_requisite_course_location2),
         ]
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, {

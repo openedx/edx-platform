@@ -106,7 +106,7 @@ class::
 
     from django.apps import AppConfig
     from openedx.core.djangoapps.plugins.constants import (
-        ProjectType, SettingsType, PluginURLs, PluginSettings
+        ProjectType, SettingsType, PluginURLs, PluginSettings, PluginContexts
     )
     class MyAppConfig(AppConfig):
         name = u'full_python_path.my_app'
@@ -144,11 +144,11 @@ class::
                 ProjectType.LMS: {
 
                     # Configure each Settings Type, as needed.
-                    SettingsType.AWS: {
+                    SettingsType.PRODUCTION: {
 
                         # The python path (relative to this app) to the settings module for the relevant Project Type and Settings Type.
                         # Optional; Defaults to u'settings'.
-                        PluginSettings.RELATIVE_PATH: u'settings.aws',
+                        PluginSettings.RELATIVE_PATH: u'settings.production',
                     },
                     SettingsType.COMMON: {
                         PluginSettings.RELATIVE_PATH: u'settings.common',
@@ -184,6 +184,19 @@ class::
                         PluginSignals.SENDER_PATH: u'full_path_to_sender_app.ModelZ',
                     }],
                 }
+            },
+
+            # Configuration setting for Plugin Contexts for this app.
+            PluginContexts.CONFIG: {
+
+                # Configure the Plugin Signals for each Project Type, as needed.
+                ProjectType.LMS: {
+
+                    # Key is the view that the app wishes to add context to and the value
+                    # is the function within the app that will return additional context
+                    # when called with the original context
+                    u'course_dashboard': u'my_app.context_api.get_dashboard_context'
+                }
             }
         }
 
@@ -203,7 +216,7 @@ OR use string constants when they cannot import from djangoapps.plugins::
             },
             u'settings_config': {
                 u'lms.djangoapp': {
-                    u'aws': { relative_path: u'settings.aws' },
+                    u'production': { relative_path: u'settings.production' },
                     u'common': { relative_path: u'settings.common'},
                 }
             },
@@ -216,6 +229,11 @@ OR use string constants when they cannot import from djangoapps.plugins::
                         u'dispatch_uid': u'my_app.my_signals.on_signal_x',
                         u'sender_path': u'full_path_to_sender_app.ModelZ',
                     }],
+                }
+            },
+            u'view_context_config': {
+                u'lms.djangoapp': {
+                    'course_dashboard': u'my_app.context_api.get_dashboard_context'
                 }
             }
         }

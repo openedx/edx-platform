@@ -1,6 +1,8 @@
 """
 Fragment for rendering text me the app.
 """
+
+
 from django.template.loader import render_to_string
 from web_fragments.fragment import Fragment
 

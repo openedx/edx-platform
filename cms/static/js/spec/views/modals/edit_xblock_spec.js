@@ -134,7 +134,7 @@ describe('EditXBlockModal', function() {
         it('shows the correct title', function() {
             var requests = AjaxHelpers.requests(this);
             modal = showModal(requests, mockXModuleEditorHtml);
-            expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
+            expect(modal.$('.modal-window-title span.modal-button-title').text()).toBe('Editing: Component');
         });
 
         it('shows the correct default buttons', function() {

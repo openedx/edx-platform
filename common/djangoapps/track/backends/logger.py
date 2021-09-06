@@ -1,6 +1,5 @@
 """Event tracker backend that saves events to a python logger."""
 
-from __future__ import absolute_import
 
 import json
 import logging

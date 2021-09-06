@@ -3,7 +3,8 @@
 End-to-end tests for the LMS.
 """
 
-from unittest import expectedFailure
+
+import pytest
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -47,6 +48,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with no children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):
@@ -80,6 +82,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):
@@ -120,10 +123,12 @@ class XBlockAcidChildTest(XBlockAcidBase):
         self.validate_acid_block_view(acid_block)
 
 
+@pytest.mark.xfail
 class XBlockAcidAsideTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):
@@ -144,7 +149,6 @@ class XBlockAcidAsideTest(XBlockAcidBase):
             )
         ).install()
 
-    @expectedFailure
     def test_acid_block(self):
         """
         Verify that all expected acid block tests pass in the lms.

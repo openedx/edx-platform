@@ -1,11 +1,12 @@
 """
 tests for the models
 """
+
+
 import json
 from datetime import datetime, timedelta
 
 import ddt
-from nose.plugins.attrib import attr
 from pytz import utc
 
 from student.roles import CourseCcxCoachRole
@@ -18,7 +19,6 @@ from .factories import CcxFactory
 
 
 @ddt.ddt
-@attr(shard=7)
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """
@@ -64,7 +64,7 @@ class TestCCX(ModuleStoreTestCase):
         """
         expected = datetime.now(utc)
         self.set_ccx_override('start', expected)
-        actual = self.ccx.start  # pylint: disable=no-member
+        actual = self.ccx.start
         diff = expected - actual
         self.assertLess(abs(diff.total_seconds()), 1)
 
@@ -76,20 +76,20 @@ class TestCCX(ModuleStoreTestCase):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
-            self.ccx.start  # pylint: disable=pointless-statement, no-member
+            self.ccx.start  # pylint: disable=pointless-statement
         with check_mongo_calls(0):
-            self.ccx.start  # pylint: disable=pointless-statement, no-member
+            self.ccx.start  # pylint: disable=pointless-statement
 
     def test_ccx_due_without_override(self):
         """verify that due returns None when the field has not been set"""
-        actual = self.ccx.due  # pylint: disable=no-member
+        actual = self.ccx.due
         self.assertIsNone(actual)
 
     def test_ccx_due_is_correct(self):
         """verify that the due datetime for a ccx is correctly retrieved"""
         expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
-        actual = self.ccx.due  # pylint: disable=no-member
+        actual = self.ccx.due
         diff = expected - actual
         self.assertLess(abs(diff.total_seconds()), 1)
 
@@ -101,9 +101,9 @@ class TestCCX(ModuleStoreTestCase):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
-            self.ccx.due  # pylint: disable=pointless-statement, no-member
+            self.ccx.due  # pylint: disable=pointless-statement
         with check_mongo_calls(0):
-            self.ccx.due  # pylint: disable=pointless-statement, no-member
+            self.ccx.due  # pylint: disable=pointless-statement
 
     def test_ccx_has_started(self):
         """verify that a ccx marked as starting yesterday has started"""
@@ -111,7 +111,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('start', then)
-        self.assertTrue(self.ccx.has_started())  # pylint: disable=no-member
+        self.assertTrue(self.ccx.has_started())
 
     def test_ccx_has_not_started(self):
         """verify that a ccx marked as starting tomorrow has not started"""
@@ -119,7 +119,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('start', then)
-        self.assertFalse(self.ccx.has_started())  # pylint: disable=no-member
+        self.assertFalse(self.ccx.has_started())
 
     def test_ccx_has_ended(self):
         """verify that a ccx that has a due date in the past has ended"""
@@ -127,7 +127,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('due', then)
-        self.assertTrue(self.ccx.has_ended())  # pylint: disable=no-member
+        self.assertTrue(self.ccx.has_ended())
 
     def test_ccx_has_not_ended(self):
         """verify that a ccx that has a due date in the future has not eneded
@@ -136,11 +136,11 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('due', then)
-        self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
+        self.assertFalse(self.ccx.has_ended())
 
     def test_ccx_without_due_date_has_not_ended(self):
         """verify that a ccx without a due date has not ended"""
-        self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
+        self.assertFalse(self.ccx.has_ended())
 
     def test_ccx_max_student_enrollment_correct(self):
         """
@@ -148,15 +148,15 @@ class TestCCX(ModuleStoreTestCase):
         """
         expected = 200
         self.set_ccx_override('max_student_enrollments_allowed', expected)
-        actual = self.ccx.max_student_enrollments_allowed  # pylint: disable=no-member
+        actual = self.ccx.max_student_enrollments_allowed
         self.assertEqual(expected, actual)
 
     def test_structure_json_default_empty(self):
         """
         By default structure_json does not contain anything
         """
-        self.assertEqual(self.ccx.structure_json, None)  # pylint: disable=no-member
-        self.assertEqual(self.ccx.structure, None)  # pylint: disable=no-member
+        self.assertEqual(self.ccx.structure_json, None)
+        self.assertEqual(self.ccx.structure, None)
 
     def test_structure_json(self):
         """
@@ -173,12 +173,12 @@ class TestCCX(ModuleStoreTestCase):
             coach=self.coach,
             structure_json=json_struct
         )
-        self.assertEqual(ccx.structure_json, json_struct)  # pylint: disable=no-member
-        self.assertEqual(ccx.structure, dummy_struct)  # pylint: disable=no-member
+        self.assertEqual(ccx.structure_json, json_struct)
+        self.assertEqual(ccx.structure, dummy_struct)
 
     def test_locator_property(self):
         """
         Verify that the locator helper property returns a correct CCXLocator
         """
-        locator = self.ccx.locator  # pylint: disable=no-member
-        self.assertEqual(self.ccx.id, long(locator.ccx))
+        locator = self.ccx.locator
+        self.assertEqual(self.ccx.id, int(locator.ccx))

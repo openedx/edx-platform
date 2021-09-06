@@ -41,12 +41,12 @@
   background: none;
 }
 
-.wmd-button-bar  {
+.wmd-button-bar {
   width: 100%;
 }
 
 .wmd-button-row {
-  @include transition(all .2s ease-out 0s);
+  @include transition(all 0.2s ease-out 0s);
 
   position: relative;
   overflow: hidden;

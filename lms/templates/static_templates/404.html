@@ -18,10 +18,9 @@ from openedx.core.djangolib.markup import HTML, Text
                 % if page_content:
                     ${page_content}
                 % else:
-                    ${Text(_('The page that you were looking for was not found. Go back to the {link_start}homepage{link_end} or let us know about any pages that may have been moved at {email}.')).format(
+                    ${Text(_('The page that you were looking for was not found. Go back to the {link_start}homepage{link_end} .')).format(
                     link_start=HTML('<a href="/">'),
-                    link_end=HTML('</a>'),
-                    email=HTML('<a href="mailto:{email}">{email}</a>').format(email=Text(static.get_tech_support_email_address()))
+                    link_end=HTML('</a>')
                     )}
                 % endif
             </%block>

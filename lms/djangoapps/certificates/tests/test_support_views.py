@@ -2,16 +2,24 @@
 Tests for certificate app views used by the support team.
 """
 
+
 import json
+from uuid import uuid4
 
 import ddt
+import six
+
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory
@@ -26,7 +34,6 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
     """
-    shard = 4
 
     SUPPORT_USERNAME = "support"
     SUPPORT_EMAIL = "support@example.com"
@@ -80,6 +87,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
             status=self.CERT_STATUS,
             mode=self.CERT_MODE,
             download_url=self.CERT_DOWNLOAD_URL,
+            verify_uuid=uuid4().hex
         )
 
         # Login as support staff
@@ -92,14 +100,17 @@ class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
         Create a course
         """
         super(CertificateSearchTests, self).setUp()
-        self.course = CourseFactory()
+        self.course = CourseFactory(
+            org=self.CERT_COURSE_KEY.org,
+            course=self.CERT_COURSE_KEY.course,
+            run=self.CERT_COURSE_KEY.run,
+        )
         self.course.cert_html_view_enabled = True
 
         #course certificate configurations
@@ -118,6 +129,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.course.certificates = {'certificates': certificates}
         self.course.save()
         self.store.update_item(self.course, self.user.id)
+        self.course_overview = CourseOverviewFactory(
+            id=self.course.id,
+            cert_html_view_enabled=True,
+        )
 
     @ddt.data(
         (GlobalStaff, True),
@@ -150,15 +165,17 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ("bar@example.com", False),
         ("", False),
         (CertificateSupportTestCase.STUDENT_USERNAME, False, 'invalid_key'),
-        (CertificateSupportTestCase.STUDENT_USERNAME, False, unicode(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
-        (CertificateSupportTestCase.STUDENT_USERNAME, True, unicode(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, False,
+            six.text_type(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, True,
+            six.text_type(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
     )
     @ddt.unpack
     def test_search(self, user_filter, expect_result, course_filter=None):
         response = self._search(user_filter, course_filter)
         if expect_result:
             self.assertEqual(response.status_code, 200)
-            results = json.loads(response.content)
+            results = json.loads(response.content.decode('utf-8'))
             self.assertEqual(len(results), 1)
         else:
             self.assertEqual(response.status_code, 400)
@@ -172,7 +189,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.student.email)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_data = results[0]
@@ -181,19 +198,20 @@ class CertificateSearchTests(CertificateSupportTestCase):
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]
 
         self.assertEqual(retrieved_cert["username"], self.STUDENT_USERNAME)
-        self.assertEqual(retrieved_cert["course_key"], unicode(self.CERT_COURSE_KEY))
+        self.assertEqual(retrieved_cert["course_key"], six.text_type(self.CERT_COURSE_KEY))
         self.assertEqual(retrieved_cert["created"], self.cert.created_date.isoformat())
         self.assertEqual(retrieved_cert["modified"], self.cert.modified_date.isoformat())
-        self.assertEqual(retrieved_cert["grade"], unicode(self.CERT_GRADE))
+        self.assertEqual(retrieved_cert["grade"], six.text_type(self.CERT_GRADE))
         self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
         self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
         self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
+        self.assertFalse(retrieved_cert["regenerate"])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
@@ -203,7 +221,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]
@@ -211,10 +229,11 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.assertEqual(
             retrieved_cert["download_url"],
             reverse(
-                'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.course.id}
+                'certificates:render_cert_by_uuid',
+                kwargs={"certificate_uuid": self.cert.verify_uuid}
             )
         )
+        self.assertTrue(retrieved_cert["regenerate"])
 
     def _search(self, user_filter, course_filter=None):
         """Execute a search and return the response. """
@@ -229,7 +248,6 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate regeneration end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -270,6 +288,10 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             self.assertEqual(response.status_code, 403)
 
     def test_regenerate_certificate(self):
+        """Test web certificate regenration."""
+        self.cert.download_url = ''
+        self.cert.save()
+
         response = self._regenerate(
             course_key=self.course.id,
             username=self.STUDENT_USERNAME,
@@ -282,6 +304,23 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
+    @patch('lms.djangoapps.certificates.queue.XQueueCertInterface._generate_cert')
+    def test_regenerate_certificate_for_honor_mode(self, mock_generate_cert):
+        """Test web certificate regenration for the users who have earned the
+           certificate in honor mode
+        """
+        self.cert.mode = 'honor'
+        self.cert.download_url = ''
+        self.cert.save()
+
+        with mock_passing_grade(percent=0.75):
+            with patch('course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
+                mock_mode_for_course.return_value = 'honor'
+                api.regenerate_user_certificates(self.student, self.course.id,
+                                                 course=self.course)
+
+                mock_generate_cert.assert_called()
+
     def test_regenerate_certificate_missing_params(self):
         # Missing username
         response = self._regenerate(course_key=self.CERT_COURSE_KEY)
@@ -293,7 +332,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     def test_regenerate_no_such_user(self):
         response = self._regenerate(
-            course_key=unicode(self.CERT_COURSE_KEY),
+            course_key=six.text_type(self.CERT_COURSE_KEY),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)
@@ -412,7 +451,6 @@ class CertificateGenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate generation end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -470,7 +508,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_no_such_user(self):
         response = self._generate(
-            course_key=unicode(self.EXISTED_COURSE_KEY_2),
+            course_key=six.text_type(self.EXISTED_COURSE_KEY_2),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)

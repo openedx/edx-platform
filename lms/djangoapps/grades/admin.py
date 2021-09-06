@@ -1,8 +1,11 @@
 """
 Django admin page for grades models
 """
+
+
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
+
 from lms.djangoapps.grades.config.forms import CoursePersistentGradesAdminForm
 from lms.djangoapps.grades.config.models import (
     ComputeGradesSetting,

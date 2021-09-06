@@ -98,7 +98,7 @@
     // layout with breadcrumb navigation
     &.has-navigation {
       .nav-actions {
-        bottom: -($baseline*1.5);
+        top: -($baseline*2);
       }
 
       .navigation-item {
@@ -209,7 +209,7 @@
 
 .content-primary,
 .content-supplementary {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 // 3/4 - 1/4 two col layout

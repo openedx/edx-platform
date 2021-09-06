@@ -19,6 +19,7 @@
         describe('constructor', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
+                jasmine.mockFullscreenAPI();
             });
 
             it('renders the fullscreen control', function() {
@@ -69,9 +70,9 @@
             });
 
             it('can update video dimensions on state change', function() {
-                state.el.trigger('fullscreen', [true]);
+                state.videoFullScreen.enter();
                 expect(state.resizer.setMode).toHaveBeenCalledWith('both');
-                state.el.trigger('fullscreen', [false]);
+                state.videoFullScreen.exit();
                 expect(state.resizer.setMode).toHaveBeenCalledWith('width');
             });
 
@@ -88,9 +89,10 @@
             });
 
             state = jasmine.initializePlayer();
-            $(state.el).trigger('fullscreen');
 
+            state.videoFullScreen.enter();
             expect(state.videoFullScreen.height).toBe(150);
+            state.videoFullScreen.exit();
         });
     });
 }).call(this);

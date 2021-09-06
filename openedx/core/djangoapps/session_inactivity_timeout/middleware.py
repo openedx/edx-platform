@@ -8,15 +8,18 @@ To enable this feature, set in a settings.py:
 
 This was taken from StackOverflow (http://stackoverflow.com/questions/14830669/how-to-expire-django-session-in-5minutes)
 """
+
+
 from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import auth
+from django.utils.deprecation import MiddlewareMixin
 
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch'
 
 
-class SessionInactivityTimeout(object):
+class SessionInactivityTimeout(MiddlewareMixin):
     """
     Middleware class to keep track of activity on a given session
     """

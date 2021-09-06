@@ -20,6 +20,7 @@ To enable this implementation, add the following Django settings:
 
 """
 
+
 import binascii
 import hmac
 import json
@@ -39,6 +40,7 @@ from six import text_type
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.markup import HTML, Text
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
@@ -120,7 +122,8 @@ def processor_hash(value):
     """
     secret_key = get_processor_config().get('SECRET_KEY', '')
     hash_obj = hmac.new(secret_key.encode('utf-8'), value.encode('utf-8'), sha256)
-    return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
+    signature = binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
+    return signature.decode('utf-8')
 
 
 def verify_signatures(params):
@@ -208,7 +211,7 @@ def sign(params):
         dict: The same parameters dict, with a 'signature' key calculated from the other values.
 
     """
-    fields = u",".join(params.keys())
+    fields = u",".join(list(params.keys()))
     params['signed_field_names'] = fields
 
     signed_fields = params.get('signed_field_names', '').split(',')
@@ -293,7 +296,7 @@ def get_purchase_params(cart, callback_url=None, extra_data=None):
 
     params['amount'] = amount
     params['currency'] = cart.currency
-    params['orderNumber'] = "OrderId: {0:d}".format(cart.id)
+    params['orderNumber'] = u"OrderId: {0:d}".format(cart.id)
 
     params['access_key'] = get_processor_config().get('ACCESS_KEY', '')
     params['profile_id'] = get_processor_config().get('PROFILE_ID', '')
@@ -416,7 +419,7 @@ def _record_purchase(params, order):
 
     if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
         log.info(
-            "Order %d purchased with params: %s", order.id, json.dumps(params)
+            u"Order %d purchased with params: %s", order.id, json.dumps(params)
         )
 
     # Mark the order as purchased and store the billing information
@@ -445,9 +448,10 @@ def _record_payment_info(params, order):
     Returns:
         None
     """
+
     if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
         log.info(
-            "Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)
+            u"Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)
         )
 
     order.processor_reply_dump = json.dumps(params)
@@ -467,15 +471,15 @@ def _get_processor_decline_html(params):
     """
     payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     return _format_error_html(
-        _(
-            "Sorry! Our payment processor did not accept your payment.  "
-            "The decision they returned was {decision}, "
-            "and the reason was {reason}.  "
-            "You were not charged. Please try a different form of payment.  "
-            "Contact us with payment-related questions at {email}."
-        ).format(
-            decision='<span class="decision">{decision}</span>'.format(decision=params['decision']),
-            reason='<span class="reason">{reason_code}:{reason_msg}</span>'.format(
+        Text(_(
+            u"Sorry! Our payment processor did not accept your payment.  "
+            u"The decision they returned was {decision}, "
+            u"and the reason was {reason}.  "
+            u"You were not charged. Please try a different form of payment.  "
+            u"Contact us with payment-related questions at {email}."
+        )).format(
+            decision=HTML(u'<span class="decision">{decision}</span>').format(decision=params['decision']),
+            reason=HTML(u'<span class="reason">{reason_code}:{reason_msg}</span>').format(
                 reason_code=params['reason_code'],
                 reason_msg=REASONCODE_MAP.get(params['reason_code'])
             ),
@@ -498,37 +502,37 @@ def _get_processor_exception_html(exception):
     payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     if isinstance(exception, CCProcessorDataException):
         return _format_error_html(
-            _(
+            Text(_(
                 u"Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data! "
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
                 u"The specific error message is: {msg} "
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
-            ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
+            )).format(
+                msg=HTML(u'<span class="exception_msg">{msg}</span>').format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
     elif isinstance(exception, CCProcessorWrongAmountException):
         return _format_error_html(
-            _(
+            Text(_(
                 u"Sorry! Due to an error your purchase was charged for a different amount than the order total! "
                 u"The specific error message is: {msg}. "
                 u"Your credit card has probably been charged. Contact us with payment-specific questions at {email}."
-            ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
+            )).format(
+                msg=HTML(u'<span class="exception_msg">{msg}</span>').format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
     elif isinstance(exception, CCProcessorSignatureException):
         return _format_error_html(
-            _(
+            Text(_(
                 u"Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are "
                 u"unable to validate that the message actually came from the payment processor. "
                 u"The specific error message is: {msg}. "
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
                 u"Your credit card may possibly have been charged. Contact us with payment-specific questions at {email}."
-            ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
+            )).format(
+                msg=HTML(u'<span class="exception_msg">{msg}</span>').format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
@@ -562,7 +566,7 @@ def _get_processor_exception_html(exception):
 
 def _format_error_html(msg):
     """ Format an HTML error message """
-    return u'<p class="error_msg">{msg}</p>'.format(msg=msg)
+    return HTML(u'<p class="error_msg">{msg}</p>').format(msg=msg)
 
 
 CARDTYPE_MAP = defaultdict(lambda: "UNKNOWN")
@@ -664,7 +668,7 @@ REASONCODE_MAP.update(
             """)),
         '233': _('General decline by the processor.  Possible action: retry with another form of payment.'),
         '234': _(
-            "There is a problem with the information in your CyberSource account.  Please let us know at {0}"
+            u"There is a problem with the information in your CyberSource account.  Please let us know at {0}"
         ).format(settings.PAYMENT_SUPPORT_EMAIL),
         '235': _('The requested capture amount exceeds the originally authorized amount.'),
         '236': _('Processor Failure.  Possible action: retry the payment'),
