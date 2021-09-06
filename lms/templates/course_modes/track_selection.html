@@ -81,8 +81,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
                     <form class="form-register-choose mb-4 mt-0" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         <div class="row">
+                        <div class="track-selection-container">
                             % if "verified" in modes:
-                            <div class="track-selection-choice track-selection-certificate col-6 mb-5">
+                            <div class="track-selection-choice track-selection-certificate mr-md-2">
                                 <div class="certificate-container">
                                     <div class="corner-overlay"></div>
                                     <span class="award-icon">
@@ -144,16 +145,16 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
                                     </%static:require_module_async>
                                 </div>
-                                <div class="certificate-container-bottom">
-                                    <span class="verified-info-icon"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
-                                    <div class="verified-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
-                                        start_bold=HTML('<b>'),
-                                        end_bold=HTML('</b>'),
-                                    )}</div>
-                                </div>
+                            </div>
+                            <div class="verified-note mr-md-2">
+                                <span class="note-icon"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
+                                <div class="note-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
+                                    start_bold=HTML('<b>'),
+                                    end_bold=HTML('</b>'),
+                                )}</div>
                             </div>
                             % endif
-                            <div class="track-selection-choice track-selection-audit col-6">
+                            <div class="track-selection-choice track-selection-audit ml-md-3">
                                 <p class="float-right m-3 text-uppercase price-display">${_("Free")}</p>
                                 <div class="choice-title"><h4>${_("Access this course")}</h4></div>
                                 <div class="choice-bullets">
