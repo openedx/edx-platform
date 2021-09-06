@@ -16065,7 +16065,7 @@ msgstr "أنت مسجّل في هذا المساق"
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
-msgstr "استعراض المساق "
+msgstr "استعراض السياق"
 
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
