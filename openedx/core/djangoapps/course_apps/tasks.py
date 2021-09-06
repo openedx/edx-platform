@@ -21,22 +21,13 @@ def cache_all_course_apps_status():
     """
     Create CourseAppStatus entries for all course apps, across all courses to speed up queries.
     """
-    course_app_plugins = CourseAppsPluginManager.get_available_plugins()
     for idx, course_key in enumerate(CourseOverview.objects.values_list('id', flat=True)):
-        if (idx + 1) % 100 == 0:
-            log.info("Cached %s records successfully", idx + 1)
         if isinstance(course_key, LibraryLocator):
             continue
-        for plugin in course_app_plugins.values():
-            # For current plugins this is just reading a django setting or returning a bool value
-            if plugin.is_available(course_key):
-                is_enabled = plugin.is_enabled(course_key)
-                CourseAppStatus.objects.update_or_create(
-                    course_key=course_key,
-                    app_id=plugin.app_id,
-                    defaults={'enabled': is_enabled}
-                )
-    log.info("Caching course apps status for all courses complete")
+        update_course_apps_status.delay(str(course_key))
+        if (idx + 1) % 100 == 0:
+            log.info("Cached course app status for %s courses successfully", idx + 1)
+    log.info("Cached course app status for all courses successfully")
 
 
 @shared_task(name='openedx.core.djangoapps.course_apps.tasks.update_course_apps_status')
