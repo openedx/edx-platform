@@ -1,8 +1,8 @@
-name: Develop -> Master PR
+name: "main -> prod pull requests"
 on:
   push:
     branches:
-      - appsembler/tahoe/develop
+      - hawthorn/main
 jobs:
   auto-pull-request:
     name: PullRequestAction
@@ -12,13 +12,13 @@ jobs:
         uses: vsoch/pull-request-action@1.0.12
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_PREFIX: "appsembler/tahoe/develop"
-          PULL_REQUEST_BRANCH: "appsembler/tahoe/master"
-          PULL_REQUEST_TITLE: "Tahoe Hawthorn `develop` -> `master` (production)"
+          BRANCH_PREFIX: "hawthorn/main"
+          PULL_REQUEST_BRANCH: "hawthorn/prod"
+          PULL_REQUEST_TITLE: "Tahoe Hawthorn `main` -> `prod` (production)"
           PULL_REQUEST_BODY: |
-            This is an automated pull request from branch `appsembler/tahoe/develop` into `appsembler/tahoe/master` (production).
+            This is an automated pull request from branch `hawthorn/main` into `hawthorn/prod` (production).
             Please review the changes and merge this pull request _before_ running the Tahoe production Cloud Build deployment.
-          PULL_REQUEST_REVIEWERS: "johnbaldwin melvinsoft OmarIthawi thraxil"
+          PULL_REQUEST_REVIEWERS: "johnbaldwin amirtds bryanlandia"
   hawthorn-to-juniper-sync:
     name: PullRequestAction
     runs-on: ubuntu-latest
@@ -27,13 +27,13 @@ jobs:
         uses: vsoch/pull-request-action@1.0.12
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_PREFIX: "appsembler/tahoe/develop"
+          BRANCH_PREFIX: "hawthorn/main"
           PULL_REQUEST_BRANCH: "main"
-          PULL_REQUEST_TITLE: "Update Tahoe Juniper (`main`) with Hawthorn changes from `develop`"
+          PULL_REQUEST_TITLE: "Update Tahoe Juniper (`main`) with changes from `hawthorn/main`"
           PULL_REQUEST_BODY: |
-            This is an automated pull request from branch `appsembler/tahoe/develop` (Hawthorn) into `main` (Juniper).
+            This is an automated pull request from branch `hawthorn/main` (Hawthorn) into `main` (Juniper).
             This is meant for making sure all of our Hawthorn changes gets merge into Juniper otherwise Juniper would stall.
             If tests passes merge this pull request.
             If there are merge conflicts, it needs to be resolved manually in a seperate pull request.
-          PULL_REQUEST_REVIEWERS: "johnbaldwin melvinsoft OmarIthawi thraxil"
+          PULL_REQUEST_REVIEWERS: "melvinsoft estherjsuh OmarIthawi thraxil"
 
