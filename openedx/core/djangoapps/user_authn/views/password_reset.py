@@ -108,6 +108,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
     site = get_current_site()
     message_context = get_base_template_context(site)
     message_context.update({
+        'full_name': (user.profile.name or user.username).title(),
         'request': request,  # Used by google_analytics_tracking_pixel
         # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

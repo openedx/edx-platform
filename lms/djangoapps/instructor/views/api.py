@@ -20,6 +20,7 @@ import six
 import unicodecsv
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail.message import EmailMessage
 from django.core.validators import validate_email
@@ -82,6 +83,7 @@ from lms.djangoapps.instructor.views.instructor_task_helpers import extract_emai
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -728,6 +730,8 @@ def students_update_enrollment(request, course_id):
                         state_transition = UNENROLLED_TO_ALLOWEDTOENROLL
 
             elif action == 'unenroll':
+                site = Site.objects.get_current()
+                email_params.update(get_base_template_context(site))
                 before, after = unenroll_email(
                     course_id, email, email_students, email_params, language=language
                 )
