@@ -25,6 +25,7 @@ from lms.djangoapps.courseware.masquerade import (
     get_masquerading_user_group,
     setup_masquerade,
 )
+
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -241,6 +242,45 @@ class TestMasqueradeLearnerOptions(StaffMasqueradeTestCase):
             response = self.get_available_masquerade_identities()
             is_learner_available = 'Learner' in map(itemgetter('name'), response.json()['available'])
             assert partitions_enabled != is_learner_available
+
+
+@ddt.ddt
+class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
+    """
+    Test that split_test content groups (which are the partitions with a "random" scheme),
+    do not show up in the masquerade options popup, but cohort groups do appear.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.user_partition = UserPartition(
+            0, 'Test User Partition', '',
+            [Group(0, 'Cohort Group 1'), Group(1, 'Cohort Group 2')],
+            scheme_id='cohort'
+        )
+        self.course.user_partitions.append(self.user_partition)
+        self.user_partition = UserPartition(
+            0, 'Test User Partition 2', '',
+            [Group(0, 'Content Group 1'), Group(1, 'Content Group 2')],
+            scheme_id='random'
+        )
+        self.course.user_partitions.append(self.user_partition)
+
+        modulestore().update_item(self.course, self.test_user.id)
+
+    @ddt.data(['Cohort Group 1', True], ['Content Group 1', False])
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    def testMasqueradeCohortAvailable(self, target, expected):
+        """
+        Args:
+            target: The partition to check for in masquerade options
+            expected: Whether to partition should be in the list
+        """
+        response = self.get_available_masquerade_identities()
+        is_target_available = target in map(itemgetter('name'), response.json()['available'])
+        assert is_target_available == expected
 
 
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):

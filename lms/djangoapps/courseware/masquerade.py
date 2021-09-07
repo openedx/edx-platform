@@ -142,7 +142,9 @@ class MasqueradeView(View):
             'user_name': course.user_name or '',
         })
         for partition in partitions:
-            if partition.active:
+            # "random" scheme implies a split_test content group, not a cohort
+            # and masquerading only cares about user cohorts
+            if partition.active and partition.scheme.name != "random":
                 data['available'].extend([
                     {
                         'group_id': group.id,
