@@ -246,6 +246,10 @@ class TestMasqueradeLearnerOptions(StaffMasqueradeTestCase):
 
 @ddt.ddt
 class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
+    """
+    Test that split_test content groups (which are the partitions with a "random" scheme),
+    do not show up in the masquerade options popup, but cohort groups do appear.
+    """
 
     def setUp(self):
         super().setUp()
@@ -269,6 +273,11 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
     def testMasqueradeCohortAvailable(self, target, expected):
+        """
+        Args:
+            target: The partition to check for in masquerade options
+            expected: Whether to partition should be in the list
+        """
         response = self.get_available_masquerade_identities()
         is_target_available = target in map(itemgetter('name'), response.json()['available'])
         assert is_target_available == expected
