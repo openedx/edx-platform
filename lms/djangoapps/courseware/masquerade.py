@@ -143,7 +143,7 @@ class MasqueradeView(View):
         })
         for partition in partitions:
             # "random" scheme implies a split_test content group, not a cohort
-            # for AA-940 remove split_test partition groups from dropdown
+            # and masquerading only cares about user cohorts
             if partition.active and partition.scheme.name != "random":
                 data['available'].extend([
                     {
