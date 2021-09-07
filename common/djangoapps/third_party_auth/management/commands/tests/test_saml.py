@@ -6,12 +6,12 @@ existing data accordingly.
 
 import os
 import unittest
+from io import StringIO
 
 from unittest import mock
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.utils.six import StringIO
 from requests import exceptions
 from requests.models import Response
 
