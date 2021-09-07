@@ -256,8 +256,7 @@ class ChooseModeView(View):
         if deadline:
             formatted_audit_access_date = strftime_localized_html(deadline, 'SHORT_DATE')
             context['audit_access_deadline'] = formatted_audit_access_date
-        full_fbe_is_on = deadline and gated_content
-        partial_fbe_is_on = deadline or gated_content
+        fbe_is_on = deadline and gated_content
 
         # Route to correct Track Selection page.
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
@@ -265,17 +264,10 @@ class ChooseModeView(View):
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
             if not error:  # TODO: Remove by executing REV-2355
                 if not enterprise_customer:  # TODO: Remove by executing REV-2342
-                    if full_fbe_is_on:
-                        return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
-                    elif partial_fbe_is_on:
-                        return render_to_response("course_modes/track_selection_types/partial_fbe.html", context)
+                    if fbe_is_on:
+                        return render_to_response("course_modes/track_selection_types/fbe.html", context)
                     else:
-                        # If the course has started redirect to course home instead
-                        if course.has_started():
-                            return redirect(reverse(
-                                'openedx.course_experience.course_home',
-                                kwargs={'course_id': course_key}))
-                        return redirect(reverse('dashboard'))
+                        return render_to_response("course_modes/track_selection_types/unfbe.html", context)
 
         # If error or enterprise_customer, failover to old choose.html page
         return render_to_response("course_modes/choose.html", context)

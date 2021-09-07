@@ -1,7 +1,7 @@
-## This template is for full Feature Based Enrollment (FBE). This means a
-## learner in the default audit track will have a limited time to complete the
-## course (course access duration) and may have some of the content of the
-## course unavailable (gated content).
+## This template is for track selection with Feature Based Enrollment (FBE).
+## This means a learner in the default audit track will have a limited time to
+## complete the course (course access duration) and may have some of the content
+## of the course unavailable (gated content).
 
 <%page expression_filter="h"/>
 <%inherit file="../track_selection.html" />
@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="track_selection_certificate_bullets">
-<div class="choice-bullets track-selection-type-full-fbe">
+<div class="choice-bullets track-selection-type-fbe">
     <ul>
         <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
                 link_start=HTML('<b><u><a class="verified" href="{track_verified_url}" target="_blank">').format(track_verified_url=track_links['verified_certificate']),
@@ -48,7 +48,7 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <%block name="track_selection_audit_bullets">
-<div class="choice-bullets track-selection-type-full-fbe">
+<div class="choice-bullets track-selection-type-fbe">
     <ul>
         <li>${Text(_("Get temporary access to  {start_bold}non-graded{end_bold} activities, including discussion forums and non-graded assignments")).format(
             start_bold=HTML('<b>'),
