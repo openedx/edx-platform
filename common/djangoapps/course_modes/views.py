@@ -263,8 +263,8 @@ class ChooseModeView(View):
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
-            if not error: # TODO: Remove by executing REV-2355
-                if not enterprise_customer: # TODO: Remove by executing REV-2342
+            if not error:  # TODO: Remove by executing REV-2355
+                if not enterprise_customer:  # TODO: Remove by executing REV-2342
                     if full_fbe_is_on:
                         return render_to_response("course_modes/track_selection_types/full_fbe.html", context)
                     elif partial_fbe_is_on:
@@ -272,7 +272,9 @@ class ChooseModeView(View):
                     else:
                         # If the course has started redirect to course home instead
                         if course.has_started():
-                            return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+                            return redirect(reverse(
+                                'openedx.course_experience.course_home',
+                                kwargs={'course_id': course_key}))
                         return redirect(reverse('dashboard'))
 
         # If error or enterprise_customer, failover to old choose.html page
