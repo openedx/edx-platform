@@ -54,6 +54,8 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.toggles import POPULATE_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
     course_home_mfe_progress_tab_is_active
@@ -1717,6 +1719,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
         except CourseAccessRedirect:
             raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+
+        if POPULATE_USER_ACTIVITY_FLAG.is_enabled():
+            # Populate user activity for tracking progress towards a user's course goals (for mobile app)
+            UserActivity.populate_user_activity(
+                request.user, usage_key.course_key, request=request, check_if_mobile_app=True
+            )
 
         # with course access now verified:
         # assume masquerading role, if applicable.

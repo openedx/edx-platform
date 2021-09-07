@@ -22,6 +22,8 @@ from lms.djangoapps.courseware.tabs import (
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
+from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.toggles import POPULATE_USER_ACTIVITY_FLAG
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
@@ -83,8 +85,11 @@ class TabTestCase(SharedModuleStoreTestCase):
         self.course.pdf_textbooks = self.books
         self.course.html_textbooks = self.books
 
+    @override_waffle_flag(POPULATE_USER_ACTIVITY_FLAG, active=True)
+    @patch.object(UserActivity, 'populate_user_activity')
     def check_tab(
             self,
+            populate_user_activity_mock,
             tab_class,
             dict_tab,
             expected_link,
@@ -120,6 +125,9 @@ class TabTestCase(SharedModuleStoreTestCase):
         if invalid_dict_tab:
             with pytest.raises(xmodule_tabs.InvalidTabsException):
                 tab.validate(invalid_dict_tab)
+
+        # all course tabs should call the populate user activity endpoint
+        populate_user_activity_mock.assert_called_once()
 
         # check get and set methods
         self.check_get_and_set_methods(tab)

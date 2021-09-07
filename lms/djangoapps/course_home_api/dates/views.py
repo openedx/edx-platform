@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.toggles import POPULATE_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
@@ -85,6 +87,10 @@ class DatesTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         is_staff = bool(has_access(request.user, 'staff', course_key))
+
+        if POPULATE_USER_ACTIVITY_FLAG.is_enabled():
+            # Populate user activity for tracking progress towards a user's course goals (for mobile app)
+            UserActivity.populate_user_activity(request.user, course.id, request=request, check_if_mobile_app=True)
 
         _, request.user = setup_masquerade(
             request,
