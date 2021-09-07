@@ -3,16 +3,16 @@ Tests for the Sending activation email celery tasks
 """
 
 
-from unittest import mock
 from django.conf import settings
 from django.test import TestCase
-
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
+from unittest import mock
+
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.views.management import compose_activation_email, compose_and_send_activation_email
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from common.djangoapps.student.models import Registration
-from common.djangoapps.student.tasks import send_activation_email
-from common.djangoapps.student.views.management import compose_activation_email, compose_and_send_activation_email
+from openedx.core.djangoapps.user_authn.tasks import send_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):
@@ -44,8 +44,8 @@ class SendActivationEmailTestCase(TestCase):
         assert self.msg.context['routed_profile_name'] == ''
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
-    @mock.patch('common.djangoapps.student.tasks.log')
-    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))  # lint-amnesty, pylint: disable=line-too-long
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.log')
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))  # lint-amnesty, pylint: disable=line-too-long
     def test_RetrySendUntilFail(self, mock_log):
         """
         Tests retries when the activation email doesn't send
@@ -74,8 +74,8 @@ class SendActivationEmailTestCase(TestCase):
         )
         assert mock_log.error.call_count == 1
 
-    @mock.patch('common.djangoapps.student.tasks.log')
-    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.log')
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.ace.send', mock.Mock(side_effect=ChannelError))
     def test_UnrecoverableSendError(self, mock_log):
         """
         Tests that a major failure of the send is logged
@@ -96,8 +96,8 @@ class SendActivationEmailTestCase(TestCase):
         assert mock_log.error.call_count == 0
         assert mock_log.exception.call_count == 1
 
-    @mock.patch('common.djangoapps.student.tasks.log')
-    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.log')
+    @mock.patch('openedx.core.djangoapps.user_authn.tasks.ace.send', mock.Mock(side_effect=ChannelError))
     @mock.patch('common.djangoapps.student.views.management.theming_helpers.get_current_site')
     @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration')
     def test_from_address_in_send_email(self, mock_site_configuration, mock_get_current_site, mock_log):
