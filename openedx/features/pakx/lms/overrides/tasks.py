@@ -102,8 +102,9 @@ def remove_enrollment_record(user_id, course_id):
     :param user_id: (str) user name
     :param course_id: (CourseKeyField) course key
     """
-
-    CourseEnrollment.objects.filter(user_id=user_id, course_id=course_id).delete()
+    enrollment = CourseEnrollment.objects.filter(user_id=user_id, course_id=course_id).first()
+    if enrollment:
+        CourseProgressStats.objects.filter(enrollment=enrollment).delete()
 
 
 # TODO: Remove this method when deployed on prod & enrollments are copied to stats
