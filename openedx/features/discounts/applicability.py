@@ -20,11 +20,13 @@ from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.courseware.utils import is_mode_upsellable
+from lms.djangoapps.courseware.toggles import COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import segment
+
 
 # .. toggle_name: discounts.enable_discounting
 # .. toggle_implementation: WaffleFlag
@@ -88,6 +90,11 @@ def can_show_streak_discount_coupon(user, course):
     Check whether this combination of user and course
     can receive the streak discount.
     """
+
+    # Feature needs to be enabled
+    if not COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT.is_enabled():
+        return False
+
     # Course end date needs to be in the future
     if course.has_ended():
         return False
