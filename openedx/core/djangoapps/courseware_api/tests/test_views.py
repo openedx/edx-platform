@@ -311,7 +311,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                     mock_segment_track.assert_called_once()
 
     def test_streak_segment_suppressed_for_unverified(self):
-        """ Test that metadata endpoint does not return a discount for unverified and signal is not sent """
+        """ Test that metadata endpoint does not return a discount and signal is not sent if flag is not set """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=False):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
