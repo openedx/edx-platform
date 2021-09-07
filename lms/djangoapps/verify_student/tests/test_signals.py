@@ -8,6 +8,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 from unittest.mock import patch
 
+from common.djangoapps.student.models_api import do_name_change_request
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
@@ -112,17 +113,23 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
     the verification attempt that was updated.
     """
 
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.photo_id_name = 'Bob Doe'
+        self.face_image_url = 'https://test.face'
+        self.photo_id_image_url = 'https://test.photo'
+        self.photo_id_key = 'test+key'
+
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
     def test_post_save_signal(self, mock_signal):
-        user = UserFactory.create()
-
         # create new softwaresecureverification
         attempt = SoftwareSecurePhotoVerification.objects.create(
-            user=user,
-            name='Bob Doe',
-            face_image_url='https://test.face',
-            photo_id_image_url='https://test.photo',
-            photo_id_key='test+key'
+            user=self.user,
+            name=self.photo_id_name,
+            face_image_url=self.face_image_url,
+            photo_id_image_url=self.photo_id_image_url,
+            photo_id_key=self.photo_id_key
         )
         self.assertTrue(mock_signal.called)
         mock_signal.assert_called_with(
@@ -130,8 +137,8 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             attempt_id=attempt.id,
             user_id=attempt.user.id,
             status=attempt.status,
-            full_name=attempt.name,
-            profile_name=attempt.user.profile.name
+            photo_id_name=attempt.name,
+            full_name=attempt.user.profile.name
         )
         mock_signal.reset_mock()
 
@@ -143,6 +150,27 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             attempt_id=attempt.id,
             user_id=attempt.user.id,
             status=attempt.status,
-            full_name=attempt.name,
-            profile_name=attempt.user.profile.name
+            photo_id_name=attempt.name,
+            full_name=attempt.user.profile.name
+        )
+
+    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    def test_post_save_signal_pending_name(self, mock_signal):
+        pending_name_change = do_name_change_request(self.user, 'Pending Name', 'test')[0]
+
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            name=self.photo_id_name,
+            face_image_url=self.face_image_url,
+            photo_id_image_url=self.photo_id_image_url,
+            photo_id_key=self.photo_id_key
+        )
+
+        mock_signal.assert_called_with(
+            sender='idv_update',
+            attempt_id=attempt.id,
+            user_id=attempt.user.id,
+            status=attempt.status,
+            photo_id_name=attempt.name,
+            full_name=pending_name_change.new_name
         )
