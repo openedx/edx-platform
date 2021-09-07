@@ -19,7 +19,7 @@
 }
 
 .track-selection-choice li {
-    margin-bottom: 26px;
+    margin-bottom: 1.25rem;
 }
 
 .track-selection-audit {
@@ -56,7 +56,7 @@
 
 .track-selection-button button {
     width: 90%;
-    font-size: 16px;
+    font-size: 1rem;
     box-shadow: none;
     border-radius: 0px;
     position: relative;
@@ -98,14 +98,14 @@
     margin-top: -1px;
     border: 1px solid #707070;
     border-top: 0;
-    padding: 16px;
+    padding: 1rem;
 }
 
 .note-info {
     float: right;
     font-size: 14px;
     margin-left: 12px;
-    line-height: 24px;
+    line-height: 1.5rem;
 }
 
 .note-icon {
@@ -115,7 +115,7 @@
 
 .choice-bullets {
     padding: 0 3rem 1rem 2rem;
-    line-height: 24px;
+    line-height: 1.5rem;
     font-size: 14px;
 }
 
@@ -144,7 +144,7 @@ a:not(.btn), a:visited:not(.btn) {
     font-size: 14px;
     font-style: normal;
     font-weight: 700;
-    line-height: 20px;
+    line-height: 1.25rem;
     float: right;
     margin: 0.75rem;
     color: #454545;
@@ -160,8 +160,9 @@ a:not(.btn), a:visited:not(.btn) {
 }
 
 .collapsible {
-    color: #00688d;
+    color: #00688d !important;
     font-weight: 700;
+    font-size: 14px !important;
 }
 
 .collapsible-item {
@@ -214,7 +215,7 @@ a:not(.btn), a:visited:not(.btn) {
     border-style: solid;
     border-color: transparent #fff transparent transparent;
     left: -14px;
-    top: 24px;
+    top: 1.5rem;
     content: '';
 }
 
