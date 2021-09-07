@@ -7,6 +7,7 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
+import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
@@ -397,9 +398,10 @@ if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
 
 #####################################################################
 
-# django-session-cookie middleware
-DCS_SESSION_COOKIE_SAMESITE = 'Lax'
-DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+if django.VERSION < (3, 1):
+    # django-session-cookie middleware
+    DCS_SESSION_COOKIE_SAMESITE = 'Lax'
+    DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 #####################################################################
 # See if the developer has any local overrides.

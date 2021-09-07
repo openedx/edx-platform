@@ -105,6 +105,10 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
 	# Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
+	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django.txt
+	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django30.txt
+	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/base.txt > requirements/edx/base.tmp
+	mv requirements/edx/base.tmp requirements/edx/base.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 

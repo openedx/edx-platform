@@ -32,6 +32,7 @@ import importlib.util
 import sys
 import os
 
+import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
@@ -1633,9 +1634,10 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
-# django-session-cookie middleware
-DCS_SESSION_COOKIE_SAMESITE = 'None'
-DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+if django.VERSION < (3, 1):
+    # django-session-cookie middleware
+    DCS_SESSION_COOKIE_SAMESITE = 'None'
+    DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 # This is the domain that is used to set shared cookies between various sub-domains.
 SHARED_COOKIE_DOMAIN = ""
@@ -2008,10 +2010,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
-    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
-    # Override was found here https://github.com/django/django/pull/11894
-    'django_cookies_samesite.middleware.CookiesSameSite',
-
     'crum.CurrentRequestUserMiddleware',
 
     # A newer and safer request cache.
@@ -2123,6 +2121,13 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
+
+if django.VERSION < (3, 1):
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    MIDDLEWARE.append(
+        'django_cookies_samesite.middleware.CookiesSameSite'
+    )
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
