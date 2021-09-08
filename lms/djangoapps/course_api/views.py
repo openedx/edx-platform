@@ -271,6 +271,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             provided org code (e.g., "HarvardX") are returned.
             Case-insensitive.
 
+        permissions (optional):
+            If specified, it filters visible `CourseOverview` objects by
+            checking if each permission specified is granted for the username.
+            Notice that Staff users are always granted permission to list any
+            course.
+
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -321,13 +327,13 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-
         return list_courses(
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
             filter_=form.cleaned_data['filter_'],
-            search_term=form.cleaned_data['search_term']
+            search_term=form.cleaned_data['search_term'],
+            permissions=form.cleaned_data['permissions']
         )
 
 

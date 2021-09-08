@@ -702,10 +702,13 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, filter_=None, permissions=None):
     """
-    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
+    Return a LazySequence of courses available, optionally filtered by org code
+    (case-insensitive) or a set of permissions to be satisfied for the specified
+    user.
     """
+
     courses = branding.get_visible_courses(
         org=org,
         filter_=filter_,
@@ -715,13 +718,15 @@ def get_courses(user, org=None, filter_=None):
         'image_set'
     )
 
+    permissions = set(permissions or '')
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
+    permissions.add(permission_name)
 
     return LazySequence(
-        (c for c in courses if has_access(user, permission_name, c)),
+        (c for c in courses if all(has_access(user, p, c) for p in permissions)),
         est_len=courses.count()
     )
 
