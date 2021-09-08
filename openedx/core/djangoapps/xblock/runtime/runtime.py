@@ -12,6 +12,7 @@ from completion.services import CompletionService
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from functools import lru_cache
 from eventtracking import tracker
 from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError

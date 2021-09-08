@@ -9,6 +9,7 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 import ddt
+import django
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -282,6 +283,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         }
 
         body = bodies[body_type]
+
+        if django.VERSION >= (3, 0):
+            expected_output = "You&#x27;re receiving this e-mail because you requested a password reset"
 
         assert 'Password reset' in sent_message.subject
         assert expected_output in body

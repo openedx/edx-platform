@@ -21,6 +21,7 @@ from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -44,10 +45,12 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
-class LoginTest(SiteMixin, CacheIsolationTestCase):
+class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view
     """
+
+    ENABLED_OPENEDX_EVENTS = []
 
     ENABLED_CACHES = ['default']
     LOGIN_FAILED_WARNING = 'Email or password is incorrect'
@@ -55,6 +58,17 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     username = 'test'
     user_email = 'test@edx.org'
     password = 'test_password'
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         """Setup a test user along with its registration and profile"""
@@ -954,12 +968,25 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
 @ddt.ddt
 @skip_unless_lms
-class LoginSessionViewTest(ApiTestCase):
+class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
     """Tests for the login end-points of the user API. """
+
+    ENABLED_OPENEDX_EVENTS = []
 
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = "password"
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()

@@ -45,7 +45,7 @@ extract_translations: ## extract localizable strings from sources
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations: requirements  ## pull translations from Transifex
+pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale
 	i18n_tool transifex pull
 	i18n_tool extract

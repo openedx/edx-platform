@@ -55,6 +55,7 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_retired_username_by_username,
     is_username_retired
 )
+from common.djangoapps.student.models_api import do_name_change_request
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -79,6 +80,7 @@ from ..models import (
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
 from .serializers import (
+    PendingNameChangeSerializer,
     UserRetirementPartnerReportSerializer,
     UserRetirementStatusSerializer,
     UserSearchEmailSerializer
@@ -245,6 +247,9 @@ class AccountViewSet(ViewSet):
 
             * phone_number: The phone number for the user. String of numbers with
               an optional `+` sign at the start.
+
+            * pending_name_change: If the user has an active name change request, returns the
+              requested name.
 
             * is_verified_name_enabled: Temporary flag to control verified name field - see
               https://github.com/edx/edx-name-affirmation/blob/main/edx_name_affirmation/toggles.py
@@ -414,6 +419,42 @@ class AccountViewSet(ViewSet):
             )
 
         return Response(account_settings)
+
+
+class NameChangeView(APIView):
+    """
+    Request a profile name change. This creates a PendingNameChange to be verified later,
+    rather than updating the user's profile name directly.
+    """
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/name_change/
+
+        Example request:
+            {
+                "name": "Jon Doe"
+            }
+        """
+        user = request.user
+        new_name = request.data.get('name', None)
+        rationale = f'Name change requested through account API by {user.username}'
+
+        serializer = PendingNameChangeSerializer(data={'new_name': new_name})
+
+        if serializer.is_valid():
+            pending_name_change = do_name_change_request(user, new_name, rationale)[0]
+            if pending_name_change:
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(
+                    'The name given was identical to the current name.',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class AccountDeactivationView(APIView):

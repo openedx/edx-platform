@@ -16,7 +16,7 @@ from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
-
+import pdb
 
 class BaseI18nTestCase(CacheIsolationTestCase):
     """
@@ -146,6 +146,7 @@ class I18nRegressionTests(BaseI18nTestCase):
         self.client.post(self.preview_language_url, {'preview_language': 'eo', 'action': 'set_preview_language'})
 
         response = self.client.get(self.url)
+        pdb.set_trace()
         self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "eo")
         # We should be able to see released languages using preview-lang, too
         self.client.post(self.preview_language_url, {'preview_language': 'es-419', 'action': 'set_preview_language'})

@@ -15,6 +15,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.course_metadata.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
@@ -52,6 +53,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             url: (str) The url to view the tab
         title: (str) The Course's display title
         celebrations: (dict) a dict of celebration data
+        user_timezone: (str) The timezone of the given user
 
     **Returns**
 
@@ -103,8 +105,14 @@ class CourseHomeMetadataView(RetrieveAPIView):
             is_course_staff=original_user_is_staff
         )
 
+        # User locale settings
+        user_timezone_locale = user_timezone_locale_prefs(request)
+        user_timezone = user_timezone_locale['user_timezone']
+
         browser_timezone = self.request.query_params.get('browser_timezone', None)
-        celebrations = get_celebrations_dict(request.user, enrollment, course, browser_timezone)
+        celebrations = get_celebrations_dict(
+            request.user, enrollment, course, user_timezone if not None else browser_timezone
+        )
 
         data = {
             'course_id': course.id,
@@ -121,6 +129,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'course_access': load_access.to_json(),
             'can_load_courseware': can_load_courseware,
             'celebrations': celebrations,
+            'user_timezone': user_timezone,
         }
         context = self.get_serializer_context()
         context['course'] = course

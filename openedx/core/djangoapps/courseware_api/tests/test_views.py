@@ -29,7 +29,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
     COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS,
 )
-from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_FLAG
+from lms.djangoapps.courseware.toggles import COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT
 from lms.djangoapps.verify_student.services import IDVerificationService
 from common.djangoapps.student.models import (
     CourseEnrollment, CourseEnrollmentCelebration
@@ -301,12 +301,26 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        with override_waffle_flag(STREAK_DISCOUNT_FLAG, active=True):
+        with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
-                response = self.client.get(self.url, content_type='application/json')
-                celebrations = response.json()['celebrations']
-                assert celebrations['streak_length_to_celebrate'] == 3
-                assert celebrations['streak_discount_enabled'] is True
+                with mock.patch('common.djangoapps.track.segment.track') as mock_segment_track:
+                    response = self.client.get(self.url, content_type='application/json')
+                    celebrations = response.json()['celebrations']
+                    assert celebrations['streak_length_to_celebrate'] == 3
+                    assert celebrations['streak_discount_enabled'] is True
+                    mock_segment_track.assert_called_once()
+
+    def test_streak_segment_suppressed_for_unverified(self):
+        """ Test that metadata endpoint does not return a discount and signal is not sent if flag is not set """
+        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
+        with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=False):
+            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+                with mock.patch('common.djangoapps.track.segment.track') as mock_segment_track:
+                    response = self.client.get(self.url, content_type='application/json')
+                    celebrations = response.json()['celebrations']
+                    assert celebrations['streak_length_to_celebrate'] == 3
+                    assert celebrations['streak_discount_enabled'] is False
+                    mock_segment_track.assert_not_called()
 
     @ddt.data(
         (False, False),

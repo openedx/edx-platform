@@ -360,8 +360,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     def clean(self):
         """
-        Validate the model
-
+        Validate the model.
         Currently, this only support courses, this can be extended
         whenever discussions are available in other contexts
         """
@@ -418,3 +417,50 @@ class DiscussionsConfiguration(TimeStampedModel):
     @classmethod
     def get_available_providers(cls, context_key: CourseKey) -> list[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
+
+
+class ProgramDiscussionsConfiguration(TimeStampedModel):
+    """
+    Associates a program with a discussion provider and configuration
+    """
+
+    program_uuid = models.CharField(
+        primary_key=True,
+        db_index=True,
+        max_length=50,
+        verbose_name=_("Program UUID"),
+    )
+    enabled = models.BooleanField(
+        default=True,
+        help_text=_("If disabled, the discussions in the associated program will be disabled.")
+    )
+    lti_configuration = models.ForeignKey(
+        LtiConfiguration,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("The LTI configuration data for this program/provider."),
+    )
+    provider_type = models.CharField(
+        blank=False,
+        max_length=50,
+        verbose_name=_("Discussion provider"),
+        help_text=_("The discussion provider's id"),
+    )
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f"ProgramDiscussionConfiguration(uuid='{self.uuid}', provider='{self.provider}', enabled={self.enabled})"
+
+    @classmethod
+    def is_enabled(cls, program_uuid) -> bool:
+        """
+        Check if there is an active configuration for a given program uuid
+
+        Default to False, if no configuration exists
+        """
+        try:
+            configuration = cls.objects.get(program_uuid=program_uuid)
+            return configuration.enabled
+        except cls.DoesNotExist:
+            return False

@@ -53,6 +53,7 @@ attrs==21.2.0
     #   -r requirements/edx/base.in
     #   aiohttp
     #   edx-ace
+    #   openedx-events
 babel==2.9.1
     # via
     #   -r requirements/edx/base.in
@@ -160,7 +161,7 @@ defusedxml==0.7.1
     #   python3-saml
     #   safe-lxml
     #   social-auth-core
-deprecated==1.2.12
+deprecated==1.2.13
     # via jwcrypto
 django==2.2.24
     # via
@@ -220,6 +221,7 @@ django==2.2.24
     #   help-tokens
     #   jsonfield2
     #   lti-consumer-xblock
+    #   openedx-events
     #   ora2
     #   rest-condition
     #   super-csv
@@ -405,7 +407,7 @@ edx-auth-backends==3.4.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/edx/base.in
-edx-bulk-grades==0.9.1
+edx-bulk-grades==0.9.2
     # via
     #   -r requirements/edx/base.in
     #   staff-graded-xblock
@@ -421,7 +423,7 @@ edx-django-release-util==1.1.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.3.0
+edx-django-utils==4.4.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -444,7 +446,7 @@ edx-drf-extensions==6.6.0
     #   edx-rbac
     #   edx-when
     #   edxval
-git+https://github.com/edx/edx-enterprise.git@f5d6588993b8022e23bfbc0dcdc0654a5b3c9f2d#edx-enterprise==3.30
+edx-enterprise==3.28.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -454,7 +456,7 @@ edx-i18n-tools==0.7.0
     # via ora2
 edx-milestones==0.3.2
     # via -r requirements/edx/base.in
-edx-name-affirmation==0.8.2
+edx-name-affirmation==0.9.1
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.2
     # via
@@ -470,11 +472,12 @@ edx-opaque-keys[django]==2.2.2
     #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
+    #   openedx-events
     #   ora2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.in
-edx-proctoring==3.24.2
+edx-proctoring==3.24.5
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -507,7 +510,7 @@ edx-toggles==4.2.0
     #   ora2
 edx-user-state-client==1.3.2
     # via -r requirements/edx/base.in
-edx-when==2.1.0
+edx-when==2.2.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -599,7 +602,7 @@ jsonfield2==3.0.3
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jwcrypto==0.9.1
+jwcrypto==1.0
     # via pylti1p3
 kombu==4.6.11
     # via celery
@@ -703,7 +706,9 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.6.20
+openedx-events==0.5.1
+    # via -r requirements/edx/base.in
+ora2==3.6.22
     # via -r requirements/edx/base.in
 packaging==21.0
     # via
@@ -731,7 +736,7 @@ pbr==5.6.0
     #   stevedore
 piexif==1.1.3
     # via -r requirements/edx/base.in
-pillow==8.3.1
+pillow==8.3.2
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -954,7 +959,6 @@ six==1.16.0
     #   html5lib
     #   interchange
     #   isodate
-    #   jwcrypto
     #   libsass
     #   pansi
     #   paver
@@ -1005,7 +1009,7 @@ stevedore==3.4.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==2.1.0
+super-csv==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   edx-bulk-grades
@@ -1072,7 +1076,8 @@ wrapt==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
-xblock==1.5.0
+    #   deprecated
+xblock==1.5.1
     # via
     #   -r requirements/edx/base.in
     #   acid-xblock
@@ -1103,7 +1108,7 @@ xblock-utils==2.2.0
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
-xmlsec==1.3.11
+xmlsec==1.3.12
     # via python3-saml
 xss-utils==0.3.0
     # via -r requirements/edx/base.in

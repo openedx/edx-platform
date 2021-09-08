@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -69,11 +70,15 @@ from common.djangoapps.util.password_policy_validators import (
 
 @ddt.ddt
 @skip_unless_lms
-class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase):
+class RegistrationViewValidationErrorTest(
+    ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase, OpenEdxEventsTestMixin
+):
     """
     Tests for catching duplicate email and username validation errors within
     the registration end-points of the User API.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
 
     maxDiff = None
 
@@ -87,6 +92,17 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
     CITY = "Springfield"
     COUNTRY = "us"
     GOALS = "Learn all the things!"
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
@@ -423,8 +439,12 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
 @ddt.ddt
 @skip_unless_lms
-class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
+class RegistrationViewTestV1(
+    ThirdPartyAuthTestMixin, UserAPITestCase, OpenEdxEventsTestMixin
+):
     """Tests for the registration end-points of the User API. """
+
+    ENABLED_OPENEDX_EVENTS = []
 
     maxDiff = None
 
@@ -485,6 +505,17 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         }
     ]
     link_template = "<a href='/honor' rel='noopener' target='_blank'>{link_label}</a>"
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
@@ -1815,6 +1846,17 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
 
     # pylint: disable=test-inherits-tests
 
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
     def setUp(self):  # pylint: disable=arguments-differ
         super(RegistrationViewTestV1, self).setUp()  # lint-amnesty, pylint: disable=bad-super-call
         self.url = reverse("user_api_registration_v2")
@@ -2043,15 +2085,30 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
 
 @httpretty.activate
 @ddt.ddt
-class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTestCase):
+class ThirdPartyRegistrationTestMixin(
+    ThirdPartyOAuthTestMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin
+):
     """
     Tests for the User API registration endpoint with 3rd party authentication.
     """
     CREATE_USER = False
 
+    ENABLED_OPENEDX_EVENTS = []
+
     ENABLED_CACHES = ['default']
 
     __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -2209,10 +2266,24 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestFacebookRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase, OpenEdxEventsTestMixin
 ):
     """Tests the User API registration endpoint with Facebook authentication."""
+
+    ENABLED_OPENEDX_EVENTS = []
+
     __test__ = True
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def test_social_auth_exception(self):
         """
@@ -2227,20 +2298,47 @@ class TestFacebookRegistrationView(
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestGoogleRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase, OpenEdxEventsTestMixin
 ):
     """Tests the User API registration endpoint with Google authentication."""
+
+    ENABLED_OPENEDX_EVENTS = []
+
     __test__ = True
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
 
 @ddt.ddt
-class RegistrationValidationViewTests(test_utils.ApiTestCase):
+class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestMixin):
     """
     Tests for validity of user data in registration forms.
     """
 
+    ENABLED_OPENEDX_EVENTS = []
+
     endpoint_name = 'registration_validation'
     path = reverse(endpoint_name)
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()

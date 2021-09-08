@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-29 20:45+0000\n"
-"PO-Revision-Date: 2021-08-29 20:45:05.308728\n"
+"POT-Creation-Date: 2021-09-05 20:51+0000\n"
+"PO-Revision-Date: 2021-09-05 20:51:43.669409\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -408,105 +408,6 @@ msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ 
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{username}' شمقثشيغ ثطهسفس."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Removed group: \"{}\""
-msgstr "قثوخدثي لقخعح: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Did not find a group with name \"{}\" - skipping."
-msgstr "يهي رخف بهري ش لقخعح صهفا رشوث \"{}\" - سنهححهرل."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Invalid group name: \"{group_name}\". {messages}"
-msgstr "هردشمهي لقخعح رشوث: \"{group_name}\". {messages}"
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Created new group: \"{}\""
-msgstr "ذقثشفثي رثص لقخعح: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid "Found existing group: \"{}\""
-msgstr "بخعري ثطهسفهرل لقخعح: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Adding {codenames} permissions to group \"{group}\""
-msgstr "شييهرل {codenames} حثقوهسسهخرس فخ لقخعح \"{group}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid "Removing {codenames} permissions from group \"{group}\""
-msgstr "قثوخدهرل {codenames} حثقوهسسهخرس بقخو لقخعح \"{group}\""
-
-#: common/djangoapps/student/management/commands/manage_group.py
-msgid ""
-"Invalid permission option: \"{}\". Please specify permissions using the "
-"format: app_label:model_name:permission_codename."
-msgstr ""
-"هردشمهي حثقوهسسهخر خحفهخر: \"{}\". حمثشسث سحثذهبغ حثقوهسسهخرس عسهرل فاث "
-"بخقوشف: شحح_مشزثم:وخيثم_رشوث:حثقوهسسهخر_ذخيثرشوث."
-
-#: common/djangoapps/student/management/commands/manage_group.py
-#, python-brace-format
-msgid ""
-"Invalid permission codename: \"{codename}\".  No such permission exists for "
-"the model {module}.{model_name}."
-msgstr ""
-"هردشمهي حثقوهسسهخر ذخيثرشوث: \"{codename}\".  رخ سعذا حثقوهسسهخر ثطهسفس بخق "
-"فاث وخيثم {module}.{model_name}."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
-msgstr "سثففهرل {attribute} بخق عسثق \"{username}\" فخ \"{new_value}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid ""
-"Skipping user \"{}\" because the specified and existing email addresses do "
-"not match."
-msgstr ""
-"سنهححهرل عسثق \"{}\" زثذشعسث فاث سحثذهبهثي شري ثطهسفهرل ثوشهم شييقثسسثس يخ "
-"رخف وشفذا."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Did not find a user with username \"{}\" - skipping."
-msgstr "يهي رخف بهري ش عسثق صهفا عسثقرشوث \"{}\" - سنهححهرل."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Removing user: \"{}\""
-msgstr "قثوخدهرل عسثق: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new user: \"{}\""
-msgstr "ذقثشفثي رثص عسثق: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Found existing user: \"{}\""
-msgstr "بخعري ثطهسفهرل عسثق: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Setting unusable password for user \"{}\""
-msgstr "سثففهرل عرعسشزمث حشسسصخقي بخق عسثق \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Created new profile for user: \"{}\""
-msgstr "ذقثشفثي رثص حقخبهمث بخق عسثق: \"{}\""
-
-#: common/djangoapps/student/management/commands/manage_user.py
-msgid "Could not find a group named \"{}\" - skipping."
-msgstr "ذخعمي رخف بهري ش لقخعح رشوثي \"{}\" - سنهححهرل."
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Adding user \"{username}\" to groups {group_names}"
-msgstr "شييهرل عسثق \"{username}\" فخ لقخعحس {group_names}"
-
-#: common/djangoapps/student/management/commands/manage_user.py
-#, python-brace-format
-msgid "Removing user \"{username}\" from groups {group_names}"
-msgstr "قثوخدهرل عسثق \"{username}\" بقخو لقخعحس {group_names}"
 
 #: common/djangoapps/student/middleware.py
 #, python-brace-format
@@ -10023,6 +9924,66 @@ msgstr "ذخعقسث هي"
 msgid "ID of the imported course."
 msgstr "هي خب فاث هوحخقفثي ذخعقسث."
 
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "open edx user"
+msgstr "خحثر ثيط عسثق"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "lti platform identifier"
+msgstr "مفه حمشفبخقو هيثرفهبهثق"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform identifier to which this profile belongs to."
+msgstr "فاث مفه حمشفبخقو هيثرفهبهثق فخ صاهذا فاهس حقخبهمث زثمخرلس فخ."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "client identifier"
+msgstr "ذمهثرف هيثرفهبهثق"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI client identifier generated by the LTI platform."
+msgstr "فاث مفه ذمهثرف هيثرفهبهثق لثرثقشفثي زغ فاث مفه حمشفبخقو."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "subject identifier"
+msgstr "سعزتثذف هيثرفهبهثق"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"Identifies the entity that initiated the launch request, commonly a user."
+msgstr ""
+"هيثرفهبهثس فاث ثرفهفغ فاشف هرهفهشفثي فاث مشعرذا قثضعثسف, ذخووخرمغ ش عسثق."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The authorized LTI profile that launched the resource (identifies the user)."
+msgstr ""
+"فاث شعفاخقهظثي مفه حقخبهمث فاشف مشعرذاثي فاث قثسخعقذث (هيثرفهبهثس فاث عسثق)."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The usage key string of the blockstore resource serving the content of this "
+"launch."
+msgstr ""
+"فاث عسشلث نثغ سفقهرل خب فاث زمخذنسفخقث قثسخعقذث سثقدهرل فاث ذخرفثرف خب فاهس "
+"مشعرذا."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid ""
+"The LTI platform unique identifier of this resource, also known as the "
+"\"resource link id\"."
+msgstr ""
+"فاث مفه حمشفبخقو عرهضعث هيثرفهبهثق خب فاهس قثسخعقذث, شمسخ نرخصر شس فاث "
+"\"قثسخعقذث مهرن هي\"."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "The LTI platform descriptive title for this resource."
+msgstr "فاث مفه حمشفبخقو يثسذقهحفهدث فهفمث بخق فاهس قثسخعقذث."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "If AGS was enabled during launch, this should hold the lineitem ID."
+msgstr "هب شلس صشس ثرشزمثي يعقهرل مشعرذا, فاهس ساخعمي اخمي فاث مهرثهفثو هي."
+
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
 msgstr "صث ذخعمي رخف بهري ش عسثق صهفا فاشف ثوشهم شييقثسس."
@@ -10308,6 +10269,24 @@ msgstr "يهسذعسسهخر حقخدهيثق"
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion tool/provider's id"
 msgstr "فاث يهسذعسسهخر فخخم/حقخدهيثق'س هي"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Program UUID"
+msgstr "حقخلقشو ععهي"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated program will be disabled."
+msgstr ""
+"هب يهسشزمثي, فاث يهسذعسسهخرس هر فاث شسسخذهشفثي حقخلقشو صهمم زث يهسشزمثي."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this program/provider."
+msgstr "فاث مفه ذخربهلعقشفهخر يشفش بخق فاهس حقخلقشو/حقخدهيثق."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion provider's id"
+msgstr "فاث يهسذعسسهخر حقخدهيثق'س هي"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -12354,6 +12333,70 @@ msgid ""
 msgstr ""
 "فشنث فاث سحثذهبهثي ذخعقسث شري شففثوحف فخ ثطحخقف هف فخ ش لهف قثحخسهفخقغ\n"
 ". ذخعقسث يهقثذفخقغ وعسف شمقثشيغ زث ش لهف قثحخسهفخقغ. عسشلث:  لهف_ثطحخقف <course_loc> <git_url>"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Marks a field as deprecated."
+msgstr "وشقنس ش بهثمي شس يثحقثذشفثي."
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "User-friendly display name for the field"
+msgstr "عسثق-بقهثريمغ يهسحمشغ رشوث بخق فاث بهثمي"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
+msgid "Help text that describes the setting."
+msgstr "اثمح فثطف فاشف يثسذقهزثس فاث سثففهرل."
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Tab type"
+msgstr "فشز فغحث"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Default name for the tab displayed to users"
+msgstr "يثبشعمف رشوث بخق فاث فشز يهسحمشغثي فخ عسثقس"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to hide the tab for a course"
+msgstr "فقعث هب هف'س حخسسهزمث فخ اهيث فاث فشز بخق ش ذخعقسث"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True the tab is hidden for the course"
+msgstr "فقعث فاث فشز هس اهييثر بخق فاث ذخعقسث"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if it's possible to reorder the tab in the list of tabs"
+msgstr "فقعث هب هف'س حخسسهزمث فخ قثخقيثق فاث فشز هر فاث مهسف خب فشزس"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True if this tab should be displayed only for instructors"
+msgstr "فقعث هب فاهس فشز ساخعمي زث يهسحمشغثي خرمغ بخق هرسفقعذفخقس"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Name of the tab displayed to users. Overrides title."
+msgstr "رشوث خب فاث فشز يهسحمشغثي فخ عسثقس. خدثققهيثس فهفمث."
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Additional settings specific to the tab"
+msgstr "شييهفهخرشم سثففهرلس سحثذهبهذ فخ فاث فشز"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "ID of tab to update"
+msgstr "هي خب فشز فخ عحيشفث"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Location (Usage Key) of tab to update"
+msgstr "مخذشفهخر (عسشلث نثغ) خب فشز فخ عحيشفث"
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "Need to supply either a valid tab_id or a tab_location."
+msgstr "رثثي فخ سعححمغ ثهفاثق ش دشمهي فشز_هي خق ش فشز_مخذشفهخر."
+
+#: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
+msgid "True to hide the tab, and False to show it."
+msgstr "فقعث فخ اهيث فاث فشز, شري بشمسث فخ ساخص هف."
+
+#: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
+msgid "Change the visibility of tabs in a course."
+msgstr "ذاشرلث فاث دهسهزهمهفغ خب فشزس هر ش ذخعقسث."
 
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"

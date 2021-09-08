@@ -47,3 +47,4 @@ class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     tabs = CourseTabSerializer(many=True)
     title = serializers.CharField()
     username = serializers.CharField()
+    user_timezone = serializers.CharField()

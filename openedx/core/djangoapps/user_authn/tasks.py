@@ -4,9 +4,8 @@ This file contains celery tasks for sending email
 
 
 import logging
-
-from celery.exceptions import MaxRetriesExceededError
 from celery import shared_task
+from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
@@ -14,15 +13,15 @@ from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
 from edx_django_utils.monitoring import set_code_owner_attribute
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 log = logging.getLogger('edx.celery.task')
 
 
-@shared_task(bind=True)
 @set_code_owner_attribute
-def send_activation_email(self, msg_string, from_address=None):
+def _send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.
     """
@@ -67,3 +66,15 @@ def send_activation_email(self, msg_string, from_address=None):
             dest_addr,
         )
         raise Exception  # lint-amnesty, pylint: disable=raise-missing-from
+
+
+_OLD_TASK_NAME = 'common.djangoapps.student.tasks.send_activation_email'
+_NEW_TASK_NAME = 'openedx.core.djangoapps.user_authn.tasks.send_activation_email'
+
+
+# Register task under both its old and new names,
+# but expose only the old-named task for invocation.
+# -> Next step: Once we deploy and teach Celery workers the new name,
+#    set `send_activation_email` to the new-named task.
+send_activation_email = shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
+shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)

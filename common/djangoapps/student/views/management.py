@@ -50,6 +50,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig  # lint-am
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_authn.tasks import send_activation_email
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import is_enterprise_learner
@@ -71,7 +72,6 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     email_exists_or_retired
 )
 from common.djangoapps.student.signals import REFUND_ORDER
-from common.djangoapps.student.tasks import send_activation_email
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore

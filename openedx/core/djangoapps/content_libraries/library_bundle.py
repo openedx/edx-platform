@@ -6,6 +6,7 @@ import logging  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import lru_cache
 
 import dateutil.parser
+from functools import lru_cache
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.plugin import PluginMissingError

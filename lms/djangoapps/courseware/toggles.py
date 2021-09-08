@@ -85,6 +85,21 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_streak_celebration', __name__
 )
 
+# .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables an engagement discount incentive message.
+# .. toggle_warnings: This flag depends on the streak celebration feature being enabled
+# .. toggle_use_cases: opt_out, open_edx
+# .. toggle_creation_date: 2021-08-26
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
+COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'streak_discount_enabled',
+    __name__,
+)
+
+
 # .. toggle_name: courseware.optimized_render_xblock
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
