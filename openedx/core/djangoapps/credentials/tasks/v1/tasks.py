@@ -95,6 +95,8 @@ def handle_notify_credentials(options, course_keys):
         logger.exception('No site configuration found for site %s', options['site'])
         return
 
+    # If a start_date or end_date are passed, this will include certificates
+    # with a CertificateDateOverride modified within the time range
     certs = get_recently_modified_certificates(
         course_keys, options['start_date'], options['end_date'], options['user_ids']
     )
