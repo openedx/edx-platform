@@ -846,9 +846,13 @@ class SubmitPhotosView(View):
         if response is not None:
             return response
 
+        full_name = None
+        if "full_name" in params:
+            full_name = params["full_name"]
+
         # If necessary, update the user's full name
-        if "full_name" in params and not is_verified_name_enabled():
-            response = self._update_full_name(request, params["full_name"])
+        if full_name is not None and not is_verified_name_enabled():
+            response = self._update_full_name(request, full_name)
             if response is not None:
                 return response
 
@@ -867,7 +871,7 @@ class SubmitPhotosView(View):
             return response
 
         # Submit the attempt
-        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification)
+        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
 
         # Send event to segment for analyzing A/B testing data
         data = {
@@ -1019,7 +1023,7 @@ class SubmitPhotosView(View):
             log.error(("Image data for user {user_id} is not valid").format(user_id=request.user.id))
             return None, None, HttpResponseBadRequest(msg)
 
-    def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None):
+    def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None, provided_name=None):
         """
         Submit a verification attempt.
 
@@ -1030,8 +1034,11 @@ class SubmitPhotosView(View):
         Keyword Arguments:
             photo_id_image (str or None): Decoded photo ID image data.
             initial_verification (SoftwareSecurePhotoVerification): The initial verification attempt.
+            provided_name (str or None): full name given by user for this attempt
         """
         attempt = SoftwareSecurePhotoVerification(user=user)
+        if provided_name:
+            attempt.name = provided_name
 
         # We will always have face image data, so upload the face image
         attempt.upload_face_image(face_image)

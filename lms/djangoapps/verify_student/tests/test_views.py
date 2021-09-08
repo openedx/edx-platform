@@ -1269,6 +1269,10 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
 
             # Check that the user's name was changed in the database if verified_name is off
             self._assert_user_name(self.FULL_NAME, equality=not flag_on)
+            # Since we are giving a full name, it should be written into the attempt
+            # whether or not the user name was updated
+            attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+            self.assertEqual(attempt.name, self.FULL_NAME)
 
     def test_submit_photos_sends_confirmation_email(self):
         self._submit_photos(
