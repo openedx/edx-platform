@@ -412,7 +412,7 @@ edx-bulk-grades==0.9.2
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/base.in
-edx-celeryutils==1.1.0
+-e git+https://github.com/edx/edx-celeryutils.git@189f370e8110dc3f79c079896da2d37ef18875f6#egg=edx-celeryutils
     # via
     #   -r requirements/edx/base.in
     #   super-csv
@@ -445,11 +445,11 @@ edx-drf-extensions==6.6.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.27.27
+-e git+https://github.com/edx/edx-enterprise.git@9449b55a1128cdfb9c49e24bbfc6f0a783553705#egg=edx-enterprise
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-edx-event-routing-backends==4.1.0
+-e git+https://github.com/edx/event-routing-backends.git@573d22c368b2da56ceac7b60dd041763902e893b#egg=edx-event-routing-backends
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.7.0
     # via ora2
@@ -476,7 +476,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.in
-edx-proctoring==3.24.5
+-e git+https://github.com/edx/edx-proctoring.git@ce570480c814dc4ae3314c502d8470d946aa3042#egg=edx-proctoring
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -493,7 +493,7 @@ edx-search==3.1.0
     # via -r requirements/edx/base.in
 edx-sga==0.16.0
     # via -r requirements/edx/base.in
-edx-submissions==3.3.1
+-e git+https://github.com/edx/edx-submissions.git@2b7dc164cf0bb1909b8c90f93b64e7b2e6633881#egg=edx-submissions
     # via
     #   -r requirements/edx/base.in
     #   ora2
@@ -619,7 +619,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==3.0.3
+-e git+https://github.com/edx/xblock-lti-consumer.git@e8d4e6af996d24f4b03e78d74b8a09ad094b043e#egg=lti-consumer-xblock
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via
@@ -707,7 +707,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.5.1
     # via -r requirements/edx/base.in
-ora2==3.6.22
+-e git+https://github.com/edx/edx-ora2.git@74a174c66ec3ce31a0ddfb64e9f57f596b47adeb#egg=ora2
     # via -r requirements/edx/base.in
 packaging==21.0
     # via
