@@ -58,6 +58,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         });
     </script>
 </%block>
+
+## REV-2133 TODO: check with Website if this is required in the new Track Selection template.
 <%static:webpack entry="Currency">
     new Currency();
 </%static:webpack>
@@ -110,7 +112,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                                     end_bold=HTML('</b>'),
                                                 )}
                                                 <span class="popover-icon">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                                    <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12.0212 6C12.0212 9.31444 9.33472 12 6.02124 12C2.70776 12 0.0212402 9.31444 0.0212402 6C0.0212402 2.68749 2.70776 0 6.02124 0C9.33472 0 12.0212 2.68749 12.0212 6ZM6.02124 7.20968C5.4066 7.20968 4.90834 7.70794 4.90834 8.32258C4.90834 8.93722 5.4066 9.43548 6.02124 9.43548C6.63588 9.43548 7.13414 8.93722 7.13414 8.32258C7.13414 7.70794 6.63588 7.20968 6.02124 7.20968ZM4.96464 3.20937L5.1441 6.49969C5.1525 6.65366 5.2798 6.77419 5.43399 6.77419H6.60849C6.76268 6.77419 6.88998 6.65366 6.89838 6.49969L7.07785 3.20937C7.08692 3.04306 6.95451 2.90323 6.78796 2.90323H5.2545C5.08795 2.90323 4.95556 3.04306 4.96464 3.20937Z" fill="#00262B"/>
+                                                    </svg>
                                                     <span class="popover">
                                                         ${Text(_("{link_start}Learn more{link_end} about course access")).format(
                                                             link_start=HTML('<u><a href="https://support.edx.org/hc/en-us/articles/360013426573-What-are-the-differences-between-audit-free-and-verified-paid-courses-" target="_blank">'),
@@ -147,7 +151,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                 </div>
                             </div>
                             <div class="verified-note mr-md-2">
-                                <span class="note-icon"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i></span>
+                                <span class="note-icon">
+                                    <svg width="16" height="24" viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 4.22074C5.59364 4.22074 3.63636 6.12408 3.63636 8.46413C3.63636 8.85488 3.96182 9.17137 4.36364 9.17137C4.76545 9.17137 5.09091 8.85488 5.09091 8.46413C5.09091 6.9038 6.39636 5.6352 8 5.6352C8.40182 5.6352 8.72727 5.31871 8.72727 4.92797C8.72727 4.53722 8.40182 4.22074 8 4.22074ZM4.36636 20.9808C4.36636 21.1201 4.40864 21.2558 4.48818 21.3716L5.60227 23C5.73727 23.1971 5.96455 23.3156 6.20773 23.3156H9.79182C10.0355 23.3156 10.2627 23.1971 10.3973 23L11.5114 21.3716C11.5905 21.2558 11.6327 21.1196 11.6332 20.9808L11.6355 19.0722H4.36455L4.36636 20.9808ZM8 0.68457C3.35091 0.68457 0 4.35202 0 8.46413C0 10.4254 0.747727 12.2147 1.98 13.5818C2.73636 14.4212 3.92273 16.1809 4.36273 17.6555V17.6582H6.54455V17.6529C6.54409 17.442 6.51182 17.2325 6.44682 17.0309C6.19273 16.2437 5.40955 14.168 3.62091 12.1833C2.68727 11.1476 2.18818 9.83395 2.18409 8.46413C2.175 5.20909 4.89636 2.80627 8 2.80627C11.2082 2.80627 13.8182 5.34435 13.8182 8.46413C13.8182 9.83307 13.3073 11.1538 12.3795 12.1833C10.6018 14.1551 9.815 16.2265 9.55682 17.0217C9.49019 17.2261 9.45615 17.4393 9.45591 17.6537V17.6582H11.6377V17.656C12.0777 16.1809 13.2641 14.4212 14.0205 13.5823C15.2523 12.2147 16 10.4254 16 8.46413C16 4.16769 12.4182 0.68457 8 0.68457Z" fill="black"/>
+                                    </svg>
+                                </span>
                                 <div class="note-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
                                     start_bold=HTML('<b>'),
                                     end_bold=HTML('</b>'),
