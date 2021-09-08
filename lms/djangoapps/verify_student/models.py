@@ -398,10 +398,10 @@ class PhotoVerification(IDVerificationAttempt):
             they uploaded are good. Note that we don't actually do a submission
             anywhere yet.
         """
-        # At any point prior to this, they can change their names via their
-        # student dashboard. But at this point, we lock the value into the
-        # attempt.
-        self.name = self.user.profile.name  # pylint: disable=no-member
+        # If a name is not already set via the verified_name flow,
+        # pick up the profile name at this time.
+        if not self.name:
+            self.name = self.user.profile.name  # pylint: disable=no-member
         self.status = self.STATUS.ready
         self.save()
 
