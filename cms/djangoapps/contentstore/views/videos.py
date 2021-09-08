@@ -245,7 +245,8 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                     )
                 if len(upload_completed_videos) > 0:
                     name_folder = configuration_helpers.get_value('EOL_VIMEO_MAIN_FOLDER', settings.EOL_VIMEO_MAIN_FOLDER)
-                    status_vimeo_task = vimeo_task(request, course_key_string, upload_completed_videos, name_folder)
+                    domain = request.build_absolute_uri('/')[:-1]
+                    status_vimeo_task = vimeo_task(request, course_key_string, upload_completed_videos, name_folder, domain)
                 return JsonResponse()
             else:
                 LOGGER.info('EolVimeo is not installed')
@@ -257,9 +258,9 @@ def videos_handler(request, course_key_string, edx_video_id=None):
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
 #### EOL ####
-def vimeo_task(request, course_id, data, name_folder):
+def vimeo_task(request, course_id, data, name_folder, domain):
     try:
-        task = task_process_data(request, course_id, data, name_folder)
+        task = task_process_data(request, course_id, data, name_folder, domain)
         return True
     except AlreadyRunningError:
         LOGGER.error("EolVimeo - Task Already Running Error, user: {}, course_id: {}".format(request.user, course_id))
