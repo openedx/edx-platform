@@ -75,3 +75,7 @@ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc32118
 
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-drag-and-drop-v2==2.3.5
+
+# ORA Staff Grader feature branch
+# TODO: remove after ORA feature branch is merged
+git+https://github.com/edx/edx-ora2@feature/ora_staff_grader#egg=ora2

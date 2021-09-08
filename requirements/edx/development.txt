@@ -929,7 +929,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.6.0
     # via -r requirements/edx/testing.txt
-ora2==3.7.4
+ora2 @ git+https://github.com/edx/edx-ora2@feature/ora_staff_grader
     # via -r requirements/edx/testing.txt
 packaging==21.2
     # via
