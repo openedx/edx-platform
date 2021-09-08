@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
+from edx_name_affirmation.toggles import is_verified_name_enabled
 from edx_rest_api_client.exceptions import SlumberBaseException
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
@@ -846,7 +847,7 @@ class SubmitPhotosView(View):
             return response
 
         # If necessary, update the user's full name
-        if "full_name" in params:
+        if "full_name" in params and not is_verified_name_enabled():
             response = self._update_full_name(request, params["full_name"])
             if response is not None:
                 return response
