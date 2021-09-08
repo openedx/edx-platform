@@ -1737,10 +1737,8 @@ class EnrollmentTrackPartitionGroupsTestCase(OutlineProcessorTestCase):  # lint-
 
         check_date = datetime(2021, 3, 27, tzinfo=timezone.utc)
         for learner_to_verify in learners_to_verify:
-            processor = EnrollmentTrackPartitionGroupsOutlineProcessor(
-                self.course_key, learner_to_verify, check_date
-            )
-            processor.load_data(full_outline)
+            processor = EnrollmentTrackPartitionGroupsOutlineProcessor(self.course_key, learner_to_verify, check_date)
+            processor.load_data()
             removed_usage_keys = processor.usage_keys_to_remove(full_outline)
             assert len(removed_usage_keys) == expected_values_dict[learner_to_verify.username]
 

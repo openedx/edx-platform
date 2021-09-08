@@ -2740,9 +2740,7 @@ def reset_due_date(request, course_id):
     unit = find_unit(course, request.POST.get('url'))
     reason = strip_tags(request.POST.get('reason', ''))
 
-    version = getattr(course, 'course_version', None)
-
-    original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
+    original_due_date = get_date_for_block(course_id, unit.location)
 
     set_due_date_extension(course, unit, student, None, request.user, reason=reason)
     if not original_due_date:
