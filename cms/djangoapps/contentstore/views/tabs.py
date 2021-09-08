@@ -61,10 +61,10 @@ def tabs_handler(request, course_key_string):
             return JsonResponse()
 
     elif request.method == "GET":  # assume html
-        # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
+        # get all tabs from the tabs list and select only static tabs (a.k.a. user-created tabs)
         # present in the same order they are displayed in LMS
 
-        tabs_to_render = list(get_course_tabs(course_item, request.user))
+        tabs_to_render = list(get_course_static_tabs(course_item, request.user))
 
         return render_to_response(
             "edit-tabs.html",
@@ -78,9 +78,9 @@ def tabs_handler(request, course_key_string):
         return HttpResponseNotFound()
 
 
-def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
+def get_course_static_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
     """
-    Yields all the course tabs in a course including hidden tabs.
+    Yields all the static tabs in a course including hidden tabs.
 
     Args:
         course_item (CourseBlock): The course object from which to get the tabs
@@ -96,7 +96,7 @@ def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]
             # static tab needs its locator information to render itself as an xmodule
             static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
             tab.locator = static_tab_loc
-        yield tab
+            yield tab
 
 
 def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -> None:
@@ -119,7 +119,7 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
 
 def reorder_tabs_handler(course_item, tabs_data, user):
     """
-    Helper function for handling reorder of tabs request
+    Helper function for handling reorder of static tabs request
     """
 
     # Tabs are identified by tab_id or locators.
@@ -128,10 +128,40 @@ def reorder_tabs_handler(course_item, tabs_data, user):
     # their tab_ids since the xmodule editor uses only locators to identify new objects.
     requested_tab_id_locators = tabs_data["tabs"]
 
-    # original tab list in original order
-    old_tab_list = course_item.tabs
+    #get original tab list of only static tabs with their original index(position) in the full course tabs list
+    old_tab_dict = {}
+    for idx, tab in enumerate(course_item.tabs):
+        if isinstance(tab, StaticTab):
+            old_tab_dict[tab] = idx
+    old_tab_list = list(old_tab_dict.keys())
 
-    # create a new list in the new order
+    new_tab_list = create_new_list(requested_tab_id_locators, old_tab_list)
+
+    # Creates a full new course tab list of both default and static course tabs
+    # by looping through the new tab list of static only tabs and
+    # putting them in their new position in the list of course item tabs
+    # original_idx gives the list of positions of all static tabs in course tabs originally
+    full_new_tab_list = course_item.tabs
+    original_idx = list(old_tab_dict.values())
+    for i in range(len(new_tab_list)):
+        full_new_tab_list[original_idx[i]] = new_tab_list[i]
+
+    # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
+    try:
+        CourseTabList.validate_tabs(full_new_tab_list)
+    except InvalidTabsException as exception:
+        raise ValidationError({"error": f"New list of tabs is not valid: {str(exception)}."}) from exception
+
+    # persist the new order of the tabs
+    course_item.tabs = full_new_tab_list
+    modulestore().update_item(course_item, user.id)
+
+
+def create_new_list(requested_tab_id_locators, old_tab_list):
+    """
+    Helper function for creating a new course tab list in the new order
+    of reordered tabs
+    """
     new_tab_list = []
     for tab_id_locator in requested_tab_id_locators:
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
@@ -143,16 +173,7 @@ def reorder_tabs_handler(course_item, tabs_data, user):
     # global or course settings.  so add those to the end of the list.
     non_displayed_tabs = set(old_tab_list) - set(new_tab_list)
     new_tab_list.extend(non_displayed_tabs)
-
-    # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
-    try:
-        CourseTabList.validate_tabs(new_tab_list)
-    except InvalidTabsException as exception:
-        raise ValidationError({"error": f"New list of tabs is not valid: {str(exception)}."}) from exception
-
-    # persist the new order of the tabs
-    course_item.tabs = new_tab_list
-    modulestore().update_item(course_item, user.id)
+    return new_tab_list
 
 
 def edit_tab_handler(course_item: CourseBlock, tabs_data: Dict, user: User):
