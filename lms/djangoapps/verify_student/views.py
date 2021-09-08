@@ -948,7 +948,7 @@ class SubmitPhotosView(View):
             full_name (unicode): The user's updated full name.
 
         Returns:
-            HttpResponse or None
+            error encoded as an HttpResponse or None indicating success
 
         """
         try:
