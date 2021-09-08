@@ -15,15 +15,15 @@ There are two common use cases:
 """
 
 
+import warnings
 from abc import abstractmethod
 from enum import Enum
-import warnings
 
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-
 from edx_toggles.toggles import SettingToggle
+
 from openedx.core.djangolib.markup import HTML, Text
 
 
@@ -187,9 +187,16 @@ class UserMessageCollection():
 # .. toggle_name: GLOBAL_NOTICE_ENABLED
 # .. toggle_implementation: SettingToggle
 # .. toggle_default: False
-# .. toggle_description: When enabled, show the contents of GLOBAL_NOTICE_MESSAGE as a message on every page. This is intended to be used as a way of communicating an upcoming or currently active maintenance window or to warn of known site issues. HTML is not supported for the message content. Message styling can be controlled with GLOBAL_NOTICE_TYPE, set to one of INFO, SUCCESS, WARNING, or ERROR (defaulting to INFO). Also see openedx.core.djangoapps.util.maintenance_banner.add_maintenance_banner for a variation that only shows a message on specific views.
+# .. toggle_description: When enabled, show the contents of GLOBAL_NOTICE_MESSAGE
+#   as a message on every page. This is intended to be used as a way of
+#   communicating an upcoming or currently active maintenance window or to
+#   warn of known site issues. HTML is not supported for the message content,
+#   only plaintext. Message styling can be controlled with GLOBAL_NOTICE_TYPE,
+#   set to one of INFO, SUCCESS, WARNING, or ERROR (defaulting to INFO). Also
+#   see openedx.core.djangoapps.util.maintenance_banner.add_maintenance_banner
+#   for a variation that only shows a message on specific views.
 # .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-09-07
+# .. toggle_creation_date: 2021-09-08
 GLOBAL_NOTICE_ENABLED = SettingToggle('GLOBAL_NOTICE_ENABLED', default=False)
 
 
@@ -204,25 +211,26 @@ class PageLevelMessages(UserMessageCollection):
         """
         Returns outstanding user messages, along with any persistent site-wide messages.
         """
-        # If there is a global notice, add it to the messages just
-        # prior to retrieval. (Kind of a hack, but this ensures both
-        # code reuse and only-once-per-page display.)
+        msgs = list(super().user_messages(request))
+
+        # Add a global notice message to the returned list, if enabled.
         try:
             if GLOBAL_NOTICE_ENABLED.is_enabled():
-                # FIXME: user_messages calls the messages "body_html"
-                # internally but the messages appear to be
-                # HTML-encoded or tag-stripped in practice. Until that
-                # ambiguity is resolved, best bet is to use plaintext
-                # that would be safe either as text or HTML.
                 if notice_message := getattr(settings, 'GLOBAL_NOTICE_MESSAGE', None):
                     notice_type_str = getattr(settings, 'GLOBAL_NOTICE_TYPE', None)
+                    # If an invalid type is given, better to show a
+                    # message with the default type than to fail to
+                    # show it at all.
                     notice_type = getattr(UserMessageType, notice_type_str, UserMessageType.INFO)
 
-                cls.register_user_message(request, notice_type, notice_message)
+                msgs.append(UserMessage(
+                    type=notice_type,
+                    message_html=str(cls.get_message_html(Text(notice_message))),
+                ))
         except BaseException as e:
             warnings.warn(f"Could not register global notice: {e!r}", UserWarning)
 
-        return super().user_messages(request)
+        return msgs
 
     @classmethod
     def get_message_html(cls, body_html, title=None, dismissable=False, **kwargs):
