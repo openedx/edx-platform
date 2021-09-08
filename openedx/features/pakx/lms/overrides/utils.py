@@ -80,7 +80,7 @@ def add_course_progress_to_enrolled_courses(request, courses_list):
             course.has_visited_course = has_visited_course
             course.resume_course_title = resume_course_title
         course.enrolled = is_enrolled
-        course.dir = 'rtl' if check_rtl_characters_in_string(course.display_name) else ''
+        course.dir = 'rtl' if is_rtl_language(course.language) else ''
 
 
 def _accumulate_total_block_counts(total_block_type_counts):
@@ -228,24 +228,23 @@ def get_course_progress_percentage(request, course_key):
     return format((total_completed_blocks / total_blocks) * 100, '.0f') if total_blocks > 0 else total_blocks
 
 
-def get_rtl_class(course_name):
+def get_rtl_class(course_language):
     """
     Figure out layout style class for course based on course name and its language
     """
-    return 'rtl-content' if "(urdu)" in course_name.lower() or check_rtl_characters_in_string(course_name) else ""
+
+    return 'rtl-content' if is_rtl_language(course_language) else ""
 
 
-def check_rtl_characters_in_string(string):
-    """"
-    check if the string contains rtl character or not
-    :param string: (str) string value to check
-
-    :return: (bool) True | False i.e True if contains
+def is_rtl_language(language_code):
+    """
+    Check if given Language code is RTL or not
     """
 
-    rtl_range = r'[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF\uFE70-\uFEFF]'
-    matched_groups = search(rtl_range, string)
-    return matched_groups is not None
+    # These methods will be removed once we move to Site wise language application
+    language_code = "en" if language_code == "" or language_code is None else language_code
+    rtl_languages = 'ur he fa ar sd pa ps'
+    return language_code in rtl_languages
 
 
 def get_date_diff_in_days(future_date):
