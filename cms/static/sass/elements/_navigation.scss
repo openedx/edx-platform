@@ -218,6 +218,15 @@ nav {
       }
     }
 
+    .hyperlink {
+      color: $gray-d2;
+
+      &:hover,
+      &:active {
+        color: theme-color("primary");
+      }
+    }
+
     .spacer {
       margin-right: 20px;
       margin-left: 20px;
