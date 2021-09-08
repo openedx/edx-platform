@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
+from common.djangoapps.student.models_api import get_name, get_pending_name_change
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL
 from xmodule.modulestore.django import SignalHandler, modulestore
 
@@ -48,11 +49,14 @@ def send_idv_update(sender, instance, **kwargs):  # pylint: disable=unused-argum
     as opposed to relying only on the post_save signal to avoid the chance that other apps
     import the SoftwareSecurePhotoVerification model.
     """
+    # Prioritize pending name change over current profile name, if the user has one
+    full_name = get_pending_name_change(instance.user) or get_name(instance.user.id)
+
     idv_update_signal.send(
         sender='idv_update',
         attempt_id=instance.id,
         user_id=instance.user.id,
         status=instance.status,
-        full_name=instance.name,
-        profile_name=instance.user.profile.name
+        photo_id_name=instance.name,
+        full_name=full_name
     )
