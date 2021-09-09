@@ -15,7 +15,7 @@
       <li class="d-none nav-item" role="presentation">
         <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#live" type="button" role="tab" aria-controls="live" aria-selected="false">Live</button>
       </li>
-      <% if (industryPathways.length > 0) { %>
+      <% if (industryPathways.length > 0 || creditPathways.length > 0) { %>
       <li class="nav-item" role="presentation">
         <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#pathways" type="button" role="tab" aria-controls="pathways" aria-selected="false">Pathways</button>
       </li>
