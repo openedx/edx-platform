@@ -57,6 +57,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.pakx.lms.pakx_admin_app.utils import send_registration_email
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
@@ -217,7 +218,9 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        compose_and_send_activation_email(user, profile, registration)
+        # PKX-463 (PR#111) Updated registration activation link email
+        # compose_and_send_activation_email(user, profile, registration)
+        send_registration_email(user, None, request.scheme, is_public_registration=True)
 
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
@@ -534,10 +537,9 @@ class RegistrationView(APIView):
             # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
-            errors = {
-                field: [{"user_message": error} for error in error_list]
-                for field, error_list in err.message_dict.items()
-            }
+
+            # PKX-463 (PR#111) Synced error message pattern to match RegistrationValidationView
+            errors = {field: ', '.join(error_list) for field, error_list in err.message_dict.items()}
             response = self._create_response(request, errors, status_code=400)
         except PermissionDenied:
             response = HttpResponseForbidden(_("Account creation not allowed."))

@@ -68,8 +68,17 @@ def index(request):
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled
 
-    # Login is default landing page
-    return redirect('signin_user')
+    try:
+        return student.views.index(request, user=request.user)
+    except NoReverseMatch:
+        log.error(
+            'https is not a registered namespace Request from {}'.format(domain),
+            'request_site= {}'.format(request.site.__dict__),
+            'enable_mktg_site= {}'.format(enable_mktg_site),
+            'Auth Status= {}'.format(request.user.is_authenticated),
+            'Request Meta= {}'.format(request.META)
+        )
+        raise
 
 
 @ensure_csrf_cookie

@@ -433,8 +433,7 @@ class CoursewareIndex(View):
         )
         hide_course_navigation = settings.FEATURES.get('HIDE_COURSEWARE_NAVIGATION')
         staff_access = self.is_staff
-        staff_title = self.course.display_name
-        rtl_class = get_rtl_class(staff_title)
+        rtl_class = get_rtl_class(self.course.language)
         course_overview = CourseOverview.get_from_id(self.course.id)
         course_experience_mode = 'Normal'
         content_class = ''

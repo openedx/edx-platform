@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 BIO_MAX_LENGTH = 300
 
 # The minimum and maximum length for the name ("full name") account field
-NAME_MIN_LENGTH = 1
+NAME_MIN_LENGTH = 3
 NAME_MAX_LENGTH = 255
 
 # The minimum and maximum length for the username account field
@@ -34,6 +34,10 @@ CUSTOM_VISIBILITY = 'custom'
 
 # Prefix prepended to user preferences related to custom account visibility preferences.
 VISIBILITY_PREFIX = 'visibility.'
+
+# Translators: This message is shown to users who attempt to create a new account using
+# an invalid name format.
+NAME_INVALID_MSG = _(u'Only alphabets are allowed.')
 
 # Translators: This message is shown when the Unicode usernames are NOT allowed.
 # It is shown to users who attempt to create a new account using invalid characters
@@ -64,8 +68,12 @@ USERNAME_CONFLICT_MSG = _(
     u"Try again with a different username."
 )
 
-# Translators: This message is shown to users who enter a username/email/password
+# Translators: This message is shown to users who enter a name/username/email/password
 # with an inappropriate length (too short or too long).
+NAME_BAD_LENGTH_MSG = format_lazy(
+    _(u"Name must be at least {min} character long."),
+    min=NAME_MIN_LENGTH
+)
 USERNAME_BAD_LENGTH_MSG = format_lazy(
     _(u"Username must be between {min} and {max} characters long."),
     min=USERNAME_MIN_LENGTH,

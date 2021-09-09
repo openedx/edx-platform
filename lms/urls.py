@@ -96,11 +96,11 @@ notification_prefs_urls = [
 
 
 urlpatterns = [
-    url(r'^$', login_and_registration_form, name='root'),  # Main marketing page, or redirect to Login
+    url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
     # TODO: Move lms specific student views out of common code
-    url(r'^dashboard/?$', branding_views.courses, name='dashboard'),
+    url(r'^dashboard/?$', student_views.student_dashboard, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
 
     # Event tracking endpoints
