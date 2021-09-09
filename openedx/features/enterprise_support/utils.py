@@ -7,7 +7,7 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
-from django.contrib.auth import get_backends, login
+from django.contrib.auth import get_backends, login, get_user_model
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
 from django.http import HttpRequest
@@ -415,16 +415,17 @@ def is_enterprise_learner(user):
     Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
-        user (User): Django User object.
+        user (User): Django User object or Django User object id.
 
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
+    user_id = user.id if isinstance(user, get_user_model()) else user
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user_id)
     if cache.get(cached_is_enterprise_key):
         return True
 
-    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+    if EnterpriseCustomerUser.objects.filter(user_id=user_id).exists():
         # Cache the enterprise user for one hour.
         cache.set(cached_is_enterprise_key, True, 3600)
         return True
