@@ -134,7 +134,8 @@ def overview_tab_view(request, course_id=None):
         'course_overview': course_overview_content.body_html if course_overview_content else None,
         'user': request.user,
         'course': course,
-        'accordion': render_accordion(request, course, course_block_tree, '', '')
+        'accordion': render_accordion(request, course, course_block_tree, '', '',
+                                      course_experience=course_overview_content.get_course_experience_display())
     }
     return render_to_response('courseware/overview.html', context)
 
