@@ -18,7 +18,7 @@ from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
 from django.urls import reverse
 from django.utils.translation import ngettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 

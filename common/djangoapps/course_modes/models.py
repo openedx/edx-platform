@@ -15,7 +15,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords

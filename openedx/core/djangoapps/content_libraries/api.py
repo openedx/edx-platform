@@ -66,7 +66,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey

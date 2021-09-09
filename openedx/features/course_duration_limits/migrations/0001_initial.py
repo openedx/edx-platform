@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
-                ('enabled', models.NullBooleanField(default=None, verbose_name='Enabled')),
+                ('enabled', models.BooleanField(default=None, verbose_name='Enabled', null=True)),
                 ('org', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('enabled_as_of', models.DateField(blank=True, default=None, null=True, verbose_name='Enabled As Of')),
                 ('changed_by', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Changed by')),

@@ -149,7 +149,7 @@ class SafeCookieData:
         safe_cookie_data = SafeCookieData(
             cls.CURRENT_VERSION,
             session_id,
-            key_salt=get_random_string(),
+            key_salt=get_random_string(length=12),
             signature=None,
         )
         safe_cookie_data.sign(user_id)

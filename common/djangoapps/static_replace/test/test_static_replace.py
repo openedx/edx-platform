@@ -9,7 +9,8 @@ from urllib.parse import parse_qsl, urlparse, urlunparse
 import ddt
 import pytest
 from django.test import override_settings
-from django.utils.http import urlencode, urlquote
+from urllib.parse import quote
+from django.utils.http import urlencode
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
@@ -45,9 +46,9 @@ def encode_unicode_characters_in_url(url):
     query_params = parse_qsl(query)
     updated_query_params = []
     for query_name, query_val in query_params:
-        updated_query_params.append((query_name, urlquote(query_val)))
+        updated_query_params.append((query_name, quote(query_val)))
 
-    return urlunparse((scheme, netloc, urlquote(path, '/:+@'), params, urlencode(query_params), fragment))
+    return urlunparse((scheme, netloc, quote(path, '/:+@'), params, urlencode(query_params), fragment))
 
 
 def test_multi_replace():
@@ -534,11 +535,11 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
     def test_canonical_asset_path_with_new_style_assets(self, base_url, start, expected, mongo_calls):
         exts = ['.html', '.tm']
         prefix = 'split'
-        encoded_base_url = urlquote('//' + base_url)
+        encoded_base_url = quote('//' + base_url)
         c4x = 'c4x/a/b/asset'
         base_asset_key = f'asset-v1:a+b+{prefix}+type@asset+block'
         adjusted_asset_key = base_asset_key
-        encoded_asset_key = urlquote(f'/asset-v1:a+b+{prefix}+type@asset+block@')
+        encoded_asset_key = quote(f'/asset-v1:a+b+{prefix}+type@asset+block@')
         encoded_base_asset_key = encoded_asset_key
         base_th_key = f'asset-v1:a+b+{prefix}+type@thumbnail+block'
         adjusted_th_key = base_th_key
@@ -565,7 +566,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             adjusted_asset_key = f'assets/courseware/VMARK/HMARK/asset-v1:a+b+{prefix}+type@asset+block'
             adjusted_th_key = f'assets/courseware/VMARK/HMARK/asset-v1:a+b+{prefix}+type@thumbnail+block'
             encoded_asset_key = f'/assets/courseware/VMARK/HMARK/asset-v1:a+b+{prefix}+type@asset+block@'
-            encoded_asset_key = urlquote(encoded_asset_key)
+            encoded_asset_key = quote(encoded_asset_key)
 
         expected = expected.format(
             prfx=prefix,
@@ -747,8 +748,8 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         prefix = 'old'
         base_c4x_block = 'c4x/a/b/asset'
         adjusted_c4x_block = base_c4x_block
-        encoded_c4x_block = urlquote('/' + base_c4x_block + '/')
-        encoded_base_url = urlquote('//' + base_url)
+        encoded_c4x_block = quote('/' + base_c4x_block + '/')
+        encoded_base_url = quote('//' + base_url)
         encoded_base_c4x_block = encoded_c4x_block
 
         start = start.format(
@@ -765,7 +766,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
         if digest:
             adjusted_c4x_block = 'assets/courseware/VMARK/HMARK/c4x/a/b/asset'
-            encoded_c4x_block = urlquote('/' + adjusted_c4x_block + '/')
+            encoded_c4x_block = quote('/' + adjusted_c4x_block + '/')
 
         expected = expected.format(
             prfx=prefix,

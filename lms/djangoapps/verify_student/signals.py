@@ -16,7 +16,7 @@ from .models import SoftwareSecurePhotoVerification, VerificationDeadline
 
 
 # Signal for emitting IDV submission and review updates
-idv_update_signal = Signal(providing_args=["attempt_id", "user_id", "status", "full_name", "profile_name"])
+idv_update_signal = Signal()
 
 
 @receiver(SignalHandler.course_published)

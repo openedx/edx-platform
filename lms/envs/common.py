@@ -34,7 +34,7 @@ import os
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,

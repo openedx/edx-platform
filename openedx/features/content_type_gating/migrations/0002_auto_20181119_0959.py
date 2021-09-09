@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contenttypegatingconfig',
             name='studio_override_enabled',
-            field=models.NullBooleanField(default=None, help_text='Allow Feature Based Enrollment visibility to be overriden on a per-component basis in Studio.', verbose_name='Studio Override Enabled'),
+            field=models.BooleanField(default=None, help_text='Allow Feature Based Enrollment visibility to be overriden on a per-component basis in Studio.', verbose_name='Studio Override Enabled', null=True),
         ),
     ]

@@ -34,7 +34,7 @@ from django.core.mail.message import forbid_multi_line_headers
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import override as override_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('internal_service_url', models.URLField(verbose_name='Internal Service URL')),
                 ('public_service_url', models.URLField(verbose_name='Public Service URL')),
                 ('api_version_number', models.IntegerField(verbose_name='API Version')),
-                ('enable_student_dashboard', models.NullBooleanField(verbose_name='Enable Student Dashboard Displays')),
+                ('enable_student_dashboard', models.BooleanField(verbose_name='Enable Student Dashboard Displays', null=True)),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={

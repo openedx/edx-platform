@@ -9,16 +9,16 @@ from django.db.models.signals import post_init, post_save
 from django.dispatch import Signal, receiver
 from django.utils import timezone
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "state"])
+update_creator_state = Signal()
 
 # A signal that will be sent when admin should be notified of a pending user request
-send_admin_notification = Signal(providing_args=["user"])
+send_admin_notification = Signal()
 
 # A signal that will be sent when user should be notified of change in course creator privileges
-send_user_notification = Signal(providing_args=["user", "state"])
+send_user_notification = Signal()
 
 
 class CourseCreator(models.Model):

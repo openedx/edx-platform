@@ -14,8 +14,8 @@ from django.dispatch import receiver
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 from django_countries import countries
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
@@ -401,7 +401,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
         if 'course_id' not in request.query_params:
             return Response(
-                build_api_error(ugettext_noop("course_id must be provided")),
+                build_api_error(gettext_noop("course_id must be provided")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -411,7 +411,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             course_module = modulestore().get_course(course_key)
         except InvalidKeyError:
             error = build_api_error(
-                ugettext_noop("The supplied course id {course_id} is not valid."),
+                gettext_noop("The supplied course id {course_id} is not valid."),
                 course_id=course_id_string,
             )
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -427,7 +427,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         text_search = request.query_params.get('text_search', None)
         if text_search and request.query_params.get('order_by', None):
             return Response(
-                build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
+                build_api_error(gettext_noop("text_search and order_by cannot be provided together")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -438,7 +438,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if topic_id is not None:
             if topic_id not in course_module.teamsets_by_id:
                 error = build_api_error(
-                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
+                    gettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -458,7 +458,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 search_engine = CourseTeamIndexer.engine()
             except ElasticSearchConnectionError:
                 return Response(
-                    build_api_error(ugettext_noop('Error connecting to elasticsearch')),
+                    build_api_error(gettext_noop('Error connecting to elasticsearch')),
                     status=status.HTTP_503_SERVICE_UNAVAILABLE
                 )
 
@@ -547,7 +547,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
-                ugettext_noop('The supplied course_id {course_id} is not valid.'),
+                gettext_noop('The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
             return Response({
@@ -557,7 +557,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         topic_id = request.data.get('topic_id')
         if not topic_id:
             field_errors['topic_id'] = build_api_error(
-                ugettext_noop('topic_id is required'),
+                gettext_noop('topic_id is required'),
                 course_id=course_id
             )
             return Response({
@@ -576,7 +576,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         # and not leak the existance of a private teamset
         if not can_user_create_team_in_topic(request.user, course_key, topic_id):
             return Response(
-                build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
+                build_api_error(gettext_noop("You can't create a team in an instructor managed topic.")),
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -588,7 +588,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             CourseTeamMembership.user_in_team_for_teamset(request.user, course_key, topic_id=topic_id)
         ):
             error_message = build_api_error(
-                ugettext_noop('You are already in a team in this teamset.'),
+                gettext_noop('You are already in a team in this teamset.'),
                 course_id=course_id,
                 teamset_id=topic_id,
             )
@@ -982,7 +982,7 @@ class TopicListView(GenericAPIView):
             return Response({
                 'field_errors': {
                     'course_id': build_api_error(
-                        ugettext_noop("The supplied course id {course_id} is not valid."),
+                        gettext_noop("The supplied course id {course_id} is not valid."),
                         course_id=course_id_string
                     )
                 }
@@ -1319,7 +1319,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         if 'team_id' in request.query_params and 'teamset_id' in request.query_params:
             return Response(
-                build_api_error(ugettext_noop("teamset_id and team_id are mutually exclusive options.")),
+                build_api_error(gettext_noop("teamset_id and team_id are mutually exclusive options.")),
                 status=status.HTTP_400_BAD_REQUEST
             )
         elif 'team_id' in request.query_params:
@@ -1339,7 +1339,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         elif 'teamset_id' in request.query_params:
             if 'course_id' not in request.query_params:
                 return Response(
-                    build_api_error(ugettext_noop("teamset_id requires course_id to also be provided.")),
+                    build_api_error(gettext_noop("teamset_id requires course_id to also be provided.")),
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -1355,7 +1355,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             teamset = teamsets.get(teamset_id, None)
             if not teamset:
                 return Response(
-                    build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                    build_api_error(gettext_noop("No teamset found in given course with given id")),
                     status=status.HTTP_404_NOT_FOUND
                 )
             teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
@@ -1368,7 +1368,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 ]
                 if teamset.is_private_managed and not teams_with_access:
                     return Response(
-                        build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                        build_api_error(gettext_noop("No teamset found in given course with given id")),
                         status=status.HTTP_404_NOT_FOUND
                     )
             team_ids = [team.team_id for team in teams_with_access]
@@ -1389,7 +1389,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         if not specified_username_or_team:
             return Response(
-                build_api_error(ugettext_noop("username or (team_id or teamset_id) must be specified.")),
+                build_api_error(gettext_noop("username or (team_id or teamset_id) must be specified.")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1410,10 +1410,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         field_errors = {}
 
         if 'username' not in request.data:
-            field_errors['username'] = build_api_error(ugettext_noop("Username is required."))
+            field_errors['username'] = build_api_error(gettext_noop("Username is required."))
 
         if 'team_id' not in request.data:
-            field_errors['team_id'] = build_api_error(ugettext_noop("Team id is required."))
+            field_errors['team_id'] = build_api_error(gettext_noop("Team id is required."))
 
         if field_errors:
             return Response({
@@ -1442,13 +1442,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         max_team_size = course_module.teams_configuration.default_max_team_size
         if max_team_size is not None and team.users.count() >= max_team_size:
             return Response(
-                build_api_error(ugettext_noop("This team is already full.")),
+                build_api_error(gettext_noop("This team is already full.")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if not can_user_modify_team(request.user, team):
             return Response(
-                build_api_error(ugettext_noop("You can't join an instructor managed team.")),
+                build_api_error(gettext_noop("You can't join an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -1466,7 +1466,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except AlreadyOnTeamInTeamset:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is already a member of a team in this teamset."),
+                    gettext_noop("The user {username} is already a member of a team in this teamset."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1474,7 +1474,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
+                    gettext_noop("The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1597,7 +1597,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
 
         if not can_user_modify_team(request.user, team):
             return Response(
-                build_api_error(ugettext_noop("You can't leave an instructor managed team.")),
+                build_api_error(gettext_noop("You can't leave an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN
             )
 

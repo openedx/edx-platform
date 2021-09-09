@@ -18,7 +18,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
@@ -99,7 +99,7 @@ REGISTRATION_UTM_PARAMETERS = {
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
+REGISTER_USER = Signal()
 
 
 # .. toggle_name: registration.enable_failure_logging

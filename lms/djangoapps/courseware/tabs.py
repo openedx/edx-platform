@@ -5,8 +5,8 @@ perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
@@ -33,7 +33,7 @@ class CoursewareTab(EnrolledTab):
     The main courseware view.
     """
     type = 'courseware'
-    title = ugettext_noop('Course')
+    title = gettext_noop('Course')
     priority = 10
     view_name = 'courseware'
     is_movable = False
@@ -68,7 +68,7 @@ class CourseInfoTab(CourseTab):
     The course info view.
     """
     type = 'course_info'
-    title = ugettext_noop('Home')
+    title = gettext_noop('Home')
     priority = 20
     view_name = 'info'
     tab_id = 'info'
@@ -85,7 +85,7 @@ class SyllabusTab(EnrolledTab):
     A tab for the course syllabus.
     """
     type = 'syllabus'
-    title = ugettext_noop('Syllabus')
+    title = gettext_noop('Syllabus')
     priority = 30
     view_name = 'syllabus'
     allow_multiple = True
@@ -103,7 +103,7 @@ class ProgressTab(EnrolledTab):
     The course progress view.
     """
     type = 'progress'
-    title = ugettext_noop('Progress')
+    title = gettext_noop('Progress')
     priority = 40
     view_name = 'progress'
     is_hideable = True
@@ -131,7 +131,7 @@ class TextbookTabsBase(CourseTab):
     Abstract class for textbook collection tabs classes.
     """
     # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
-    title = ugettext_noop("Textbooks")
+    title = gettext_noop("Textbooks")
     is_collection = True
     is_default = False
 
@@ -263,7 +263,7 @@ class ExternalDiscussionCourseTab(LinkTab):
 
     type = 'external_discussion'
     # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
-    title = ugettext_noop('Discussion')
+    title = gettext_noop('Discussion')
     priority = None
     is_default = False
 
@@ -326,7 +326,7 @@ class DatesTab(EnrolledTab):
     A tab representing the relevant dates for a course.
     """
     type = "dates"
-    title = ugettext_noop(
+    title = gettext_noop(
         "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
     priority = 50
     view_name = "dates"

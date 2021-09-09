@@ -4,7 +4,7 @@ Enterprise support admin views.
 
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from enterprise.models import EnterpriseCourseEnrollment
 

@@ -11,8 +11,8 @@ from django.contrib.auth.password_validation import MinimumLengthValidator as Dj
 from django.contrib.auth.password_validation import get_default_password_validators
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 log = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ def _validate_condition(password, fn, min_count):
 
 class MinimumLengthValidator(DjangoMinimumLengthValidator):  # lint-amnesty, pylint: disable=missing-class-docstring
     def get_instruction_text(self):
-        return ungettext(
+        return ngettext(
             'at least %(min_length)d character',
             'at least %(min_length)d characters',
             self.min_length
@@ -171,7 +171,7 @@ class MaximumLengthValidator:
     def validate(self, password, user=None):  # lint-amnesty, pylint: disable=unused-argument
         if len(password) > self.max_length:
             raise ValidationError(
-                ungettext(
+                ngettext(
                     'This password is too long. It must contain no more than %(max_length)d character.',
                     'This password is too long. It must contain no more than %(max_length)d characters.',
                     self.max_length
@@ -181,7 +181,7 @@ class MaximumLengthValidator:
             )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             'Your password must contain no more than %(max_length)d character.',
             'Your password must contain no more than %(max_length)d characters.',
             self.max_length
@@ -209,7 +209,7 @@ class AlphabeticValidator:
         if _validate_condition(password, lambda c: c.isalpha(), self.min_alphabetic):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_alphabetic)d letter.',
                 'This password must contain at least %(min_alphabetic)d letters.',
                 self.min_alphabetic
@@ -219,7 +219,7 @@ class AlphabeticValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             'Your password must contain at least %(min_alphabetic)d letter.',
             'Your password must contain at least %(min_alphabetic)d letters.',
             self.min_alphabetic
@@ -227,7 +227,7 @@ class AlphabeticValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_alphabetic > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d letter',
                 '%(num)d letters',
                 self.min_alphabetic
@@ -257,7 +257,7 @@ class NumericValidator:
         if _validate_condition(password, lambda c: c.isnumeric(), self.min_numeric):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_numeric)d number.',
                 'This password must contain at least %(min_numeric)d numbers.',
                 self.min_numeric
@@ -267,7 +267,7 @@ class NumericValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_numeric)d number.",
             "Your password must contain at least %(min_numeric)d numbers.",
             self.min_numeric
@@ -275,7 +275,7 @@ class NumericValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_numeric > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d number',
                 '%(num)d numbers',
                 self.min_numeric
@@ -305,7 +305,7 @@ class UppercaseValidator:
         if _validate_condition(password, lambda c: c.isupper(), self.min_upper):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_upper)d uppercase letter.',
                 'This password must contain at least %(min_upper)d uppercase letters.',
                 self.min_upper
@@ -315,7 +315,7 @@ class UppercaseValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_upper)d uppercase letter.",
             "Your password must contain at least %(min_upper)d uppercase letters.",
             self.min_upper
@@ -323,7 +323,7 @@ class UppercaseValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_upper > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d uppercase letter',
                 '%(num)d uppercase letters',
                 self.min_upper
@@ -353,7 +353,7 @@ class LowercaseValidator:
         if _validate_condition(password, lambda c: c.islower(), self.min_lower):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_lower)d lowercase letter.',
                 'This password must contain at least %(min_lower)d lowercase letters.',
                 self.min_lower
@@ -363,7 +363,7 @@ class LowercaseValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_lower)d lowercase letter.",
             "Your password must contain at least %(min_lower)d lowercase letters.",
             self.min_lower
@@ -371,7 +371,7 @@ class LowercaseValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_lower > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d lowercase letter',
                 '%(num)d lowercase letters',
                 self.min_lower
@@ -402,7 +402,7 @@ class PunctuationValidator:
         if _validate_condition(password, lambda c: 'P' in unicodedata.category(c), self.min_punctuation):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_punctuation)d punctuation mark.',
                 'This password must contain at least %(min_punctuation)d punctuation marks.',
                 self.min_punctuation
@@ -412,7 +412,7 @@ class PunctuationValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_punctuation)d punctuation mark.",
             "Your password must contain at least %(min_punctuation)d punctuation marks.",
             self.min_punctuation
@@ -420,7 +420,7 @@ class PunctuationValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_punctuation > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d punctuation mark',
                 '%(num)d punctuation marks',
                 self.min_punctuation
@@ -450,7 +450,7 @@ class SymbolValidator:
         if _validate_condition(password, lambda c: 'S' in unicodedata.category(c), self.min_symbol):
             return
         raise ValidationError(
-            ungettext(
+            ngettext(
                 'This password must contain at least %(min_symbol)d symbol.',
                 'This password must contain at least %(min_symbol)d symbols.',
                 self.min_symbol
@@ -460,7 +460,7 @@ class SymbolValidator:
         )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_symbol)d symbol.",
             "Your password must contain at least %(min_symbol)d symbols.",
             self.min_symbol
@@ -468,7 +468,7 @@ class SymbolValidator:
 
     def get_instruction_text(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.min_symbol > 0:
-            return ungettext(
+            return ngettext(
                 '%(num)d symbol',
                 '%(num)d symbols',
                 self.min_symbol

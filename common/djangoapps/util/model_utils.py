@@ -12,7 +12,7 @@ from eventtracking import tracker
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 # Used to signal a field value change
-USER_FIELDS_CHANGED = Signal(providing_args=["user", "table", "changed_values"])
+USER_FIELDS_CHANGED = Signal()
 
 
 def get_changed_fields_dict(instance, model_class):

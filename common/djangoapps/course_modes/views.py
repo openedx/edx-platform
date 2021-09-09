@@ -18,7 +18,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, to_locale
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_client_ip

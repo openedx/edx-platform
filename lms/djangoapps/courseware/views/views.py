@@ -22,11 +22,11 @@ from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import urlquote_plus
+from urllib.parse import quote_plus
 from django.utils.text import slugify
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -679,11 +679,11 @@ class CourseTabView(EdxFragmentView):
                     Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
                         sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                             sign_in_label=_("sign in"),
-                            current_url=urlquote_plus(request.path),
+                            current_url=quote_plus(request.path),
                         ),
                         register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                             register_label=_("register"),
-                            current_url=urlquote_plus(request.path),
+                            current_url=quote_plus(request.path),
                         ),
                     ),
                     once_only=True
@@ -694,11 +694,11 @@ class CourseTabView(EdxFragmentView):
                     Text(_("{sign_in_link} or {register_link}.")).format(
                         sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                             sign_in_label=_("Sign in"),
-                            current_url=urlquote_plus(request.path),
+                            current_url=quote_plus(request.path),
                         ),
                         register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                             register_label=_("register"),
-                            current_url=urlquote_plus(request.path),
+                            current_url=quote_plus(request.path),
                         ),
                     )
                 )
@@ -1893,11 +1893,11 @@ def _get_fa_header(header):
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
-FA_INCOME_LABEL = ugettext_noop('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = ugettext_noop('Tell us about your current financial situation. Why do you need assistance?')  # lint-amnesty, pylint: disable=line-too-long
-FA_GOALS_LABEL = ugettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')  # lint-amnesty, pylint: disable=line-too-long
+FA_INCOME_LABEL = gettext_noop('Annual Household Income')
+FA_REASON_FOR_APPLYING_LABEL = gettext_noop('Tell us about your current financial situation. Why do you need assistance?')  # lint-amnesty, pylint: disable=line-too-long
+FA_GOALS_LABEL = gettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')  # lint-amnesty, pylint: disable=line-too-long
 
-FA_EFFORT_LABEL = ugettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')  # lint-amnesty, pylint: disable=line-too-long
+FA_EFFORT_LABEL = gettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')  # lint-amnesty, pylint: disable=line-too-long
 
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
@@ -2012,7 +2012,7 @@ def financial_assistance_form(request):
                 'defaultValue': '',
                 'required': True,
                 'options': enrolled_courses,
-                'instructions': ugettext(
+                'instructions': gettext(
                     'Select the course for which you want to earn a verified certificate. If'
                     ' the course does not appear in the list, make sure that you have enrolled'
                     ' in the audit track for the course.'

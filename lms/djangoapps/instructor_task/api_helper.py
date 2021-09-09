@@ -12,7 +12,7 @@ import logging
 
 from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKey
 
 from common.djangoapps.util.db import outer_atomic

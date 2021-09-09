@@ -5,7 +5,7 @@ from typing import Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_noop as _
+from django.utils.translation import gettext_noop as _
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 

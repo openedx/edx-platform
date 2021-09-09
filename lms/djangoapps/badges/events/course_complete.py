@@ -8,7 +8,7 @@ import logging
 
 from django.urls import reverse
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
 from lms.djangoapps.badges.utils import requires_badges_enabled, site_prefix

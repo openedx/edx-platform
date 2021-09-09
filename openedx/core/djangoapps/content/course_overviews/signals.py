@@ -16,8 +16,8 @@ from .models import CourseOverview
 LOG = logging.getLogger(__name__)
 
 
-COURSE_START_DATE_CHANGED = Signal(providing_args=["updated_course_overview", "previous_start_date"])
-COURSE_PACING_CHANGED = Signal(providing_args=["updated_course_overview", "previous_self_paced"])
+COURSE_START_DATE_CHANGED = Signal()
+COURSE_PACING_CHANGED = Signal()
 
 
 @receiver(SignalHandler.course_published)

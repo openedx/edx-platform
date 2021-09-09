@@ -18,7 +18,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from importlib.metadata import version
 from path import Path as path
@@ -378,8 +378,8 @@ openid.oidutil.log = lambda message, level=0: None
 
 # Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
+PLATFORM_NAME = gettext_lazy("édX")
+PLATFORM_DESCRIPTION = gettext_lazy("Open édX Platform")
 
 SITE_NAME = "edx.org"
 
