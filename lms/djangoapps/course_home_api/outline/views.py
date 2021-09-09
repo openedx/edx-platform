@@ -254,7 +254,8 @@ class OutlineTabView(RetrieveAPIView):
                 if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
 
                     course_goals = {
-                        'selected_goal': None
+                        'selected_goal': None,
+                        'number_of_days_goals_enabled': True,
                     }
 
                     selected_goal = get_course_goal(request.user, course_key)

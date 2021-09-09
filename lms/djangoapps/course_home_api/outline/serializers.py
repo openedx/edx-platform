@@ -68,6 +68,7 @@ class CourseGoalsSerializer(serializers.Serializer):
     """
     goal_options = serializers.ListField(default=[])
     selected_goal = serializers.DictField()
+    number_of_days_goals_enabled = serializers.BooleanField(default=False)
 
 
 class CourseToolSerializer(serializers.Serializer):
