@@ -676,7 +676,8 @@ def videos_index_html(course, pagination_conf=None):
     Returns an HTML page to display previous video uploads and allow new ones
     """
     #### EOL ####
-    update_video_vimeo(six.text_type(course.id))
+    if ENABLE_EOL_VIMEO:
+        update_video_vimeo(six.text_type(course.id))
     #### END EOL ####
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
