@@ -51,7 +51,7 @@ define([
                 }
             }
         ],
-        facets: {
+        aggs: {
             org: {
                 total: 26,
                 terms: {
