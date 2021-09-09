@@ -57,7 +57,6 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.pakx.lms.pakx_admin_app.utils import send_registration_email
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
@@ -220,6 +219,7 @@ def create_account_with_params(request, params):
     else:
         # PKX-463 (PR#111) Updated registration activation link email
         # compose_and_send_activation_email(user, profile, registration)
+        from openedx.features.pakx.lms.pakx_admin_app.utils import send_registration_email
         send_registration_email(user, None, request.scheme, is_public_registration=True)
 
     # Perform operations that are non-critical parts of account creation
