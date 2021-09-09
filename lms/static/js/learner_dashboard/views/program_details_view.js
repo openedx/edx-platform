@@ -75,9 +75,12 @@ class ProgramDetailsView extends Backbone.View {
       completedCount,
       completeProgramURL: buyButtonUrl,
       programDiscussionEnabled: this.options.programDiscussionEnabled,
+      industryPathways : this.options.industryPathways,
+      creditPathways : this.options.creditPathways,
     };
     data = $.extend(data, this.programModel.toJSON());
     HtmlUtils.setHtml(this.$el, this.tpl(data));
+    console.log(this)
     this.postRender();
   }
 
@@ -124,6 +127,7 @@ class ProgramDetailsView extends Backbone.View {
       programRecordUrl: this.options.urls.program_record_url,
       industryPathways: this.options.industryPathways,
       creditPathways: this.options.creditPathways,
+      programDiscussionEnabled: this.options.programDiscussionEnabled,
     });
   }
 
