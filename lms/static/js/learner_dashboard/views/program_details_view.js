@@ -80,7 +80,6 @@ class ProgramDetailsView extends Backbone.View {
     };
     data = $.extend(data, this.programModel.toJSON());
     HtmlUtils.setHtml(this.$el, this.tpl(data));
-    console.log(this)
     this.postRender();
   }
 
