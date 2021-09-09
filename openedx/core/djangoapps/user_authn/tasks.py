@@ -20,8 +20,9 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 log = logging.getLogger('edx.celery.task')
 
 
+@shared_task(bind=True)
 @set_code_owner_attribute
-def _send_activation_email(self, msg_string, from_address=None):
+def send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.
     """
@@ -66,15 +67,3 @@ def _send_activation_email(self, msg_string, from_address=None):
             dest_addr,
         )
         raise Exception  # lint-amnesty, pylint: disable=raise-missing-from
-
-
-_OLD_TASK_NAME = 'common.djangoapps.student.tasks.send_activation_email'
-_NEW_TASK_NAME = 'openedx.core.djangoapps.user_authn.tasks.send_activation_email'
-
-
-# Register task under both its old and new names,
-# but expose only the new-named task for invocation.
-# -> Next step: Once we deploy and stop using the old task name,
-#    stop registering the task under the old name.
-shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
-send_activation_email = shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)
