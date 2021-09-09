@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import MessengerContent from "./MessengerContent"
+import MessengerContent from "./MessengerContent";
 
 export class Messenger {
     constructor(context) {

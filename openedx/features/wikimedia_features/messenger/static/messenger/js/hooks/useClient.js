@@ -1,6 +1,7 @@
 import HttpClient from "../client";
 import Cookies from "js-cookie";
 
+
 export default function useClient() {
     const client = new HttpClient({
         headers: {
@@ -8,5 +9,9 @@ export default function useClient() {
         },
     });
 
-    return { client }
+    const notification = (func, msg) => {
+        func(msg, { theme: "colored" });
+    }
+
+    return { client, notification };
 }

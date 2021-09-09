@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { ToastsContainer, ToastsStore } from "react-toasts";
+import { ToastContainer } from 'react-toastify';
 
 import useInboxList from './hooks/useInboxList';
 import useSelectedInbox from './hooks/useSelectedInbox';
-import useCreateUpdateMessages from './hooks/useCreateUpdateMessages'
+import useCreateUpdateMessages from './hooks/useCreateUpdateMessages';
 import useScrollObserver from './hooks/useScrollObserver';
 
-import Inbox from "./components/Inbox/index"
-import Conversation from "./components/Conversation/index"
-import NewMessageModal from './components/newMessageModal'
+import Inbox from "./components/Inbox/index";
+import Conversation from "./components/Conversation/index";
+import NewMessageModal from './components/newMessageModal';
 
 
 export default function MessengerContent({ context }) {
-    const [inboxPageNumber, setInboxPageNumber] = useState(1)
-    const [messagesPageNumber, setMessagesPageNumber] = useState(1)
+    const [inboxPageNumber, setInboxPageNumber] = useState(1);
+    const [messagesPageNumber, setMessagesPageNumber] = useState(1);
 
     const {
         selectedInboxUser,
@@ -22,20 +22,20 @@ export default function MessengerContent({ context }) {
         setSelectedInboxMessages,
         messagesLoading,
         messagesHasMore
-    } = useSelectedInbox(messagesPageNumber, setMessagesPageNumber, context)
+    } = useSelectedInbox(messagesPageNumber, setMessagesPageNumber, context);
 
     const {
         inboxList,
         setInboxList,
         inboxLoading,
         inboxHasMore
-    } = useInboxList(inboxPageNumber, setSelectedInboxUser, context)
+    } = useInboxList(inboxPageNumber, setSelectedInboxUser, context);
 
     const {
         updateLastMessage,
         createGroupMessages,
         createMessage,
-    } = useCreateUpdateMessages(inboxList, setInboxList, selectedInboxUser, setSelectedInboxMessages, context)
+    } = useCreateUpdateMessages(inboxList, setInboxList, selectedInboxUser, setSelectedInboxMessages, context);
 
 
     const {
@@ -44,7 +44,7 @@ export default function MessengerContent({ context }) {
     } = useScrollObserver(
         setInboxPageNumber, inboxLoading, inboxHasMore,
         setMessagesPageNumber, messagesLoading, messagesHasMore
-    )
+    );
 
     return (
         <div>
@@ -69,7 +69,7 @@ export default function MessengerContent({ context }) {
                 createGroupMessages = { createGroupMessages }
                 context = { context }
             />
-            <ToastsContainer store = { ToastsStore } />
+            <ToastContainer />
         </div>
     )
 }
