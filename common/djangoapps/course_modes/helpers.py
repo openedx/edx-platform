@@ -129,44 +129,47 @@ def get_course_final_price(user, sku, course_price):
 
 def get_verified_track_links(language):
     """
-    Format the correct links for Value Prop's Track Selection verified option, for the specified language.
+    Format the URL's for Value Prop's Track Selection verified option, for the specified language.
 
     Arguments:
         language (str): The language from the user's account settings.
 
     Returns: dict
-        Dictionary with URL's with verified certificate informational links for track selection.
+        Dictionary with URL's with verified certificate informational links.
+        If not edx.org, returns a dictionary with default URL's.
     """
     support_url = settings.SUPPORT_SITE_LINK
     root_url = settings.LMS_ROOT_URL
 
+    enabled_languages = {
+        'en': 'hc/en-us',
+        'es-419': 'hc/es-419',
+    }
+
     # Add edX specific links only to edx.org
     if root_url and 'edx.org' in root_url:
-        track_verified_url = urljoin(root_url, '/verified-certificate')
+        track_verified_url = urljoin(root_url, 'verified-certificate')
         if support_url and 'support.edx.org' in support_url:
-            enabled_languages = {
-                'en': 'hc/en-us',
-                'es-419': 'hc/es-419'
+            support_article_params = '/articles/360013426573-'
+            language_specific_params = {
+                'en': 'What-are-the-differences-between-audit-free-and-verified-paid-courses-',
+                'es-419': ('-Cu%C3%A1les-son-las-diferencias'
+                           '-entre-los-cursos-de-auditor%C3%ADa-gratuitos-y-verificados-pagos-')
             }
+            if language in ('es-419', 'es'):
+                full_params = enabled_languages['es-419'] + support_article_params + language_specific_params['es-419']
+            else:
+                full_params = enabled_languages['en'] + support_article_params + language_specific_params['en']
             track_comparison_url = urljoin(
                 support_url,
-                enabled_languages['en'],
-                '/articles/360013426573-What-are-the-differences-between-audit-free-and-verified-paid-courses-'
+                full_params
             )
-            if language in enabled_languages:
-                if language in ('es-419', 'es'):
-                    track_comparison_url = urljoin(
-                        support_url,
-                        enabled_languages[language],
-                        '/articles/360013426573--Cu%C3%A1les-son-las-diferencias',
-                        '-entre-los-cursos-de-auditor%C3%ADa-gratuitos-y-verificados-pagos-'
-                    )
             return {
                 'verified_certificate': track_verified_url,
                 'learn_more': track_comparison_url,
             }
-    else:
-        return {
-            'verified_certificate': root_url,
-            'learn_more': support_url,
-        }
+    # Default URL's are used if not edx.org
+    return {
+        'verified_certificate': root_url,
+        'learn_more': support_url,
+    }
