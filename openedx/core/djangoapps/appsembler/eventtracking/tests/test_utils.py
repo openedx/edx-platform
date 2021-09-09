@@ -1,9 +1,9 @@
 """
 Super minimal testing for the appsembler.eventtracking.segment module
 """
+import pytest
 from mock import patch, Mock
 from django.test import TestCase
-import ddt
 
 from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
     EventProcessingError,
@@ -24,75 +24,78 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
 EVENTTRACKING_MODULE = 'openedx.core.djangoapps.appsembler.eventtracking'
 
 
-@ddt.ddt
-class EventTrackingUtilsTests(TestCase):
+@pytest.mark.django_db
+def test_gets_site_config():
     """
-    Very basic and very much not exhaustive testing of
-    appsembler.eventtracking.utils module
+    A bit about the event dict.
+    It can have the following keys: 'org', 'course_id' but doesn't have to
+    have them
     """
-    def setUp(self):
-        self.site_config = SiteConfigurationFactory()
-        self.org = OrganizationFactory(sites=[self.site_config.site])
-        self.org_course = OrganizationCourseFactory(organization=self.org)
+    mock_site_config = Mock()
 
-        self.site_context = dict(org=self.org.short_name,
-                                 course_id=str(self.org_course.course_id))
+    with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
+               return_value=mock_site_config):
+        site_config = get_site_config_for_event(dict())
+    assert site_config == mock_site_config
 
-    def test_gets_site_config(self):
-        """
-        A bit about the event dict.
-        It can have the following keys: 'org', 'course_id' but doesn't have to
-        have them
-        """
-        mock_site_config = Mock()
 
-        with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
-                   return_value=mock_site_config):
-            site_config = get_site_config_for_event(dict())
-        assert site_config == mock_site_config
+@pytest.mark.django_db
+@pytest.mark.parametrize('context_key', ['org', 'course_id'])
+def test_event_has_site_context(context_key):
+    """
+    A bit about the event dict.
+    It can have the following keys: 'org', 'course_id' but doesn't have to
+    have them
+    """
+    site_config = SiteConfigurationFactory()
+    org = OrganizationFactory(sites=[site_config.site])
+    org_course = OrganizationCourseFactory(organization=org)
 
-    @ddt.data('org', 'course_id')
-    def test_event_has_site_context(self, context_key):
-        """
-        A bit about the event dict.
-        It can have the following keys: 'org', 'course_id' but doesn't have to
-        have them
-        """
-        event_props = {context_key: self.site_context[context_key]}
-        with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
-                   return_value=None):
-            site_config = get_site_config_for_event(event_props)
-        assert site_config == self.site_config
+    site_context = dict(org=org.short_name,
+                        course_id=str(org_course.course_id))
 
-    def test_event_raises_exception_on_event_props(self):
-        """
-        A bit about the event dict.
-        It can have the following keys: 'org', 'course_id' but doesn't have to
-        have them
-        """
-        with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
-                   return_value=None):
-            with self.assertRaises(EventProcessingError):
-                get_site_config_for_event(dict())
+    event_props = {context_key: site_context[context_key]}
+    with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
+               return_value=None):
+        site_config = get_site_config_for_event(event_props)
+    assert site_config == site_config
 
-    def test_event_raises_exception_on_no_org_found(self):
-        """
-        A bit about the event dict.
-        It can have the following keys: 'org', 'course_id' but doesn't have to
-        have them
-        """
-        with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
-                   return_value=None):
-            with self.assertRaises(EventProcessingError):
-                get_site_config_for_event(dict(org='no-org'))
 
-    def test_event_raises_exception_on_no_course_id_found(self):
-        """
-        A bit about the event dict.
-        It can have the following keys: 'org', 'course_id' but doesn't have to
-        have them
-        """
-        with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
-                   return_value=None):
-            with self.assertRaises(EventProcessingError):
-                get_site_config_for_event(dict(course_id='no-course-id'))
+@pytest.mark.django_db
+def test_event_raises_exception_on_event_props():
+    """
+    A bit about the event dict.
+    It can have the following keys: 'org', 'course_id' but doesn't have to
+    have them
+    """
+    with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
+               return_value=None):
+        with pytest.raises(EventProcessingError):
+            get_site_config_for_event(dict())
+
+
+@pytest.mark.django_db
+def test_event_raises_exception_on_no_org_found():
+    """
+    A bit about the event dict.
+    It can have the following keys: 'org', 'course_id' but doesn't have to
+    have them
+    """
+    with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
+               return_value=None):
+        with pytest.raises(EventProcessingError):
+            get_site_config_for_event(dict(org='no-org'))
+
+
+@pytest.mark.django_db
+def test_event_raises_exception_on_no_course_id_found(caplog):
+    """
+    A bit about the event dict.
+    It can have the following keys: 'org', 'course_id' but doesn't have to
+    have them
+    """
+    with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
+               return_value=None):
+        with pytest.raises(EventProcessingError):
+            get_site_config_for_event(dict(course_id='no-course-id'))
+    assert 'get_site_config_for_event: Cannot get site config for event' in caplog.text, 'Should log the exception'

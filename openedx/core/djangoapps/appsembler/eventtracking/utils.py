@@ -15,6 +15,8 @@ of functionality). Yes, naming matters.
 Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
 `get_site_config_for_event` is specific to sites.
 """
+
+import logging
 from django.core.exceptions import MultipleObjectsReturned
 
 from openedx.core.djangoapps.site_configuration.helpers import (
@@ -24,6 +26,9 @@ from openedx.core.djangoapps.site_configuration.helpers import (
 from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
     EventProcessingError
 )
+
+
+log = logging.getLogger(__name__)
 
 
 def get_site_config_for_event(event_props):
@@ -74,5 +79,6 @@ def get_site_config_for_event(event_props):
             MultipleObjectsReturned,
             Organization.DoesNotExist
         ) as e:
+            log.exception('get_site_config_for_event: Cannot get site config for event. props=`%s`', repr(event_props))
             raise EventProcessingError(e)
     return site_configuration
