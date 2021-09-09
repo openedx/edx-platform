@@ -25,7 +25,7 @@ from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.helpers import get_course_final_price
+from common.djangoapps.course_modes.helpers import get_course_final_price, get_verified_track_links
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.date_utils import strftime_localized_html
 from edx_toggles.toggles import WaffleFlag
@@ -247,6 +247,9 @@ class ChooseModeView(View):
                     context['currency_data'] = json.dumps(currency_data)
                 except TypeError:
                     pass
+
+        language = get_language()
+        context['track_links'] = get_verified_track_links(language)
 
         duration = get_user_course_duration(request.user, course)
         deadline = duration and get_user_course_expiration_date(request.user, course)

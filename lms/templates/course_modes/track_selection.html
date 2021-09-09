@@ -97,10 +97,12 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
                                     <div class="choice-bullets">
                                         <ul>
-                                            <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
-                                                link_start=HTML('<b><u><a class="verified" href="https://www.edx.org/verified-certificate" target="_blank">'),
-                                                link_end=HTML('</a></u></b>'),
-                                            )}</li>
+                                            <li>
+                                                ${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
+                                                    link_start=HTML('<b><u><a class="verified" href="{track_verified_url}" target="_blank">').format(track_verified_url=track_links['verified_certificate']),
+                                                    link_end=HTML('</a></u></b>')
+                                                )}
+                                            </li>
                                             <li>${Text(_("Get {start_bold}access to all course activities{end_bold}, including both graded and non-graded assignments, while the course is running")).format(
                                                 start_bold=HTML('<b>'),
                                                 end_bold=HTML('</b>'),
@@ -117,8 +119,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                                     </svg>
                                                     <span class="popover">
                                                         ${Text(_("{link_start}Learn more{link_end} about course access")).format(
-                                                            link_start=HTML('<u><a href="https://support.edx.org/hc/en-us/articles/360013426573-What-are-the-differences-between-audit-free-and-verified-paid-courses-" target="_blank">'),
-                                                            link_end=HTML('</a></u>'),
+                                                            link_start=HTML('<u><a href="{track_comparison_url}" target="_blank">').format(track_comparison_url=track_links['learn_more']),
+                                                            link_end=HTML('</a></u>')
                                                         )}
                                                     </span>
                                                 </span>
