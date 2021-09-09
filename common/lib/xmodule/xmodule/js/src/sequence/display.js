@@ -417,14 +417,18 @@
           return "\u202A"
         };
 
+        function getAccordionElement(element, element_title) {
+          var accordionElementID = "#"+$(element).attr('data-index') + "_" + element_title.replace(/[&\/\\#,+!()$~%.'":*?<>{}]/g, "-").replace(/ /g, "-");
+          return $(accordionElementID)
+        }
+
         function update_unit_title(element, is_active) {
           var element_title = element.getAttribute("data-page-title");
-          var accordionElementID = "#"+$(element).attr('data-index') + "_" + element_title.replace(/[&\/\\#,+!()$~%.'":*?<>{}]/g, "-").replace(/ /g, "-");
           // Update selected in Accordion
-          var videoElement = $(accordionElementID)
-          if (typeof videoElement[0] !== "undefined") {
+          var accordionElement = getAccordionElement(element, element_title);
+          if (typeof accordionElement[0] !== "undefined") {
             $(".menu-item").removeClass("active");
-            $(videoElement).addClass('active');
+            $(accordionElement).addClass('active');
           }
           var updated_title = get_formatting_char(element_title) + element.getAttribute("data-element") +". "
           if (is_active) {
@@ -454,12 +458,16 @@
             var completionUrl = this.ajaxUrl + '/get_completion';
             var usageKey = element[0].attributes['data-id'].value;
             var completionIndicators = element.find('.check-circle');
+            var element_title = element[0].getAttribute("data-page-title");
+            // Add completion marker class on Accordion Item
+            var accordionElement = getAccordionElement(element[0], element_title);
             if (completionIndicators.length) {
                 $.postWithPrefix(completionUrl, {
                     usage_key: usageKey
                 }, function(data) {
                     if (data.complete === true) {
                         completionIndicators.removeClass('is-hidden');
+                        accordionElement.addClass('complete')
                     }
                 });
             }
