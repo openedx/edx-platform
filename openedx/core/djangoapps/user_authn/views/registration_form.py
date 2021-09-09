@@ -96,6 +96,11 @@ def validate_name(name):
     Args:
         name (unicode): The name to validate.
     """
+    from openedx.core.djangoapps.user_api.accounts.api import get_name_validation_error
+    err_msg = get_name_validation_error(name)
+    if err_msg:
+        raise forms.ValidationError(err_msg)
+
     if contains_html(name):
         raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
 
@@ -136,7 +141,7 @@ class AccountCreationForm(forms.Form):
     """
 
     _EMAIL_INVALID_MSG = _(u"A properly formatted e-mail is required")
-    _NAME_TOO_SHORT_MSG = _(u"Your legal name must be a minimum of one character long")
+    _NAME_TOO_SHORT_MSG = accounts.NAME_BAD_LENGTH_MSG
 
     # TODO: Resolve repetition
 

@@ -4,7 +4,7 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
-
+import re
 import datetime
 
 import six
@@ -348,7 +348,15 @@ def get_name_validation_error(name):
     :return: Validation error message.
 
     """
-    return '' if name else accounts.REQUIRED_FIELD_NAME_MSG
+    # PKX-463 (PR#111) Updated Full Name validation as per need
+    if not name.strip():
+        return accounts.REQUIRED_FIELD_NAME_MSG
+    if not re.match('^[a-zA-Z ]+$', name):
+        return accounts.NAME_INVALID_MSG
+    if len(name.strip()) < accounts.NAME_MIN_LENGTH:
+        return accounts.NAME_BAD_LENGTH_MSG
+
+    return ''
 
 
 def get_username_validation_error(username):

@@ -65,7 +65,7 @@ def specify_user_role(user, role):
         user.groups.remove(g_admin, g_tm)
 
 
-def get_registration_email_message_context(user, password, protocol):
+def get_registration_email_message_context(user, password, protocol, is_public_registration):
     """
     return context for registration notification email body
     """
@@ -76,6 +76,7 @@ def get_registration_email_message_context(user, password, protocol):
     }
     message_context.update(get_base_template_context(site))
     message_context.update({
+        'is_public_registration': is_public_registration,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'username': user.username,
         'password': password,
@@ -141,13 +142,13 @@ def get_available_course_qs():
     )
 
 
-def send_registration_email(user, password, protocol):
+def send_registration_email(user, password, protocol, is_public_registration=False):
     """
     send a registration notification via email
     """
     message = RegistrationNotification().personalize(
         recipient=Recipient(user.username, user.email),
         language=user.profile.language,
-        user_context=get_registration_email_message_context(user, password, protocol),
+        user_context=get_registration_email_message_context(user, password, protocol, is_public_registration),
     )
     ace.send(message)
