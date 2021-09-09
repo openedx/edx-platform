@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
-from oauth2_provider.models import Application
 
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
@@ -25,7 +24,6 @@ class LogoutView(TemplateView):
     The template should load iframes to log the user out of OpenID Connect services.
     See http://openid.net/specs/openid-connect-logout-1_0.html.
     """
-    oauth_client_ids = []
     template_name = 'logout.html'
 
     # Keep track of the page to which the user should ultimately be redirected.
@@ -128,23 +126,19 @@ class LogoutView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Create a list of URIs that must be called to log the user out of all of the IDAs.
-        uris = []
-
-        # Add the logout URIs for IDAs that the user was logged into (according to the session).  This line is specific
-        # to DOP.
-        uris += Application.objects.filter(client_id__in=self.oauth_client_ids,
-                                           redirect_uris__isnull=False).values_list('redirect_uris', flat=True)
-
-        # Add the extra logout URIs from settings.  This is added as a stop-gap solution for sessions that were
-        # established via DOT.
-        uris += settings.IDA_LOGOUT_URI_LIST
-
+        # We don't know which IDAs have a session, so load the logout pages for all of them.
         referrer = self.request.META.get('HTTP_REFERER', '').strip('/')
         logout_uris = []
 
-        for uri in uris:
-            # Only include the logout URI if the browser didn't come from that IDA's logout endpoint originally,
+        for uri in settings.IDA_LOGOUT_URI_LIST:
+            # ...except only include the logout URI if the browser didn't come from that IDA's logout endpoint originally,
             # avoiding a double-logout.
+            #
+            # This string prefix check doesn't really do the right thing if the
+            # user navigates from the IDA's root page, or if the browser removes
+            # the path from the referer URI. However, the IDA should always
+            # direct the user to its own logout page first, which prevents this
+            # from mattering.
             if not referrer or (referrer and not uri.startswith(referrer)):
                 logout_uris.append(self._build_logout_url(uri))
 
