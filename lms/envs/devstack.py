@@ -397,6 +397,7 @@ if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
 
 #####################################################################
 
+
 # django-session-cookie middleware
 DCS_SESSION_COOKIE_SAMESITE = 'Lax'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
