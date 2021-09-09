@@ -1,0 +1,53 @@
+<%page expression_filter="h"/>
+<%!
+  import json
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+  from openedx.core.djangolib.markup import HTML, Text
+  %>
+  <%inherit file="../main.html" />
+  <%
+  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+  %>
+
+
+  <%namespace name='static' file='../static_content.html'/>
+
+  <%block name="pagetitle">${_("Reports")}</%block>
+
+% if not course_discovery_enabled:
+  <h3 class="hd hd-3">${_("Select course to generate it's report ")}</h3>
+
+  <br>
+
+  <select name="course_categories" class="filter-selectbox">
+    %for course in courses:
+      <p>course</p>
+      <option value=${course}>${course.display_name_with_default}</option>
+    %endfor
+  </select>
+
+  <br><br><br>
+
+  <p>
+    <input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['key']['get_students_features_url'] }" data-csv="true">
+  </p>
+
+  <br>
+
+  <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
+  <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
+
+  <br><br>
+
+  <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
+  <br>
+  <p>
+      ${_("The reports listed below are available for download, identified by UTC date and time of generation.")}
+  </p>
+
+  <br><br>
+  <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['key']['list_report_downloads_url'] }" ></div>
+% endif
+
+<script type="text/javascript" src="${static.url('admin_dashboard/js/course_reports.js')}"></script>
