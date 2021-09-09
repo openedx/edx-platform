@@ -67,7 +67,7 @@ from django.db import IntegrityError, transaction
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 try:
     from eol_vimeo.vimeo_task import task_process_data
-    from eol_vimeo.vimeo_utils import update_create_vimeo_model
+    from eol_vimeo.vimeo_utils import update_create_vimeo_model, update_video_vimeo
     ENABLE_EOL_VIMEO = True
 except ImportError:
     ENABLE_EOL_VIMEO = False
@@ -166,7 +166,6 @@ class StatusDisplayStrings(object):
         "ingest": _IN_PROGRESS,
         "transcode_queue": _IN_PROGRESS,
         "transcode_active": _IN_PROGRESS,
-        "vimeo_encoding":_IN_PROGRESS,
         "file_delivered": _COMPLETE,
         "file_complete": _COMPLETE,
         "upload_completed": _UPLOAD_COMPLETED,
@@ -185,7 +184,11 @@ class StatusDisplayStrings(object):
         # TODO: Add a related unit tests when the VAL update is part of platform
         "transcript_failed": _TRANSCRIPT_FAILED,
     }
-
+    #### EOL ####
+    _STATUS_MAP["vimeo_encoding"] = _IN_PROGRESS
+    _STATUS_MAP["vimeo_upload"] = _IN_PROGRESS
+    _STATUS_MAP["vimeo_patch_failed"] = 'Error Patch'
+    #### END EOL ####
     @staticmethod
     def get(val_status):
         """Map a VAL status string to a localized display string"""
@@ -234,7 +237,7 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                     status = video.get('status')
                     if status == 'upload_completed':
                         upload_completed_videos.append(video)
-                        status = 'upload'
+                        status = 'vimeo_upload'
                     update_video_status(video.get('edxVideoId'), status)
                     update_create_vimeo_model(video.get('edxVideoId'), request.user.id, status, video.get('message'), course_key_string)
                     LOGGER.info(
@@ -672,6 +675,9 @@ def videos_index_html(course, pagination_conf=None):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
+    #### EOL ####
+    update_video_vimeo(six.text_type(course.id))
+    #### END EOL ####
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     context = {

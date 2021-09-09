@@ -867,7 +867,9 @@ class VideoBlock(
         """
         try:
             from eol_vimeo.models import EolVimeoVideo
+            from eol_vimeo.vimeo_utils import update_video_vimeo
             from edxval.api import _get_video
+            update_video_vimeo(str(course_key))
             video_list = []
             vimeo_list = EolVimeoVideo.objects.filter(course_key=course_key, status__in=['vimeo_encoding', 'upload_completed']).values('edx_video_id')
             for video in vimeo_list:
