@@ -2,7 +2,6 @@
 Table for storing information about whether or not Studio users have course creation privileges.
 """
 
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.db.models.signals import post_init, post_save
@@ -10,9 +9,10 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from organizations.models import Organization
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "state"])
+update_creator_state = Signal(providing_args=["caller", "user", "state", "organizations"])
 
 # A signal that will be sent when admin should be notified of a pending user request
 send_admin_notification = Signal(providing_args=["user"])
@@ -48,6 +48,12 @@ class CourseCreator(models.Model):
                              help_text=_("Current course creator state"))
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
+    organizations = models.ManyToManyField(Organization, blank=True,
+                                           help_text=_("Organizations under which the user is allowed "
+                                                       "to create courses."))
+    all_organizations = models.BooleanField(default=True,
+                                            help_text=_("Grant the user the permission to create courses "
+                                                        "in ALL organizations"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"
@@ -60,6 +66,7 @@ def post_init_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unuse
     """
     instance = kwargs['instance']
     instance.orig_state = instance.state
+    instance.orig_all_organizations = instance.all_organizations
 
 
 @receiver(post_save, sender=CourseCreator)
@@ -70,7 +77,9 @@ def post_save_callback(sender, **kwargs):
     instance = kwargs['instance']
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
-    if instance.state != instance.orig_state:
+    # We need to keep track of all_organization switch. If this switch is changed we are going to remove the
+    # Course Creator group.
+    if instance.state != instance.orig_state or instance.all_organizations != instance.orig_all_organizations:
         granted_state_change = instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED
         # If either old or new state is 'granted', we must manipulate the course creator
         # group maintained by authz. That requires staff permissions (stored admin).
@@ -80,7 +89,8 @@ def post_save_callback(sender, **kwargs):
                 sender=sender,
                 caller=instance.admin,
                 user=instance.user,
-                state=instance.state
+                state=instance.state,
+                all_organizations=instance.all_organizations
             )
 
         # If user has been denied access, granted access, or previously granted access has been
@@ -101,4 +111,5 @@ def post_save_callback(sender, **kwargs):
 
         instance.state_changed = timezone.now()
         instance.orig_state = instance.state
+        instance.orig_all_organizations = instance.all_organizations
         instance.save()

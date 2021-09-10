@@ -5,7 +5,7 @@ Methods for interacting programmatically with the user creator table.
 
 from cms.djangoapps.course_creators.models import CourseCreator
 from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseCreatorRole
+from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 
 
 def add_user_with_status_unrequested(user):
@@ -48,6 +48,16 @@ def update_course_creator_group(caller, user, add):
         auth.add_users(caller, CourseCreatorRole(), user)
     else:
         auth.remove_users(caller, CourseCreatorRole(), user)
+
+
+def update_org_content_creator_role(caller, user, orgs):
+    """
+    Method for updating users for OrgContentCreatorRole, this method
+    takes care of creating and deleting the role as required.
+
+    Caller must have staff permissions.
+    """
+    auth.update_org_role(caller, OrgContentCreatorRole, user, orgs)
 
 
 def get_course_creator_status(user):

@@ -19,6 +19,9 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -29,15 +32,17 @@ from common.djangoapps.student.auth import (
     has_studio_read_access,
     has_studio_write_access
 )
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    LibraryUserRole
+)
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError
 
 from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
+from .helpers import is_content_creator
 from .item import create_xblock_info
 from .user import user_with_role
 
@@ -63,7 +68,7 @@ def should_redirect_to_library_authoring_mfe():
     )
 
 
-def get_library_creator_status(user):
+def user_can_create_library(user, org=None):
     """
     Helper method for returning the library creation status for a particular user,
     taking into account the value LIBRARIES_ENABLED.
@@ -74,7 +79,10 @@ def get_library_creator_status(user):
     elif user.is_staff:
         return True
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return get_course_creator_status(user) == 'granted'
+        has_course_creator_role = True
+        if org:
+            has_course_creator_role = is_content_creator(user, org)
+        return get_course_creator_status(user) == 'granted' and has_course_creator_role
     else:
         # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
         disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
@@ -97,7 +105,7 @@ def library_handler(request, library_key_string=None):
         raise Http404  # Should never happen because we test the feature in urls.py also
 
     if request.method == 'POST':
-        if not get_library_creator_status(request.user):
+        if not user_can_create_library(request.user):
             return HttpResponseForbidden()
 
         if library_key_string is not None:
@@ -188,6 +196,8 @@ def _create_library(request):
         library = request.json.get('number', None)
         if library is None:
             library = request.json['library']
+        if not user_can_create_library(request.user, org):
+            raise PermissionDenied()
         store = modulestore()
         with store.default_store(ModuleStoreEnum.Type.split):
             new_lib = store.create_library(
@@ -198,6 +208,19 @@ def _create_library(request):
             )
         # Give the user admin ("Instructor") role for this library:
         add_instructor(new_lib.location.library_key, request.user, request.user)
+    except PermissionDenied as error:
+        log.info(
+            "User does not have the permission to create LIBRARY in this organization."
+            "User: '%s' Org: '%s' LIBRARY #: '%s'.",
+            request.user.id,
+            org,
+            library,
+        )
+        return JsonResponse({
+            'error': _('User does not have the permission to create library in this organization '
+                       'or course creation is disabled')},
+            status=403
+        )
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({

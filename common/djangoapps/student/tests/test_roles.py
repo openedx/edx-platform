@@ -15,11 +15,12 @@ from common.djangoapps.student.roles import (
     CourseRole,
     CourseStaffRole,
     GlobalStaff,
+    OrgContentCreatorRole,
     OrgInstructorRole,
     OrgStaffRole,
     RoleCache
 )
-from common.djangoapps.student.tests.factories import AnonymousUserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, InstructorFactory, StaffFactory, UserFactory
 
 
 class RolesTestCase(TestCase):
@@ -36,6 +37,7 @@ class RolesTestCase(TestCase):
         self.global_staff = UserFactory(is_staff=True)
         self.course_staff = StaffFactory(course_key=self.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course_key)
+        self.orgs = ["Marvel", "DC"]
 
     def test_global_staff(self):
         assert not GlobalStaff().has_user(self.student)
@@ -139,6 +141,18 @@ class RolesTestCase(TestCase):
         role.add_users(self.student)
         role.remove_users(self.student)
         assert not role.has_user(self.student)
+
+    def test_get_orgs_for_user(self):
+        """
+        Test get_orgs_for_user
+        """
+        role = OrgContentCreatorRole(org=self.orgs[0])
+        assert len(role.get_orgs_for_user(self.student)) == 0
+        role.add_users(self.student)
+        assert len(role.get_orgs_for_user(self.student)) == 1
+        role_second_org = OrgContentCreatorRole(org=self.orgs[1])
+        role_second_org.add_users(self.student)
+        assert len(role.get_orgs_for_user(self.student)) == 2
 
 
 @ddt.ddt
