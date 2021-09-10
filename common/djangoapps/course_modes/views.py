@@ -262,9 +262,9 @@ class ChooseModeView(View):
             if not error:  # TODO: Remove by executing REV-2355
                 if not enterprise_customer:  # TODO: Remove by executing REV-2342
                     if fbe_is_on:
-                        return render_to_response("course_modes/track_selection_types/fbe.html", context)
+                        return render_to_response("course_modes/fbe.html", context)
                     else:
-                        return render_to_response("course_modes/track_selection_types/unfbe.html", context)
+                        return render_to_response("course_modes/unfbe.html", context)
 
         # If error or enterprise_customer, failover to old choose.html page
         return render_to_response("course_modes/choose.html", context)
