@@ -111,7 +111,7 @@ class LinkProgramEnrollmentSupportView(View):
             for item in ext_key_to_username.items()
             if item not in link_errors
         ]
-        errors = [message for message in link_errors.values()]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        errors = list(link_errors.values())
         return successes, errors
 
 

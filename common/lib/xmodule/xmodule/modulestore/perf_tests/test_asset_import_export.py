@@ -194,7 +194,7 @@ class TestModulestoreAssetSize(unittest.TestCase):
 
                 results = asset_collection.map_reduce(mapper, reducer, "size_results")
                 result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
-                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, results.find()
                 )
                 with open("bson_sizes.txt", "a") as f:
                     f.write(result_str)

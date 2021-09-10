@@ -46,12 +46,7 @@ class Command(BaseCommand):
 
         with open(file_path) as csv_file:
             csv_reader = csv.reader(csv_file)
-
-            email_mappings = [
-                (current_email, new_email)
-                for (current_email, new_email)  # lint-amnesty, pylint: disable=unnecessary-comprehension
-                in csv_reader
-            ]
+            email_mappings = list(csv_reader)
 
         successful_updates = []
         failed_updates = []
