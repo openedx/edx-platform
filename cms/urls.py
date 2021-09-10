@@ -44,6 +44,8 @@ COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
+# oauth2_urlpatterns needs to be first to override any other login and
+# logout related views.
 urlpatterns = oauth2_urlpatterns + [
     url(r'', include('openedx.core.djangoapps.user_authn.urls_common')),
     url(r'', include('common.djangoapps.student.urls')),
