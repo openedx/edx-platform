@@ -12,6 +12,8 @@ from common.djangoapps.track.event_transaction_utils import (
     set_event_transaction_type
 )
 
+from openedx.features.enterprise_support.context import get_enterprise_event_context
+
 COURSE_GRADE_CALCULATED = 'edx.grades.course.grade_calculated'
 GRADES_OVERRIDE_EVENT_TYPE = 'edx.grades.problem.score_overridden'
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
@@ -147,6 +149,8 @@ def course_grade_passed_first_time(user_id, course_id):
     """
     event_name = COURSE_GRADE_PASSED_FIRST_TIME_EVENT_TYPE
     context = contexts.course_context_from_course_id(course_id)
+    context_enterprise = get_enterprise_event_context(user_id, course_id)
+    context.update(context_enterprise)
     # TODO (AN-6134): remove this context manager
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(

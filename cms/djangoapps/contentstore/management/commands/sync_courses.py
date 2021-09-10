@@ -44,6 +44,8 @@ class Command(BaseCommand):
         instructor = self.get_user(options['instructor'])
 
         course_runs = get_course_runs()
+        if len(course_runs) == 0:
+            raise CommandError('No course runs to synchronize')
         for course_run in course_runs:
             course_key = CourseKey.from_string(course_run.get('key'))
             fields = {

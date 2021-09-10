@@ -450,7 +450,7 @@ class ProgramDiscussionsConfiguration(TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"ProgramDiscussionConfiguration(uuid='{self.uuid}', provider='{self.provider}', enabled={self.enabled})"
+        return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
 
     @classmethod
     def is_enabled(cls, program_uuid) -> bool:

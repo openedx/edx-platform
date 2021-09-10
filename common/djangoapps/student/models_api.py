@@ -109,6 +109,17 @@ def get_course_access_role(user, org, course_id, role):
     return course_access_role
 
 
+def get_pending_name_change(user):
+    """
+    Return a string representing the user's pending name change, or None if it does not exist.
+    """
+    try:
+        pending_name_change = _PendingNameChange.objects.get(user=user)
+        return pending_name_change.new_name
+    except _PendingNameChange.DoesNotExist:
+        return None
+
+
 def do_name_change_request(user, new_name, rationale):
     """
     Create a name change request. This either updates the user's current PendingNameChange, or creates

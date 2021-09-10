@@ -87,7 +87,8 @@ class AwardProgramCertificateTestCase(TestCase):
         """
         Ensure the correct API call gets made
         """
-        test_username = 'test-username'
+        student = UserFactory(username='test-username', email='test-email@email.com')
+
         test_client = EdxRestApiClient('http://test-server', jwt='test-token')
 
         httpretty.register_uri(
@@ -95,10 +96,12 @@ class AwardProgramCertificateTestCase(TestCase):
             'http://test-server/credentials/',
         )
 
-        tasks.award_program_certificate(test_client, test_username, 123, datetime(2010, 5, 30))
+        tasks.award_program_certificate(test_client, student, 123, datetime(2010, 5, 30))
 
         expected_body = {
-            'username': test_username,
+            'username': student.username,
+            'lms_user_id': student.id,
+            'email': student.email,
             'credential': {
                 'program_uuid': 123,
                 'type': tasks.PROGRAM_CERTIFICATE,

@@ -100,7 +100,12 @@ class CourseListTestMixin(CourseApiTestMixin):
     Common behavior for list_courses tests
     """
 
-    def _make_api_call(self, requesting_user, specified_user, org=None, filter_=None):
+    def _make_api_call(self,
+                       requesting_user,
+                       specified_user,
+                       org=None,
+                       filter_=None,
+                       permissions=None):
         """
         Call the list_courses api endpoint to get information about
         `specified_user` on behalf of `requesting_user`.
@@ -108,7 +113,13 @@ class CourseListTestMixin(CourseApiTestMixin):
         request = Request(self.request_factory.get('/'))
         request.user = requesting_user
         with check_mongo_calls(0):
-            return list_courses(request, specified_user.username, org=org, filter_=filter_)
+            return list_courses(
+                request,
+                specified_user.username,
+                org=org,
+                filter_=filter_,
+                permissions=permissions,
+            )
 
     def verify_courses(self, courses):
         """
@@ -208,6 +219,28 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
             filtered_courses = self._make_api_call(self.staff_user, self.staff_user, filter_=filter_)
             assert {course.id for course in filtered_courses} == {course.id for course in expected_courses},\
                 f'testing course_api.api.list_courses with filter_={filter_}'
+
+    def test_permissions(self):
+
+        # Create a second course to be filtered out of queries.
+        self.create_course(course='should-be-hidden-course')
+
+        # Create instructor (non-staff), and enroll him in the course.
+        instructor_user = self.create_user('the-instructor', is_staff=False)
+        self.create_enrollment(user=instructor_user, course_id=self.course.id)
+        self.create_courseaccessrole(
+            user=instructor_user,
+            course_id=self.course.id,
+            role='instructor',
+            org='edX',
+        )
+
+        filtered_courses = self._make_api_call(
+            instructor_user,
+            instructor_user,
+            permissions={'instructor'})
+
+        self.assertEqual({c.id for c in filtered_courses}, {self.course.id})
 
 
 class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):

@@ -91,15 +91,15 @@ def get_certified_programs(student):
     return certified_programs
 
 
-def award_program_certificate(client, username, program_uuid, visible_date):
+def award_program_certificate(client, user, program_uuid, visible_date):
     """
     Issue a new certificate of completion to the given student for the given program.
 
     Args:
         client:
             credentials API client (EdxRestApiClient)
-        username:
-            The username of the student
+        user:
+            The student's user data
         program_uuid:
             uuid of the completed program
         visible_date:
@@ -110,7 +110,9 @@ def award_program_certificate(client, username, program_uuid, visible_date):
 
     """
     client.credentials.post({
-        'username': username,
+        'username': user.username,
+        'lms_user_id': user.id,
+        'email': user.email,
         'credential': {
             'type': PROGRAM_CERTIFICATE,
             'program_uuid': program_uuid
@@ -231,7 +233,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
             visible_date = completed_programs[program_uuid]
             try:
                 LOGGER.info(f"Visible date for user {username} : program {program_uuid} is {visible_date}")
-                award_program_certificate(credentials_client, username, program_uuid, visible_date)
+                award_program_certificate(credentials_client, student, program_uuid, visible_date)
                 LOGGER.info(f"Awarded certificate for program {program_uuid} to user {username}")
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
