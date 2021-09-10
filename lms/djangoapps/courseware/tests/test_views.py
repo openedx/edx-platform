@@ -49,6 +49,7 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware import access_utils
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
@@ -88,6 +89,7 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
     get_courseware_url,
+    get_learning_mfe_home_url,
     make_learning_mfe_courseware_url,
     ExperienceOption,
 )
@@ -129,6 +131,13 @@ def _set_preview_mfe_flag(active: bool):
     A decorator/contextmanager to force the courseware MFE educator preview flag on or off.
     """
     return override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, active=active)
+
+
+def _set_course_home_mfe_flag(activate_mfe: bool):
+    """
+    A decorator/contextmanager to force the courseware home MFE flag on or off.
+    """
+    return override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=(not activate_mfe))
 
 
 @ddt.ddt
@@ -577,6 +586,33 @@ class ViewsTestCase(BaseViewsTestCase):
         assert response.status_code == 200
         self.assertNotContains(response, 'Problem 1')
         self.assertNotContains(response, 'Problem 2')
+
+    @ddt.data(False, True)
+    def test_mfe_link_from_about_page(self, activate_mfe):
+        """
+        Verify course about page links to the MFE when enabled.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+        CourseEnrollment.enroll(self.user, course.id)
+        assert self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+        legacy_url = reverse(
+            'openedx.course_experience.course_home',
+            kwargs={
+                'course_id': str(course.id),
+            }
+        )
+        mfe_url = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+
+        with _set_course_home_mfe_flag(activate_mfe):
+            response = self.client.get(reverse('about_course', args=[str(course.id)]))
+            if activate_mfe:
+                self.assertContains(response, mfe_url)
+                self.assertNotContains(response, legacy_url)
+            else:
+                self.assertNotContains(response, mfe_url)
+                self.assertContains(response, legacy_url)
 
     def _create_url_for_enroll_staff(self):
         """

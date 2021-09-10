@@ -933,7 +933,10 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if request.user.has_perm(VIEW_COURSE_HOME, course):
-            course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
+            if course_home_legacy_is_active(course.id):
+                course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
+            else:
+                course_target = get_learning_mfe_home_url(course_key=course.id, view_name='home')
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
