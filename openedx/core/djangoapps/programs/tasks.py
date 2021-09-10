@@ -112,7 +112,6 @@ def award_program_certificate(client, user, program_uuid, visible_date):
     client.credentials.post({
         'username': user.username,
         'lms_user_id': user.id,
-        'email': user.email,
         'credential': {
             'type': PROGRAM_CERTIFICATE,
             'program_uuid': program_uuid
