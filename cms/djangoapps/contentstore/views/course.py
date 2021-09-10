@@ -918,7 +918,8 @@ def _create_or_rerun_course(request):
         )
     except PermissionDenied as error:
         log.info(
-            "User does not have the permission to create course in this organization."
+            "User does not have the permission to create course in this organization"
+            "or course creation is disabled."
             "User: '%s' Org: '%s' Course #: '%s'.",
             request.user.id,
             org,
@@ -1876,11 +1877,7 @@ def _get_course_creator_status(user, org=None):
         course_creator_status = 'disallowed_for_this_site'
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
-        has_course_creator_role = True
-        if org:
-            has_course_creator_role = is_content_creator(user, org)
-
-        if course_creator_status is None or not has_course_creator_role:
+        if course_creator_status is None:
             # User not grandfathered in as an existing user, has not previously visited the dashboard page.
             # Add the user to the course creator admin table with status 'unrequested'.
             add_user_with_status_unrequested(user)

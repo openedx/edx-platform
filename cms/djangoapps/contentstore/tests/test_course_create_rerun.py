@@ -281,8 +281,8 @@ class TestCourseListing(ModuleStoreTestCase):
         self.course_creator_entry.all_organizations = False
         self.course_creator_entry.state = CourseCreator.GRANTED
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
-        dc_org_object = Organization.objects.filter(name='Test Organization')
-        self.course_creator_entry.organizations.add(*dc_org_object)
+        dc_org_object = Organization.objects.get(name='Test Organization')
+        self.course_creator_entry.organizations.add(dc_org_object)
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': self.source_course_key.org,
@@ -315,8 +315,10 @@ class TestCourseListing(ModuleStoreTestCase):
         self.course_creator_entry.all_organizations = False
         self.course_creator_entry.state = CourseCreator.GRANTED
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
-        dc_org_object = Organization.objects.filter(name='DC')
-        self.course_creator_entry.organizations.add(*dc_org_object)
+        # User has been given the permission to create course under `DC` organization.
+        # When the user tries to create course under `Test Organization` it throws a 403.
+        dc_org_object = Organization.objects.get(name='DC')
+        self.course_creator_entry.organizations.add(dc_org_object)
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': self.source_course_key.org,
