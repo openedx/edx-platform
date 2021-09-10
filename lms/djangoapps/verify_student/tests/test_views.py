@@ -21,8 +21,9 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
 from opaque_keys.edx.locator import CourseLocator
-from waffle.testutils import override_switch
+from waffle.testutils import override_flag, override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -1256,16 +1257,22 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         # Verify that the user's name wasn't changed
         self._assert_user_name(self.user.profile.name)
 
-    def test_submit_photos_and_change_name(self):
-        # Submit the photos, along with a name change
-        self._submit_photos(
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            full_name=self.FULL_NAME
-        )
+    @ddt.data(True, False)
+    def test_submit_photos_and_change_name(self, flag_on):
+        with override_flag(VERIFIED_NAME_FLAG.name, flag_on):
+            # Submit the photos, along with a name change
+            self._submit_photos(
+                face_image=self.IMAGE_DATA,
+                photo_id_image=self.IMAGE_DATA,
+                full_name=self.FULL_NAME
+            )
 
-        # Check that the user's name was changed in the database
-        self._assert_user_name(self.FULL_NAME)
+            # Check that the user's name was changed in the database if verified_name is off
+            self._assert_user_name(self.FULL_NAME, equality=not flag_on)
+            # Since we are giving a full name, it should be written into the attempt
+            # whether or not the user name was updated
+            attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+            self.assertEqual(attempt.name, self.FULL_NAME)
 
     def test_submit_photos_sends_confirmation_email(self):
         self._submit_photos(
@@ -1479,7 +1486,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             # Verify that photo submission confirmation email was not sent
             assert len(mail.outbox) == 0
 
-    def _assert_user_name(self, full_name):
+    def _assert_user_name(self, full_name, equality=True):
         """Check the user's name.
 
         Arguments:
@@ -1492,7 +1499,10 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         request = RequestFactory().get('/url')
         request.user = self.user
         account_settings = get_account_settings(request)[0]
-        assert account_settings['name'] == full_name
+        if equality:
+            assert account_settings['name'] == full_name
+        else:
+            assert not account_settings['name'] == full_name
 
     def _get_post_data(self):
         """Retrieve POST data from the last request. """
