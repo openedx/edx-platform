@@ -101,7 +101,6 @@ class AwardProgramCertificateTestCase(TestCase):
         expected_body = {
             'username': student.username,
             'lms_user_id': student.id,
-            'email': student.email,
             'credential': {
                 'program_uuid': 123,
                 'type': tasks.PROGRAM_CERTIFICATE,
