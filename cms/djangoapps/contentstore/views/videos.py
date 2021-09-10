@@ -68,6 +68,7 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 try:
     from eol_vimeo.vimeo_task import task_process_data
     from eol_vimeo.vimeo_utils import update_create_vimeo_model, update_video_vimeo
+    from django.contrib.auth.base_user import BaseUserManager
     ENABLE_EOL_VIMEO = True
 except ImportError:
     ENABLE_EOL_VIMEO = False
@@ -239,7 +240,8 @@ def videos_handler(request, course_key_string, edx_video_id=None):
                         upload_completed_videos.append(video)
                         status = 'vimeo_upload'
                     update_video_status(video.get('edxVideoId'), status)
-                    update_create_vimeo_model(video.get('edxVideoId'), request.user.id, status, video.get('message'), course_key_string)
+                    token = BaseUserManager().make_random_password(50)
+                    update_create_vimeo_model(video.get('edxVideoId'), request.user.id, status, video.get('message'), course_key_string, token=token)
                     LOGGER.info(
                         u'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
                         video.get('edxVideoId'),
