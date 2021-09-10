@@ -3,9 +3,10 @@ CCX API URLs.
 """
 
 
-from django.conf.urls import include, url
+from django.conf.urls import include
+from django.urls import path
 
 app_name = 'ccx_api'
 urlpatterns = [
-    url(r'^v0/', include('lms.djangoapps.ccx.api.v0.urls')),
+    path('v0/', include('lms.djangoapps.ccx.api.v0.urls')),
 ]

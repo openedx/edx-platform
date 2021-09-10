@@ -9,17 +9,17 @@ NOTE: These views are deprecated.  These routes are superseded by
 
 
 from django.conf import settings
-from django.conf.urls import url
 
 from .views import ProfileImageRemoveView, ProfileImageUploadView
+from django.urls import re_path
 
 urlpatterns = [
-    url(
+    re_path(
         r'^v1/' + settings.USERNAME_PATTERN + '/upload$',
         ProfileImageUploadView.as_view(),
         name="profile_image_upload"
     ),
-    url(
+    re_path(
         r'^v1/' + settings.USERNAME_PATTERN + '/remove$',
         ProfileImageRemoveView.as_view(),
         name="profile_image_remove"
