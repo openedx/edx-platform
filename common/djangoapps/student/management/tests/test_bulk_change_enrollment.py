@@ -107,7 +107,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
                 commit=True,
             )
 
-        if django.VERSION < (3,0):
+        if django.VERSION < (3, 0):
             assert 'Error: one of the arguments -c/--course -o/--org is required' == str(err.value)
         else:
             assert 'Error: argument -o/--org: not allowed with argument -c/--course' == str(err.value)
