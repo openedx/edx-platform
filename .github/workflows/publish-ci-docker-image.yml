@@ -14,7 +14,7 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run : |
-          docker build -f .ci/Dockerfile
-          docker tag openedx/edx-platform-ci-runner
+          docker build -t openedx/edx-platform-ci-runner:latest -f scripts/ci-runner.Dockerfile .
           make docker_auth
           docker push 'openedx/edx-platform-ci-runner:latest'
+
