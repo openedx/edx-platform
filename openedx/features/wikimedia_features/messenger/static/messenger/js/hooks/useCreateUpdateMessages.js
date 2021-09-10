@@ -1,28 +1,29 @@
-import { useEffect } from 'react'
-import { ToastsStore } from "react-toasts";
-import useClient from "./useClient"
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+
+import useClient from "./useClient";
 
 
 export default function useCreateUpdateMessages(
     inboxList, setInboxList, selectedInboxUser, setSelectedInboxMessages, context) {
-    const { client } = useClient()
-    let currentInbox = {}
+    const { client, notification } = useClient();
+    let currentInbox = {};
 
     const createMessage = async(message, setMessage, updateLastMessage) => {
         try {
             const createdMessage = (await client.post(context.MESSAGE_URL, {
                 receiver: selectedInboxUser,
                 message: message
-            })).data
+            })).data;
             if (createdMessage) {
                 setSelectedInboxMessages((prevMsgs) => [createdMessage, ...prevMsgs]);
-                setMessage("")
-                updateLastMessage(message)
+                setMessage("");
+                updateLastMessage(message);
             }
-            ToastsStore.success("Message has been sent.")
+            notification(toast.success, "Message has been sent.");
         } catch (e) {
+            notification(toast.error, "Error in sending message. Please try again!");
             console.error(e);
-            ToastsStore.error("Unable to send your message, please try again!")
         }
     }
 
@@ -31,39 +32,39 @@ export default function useCreateUpdateMessages(
             const UpdatedInbox = (await client.post(context.BULK_MESSAGE_URL, {
                 receivers: users.map((user) => user.id),
                 message: message
-            })).data
+            })).data;
 
             updateInboxList(UpdatedInbox);
             updateOpenedConversation(message, users);
-            ToastsStore.success("Message has been sent.")
+            notification(toast.success, "Message(s) have been sent.");
         } catch (e) {
+            notification(toast.error, "Error in sending messages. Please try again!");
             console.error(e);
-            ToastsStore.error("Unable to send your message, please try again!")
         }
     }
 
     const updateInboxList = (UpdatedInbox ) => {
-        let newlyCreatedInbox = []
-        let newList = inboxList.map((inbox) => inbox)
+        let newlyCreatedInbox = [];
+        let newList = inboxList.map((inbox) => inbox);
         UpdatedInbox.forEach((newInbox) => {
-            let existingInbox = inboxList.find((inbox) => inbox.id === newInbox.id)
+            let existingInbox = inboxList.find((inbox) => inbox.id === newInbox.id);
             if (existingInbox) {
                 newList = newList.map((inbox) => {
                     return inbox.id == newInbox.id ? newInbox : inbox;
-                })
+                });
             } else {
-                newlyCreatedInbox.push(newInbox)
+                newlyCreatedInbox.push(newInbox);
             }
-        })
+        });
 
         if (newlyCreatedInbox) {
-            newList = [...newlyCreatedInbox, ...newList]
+            newList = [...newlyCreatedInbox, ...newList];
         }
         setInboxList(newList);
     }
 
     const updateOpenedConversation = (message, users) => {
-        let isConversationOpened = users.some((user) => user.username == selectedInboxUser)
+        let isConversationOpened = users.some((user) => user.username == selectedInboxUser);
         if (isConversationOpened) {
             setSelectedInboxMessages((prevMsgs) => {
                 return [{
@@ -71,8 +72,8 @@ export default function useCreateUpdateMessages(
                     sender_img: context.LOGIN_USER_IMG,
                     created: "now",
                     message
-                }, ...prevMsgs, ]
-            })
+                }, ...prevMsgs, ];
+            });
         }
     }
 
@@ -84,35 +85,35 @@ export default function useCreateUpdateMessages(
             if (updatedInbox) {
                 setInboxList((previousList) => {
                     return previousList.map((inbox) => {
-                        return (inbox.id === updatedInbox.id ? updatedInbox : inbox)
+                        return (inbox.id === updatedInbox.id ? updatedInbox : inbox);
                     })
                 });
             }
         } catch (ex) {
-            ToastsStore.error('Failed: Failure while updating .');
-            console.error(ex)
+            notification(toast.error, "Error in marking messages read.");
+            console.error(ex);
         }
     }
 
     const updateLastMessage = (message) => {
-        currentInbox = inboxList.find((inbox) => inbox.with_user == selectedInboxUser)
+        currentInbox = inboxList.find((inbox) => inbox.with_user == selectedInboxUser);
         if (currentInbox) {
             currentInbox.last_message = message.length > 30 ? `${message.substring(0, 30)}...`: message;
             setInboxList((previousList) => {
                 return previousList.map((inbox) => {
-                    return (inbox.id === currentInbox.id ? currentInbox : inbox)
-                })
+                    return (inbox.id === currentInbox.id ? currentInbox : inbox);
+                });
             });
         }
     }
 
     useEffect(() => {
-        currentInbox = inboxList.find((inbox) => inbox.with_user == selectedInboxUser)
+        currentInbox = inboxList.find((inbox) => inbox.with_user == selectedInboxUser);
         if (currentInbox && currentInbox.unread_count) {
             setTimeout(() => { updateUnreadCount(currentInbox.id) }, 3000);
 
         }
-    }, [selectedInboxUser])
+    }, [selectedInboxUser]);
 
-    return { updateLastMessage, createGroupMessages, createMessage, updateUnreadCount }
+    return { updateLastMessage, createGroupMessages, createMessage, updateUnreadCount };
 }

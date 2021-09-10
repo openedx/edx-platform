@@ -5,7 +5,7 @@ export default function Inbox({
     selectedInboxUser,
 }) {
     const handleInboxClick = (event) => {
-        setSelectedInboxUser(event.currentTarget.dataset.user)
+        setSelectedInboxUser(event.currentTarget.dataset.user);
     }
 
     return (

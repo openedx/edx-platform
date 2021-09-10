@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
 export default function Conversation({
     selectedInboxMessages,
@@ -9,7 +9,7 @@ export default function Conversation({
     selectedInboxUser
 }) {
 
-    const [message, setMessage] = useState("")
+    const [message, setMessage] = useState("");
 
     const handleSendMessageBtnClick = () => {
         createMessage(message, setMessage, updateLastMessage);

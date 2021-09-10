@@ -14,6 +14,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
     </title>
 </%block>
 
+<%block name="head_extra">
+    <link rel="stylesheet" type="text/css" href="/static/css/ReactToastify.css" />
+</%block>
+
 <%block name="body">
     <div id="root" class="container">
     </div>

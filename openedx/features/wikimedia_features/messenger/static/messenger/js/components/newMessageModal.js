@@ -1,16 +1,16 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
 import Multiselect from 'multiselect-react-dropdown';
-import useUserSearch from '../hooks/useUserSearch'
+import useUserSearch from '../hooks/useUserSearch';
 
 
 export default function NewMessageModal({createGroupMessages, context}) {
-    const [newMessageUsers, setNewMessageUsers] = useState([])
-    const [groupNewMessage, setGroupNewMessage ] = useState("")
-    const [newMessageSelectedUsers, setNewMessageSelectedUsers] = useState([])
-    const {fetchUsers} = useUserSearch(context)
+    const [newMessageUsers, setNewMessageUsers] = useState([]);
+    const [groupNewMessage, setGroupNewMessage ] = useState("");
+    const [newMessageSelectedUsers, setNewMessageSelectedUsers] = useState([]);
+    const {fetchUsers} = useUserSearch(context);
 
     const handleSearch = (query) => {
-        fetchUsers(query, setNewMessageUsers)
+        fetchUsers(query, setNewMessageUsers);
     }
 
     const handleNewMessageBtnClick = (event) => {

@@ -54,7 +54,7 @@
     "react-redux": "5.0.7",
     "react-router-dom": "5.1.2",
     "react-slick": "0.16.0",
-    "react-toasts": "^3.0.6",
+    "react-toastify": "^8.0.2",
     "redux": "3.7.2",
     "redux-thunk": "2.2.0",
     "requirejs": "2.3.5",

@@ -1,8 +1,9 @@
-import { ToastsStore } from "react-toasts";
-import useClient from "./useClient"
+import useClient from "./useClient";
+
+import { toast } from 'react-toastify';
 
 export default function useUserSearch(context) {
-    const { client } = useClient()
+    const { client, notification } = useClient();
 
     const fetchUsers = async(query, setNewMessageUsers) => {
         try {
@@ -13,14 +14,14 @@ export default function useUserSearch(context) {
                         return {
                             id: user.username,
                             username: user.username
-                        }
+                        };
                     }));
                 }
             }
         } catch (ex) {
-            ToastsStore.error('Failed to fetch users.');
-            console.error(ex)
+            notification(toast.error, "Unable to search users.");
+            console.error(ex);
         }
     }
-    return { fetchUsers }
+    return { fetchUsers };
 }
