@@ -167,10 +167,6 @@ ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of
-# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
-
 SITE_NAME = ENV_TOKENS.get('SITE_NAME', SITE_NAME)
 
 ALLOWED_HOSTS = [

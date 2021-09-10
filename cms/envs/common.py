@@ -513,10 +513,6 @@ ENABLE_JASMINE = False
 
 MARKETING_EMAILS_OPT_IN = False
 
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
-# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
-
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
@@ -754,8 +750,7 @@ MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 WIKI_ENABLED = True
 
 CERT_QUEUE = 'certificates'
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of
-# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+# Unused in CMS
 IDA_LOGOUT_URI_LIST = []
 
 ELASTIC_SEARCH_CONFIG = [

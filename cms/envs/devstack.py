@@ -208,11 +208,6 @@ JWT_AUTH.update({
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 
-IDA_LOGOUT_URI_LIST = [
-    'http://localhost:18130/logout/',  # ecommerce
-    'http://localhost:18150/logout/',  # credentials
-]
-
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
