@@ -65,3 +65,11 @@ Config and code changes to be performed after all environments are using OAuth f
 - Remove ``LOGIN_URL`` overrides from all environments (devstack and others)
 - Remove remaining ``ARCH-1253`` detritus (login redirect)
 - Remove this doc!
+
+Declining the migration
+-----------------------
+
+Untested instructions for continuing to keep the shared sessions:
+
+- Override ``FRONTEND_LOGOUT_URL`` for Studio to be ``<LMS base>/logout``
+- Override ``LOGIN_URL`` for Studio to be ``<LMS base>/login``

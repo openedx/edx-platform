@@ -65,6 +65,9 @@ urlpatterns = [
     # Login Refresh of JWT Cookies
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
 
+    # WARNING: This is similar to auth_backends ^logout/$ (which has a
+    # trailing slash); LMS uses this view, but Studio links to the
+    # auth_backends logout view.
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
 
     # Moved from user_api/legacy_urls.py

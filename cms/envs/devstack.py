@@ -51,7 +51,6 @@ FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 # TODO: Remove after Studio OAuth transition is complete. See docs/guides/studio_oauth.rst
 LOGIN_URL = '/login/'
 FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 ########################### PIPELINE #################################
 
