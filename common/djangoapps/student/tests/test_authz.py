@@ -297,11 +297,3 @@ class CourseOrgGroupTest(TestCase):
         assert not user_has_role(self.user, OrgContentCreatorRole(self.org))
         update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.org])
         assert user_has_role(self.user, OrgContentCreatorRole(self.org))
-
-    def test_non_org_user_write_access(self):
-        """
-        Test that OrgContentCreatorRole has write access
-        """
-        assert not has_studio_write_access(self.user, self.course_key)
-        update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.org])
-        assert has_studio_write_access(self.user, self.course_key)

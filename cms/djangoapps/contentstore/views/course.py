@@ -1862,7 +1862,7 @@ def are_content_experiments_enabled(course):
     )
 
 
-def _get_course_creator_status(user, org=None):
+def _get_course_creator_status(user):
     """
     Helper method for returning the course creator status for a particular user,
     taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
