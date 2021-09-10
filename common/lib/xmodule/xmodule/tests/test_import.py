@@ -553,11 +553,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
-        errors = [
-            (msg, err)
-            for msg, err  # lint-amnesty, pylint: disable=unnecessary-comprehension
-            in modulestore.get_course_errors(course.id)
-        ]
+        errors = modulestore.get_course_errors(course.id)
 
         assert any(((expect in msg) or (expect in err)) for (msg, err) in errors)
         chapters = course.get_children()
