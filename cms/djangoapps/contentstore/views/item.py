@@ -114,7 +114,7 @@ def _is_library_component_limit_reached(usage_key):
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
-def xblock_handler(request, usage_key_string):
+def xblock_handler(request, usage_key_string=None):
     """
     The restful handler for xblock requests.
 
