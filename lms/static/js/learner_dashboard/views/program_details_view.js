@@ -11,6 +11,7 @@ import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
+import updatedPageTpl from '../../../templates/learner_dashboard/program_details_view_updated.underscore';
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class ProgramDetailsView extends Backbone.View {
@@ -26,7 +27,11 @@ class ProgramDetailsView extends Backbone.View {
 
   initialize(options) {
     this.options = options;
-    this.tpl = HtmlUtils.template(pageTpl);
+    if (this.options.programDiscussionEnabled) {
+      this.tpl = HtmlUtils.template(updatedPageTpl);
+    } else {
+      this.tpl = HtmlUtils.template(pageTpl);
+    }
     this.programModel = new Backbone.Model(this.options.programData);
     this.courseData = new Backbone.Model(this.options.courseData);
     this.certificateCollection = new Backbone.Collection(this.options.certificateData);
