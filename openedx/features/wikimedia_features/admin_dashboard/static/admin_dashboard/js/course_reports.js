@@ -25,12 +25,12 @@
             dataType: 'json',
             url: endpoint,
             success: function(data) {
+                $('#report-downloads-table').empty();
                 if (data.downloads.length){
                     for (let i = 0; i < data.downloads.length; i++) {
                         $('#report-downloads-table').append(data.downloads[i]['link']);
                         $('#report-downloads-table').append('<br>');
                     }
-                    $('#report-downloads-table').append(data.downloads[0]['link'])
                 }
             },
             error: function() {
