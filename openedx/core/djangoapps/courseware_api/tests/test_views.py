@@ -387,7 +387,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 assert courseware_data['is_mfe_proctored_exams_enabled'] == (is_globally_enabled and is_waffle_enabled)
 
 
-class SequenceApiTestViews(BaseCoursewareTests):
+@ddt.ddt
+class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
     """
     Tests for the sequence REST API
     """
@@ -406,6 +407,32 @@ class SequenceApiTestViews(BaseCoursewareTests):
         assert response.status_code == 200
         assert response.data['display_name'] == 'sequence'
         assert len(response.data['items']) == 1
+
+    @ddt.data(
+        (False, None, False, False),
+        (True, None, True, False),
+        (True, {'username': 'student'}, False, True),
+        # Masquerading as a limited-access learner here, but specific partition/group doesn't matter.
+        # We just want to test that masquerading as a non-specific learner has a different outcome.
+        (True, {'user_partition_id': 51, 'group_id': 1}, True, False),
+    )
+    @ddt.unpack
+    def test_hidden_after_due(self, is_past_due, masquerade_config, expected_hidden, expected_banner):
+        """Validate the metadata when hide-after-due is set for a sequence"""
+        due = datetime.now() + timedelta(days=-1 if is_past_due else 1)
+        sequence = ItemFactory(parent=self.chapter, category='sequential', hide_after_due=True, due=due)
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        user = self.instructor if masquerade_config else self.user
+        self.client.login(username=user.username, password='foo')
+        if masquerade_config:
+            self.update_masquerade(**masquerade_config)
+
+        response = self.client.get(f'/api/courseware/sequence/{sequence.location}')
+        assert response.status_code == 200
+        assert response.data['is_hidden_after_due'] == expected_hidden
+        assert bool(response.data['banner_text']) == expected_banner
 
 
 class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
