@@ -218,7 +218,7 @@ class RoleBase(AccessRole):
         )
         return entries
 
-    def get_org_for_user(self, user):
+    def get_orgs_for_user(self, user):
         """
         Returns a list of org short names for the user with given role.
         """

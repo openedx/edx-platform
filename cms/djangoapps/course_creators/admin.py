@@ -54,7 +54,7 @@ class CourseCreatorForm(forms.ModelForm):
         if is_state_granted:
             if is_all_org_selected_with_orgs:
                 raise ValidationError(
-                    "The role can be granted either to ALL Organizations or to "
+                    "The role can be granted either to ALL organizations or to "
                     "specific organizations but not both."
                 )
             if is_orgs_added_with_all_orgs_selected:

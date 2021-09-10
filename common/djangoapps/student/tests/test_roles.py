@@ -141,17 +141,17 @@ class RolesTestCase(TestCase):
         role.remove_users(self.student)
         assert not role.has_user(self.student)
 
-    def test_get_org_for_user(self):
+    def test_get_orgs_for_user(self):
         """
-        Test get_org_for_user
+        Test get_orgs_for_user
         """
         role = OrgContentCreatorRole(org=self.orgs[0])
-        assert len(list(role.get_org_for_user(self.student))) == 0
+        assert len(role.get_orgs_for_user(self.student)) == 0
         role.add_users(self.student)
-        assert len(list(role.get_org_for_user(self.student))) == 1
+        assert len(role.get_orgs_for_user(self.student)) == 1
         role_second_org = OrgContentCreatorRole(org=self.orgs[1])
         role_second_org.add_users(self.student)
-        assert len(list(role.get_org_for_user(self.student))) == 2
+        assert len(role.get_orgs_for_user(self.student)) == 2
 
 
 @ddt.ddt
