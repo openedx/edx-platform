@@ -19,6 +19,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
     LibraryUserRole,
+    OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
     OrgStaffRole
@@ -49,7 +50,7 @@ def user_has_role(user, role):
     """
     if not user.is_active:
         return False
-    # do cheapest check first even tho it's not the direct one
+    # Do cheapest check first even though it's not the direct one
     if GlobalStaff().has_user(user):
         return True
     # CourseCreator is odd b/c it can be disabled via config
@@ -63,10 +64,11 @@ def user_has_role(user, role):
 
     if role.has_user(user):
         return True
-    # if not, then check inferred permissions
+    # If not, then check inferred permissions
     if (isinstance(role, (CourseStaffRole, CourseBetaTesterRole)) and
             CourseInstructorRole(role.course_key).has_user(user)):
         return True
+
     return False
 
 
@@ -160,6 +162,26 @@ def remove_users(caller, role, *users):
     role.remove_users(*users)
 
 
+def update_org_role(caller, role, user, orgs):
+    """
+    The caller requests updating the Org role for the user. Checks that the caller has
+    sufficient authority.
+
+    :param caller: an user
+    :param role: an AccessRole class
+    :param user: an user for which org roles are updated
+    :param orgs: List of organization names to update the org role
+    """
+    _check_caller_authority(caller, role())
+    existing_org_roles = set(role().get_orgs_for_user(user))
+    orgs_roles_to_create = list(set(orgs) - existing_org_roles)
+    org_roles_to_delete = list(existing_org_roles - set(orgs))
+    for org in orgs_roles_to_create:
+        role(org=org).add_users(user)
+    for org in org_roles_to_delete:
+        role(org=org).remove_users(user)
+
+
 def _check_caller_authority(caller, role):
     """
     Internal function to check whether the caller has authority to manipulate this role
@@ -172,7 +194,7 @@ def _check_caller_authority(caller, role):
     if GlobalStaff().has_user(caller):
         return
 
-    if isinstance(role, (GlobalStaff, CourseCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
+    if isinstance(role, (GlobalStaff, CourseCreatorRole, OrgContentCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
         if not user_has_role(caller, CourseInstructorRole(role.course_key)):

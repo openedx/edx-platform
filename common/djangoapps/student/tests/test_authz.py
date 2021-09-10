@@ -3,16 +3,28 @@ Tests authz.py
 """
 
 from unittest import mock
-import pytest
 
+import pytest
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.auth import (
+    add_users,
+    has_studio_read_access,
+    has_studio_write_access,
+    remove_users,
+    update_org_role,
+    user_has_role
+)
+from common.djangoapps.student.roles import (
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    OrgContentCreatorRole
+)
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 
@@ -254,3 +266,34 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator, self.staff, another_staff)
         with pytest.raises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
+
+
+class CourseOrgGroupTest(TestCase):
+    """
+    Tests for Org Content Creator groups for a particular course.
+    """
+
+    def setUp(self):
+        """ Test case setup """
+        super().setUp()
+        self.global_admin = AdminFactory()
+        self.user = UserFactory.create(
+            username='test', email='test+courses@edx.org', password='foo'
+        )
+        self.org = 'mitx'
+        self.course_key = CourseLocator(self.org, '101', 'test')
+
+    def test_update_org_role_permission_denied(self):
+        """
+        Verifies PermissionDenied if caller of update_org_role is not instructor role.
+        """
+        with pytest.raises(PermissionDenied):
+            update_org_role(self.user, OrgContentCreatorRole, self.user, [self.org])
+
+    def test_update_org_role_permission(self):
+        """
+        Verifies if caller of update_org_role is GlobalAdmin.
+        """
+        assert not user_has_role(self.user, OrgContentCreatorRole(self.org))
+        update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.org])
+        assert user_has_role(self.user, OrgContentCreatorRole(self.org))

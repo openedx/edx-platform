@@ -43,10 +43,8 @@ from common.djangoapps.course_action_state.managers import CourseActionStateItem
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.roles import (
-    CourseCreatorRole,
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
@@ -108,12 +106,13 @@ from ..utils import (
     reverse_usage_url
 )
 from .component import ADVANCED_COMPONENT_TYPES
+from .helpers import is_content_creator
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from .item import create_xblock_info
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,
-    get_library_creator_status,
+    user_can_create_library,
     should_redirect_to_library_authoring_mfe
 )
 
@@ -564,7 +563,7 @@ def course_listing(request):
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-        'show_new_library_button': get_library_creator_status(user) and not should_redirect_to_library_authoring_mfe(),
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
@@ -850,9 +849,6 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not auth.user_has_role(request.user, CourseCreatorRole()):
-        raise PermissionDenied()
-
     try:
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
@@ -860,6 +856,10 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
+        has_course_creator_role = is_content_creator(request.user, org)
+
+        if not has_course_creator_role:
+            raise PermissionDenied()
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
@@ -915,6 +915,20 @@ def _create_or_rerun_course(request):
     except InvalidKeyError as error:
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=str(error))}
+        )
+    except PermissionDenied as error:
+        log.info(
+            "User does not have the permission to create course in this organization"
+            "or course creation is disabled."
+            "User: '%s' Org: '%s' Course #: '%s'.",
+            request.user.id,
+            org,
+            course,
+        )
+        return JsonResponse({
+            'error': _('User does not have the permission to create courses in this organization '
+                       'or course creation is disabled')},
+            status=403
         )
 
 

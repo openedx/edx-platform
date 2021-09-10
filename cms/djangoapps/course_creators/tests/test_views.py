@@ -14,10 +14,11 @@ from cms.djangoapps.course_creators.views import (
     add_user_with_status_unrequested,
     get_course_creator_status,
     update_course_creator_group,
+    update_org_content_creator_role,
     user_requested_access
 )
 from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseCreatorRole
+from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -40,6 +41,7 @@ class CourseCreatorView(TestCase):
             password='foo',
         )
         self.admin.is_staff = True
+        self.org = "Edx"
 
     def test_staff_permission_required(self):
         """
@@ -83,6 +85,14 @@ class CourseCreatorView(TestCase):
             self.assertTrue(auth.user_has_role(self.user, CourseCreatorRole()))
             update_course_creator_group(self.admin, self.user, False)
             self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
+
+    def test_update_org_content_creator_role(self):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            self.assertFalse(auth.user_has_role(self.user, OrgContentCreatorRole(self.org)))
+            update_org_content_creator_role(self.admin, self.user, [self.org])
+            self.assertTrue(auth.user_has_role(self.user, OrgContentCreatorRole(self.org)))
+            update_org_content_creator_role(self.admin, self.user, [])
+            self.assertFalse(auth.user_has_role(self.user, OrgContentCreatorRole(self.org)))
 
     def test_user_requested_access(self):
         add_user_with_status_unrequested(self.user)
