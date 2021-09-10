@@ -33,8 +33,7 @@ MAX_RETRIES = 11
 
 PROGRAM_CERTIFICATE = 'program'
 COURSE_CERTIFICATE = 'course-run'
-VISIBLE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-DATE_OVERRIDE_FORMAT = '%Y-%m-%d'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_completed_programs(site, student):
@@ -120,7 +119,7 @@ def award_program_certificate(client, user, program_uuid, visible_date):
         'attributes': [
             {
                 'name': 'visible_date',
-                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
+                'value': visible_date.strftime(DATE_FORMAT)
             }
         ]
     })
@@ -310,11 +309,11 @@ def post_course_certificate(client, username, certificate, visible_date, date_ov
             'mode': certificate.mode,
             'type': COURSE_CERTIFICATE,
         },
-        'date_override': {'date': date_override.strftime(DATE_OVERRIDE_FORMAT)} if date_override else None,
+        'date_override': {'date': date_override.strftime(DATE_FORMAT)} if date_override else None,
         'attributes': [
             {
                 'name': 'visible_date',
-                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
+                'value': visible_date.strftime(DATE_FORMAT)
             }
         ]
     })
@@ -450,7 +449,7 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
             # Date is being passed via JSON and is encoded in the EMCA date time string format. The rest of the code
             # expects a datetime.
             if certificate_available_date:
-                certificate_available_date = datetime.strptime(certificate_available_date, VISIBLE_DATE_FORMAT)
+                certificate_available_date = datetime.strptime(certificate_available_date, DATE_FORMAT)
 
             # Even in the cases where this task is called with a certificate_available_date, we still need to retrieve
             # the course overview because it's required to determine if we should use the certificate_available_date or
