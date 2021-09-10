@@ -68,7 +68,7 @@ def should_redirect_to_library_authoring_mfe():
     )
 
 
-def get_library_creator_status(user, org=None):
+def user_can_create_library(user, org=None):
     """
     Helper method for returning the library creation status for a particular user,
     taking into account the value LIBRARIES_ENABLED.
@@ -105,7 +105,7 @@ def library_handler(request, library_key_string=None):
         raise Http404  # Should never happen because we test the feature in urls.py also
 
     if request.method == 'POST':
-        if not get_library_creator_status(request.user):
+        if not user_can_create_library(request.user):
             return HttpResponseForbidden()
 
         if library_key_string is not None:
@@ -196,7 +196,7 @@ def _create_library(request):
         library = request.json.get('number', None)
         if library is None:
             library = request.json['library']
-        if not get_library_creator_status(request.user, org):
+        if not user_can_create_library(request.user, org):
             raise PermissionDenied()
         store = modulestore()
         with store.default_store(ModuleStoreEnum.Type.split):

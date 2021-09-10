@@ -112,7 +112,7 @@ from .item import create_xblock_info
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,
-    get_library_creator_status,
+    user_can_create_library,
     should_redirect_to_library_authoring_mfe
 )
 
@@ -563,7 +563,7 @@ def course_listing(request):
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-        'show_new_library_button': get_library_creator_status(user) and not should_redirect_to_library_authoring_mfe(),
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
