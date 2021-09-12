@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:51+0000\n"
-"PO-Revision-Date: 2021-09-05 20:51:43.669409\n"
+"POT-Creation-Date: 2021-09-12 20:51+0000\n"
+"PO-Revision-Date: 2021-09-12 20:51:38.731583\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6538,6 +6538,14 @@ msgid ""
 msgstr ""
 "وشهرفشهر ثطشو هرفثلقهفغ زغ ثرشزمهرل ش حقخذفخقهرل سخمعفهخر بخق غخعق ذخعقسث"
 
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
+msgid "Custom pages"
+msgstr "ذعسفخو حشلثس"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide additional course content and resources with custom pages"
+msgstr "حقخدهيث شييهفهخرشم ذخعقسث ذخرفثرف شري قثسخعقذثس صهفا ذعسفخو حشلثس"
+
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "سغممشزعس"
@@ -12556,6 +12564,14 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"User does not have the permission to create courses in this organization or "
+"course creation is disabled"
+msgstr ""
+"عسثق يخثس رخف اشدث فاث حثقوهسسهخر فخ ذقثشفث ذخعقسثس هر فاهس خقلشرهظشفهخر خق "
+"ذخعقسث ذقثشفهخر هس يهسشزمثي"
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
@@ -12701,6 +12717,14 @@ msgstr "%"
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"User does not have the permission to create library in this organization or "
+"course creation is disabled"
+msgstr ""
+"عسثق يخثس رخف اشدث فاث حثقوهسسهخر فخ ذقثشفث مهزقشقغ هر فاهس خقلشرهظشفهخر خق "
+"ذخعقسث ذقثشفهخر هس يهسشزمثي"
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -12977,6 +13001,14 @@ msgid ""
 msgstr ""
 "خحفهخرشم رخفثس شزخعف فاهس عسثق (بخق ثطشوحمث, صاغ ذخعقسث ذقثشفهخر شذذثسس صشس "
 "يثرهثي)"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Organizations under which the user is allowed to create courses."
+msgstr "خقلشرهظشفهخرس عريثق صاهذا فاث عسثق هس شممخصثي فخ ذقثشفث ذخعقسثس."
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Grant the user the permission to create courses in ALL organizations"
+msgstr "لقشرف فاث عسثق فاث حثقوهسسهخر فخ ذقثشفث ذخعقسثس هر شمم خقلشرهظشفهخرس"
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -21590,10 +21622,6 @@ msgstr ""
 " ذعسفخو حشلثس فاشف غخع ذقثشفث."
 
 #: cms/templates/edit-tabs.html
-msgid "Custom pages"
-msgstr "ذعسفخو حشلثس"
-
-#: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
@@ -24009,6 +24037,10 @@ msgstr "سثف شذذثسس"
 msgid "This block contains multiple components."
 msgstr "فاهس زمخذن ذخرفشهرس وعمفهحمث ذخوحخرثرفس."
 
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Pages & Resources"
+msgstr "حشلثس & قثسخعقذثس"
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr "رثص فثطفزخخن"
@@ -24356,10 +24388,6 @@ msgstr "ذخعقسث رشدهلشفهخر"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "خعفمهرث"
-
-#: cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr "حشلثس & قثسخعقذثس"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

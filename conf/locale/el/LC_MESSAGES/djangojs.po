@@ -83,7 +83,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-29 20:44+0000\n"
+"POT-Creation-Date: 2021-09-05 20:44+0000\n"
 "PO-Revision-Date: 2021-08-01 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)\n"
@@ -1595,7 +1595,7 @@ msgstr ""
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
-msgstr ""
+msgstr "Τίτλος"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -4834,7 +4834,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "Δεν μπορέσαμε να δημιουργήσουμε τον λογαριασμό σας"
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
@@ -7025,6 +7025,8 @@ msgstr ""
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
+"Προσθέστε έναν σαφή και περιγραφικό τίτλο για να ενθαρρύνετε τους "
+"συμφοιτητές σας να συμμετάσχουν στην ανάρτησή σας. (Απαιτείται)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Edit your post below."
@@ -7124,7 +7126,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Νέα ανάρτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Visible to"
@@ -7142,7 +7144,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "Ακολουθήστε αυτή την ανάρτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously"
@@ -7167,11 +7169,13 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "ΘΕΜΑ:"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
+"Καταχωρήστε την ανάρτησή σας σε κάποια από τις εβδομάδες, ώστε να βοηθήσετε "
+"τους συμφοιτητές σας να την βρουν. (Απαιτείται)."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Community TA)"
@@ -7200,17 +7204,20 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Post type"
-msgstr ""
+msgstr "ΜΟΡΦΗ:"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
 msgstr ""
+"Επιλέξτε \"Ερώτηση\" αν θέλετε να θέσετε κάποιο θέμα στο οποίο ζητάτε "
+"απάντηση. Επιλέξτε \"Συζήτηση\" για να κοινοποιήσετε κάποιο σχόλιο ή ιδέα "
+"σας που μπορεί να αποτελέσει έναυσμα για συζήτηση. (Απαιτείται)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
+msgstr "Ερώτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
@@ -8506,6 +8513,8 @@ msgid ""
 "Please enter your log-in or recovery email address below and we will send "
 "you an email with instructions."
 msgstr ""
+"Παρακαλούμε, εισάγετε το email σας και θα σας αποστείλουμε οδηγίες για τη "
+"δημιουργία νέου κωδικού."
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Recover my password"
