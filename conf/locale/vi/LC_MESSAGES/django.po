@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:44+0000\n"
+"POT-Creation-Date: 2021-09-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
 "Language-Team: Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)\n"
@@ -5852,6 +5852,14 @@ msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
+#: cms/templates/edit-tabs.html
+msgid "Custom pages"
+msgstr "Trang tùy chỉnh"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide additional course content and resources with custom pages"
+msgstr ""
+
 #: lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "Đề cương"
@@ -11241,6 +11249,12 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"User does not have the permission to create courses in this organization or "
+"course creation is disabled"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
@@ -11385,6 +11399,12 @@ msgstr "%"
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"User does not have the permission to create library in this organization or "
+"course creation is disabled"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -11661,6 +11681,14 @@ msgid ""
 msgstr ""
 "Các ghi chú tùy chọn về thành viên này (ví dụ, tại sao việc truy cập vào "
 "tiến trình tạo khóa học bị từ chối)"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Organizations under which the user is allowed to create courses."
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Grant the user the permission to create courses in ALL organizations"
+msgstr ""
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -19899,10 +19927,6 @@ msgstr ""
 " sách giáo khoa và trang tùy chỉnh mà bạn tạo."
 
 #: cms/templates/edit-tabs.html
-msgid "Custom pages"
-msgstr "Trang tùy chỉnh"
-
-#: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
@@ -22309,6 +22333,10 @@ msgstr "Thiết lạp Truy cập"
 msgid "This block contains multiple components."
 msgstr "Khối này chứa nhiều thành phần."
 
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Pages & Resources"
+msgstr ""
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr "Giáo Trình Mới"
@@ -22659,10 +22687,6 @@ msgstr "Danh Mục Khóa Học"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Phác Thảo"
-
-#: cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

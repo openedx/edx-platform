@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:51+0000\n"
-"PO-Revision-Date: 2021-09-05 20:51:43.669409\n"
+"POT-Creation-Date: 2021-09-12 20:51+0000\n"
+"PO-Revision-Date: 2021-09-12 20:51:38.731583\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7595,6 +7595,16 @@ msgstr ""
 "Mäïntäïn éxäm ïntégrïtý ßý énäßlïng ä pröçtörïng sölütïön för ýöür çöürsé "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
+msgid "Custom pages"
+msgstr "Çüstöm pägés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide additional course content and resources with custom pages"
+msgstr ""
+"Prövïdé äddïtïönäl çöürsé çöntént änd résöürçés wïth çüstöm pägés Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "Sýlläßüs Ⱡ'σяєм ιρѕυм ∂#"
@@ -14628,6 +14638,14 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"User does not have the permission to create courses in this organization or "
+"course creation is disabled"
+msgstr ""
+"Ûsér döés nöt hävé thé pérmïssïön tö çréäté çöürsés ïn thïs örgänïzätïön ör "
+"çöürsé çréätïön ïs dïsäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
@@ -14808,6 +14826,14 @@ msgstr "% Ⱡ#"
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\" Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"User does not have the permission to create library in this organization or "
+"course creation is disabled"
+msgstr ""
+"Ûsér döés nöt hävé thé pérmïssïön tö çréäté lïßrärý ïn thïs örgänïzätïön ör "
+"çöürsé çréätïön ïs dïsäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -15114,6 +15140,18 @@ msgid ""
 msgstr ""
 "Öptïönäl nötés äßöüt thïs üsér (för éxämplé, whý çöürsé çréätïön äççéss wäs "
 "dénïéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Organizations under which the user is allowed to create courses."
+msgstr ""
+"Örgänïzätïöns ündér whïçh thé üsér ïs ällöwéd tö çréäté çöürsés. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Grant the user the permission to create courses in ALL organizations"
+msgstr ""
+"Gränt thé üsér thé pérmïssïön tö çréäté çöürsés ïn ÀLL örgänïzätïöns Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -24908,10 +24946,6 @@ msgstr ""
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢#"
 
 #: cms/templates/edit-tabs.html
-msgid "Custom pages"
-msgstr "Çüstöm pägés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
@@ -27814,6 +27848,10 @@ msgstr ""
 "Thïs ßlöçk çöntäïns mültïplé çömpönénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Pages & Resources"
+msgstr "Pägés & Résöürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr "Néw Téxtßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -28217,10 +28255,6 @@ msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr "Pägés & Résöürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
