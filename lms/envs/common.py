@@ -1634,10 +1634,9 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
-if django.VERSION < (3, 1):
-    # django-session-cookie middleware
-    DCS_SESSION_COOKIE_SAMESITE = 'None'
-    DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+# django-session-cookie middleware
+DCS_SESSION_COOKIE_SAMESITE = 'None'
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 # This is the domain that is used to set shared cookies between various sub-domains.
 SHARED_COOKIE_DOMAIN = ""
@@ -2010,6 +2009,10 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    'django_cookies_samesite.middleware.CookiesSameSite',
+
     'crum.CurrentRequestUserMiddleware',
 
     # A newer and safer request cache.
@@ -2122,10 +2125,10 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
-if django.VERSION < (3, 1):
+if django.VERSION >= (3, 1):
     # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
     # Override was found here https://github.com/django/django/pull/11894
-    MIDDLEWARE.append(
+    MIDDLEWARE.remove(
         'django_cookies_samesite.middleware.CookiesSameSite'
     )
 

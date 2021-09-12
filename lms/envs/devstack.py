@@ -398,10 +398,10 @@ if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
 
 #####################################################################
 
-if django.VERSION < (3, 1):
-    # django-session-cookie middleware
-    DCS_SESSION_COOKIE_SAMESITE = 'Lax'
-    DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+
+# django-session-cookie middleware
+DCS_SESSION_COOKIE_SAMESITE = 'Lax'
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 #####################################################################
 # See if the developer has any local overrides.
