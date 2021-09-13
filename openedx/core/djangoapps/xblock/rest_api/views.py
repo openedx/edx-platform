@@ -102,7 +102,7 @@ def get_handler_url(request, usage_key_str, handler_name):
 # and https://github.com/edx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
-def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix):
+def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None):
     """
     Run an XBlock's handler and return the result
 
