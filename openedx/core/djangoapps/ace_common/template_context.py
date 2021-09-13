@@ -11,7 +11,8 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
 
-def get_base_template_context(site):
+# PKX-473 - Added user organization name in email header
+def get_base_template_context(site, user=None):
     """
     Dict with entries needed for all templates that use the base template.
     """
@@ -22,7 +23,7 @@ def get_base_template_context(site):
     except NoReverseMatch:
         dashboard_url = reverse('home')
 
-    return {
+    context = {
         # Platform information
         'homepage_url': marketing_link('ROOT'),
         'dashboard_url': dashboard_url,
@@ -40,3 +41,13 @@ def get_base_template_context(site):
         'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
         'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_URLS', site=site),
     }
+
+    if user:
+        context.update({
+            'username': user.profile.name or user.username,
+            'full_name': (user.profile.name or user.username).title(),
+            'email': user.email,
+            'user_org': user.profile.organization.name if user.profile.organization else None
+        })
+
+    return context

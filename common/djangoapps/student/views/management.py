@@ -645,7 +645,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
     use_https = theming_helpers.get_current_request().is_secure()
 
     site = Site.objects.get_current()
-    message_context = get_base_template_context(site)
+    message_context = get_base_template_context(site, user=user)
     message_context.update({
         'old_email': user.email,
         'new_email': new_email,
@@ -755,7 +755,7 @@ def confirm_email_change(request, key):
             )
 
         site = Site.objects.get_current()
-        message_context = get_base_template_context(site)
+        message_context = get_base_template_context(site, user=user)
         message_context.update({
             'old_email': user.email,
             'new_email': pec.new_email,

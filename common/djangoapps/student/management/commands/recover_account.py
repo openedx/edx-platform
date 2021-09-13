@@ -103,10 +103,9 @@ class Command(BaseCommand):
         :param email:
         :param site:
         """
-        message_context = get_base_template_context(site)
+        message_context = get_base_template_context(site, user=user)
         message_context.update({
             'email': email,
-            'full_name': (user.profile.name or user.username).title(),
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
                 protocol='http',

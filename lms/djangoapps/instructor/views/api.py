@@ -731,7 +731,7 @@ def students_update_enrollment(request, course_id):
 
             elif action == 'unenroll':
                 site = Site.objects.get_current()
-                email_params.update(get_base_template_context(site))
+                email_params.update(get_base_template_context(site, user=user))
                 before, after = unenroll_email(
                     course_id, email, email_students, email_params, language=language
                 )

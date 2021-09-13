@@ -74,13 +74,11 @@ def get_registration_email_message_context(user, password, protocol, is_public_r
     message_context = {
         'site_name': site.domain
     }
-    message_context.update(get_base_template_context(site))
+    message_context.update(get_base_template_context(site, user=user))
     message_context.update({
         'is_public_registration': is_public_registration,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'username': user.username,
         'password': password,
-        'full_name': (user.profile.name or user.username).title(),
         'email': user.email,
         'employee_id': user.profile.employee_id,
         'language': user.profile.language,

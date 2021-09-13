@@ -37,7 +37,7 @@ def send_account_recovery_email_for_user(user, request, email=None):
         email (str): Send email to this address.
     """
     site = get_current_site()
-    message_context = get_base_template_context(site)
+    message_context = get_base_template_context(site, user=user)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
         'email': email,
