@@ -1,0 +1,11 @@
+---
+metadata:
+    display_name: Guest Video
+data: |
+      <div class="div-video">
+      <img class="icon-image" src="/static/video.png" alt="">
+       <div>
+      <h4>Guest Video: [Enter Video Title Here]</h4>
+      <p>In the following video...</p>
+      </div>
+      </div>

@@ -1,0 +1,14 @@
+---
+metadata:
+    display_name: Case Analysis
+data: |
+      <div class="div-casestudy"><img class="icon-image" src="/static/Case_Study.png" alt="" />
+      <div>
+      <h4>Case Analysis</h4>
+      <p>Having read this case, consider the following questions:</p>
+      <ul>
+      <li>[Enter question 1]</li>
+      <li>[Enter question 2]</li>
+      </ul>
+      </div>
+      </div>

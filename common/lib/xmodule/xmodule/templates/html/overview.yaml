@@ -1,0 +1,13 @@
+---
+metadata:
+    display_name: Overview
+data: |
+      <div class="div-overview">
+      <img class="icon-image" src="/static/info.png" alt="">
+      <div>
+          <h4>Overview</h4>
+          <p>Module Time: 7-10 hours | <a href="/static/CYB-Summer-2021-M1.pdf" target="_blank">Download Module Materials</a> (PDF)</p>
+              <p>Welcome to the [X] module of the [Enter Programme Name Here]!</p>
+              <p>This week we will learn about [Enter text here]</p>
+      </div>
+      </div>

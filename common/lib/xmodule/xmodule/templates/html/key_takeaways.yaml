@@ -1,0 +1,17 @@
+---
+metadata:
+    display_name: Key Takeaways
+data: |
+      <div class="div-keytakeaways">
+      <img class="icon-image" src="/static/highlights_takeaways.png" alt="">
+        <div>
+      <h4>Key Takeaways</h4>
+      <p>Let's review the key points of this section:</p>
+      <ol>
+        <li>[Enter key point 1]</li>
+      <li>[Enter key point 2]</li>
+      <li>[Enter key point 3]</li>
+      <li>[Enter key point 4]</li>
+      </ol>
+      </div>
+      </div>

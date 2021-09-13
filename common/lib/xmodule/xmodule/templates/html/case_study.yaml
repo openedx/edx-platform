@@ -1,0 +1,11 @@
+---
+metadata:
+    display_name: Case Study
+data: |
+      <div class="div-casestudy">
+        <img class="icon-image" src="/static/quick_fact.png" alt="">
+        <div>
+          <h4>Quick Facts</h4>
+      		<p>[Enter text here]</p>
+        </div>
+      </div>

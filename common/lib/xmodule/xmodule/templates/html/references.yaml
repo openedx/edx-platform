@@ -1,0 +1,14 @@
+---
+metadata:
+    display_name: References
+data: |
+      <div class="div-references">
+        <img class="icon-image" src="/static/references.png" alt=""/>
+      <div>
+      <h4>References</h4>
+      <h5>[Enter Module Reference e.g. 1.2.1]</h5>
+      <p>[Example] Coble, Sarah. "Florida Student Discovers Flaws in Leading Doorbell Security Cameras." Infosecurity, 05 June 2020, https://www.infosecurity-magazine.com/news/flaws-in-leading-doorbell-security. Accessed 7 June 2021.</p>
+      <h5>[Enter Module Reference e.g. 1.2.2]</h5>
+      <p>[Example] Hardjono, Thomas, David Shrier, and Alex Pentland, editors. Trusted Data: A New Framework for Identity and Data Sharing. MIT Press, 2019.</p>
+      </div>
+      </div>
