@@ -537,9 +537,10 @@ class RegistrationView(APIView):
             # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
-
-            # PKX-463 (PR#111) Synced error message pattern to match RegistrationValidationView
-            errors = {field: ', '.join(error_list) for field, error_list in err.message_dict.items()}
+            errors = {
+                field: [{"user_message": error} for error in error_list]
+                for field, error_list in err.message_dict.items()
+            }
             response = self._create_response(request, errors, status_code=400)
         except PermissionDenied:
             response = HttpResponseForbidden(_("Account creation not allowed."))

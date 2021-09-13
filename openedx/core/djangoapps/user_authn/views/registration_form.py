@@ -96,11 +96,6 @@ def validate_name(name):
     Args:
         name (unicode): The name to validate.
     """
-    from openedx.core.djangoapps.user_api.accounts.api import get_name_validation_error
-    err_msg = get_name_validation_error(name)
-    if err_msg:
-        raise forms.ValidationError(err_msg)
-
     if contains_html(name):
         raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
 
