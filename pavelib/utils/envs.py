@@ -328,7 +328,7 @@ class Env:
                 "at '{path}'".format(path=env_path),
                 file=sys.stderr,
             )
-            return dict()
+            return {}
 
         # Otherwise, load the file as JSON and return the resulting dict
         try:
@@ -348,7 +348,7 @@ class Env:
         """
         Return a dictionary of feature flags configured by the environment.
         """
-        return self.env_tokens.get('FEATURES', dict())
+        return self.env_tokens.get('FEATURES', {})
 
     @classmethod
     def rsync_dirs(cls):

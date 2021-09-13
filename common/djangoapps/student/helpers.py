@@ -341,7 +341,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
     header_accept = request_headers.get('HTTP_ACCEPT', '')
     accepts_text_html = any(
         mime_type in header_accept
-        for mime_type in {'*/*', 'text/*', 'text/html'}
+        for mime_type in ['*/*', 'text/*', 'text/html']
     )
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.

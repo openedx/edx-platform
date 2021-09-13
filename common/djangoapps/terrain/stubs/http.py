@@ -118,7 +118,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             }
 
         except:  # lint-amnesty, pylint: disable=bare-except
-            return dict()
+            return {}
 
     @lazy
     def get_params(self):
@@ -252,7 +252,7 @@ class StubHttpService(ThreadingMixIn, HTTPServer):
         HTTPServer.__init__(self, address, self.HANDLER_CLASS)
 
         # Create a dict to store configuration values set by the client
-        self.config = dict()
+        self.config = {}
 
         # Start the server in a separate thread
         server_thread = threading.Thread(target=self.serve_forever)
