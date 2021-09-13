@@ -284,7 +284,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         body = bodies[body_type]
 
-        if django.VERSION >= (3, 0):
+        if django.VERSION >= (3, 0) and body_type == 'html':
             expected_output = "You&#x27;re receiving this e-mail because you requested a password reset"
 
         assert 'Password reset' in sent_message.subject
