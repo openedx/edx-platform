@@ -1214,8 +1214,8 @@ class CertificateDateOverride(TimeStampedModel):
         related_name='date_override',
         help_text="The id of the Generated Certificate to override",
     )
-    date = models.DateField(
-        help_text="The date to display on the certificate",
+    date = models.DateTimeField(
+        help_text="The date to display on the certificate. Set 'Time' to midnight (00:00:00).",
     )
     reason = models.TextField(
         help_text="The reason why you are overriding the certificate date (Update this when you add OR edit the date.)",

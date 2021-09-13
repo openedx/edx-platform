@@ -586,7 +586,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
         assert call_args[3] == self.certificate.modified_date
-        assert call_args[4] == self.certificate.date_override.date.date()
+        assert call_args[4] == self.certificate.date_override.date
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """
