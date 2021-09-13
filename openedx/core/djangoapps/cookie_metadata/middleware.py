@@ -81,8 +81,10 @@ class CookieNameChange:
                     alt_cookie_value = request.COOKIES[expand_settings["alternate"]]
                     del request.COOKIES[expand_settings["alternate"]]
                     # Adding custom attribute: cookie.change_name
-                    # if cookie.change_name in transaction and equal 0, cookie with alternate name is detected and deleted
-                    # if cookie.change_name in transaction and equal 1, cookie with current name not in request and added
+                    # if cookie.change_name in transaction and equal 0,
+                    #     cookie with alternate name was detected and deleted
+                    # if cookie.change_name in transaction and equal 1,
+                    #     cookie with current name was added
                     set_custom_attribute("cookie.change_name", 0)
 
                 if (
