@@ -1778,7 +1778,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             metadata={'graded': True, 'format': 'Homework', 'start': in_the_future},
             display_name='Unreleased'
         )
-        self.define_option_problem(u'Unreleased', parent=self.unreleased_section)
+        self.define_option_problem('Unreleased', parent=self.unreleased_section)
 
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @ddt.data(True, False)

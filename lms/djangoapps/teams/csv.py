@@ -72,7 +72,7 @@ def _lookup_team_membership_data(course):
     team_membership_data = []
     for course_enrollment in course_enrollments:
         # This dict contains all the user's team memberships keyed by teamset
-        student_row = teamset_memberships_by_user.get(course_enrollment.user, dict())
+        student_row = teamset_memberships_by_user.get(course_enrollment.user, {})
         student_row['user'] = _get_displayed_user_identifier(course_enrollment)
         student_row['mode'] = course_enrollment.mode
         team_membership_data.append(student_row)
@@ -131,11 +131,11 @@ def _group_teamset_memberships_by_user(course_team_memberships):
             per user represented in input
         }
     """
-    teamset_memberships_by_user = dict()
+    teamset_memberships_by_user = {}
     for team_membership in course_team_memberships:
         user = team_membership.user
         if user not in teamset_memberships_by_user:
-            teamset_memberships_by_user[user] = dict()
+            teamset_memberships_by_user[user] = {}
         topic_id = team_membership.team.topic_id
         team_name = team_membership.team.name
         teamset_memberships_by_user[user][topic_id] = team_name

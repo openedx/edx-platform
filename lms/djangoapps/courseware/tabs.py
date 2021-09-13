@@ -311,7 +311,7 @@ class SingleTextbookTab(CourseTab):
             """ Constructs a link for textbooks from a view name, a course, and an index. """
             return reverse_func(view_name, args=[str(course.id), index])
 
-        tab_dict = dict()
+        tab_dict = {}
         tab_dict['name'] = name
         tab_dict['tab_id'] = tab_id
         tab_dict['link_func'] = link_func
@@ -393,10 +393,10 @@ def _get_dynamic_tabs(course, user):
     Note: dynamic tabs are those that are not persisted in the course, but are
     instead added dynamically based upon the user's role.
     """
-    dynamic_tabs = list()
+    dynamic_tabs = []
     for tab_type in CourseTabPluginManager.get_tab_types():
         if getattr(tab_type, "is_dynamic", False):
-            tab = tab_type(dict())
+            tab = tab_type({})
             if tab.is_enabled(course, user=user):
                 dynamic_tabs.append(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
