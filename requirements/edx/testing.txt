@@ -55,7 +55,7 @@ appdirs==1.4.4
     #   fs
 asgiref==3.4.1
     # via uvicorn
-astroid==2.6.6
+astroid==2.7.3
     # via
     #   pylint
     #   pylint-celery
@@ -988,9 +988,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.9.6
+pylint==2.11.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django

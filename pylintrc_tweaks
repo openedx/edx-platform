@@ -24,6 +24,9 @@ disable+ =
     consider-using-enumerate,
     no-member,
     consider-using-with,
+    unspecified-encoding,
+    unused-variable,
+    unsubscriptable-object,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
