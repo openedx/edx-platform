@@ -1291,7 +1291,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         ])
         courses = self.collection.find(course_search_location, projection={'_id': True})
         try:
-            course = courses.next()  # lint-amnesty, pylint: disable=next-method-called
+            course = courses.next()
             raise DuplicateCourseError(course_id, course['_id'])
         except StopIteration:
             pass

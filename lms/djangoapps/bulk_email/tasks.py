@@ -480,7 +480,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             task_id,
             email_id
         )
-        raise
+        raise exc
 
     # Exclude optouts (if not a retry):
     # Note that we don't have to do the optout logic at all if this is a retry,

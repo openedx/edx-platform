@@ -546,7 +546,7 @@ class DeactivateLogoutView(APIView):
                     ace.send(notification)
                 except Exception as exc:
                     log.exception('Error sending out deletion notification email')
-                    raise
+                    raise exc
 
                 # Log the user out.
                 logout(request)

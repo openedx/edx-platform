@@ -201,7 +201,7 @@ def update_bundle(bundle_uuid, **fields):
     if "collection_uuid" in fields:
         data["collection_uuid"] = str(fields.pop("collection_uuid"))
     if fields:
-        raise ValueError(f"Unexpected extra fields passed "  # pylint: disable=dict-keys-not-iterating
+        raise ValueError(f"Unexpected extra fields passed "
                          f"to update_bundle: {fields.keys()}")
     result = api_request('patch', api_url('bundles', str(bundle_uuid)), json=data)
     return _bundle_from_response(result)
@@ -323,7 +323,7 @@ def get_bundle_files(bundle_uuid, use_draft=None):
     """
     Get an iterator over all the files in the specified bundle or draft.
     """
-    return get_bundle_files_dict(bundle_uuid, use_draft).values()  # lint-amnesty, pylint: disable=dict-values-not-iterating
+    return get_bundle_files_dict(bundle_uuid, use_draft).values()
 
 
 def get_bundle_links(bundle_uuid, use_draft=None):
