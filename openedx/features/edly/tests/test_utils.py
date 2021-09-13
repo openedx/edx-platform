@@ -2,6 +2,7 @@
 Tests for Edly Utils Functions.
 """
 from urllib.parse import urljoin
+import json
 import jwt
 import mock
 from mock import MagicMock
@@ -20,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
+from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly import cookies as cookies_api
 from openedx.features.edly.tests.factories import (
@@ -86,6 +88,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         super(UtilsTests, self).setUp()
         self.user = UserFactory.create()
         self.admin_user = UserFactory.create(is_staff=True)
+        self.user_password = 'password'
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -125,6 +128,13 @@ class UtilsTests(SharedModuleStoreTestCase):
         from course_creators.views import get_course_creator_status
 
         return get_course_creator_status(user)
+
+    def _set_user_password(self, user):
+        """
+        Helper method to set the user password.
+        """
+        user.set_password(self.user_password)
+        self.user.save()
 
     def test_encode_edly_user_info_cookie(self):
         """
@@ -237,6 +247,41 @@ class UtilsTests(SharedModuleStoreTestCase):
         edly_sub_organization_linked_to_site.edly_organization.save()
 
         assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+
+    def test_user_can_login_on_requested_edly_organization_on_login_view(self):
+        """
+        Test user can login on the requested URL site if linked with its parent edly-organization.
+        """
+
+        self._set_user_password(self.user)
+        post_params = {'email': self.user.email, 'password': self.user_password}
+        request = RequestFactory().post('/', post_params)
+        request.site = SiteFactory()
+        request.session = self._get_stub_session()
+
+        edly_sub_organization_linked_to_site = self._create_edly_sub_organization()
+        edly_sub_organization_linked_to_user = EdlySubOrganizationFactory(
+            lms_site=request.site,
+            edly_organization=edly_sub_organization_linked_to_site.edly_organization,
+        )
+        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)  # pylint: disable=E1101
+
+        response = login_user(request)
+        assert response.status_code == 200
+
+    def test_user_cannot_login_on_requested_edly_organization_on_login_view(self):
+        """
+        Test user cannot login on the requested URL site if not linked with its parent edly-organization.
+        """
+
+        self._set_user_password(self.user)
+        post_params = {'email': self.user.email, 'password': self.user_password}
+        request = RequestFactory().post('/', post_params)
+        request.site = SiteFactory()
+        request.session = self._get_stub_session()
+
+        response = login_user(request)
+        assert json.loads(response.content.decode('utf-8')).get('value') == 'You are not allowed to login on this site.'
 
     def test_get_edly_sub_org_from_cookie(self):
         """
