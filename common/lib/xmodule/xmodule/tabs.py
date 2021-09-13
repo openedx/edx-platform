@@ -311,7 +311,7 @@ class StaticTab(CourseTab):
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
         if tab_dict is None:
-            tab_dict = dict()
+            tab_dict = {}
 
         if name is not None:
             tab_dict['name'] = name

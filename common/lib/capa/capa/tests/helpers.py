@@ -90,7 +90,7 @@ def mock_capa_module():
         """
         Mock implementation of __unicode__ or __str__ for the module's location.
         """
-        return u'i4x://Foo/bar/mock/abc'
+        return 'i4x://Foo/bar/mock/abc'
 
     capa_module = Mock()
     if six.PY2:
