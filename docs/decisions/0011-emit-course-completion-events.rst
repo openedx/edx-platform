@@ -18,13 +18,13 @@ Context
 Decision
 --------
 
-#. edX platform will be configured to emit an event named ``edx.course.completed`` when a learner passes a course for the first time. Therefore ``edx.course.completed`` will be emitted if the learner has achieved passing grade AND passing timestamp of grade for this learner and course does not exist as seen `here`_.
+#. edX platform will be configured to emit an event named ``edx.course.grade.passed.first_time`` when a learner passes a course for the first time. Therefore ``edx.course.completed`` will be emitted if the learner has achieved passing grade AND passing timestamp of grade for this learner and course does not exist as seen `here`_.
 
 #. For LRS consumers who may be interested in knowing whenever a learner passes or fails a course, edX platform will be configured to emit events named ``edx.course.grade.now_passed`` and ``edx.course.grade.now_failed``.
 
 Consequences
 ------------
 
-#. `edx.course.completed` event will only be emitted for a course if `PersistentGradesEnabledFlag` is `True` for that course.
+#. `edx.course.grade.passed.first_time` event will only be emitted for a course if `PersistentGradesEnabledFlag` is `True` for that course.
 
 .. _here: https://github.com/edx/edx-platform/blob/8aedebcdb29bb16b94786503c12a52b07c73dff5/lms/djangoapps/grades/models.py#L647
