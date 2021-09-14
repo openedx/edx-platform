@@ -19,6 +19,8 @@ def create_user_with_logs(*args, **kwargs):
     beeline.add_context_field('create_user_result', result)
     beeline.add_context_field('is_new_user', result.get('is_new'))
     beeline.add_context_field('create_user__username', getattr(user, 'username', None))
-    beeline.add_context_field('create_user__is_active', getattr(user, 'is_active', 'N/A'))
-
+    try:
+        beeline.add_context_field('create_user__is_active', user.is_active)
+    except AttributeError:
+        beeline.add_context_field('create_user__is_active', 'N/A')
     return result
