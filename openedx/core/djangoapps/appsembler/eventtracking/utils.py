@@ -58,14 +58,17 @@ def get_site_config_for_event(event_props):
                 org_name = event_props['org']
                 org = Organization.objects.get(short_name=org_name)
             # try by OrganizationCourse relationship if event has a course_id property
-            elif 'course_id' in event_props:
-                course_id = event_props['course_id']
+            elif 'course_id' in event_props or 'course_key' in event_props:
+                if 'course_id' in event_props:
+                    course_id = event_props['course_id']
+                else:
+                    course_id = event_props['course_key']
                 # allow to fail if more than one Organization to avoid sharing data
                 org = Organization.objects.get(
                     organizationcourse__course_id=str(course_id))
             else:
                 raise EventProcessingError(
-                    "There isn't and org or course_id attribute set in the "
+                    "There isn't and org, course_key or course_id attribute set in the "
                     "segment event, so we couldn't determine the site."
                 )
             # Same logic as in 'appsembler.sites.utils.get_site_by_organization'

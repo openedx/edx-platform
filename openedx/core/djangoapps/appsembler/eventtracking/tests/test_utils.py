@@ -40,7 +40,7 @@ def test_gets_site_config():
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('context_key', ['org', 'course_id'])
+@pytest.mark.parametrize('context_key', ['org', 'course_id', 'course_key'])
 def test_event_has_site_context(context_key):
     """
     A bit about the event dict.
@@ -51,8 +51,11 @@ def test_event_has_site_context(context_key):
     org = OrganizationFactory(sites=[site_config.site])
     org_course = OrganizationCourseFactory(organization=org)
 
-    site_context = dict(org=org.short_name,
-                        course_id=str(org_course.course_id))
+    site_context = dict(
+        org=org.short_name,
+        course_id=str(org_course.course_id),
+        course_key=str(org_course.course_id),
+    )
 
     event_props = {context_key: site_context[context_key]}
     with patch(EVENTTRACKING_MODULE + '.utils.get_current_site_configuration',
