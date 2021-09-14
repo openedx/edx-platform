@@ -42,14 +42,16 @@ from .serializers import (
 )
 from .tasks import enroll_users
 from .utils import (
-    get_course_same_org_user_filter,
+    get_user_org,
+    get_course_overview_same_org_filter,
     get_available_course_qs,
     get_completed_course_count_filters,
     get_learners_filter,
     get_org_users_qs,
     get_roles_q_filters,
     get_user_org_filter,
-    send_registration_email
+    send_registration_email,
+    get_user_same_org_filter
 )
 
 
@@ -93,7 +95,8 @@ class UserCourseEnrollmentsListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         return CourseEnrollment.objects.filter(
-            user_id=self.kwargs['user_id'], is_active=True
+            user_id=self.kwargs['user_id'], is_active=True,
+            course__org__iexact=get_user_org(self.request.user)
         ).select_related(
             'enrollment_stats',
             'course'
@@ -187,7 +190,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         total_users_count = self.get_queryset().count()
 
         roles = self.request.query_params['roles'].split(',') if self.request.query_params.get('roles') else []
-        roles_qs = get_roles_q_filters(roles)
+        roles_qs = get_roles_q_filters(roles, self.request.user)
         if roles_qs:
             self.queryset = self.queryset.filter(roles_qs)
 
@@ -362,12 +365,11 @@ class CourseStatsListAPI(generics.ListAPIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [CanAccessPakXAdminPanel]
     pagination_class = None
-    queryset = CourseOverview.objects.all()
     serializer_class = CourseStatsListSerializer
 
     def get_queryset(self):
         completed_count, in_progress_count = get_completed_course_count_filters(True, self.request.user)
-        return CourseOverview.objects.filter(get_course_same_org_user_filter(self.request.user)).annotate(
+        return CourseOverview.objects.filter(get_course_overview_same_org_filter(self.request.user)).annotate(
             in_progress=in_progress_count,
             completed=completed_count
         )
@@ -414,9 +416,10 @@ class LearnerListAPI(generics.ListAPIView):
     def get_queryset(self):
         user_qs = User.objects.filter(get_learners_filter())
         if not self.request.user.is_superuser:
-            user_qs = user_qs.filter(**get_user_org_filter(self.request.user))
+            user_qs = user_qs.filter(get_user_same_org_filter(self.request.user))
 
-        enrollments = CourseEnrollment.objects.filter(is_active=True).select_related('enrollment_stats')
+        enrollments = CourseEnrollment.objects.filter(
+            is_active=True, course__org__iexact=get_user_org(self.request.user)).select_related('enrollment_stats')
         return user_qs.select_related(
             'profile'
         ).prefetch_related(
@@ -482,7 +485,7 @@ class CourseListAPI(generics.ListAPIView):
         return context
 
     def get_queryset(self):
-        queryset = CourseOverview.objects.filter(get_available_course_qs(self.request.user))
+        queryset = CourseOverview.objects.filter(get_course_overview_same_org_filter(self.request.user))
 
         user_id = self.request.query_params.get('user_id', '').strip().lower()
         if user_id:

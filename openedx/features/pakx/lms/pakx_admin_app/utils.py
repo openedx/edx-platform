@@ -25,21 +25,43 @@ def get_user_org_filter(user):
     return {'profile__organization_id': user.profile.organization_id}
 
 
+def get_user_org(user):
+    """get org for given user object"""
+
+    return getattr(user.profile.organization, "short_name", "").lower()
+
+
+def get_course_overview_same_org_filter(user):
+    """get same org filter with respect course's org"""
+
+    return Q(org__iexact=get_user_org(user))
+
+
+def get_user_same_org_filter(user):
+    """get same org filter with respect to user's profile-> org"""
+
+    return Q(profile__organization__short_name__iexact=get_user_org(user))
+
+
 def get_learners_filter():
+    """get learners filter, excludes dummy emails & add org condition """
     return Q(
         Q(is_superuser=False) & Q(is_staff=False) & ~(Q(email__icontains='fake') | Q(email__icontains='fake'))
     )
 
 
-def get_enrollment_same_org_user_filter(user):
-    """get filter against enrollment record and user's org"""
-    return Q(courseenrollment__course__org=_get_user_org(user))
+def get_user_enrollment_same_org_filter(user):
+    """get filter against enrollment record and user's course enrollment, enrollment->course->org"""
+
+    return Q(courseenrollment__user__profile__organization__short_name__iexact=get_user_org(user))
 
 
-def get_roles_q_filters(roles):
+def get_roles_q_filters(roles, user):
     """
     return Q filter to be used for filter user queryset
     :param roles: request params to filter roles
+    :param user: (User) user object
+
     :return: Q filters
     """
     qs = Q()
@@ -70,18 +92,6 @@ def specify_user_role(user, role):
         user.groups.remove(g_admin, g_tm)
 
 
-def _get_user_org(user):
-    """get org for given user object"""
-
-    return getattr(user.profile.organization, "short_name", "")
-
-
-def get_course_same_org_user_filter(user):
-    """get same org filter"""
-
-    return Q(org=_get_user_org(user))
-
-
 def get_registration_email_message_context(user, password, protocol, is_public_registration):
     """
     return context for registration notification email body
@@ -110,12 +120,14 @@ def get_registration_email_message_context(user, password, protocol, is_public_r
 
 def get_completed_course_count_filters(exclude_staff_superuser=False, user=None):
     completed = Q(
+        get_user_enrollment_same_org_filter(user) &
         Q(courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED) &
-        Q(courseenrollment__is_active=True) & get_enrollment_same_org_user_filter(user)
+        Q(courseenrollment__is_active=True)
     )
     in_progress = Q(
+        get_user_enrollment_same_org_filter(user) &
         Q(courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED) &
-        Q(courseenrollment__is_active=True) & get_enrollment_same_org_user_filter(user)
+        Q(courseenrollment__is_active=True)
     )
 
     if exclude_staff_superuser:
@@ -134,7 +146,7 @@ def get_org_users_qs(user):
     """
     queryset = User.objects.filter(get_learners_filter())
     if not user.is_superuser:
-        queryset = queryset.filter(**get_user_org_filter(user))
+        queryset = queryset.filter(get_user_same_org_filter(user))
 
     return queryset.select_related(
         'profile'
@@ -152,7 +164,7 @@ def get_available_course_qs(user):
         ) &
         (
             Q(enrollment_end__gt=now) | Q(enrollment_end__isnull=True)
-        ) & get_course_same_org_user_filter(user)
+        ) & get_course_overview_same_org_filter(user)
     )
 
 
