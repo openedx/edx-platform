@@ -28,6 +28,10 @@
         margin-bottom: 2rem;
     }
 
+    .track-selection-audit .choice-bullets li:last-child {
+        margin-bottom: 5rem;
+    }
+
     .certificate-container {
         background-color: #EFF8FA;
         border: 1px solid #707070;
@@ -116,6 +120,7 @@
 
     .choice-bullets li {
         color: #454545;
+        margin-bottom: 1.25rem;
     }
 
     .choice-title {
