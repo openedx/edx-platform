@@ -96,7 +96,7 @@ class UserCourseEnrollmentsListAPI(generics.ListAPIView):
     def get_queryset(self):
         return CourseEnrollment.objects.filter(
             user_id=self.kwargs['user_id'], is_active=True,
-            course__org__iexact=get_user_org(self.request.user)
+            course__org__iregex=get_user_org(self.request.user)
         ).select_related(
             'enrollment_stats',
             'course'
@@ -369,7 +369,10 @@ class CourseStatsListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         completed_count, in_progress_count = get_completed_course_count_filters(True, self.request.user)
-        return CourseOverview.objects.filter(get_course_overview_same_org_filter(self.request.user)).annotate(
+        overview_qs = CourseOverview.objects.all()
+        if not self.request.user.is_superuser:
+            overview_qs = overview_qs.filter(get_course_overview_same_org_filter(self.request.user))
+        return overview_qs.annotate(
             in_progress=in_progress_count,
             completed=completed_count
         )
@@ -415,11 +418,12 @@ class LearnerListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         user_qs = User.objects.filter(get_learners_filter())
+        enrollment_qs = CourseEnrollment.objects.filter(is_active=True)
         if not self.request.user.is_superuser:
             user_qs = user_qs.filter(get_user_same_org_filter(self.request.user))
+            enrollment_qs = enrollment_qs.filter(course__org__iregex=get_user_org(self.request.user))
 
-        enrollments = CourseEnrollment.objects.filter(
-            is_active=True, course__org__iexact=get_user_org(self.request.user)).select_related('enrollment_stats')
+        enrollments = enrollment_qs.select_related('enrollment_stats')
         return user_qs.select_related(
             'profile'
         ).prefetch_related(
@@ -485,7 +489,9 @@ class CourseListAPI(generics.ListAPIView):
         return context
 
     def get_queryset(self):
-        queryset = CourseOverview.objects.filter(get_course_overview_same_org_filter(self.request.user))
+        queryset = CourseOverview.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(get_course_overview_same_org_filter(self.request.user))
 
         user_id = self.request.query_params.get('user_id', '').strip().lower()
         if user_id:
