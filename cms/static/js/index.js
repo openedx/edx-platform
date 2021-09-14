@@ -168,7 +168,7 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
                 $('.libraries-tab').toggleClass('active', tab === 'libraries-tab');
 
             // Also toggle this course-related notice shown below the course tab, if it is present:
-                $('.wrapper-creationrights').toggleClass('is-hidden', tab !== 'courses');
+                $('.wrapper-creationrights').toggleClass('is-hidden', tab !== 'courses-tab');
             };
         };
 
