@@ -28,32 +28,35 @@ def get_user_org_filter(user):
 def get_user_org(user):
     """get org for given user object"""
 
-    return getattr(user.profile.organization, "short_name", "").lower()
+    user_org = getattr(user.profile.organization, "short_name", "").lower()
+    if user_org == 'arbisoft':  # TODO: REMOVE THIS IF WHEN WORK PLACE ESSENTIALS COURSES ARE REMOVED
+        return r'({}|{})'.format(user_org, 'pakx')
+    return r'({})'.format(user_org)
 
 
 def get_course_overview_same_org_filter(user):
     """get same org filter with respect course's org"""
 
-    return Q(org__iexact=get_user_org(user))
+    return Q(org__iregex=get_user_org(user))
 
 
 def get_user_same_org_filter(user):
     """get same org filter with respect to user's profile-> org"""
 
-    return Q(profile__organization__short_name__iexact=get_user_org(user))
+    return Q(profile__organization__short_name__iregex=get_user_org(user))
 
 
 def get_learners_filter():
     """get learners filter, excludes dummy emails & add org condition """
     return Q(
-        Q(is_superuser=False) & Q(is_staff=False) & ~(Q(email__icontains='fake') | Q(email__icontains='fake'))
+        Q(is_superuser=False) & Q(is_staff=False) & ~(Q(email__icontains='fake') | Q(email__icontains='example'))
     )
 
 
 def get_user_enrollment_same_org_filter(user):
     """get filter against enrollment record and user's course enrollment, enrollment->course->org"""
 
-    return Q(courseenrollment__user__profile__organization__short_name__iexact=get_user_org(user))
+    return Q(courseenrollment__user__profile__organization__short_name__iregex=get_user_org(user))
 
 
 def get_roles_q_filters(roles, user):
@@ -120,18 +123,18 @@ def get_registration_email_message_context(user, password, protocol, is_public_r
 
 def get_completed_course_count_filters(exclude_staff_superuser=False, user=None):
     completed = Q(
-        get_user_enrollment_same_org_filter(user) &
         Q(courseenrollment__enrollment_stats__email_reminder_status=CourseProgressStats.COURSE_COMPLETED) &
         Q(courseenrollment__is_active=True)
     )
     in_progress = Q(
-        get_user_enrollment_same_org_filter(user) &
         Q(courseenrollment__enrollment_stats__email_reminder_status__lt=CourseProgressStats.COURSE_COMPLETED) &
         Q(courseenrollment__is_active=True)
     )
 
     if exclude_staff_superuser:
         learners = Q(courseenrollment__user__is_staff=False) & Q(courseenrollment__user__is_superuser=False)
+        if not user.is_superuser:
+            learners = Q(learners & get_user_enrollment_same_org_filter(user))
         completed = Q(learners & completed)
         in_progress = Q(learners & in_progress)
 
