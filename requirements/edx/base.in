@@ -59,7 +59,6 @@ django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
 django-pyfs
 django-ratelimit
-django-require
 django-sekizai
 django-ses
 django-simple-history
