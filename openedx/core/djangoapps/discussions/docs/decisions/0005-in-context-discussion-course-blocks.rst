@@ -28,8 +28,8 @@ Decision
 
 A direct link to the topic that needs to be embedded can be generated
 by edx-platform and provided to MFEs via the course blocks API which is
-already is used by the learning MFE. The learning MFE can then directly
-embed this link in a sidebar.
+already used by the learning MFE. The learning MFE can then directly
+embed this link in an iframe as a sidebar.
 
 For example, when the discussion link is requested using
 `requested_fields=discussions_embed_url` it will return roughly the
@@ -54,12 +54,16 @@ following:
 
 For units that don't have a linked discussion, no link will be returned.
 
-The new discussions experience includes a setting to group discussions at
-the subsection level instead of the unit level. This setting will show all
-threads related to a subsection in the sidebar if enabled. If this setting
-is enabled, then the blocks API will return a link for a the entire
-subsection. The discussions MFE will be responsible for checking that this
-course has the setting enabled, and will show an alternative UI in that case.
+The new discussions experience includes a setting called 
+`discussions_group_at_subsection` to group discussions at the subsection 
+level instead of the unit level. Normally the sidebar next to a unit will 
+only show threads from that unit. However, if this setting is enabled
+then the MFE should show threads related to all the units from the 
+subsection in the sidebar. 
+
+If this setting is enabled, then the blocks API will return a link for 
+the entire subsection. The MFE can accomodate for this in the UI by
+presenting it in a different way if need be. 
 
 E.g.
 
@@ -79,5 +83,3 @@ E.g.
         },
         ...
     }
-
-The discussions MFE will then display all the threads in this category.
