@@ -21,6 +21,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 from pytz import UTC
 from requests import HTTPError
 from six import text_type
@@ -205,9 +206,10 @@ def create_account_with_params(request, params):
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,
         )
 
-        new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
-        django_login(request, new_user)
-        request.session.set_expiry(0)
+        # PKX-463 - authentication after account activation
+        # new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
+        # django_login(request, new_user)
+        # request.session.set_expiry(0)
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
@@ -241,17 +243,17 @@ def create_account_with_params(request, params):
     create_comments_service_user(user)
 
     try:
-        _record_registration_attributions(request, new_user)
+        _record_registration_attributions(request, user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
-    if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+    # if new_user is not None:
+    #     AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
 
-    return new_user
+    return user
 
 
 def _link_user_to_third_party_provider(
@@ -493,9 +495,10 @@ class RegistrationView(APIView):
         if response:
             return response
 
-        response = self._create_response(request, {}, status_code=200)
-        set_logged_in_cookies(request, response, user)
-        return response
+        # PKX-463 - authentication after account activation
+        return redirect('/login')
+        # response = self._create_response(request, {}, status_code=200)
+        # set_logged_in_cookies(request, response, user)
 
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
