@@ -439,3 +439,17 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+
+#################### Pulsar Broker Configuration  ################################
+import pulsar
+
+CLIENT = pulsar.Client("pulsar://pulsar:6650")
+CONSUMER_GROUP_NAME = "edx.lms"
+ARCH_EXPERIMENTS_TOPIC = "arch_experiment_topic"
+ARCH_EXPERIMENTS_PRODUCER = CLIENT.create_producer(ARCH_EXPERIMENTS_TOPIC)
+ARCH_EXPERIMENTS_CONSUMER = CLIENT.subscribe(
+    ARCH_EXPERIMENTS_TOPIC,
+    CONSUMER_GROUP_NAME,
+    consumer_type=pulsar.ConsumerType.Shared,
+)
