@@ -117,6 +117,12 @@ from common.djangoapps.student.models import CourseEnrollment
 
 <div class="dashboard-notifications" tabindex="-1">
 
+    %if banner_account_activation_message:
+        <div class="dashboard-banner">
+            ${banner_account_activation_message | n, decode.utf8}
+        </div>
+    %endif
+
     %if enrollment_message:
         <section class="dashboard-banner">
             ${enrollment_message | n, decode.utf8}

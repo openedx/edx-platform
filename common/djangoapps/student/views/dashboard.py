@@ -5,6 +5,7 @@ Dashboard view and supporting methods
 
 import datetime
 import logging
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib import messages
@@ -108,7 +109,7 @@ def _get_recently_enrolled_courses(course_enrollments):
     ]
 
 
-def _create_recent_enrollment_message(course_enrollments):
+def _create_recent_enrollment_message(course_enrollments, course_modes):  # lint-amnesty, pylint: disable=unused-argument
     """
     Builds a recent course enrollment message.
 
@@ -117,6 +118,7 @@ def _create_recent_enrollment_message(course_enrollments):
 
     Args:
         course_enrollments (list[CourseEnrollment]): a list of course enrollments.
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
 
     Returns:
         A string representing the HTML message output from the message template.
@@ -288,6 +290,29 @@ def get_verification_error_reasons_for_display(verification_error_codes):
             verification_errors.append(error_text)
 
     return verification_errors
+
+
+def reverification_info(statuses):
+    """
+    Returns reverification-related information for *all* of user's enrollments whose
+    reverification status is in statuses.
+
+    Args:
+        statuses (list): a list of reverification statuses we want information for
+            example: ["must_reverify", "denied"]
+
+    Returns:
+        dictionary of lists: dictionary with one key per status, e.g.
+            dict["must_reverify"] = []
+            dict["must_reverify"] = [some information]
+    """
+    reverifications = defaultdict(list)
+
+    # Sort the data by the reverification_end_date
+    for status in statuses:
+        if reverifications[status]:
+            reverifications[status].sort(key=lambda x: x.date)
+    return reverifications
 
 
 def _credit_statuses(user, course_enrollments):
@@ -527,7 +552,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     # Check to see if the student has recently enrolled in a course.
     # If so, display a notification message confirming the enrollment.
-    enrollment_message = _create_recent_enrollment_message(course_enrollments)
+    enrollment_message = _create_recent_enrollment_message(
+        course_enrollments, course_modes_by_course
+    )
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     # Display activation message
@@ -552,10 +579,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     recovery_email_message = recovery_email_activation_message = None
     if is_secondary_email_feature_enabled():
         try:
-            PendingSecondaryEmailChange.objects.get(user=user)
+            pending_email = PendingSecondaryEmailChange.objects.get(user=user)  # lint-amnesty, pylint: disable=unused-variable
         except PendingSecondaryEmailChange.DoesNotExist:
             try:
-                AccountRecovery.objects.get(user=user)
+                account_recovery_obj = AccountRecovery.objects.get(user=user)  # lint-amnesty, pylint: disable=unused-variable
             except AccountRecovery.DoesNotExist:
                 recovery_email_message = Text(
                     _(
@@ -604,7 +631,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     ecommerce_service = EcommerceService()
     inverted_programs = meter.invert_programs()
 
-    programs_data = {}
+    urls, programs_data = {}, {}
     bundles_on_dashboard_flag = LegacyWaffleFlag(experiments_namespace, 'bundles_on_dashboard', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
@@ -665,6 +692,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     verification_status = IDVerificationService.user_status(user)
     verification_errors = get_verification_error_reasons_for_display(verification_status['error'])
 
+    # Gets data for midcourse reverifications, if any are necessary or have failed
+    statuses = ["approved", "denied", "pending", "must_reverify"]
+    reverifications = reverification_info(statuses)
+
     enrolled_courses_either_paid = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.is_paid_course()
@@ -675,6 +706,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.is_order_voucher_refundable()
     )
+
+    # If there are *any* denied reverifications that have not been toggled off,
+    # we'll display the banner
+    denied_banner = any(item.display for item in reverifications["denied"])
 
     # get list of courses having pre-requisites yet to be completed
     courses_having_prerequisites = frozenset(
@@ -706,9 +741,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         course_enrollments = [
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
+
     show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
 
     context = {
+        'urls': urls,
         'programs_data': programs_data,
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
@@ -728,11 +765,13 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'cert_statuses': cert_statuses,
         'credit_statuses': _credit_statuses(user, course_enrollments),
         'show_email_settings_for': show_email_settings_for,
+        'reverifications': reverifications,
         'verification_display': verification_status['should_display'],
         'verification_status': verification_status['status'],
         'verification_expiry': verification_status['verification_expiry'],
         'verification_status_by_course': verify_status_by_course,
         'verification_errors': verification_errors,
+        'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
         'show_account_activation_popup': show_account_activation_popup,
         'user': user,
@@ -740,6 +779,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'enrolled_courses_voucher_refundable': enrolled_courses_voucher_refundable,
+        'provider_states': [],
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
