@@ -81,6 +81,7 @@
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2017
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021
 # Hassan Husseini <hassan@constructeducation.com>, 2020
 # Karim ElSayed <karim.mohamed.eg@gmail.com>, 2016
 # Karim ElSayed <karim.mohamed.eg@gmail.com>, 2016
@@ -244,7 +245,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:44+0000\n"
+"POT-Creation-Date: 2021-09-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -6777,6 +6778,14 @@ msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
+#: cms/templates/edit-tabs.html
+msgid "Custom pages"
+msgstr "الصفحات المخصّصة"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide additional course content and resources with custom pages"
+msgstr ""
+
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "مخطّط المنهج الدراسي"
@@ -12697,6 +12706,12 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"User does not have the permission to create courses in this organization or "
+"course creation is disabled"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
@@ -12841,6 +12856,12 @@ msgstr "%"
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"User does not have the permission to create library in this organization or "
+"course creation is disabled"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -13113,6 +13134,14 @@ msgid ""
 "denied)"
 msgstr ""
 "ملاحظات اختيارية حول هذا المستخدم (لماذا مثلًا رُفض طلب الدخول لإنشاء مساق)"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Organizations under which the user is allowed to create courses."
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Grant the user the permission to create courses in ALL organizations"
+msgstr ""
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -21592,10 +21621,6 @@ msgstr ""
 "والصفحات المخصّصة التي تنشئها."
 
 #: cms/templates/edit-tabs.html
-msgid "Custom pages"
-msgstr "الصفحات المخصّصة"
-
-#: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
@@ -23972,6 +23997,10 @@ msgstr "إعدادات ضبط إتاحة الوصول"
 msgid "This block contains multiple components."
 msgstr "تحتوي هذه الكتلة على عدة مكوِّنات."
 
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Pages & Resources"
+msgstr ""
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr "كتاب جديد"
@@ -24321,10 +24350,6 @@ msgstr "تصفّح المساق"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "المخطّط الكلّي"
-
-#: cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
