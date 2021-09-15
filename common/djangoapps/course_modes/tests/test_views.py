@@ -4,7 +4,6 @@ Tests for course_modes views.
 
 
 import decimal
-import mock
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
@@ -40,6 +39,7 @@ GATING_CLASS_NAME = 'openedx.features.content_type_gating.models.ContentTypeGati
 
 # Name of the class to mock for Course Duration Limits.
 CDL_CLASS_NAME = 'openedx.features.course_duration_limits.models.CourseDurationLimitConfig.enabled_for_enrollment'
+
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -591,7 +591,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             course_duration_limits_on,
             waffle_flag_on,
             expected_page_assertion_function
-            ):
+    ):
         """
         Feature-based enrollment (FBE) is when gated content and course duration
         limits are enabled when a user is auditing a course.
@@ -628,6 +628,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                     url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
                     response = self.client.get(url)
                     expected_page_assertion_function(self, response, min_price=verified_mode.min_price)
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
