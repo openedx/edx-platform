@@ -1,1 +1,2 @@
 Django>=3.2,<3.3
+django-cookies-samesite==0.9.0
