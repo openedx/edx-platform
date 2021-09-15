@@ -408,6 +408,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
         'site_name': stripped_site_name,
         'registration_url': registration_url,
         'course': course,
+        'date': datetime.today().strftime("%A, %B %d, %Y"),
         'display_name': display_name,
         'auto_enroll': auto_enroll,
         'course_url': course_url,
