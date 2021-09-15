@@ -103,13 +103,20 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
-	# Let tox control the Django version for tests
+	Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
+	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
+	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+
 	grep -e "^django-cookies-samesite==" requirements/edx/base.txt > requirements/edx/django.txt
 	grep -e "^django-cookies-samesite==" requirements/edx/base.txt > requirements/edx/django30.txt
+	grep -e "^django-cookies-samesite==" requirements/edx/base.txt > requirements/edx/django31.txt
+
 	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/base.txt > requirements/edx/base.tmp
 	mv requirements/edx/base.tmp requirements/edx/base.txt
-	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
+	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/development.txt > requirements/edx/development.tmp
+	mv requirements/edx/development.tmp requirements/edx/development.txt
+	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
 upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
