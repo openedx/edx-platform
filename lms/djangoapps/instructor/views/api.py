@@ -707,6 +707,10 @@ def students_update_enrollment(request, course_id):
             # simply that it is plausibly valid)
             validate_email(email)  # Raises ValidationError if invalid
             if action == 'enroll':
+                email_params.update({
+                    'image_url': "https://{}/{}".format(configuration_helpers.get_value(
+                        'SITE_NAME', settings.SITE_NAME), course.course_image)
+                })
                 before, after, enrollment_obj = enroll_email(
                     course_id, email, auto_enroll, email_students, email_params, language=language
                 )
