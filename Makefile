@@ -108,6 +108,8 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
+	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django.txt
+	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django30.txt
 	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django.txt
 	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django30.txt
 
