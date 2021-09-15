@@ -7,7 +7,6 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
-import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value

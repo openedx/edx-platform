@@ -21,7 +21,6 @@ import copy
 import datetime
 import os
 
-import django
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
