@@ -12,6 +12,8 @@ import django
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from lms.djangoapps.utils import _get_key
+
 
 @ddt.ddt
 class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
