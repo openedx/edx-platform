@@ -135,7 +135,8 @@ python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 rest-condition                      # DRF's recommendation for supporting complex permissions
-social-auth-core
+steamid-social-auth-core==3.4.0     # fork of social-auth-core with steamid-opneidconnect implementation
+python-jose>=3.0.0                  # required for openid connect implementations of python-social-auth
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates

@@ -220,7 +220,8 @@ simplejson==3.17.2        # via -r requirements/edx/base.in, sailthru-client, su
 six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.in
-social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
+steamid-social-auth-core==3.4.0  # via -r requirements/edx/base.in, social-auth-app-django
+python-jose>=3.0.0        # via steamid-oidc
 sorl-thumbnail==12.6.3    # via -r requirements/edx/base.in, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.in
 soupsieve==2.0.1          # via beautifulsoup4
