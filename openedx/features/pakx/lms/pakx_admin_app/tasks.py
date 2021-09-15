@@ -34,8 +34,6 @@ def get_enrolment_email_message_context(site, user, course, url, image_url):
     message_context.update(get_base_template_context(site, user=user))
     message_context.update({
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'date': datetime.today().strftime("%A, %B %d, %Y"),
-        'username': user.profile.name or user.username,
         'dashboard_url': dashboard_url,
         'course': course,
         'url': url,
