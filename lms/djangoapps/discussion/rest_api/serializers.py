@@ -13,13 +13,12 @@ from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.utils import (
-    available_division_schemes,
     course_discussion_division_enabled,
     get_group_id_for_user,
     get_group_name,
-    get_group_names_by_id,
     is_comment_too_deep,
 )
+from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from lms.djangoapps.discussion.rest_api.permissions import (
     NON_UPDATABLE_COMMENT_FIELDS,
     NON_UPDATABLE_THREAD_FIELDS,
@@ -27,7 +26,6 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
-from lms.djangoapps.discussion.views import get_divided_discussions
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
@@ -519,89 +517,6 @@ class DiscussionTopicSerializer(serializers.Serializer):
         Overriden update abstract method
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class DiscussionSettingsSerializer(serializers.Serializer):
-    """
-    Serializer for course discussion settings.
-    """
-    divided_discussions = serializers.ListField(
-        child=serializers.CharField(),
-        write_only=True,
-    )
-    divided_course_wide_discussions = serializers.ListField(
-        child=serializers.CharField(),
-        read_only=True,
-    )
-    divided_inline_discussions = serializers.ListField(
-        child=serializers.CharField(),
-        read_only=True,
-    )
-    always_divide_inline_discussions = serializers.BooleanField()
-    division_scheme = serializers.CharField()
-
-    def to_internal_value(self, data: dict) -> dict:
-        """
-        Transform the *incoming* primitive data into a native value.
-        """
-        payload = super().to_internal_value(data) or {}
-        course = self.context['course']
-        instance = self.context['settings']
-        if any(item in data for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
-            divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-                course, instance
-            )
-            divided_course_wide_discussions = data.get(
-                'divided_course_wide_discussions',
-                divided_course_wide_discussions
-            )
-            divided_inline_discussions = data.get('divided_inline_discussions', divided_inline_discussions)
-            try:
-                payload['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
-            except TypeError as error:
-                raise ValidationError(str(error)) from error
-        for item in ('always_divide_inline_discussions', 'division_scheme'):
-            if item in data:
-                payload[item] = data[item]
-        return payload
-
-    def to_representation(self, instance: CourseDiscussionSettings) -> dict:
-        """
-        Return a serialized representation of the course discussion settings.
-        """
-        payload = super().to_representation(instance)
-        course = self.context['course']
-        instance = self.context['settings']
-        course_key = course.id
-        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-            course, instance
-        )
-        payload = {
-            'id': instance.id,
-            'divided_inline_discussions': divided_inline_discussions,
-            'divided_course_wide_discussions': divided_course_wide_discussions,
-            'always_divide_inline_discussions': instance.always_divide_inline_discussions,
-            'division_scheme': instance.division_scheme,
-            'available_division_schemes': available_division_schemes(course_key)
-        }
-        return payload
-
-    def create(self, validated_data):
-        """
-        This method intentionally left empty
-        """
-
-    def update(self, instance: CourseDiscussionSettings, validated_data: dict) -> CourseDiscussionSettings:
-        """
-        Update and save an existing instance
-        """
-        if not any(field in validated_data for field in self.fields):
-            raise ValidationError('Bad request')
-        try:
-            instance.update(validated_data)
-        except ValueError as e:
-            raise ValidationError(str(e)) from e
-        return instance
 
 
 class DiscussionRolesSerializer(serializers.Serializer):

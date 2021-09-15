@@ -162,7 +162,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.enabled  # by default
         assert configuration.lti_configuration is None
         assert len(configuration.plugin_configuration.keys()) == 0
-        assert not configuration.provider_type
+        assert configuration.provider_type == 'legacy'
 
     def test_get_with_values(self):
         """
@@ -236,7 +236,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.enabled
         assert not configuration.lti_configuration
         assert not configuration.plugin_configuration
-        assert not configuration.provider_type
+        assert configuration.provider_type == 'legacy'
 
     def test_get_explicit(self):
         """
