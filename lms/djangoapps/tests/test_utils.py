@@ -3,9 +3,12 @@ Unit Tests for Utils Class
 """
 
 
+import importlib
+from importlib.metadata import version
 from unittest import TestCase
 
 import ddt
+import django
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -34,7 +37,13 @@ class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docst
         Make sure with django (2.2 or 3.0) django_cookies_samesite settings enabled.
         For greater version django_cookies_samesite not required.
         """
-        # not adding any django condition here. it will fail with django31 which is fine for now.
-        self.assertTrue('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
         self.assertTrue(hasattr(settings, 'DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL'))
         self.assertTrue(hasattr(settings, 'DCS_SESSION_COOKIE_SAMESITE'))
+
+        if django.VERSION >= (3, 1):
+            self.assertFalse('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
+            with self.assertRaises(importlib.metadata.PackageNotFoundError):
+                version('django-cookies-samesite')
+        else:
+            self.assertTrue(version('django-cookies-samesite'))
+            self.assertTrue('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
