@@ -33,6 +33,9 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 
 <%
   reverify_link = IDVerificationService.get_verify_location()
+  cert_name_short = course_overview.cert_name_short
+  if cert_name_short == "":
+    cert_name_short = settings.CERT_NAME_SHORT
 
   cert_name_long = course_overview.cert_name_long
   if cert_name_long == "":
@@ -57,6 +60,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
             verification_status.get('status'),
             course_overview.id
         )
+    %>
+    <%
         mode_class = course_verified_certs.get('display_mode', '')
         if mode_class:
             mode_class = ' ' + mode_class ;
@@ -304,7 +309,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                   % endif
 
                 % else:
-                  <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target"/>
+                  <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target, related_programs=related_programs"/>
                 % endif
               % endif
           </div>

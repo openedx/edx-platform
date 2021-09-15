@@ -21,6 +21,11 @@ from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.models import CourseEnrollment
 %>
 
+<%
+  cert_name_short = settings.CERT_NAME_SHORT
+  cert_name_long = settings.CERT_NAME_LONG
+%>
+
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
@@ -107,6 +112,12 @@ from common.djangoapps.student.models import CourseEnrollment
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
+
+    %if banner_account_activation_message:
+        <div class="dashboard-banner">
+            ${banner_account_activation_message | n, decode.utf8}
+        </div>
+    %endif
 
     %if enrollment_message:
         <div class="dashboard-banner">
