@@ -304,7 +304,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                   % endif
 
                 % else:
-                  <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target"/>
+                  <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target, related_programs=related_programs"/>
                 % endif
               % endif
           </div>
