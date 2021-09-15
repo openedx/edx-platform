@@ -34,11 +34,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..views import VALUE_PROP_TRACK_SELECTION_FLAG
 
-# Name of the class to mock for Content Type Gating.
-GATING_CLASS_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
+# Name of the method to mock for Content Type Gating.
+GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
 
-# Name of the class to mock for Course Duration Limits.
-CDL_CLASS_NAME = 'openedx.features.course_duration_limits.models.CourseDurationLimitConfig.enabled_for_enrollment'
+# Name of the method to mock for Course Duration Limits.
+CDL_METHOD_NAME = 'openedx.features.course_duration_limits.models.CourseDurationLimitConfig.enabled_for_enrollment'
 
 
 @ddt.ddt
@@ -518,7 +518,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     def _assert_fbe_page(self, response, min_price=None, **_):
         """
-        Assert fbe.html was transcluded.
+        Assert fbe.html was rendered.
         """
         self.assertContains(response, "Choose a path for your course in")
 
@@ -549,7 +549,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     def _assert_unfbe_page(self, response, min_price=None, **_):
         """
-        Assert track_selection.html and unfbe.html were transcluded.
+        Assert track_selection.html and unfbe.html were rendered.
         """
         # Check for string unique to track_selection.html.
         self.assertContains(response, "| Upgrade Now")
@@ -566,7 +566,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     def _assert_legacy_page(self, response, **_):
         """
-        Assert choose.html was transcluded.
+        Assert choose.html was rendered.
         """
         # Check for string unique to the legacy choose.html.
         self.assertContains(response, "Choose Your Track")
@@ -602,7 +602,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             2. unfbe.html - partial or no FBE
             3. choose.html - legacy track selection page
 
-        This test checks that the right page is shown.
+        This test checks that the right template is rendered.
 
         """
         # The active course mode already exists. Create verified course mode:
@@ -623,8 +623,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Check whether new track selection template is rendered.
         # This should *only* be shown when the waffle flag is on.
         with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=waffle_flag_on):
-            with patch(GATING_CLASS_NAME, return_value=gated_content_on):
-                with patch(CDL_CLASS_NAME, return_value=course_duration_limits_on):
+            with patch(GATING_METHOD_NAME, return_value=gated_content_on):
+                with patch(CDL_METHOD_NAME, return_value=course_duration_limits_on):
                     url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
                     response = self.client.get(url)
                     expected_page_assertion_function(self, response, min_price=verified_mode.min_price)

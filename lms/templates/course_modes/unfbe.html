@@ -17,7 +17,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <div class="choice-bullets track-selection-type-unfbe">
     <ul>
         <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
-            link_start=HTML('<b><u><a class="verified" href="https://www.edx.org/verified-certificate" target="_blank">'),
+            link_start=HTML('<b><u><a class="verified" href="{track_verified_url}" target="_blank">').format(track_verified_url=track_links['verified_certificate']),
             link_end=HTML('</a></u></b>'),
         )}</li>
         <li>${Text(_("Support our {start_bold}mission{end_bold} to increase access to high-quality education for everyone, everywhere")).format(
