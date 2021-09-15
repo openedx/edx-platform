@@ -104,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:44+0000\n"
+"POT-Creation-Date: 2021-09-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -6460,6 +6460,14 @@ msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
+#: cms/templates/edit-tabs.html
+msgid "Custom pages"
+msgstr "Halaman Kustom"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Provide additional course content and resources with custom pages"
+msgstr ""
+
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "Silabus"
@@ -12141,6 +12149,12 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"User does not have the permission to create courses in this organization or "
+"course creation is disabled"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
@@ -12278,6 +12292,12 @@ msgstr "%"
 #: cms/djangoapps/contentstore/views/item.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"User does not have the permission to create library in this organization or "
+"course creation is disabled"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/library.py
@@ -12551,6 +12571,14 @@ msgid ""
 msgstr ""
 "Catatan tambahan tentang pengguna ini (misalnya, kenapa akses pembuatan "
 "kursus ditolak)"
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Organizations under which the user is allowed to create courses."
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py
+msgid "Grant the user the permission to create courses in ALL organizations"
+msgstr ""
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -21007,10 +21035,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/edit-tabs.html
-msgid "Custom pages"
-msgstr "Halaman Kustom"
-
-#: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
@@ -23137,6 +23161,10 @@ msgstr "Atur Akses"
 msgid "This block contains multiple components."
 msgstr ""
 
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Pages & Resources"
+msgstr ""
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr "Buku Teks Baru"
@@ -23453,10 +23481,6 @@ msgstr "Navigasi kursus"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Garis Besar"
-
-#: cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

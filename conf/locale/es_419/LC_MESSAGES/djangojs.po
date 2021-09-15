@@ -148,6 +148,7 @@
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
 # Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
+# Carla Duarte <cduarte@edx.org>, 2021
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
@@ -170,9 +171,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-05 20:44+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-09-12 20:44+0000\n"
+"PO-Revision-Date: 2021-09-15 17:16+0000\n"
+"Last-Translator: Carla Duarte <cduarte@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -11175,26 +11176,28 @@ msgid ""
 "When learners submit an answer to an assessment, they immediately see "
 "whether the answer is correct or incorrect, and the score received."
 msgstr ""
-"Cuando los estudiantes envían una respuesta para evaluación, ven "
-"inmediatamente si la respuesta es correcta o incorrecta, y la calificación "
-"recibida."
+"Cuando un estudiante ya haya enviado su respuesta en una evaluación, en "
+"seguida verá si esa respuesta es correcta o incorrecta y la puntuación "
+"correspondiente."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Never show assessment results"
-msgstr "No mostrar nunca los resultados de la evaluación"
+msgstr "Nunca mostrar los resultados de la evaluación"
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners never see whether their answers to assessments are correct or "
 "incorrect, nor the score received."
 msgstr ""
-"Los estudiantes nunca verán si sus respuestas a las evaluaciones son "
-"correctas o incorrectas, no hay un puntaje recibido."
+"Al haber enviado sus respuestas, los estudiantes nunca verán si esas "
+"respuestas son correctas o incorrectas. Tampoco verán la puntuación "
+"correspondiente."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Show assessment results when subsection is past due"
 msgstr ""
-"Mostrar resultados de las evaluaciones cuando la subsección haya caducado"
+"Mostrar los resultados de las evaluaciones una vez que haya pasado la fecha "
+"límite"
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
@@ -11202,9 +11205,10 @@ msgid ""
 "incorrect, nor the score received, until after the course end date has "
 "passed."
 msgstr ""
-"Los estudiantes no ven si sus respuestas a las evaluaciones fueron correctas"
-" o incorrectas, ni la puntuación recibida, hasta después que la fecha de "
-"caducidad del curso haya pasado."
+"Tras enviar sus respuestas, los estudiantes no verán si son correctas o "
+"incorrectas, ni la puntuación recibida hasta que haya pasado la fecha límite"
+" de la evaluación. En los cursos al ritmo del estudiante la fecha límite es "
+"la fecha final del curso. "
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
