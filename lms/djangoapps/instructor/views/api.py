@@ -700,16 +700,20 @@ def students_update_enrollment(request, course_id):
         else:
             email = user.email
             language = get_user_email_language(user)
-
+        site = Site.objects.get_current()
+        email_params.update(get_base_template_context(site, user=user))
         try:
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
             validate_email(email)  # Raises ValidationError if invalid
             if action == 'enroll':
+                course_overview = CourseOverview.objects.get(id=course_id)
+                absolute_domain = 'https://' + Site.objects.get_current().domain
+                course_url_template = "{domain}/courses/{course_id}/overview"
                 email_params.update({
-                    'image_url': "https://{}/{}".format(configuration_helpers.get_value(
-                        'SITE_NAME', settings.SITE_NAME), course.course_image)
+                    'url': course_url_template.format(domain=absolute_domain, course_id=course_id),
+                    'image_url': absolute_domain + course_overview.course_image_url
                 })
                 before, after, enrollment_obj = enroll_email(
                     course_id, email, auto_enroll, email_students, email_params, language=language
@@ -734,8 +738,6 @@ def students_update_enrollment(request, course_id):
                         state_transition = UNENROLLED_TO_ALLOWEDTOENROLL
 
             elif action == 'unenroll':
-                site = Site.objects.get_current()
-                email_params.update(get_base_template_context(site, user=user))
                 before, after = unenroll_email(
                     course_id, email, email_students, email_params, language=language
                 )
