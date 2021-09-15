@@ -28,7 +28,7 @@ For each deployed environment (stage, production, etc.):
      - Go to ``/admin/oauth2_provider/application/add/`` in LMS admin
      - Copy the prepopulated client ID and secret to a secure place
      - Leave the user field empty
-     - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/``
+     - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/`` (as well as for any additional domains, such as internally routed domains)
      - Set client type to ``Confidential``
      - Set authorization grant type to ``Authorization code``
      - Set the name to ``studio-sso``
@@ -52,7 +52,6 @@ For each deployed environment (stage, production, etc.):
 #. Configure Studio to initiative OAuth flow and use a separate session cookie::
 
     LOGIN_URL: /login/  # to activate OAuth functionality
-    SESSION_COOKIE_DOMAIN: <studio domain>  # since no longer using root domain to share with LMS
     SESSION_COOKIE_NAME: studio_sessionid
 
 Cleanup
@@ -63,8 +62,7 @@ Config and code changes to be performed after all environments are using OAuth f
 - Set ``LOGIN_URL`` to ``'/login/'`` in ``cms/envs/common.py``
 - Deploy
 - Remove ``LOGIN_URL`` overrides from all environments (devstack and others)
-- Remove remaining ``ARCH-1253`` detritus (login redirect)
-- Remove this doc!
+- Remove doc (convert to migration instructions for next release)
 
 Declining the migration
 -----------------------
@@ -72,4 +70,5 @@ Declining the migration
 Untested instructions for continuing to keep the shared sessions:
 
 - Override ``FRONTEND_LOGOUT_URL`` for Studio to be ``<LMS base>/logout``
+- Override ``FRONTEND_LOGIN_URL`` for Studio to be ``<LMS base>/login``
 - Override ``LOGIN_URL`` for Studio to be ``<LMS base>/login``
