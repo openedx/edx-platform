@@ -527,6 +527,7 @@ def activate_account(request, key):
         html_end=HTML('</p>'),
     )
 
+    show_account_activation_popup = None
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
@@ -585,6 +586,7 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
+            show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
 
     # If a safe `next` parameter is provided in the request
     # and it's not the same as the dashboard, redirect there.
@@ -612,7 +614,14 @@ def activate_account(request, key):
         url_path = '/login?{}'.format(urllib.parse.urlencode(params))
         return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
 
-    return redirect(redirect_url) if redirect_url and is_enterprise_learner(request.user) else redirect('dashboard')
+    response = redirect(redirect_url) if redirect_url and is_enterprise_learner(request.user) else redirect('dashboard')
+    if show_account_activation_popup:
+        response.delete_cookie(
+            settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            path='/',
+        )
+    return response
 
 
 @ensure_csrf_cookie
