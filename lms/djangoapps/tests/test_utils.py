@@ -41,9 +41,9 @@ class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docst
         self.assertTrue(hasattr(settings, 'DCS_SESSION_COOKIE_SAMESITE'))
 
         if django.VERSION >= (3, 1):
-            self.assertFalse('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
+            self.assertNotIn('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
             with self.assertRaises(importlib.metadata.PackageNotFoundError):
                 version('django-cookies-samesite')
         else:
             self.assertTrue(version('django-cookies-samesite'))
-            self.assertTrue('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
+            self.assertIn('django_cookies_samesite.middleware.CookiesSameSite' in settings.MIDDLEWARE)
