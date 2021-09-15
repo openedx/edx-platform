@@ -15,9 +15,15 @@ class DiscussionsConfig(AppConfig):
     name = 'openedx.core.djangoapps.discussions'
     plugin_app = {
         PluginURLs.CONFIG: {
+            # TODO: Remove the LMS path once its usage has been removed from frontend-app-course-authoring.
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: r'^discussions/',
+                PluginURLs.REGEX: r'^discussions/api/',
+                PluginURLs.RELATIVE_PATH: 'urls',
+            },
+            ProjectType.CMS: {
+                PluginURLs.NAMESPACE: '',
+                PluginURLs.REGEX: r'^api/discussions/',
                 PluginURLs.RELATIVE_PATH: 'urls',
             },
         },
