@@ -363,20 +363,15 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert 'Valid e-mail address required.' in field_errors['email']['developer_message']
         assert 'Full Name cannot contain the following characters: < >' in field_errors['name']['user_message']
 
+    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
+    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=False))
     @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
-    @patch(
-        'openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
-        Mock(return_value=['mock certificate'])
-    )
     def test_name_update_requires_idv(self):
         """
         Test that a name change is blocked through this API if it requires ID verification.
-        In this case, the user has at least one certificate.
         """
-        update = {'name': 'New Name'}
-
         with pytest.raises(AccountValidationError) as context_manager:
-            update_account_settings(self.user, update)
+            update_account_settings(self.user, {'name': 'New Name'})
 
         field_errors = context_manager.value.field_errors
         assert len(field_errors) == 1
@@ -385,17 +380,15 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['name'] != 'New Name'
 
+    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
+    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=True))
     @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
-    @patch(
-        'openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
-        Mock(return_value=[])
-    )
     def test_name_update_does_not_require_idv(self):
         """
-        Test that the user can change their name freely if it does not require verification.
+        Test that the user can change their name if change does not require IDV.
         """
-        update = {'name': 'New Name'}
-        update_account_settings(self.user, update)
+        update_account_settings(self.user, {'name': 'New Name'})
+
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['name'] == 'New Name'
 
