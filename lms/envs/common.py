@@ -32,6 +32,7 @@ import importlib.util
 import sys
 import os
 
+import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
@@ -2123,6 +2124,13 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
+
+if django.VERSION >= (3, 1):
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    MIDDLEWARE.remove(
+        'django_cookies_samesite.middleware.CookiesSameSite'
+    )
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
