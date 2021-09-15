@@ -59,6 +59,7 @@ See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more d
 
 
 import base64
+import beeline
 import hashlib
 import hmac
 import json
@@ -539,6 +540,7 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
 
 
 @partial.partial
+@beeline.traced('third_party_auth.ensure_user_information')
 def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None, current_partial=None,
                             allow_inactive_user=False, details=None, *args, **kwargs):
     """
@@ -557,12 +559,19 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # It is important that we always execute the entire pipeline. Even if
     # behavior appears correct without executing a step, it means important
     # invariants have been violated and future misbehavior is likely.
+
+    beeline.add_context_field('ensure_user_information__dispatched_to_login', False)
+
     def dispatch_to_login():
         """Redirects to the login page."""
+        beeline.add_context_field('ensure_user_information__dispatched_to_login', True)
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
+
+    beeline.add_context_field('ensure_user_information__dispatch_to_register', False)
 
     def dispatch_to_register():
         """Redirects to the registration page."""
+        beeline.add_context_field('ensure_user_information__dispatch_to_register', True)
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
     def should_force_account_creation():
@@ -578,6 +587,13 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return (current_provider and
                 current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list])
 
+    beeline.add_context_field('ensure_user_information__user', user)
+    beeline.add_context_field('ensure_user_information__allow_inactive_user', allow_inactive_user)
+    beeline.add_context_field('ensure_user_information__details', details)
+    beeline.add_context_field('ensure_user_information__should_force_account_creation', 'unset')
+    beeline.add_context_field('ensure_user_information__user_exists', 'unset')
+    beeline.add_context_field('ensure_user_information__is_provider_saml', 'unset')
+
     if current_partial:
         strategy.session_set('partial_pipeline_token_', current_partial.token)
         strategy.storage.partial.store(current_partial)
@@ -585,10 +601,12 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     if not user:
         # Use only email for user existence check in case of saml provider
         if is_provider_saml():
+            beeline.add_context_field('ensure_user_information__is_provider_saml', True)
             user_details = {'email': details.get('email')} if details else None
         else:
             user_details = details
         if user_exists(user_details or {}):
+            beeline.add_context_field('ensure_user_information__user_exists', True)
             # User has not already authenticated and the details sent over from
             # identity provider belong to an existing user.
             return dispatch_to_login()
@@ -599,6 +617,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
             if should_force_account_creation():
+                beeline.add_context_field('ensure_user_information__should_force_account_creation', True)
                 return dispatch_to_register()
             return dispatch_to_login()
         elif auth_entry == AUTH_ENTRY_REGISTER:
@@ -612,6 +631,14 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             return redirect_to_custom_form(strategy.request, auth_entry, details or {}, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
+
+    beeline.add_context_field('ensure_user_information__user', user)
+    beeline.add_context_field('ensure_user_information__user__type', type(user))
+
+    try:
+        beeline.add_context_field('ensure_user_information__is_active', user.is_active)
+    except AttributeError:
+        beeline.add_context_field('ensure_user_information__is_active', 'N/A')
 
     if not user.is_active:
         # The user account has not been verified yet.
