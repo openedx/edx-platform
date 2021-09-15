@@ -40,6 +40,8 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -1144,3 +1146,46 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
         assert response.status_code == 200
         assert len(data) == 1
         self.assertContains(response, '"uid": "test@example.com"')
+
+
+class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):
+    """
+    Test suite for FBE Support API view.
+    """
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+    def test_fbe_enabled_response(self):
+        """
+        Test the response for the api view when the gating and duration configs
+        are enabled.
+        """
+        for course_mode in [CourseMode.AUDIT, CourseMode.VERIFIED]:
+            CourseModeFactory.create(mode_slug=course_mode, course_id=self.course.id)
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(
+            reverse("support:feature_based_enrollment_details", kwargs={'course_id': str(self.course.id)})
+        )
+        data = json.loads(response.content.decode('utf-8'))
+        gating_config = data['gating_config']
+        duration_config = data['duration_config']
+
+        assert str(self.course.id) == data['course_id']
+        assert gating_config['enabled']
+        assert gating_config['enabled_as_of'] == '2018-01-01 00:00:00+00:00'
+        assert duration_config['enabled']
+        assert duration_config['enabled_as_of'] == '2018-01-01 00:00:00+00:00'
+
+    def test_fbe_disabled_response(self):
+        """
+        Test the FBE support api view response to be empty when no gating and duration
+        config is present.
+        """
+        response = self.client.get(
+            reverse("support:feature_based_enrollment_details", kwargs={'course_id': str(self.course.id)})
+        )
+        data = json.loads(response.content.decode('utf-8'))
+        assert data == {}
