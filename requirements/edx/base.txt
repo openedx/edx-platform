@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+django-cookies-samesite==0.9.0
 -e common/lib/capa
     # via
     #   -r requirements/edx/local.in
