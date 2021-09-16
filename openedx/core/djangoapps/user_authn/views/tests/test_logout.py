@@ -193,3 +193,18 @@ class LogoutTests(TestCase):
                 'show_tpa_logout_link': True,
             }
             self.assertDictContainsSubset(expected, response.context_data)
+
+    @mock.patch('openedx.core.djangoapps.user_authn.views.logout.is_safe_login_or_logout_redirect')
+    @override_settings(LOGOUT_REDIRECT_URL='http://test-mock.com/logout')
+    def test_logout_redirect_url_settings(self, mock_is_safe_login_or_logout_redirect):
+        mock_is_safe_login_or_logout_redirect.return_value = True
+        redirect_url = ''
+        url = '{logout_path}?redirect_url={redirect_url}'.format(
+            logout_path=reverse('logout'),
+            redirect_url=redirect_url
+        )
+        response = self.client.get(url, HTTP_HOST='testserver')
+        expected = {
+            'target': urllib.parse.unquote(settings.LOGOUT_REDIRECT_URL),
+        }
+        self.assertDictContainsSubset(expected, response.context_data)

@@ -1363,6 +1363,12 @@ USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 
 
+# .. setting_name: LOGOUT_REDIRECT_URL
+# .. setting_default: None
+# .. setting_description: The user is by default redirected to edX's dashboard, if redirect_url is not specified
+#  in the logout URL. LOGOUT_REDIRECT_URL can be used as default redirection-url instead of dashboard.
+LOGOUT_REDIRECT_URL = None
+
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
 

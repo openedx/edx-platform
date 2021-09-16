@@ -60,6 +60,11 @@ class LogoutView(TemplateView):
         if target_url:
             target_url = parse.unquote(parse.quote_plus(target_url))
 
+        # In case no target-url is specified in request,
+        # LOGOUT_REDIRECT_URL will be used instead.
+        if not target_url and settings.LOGOUT_REDIRECT_URL:
+            target_url = settings.LOGOUT_REDIRECT_URL
+
         use_target_url = target_url and is_safe_login_or_logout_redirect(
             redirect_to=target_url,
             request_host=self.request.get_host(),
