@@ -1576,7 +1576,6 @@ def get_student_enrollment_status(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@common_exceptions_400
 @require_course_permission(permissions.ENROLLMENT_REPORT)
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"
