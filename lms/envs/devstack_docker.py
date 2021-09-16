@@ -7,3 +7,12 @@ still refers to it.
 """
 
 from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.openedx.learning.course.enrollment.started.v1": {
+        "pipeline": [
+            "openedx_basic_hooks.filters.enrollment.avoid_enrollment",
+        ],
+        "fail_silently": False,
+    }
+}
