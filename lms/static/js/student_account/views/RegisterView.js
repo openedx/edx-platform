@@ -23,6 +23,7 @@
                 events: {
                     'click .js-register': 'submitForm',
                     'click .login-provider': 'thirdPartyAuth',
+                    'click .toggle-password': 'togglePassword',
                     'click input[required][type="checkbox"]': 'liveValidateHandler',
                     'blur input[required], textarea[required], select[required]': 'liveValidateHandler',
                     'focus input[required], textarea[required], select[required]': 'handleRequiredInputFocus'
@@ -471,6 +472,14 @@
                         $(this.el).show(); // Show in case the form was hidden for auto-submission
                     }
                 },
+
+            togglePassword: function(event) {
+                event.preventDefault();
+                var passwordField = document.querySelector("#register-password")
+                var newType = passwordField.getAttribute("type") === "password" ? "text" : "password"
+                passwordField.setAttribute("type", newType);
+                $(event.target).toggleClass("fa-eye fa-eye-slash");
+            },
 
                 resetValidationVariables: function() {
                     this.positiveValidationEnabled = true;
