@@ -88,7 +88,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     def test_optout_using_unsubscribe_link_in_email(self):
         """
-        Make sure email is't sent to learner after opt out.
+        Make sure email isn't sent to learner after opt out.
         """
         self.client.logout()
 
