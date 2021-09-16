@@ -13,9 +13,11 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id, program_discussions_is_enabled
+from lti_consumer.lti_1p1.contrib.django import lti_embed
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
+from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
@@ -25,6 +27,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_marketing_url
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from openedx.core.djangolib.markup import HTML
 
 
 class ProgramsFragmentView(EdxFragmentView):
@@ -70,6 +73,30 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
+
+    def _get_lti_embed_code(self, program_uuid) -> str:
+        lti_config = ProgramDiscussionsConfiguration.objects.filter(
+            program_uuid=program_uuid
+        ).first().lti_configuration
+        lti_consumer = lti_config.get_lti_consumer()
+        user_id = 'unique_user_id'
+        context_id = program_uuid
+        resource_link_id = program_uuid
+        roles = 'student'
+        context_title = program_uuid
+        result_sourcedid = 'resource_id'
+
+        return lti_embed(
+            html_element_id='lti-tab-launcher',
+            lti_consumer=lti_consumer,
+            resource_link_id=resource_link_id,
+            user_id=user_id,
+            roles=roles,
+            context_id=context_id,
+            context_title=context_title,
+            context_label=context_id,
+            result_sourcedid=result_sourcedid
+        )
 
     def render_to_fragment(self, request, program_uuid, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """View details about a specific program."""
@@ -128,6 +155,31 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'program_record_url': program_record_url,
         }
 
+        lti_embed_html = self._get_lti_embed_code(program_uuid)
+
+        fragment = Fragment(
+            HTML(
+                """
+                <iframe
+                    id='lti-tab-embed'
+                    srcdoc='{srcdoc}'
+                 >
+                </iframe>
+                """
+            ).format(
+                srcdoc=lti_embed_html
+            )
+        )
+        fragment.add_css(
+            """
+            #lti-tab-embed {
+                width: 100%;
+                min-height: 800px;
+                border: none;
+            }
+            """
+        )
+
         context = {
             'urls': urls,
             'user_preferences': get_user_preferences(request.user),
@@ -136,7 +188,8 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
-            'program_discussions_enabled': program_discussions_is_enabled()
+            'program_discussions_enabled': program_discussions_is_enabled(),
+            'discussion_fragment': {"iframe": fragment.content}
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)
