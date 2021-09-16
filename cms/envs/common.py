@@ -647,11 +647,8 @@ LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 # Use LMS SSO for login, once enabled by setting LOGIN_URL (see docs/guides/studio_oauth.rst)
 SOCIAL_AUTH_STRATEGY = 'auth_backends.strategies.EdxDjangoStrategy'
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
-# TODO: Set LOGIN_URL to '/login/' after Studio OAuth transition is complete, and
-# finish ARCH-1253 cleanup. See docs/guides/studio_oauth.rst
-LOGIN_URL = reverse_lazy('login_redirect_to_lms')
-FRONTEND_LOGIN_URL = lambda settings: settings.LMS_ROOT_URL + '/login'
-derived('FRONTEND_LOGIN_URL')
+LOGIN_URL = '/login/'
+FRONTEND_LOGIN_URL = LOGIN_URL
 # Warning: Must have trailing slash to activate correct logout view
 # (auth_backends, not LMS user_authn)
 FRONTEND_LOGOUT_URL = '/logout/'
