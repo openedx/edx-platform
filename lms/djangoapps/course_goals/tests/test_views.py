@@ -5,23 +5,18 @@ Unit tests for course_goals.views methods.
 
 from unittest import mock
 
-from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APIClient
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_goals.models import CourseGoal
-from lms.djangoapps.course_goals.toggles import POPULATE_USER_ACTIVITY_FLAG
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 EVENT_NAME_ADDED = 'edx.course.goal.added'
 EVENT_NAME_UPDATED = 'edx.course.goal.updated'
-
-User = get_user_model()
 
 
 class TestCourseGoalsAPI(SharedModuleStoreTestCase):
@@ -117,67 +112,3 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
 
         response = self.client.post(self.apiUrl, post_data)
         return response
-
-
-@override_waffle_flag(POPULATE_USER_ACTIVITY_FLAG, active=True)
-class TestUserActivityAPI(SharedModuleStoreTestCase):
-    """
-    Testing the User Activity API.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.course = CourseFactory.create()
-
-        self.user = UserFactory.create(username='john', email='l@gmail.com', password='password', is_staff=True)
-        CourseEnrollment.enroll(self.user, self.course.id)
-
-        self.client = APIClient(enforce_csrf_checks=True)
-        self.client.login(username=self.user.username, password=self.user.password)
-        self.client.force_authenticate(user=self.user)
-
-        self.apiUrl = reverse('course_goals_api:populate_user_activity')
-
-    def test_populate_activity(self):
-        '''
-        Test the happy path of populating user activity
-        '''
-        post_data = {
-            'course_key': self.course.id,
-            'user_id': self.user.id,
-        }
-
-        response = self.client.post(self.apiUrl, post_data)
-        assert response.status_code == 201
-        assert response.json() == {'activity_object_id': 1}
-
-        response = self.client.post(self.apiUrl, post_data)
-        assert response.status_code == 200
-        assert response.json() == {'activity_object_id': 1}
-
-    def test_invalid_parameters(self):
-        '''
-        Ensure that we check that parameters meet the requirements
-        and return a 400 otherwise.
-        '''
-        post_data = {
-            'course_key': self.course.id,
-        }
-
-        response = self.client.post(self.apiUrl, post_data)
-        assert response.status_code == 400
-
-        post_data = {
-            'user_id': self.user.id,
-        }
-
-        response = self.client.post(self.apiUrl, post_data)
-        assert response.status_code == 400
-
-        post_data = {
-            'user_id': self.user.id,
-            'course_key': 'invalidcoursekey',
-        }
-
-        response = self.client.post(self.apiUrl, post_data)
-        assert response.status_code == 400

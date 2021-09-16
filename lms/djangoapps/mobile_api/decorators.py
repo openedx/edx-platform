@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import POPULATE_USER_ACTIVITY_FLAG
+from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -43,10 +43,10 @@ def mobile_course_access(depth=0):
                         depth=depth,
                         check_if_enrolled=True,
                     )
-                    if POPULATE_USER_ACTIVITY_FLAG.is_enabled():
-                        # Populate user activity for tracking progress towards a user's course goals (for mobile app)
-                        UserActivity.populate_user_activity(
-                            request.user, course_id, request=request, check_if_mobile_app=True
+                    if RECORD_USER_ACTIVITY_FLAG.is_enabled():
+                        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+                        UserActivity.record_user_activity(
+                            request.user, course_id, request=request, only_if_mobile_app=True
                         )
                 except CoursewareAccessException as error:
                     return Response(data=error.to_json(), status=status.HTTP_404_NOT_FOUND)
