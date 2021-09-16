@@ -138,8 +138,8 @@ def get_verified_track_links(language):
         Dictionary with URL's with verified certificate informational links.
         If not edx.org, returns a dictionary with default URL's.
     """
-    support_url = settings.SUPPORT_SITE_LINK
-    root_url = settings.LMS_ROOT_URL
+    support_root_url = settings.SUPPORT_SITE_LINK
+    marketing_root_url = settings.MKTG_URLS.get('ROOT')
 
     enabled_languages = {
         'en': 'hc/en-us',
@@ -147,10 +147,12 @@ def get_verified_track_links(language):
     }
 
     # Add edX specific links only to edx.org
-    if root_url and 'edx.org' in root_url:
-        track_verified_url = urljoin(root_url, 'verified-certificate')
-        if support_url and 'support.edx.org' in support_url:
+    if marketing_root_url and 'edx.org' in marketing_root_url:
+        track_verified_url = urljoin(marketing_root_url, 'verified-certificate')
+        if support_root_url and 'support.edx.org' in support_root_url:
             support_article_params = '/articles/360013426573-'
+            # Must specify the language in the URL since
+            # support links do not auto detect the language settings
             language_specific_params = {
                 'en': 'What-are-the-differences-between-audit-free-and-verified-paid-courses-',
                 'es-419': ('-Cu%C3%A1les-son-las-diferencias'
@@ -161,7 +163,7 @@ def get_verified_track_links(language):
             else:
                 full_params = enabled_languages['en'] + support_article_params + language_specific_params['en']
             track_comparison_url = urljoin(
-                support_url,
+                support_root_url,
                 full_params
             )
             return {
@@ -170,6 +172,6 @@ def get_verified_track_links(language):
             }
     # Default URL's are used if not edx.org
     return {
-        'verified_certificate': root_url,
-        'learn_more': support_url,
+        'verified_certificate': marketing_root_url,
+        'learn_more': support_root_url,
     }
