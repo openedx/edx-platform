@@ -2,14 +2,14 @@
 URLs for the student support app.
 """
 
-
+from django.conf import settings
 from django.conf.urls import url
 
 from .views.certificate import CertificatesSupportView
 from .views.contact_us import ContactUsView
 from .views.course_entitlements import EntitlementSupportView
 from .views.enrollments import EnrollmentSupportListView, EnrollmentSupportView
-from .views.feature_based_enrollments import FeatureBasedEnrollmentsSupportView
+from .views.feature_based_enrollments import FeatureBasedEnrollmentsSupportView, FeatureBasedEnrollmentSupportAPIView
 from .views.index import index
 from .views.manage_user import ManageUserDetailView, ManageUserSupportView
 from .views.program_enrollments import LinkProgramEnrollmentSupportView, ProgramEnrollmentsInspectorView
@@ -39,6 +39,11 @@ urlpatterns = [
         r'^feature_based_enrollments/?$',
         FeatureBasedEnrollmentsSupportView.as_view(),
         name="feature_based_enrollments"
+    ),
+    url(
+        fr'^feature_based_enrollment_details/{settings.COURSE_ID_PATTERN}$',
+        FeatureBasedEnrollmentSupportAPIView.as_view(),
+        name="feature_based_enrollment_details"
     ),
     url(r'link_program_enrollments/?$', LinkProgramEnrollmentSupportView.as_view(), name='link_program_enrollments'),
     url(
