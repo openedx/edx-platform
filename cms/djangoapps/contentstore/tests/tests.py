@@ -181,7 +181,7 @@ class AuthTestCase(ContentStoreTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="action action-signin" href="/signin_redirect_to_lms?next=http%3A%2F%2Ftestserver%2F">'
+                '<a class="action action-signin" href="/login/?next=http%3A%2F%2Ftestserver%2F">'
                 'Sign In</a>'
             )
 
