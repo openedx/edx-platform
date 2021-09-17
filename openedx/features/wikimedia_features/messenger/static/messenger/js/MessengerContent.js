@@ -14,6 +14,7 @@ import NewMessageModal from './components/newMessageModal';
 export default function MessengerContent({ context }) {
     const [inboxPageNumber, setInboxPageNumber] = useState(1);
     const [messagesPageNumber, setMessagesPageNumber] = useState(1);
+    const [isDrawerShown, setDrawerShown] = useState(false);
 
     const {
         selectedInboxUser,
@@ -47,8 +48,8 @@ export default function MessengerContent({ context }) {
     );
 
     return (
-        <div>
-            <div className = "messenger main-container" >
+        <div className={isDrawerShown ? 'chat-sidebar-open': ''}>
+            <div className="messenger main-container">
                 <Inbox
                     setSelectedInboxUser = { setSelectedInboxUser }
                     inboxList = { inboxList }
@@ -63,7 +64,13 @@ export default function MessengerContent({ context }) {
                     updateLastMessage = { updateLastMessage }
                     lastMessageRef = { lastMessageRef }
                     selectedInboxUser = { selectedInboxUser }
+                    isDrawerShown = { isDrawerShown }
+                    setDrawerShown = { setDrawerShown }
                 />
+                <div
+                    className="chat-overlay"
+                    onClick={() => setDrawerShown(!isDrawerShown)}
+                ></div>
             </div>
             <NewMessageModal
                 createGroupMessages = { createGroupMessages }
