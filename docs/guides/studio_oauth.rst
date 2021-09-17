@@ -1,25 +1,21 @@
 Enabling OAuth for Studio login
 ===============================
 
-Migration guide for edx.org (and anyone else following master) in converting Studio login to use OAuth.
-
-This is a temporary document for Arch-BOM.
+This is a migration guide for converting Studio login to use OAuth, for use in the Lilac to Maple upgrade.
 
 Background
 ----------
 
 As of Lilac, the Studio by default shares a session cookie with the LMS.  This either forces Studio to be on a subdomain of the LMS or the LMS to set its session cookie on a wide domain, which exposes it to a potentially large number of subdomains.
 
-By setting up Studio to use LMS's OAuth2-based single-sign-on (SSO), the cookies (and domains) can be decoupled to improve both flexibility and security.
+Maple's configuration assumes that Studio will use LMS's OAuth2-based single-sign-on (SSO). This means that the cookies (and domains) can be decoupled to improve both flexibility and security. However, there are a few steps to take to finish this configuration (otherwise Studio logins will not work.)
 
 Migration
 ---------
 
-Most of the configuration is already in place, and Studio and LMS just need to be configured in each environment to enable the new flow. (Devstack and sandboxes will autoconfigure for OAuth.)
+Studio and LMS need to be configured in each environment to enable the new flow, with the exception of devstack and sandboxes (which will autoconfigure for OAuth.) Migration involves enabling OAuth and separating the session cookies for LMS and Studio. The session cookie split will require Studio users to log in again.
 
-Migration involves simultaneously enabling OAuth and separating the session cookies for LMS and Studio. This effectively causes a logout for Studio users, although they'll still be logged into LMS and aside from a brief disruption during the mixed-config interval they should not experience many problems.
-
-For each deployed environment (stage, production, etc.):
+Follow these steps for each deployed environment (stage, production, etc.):
 
 #. Register an SSO OAuth2 client in LMS:
 
@@ -28,10 +24,10 @@ For each deployed environment (stage, production, etc.):
      - Go to ``/admin/oauth2_provider/application/add/`` in LMS admin
      - Copy the prepopulated client ID and secret to a secure place
      - Leave the user field empty
-     - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/`` (as well as for any additional domains, such as internally routed domains)
+     - Set redirect URLs to ``<STUDIO_ROOT_URL>/complete/edx-oauth2/`` (as well as for any alternate Studio domain names)
      - Set client type to ``Confidential``
      - Set authorization grant type to ``Authorization code``
-     - Set the name to ``studio-sso``
+     - Set the name to ``studio-sso`` or other name of your choice
      - Select the "Skip authorization" checkbox
 
    - Configure the client's scope:
@@ -49,20 +45,11 @@ For each deployed environment (stage, production, etc.):
     SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT: <server-to-server LMS root URL>  # possibly same as public LMS root URL
     SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT: <public LMS root URL>
 
-#. Configure Studio to initiative OAuth flow and use a separate session cookie::
+#. Configure Studio to initiate OAuth flow and use a separate session cookie::
 
-    LOGIN_URL: /login/  # to activate OAuth functionality
     SESSION_COOKIE_NAME: studio_sessionid
 
-Cleanup
--------
-
-Config and code changes to be performed after all environments are using OAuth flow for Studio.
-
-- Set ``LOGIN_URL`` to ``'/login/'`` in ``cms/envs/common.py``
-- Deploy
-- Remove ``LOGIN_URL`` overrides from all environments (devstack and others)
-- Remove doc (convert to migration instructions for next release)
+This cookie renaming step is also a good opportunity to change ``SESSION_COOKIE_DOMAIN`` if desired, since it allows for a clean transition without having to worry about `flaky behavior driven by order-unstable cookie-sending <https://fwielstra.github.io/2017/03/13/fun-with-cookies-and-subdomains/>`_. Narrowing the domain (or removing it, to keep subdomains from seeing the cookie) may improve the security of your deployment, but the best option depends on the exact layout of your domain names and is beyond the scope of this document.
 
 Declining the migration
 -----------------------
