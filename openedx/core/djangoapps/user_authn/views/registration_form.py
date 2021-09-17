@@ -13,7 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator, ValidationError, slug_re
 from django.forms import widgets
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_countries import countries
 
 from common.djangoapps import third_party_auth

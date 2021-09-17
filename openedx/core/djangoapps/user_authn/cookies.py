@@ -28,8 +28,8 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 log = logging.getLogger(__name__)
 
-
-CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
+# providing_args=['user', 'response']
+CREATE_LOGON_COOKIE = Signal()
 
 
 JWT_COOKIE_NAMES = (
