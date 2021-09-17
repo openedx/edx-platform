@@ -1,7 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from django.apps import AppConfig
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from edx_proctoring.runtime import set_runtime_service
 
 
