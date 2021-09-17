@@ -889,6 +889,19 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 changed[provider_field] = current_value
                 setattr(model, field, provider_value)
 
+        # Generate fullname only for IES IDP.
+        ies_entity_ids = [
+            'https://iam-stage.pearson.com:443/auth/saml-idp-uid',
+            'https://iam.pearson.com:443/auth/saml-idp-uid',
+        ]
+
+        if (details.get('first_name') and details.get('last_name') and
+            current_provider.entity_id in ies_entity_ids):
+            fullname_value = '{} {}'.format(details.get('first_name'), details.get('last_name'))
+            changed['fullname'] = fullname_value
+
+            setattr(user.profile, 'name', fullname_value)
+
         if changed:
             logger.info(
                 '[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '
