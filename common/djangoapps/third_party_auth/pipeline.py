@@ -704,7 +704,8 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
                     pass
                 else:
                     response = redirect(redirect_url)
-                    return user_authn_cookies.set_logged_in_cookies(request, response, user)
+                    # TODO: Fix `/auth/complete/` redirection error (502)
+                    user_authn_cookies.set_logged_in_cookies(request, response, user)
 
 
 @partial.partial
