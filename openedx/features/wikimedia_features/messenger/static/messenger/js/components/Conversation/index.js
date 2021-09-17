@@ -7,9 +7,7 @@ export default function Conversation({
     messagesLoading,
     updateLastMessage,
     lastMessageRef,
-    selectedInboxUser,
-    isDrawerShown,
-    setDrawerShown
+    selectedInboxUser
 }) {
 
     const [message, setMessage] = useState("");
@@ -28,12 +26,6 @@ export default function Conversation({
         <div className="chat-container">
             <div className="chat-header">
                 <h2>{selectedInboxUser}&nbsp;</h2>
-                <button className="hamburger-menu" onClick={() => {setDrawerShown(!isDrawerShown)}}>
-                    <span className="line"></span>
-                    <span className="line"></span>
-                    <span className="line"></span>
-                    <span className="line"></span>
-                </button>
             </div>
             <div className="chat">
                 {selectedInboxMessages && !messagesLoading && selectedInboxMessages.map(

@@ -56,6 +56,8 @@ export default function MessengerContent({ context }) {
                     lastInboxRef = { lastInboxRef }
                     inboxLoading = { inboxLoading }
                     selectedInboxUser = { selectedInboxUser }
+                    isDrawerShown = { isDrawerShown }
+                    setDrawerShown = { setDrawerShown }
                 />
                 <Conversation
                     createMessage = { createMessage }
@@ -64,8 +66,6 @@ export default function MessengerContent({ context }) {
                     updateLastMessage = { updateLastMessage }
                     lastMessageRef = { lastMessageRef }
                     selectedInboxUser = { selectedInboxUser }
-                    isDrawerShown = { isDrawerShown }
-                    setDrawerShown = { setDrawerShown }
                 />
                 <div
                     className="chat-overlay"

@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Spinner from '../../assets/spinner';
 
 export default function Inbox({
-    inboxList, lastInboxRef, inboxLoading, setSelectedInboxUser,
+    inboxList,
+    lastInboxRef,
+    inboxLoading,
+    setSelectedInboxUser,
     selectedInboxUser,
+    isDrawerShown,
+    setDrawerShown
 }) {
+
+    const [searchedUser, setSearchUser] = useState('');
+
     const handleInboxClick = (event) => {
         setSelectedInboxUser(event.currentTarget.dataset.user);
+        setDrawerShown(!isDrawerShown);
     }
 
     return (
@@ -20,9 +29,26 @@ export default function Inbox({
                 </div>
                 <div className="search-box">
                     <span className="fa fa-search"></span>
-                    <input type="text" className="search-field" placeholder="Search Users" />
-                    <span className="fa fa-times-circle"></span>
+                    <input
+                        type="text"
+                        value={searchedUser}
+                        onChange={(e)=>setSearchUser(e.target.value)}
+                        className="search-field"
+                        placeholder="Search Users"
+                    />
+                    {
+                        searchedUser && (
+                            <span
+                                className="fa fa-times-circle"
+                                onClick={() => {setSearchUser('')}}
+                            ></span>
+                        )
+                    }
                 </div>
+                <span
+                    className="fa fa-cog"
+                    onClick={() => {setDrawerShown(!isDrawerShown)}}
+                ></span>
             </div>
             <ul className="inbox-list">
                 {
@@ -36,10 +62,14 @@ export default function Inbox({
                             let setRef = (inboxList.length === index + 1 ) ? true : false;
                             let name = (selectedInboxUser === inbox.with_user) ? "inbox-message active" : "inbox-message";
                             const unreadClass = inbox.unread_count ? 'unread' : '';
+                            const hasProfileImage = inbox.with_user_img.indexOf('default_50') === -1;
                             return (
                                 <li key={index} data-user={inbox.with_user} className={`${name} ${unreadClass}`} ref={setRef ? lastInboxRef : null} onClick={(e)=>handleInboxClick(e)}>
-                                    <img src={inbox.with_user_img} alt={inbox.with_user} />
-                                    <span className="img-placeholder" style={{background: '#a7f9e0'}}>TS</span>
+                                    {
+                                        hasProfileImage
+                                        ? (<img src={inbox.with_user_img} alt={inbox.with_user} />)
+                                        : (<span className="img-placeholder" style={{background: '#a7f9e0'}}>TS</span>)
+                                    }
                                     <div className="about">
                                         <div className="title">
                                             <span className="date">9:45 pm</span>
