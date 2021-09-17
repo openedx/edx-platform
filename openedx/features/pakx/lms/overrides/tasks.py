@@ -20,7 +20,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from openedx.features.pakx.lms.overrides.message_types import CourseProgress
+from openedx.features.pakx.lms.overrides.message_types import ContactUs, CourseProgress
 from openedx.features.pakx.lms.overrides.models import CourseProgressStats
 from openedx.features.pakx.lms.overrides.utils import (
     create_dummy_request,
@@ -77,6 +77,27 @@ def send_reminder_email(data, course_key):
             user_context=message_context
         )
         ace.send(msg)
+
+
+@task(name='send_contact_us_email')
+def send_contact_us_email(data):
+    """
+    A task to send contact us data to support emails
+    :param data: (dict) dict containing data for the email
+    """
+
+    log.info("Sending contact us email to support email ID")
+    site = Site.objects.get_current()
+    message_context = get_base_template_context(site)
+    message_context.update(data)
+
+    recipient = configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL)
+    msg = ContactUs().personalize(
+        recipient=Recipient(recipient),
+        language=settings.LANGUAGE_CODE,
+        user_context=message_context
+    )
+    ace.send(msg)
 
 
 @task(name='add_enrollment_record')

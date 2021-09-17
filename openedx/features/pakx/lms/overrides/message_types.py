@@ -11,3 +11,10 @@ class CourseProgress(BaseMessageType):
         super(CourseProgress, self).__init__(*args, **kwargs)
 
         self.options['transactional'] = True
+
+
+class ContactUs(BaseMessageType):
+    def __init__(self, *args, **kwargs):
+        super(ContactUs, self).__init__(*args, **kwargs)
+
+        self.options['transactional'] = True

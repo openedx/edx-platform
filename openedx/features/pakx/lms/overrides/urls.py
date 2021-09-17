@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import overview_tab_view, business_view
+from .views import ContactUsView, business_view, overview_tab_view
 
 urlpatterns = [
+    url(r'^support/contact_us/?$', ContactUsView.as_view(), name="contact_us"),
     url(
         r'^courses/{course_id}/overview/$'.format(course_id=settings.COURSE_ID_PATTERN),
         overview_tab_view,

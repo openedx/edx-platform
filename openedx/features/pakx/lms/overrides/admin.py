@@ -3,7 +3,7 @@
 from completion.models import BlockCompletion
 from django.contrib import admin
 
-from openedx.features.pakx.lms.overrides.models import CourseProgressStats
+from openedx.features.pakx.lms.overrides.models import ContactUs, CourseProgressStats
 
 
 class BlockCompletionAdmin(admin.ModelAdmin):
@@ -45,3 +45,14 @@ class CourseProgressStatsAdmin(admin.ModelAdmin):
         return obj.enrollment.course.display_name
 
     get_course_name.short_description = 'Course Title'
+
+
+@admin.register(ContactUs)
+class ContactUsAdmin(admin.ModelAdmin):
+    """
+    Admin interface for ContactUs records
+    """
+
+    list_display = ['full_name', 'email', 'phone', 'organization', 'created_by', 'created_at']
+    search_fields = ['created_by', 'name', 'email']
+    list_filter = ['created_at', 'organization']

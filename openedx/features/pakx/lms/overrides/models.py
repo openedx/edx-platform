@@ -1,6 +1,9 @@
 """Django models for overrides app"""
 
+from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import ugettext as _
 
 from student.models import CourseEnrollment
 
@@ -27,3 +30,22 @@ class CourseProgressStats(models.Model):
 
     class Meta:
         verbose_name_plural = 'Course Progress Stats'
+
+
+class ContactUs(models.Model):
+    """
+    Model to store the records of contact us form data
+    """
+    full_name = models.CharField(max_length=24)
+    organization = models.CharField(max_length=40, null=True, blank=True)
+    phone = models.CharField(
+        max_length=16,
+        validators=[RegexValidator(message='Phone number can only contain numbers.', regex='^\\+?1?\\d*$')]
+    )
+    email = models.EmailField()
+    message = models.TextField(verbose_name=_('How can we help you?'))
+    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Contact Us'

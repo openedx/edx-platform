@@ -2,12 +2,16 @@
 
 import waffle
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
-from django.http import Http404
+from django.forms.models import model_to_dict
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -37,6 +41,8 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
+from openedx.features.pakx.lms.overrides.forms import ContactUsForm
+from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
     get_courses_for_user,
@@ -319,3 +325,60 @@ def course_about(request, category, course_id):
 def business_view(request, *args, **kwargs):
     """Business View"""
     return render_to_response('overrides/business.html', {})
+
+
+class ContactUsView(View):
+    """
+    View for viewing and submitting contact us form.
+    """
+
+    def get_context_data(self, request):
+        context = {
+            'tags': ['LMS'],
+            'form': ContactUsForm(),
+            'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+            'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+            'custom_fields': settings.ZENDESK_CUSTOM_FIELDS
+        }
+        if request.user.is_authenticated:
+            context['course_id'] = request.session.get('course_id', '')
+
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
+
+        if request.user.is_authenticated:
+            context['form'] = ContactUsForm(initial={
+                'email': request.user.email,
+                'full_name': request.user.profile.name,
+                'organization': getattr(request.user.profile.organization, 'name', ''),
+            })
+
+        return render_to_response("support/contact_us.html", context)
+
+    def post(self, request):
+        form_data = request.POST.copy()
+
+        form = ContactUsForm(form_data)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            if request.user.is_authenticated:
+                instance.created_by = request.user
+            instance.save()
+
+            email_data = model_to_dict(
+                instance, fields=['full_name', 'email', 'organization', 'phone', 'message']
+            )
+            email_data['form_message'] = email_data.pop('message')
+            send_contact_us_email(email_data)
+
+            messages.success(
+                self.request,
+                _(u'Thanks for contacting us. Our team member will contact you soon.')
+            )
+            return HttpResponseRedirect('/support/contact_us/')
+
+        context = self.get_context_data(request)
+        context['form'] = form
+        return render_to_response("support/contact_us.html", context)
