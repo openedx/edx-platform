@@ -18,7 +18,7 @@ Context
 Decision
 --------
 
-#. edX platform will be configured to emit an event named ``edx.course.grade.passed.first_time`` when a learner passes a course for the first time. Therefore ``edx.course.completed`` will be emitted if the learner has achieved passing grade AND passing timestamp of grade for this learner and course does not exist as seen `here`_.
+#. edX platform will be configured to emit an event named ``edx.course.grade.passed.first_time`` when a learner passes a course for the first time. This event will therefore be emitted when the learner has achieved passing grade AND passing timestamp of grade for this learner and course does not exist as seen `here`_.
 
 #. For LRS consumers who may be interested in knowing whenever a learner passes or fails a course, edX platform will be configured to emit events named ``edx.course.grade.now_passed`` and ``edx.course.grade.now_failed``.
 
