@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
@@ -36,9 +37,6 @@ class CourseGoal(models.Model):
     course_key = CourseKeyField(max_length=255, db_index=True)
     # The goal a user has set for the number of days they want to learn per week
     days_per_week = models.PositiveIntegerField(default=0)
-    # email_reminder_sent = models.BooleanField(
-    #     default=False, help_text='Tracks if the email reminder to complete the Course Goal has been sent this week.'
-    # )
 
     # Controls whether a user will receive emails reminding them to stay on track with their learning goal
     subscribed_to_reminders = models.BooleanField(default=False)
@@ -65,6 +63,21 @@ class CourseGoal(models.Model):
         if self.unsubscribe_token is None:
             self.unsubscribe_token = uuid.uuid4()
         super().save(**kwargs)
+
+
+class CourseGoalReminderStatus(TimeStampedModel):
+    """
+    Tracks whether we've sent a reminder about a particular goal this week.
+
+    See the management command goal_reminder_email for more detail about how this is used.
+    """
+    class Meta:
+        verbose_name_plural = "Course goal reminder statuses"
+
+    goal = models.OneToOneField(CourseGoal, on_delete=models.CASCADE, related_name='reminder_status')
+    email_reminder_sent = models.BooleanField(
+        default=False, help_text='Tracks if the email reminder to complete the Course Goal has been sent this week.'
+    )
 
 
 class UserActivity(models.Model):
