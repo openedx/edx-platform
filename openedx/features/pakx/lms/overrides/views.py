@@ -3,11 +3,11 @@
 import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -19,11 +19,8 @@ from lms.djangoapps.courseware.access_utils import check_public_access
 from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     get_course_with_access,
-    get_courses,
     get_permission_for_course_about,
-    get_studio_url,
-    sort_by_announcement,
-    sort_by_start_date
+    get_studio_url
 )
 from lms.djangoapps.courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.views.index import render_accordion
@@ -34,18 +31,72 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.features.course_experience import course_home_url_name
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
-from openedx.features.pakx.lms.overrides.utils import add_course_progress_to_enrolled_courses
+from openedx.features.pakx.lms.overrides.utils import (
+    add_course_progress_to_enrolled_courses,
+    get_courses_for_user,
+    get_featured_course
+)
 from student.models import CourseEnrollment
 from util.cache import cache_if_anonymous
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
+
+
+# NOTE: This view is not linked to directly--it is called from
+# branding/views.py:index(), which is cached for anonymous users.
+# This means that it should always return the same thing for anon
+# users. (in particular, no switching based on query params allowed)
+def index(request, extra_context=None, user=AnonymousUser()):
+    """
+    Render the edX main page.
+
+    extra_context is used to allow immediate display of certain modal windows, eg signup.
+    """
+    if extra_context is None:
+        extra_context = {}
+    featured_course = get_featured_course()
+
+    courses_for_user = get_courses_for_user(user)
+
+    context = {'courses': courses_for_user, 'featured_course': featured_course,
+               'homepage_overlay_html': configuration_helpers.get_value('homepage_overlay_html'),
+               'show_partners': configuration_helpers.get_value('show_partners', True),
+               'show_homepage_promo_video': configuration_helpers.get_value('show_homepage_promo_video', False),
+               'homepage_course_max': configuration_helpers.get_value(
+                   'HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX
+               )}
+
+    # This appears to be an unused context parameter, at least for the master templates...
+
+    # TO DISPLAY A YOUTUBE WELCOME VIDEO
+    # 1) Change False to True
+
+    # Maximum number of courses to display on the homepage.
+
+    # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via site configuration
+    # Note: This value should be moved into a configuration setting and plumbed-through to the
+    # context via the site configuration workflow, versus living here
+    youtube_video_id = configuration_helpers.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
+    context['homepage_promo_video_youtube_id'] = youtube_video_id
+
+    # allow for theme override of the courses list
+    context['courses_list'] = theming_helpers.get_template_path('courses_list.html')
+
+    # Insert additional context for use in the template
+    context.update(extra_context)
+
+    # Add marketable programs to the context.
+    context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
+
+    return render_to_response('index.html', context)
 
 
 @ensure_csrf_cookie
@@ -78,13 +129,7 @@ def courses(request, section='in-progress'):
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
-
-        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
-            courses_list = sort_by_start_date(courses_list)
-        else:
-            courses_list = sort_by_announcement(courses_list)
+        courses_list = get_courses_for_user(request.user)
 
     # split courses into categories i.e upcoming & in-progress
     in_progress_courses = []
@@ -92,7 +137,6 @@ def courses(request, section='in-progress'):
     completed_courses = []
 
     add_course_progress_to_enrolled_courses(request, courses_list)
-
     show_only_enrolled_courses = waffle.switch_is_active('show_only_enrolled_courses')
 
     for course in courses_list:
@@ -136,7 +180,7 @@ def overview_tab_view(request, course_id=None):
         'user': request.user,
         'course': course,
         'accordion': render_accordion(request, course, course_block_tree, '', '',
-                                      course_experience=course_overview_content.get_course_experience_display())
+                                      course_experience_mode=course_overview_content.get_course_experience_display())
     }
     return render_to_response('courseware/overview.html', context)
 

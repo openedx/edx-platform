@@ -18,11 +18,11 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 import branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
-from openedx.features.pakx.lms.overrides import views as pakx_views
 import student.views
 from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.pakx.lms.overrides import views as pakx_views
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 
@@ -69,7 +69,7 @@ def index(request):
     #  marketing and edge are enabled
 
     try:
-        return student.views.index(request, user=request.user)
+        return pakx_views.index(request, user=request.user)
     except NoReverseMatch:
         log.error(
             'https is not a registered namespace Request from {}'.format(domain),
