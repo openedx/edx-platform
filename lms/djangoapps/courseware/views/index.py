@@ -45,7 +45,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
-from openedx.features.pakx.lms.overrides.utils import get_rtl_class
+from openedx.features.pakx.lms.overrides.utils import get_rtl_class, get_course_mode_and_content_class
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment
@@ -435,12 +435,7 @@ class CoursewareIndex(View):
         staff_access = self.is_staff
         rtl_class = get_rtl_class(self.course.language)
         course_overview = CourseOverview.get_from_id(self.course.id)
-        course_experience_mode = 'Normal'
-        content_class = ''
-        if hasattr(course_overview, 'custom_settings'):
-            custom_settings = course_overview.custom_settings
-            course_experience_mode = custom_settings.get_course_experience_display()
-            content_class = 'video-course-content' if course_experience_mode == 'Video' else ''
+        course_experience_mode, content_class = get_course_mode_and_content_class(course_overview)
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],

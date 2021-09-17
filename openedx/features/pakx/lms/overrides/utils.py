@@ -2,9 +2,9 @@
 
 from datetime import datetime
 from logging import getLogger
-from re import search
 
 from completion.models import BlockCompletion
+from django.conf import settings
 from django.db.models import Case, IntegerField, Sum, When
 from django.db.models.functions import Coalesce
 from opaque_keys.edx.keys import CourseKey
@@ -12,8 +12,15 @@ from six import text_type
 
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
+from lms.djangoapps.courseware.courses import (
+    get_courses,
+    sort_by_announcement,
+    sort_by_start_date
+)
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.request_utils import get_request_or_stub
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
 from student.models import CourseEnrollment
@@ -25,6 +32,55 @@ BLOCK_TYPES_TO_FILTER = [
     'course', 'chapter', 'sequential', 'vertical', 'discussion', 'openassessment', 'pb-mcq', 'pb-answer', 'pb-choice',
     'pb-message'
 ]
+
+
+def get_featured_course():
+    """
+    Get featured course, if feature_course_key is set in Site Configurations
+
+    :returns (CourseOverview): course or None
+    """
+
+    feature_course_key = configuration_helpers.get_value('feature_course_key', None)
+    if feature_course_key:
+        return CourseOverview.get_from_id(CourseKey.from_string(feature_course_key))
+
+
+def get_courses_for_user(user):
+    """
+    get courses for given user object
+
+    :returns [CourseOverview]: List of courses
+    """
+
+    courses = get_courses(user)
+    if configuration_helpers.get_value(
+        "ENABLE_COURSE_SORTING_BY_START_DATE",
+        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
+    ):
+        courses = sort_by_start_date(courses)
+    else:
+        courses = sort_by_announcement(courses)
+    return courses
+
+
+def get_course_mode_and_content_class(course_overview):
+    """
+    get course mode and content class for given course overview
+    :param course_overview: (CourseOverview) course overview object
+
+    :return (str, str): tuple of string
+
+    """
+
+    content_class = ''
+    course_experience_mode = "Normal"
+    if hasattr(course_overview, 'custom_settings'):
+        custom_settings = course_overview.custom_settings
+        course_experience_mode = custom_settings.get_course_experience_display()
+        content_class = 'video-course-content' if course_experience_mode == 'Video' else ''
+
+    return course_experience_mode, content_class
 
 
 def _get_resume_course_info(request, course_id, are_future_start_dates_allowed=False):
