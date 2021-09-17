@@ -11,8 +11,8 @@ import logging
 import eventtracking
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 
 # Default error message for user
-DEFAULT_USER_MESSAGE = ugettext_noop('An error has occurred. Please try again.')
+DEFAULT_USER_MESSAGE = gettext_noop('An error has occurred. Please try again.')
 
 
 class BookmarksPagination(DefaultPagination):
@@ -217,27 +217,27 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         Request data: {"usage_id": <usage-id>}
         """
         if not request.data:
-            return self.error_response(ugettext_noop('No data provided.'), DEFAULT_USER_MESSAGE)
+            return self.error_response(gettext_noop('No data provided.'), DEFAULT_USER_MESSAGE)
 
         usage_id = request.data.get('usage_id', None)
         if not usage_id:
-            return self.error_response(ugettext_noop('Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
+            return self.error_response(gettext_noop('Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
 
         try:
             usage_key = UsageKey.from_string(unquote_slashes(usage_id))
         except InvalidKeyError:
-            error_message = ugettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
+            error_message = gettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, DEFAULT_USER_MESSAGE)
 
         try:
             bookmark = api.create_bookmark(user=self.request.user, usage_key=usage_key)
         except ItemNotFoundError:
-            error_message = ugettext_noop('Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
+            error_message = gettext_noop('Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, DEFAULT_USER_MESSAGE)
         except BookmarksLimitReachedError:
-            error_message = ugettext_noop(
+            error_message = gettext_noop(
                 'You can create up to {max_num_bookmarks_per_course} bookmarks.'
                 ' You must remove some bookmarks before you can add new ones.'
             ).format(max_num_bookmarks_per_course=settings.MAX_BOOKMARKS_PER_COURSE)
@@ -307,7 +307,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         try:
             return UsageKey.from_string(usage_id)
         except InvalidKeyError:
-            error_message = ugettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
+            error_message = gettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
@@ -332,7 +332,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
                 fields=self.fields_to_return(request.query_params)
             )
         except ObjectDoesNotExist:
-            error_message = ugettext_noop(
+            error_message = gettext_noop(
                 'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
@@ -352,7 +352,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         try:
             api.delete_bookmark(user=request.user, usage_key=usage_key_or_response)
         except ObjectDoesNotExist:
-            error_message = ugettext_noop(
+            error_message = gettext_noop(
                 'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
