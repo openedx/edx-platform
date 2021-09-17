@@ -81,7 +81,7 @@ backoff==1.10.0
     #   analytics-python
 backports.entry-points-selectable==1.1.0
     # via virtualenv
-beautifulsoup4==4.9.3
+beautifulsoup4==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -142,7 +142,7 @@ chardet==4.0.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.4
+charset-normalizer==2.0.5
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -371,7 +371,7 @@ django-model-utils==4.1.1
     #   edxval
     #   ora2
     #   super-csv
-django-mptt==0.13.2
+django-mptt==0.13.3
     # via
     #   -r requirements/edx/base.txt
     #   django-wiki
@@ -481,7 +481,7 @@ edx-ace==1.3.1
     # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.txt
-edx-api-doc-tools==1.4.3
+edx-api-doc-tools==1.5.0
     # via -r requirements/edx/base.txt
 edx-auth-backends==3.4.0
     # via
@@ -562,8 +562,9 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==3.24.5
+edx-proctoring==3.24.6
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
@@ -601,6 +602,7 @@ edx-user-state-client==1.3.2
     # via -r requirements/edx/base.txt
 edx-when==2.1.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
 edxval==2.0.3
@@ -618,7 +620,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.1.0
     # via -r requirements/edx/base.txt
-event-tracking==1.1.0
+event-tracking==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-routing-backends
@@ -628,7 +630,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==8.12.1
+faker==8.13.2
     # via factory-boy
 fastapi==0.68.1
     # via pact-python
@@ -879,7 +881,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.5.1
+openedx-events==0.6.0
     # via -r requirements/edx/base.txt
 ora2==3.6.22
     # via -r requirements/edx/base.txt
@@ -1293,7 +1295,7 @@ soupsieve==2.2.1
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   django
@@ -1342,7 +1344,7 @@ toml==0.10.2
     #   pytest
     #   pytest-cov
     #   tox
-tox==3.24.3
+tox==3.24.4
     # via
     #   -r requirements/edx/testing.in
     #   tox-battery
@@ -1393,7 +1395,7 @@ vine==1.3.0
     #   -r requirements/edx/base.txt
     #   amqp
     #   celery
-virtualenv==20.7.2
+virtualenv==20.8.0
     # via tox
 voluptuous==0.12.1
     # via
