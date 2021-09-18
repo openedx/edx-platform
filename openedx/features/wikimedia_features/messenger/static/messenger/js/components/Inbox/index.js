@@ -8,14 +8,24 @@ export default function Inbox({
     setSelectedInboxUser,
     selectedInboxUser,
     isDrawerShown,
-    setDrawerShown
+    setDrawerShown,
+    searchInbox,
+    setSearchInbox
 }) {
 
-    const [searchedUser, setSearchUser] = useState('');
 
     const handleInboxClick = (event) => {
         setSelectedInboxUser(event.currentTarget.dataset.user);
         setDrawerShown(!isDrawerShown);
+    }
+
+    const renderDate = (date_str) => {
+        let date = new Date(date_str).toDateString();
+        let today = new Date().toDateString();
+        let yesterday = (new Date(Date.now() - 86400000 )).toDateString();
+        if (today == date) return "Today";
+        if (yesterday == date) return "Yesterday";
+        return date_str
     }
 
     return (
@@ -31,16 +41,16 @@ export default function Inbox({
                     <span className="fa fa-search"></span>
                     <input
                         type="text"
-                        value={searchedUser}
-                        onChange={(e)=>setSearchUser(e.target.value)}
+                        value={searchInbox}
+                        onChange={(e)=>setSearchInbox(e.target.value)}
                         className="search-field"
                         placeholder="Search Users"
                     />
                     {
-                        searchedUser && (
+                        searchInbox && (
                             <span
                                 className="fa fa-times-circle"
-                                onClick={() => {setSearchUser('')}}
+                                onClick={() => {setSearchInbox('')}}
                             ></span>
                         )
                     }
@@ -72,7 +82,7 @@ export default function Inbox({
                                     }
                                     <div className="about">
                                         <div className="title">
-                                            <span className="date">9:45 pm</span>
+                                            <span className="date">{renderDate(inbox.last_message_date)}</span>
                                             <span className="name">{inbox.with_user}</span>
                                         </div>
                                         <div className="message">

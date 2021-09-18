@@ -54,7 +54,7 @@ class UserInboxManager(models.Manager):
         return super().get_queryset().filter(
             Q(last_message__sender=user) |
             Q(last_message__receiver=user)
-        )
+        ).order_by('-last_message__created')
 
 
 class Inbox(models.Model):

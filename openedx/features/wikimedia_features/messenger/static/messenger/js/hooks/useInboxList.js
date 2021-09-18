@@ -3,23 +3,25 @@ import useClient from "./useClient";
 
 import { toast } from 'react-toastify';
 
-export default function useInboxList(inboxPageNumber, setSelectedInboxUser, context) {
+export default function useInboxList(inboxPageNumber, setSelectedInboxUser, context, setInboxPageNumber, searchInbox) {
     const { client, notification } = useClient();
     const [inboxList, setInboxList] = useState([]);
     const [inboxHasMore, setInboxHasMore] = useState(false);
     const [inboxLoading, setInboxLoading] = useState(false);
 
-    const fetchInboxList = async() => {
+    const fetchInboxList = async(pageNumber) => {
         try {
             setInboxLoading(true);
-            const inboxListData = (await client.get(`${context.INBOX_URL}?page=${inboxPageNumber}`)).data;
+            const inboxListData = (await client.get(`${context.INBOX_URL}?page=${pageNumber}&search=${searchInbox}`)).data;
             if (inboxListData) {
-                setInboxList((previousList) => [...previousList, ...inboxListData.results]);
-                setInboxHasMore(inboxPageNumber < inboxListData.num_pages);
-
-                if (inboxPageNumber == 1 && inboxListData.results.length) {
-                    setSelectedInboxUser(inboxListData.results[0].with_user);
+                if (pageNumber == 1) {
+                    if (inboxListData.results.length) setSelectedInboxUser(inboxListData.results[0].with_user);
+                    setInboxList(inboxListData.results);
+                } else {
+                    setInboxList((previousList) => [...previousList, ...inboxListData.results]);
                 }
+                setInboxHasMore(pageNumber < inboxListData.num_pages);
+
             }
             setInboxLoading(false);
         } catch (e) {
@@ -29,7 +31,20 @@ export default function useInboxList(inboxPageNumber, setSelectedInboxUser, cont
     }
 
     useEffect(() => {
-        fetchInboxList()
+        setInboxLoading(true);
+        const delayDebounceFetch= setTimeout(() => {
+            setInboxPageNumber(1);
+            fetchInboxList(1);
+          }, 3000)
+          return () => clearTimeout(delayDebounceFetch)
+    }, [searchInbox]);
+
+    useEffect(() => {
+        fetchInboxList(1);
+    }, []);
+
+    useEffect(() => {
+        if (inboxPageNumber > 1) fetchInboxList(inboxPageNumber)
     }, [inboxPageNumber]);
 
     return { inboxList, setInboxList, inboxLoading, inboxHasMore };

@@ -27,7 +27,7 @@ export default function useCreateUpdateMessages(
         }
     }
 
-    const createGroupMessages = async(message, users) => {
+    const createGroupMessages = async(message, setMessage, users) => {
         try {
             const UpdatedInbox = (await client.post(context.BULK_MESSAGE_URL, {
                 receivers: users.map((user) => user.id),
@@ -36,6 +36,7 @@ export default function useCreateUpdateMessages(
 
             updateInboxList(UpdatedInbox);
             updateOpenedConversation(message, users);
+            setMessage("");
             notification(toast.success, "Message(s) have been sent.");
         } catch (e) {
             notification(toast.error, "Error in sending messages. Please try again!");
@@ -44,22 +45,9 @@ export default function useCreateUpdateMessages(
     }
 
     const updateInboxList = (UpdatedInbox ) => {
-        let newlyCreatedInbox = [];
-        let newList = inboxList.map((inbox) => inbox);
-        UpdatedInbox.forEach((newInbox) => {
-            let existingInbox = inboxList.find((inbox) => inbox.id === newInbox.id);
-            if (existingInbox) {
-                newList = newList.map((inbox) => {
-                    return inbox.id == newInbox.id ? newInbox : inbox;
-                });
-            } else {
-                newlyCreatedInbox.push(newInbox);
-            }
-        });
-
-        if (newlyCreatedInbox) {
-            newList = [...newlyCreatedInbox, ...newList];
-        }
+        let UpdatedInboxIds = UpdatedInbox.map(inbox => inbox.id)
+        let newList = inboxList.filter((inbox) => !UpdatedInboxIds.includes(inbox.id))
+        newList = [...UpdatedInbox, ...newList];
         setInboxList(newList);
     }
 

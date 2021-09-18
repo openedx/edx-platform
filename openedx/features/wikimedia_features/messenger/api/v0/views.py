@@ -4,6 +4,7 @@ Views for Messenger v0 API(s)
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from rest_framework import generics
+from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -100,6 +101,8 @@ class InboxView(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = InboxSerializer
     pagination_class = MesssengerResultsSetPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['last_message__sender__username', 'last_message__receiver__username']
 
     def get_queryset(self):
         return Inbox.user_inbox.find_all(self.request.user)
