@@ -80,8 +80,6 @@ class ProgramDetailsView extends Backbone.View {
       completedCount,
       completeProgramURL: buyButtonUrl,
       programDiscussionEnabled: this.options.programDiscussionEnabled,
-      industryPathways: this.options.industryPathways,
-      creditPathways: this.options.creditPathways,
       discussionFragment: this.options.discussionFragment,
     };
     data = $.extend(data, this.programModel.toJSON());
