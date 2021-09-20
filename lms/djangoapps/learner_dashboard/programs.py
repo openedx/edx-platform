@@ -74,6 +74,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
+    DEFAULT_ROLE = 'student'
 
     @staticmethod
     def get_program_discussion_configuration(program_uuid):
@@ -104,7 +105,8 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         user_id = str(request.user.id)
         context_id = program_uuid
         resource_link_id = self._get_resource_link_id(program_uuid, request)
-        roles = 'student'
+        # TODO: Add support for multiple roles
+        roles = self.DEFAULT_ROLE
         context_title = program_uuid
         result_sourcedid = self._get_result_sourcedid(context_id, resource_link_id, user_id)
 
@@ -124,32 +126,32 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         """
         Returns the program discussion fragment if program discussions configuration exists for a program uuid
         """
-        program_discussions_configuration = self.get_program_discussion_configuration(program_uuid)
-        if program_discussions_is_enabled() and program_discussions_configuration:
-            lti_embed_html = self._get_lti_embed_code(program_discussions_configuration, request)
-            fragment = Fragment(
-                HTML(
-                    """
-                    <iframe
-                        id='lti-tab-embed'
-                        style='width: 100%; min-height: 800px; border: none'
-                        srcdoc='{srcdoc}'
-                     >
-                    </iframe>
-                    """
-                ).format(
-                    srcdoc=lti_embed_html
+        if program_discussions_is_enabled():
+            program_discussions_configuration = self.get_program_discussion_configuration(program_uuid)
+            if program_discussions_configuration:
+                lti_embed_html = self._get_lti_embed_code(program_discussions_configuration, request)
+                fragment = Fragment(
+                    HTML(
+                        """
+                        <iframe
+                            id='lti-tab-embed'
+                            style='width: 100%; min-height: 800px; border: none'
+                            srcdoc='{srcdoc}'
+                         >
+                        </iframe>
+                        """
+                    ).format(
+                        srcdoc=lti_embed_html
+                    )
                 )
-            )
-            return {
-                'iframe': fragment.content,
-                'enabled': True
-            }
-        else:
-            return {
-                'iframe': '',
-                'enabled': False
-            }
+                return {
+                    'iframe': fragment.content,
+                    'enabled': True
+                }
+        return {
+            'iframe': '',
+            'enabled': False
+        }
 
     def render_to_fragment(self, request, program_uuid, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """View details about a specific program."""
