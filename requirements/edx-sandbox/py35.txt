@@ -51,7 +51,7 @@ networkx==2.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py35.in
-nltk==3.6.2
+nltk==3.6.3
     # via
     #   -r requirements/edx-sandbox/py35.in
     #   chem
@@ -103,7 +103,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/py35-constraints.txt
     #   -r requirements/edx-sandbox/py35.in
     #   symmath
-tqdm==4.62.2
+tqdm==4.62.3
     # via nltk
 
 # The following packages are considered to be unsafe in a requirements file:
