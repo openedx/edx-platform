@@ -12,6 +12,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import TieredCache
 from model_utils import Choices
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
@@ -71,6 +72,21 @@ class CourseGoal(models.Model):
         if self.unsubscribe_token is None:
             self.unsubscribe_token = uuid.uuid4()
         super().save(**kwargs)
+
+
+class CourseGoalReminderStatus(TimeStampedModel):
+    """
+    Tracks whether we've sent a reminder about a particular goal this week.
+
+    See the management command goal_reminder_email for more detail about how this is used.
+    """
+    class Meta:
+        verbose_name_plural = "Course goal reminder statuses"
+
+    goal = models.OneToOneField(CourseGoal, on_delete=models.CASCADE, related_name='reminder_status')
+    email_reminder_sent = models.BooleanField(
+        default=False, help_text='Tracks if the email reminder to complete the Course Goal has been sent this week.'
+    )
 
 
 class UserActivity(models.Model):
