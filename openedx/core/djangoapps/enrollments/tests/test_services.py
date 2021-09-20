@@ -7,9 +7,9 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -28,7 +28,7 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
             CourseMode.PROFESSIONAL,
             CourseMode.VERIFIED
         ]
-        self.course = CourseFactory.create(enable_proctored_exams=True)
+        self.course = CourseOverviewFactory.create(enable_proctored_exams=True)
 
         for index in range(len(self.course_modes)):
             course_mode = self.course_modes[index]
@@ -74,7 +74,7 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         """
         Test that an empty list is returned if a course has no enrollments
         """
-        course = CourseFactory.create(enable_proctored_exams=True)
+        course = CourseOverviewFactory.create(enable_proctored_exams=True)
 
         enrollments = self.service.get_enrollments_can_take_proctored_exams(str(course.id))  # pylint: disable=no-member
 
@@ -82,7 +82,7 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
 
     def test_get_enrollments_can_take_proctored_exams_allow_honor(self):
         self.course.proctoring_provider = 'test'
-        self.store.update_item(self.course, self.user.id)
+        self.course.save()
 
         mock_proctoring_backend = {
             'test': {
@@ -104,7 +104,7 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
 
     def test_get_enrollments_can_take_proctored_exams_not_enable_proctored_exams(self):
         self.course.enable_proctored_exams = False
-        self.store.update_item(self.course, self.user.id)
+        self.course.save()
 
         enrollments = self.service.get_enrollments_can_take_proctored_exams(str(self.course.id))
 
@@ -170,7 +170,7 @@ class EnrollmentsServicePerformanceTests(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.service = EnrollmentsService()
-        self.course = CourseFactory.create(enable_proctored_exams=True)
+        self.course = CourseOverviewFactory.create(enable_proctored_exams=True)
         self.course_modes = [
             CourseMode.AUDIT,
             CourseMode.EXECUTIVE_EDUCATION,
