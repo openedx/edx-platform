@@ -4,7 +4,7 @@ Urls for pakx lms apps
 from django.conf import settings
 from django.conf.urls import include, url
 
-from openedx.features.pakx.lms.overrides.views import course_about, courses
+from openedx.features.pakx.lms.overrides.views import course_about_category, courses
 
 pakx_url_patterns = [
     # URL for overrides app
@@ -25,7 +25,7 @@ pakx_url_patterns = [
             category=r'(?P<category>[a-z-]+)',
             course_id=settings.COURSE_ID_PATTERN,
         ),
-        course_about,
+        course_about_category,
         name='about_course_with_category',
     ),
 

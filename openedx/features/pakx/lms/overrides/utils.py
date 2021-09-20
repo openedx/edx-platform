@@ -83,7 +83,7 @@ def get_course_mode_and_content_class(course_overview):
     return course_experience_mode, content_class
 
 
-def _get_resume_course_info(request, course_id, are_future_start_dates_allowed=False):
+def get_resume_course_info(request, course_id, are_future_start_dates_allowed=False):
     """
     adds information relevant to resume course functionality to the given course model and progress
 
@@ -128,7 +128,7 @@ def add_course_progress_to_enrolled_courses(request, courses_list):
         course.user_progress = '0'
         if is_enrolled:
             course_id = text_type(course.id)
-            has_visited_course, resume_course_url, resume_course_title = _get_resume_course_info(
+            has_visited_course, resume_course_url, resume_course_title = get_resume_course_info(
                 request, course_id, True
             )
             course.user_progress = get_course_progress_percentage(request, course_id)
