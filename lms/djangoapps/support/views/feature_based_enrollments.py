@@ -2,18 +2,17 @@
 Support tool for viewing course duration information
 """
 
-
-from django.core.exceptions import ObjectDoesNotExist
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import GenericAPIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from lms.djangoapps.support.views.utils import get_course_duration_info
 
 
 class FeatureBasedEnrollmentsSupportView(View):
@@ -29,7 +28,7 @@ class FeatureBasedEnrollmentsSupportView(View):
         course_key = request.GET.get('course_key', '')
 
         if course_key:
-            results = self._get_course_duration_info(course_key)
+            results = get_course_duration_info(course_key)
         else:
             results = {}
 
@@ -38,35 +37,40 @@ class FeatureBasedEnrollmentsSupportView(View):
             'results': results,
         })
 
-    def _get_course_duration_info(self, course_key):
+
+class FeatureBasedEnrollmentSupportAPIView(GenericAPIView):
+    """
+    Support-only API View for getting feature based enrollment configuration details
+    for a course.
+    """
+    authentication_classes = (
+        JwtAuthentication, SessionAuthentication
+    )
+    permission_classes = (IsAuthenticated,)
+
+    @method_decorator(require_support_permission)
+    def get(self, request, course_id):
         """
-        Fetch course duration information from database
+        Returns the duration config information if FBE is enabled. If
+        FBE is not enabled, empty dict is returned.
+
+        * Example Request:
+            - GET /support/feature_based_enrollment_details/<course_id>
+
+        * Example Response:
+            {
+              "course_id": <course_id>,
+              "course_name": "FBE course",
+              "gating_config": {
+                "enabled": true,
+                "enabled_as_of": "2030-01-01 00:00:00+00:00",
+                "reason": "Site"
+              },
+              "duration_config": {
+                "enabled": true,
+                "enabled_as_of": "2030-01-01 00:00:00+00:00",
+                "reason": "Site"
+              }
+            }
         """
-        try:
-            key = CourseKey.from_string(course_key)
-            course = CourseOverview.objects.values('display_name').get(id=key)
-            duration_config = CourseDurationLimitConfig.current(course_key=key)
-            gating_config = ContentTypeGatingConfig.current(course_key=key)
-            duration_enabled = CourseDurationLimitConfig.enabled_for_course(course_key=key)
-            gating_enabled = ContentTypeGatingConfig.enabled_for_course(course_key=key)
-
-            gating_dict = {
-                'enabled': gating_enabled,
-                'enabled_as_of': str(gating_config.enabled_as_of) if gating_config.enabled_as_of else 'N/A',
-                'reason': gating_config.provenances['enabled'].value
-            }
-            duration_dict = {
-                'enabled': duration_enabled,
-                'enabled_as_of': str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A',
-                'reason': duration_config.provenances['enabled'].value
-            }
-
-            return {
-                'course_id': course_key,
-                'course_name': course.get('display_name'),
-                'gating_config': gating_dict,
-                'duration_config': duration_dict,
-            }
-
-        except (ObjectDoesNotExist, InvalidKeyError):
-            return {}
+        return JsonResponse(get_course_duration_info(course_id))

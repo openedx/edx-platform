@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-12 20:51+0000\n"
-"PO-Revision-Date: 2021-09-12 20:51:38.731583\n"
+"POT-Creation-Date: 2021-09-19 20:51+0000\n"
+"PO-Revision-Date: 2021-09-19 20:51:57.480775\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -6290,6 +6290,8 @@ msgstr ""
 "Pléäsé çhéçk thé sýntäx öf ýöür éntrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#. Translators: This string is used across Open edX installations
+#. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
 msgid "Take free online courses at edX.org"
 msgstr ""
@@ -12408,6 +12410,7 @@ msgstr "Kéép léärnïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on "
@@ -12420,6 +12423,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on %(platform_name)s? We do, "
@@ -14108,30 +14112,6 @@ msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr ""
 "Ýöü hävé üséd {attempts} öf ünlïmïtéd ättémpts för thïs prößlém. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
-msgstr ""
-"Rémémßér whén ýöü énrölléd ïn %(course_name)s, änd öthér çöürsés ön édX.örg?"
-" Wé dö, änd wé’ré gläd tö hävé ýöü! Çömé séé whät évérýöné ïs léärnïng. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
-
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
-msgstr ""
-"Rémémßér whén ýöü énrölléd ïn %(course_name)s ön édX.örg? Wé dö, änd wé’ré "
-"gläd tö hävé ýöü! Çömé séé whät évérýöné ïs léärnïng. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -17733,9 +17713,10 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/bulk_email/unsubscribe_success.html
-msgid "{link_start}Return to edX.org{link_end}"
+msgid "{link_start}Return to {platform_name}{link_end}"
 msgstr ""
-"{link_start}Rétürn tö édX.örg{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"{link_start}Rétürn tö {platform_name}{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт,#"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -18582,6 +18563,77 @@ msgstr ""
 "єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
 "νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ#"
 
+#: lms/templates/course_modes/fbe.html lms/templates/course_modes/unfbe.html
+msgid ""
+"Showcase a {link_start}verified certificate{link_end} of completion on your "
+"resumé to advance your career"
+msgstr ""
+"Shöwçäsé ä {link_start}vérïfïéd çértïfïçäté{link_end} öf çömplétïön ön ýöür "
+"résümé tö ädvänçé ýöür çäréér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/course_modes/fbe.html
+msgid ""
+"Get {start_bold}access to all course activities{end_bold}, including both "
+"graded and non-graded assignments, while the course is running"
+msgstr ""
+"Gét {start_bold}äççéss tö äll çöürsé äçtïvïtïés{end_bold}, ïnçlüdïng ßöth "
+"grädéd änd nön-grädéd ässïgnménts, whïlé thé çöürsé ïs rünnïng Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/course_modes/fbe.html
+msgid "Show more"
+msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/course_modes/fbe.html
+msgid ""
+"{start_bold}Full access{end_bold} to course content and materials, even "
+"after the course ends"
+msgstr ""
+"{start_bold}Füll äççéss{end_bold} tö çöürsé çöntént änd mätérïäls, évén "
+"äftér thé çöürsé énds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/course_modes/fbe.html
+msgid "{link_start}Learn more{link_end} about course access"
+msgstr ""
+"{link_start}Léärn möré{link_end} äßöüt çöürsé äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/course_modes/fbe.html lms/templates/course_modes/unfbe.html
+msgid ""
+"Support our {start_bold}mission{end_bold} to increase access to high-quality"
+" education for everyone, everywhere"
+msgstr ""
+"Süppört öür {start_bold}mïssïön{end_bold} tö ïnçréäsé äççéss tö hïgh-qüälïtý"
+" édüçätïön för évérýöné, évérýwhéré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/course_modes/fbe.html
+msgid ""
+"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
+"including discussion forums and non-graded assignments"
+msgstr ""
+"Gét témpörärý äççéss tö  {start_bold}nön-grädéd{end_bold} äçtïvïtïés, "
+"ïnçlüdïng dïsçüssïön förüms änd nön-grädéd ässïgnménts Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕι#"
+
+#: lms/templates/course_modes/fbe.html
+msgid ""
+"Get {start_bold}temporary access{end_bold} to the course material, including"
+" videos and readings"
+msgstr ""
+"Gét {start_bold}témpörärý äççéss{end_bold} tö thé çöürsé mätérïäl, ïnçlüdïng"
+" vïdéös änd réädïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/course_modes/fbe.html
+msgid "Access expires and all progress will be lost on"
+msgstr ""
+"Àççéss éxpïrés änd äll prögréss wïll ßé löst ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/course_modes/fbe.html
+msgid "Access expires and all progress will be lost"
+msgstr ""
+"Àççéss éxpïrés änd äll prögréss wïll ßé löst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
 #: lms/templates/course_modes/track_selection.html
 msgid "Enroll In {course_name} | Upgrade Now"
 msgstr ""
@@ -18591,48 +18643,6 @@ msgstr ""
 msgid "Choose a path for your course in"
 msgstr ""
 "Çhöösé ä päth för ýöür çöürsé ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"Showcase a {link_start}verified certificate{link_end} of completion on your "
-"resumé to advance your career"
-msgstr ""
-"Shöwçäsé ä {link_start}vérïfïéd çértïfïçäté{link_end} öf çömplétïön ön ýöür "
-"résümé tö ädvänçé ýöür çäréér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"Get {start_bold}access to all course activities{end_bold}, including both "
-"graded and non-graded assignments, while the course is running"
-msgstr ""
-"Gét {start_bold}äççéss tö äll çöürsé äçtïvïtïés{end_bold}, ïnçlüdïng ßöth "
-"grädéd änd nön-grädéd ässïgnménts, whïlé thé çöürsé ïs rünnïng Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "Show more"
-msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"{start_bold}Full access{end_bold} to course content and materials, even "
-"after the course ends"
-msgstr ""
-"{start_bold}Füll äççéss{end_bold} tö çöürsé çöntént änd mätérïäls, évén "
-"äftér thé çöürsé énds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "{link_start}Learn more{link_end} about course access"
-msgstr ""
-"{link_start}Léärn möré{link_end} äßöüt çöürsé äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"Support our {start_bold}non-profit mission{end_bold} to increase access to "
-"high-quality education for everyone, everywhere"
-msgstr ""
-"Süppört öür {start_bold}nön-pröfït mïssïön{end_bold} tö ïnçréäsé äççéss tö "
-"hïgh-qüälïtý édüçätïön för évérýöné, évérýwhéré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/course_modes/track_selection.html
 msgid ""
@@ -18646,34 +18656,15 @@ msgstr ""
 msgid "Access this course"
 msgstr "Àççéss thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"Get temporary access to  {start_bold}non-graded{end_bold} activities, "
-"including discussion forums and non-graded assignments"
+#: lms/templates/course_modes/unfbe.html
+msgid "Get access to the course material, including videos and readings"
 msgstr ""
-"Gét témpörärý äççéss tö  {start_bold}nön-grädéd{end_bold} äçtïvïtïés, "
-"ïnçlüdïng dïsçüssïön förüms änd nön-grädéd ässïgnménts Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕι#"
+"Gét äççéss tö thé çöürsé mätérïäl, ïnçlüdïng vïdéös änd réädïngs Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/templates/course_modes/track_selection.html
-msgid ""
-"Get {start_bold}temporary access{end_bold} to the course material, including"
-" videos and readings"
-msgstr ""
-"Gét {start_bold}témpörärý äççéss{end_bold} tö thé çöürsé mätérïäl, ïnçlüdïng"
-" vïdéös änd réädïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "Access expires and all progress will be lost on"
-msgstr ""
-"Àççéss éxpïrés änd äll prögréss wïll ßé löst ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/course_modes/track_selection.html
-msgid "Access expires and all progress will be lost"
-msgstr ""
-"Àççéss éxpïrés änd äll prögréss wïll ßé löst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+#: lms/templates/course_modes/unfbe.html
+msgid "Some graded content may be lost"
+msgstr "Sömé grädéd çöntént mäý ßé löst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
@@ -20715,10 +20706,12 @@ msgstr ""
 msgid "A Note to Learners"
 msgstr "À Nöté tö Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Dear edX Learner,"
 msgstr "Déär édX Léärnér, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "EdX Financial Assistance is a program we created to give learners in all "
@@ -20734,6 +20727,7 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "If you are interested in working toward a Verified Certificate, but cannot "
@@ -20749,6 +20743,7 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя.#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "In order to be eligible for edX Financial Assistance, you must demonstrate "
@@ -20764,6 +20759,7 @@ msgstr ""
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ є#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "If your application is approved, we'll give you instructions for verifying "
@@ -20779,6 +20775,7 @@ msgstr ""
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυη#"
 
+#. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "EdX is committed to making it possible for you to take high quality courses "
@@ -20794,6 +20791,8 @@ msgstr ""
 "αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
 "ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт#"
 
+#. Translators: This string will not be used in Open edX installations. Do not
+#. translate the name "Anant".
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Sïnçérélý, Ànänt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"

@@ -246,8 +246,7 @@ ${HTML(fragment.foot_html())}
             </div>
         </header>
 
-        <main id="main" tabindex="-1" aria-label="Content"
-        data-is-verified-name-enabled="${is_verified_name_enabled}">
+        <main id="main" tabindex="-1" aria-label="Content">
             % if getattr(course, 'entrance_exam_enabled') and \
                getattr(course, 'entrance_exam_minimum_score_pct') and \
                entrance_exam_current_score is not UNDEFINED:

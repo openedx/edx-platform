@@ -66,8 +66,7 @@ from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import (
     courseware_legacy_is_visible,
-    courseware_mfe_is_advertised,
-    is_verified_name_enabled_for_course
+    courseware_mfe_is_advertised
 )
 from .views import CourseTabView
 
@@ -445,8 +444,7 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
-            'show_search': show_search,
-            'is_verified_name_enabled': is_verified_name_enabled_for_course(self.course.id),
+            'show_search': show_search
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

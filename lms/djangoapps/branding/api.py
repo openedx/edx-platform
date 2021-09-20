@@ -112,6 +112,8 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
                    "&utm_source=opensource-partner"
                    "&utm_content=open-edx-partner-footer-link"
                    "&utm_campaign=open-edx-footer",
+            # Translators: This string is used across Open edX installations
+            # as a callback to edX. Please do not translate `edX.org`
             "text": _("Take free online courses at edX.org"),
         },
     }

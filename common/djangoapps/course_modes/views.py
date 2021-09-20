@@ -139,14 +139,11 @@ class ChooseModeView(View):
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            return redirect(reverse('dashboard'))
+            return self._redirect_to_course_or_dashboard(course, course_key, request.user)
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
-            # If the course has started redirect to course home instead
-            if course.has_started():
-                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return self._redirect_to_course_or_dashboard(course, course_key, request.user)
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(str(course_key), None)
@@ -258,15 +255,18 @@ class ChooseModeView(View):
             context['audit_access_deadline'] = formatted_audit_access_date
         fbe_is_on = deadline and gated_content
 
+        # Route to correct Track Selection page.
         # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
         # and happy path version is ready to be rolled out to all users.
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
-            # First iteration of happy path does not handle errors. If there are enrollment errors for a learner that is
-            # technically considered happy path, old Track Selection page will be displayed.
-            if not error:
-                # Happy path conditions.
-                if verified_mode and fbe_is_on and not enterprise_customer:
-                    return render_to_response("course_modes/track_selection.html", context)
+            if not error:  # TODO: Remove by executing REV-2355
+                if not enterprise_customer:  # TODO: Remove by executing REV-2342
+                    if fbe_is_on:
+                        return render_to_response("course_modes/fbe.html", context)
+                    else:
+                        return render_to_response("course_modes/unfbe.html", context)
+
+        # If error or enterprise_customer, failover to old choose.html page
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
@@ -309,17 +309,11 @@ class ChooseModeView(View):
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
             CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
-            # If the course has started redirect to course home instead
-            if course.has_started():
-                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return self._redirect_to_course_or_dashboard(course, course_key, user)
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
-            # If the course has started redirect to course home instead
-            if course.has_started():
-                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return self._redirect_to_course_or_dashboard(course, course_key, user)
 
         mode_info = allowed_modes[requested_mode]
 
@@ -365,6 +359,24 @@ class ChooseModeView(View):
             return 'audit'
         else:
             return None
+
+    def _redirect_to_course_or_dashboard(self, course, course_key, user):
+        """Perform a redirect to the course if the user is able to access the course.
+
+        If the user is not able to access the course, redirect the user to the dashboard.
+
+        Args:
+            course: modulestore object for course
+            course_key: course_id converted to a course_key
+            user: request.user, the current user for the request
+
+        Returns:
+            302 to the course if possible or the dashboard if not.
+        """
+        if course.has_started() or user.is_staff:
+            return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+        else:
+            return redirect(reverse('dashboard'))
 
 
 def create_mode(request, course_id):
