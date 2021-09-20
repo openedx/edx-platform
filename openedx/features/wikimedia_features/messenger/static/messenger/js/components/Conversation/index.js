@@ -31,9 +31,15 @@ export default function Conversation({
                 {selectedInboxMessages && !messagesLoading && selectedInboxMessages.map(
                     (message, index) => {
                         let setRef = (selectedInboxMessages.length === index + 1 ) ? true : false;
+                        const hasProfileImage = message.sender_img.indexOf('default_50') === -1;
+                        const profileName = `${message.sender[0]}${message.sender.split(' ')[1] ? message.sender.split(' ')[1][0] : message.sender[1]}`;
                         return (
                             <div className="chat-row" key={index} ref={setRef ? lastMessageRef : null}>
-                                <img src={message.sender_img} alt={message.sender} />
+                                {
+                                    hasProfileImage
+                                    ? (<img src={message.sender_img} alt={message.sender} />)
+                                    : (<span className="img-placeholder" style={{background: '#a7f9e0'}}>{profileName}</span>)
+                                }
                                 <div className="chat-detail">
                                     <span className="msg-sender">{message.sender}</span>
                                     <span className="chat-time">{message.created}</span>

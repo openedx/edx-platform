@@ -73,12 +73,13 @@ export default function Inbox({
                             let name = (selectedInboxUser === inbox.with_user) ? "inbox-message active" : "inbox-message";
                             const unreadClass = inbox.unread_count ? 'unread' : '';
                             const hasProfileImage = inbox.with_user_img.indexOf('default_50') === -1;
+                            const profileName = `${inbox.with_user[0]}${inbox.with_user.split(' ')[1] ? inbox.with_user.split(' ')[1][0] : inbox.with_user[1]}`;
                             return (
                                 <li key={index} data-user={inbox.with_user} className={`${name} ${unreadClass}`} ref={setRef ? lastInboxRef : null} onClick={(e)=>handleInboxClick(e)}>
                                     {
                                         hasProfileImage
                                         ? (<img src={inbox.with_user_img} alt={inbox.with_user} />)
-                                        : (<span className="img-placeholder" style={{background: '#a7f9e0'}}>TS</span>)
+                                        : (<span className="img-placeholder" style={{background: '#a7f9e0'}}>{profileName}</span>)
                                     }
                                     <div className="about">
                                         <div className="title">
