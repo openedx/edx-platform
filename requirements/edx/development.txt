@@ -150,7 +150,7 @@ chardet==4.0.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.5
+charset-normalizer==2.0.6
     # via
     #   -r requirements/edx/testing.txt
     #   requests
@@ -327,7 +327,6 @@ django-config-models==2.2.0
     #   edx-event-routing-backends
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cookies-samesite==0.9.0
     # via -r requirements/edx/testing.txt
 django-cors-headers==3.2.0
     # via
@@ -688,7 +687,7 @@ gitdb==4.0.7
     # via
     #   -r requirements/edx/testing.txt
     #   gitpython
-gitpython==3.1.18
+gitpython==3.1.24
     # via
     #   -r requirements/edx/testing.txt
     #   transifex-client
@@ -864,7 +863,7 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   xblock
-maxminddb==2.0.3
+maxminddb==2.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   geoip2
@@ -907,7 +906,7 @@ newrelic==6.10.0.165
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
-nltk==3.6.2
+nltk==3.6.3
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1465,6 +1464,7 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
+    #   gitpython
     #   mypy
     #   pydantic
 ua-parser==0.10.0
