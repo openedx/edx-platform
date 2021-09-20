@@ -188,6 +188,7 @@ class StatusDisplayStrings(object):
     #### EOL ####
     _STATUS_MAP["vimeo_encoding"] = _IN_PROGRESS
     _STATUS_MAP["vimeo_upload"] = _IN_PROGRESS
+    _STATUS_MAP["vimeo_not_found"] = 'Video no encontrado'
     _STATUS_MAP["vimeo_patch_failed"] = 'Error Patch'
     #### END EOL ####
     @staticmethod
