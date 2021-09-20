@@ -111,7 +111,10 @@
                     value="<%- defaultValue %>"
             />
             <% if ( type === 'password') { %>
-                <span toggle="#login-password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                <span toggle="#login-password" class="fa fa-fw fa-eye field-icon toggle-password">
+                    <span class="pass-tooltip show-pass">Show Password</span>
+                    <span class="pass-tooltip hidde-pass">Hide Password</span>
+                </span>
             <% } %>
         </div>
         <% if ( type === 'checkbox' ) { %>
