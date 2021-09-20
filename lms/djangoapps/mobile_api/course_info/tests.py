@@ -5,13 +5,21 @@ Tests for course_info
 
 import ddt
 from django.conf import settings
+from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from rest_framework.test import APIClient
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
@@ -219,3 +227,54 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         self.course.mobile_available = True
         self.store.update_item(self.course, self.user.id)
         self.login_and_enroll()
+
+
+@override_waffle_flag(RECORD_USER_ACTIVITY_FLAG, active=True)
+class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCase):
+    """
+    Testing the Course Goals User Activity API.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.apiUrl = reverse('record_user_activity', args=['v1'])
+        self.login_and_enroll()
+
+    def test_record_activity(self):
+        '''
+        Test the happy path of recording user activity
+        '''
+        post_data = {
+            'course_key': self.course.id,
+            'user_id': self.user.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 200
+
+    def test_invalid_parameters(self):
+        '''
+        Ensure that we check that parameters meet the requirements
+        and return a 400 otherwise.
+        '''
+        post_data = {
+            'course_key': self.course.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400
+
+        post_data = {
+            'user_id': self.user.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400
+
+        post_data = {
+            'user_id': self.user.id,
+            'course_key': 'invalidcoursekey',
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400

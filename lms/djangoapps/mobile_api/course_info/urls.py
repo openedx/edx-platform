@@ -6,7 +6,7 @@ URLs for course_info API
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import CourseHandoutsList, CourseUpdatesList
+from .views import CourseHandoutsList, CourseUpdatesList, CourseGoalsRecordUserActivity
 
 urlpatterns = [
     url(
@@ -19,4 +19,5 @@ urlpatterns = [
         CourseUpdatesList.as_view(),
         name='course-updates-list'
     ),
+    url(r'^record_user_activity$', CourseGoalsRecordUserActivity.as_view(), name='record_user_activity'),
 ]

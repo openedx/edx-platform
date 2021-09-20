@@ -3,13 +3,21 @@ Course Goals Models
 """
 
 import uuid
+import logging
+import pytz
+from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from edx_django_utils.cache import TieredCache
 from model_utils import Choices
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+
+from lms.djangoapps.courseware.masquerade import is_masquerading
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # Each goal is represented by a goal key and a string description.
 GOAL_KEY_CHOICES = Choices(
@@ -20,6 +28,7 @@ GOAL_KEY_CHOICES = Choices(
 )
 
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 
 class CourseGoal(models.Model):
@@ -84,3 +93,64 @@ class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255)
     date = models.DateField()
+
+    @classmethod
+    def record_user_activity(cls, user, course_key, request=None, only_if_mobile_app=False):
+        '''
+        Update the user activity table with a record for this activity.
+
+        Since we store one activity per date, we don't need to query the database
+        for every activity on a given date.
+        To avoid unnecessary queries, we store a record in a cache once we have an activity for the date,
+        which times out at the end of that date (in the user's timezone).
+
+        The request argument is only used to check if the request is coming from a mobile app.
+        Once the only_if_mobile_app argument is removed the request argument can be removed as well.
+
+        The return value is the id of the object that was created, or retrieved.
+        A return value of None signifies that there was an issue with the parameters (or the user was masquerading).
+        '''
+        if not (user and user.id) or not course_key:
+            return None
+
+        if only_if_mobile_app and request and not is_request_from_mobile_app(request):
+            return None
+
+        if is_masquerading(user, course_key):
+            return None
+
+        user_preferences = get_user_preferences(user)
+        timezone = pytz.timezone(user_preferences.get('time_zone', 'UTC'))
+        now = datetime.now(timezone)
+        date = now.date()
+
+        cache_key = 'goals_user_activity_{}_{}_{}'.format(str(user.id), str(course_key), str(date))
+
+        cached_value = TieredCache.get_cached_response(cache_key)
+        if cached_value.is_found:
+            # Temporary debugging log for testing mobile app connection
+            if request:
+                log.info(
+                    'Retrieved cached value with request {} for user and course combination {} {}'.format(
+                        str(request.build_absolute_uri()), str(user.id), str(course_key)
+                    )
+                )
+            return cached_value.value, False
+
+        activity_object, __ = cls.objects.get_or_create(user=user, course_key=course_key, date=date)
+
+        # Cache result until the end of the day to avoid unnecessary database requests
+        tomorrow = now + timedelta(days=1)
+        midnight = datetime(year=tomorrow.year, month=tomorrow.month,
+                            day=tomorrow.day, hour=0, minute=0, second=0, tzinfo=timezone)
+        seconds_until_midnight = (midnight - now).seconds
+
+        TieredCache.set_all_tiers(cache_key, activity_object.id, seconds_until_midnight)
+        # Temporary debugging log for testing mobile app connection
+        if request:
+            log.info(
+                'Set cached value with request {} for user and course combination {} {}'.format(
+                    str(request.build_absolute_uri()), str(user.id), str(course_key)
+                )
+            )
+        return activity_object.id

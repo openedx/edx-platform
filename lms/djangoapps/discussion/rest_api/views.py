@@ -18,6 +18,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from xmodule.modulestore.django import modulestore
 
+from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -90,6 +92,9 @@ class CourseView(DeveloperErrorViewMixin, APIView):
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseKey.from_string(course_id)  # TODO: which class is right?
+        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
+            # Record user activity for tracking progress towards a user's course goals (for mobile app)
+            UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(get_course(request, course_key))
 
 
@@ -132,6 +137,9 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
                 course_key,
                 set(topic_ids.strip(',').split(',')) if topic_ids else None,
             )
+            if RECORD_USER_ACTIVITY_FLAG.is_enabled():
+                # Record user activity for tracking progress towards a user's course goals (for mobile app)
+                UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(response)
 
 
@@ -322,6 +330,13 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         form = ThreadListGetForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
+
+        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
+            # Record user activity for tracking progress towards a user's course goals (for mobile app)
+            UserActivity.record_user_activity(
+                request.user, form.cleaned_data["course_id"], request=request, only_if_mobile_app=True
+            )
+
         return get_thread_list(
             request,
             form.cleaned_data["course_id"],

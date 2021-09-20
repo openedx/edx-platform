@@ -1,11 +1,10 @@
 """
-Unit tests for course_goals.api methods.
+Unit tests for course_goals.views methods.
 """
 
 
 from unittest import mock
 
-from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -18,8 +17,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 EVENT_NAME_ADDED = 'edx.course.goal.added'
 EVENT_NAME_UPDATED = 'edx.course.goal.updated'
-
-User = get_user_model()
 
 
 class TestCourseGoalsAPI(SharedModuleStoreTestCase):
