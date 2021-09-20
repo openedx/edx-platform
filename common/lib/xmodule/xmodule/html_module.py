@@ -144,7 +144,12 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         ],
         'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
     }
-    preview_view_css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/html/display.scss'),
+            resource_string(__name__, 'css/html/esme_custom.scss'),
+        ]
+    }
 
     uses_xmodule_styles_setup = True
     requires_per_student_anonymous_id = True
