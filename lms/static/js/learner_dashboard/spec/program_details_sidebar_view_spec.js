@@ -57,6 +57,8 @@ describe('Program Progress View', () => {
     programRecordUrl: '/foo/bar',
     industryPathways: data.industryPathways,
     creditPathways: data.creditPathways,
+    programDiscussionEnabled: false
+
   });
 
   beforeEach(() => {
@@ -153,6 +155,7 @@ describe('Program Progress View', () => {
       programRecordUrl: '/foo/bar',
       industryPathways: [],
       creditPathways: [],
+      programDiscussionEnabled: false
     });
 
     expect(emptyView.$('.program-credit-pathways .divider-heading')).toHaveLength(0);
