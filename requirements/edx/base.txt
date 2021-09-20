@@ -112,7 +112,7 @@ chardet==4.0.0
     # via
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.5
+charset-normalizer==2.0.6
     # via
     #   -r requirements/edx/paver.txt
     #   requests
@@ -655,7 +655,7 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   xblock
-maxminddb==2.0.3
+maxminddb==2.1.0
     # via geoip2
 mock==4.0.3
     # via
@@ -682,7 +682,7 @@ newrelic==6.10.0.165
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
-nltk==3.6.2
+nltk==3.6.3
     # via
     #   -r requirements/edx/base.in
     #   chem

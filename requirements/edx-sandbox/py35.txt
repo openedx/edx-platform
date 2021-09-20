@@ -51,7 +51,7 @@ networkx==2.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py35.in
-nltk==3.6.2
+nltk==3.6.3
     # via
     #   -r requirements/edx-sandbox/py35.in
     #   chem
