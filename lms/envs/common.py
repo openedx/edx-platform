@@ -730,7 +730,7 @@ FEATURES = {
     # .. toggle_description: When set to True, language selector will be visible in the footer.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
-    # .. toggle_warnings: LANGUAGE_COOKIE is required to use footer-language-selector, set it if it has not been set.
+    # .. toggle_warnings: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
@@ -1708,7 +1708,7 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
-LANGUAGE_COOKIE = "openedx-language-preference"
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [

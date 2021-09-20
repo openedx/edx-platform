@@ -372,7 +372,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
             expected_language_code: string indicating a language code
         """
         assert get_user_preference(user, LANGUAGE_KEY) == expected_language_code
-        assert self.client.cookies[settings.LANGUAGE_COOKIE].value == expected_language_code
+        assert self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value == expected_language_code
 
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})

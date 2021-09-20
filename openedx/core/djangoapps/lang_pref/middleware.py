@@ -8,6 +8,8 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
+from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -27,9 +29,12 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
         If a user's UserPreference contains a language preference, use the user's preference.
         Save the current language preference cookie as the user's preferred language.
         """
-        cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE, None)
+        cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, None)
         if cookie_lang:
             if request.user.is_authenticated:
+                # DarkLangMiddleware will take care of this so don't change anything
+                if DarkLangConfig.current().enabled and get_user_preference(request.user, DARK_LANGUAGE_KEY):
+                    return
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
             else:
                 request._anonymous_user_cookie_lang = cookie_lang  # lint-amnesty, pylint: disable=protected-access
@@ -58,6 +63,11 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
             current_user = getattr(request.user, 'real_user', request.user)
 
         if current_user and current_user.is_authenticated:
+
+            # DarkLangMiddleware has already set this cookie
+            if DarkLangConfig.current().enabled and get_user_preference(current_user, DARK_LANGUAGE_KEY):
+                return response
+
             anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
             if anonymous_cookie_lang:
                 user_pref = anonymous_cookie_lang
@@ -70,19 +80,19 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
                     # If we can't find the user preferences, then don't modify the cookie
                     pass
 
-            # If set, set the user_pref in the LANGUAGE_COOKIE
+            # If set, set the user_pref in the LANGUAGE_COOKIE_NAME
             if user_pref and not is_request_from_mobile_app(request):
                 response.set_cookie(
-                    settings.LANGUAGE_COOKIE,
+                    settings.LANGUAGE_COOKIE_NAME,
                     value=user_pref,
-                    domain=settings.SESSION_COOKIE_DOMAIN,
+                    domain=settings.SHARED_COOKIE_DOMAIN,
                     max_age=COOKIE_DURATION,
                     secure=request.is_secure()
                 )
             else:
                 response.delete_cookie(
-                    settings.LANGUAGE_COOKIE,
-                    domain=settings.SESSION_COOKIE_DOMAIN
+                    settings.LANGUAGE_COOKIE_NAME,
+                    domain=settings.SHARED_COOKIE_DOMAIN
                 )
 
         return response
