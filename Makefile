@@ -131,7 +131,6 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
 	# to avoid multiple entries copy this in tmp and remove it from django and django30.
-	grep -e "^django-cookies-samesite==" requirements/edx/django.txt > requirements/edx/samesite.tmp
 	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django.txt
 	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django30.txt
 	grep -e "^django-cookies-samesite==" requirements/edx/samesite.tmp >> requirements/edx/django.txt
