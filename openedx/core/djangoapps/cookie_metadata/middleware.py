@@ -41,9 +41,9 @@ class CookieNameChange:
                alternate: new
              SOME_COOKIE_NAME: old
 
-        3. Change the current name, both in the main cookie setting and in the
-           name-change dictionary, now that all servers are capable of reading
-           either name::
+        3. Swap the new and old cookie names in all three places they occur (the
+           main setting and the two dictionary elements), now that all servers
+           are capable of reading either name::
 
              COOKIE_NAME_CHANGE_ACTIVATE: True
              COOKIE_NAME_CHANGE_EXPAND_INFO:
