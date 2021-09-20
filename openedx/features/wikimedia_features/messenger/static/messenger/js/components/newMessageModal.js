@@ -15,7 +15,7 @@ export default function NewMessageModal({createGroupMessages, context}) {
 
     const handleNewMessageBtnClick = (event) => {
         event.preventDefault();
-        createGroupMessages(groupNewMessage, newMessageSelectedUsers);
+        createGroupMessages(groupNewMessage, setGroupNewMessage, newMessageSelectedUsers);
     }
 
     return (

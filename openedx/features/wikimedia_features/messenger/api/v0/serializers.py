@@ -1,6 +1,7 @@
 """
 Serializers for Messenger v0 API(s)
 """
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils.translation import ugettext as _
@@ -61,6 +62,12 @@ class InboxSerializer(serializers.ModelSerializer):
         super(InboxSerializer, self).__init__(*args, **kwargs)
         self.request = self.context.get('request')
 
+    def _get_last_message_date(self, msg_datetime):
+        if msg_datetime.date() == datetime.today().date():
+            return "Today"
+        else:
+            return msg_datetime.strftime('%x')
+
     def get_with_user(self, obj):
         if self.request:
             if obj.last_message.sender != self.request.user:
@@ -74,7 +81,8 @@ class InboxSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         with_user = User.objects.get(username=response.get('with_user'))
         response['with_user_img'] = get_profile_image_urls_for_user(with_user, self.request).get('medium')
-        response['last_message'] =instance.last_message.message
+        response['last_message'] = instance.last_message.message
+        response['last_message_date'] = instance.last_message.created.strftime('%x')
 
         # if last message is send by login-user then unread count will be 0
         if self.request and instance.last_message.sender == self.request.user:
@@ -102,7 +110,7 @@ class MessageSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['sender'] = instance.sender.username
-        response['created'] = instance.created.strftime('%x-%I:%M %p')
+        response['created'] = instance.created.strftime('%x %I:%M %p')
         response['sender_img']= get_profile_image_urls_for_user(
             instance.sender, self.context.get('request')
         ).get('medium')

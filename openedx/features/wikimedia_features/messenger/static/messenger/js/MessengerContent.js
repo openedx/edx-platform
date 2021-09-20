@@ -14,6 +14,8 @@ import NewMessageModal from './components/newMessageModal';
 export default function MessengerContent({ context }) {
     const [inboxPageNumber, setInboxPageNumber] = useState(1);
     const [messagesPageNumber, setMessagesPageNumber] = useState(1);
+    const [isDrawerShown, setDrawerShown] = useState(false);
+    const [searchInbox, setSearchInbox] = useState("");
 
     const {
         selectedInboxUser,
@@ -29,7 +31,7 @@ export default function MessengerContent({ context }) {
         setInboxList,
         inboxLoading,
         inboxHasMore
-    } = useInboxList(inboxPageNumber, setSelectedInboxUser, context);
+    } = useInboxList(inboxPageNumber, setSelectedInboxUser, context, setInboxPageNumber, searchInbox);
 
     const {
         updateLastMessage,
@@ -47,14 +49,18 @@ export default function MessengerContent({ context }) {
     );
 
     return (
-        <div>
-            <div className = "messenger main-container" >
+        <div className={isDrawerShown ? 'chat-sidebar-open': ''}>
+            <div className="messenger main-container">
                 <Inbox
                     setSelectedInboxUser = { setSelectedInboxUser }
                     inboxList = { inboxList }
                     lastInboxRef = { lastInboxRef }
                     inboxLoading = { inboxLoading }
                     selectedInboxUser = { selectedInboxUser }
+                    isDrawerShown = { isDrawerShown }
+                    setDrawerShown = { setDrawerShown }
+                    searchInbox = { searchInbox }
+                    setSearchInbox = { setSearchInbox }
                 />
                 <Conversation
                     createMessage = { createMessage }
@@ -64,6 +70,10 @@ export default function MessengerContent({ context }) {
                     lastMessageRef = { lastMessageRef }
                     selectedInboxUser = { selectedInboxUser }
                 />
+                <div
+                    className="chat-overlay"
+                    onClick={() => setDrawerShown(!isDrawerShown)}
+                ></div>
             </div>
             <NewMessageModal
                 createGroupMessages = { createGroupMessages }
