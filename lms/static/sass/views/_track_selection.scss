@@ -240,6 +240,10 @@
         .price-display {
             font-size: 14px;
         }
+
+        .choice-bullets {
+            padding: 0 2rem 1rem 1rem;
+        }
     }
 
     @media (min-width: map-get($grid-breakpoints, 'md')) {
