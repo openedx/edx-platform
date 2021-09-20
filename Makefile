@@ -137,10 +137,6 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django30.txt
 
 	# removing django-cookies-samesite from all requirements files. It is not require for django32
-	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/base.txt > requirements/edx/base.tmp
-	mv requirements/edx/base.tmp requirements/edx/base.txt
-	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/development.txt > requirements/edx/development.tmp
-	mv requirements/edx/development.tmp requirements/edx/development.txt
 	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
