@@ -45,6 +45,8 @@ from openedx.features.pakx.lms.overrides.forms import ContactUsForm
 from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
+    get_resume_course_info,
+    get_course_progress_percentage,
     get_courses_for_user,
     get_featured_course
 )
@@ -180,30 +182,26 @@ def overview_tab_view(request, course_id=None):
     course_block_tree = get_course_outline_block_tree(
         request, text_type(course_id), request.user, allow_start_dates_in_future=True
     )
+    course_experience_mode = "Normal"
     course_overview_content = CourseOverviewContent.objects.filter(course_id=course_key).first()
+    if course_overview_content:
+        course_experience_mode = course_overview_content.get_course_experience_display()
+
     context = {
         'course_overview': course_overview_content.body_html if course_overview_content else None,
         'user': request.user,
         'course': course,
         'accordion': render_accordion(request, course, course_block_tree, '', '',
-                                      course_experience_mode=course_overview_content.get_course_experience_display())
+                                      course_experience_mode=course_experience_mode)
     }
     return render_to_response('courseware/overview.html', context)
 
 
-# noinspection PyInterpreter
-@ensure_csrf_cookie
-@ensure_valid_course_key
-@cache_if_anonymous()
-def course_about(request, category, course_id):
+def _get_course_about_context(request, course_id, category=None):
     """
-    Display the course's about page.
+    context required for course about page
+    """
 
-    Arguments:
-        request (WSGIRequest): HTTP request
-        course_id (str): Unique ID of course
-        category (str): 'In Progress'/'Upcoming'/'Completed'
-    """
     course_key = CourseKey.from_string(course_id)
 
     # If a user is not able to enroll in a course then redirect
@@ -261,6 +259,15 @@ def course_about(request, category, course_id):
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
         invitation_only = course.invitation_only
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
+
+        resume_course_url = None
+        has_visited_course = None
+        user_progress = 0
+        if is_enrolled:
+            has_visited_course, resume_course_url, _ = get_resume_course_info(
+                request, course_id)
+            user_progress = get_course_progress_percentage(request, course_id)
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
@@ -270,6 +277,7 @@ def course_about(request, category, course_id):
         active_reg_button = not (registered or is_course_full or not can_enroll)
 
         is_shib_course = uses_shib(course)
+        language =  dict(settings.ALL_LANGUAGES).get(course.language)
 
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
@@ -291,6 +299,7 @@ def course_about(request, category, course_id):
 
         context = {
             'course': course,
+            'language': language,
             'course_details': course_details,
             'staff_access': staff_access,
             'studio_url': studio_url,
@@ -316,10 +325,42 @@ def course_about(request, category, course_id):
             'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
-            'category': category
+            'category': category,
+            'is_enrolled': is_enrolled,
+            'resume_course_url': resume_course_url,
+            'has_visited_course': has_visited_course,
+            'user_progress': user_progress
         }
 
-        return render_to_response('courseware/course_about.html', context)
+        return context
+
+
+@ensure_csrf_cookie
+@ensure_valid_course_key
+@cache_if_anonymous()
+def course_about(request, course_id):
+    """
+    Display the course's about page.
+    """
+
+    return render_to_response('courseware/course_about.html', _get_course_about_context(request, course_id))
+
+
+# noinspection PyInterpreter
+@ensure_csrf_cookie
+@ensure_valid_course_key
+@cache_if_anonymous()
+def course_about_category(request, category, course_id):
+    """
+    Display the course's about page.
+
+    Arguments:
+        request (WSGIRequest): HTTP request
+        course_id (str): Unique ID of course
+        category (str): 'In Progress'/'Upcoming'/'Completed'
+    """
+
+    return render_to_response('courseware/course_about.html', _get_course_about_context(request, course_id, category))
 
 
 def business_view(request, *args, **kwargs):

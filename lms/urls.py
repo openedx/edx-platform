@@ -52,6 +52,7 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.pakx.lms.urls import pakx_url_patterns
+from openedx.features.pakx.lms.overrides.views import course_about
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
@@ -340,7 +341,7 @@ urlpatterns += [
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        courseware_views.course_about,
+        course_about,
         name='about_course',
     ),
     url(
