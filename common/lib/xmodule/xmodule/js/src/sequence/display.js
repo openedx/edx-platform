@@ -417,15 +417,15 @@
           return "\u202A"
         };
 
-        function getAccordionElement(element, element_title) {
-          var accordionElementID = "#"+$(element).attr('data-index') + "_" + element_title.replace(/[&\/\\#,+!()$~%.'":*?<>{}]/g, "-").replace(/ /g, "-");
+        function getAccordionElement(element) {
+          var accordionElementID = "#" + element.getAttribute('data-usage')
           return $(accordionElementID)
         }
 
         function update_unit_title(element, is_active) {
           var element_title = element.getAttribute("data-page-title");
           // Update selected in Accordion
-          var accordionElement = getAccordionElement(element, element_title);
+          var accordionElement = getAccordionElement(element);
           if (typeof accordionElement[0] !== "undefined") {
             $(".menu-item").removeClass("active");
             $(accordionElement).addClass('active');
@@ -460,7 +460,7 @@
             var completionIndicators = element.find('.check-circle');
             var element_title = element[0].getAttribute("data-page-title");
             // Add completion marker class on Accordion Item
-            var accordionElement = getAccordionElement(element[0], element_title);
+            var accordionElement = getAccordionElement(element[0]);
             if (completionIndicators.length) {
                 $.postWithPrefix(completionUrl, {
                     usage_key: usageKey
