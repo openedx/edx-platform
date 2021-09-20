@@ -121,7 +121,7 @@ class ChooseModeView(View):
         ecommerce_service = EcommerceService()
 
         # We assume that, if 'professional' is one of the modes, it should be the *only* mode.
-        # If there are both modes, default to non-id-professional.
+        # If there are both modes, default to 'no-id-professional'.
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             purchase_workflow = request.GET.get("purchase_workflow", "single")

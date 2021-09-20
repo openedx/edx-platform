@@ -1,5 +1,8 @@
 .track-selection-container {
-    max-width: 946px;
+    .wrapper-register-choose {
+        max-width: 946px;
+        margin: 0 auto;
+    }
 
     .page-header h3 {
         color: #001B1E;
@@ -25,7 +28,7 @@
     }
 
     .track-selection-certificate .choice-bullets li:last-child {
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .track-selection-audit .choice-bullets li:last-child {

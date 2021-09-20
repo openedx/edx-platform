@@ -59,9 +59,9 @@ from openedx.core.djangolib.markup import HTML, Text
             end_bold=HTML('</b>'),
         )}</li>
         % if audit_access_deadline:
-        <li>${_("Access expires and all progress will be lost on")} ${audit_access_deadline}</li>
+        <li class="font-italic">${_("Access expires and all progress will be lost on")} ${audit_access_deadline}</li>
         % else:
-        <li>${_("Access expires and all progress will be lost")}</li>
+        <li class="font-italic">${_("Access expires and all progress will be lost")}</li>
         % endif
     </ul>
 </div>

@@ -7,12 +7,14 @@ import decimal
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
+from urllib.parse import urljoin
 
 import ddt
 import freezegun
 import httpretty
 import pytz
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 
 from common.djangoapps.course_modes.models import CourseMode, Mode
@@ -542,6 +544,16 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertContains(response, 'access to all course activities')
         self.assertContains(response, 'Full access')
 
+        # Check for informational links - verified
+        marketing_root = settings.MKTG_URLS.get('ROOT')
+        marketing_url = urljoin(marketing_root, 'verified-certificate')
+        self.assertContains(response, marketing_url)
+        support_root = settings.SUPPORT_SITE_LINK
+        article_params = ('hc/en-us/articles/360013426573-'
+                          'What-are-the-differences-between-audit-free-and-verified-paid-courses-')
+        support_url = urljoin(support_root, article_params)
+        self.assertContains(response, support_url)
+
         # Check for happy path messaging - audit
         self.assertContains(response, "discussion forums and non-graded assignments")
         self.assertContains(response, "Get temporary access")
@@ -573,6 +585,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # This string only occurs in lms/templates/course_modes/choose.html
         # and related theme and translation files.
 
+    @override_settings(MKTG_URLS={'ROOT': 'https://www.example.edx.org'})
     @ddt.data(
         # gated_content_on, course_duration_limits_on, waffle_flag_on, expected_page_assertion_function
         (True, True, True, _assert_fbe_page),
