@@ -10,7 +10,7 @@ from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 
 class EnrollmentsService:
@@ -68,12 +68,12 @@ class EnrollmentsService:
         * text_search: the string against which to do a match on users' username or email; optional
         """
         course_id_coursekey = CourseKey.from_string(course_id)
-        course_module = modulestore().get_course(course_id_coursekey)
-        if not course_module or not course_module.enable_proctored_exams:
+        course_overview = get_course_overview_or_none(course_id_coursekey)
+        if not course_overview or not course_overview.enable_proctored_exams:
             return None
 
         allow_honor_mode = settings.PROCTORING_BACKENDS.get(
-            course_module.proctoring_provider, {}
+            course_overview.proctoring_provider, {}
         ).get('allow_honor_mode', False)
         enrollments = self._get_enrollments_for_course_proctoring_eligible_modes(course_id, allow_honor_mode)
 
