@@ -30,7 +30,7 @@ from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from organizations.api import add_organization_course, ensure_organization
+from organizations.api import add_organization_course, ensure_organization, get_organizations
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
 
@@ -537,7 +537,13 @@ def course_listing(request):
 
     optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
-    org = request.GET.get('org', '') if optimization_enabled else None
+    org = None
+    org_names_list = []
+
+    if optimization_enabled:
+        org = request.GET.get('org') if request.GET.get('org') else None
+        org_names_list = [(org['short_name']) for org in get_organizations() if 'short_name' in org]
+
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = []
@@ -586,7 +592,8 @@ def course_listing(request):
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'optimization_enabled': optimization_enabled,
-        'active_tab': 'courses'
+        'active_tab': 'courses',
+        'org_names_list': org_names_list,
     })
 
 
