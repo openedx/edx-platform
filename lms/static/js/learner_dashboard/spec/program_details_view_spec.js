@@ -493,6 +493,7 @@ describe('Program Details Header View', () => {
         destination_url: 'industry.com',
       },
     ],
+    programDiscussionEnabled: false
   };
   const data = options.programData;
 
