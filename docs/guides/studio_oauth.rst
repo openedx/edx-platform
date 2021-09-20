@@ -50,12 +50,3 @@ Follow these steps for each deployed environment (stage, production, etc.):
     SESSION_COOKIE_NAME: studio_sessionid
 
 This cookie renaming step is also a good opportunity to change ``SESSION_COOKIE_DOMAIN`` if desired, since it allows for a clean transition without having to worry about `flaky behavior driven by order-unstable cookie-sending <https://fwielstra.github.io/2017/03/13/fun-with-cookies-and-subdomains/>`_. Narrowing the domain (or removing it, to keep subdomains from seeing the cookie) may improve the security of your deployment, but the best option depends on the exact layout of your domain names and is beyond the scope of this document.
-
-Declining the migration
------------------------
-
-Untested instructions for continuing to keep the shared sessions:
-
-- Override ``FRONTEND_LOGOUT_URL`` for Studio to be ``<LMS base>/logout``
-- Override ``FRONTEND_LOGIN_URL`` for Studio to be ``<LMS base>/login``
-- Override ``LOGIN_URL`` for Studio to be ``<LMS base>/login``
