@@ -1316,7 +1316,7 @@ tableauserverclient==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-testfixtures==6.18.1
+testfixtures==6.18.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
