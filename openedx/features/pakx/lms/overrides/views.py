@@ -392,7 +392,7 @@ class ContactUsView(View):
         if request.user.is_authenticated:
             context['form'] = ContactUsForm(initial={
                 'email': request.user.email,
-                'full_name': request.user.profile.name,
+                'full_name': (request.user.profile.name or request.user.get_full_name()).title().strip(),
                 'organization': getattr(request.user.profile.organization, 'name', ''),
             })
 

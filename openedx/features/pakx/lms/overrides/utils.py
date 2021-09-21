@@ -2,21 +2,20 @@
 
 from datetime import datetime
 from logging import getLogger
+from re import compile, findall
 
 from completion.models import BlockCompletion
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import Case, IntegerField, Sum, When
 from django.db.models.functions import Coalesce
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
-from lms.djangoapps.courseware.courses import (
-    get_courses,
-    sort_by_announcement,
-    sort_by_start_date
-)
+from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -313,3 +312,30 @@ def get_date_diff_in_days(future_date):
 
     current_date = datetime.now().date()
     return (future_date.date() - current_date).days
+
+
+def validate_text_for_emoji(text):
+    """
+    get date diff validates the text and raise validation
+    error if a emoji exists in the text
+    :param text: (str) text to be validated
+
+    :raise: validation error
+    """
+    pattern = compile(
+        "(["
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F700-\U0001F77F"  # alchemical symbols
+        "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+        "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+        "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+        "\U0001FA00-\U0001FA6F"  # Chess Symbols
+        "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+        "\U00002702-\U000027B0"  # Dingbats
+        "])"
+    )
+    if text and findall(pattern, text):
+        raise ValidationError(_('Invalid data! text should not contain any emoji.'))

@@ -1,10 +1,11 @@
 """Django models for overrides app"""
 
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
+from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from openedx.features.pakx.lms.overrides.utils import validate_text_for_emoji
 from student.models import CourseEnrollment
 
 
@@ -36,14 +37,27 @@ class ContactUs(models.Model):
     """
     Model to store the records of contact us form data
     """
-    full_name = models.CharField(max_length=24)
-    organization = models.CharField(max_length=40, null=True, blank=True)
-    phone = models.CharField(
-        max_length=16,
-        validators=[RegexValidator(message='Phone number can only contain numbers.', regex='^\\+?1?\\d*$')]
+    full_name = models.CharField(
+        max_length=24,
+        validators=[
+            validate_text_for_emoji,
+            MinLengthValidator(limit_value=3, message='Name should be of minimum 3 chars.'),
+            RegexValidator(message=_('Name can only contain alphabets.'), regex='^[a-zA-Z ]*$')
+        ]
     )
     email = models.EmailField()
-    message = models.TextField(verbose_name=_('How can we help you?'))
+    organization = models.CharField(max_length=40, null=True, blank=True, validators=[validate_text_for_emoji])
+    phone = models.CharField(
+        max_length=16,
+        validators=[
+            MinLengthValidator(limit_value=11, message=_('Phone number should be of minimum 11 chars.')),
+            RegexValidator(message=_('Phone number can only contain numbers.'), regex='^\\+?1?\\d*$')
+        ]
+    )
+    message = models.TextField(
+        verbose_name=_('How can we help you?'),
+        validators=[MaxLengthValidator(4000, message=_('Message should be of maximum 4000 chars.')), validate_text_for_emoji]
+    )
     created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
 
