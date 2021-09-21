@@ -24,17 +24,3 @@
         }
     }
 }
-
-// Extra mfe theme-specific rules.
-// Move this to a separate file in case more mfe specific rules need to be a added
-.xmodule_display.xmodule_ProblemBlock div.problem {
-  .choicegroup {
-    label {
-      padding-left: $baseline*2.3;
-    }
-
-    input[type="radio"], input[type="checkbox"] {
-      top: 0.35em;
-    }
-  }
-}
