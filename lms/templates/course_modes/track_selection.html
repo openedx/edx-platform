@@ -16,6 +16,17 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="js_extra">
     <script type="text/javascript">
+        // upgrade button re-direct to ecommerce basket (which re-directs to Payment MFE)
+        % if use_ecommerce_payment_flow:
+        $(function(){
+            $('button[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
+                encodeURIComponent('${sku | n, js_escaped_string}');
+            });
+        });
+        % endif
+
         // popover icon toggle
         $(function(){
             $('body').click(function (e) {

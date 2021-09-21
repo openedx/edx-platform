@@ -20,7 +20,6 @@
         background-color: white;
         border: 1px solid #707070;
         position: relative;
-        float: right;
     }
 
     .track-selection-certificate {
@@ -239,6 +238,10 @@
 
         .price-display {
             font-size: 14px;
+        }
+
+        .choice-bullets {
+            padding: 0 2rem 1rem 1rem;
         }
     }
 
