@@ -114,64 +114,6 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
 )
 
-# .. toggle_name: courseware.mfe_special_exams
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable special exams experience without
-#   redirecting students to LMS.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-4-29
-# .. toggle_target_removal_date: 2021-6-30
-# .. toggle_warnings: None
-COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'mfe_special_exams', __name__
-)
-
-# .. toggle_name: courseware.mfe_proctored_exams
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable proctored exams experience without
-#   redirecting students to LMS.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-5-24
-# .. toggle_target_removal_date: 2021-6-30
-# .. toggle_warnings: None
-COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'mfe_proctored_exams', __name__
-)
-
-
-def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
-    """
-    Can we see a course special exams in the Learning MFE?
-    """
-    #Avoid circular imports.
-    from lms.djangoapps.courseware.access_utils import in_preview_mode
-    # DENY: Old Mongo courses don't work in the MFE.
-    if course_key.deprecated:
-        return False
-    # DENY: Course preview doesn't work in the MFE
-    if in_preview_mode():
-        return False
-    # OTHERWISE: Defer to value of waffle flag for this course run and user.
-    return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
-
-
-def mfe_proctored_exams_is_active(course_key: CourseKey) -> bool:
-    """
-    Can we see a course special exams in the Learning MFE?
-    """
-    #Avoid circular imports.
-    from lms.djangoapps.courseware.access_utils import in_preview_mode
-    # DENY: Old Mongo courses don't work in the MFE.
-    if course_key.deprecated:
-        return False
-    # DENY: Course preview doesn't work in the MFE
-    if in_preview_mode():
-        return False
-    # OTHERWISE: Defer to value of waffle flag for this course run and user.
-    return COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS.is_enabled(course_key)
-
 
 def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     """
