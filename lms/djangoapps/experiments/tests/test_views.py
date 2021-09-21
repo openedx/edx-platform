@@ -13,7 +13,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from importlib_metadata import version
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -260,11 +259,6 @@ class ExperimentCrossDomainTests(APITestCase):
             data,
             **kwargs
         )
-
-    def test_white_list_contents_with_cors_header_version(self, *args):  # pylint: disable=unused-argument
-        """ Verify that with django-cor-header<3 it loads list with scheme. """
-        assert settings.CORS_ORIGIN_WHITELIST == ['https://sandbox.edx.org']
-        assert int(version('django_cors_headers').split('.')[0]) == 3
 
 
 class ExperimentKeyValueViewSetTests(APITestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

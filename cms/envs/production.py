@@ -16,7 +16,6 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
-from importlib.metadata import version
 from path import Path as path
 
 
@@ -556,12 +555,6 @@ derive_settings(__name__)
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
-
-    # values are already updated above with default CORS_ORIGIN_WHITELIST values but in
-    # case of new version django_cors_headers they will get override.
-    cors_major_version = int(version('django_cors_headers').split('.')[0])
-    if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME'):
-        CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME')
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
