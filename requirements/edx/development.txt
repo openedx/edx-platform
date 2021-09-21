@@ -577,7 +577,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.0.0
+edx-proctoring==4.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
