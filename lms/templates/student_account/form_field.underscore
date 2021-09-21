@@ -116,6 +116,10 @@
                     <span class="pass-tooltip hidde-pass">Hide Password</span>
                 </span>
             <% } %>
+        <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
+            <span class="sr-only"></span>
+            <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
+        </span>
         </div>
         <% if ( type === 'checkbox' ) { %>
             <label for="<%- form %>-<%- name %>">
@@ -132,11 +136,6 @@
                 <% } %>
             </label>
         <% } %>
-
-        <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only"></span>
-            <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
-        </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
     <% } %>
 
