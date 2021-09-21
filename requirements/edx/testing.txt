@@ -142,7 +142,7 @@ chardet==4.0.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.5
+charset-normalizer==2.0.6
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -655,11 +655,11 @@ future==0.18.2
     #   edx-celeryutils
     #   edx-enterprise
     #   pyjwkest
-geoip2==4.2.0
+geoip2==4.3.0
     # via -r requirements/edx/base.txt
 gitdb==4.0.7
     # via gitpython
-gitpython==3.1.18
+gitpython==3.1.24
     # via transifex-client
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -820,7 +820,7 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   xblock
-maxminddb==2.0.3
+maxminddb==2.1.0
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -855,7 +855,7 @@ newrelic==6.10.0.165
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-nltk==3.6.2
+nltk==3.6.3
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1342,7 +1342,7 @@ tox==3.24.4
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
-tqdm==4.62.2
+tqdm==4.62.3
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1352,6 +1352,7 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
+    #   gitpython
     #   pydantic
 ua-parser==0.10.0
     # via
