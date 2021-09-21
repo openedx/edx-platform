@@ -414,7 +414,7 @@ django-ratelimit==3.0.1
     # via -r requirements/edx/testing.txt
 git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a6#egg=django-ratelimit-backend==2.0.1a6
     # via -r requirements/edx/testing.txt
-django-require==1.0.11
+git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776#egg=django-require==1.0.12
     # via -r requirements/edx/testing.txt
 django-sekizai==2.0.0
     # via
@@ -1423,7 +1423,7 @@ tableauserverclient==0.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-testfixtures==6.18.1
+testfixtures==6.18.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
