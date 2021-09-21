@@ -30,7 +30,6 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         // popover icon toggle
         $(function(){
             $('body').click(function (e) {
-                e.stopPropagation();
                 $('.popover').css({"visibility": "hidden", "opacity": 0});
             });
             $('.popover-icon').click(function(e){
