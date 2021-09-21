@@ -569,7 +569,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # and related theme and translation files.
 
         # Check for string unique to unfbe.html.
-        self.assertContains(response, "Some graded content may be lost")
+        self.assertContains(response, "Some graded content may be locked")
         # This string only occurs in lms/templates/course_modes/unfbe.html
         # and related theme and translation files.
 
