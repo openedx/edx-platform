@@ -2,6 +2,7 @@
 Views for Messenger v0 API(s)
 """
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import generics
 from rest_framework import filters
@@ -105,7 +106,17 @@ class InboxView(viewsets.ModelViewSet):
     search_fields = ['last_message__sender__username', 'last_message__receiver__username']
 
     def get_queryset(self):
-        return Inbox.user_inbox.find_all(self.request.user)
+        qs = Inbox.user_inbox.find_all(self.request.user)
+        # sort qs to show inbox with unread messages on top
+        return sorted(
+            qs,
+            key=lambda x, user=self.request.user: x.unread_count if (x.unread_count and x.last_message.receiver==user) else 0,
+            reverse=True
+        )
+
+    def get_object(self, *args, **kwargs):
+        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
+        return get_object_or_404(Inbox.user_inbox.find_all(self.request.user), **filter_kwargs)
 
 
 class ConversationView(viewsets.ModelViewSet):
