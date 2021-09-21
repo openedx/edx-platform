@@ -435,7 +435,9 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
-        help=_("Enter the unique identifier for your course's video files provided by edX."),
+        help=_(
+            "Enter the unique identifier for your course's video files provided by {platform_name}."
+        ).format(platform_name=settings.PLATFORM_NAME),
         scope=Scope.settings
     )
     no_grade = Boolean(
@@ -479,9 +481,10 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
             # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
             # his students.
-            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
-            " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
-        ),
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage "
+            "Custom Courses on {platform_name}. When false, Custom Courses cannot be created, "
+            "but existing Custom Courses will be preserved."
+        ).format(platform_name=settings.PLATFORM_NAME),
         default=False,
         scope=Scope.settings
     )

@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -10,7 +11,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
     %if verification_status == 'approved':
         <li class="status status-verification is-accepted">
             <span class="title status-title">${_("Current ID Verification Status: Approved")}</span>
-            <p class="status-note">${_("Your edX ID verification has been approved. Your ID verification is effective for two years after submission.")}</p>
+            <p class="status-note">${_("Your {platform_name} ID verification has been approved. Your ID verification is effective for two years after submission.").format(platform_name=settings.PLATFORM_NAME)}</p>
             %if verification_expiry:
                 <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_("Your photo ID verification expires on {verification_expiry}. Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.").format(verification_expiry=verification_expiry)}</i></p>
                 <div class="btn-reverify">
@@ -21,7 +22,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
     %elif verification_status == 'pending':
         <li class="status status-verification is-pending">
             <span class="title status-title">${_("Current ID Verification Status: Pending")}</span>
-            <p class="status-note">${_("Your edX ID verification is pending. Your ID verification information has been submitted and will be reviewed shortly.")}</p>
+            <p class="status-note">${_("Your {platform_name} ID verification is pending. Your ID verification information has been submitted and will be reviewed shortly.").format(platform_name=settings.PLATFORM_NAME)}</p>
         </li>
     %elif verification_status in ['denied','must_reverify', 'must_retry']:
         <li class="status status-verification is-denied">

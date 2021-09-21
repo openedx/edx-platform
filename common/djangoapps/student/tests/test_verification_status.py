@@ -30,6 +30,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+@override_settings(PLATFORM_NAME='edX')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):

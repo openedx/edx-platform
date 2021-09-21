@@ -9,6 +9,7 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.http import QueryDict
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
@@ -613,6 +614,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
+    @override_settings(PLATFORM_NAME="edX")
     def test_masters_course_message(self):
         enroll_button_html = "<button class=\"enroll-btn btn-link\">Enroll now</button>"
 

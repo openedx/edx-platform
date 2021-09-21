@@ -6,6 +6,7 @@ View logic for handling course messages.
 from datetime import datetime
 
 from babel.dates import format_date, format_timedelta
+from django.conf import settings
 from django.contrib import auth
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
@@ -142,8 +143,10 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             # if a course is a Master's only course, we will not offer user ability to self-enroll
             CourseHomeMessages.register_info_message(
                 request,
-                Text(_('You must be enrolled in the course to see course content. '
-                       'Please contact your degree administrator or edX Support if you have questions.')),
+                Text(_(
+                    'You must be enrolled in the course to see course content. '
+                    'Please contact your degree administrator or {platform_name} Support if you have questions.'
+                )).format(platform_name=settings.PLATFORM_NAME),
                 title=title
             )
         elif not course.invitation_only:

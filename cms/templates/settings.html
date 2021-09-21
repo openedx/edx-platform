@@ -338,7 +338,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <span class="tip tip-stacked">
                   ${_("Last day students can enroll.")}
                 % if not enrollment_end_editable:
-                  ${_("Contact your edX partner manager to update these settings.")}
+                  ${_("Contact your {platform_name} partner manager to update these settings.").format(platform_name=settings.PLATFORM_NAME)}
                 % endif
                 </span>
               </div>
@@ -359,7 +359,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <input type="text" class="date upgrade-deadline" id="course-upgrade-deadline-date" placeholder="MM/DD/YYYY" autocomplete="off" readonly aria-readonly="true" />
                 <span class="tip tip-stacked">
                   ${_("Last day students can upgrade to a verified enrollment.")}
-                  ${_("Contact your edX partner manager to update these settings.")}
+                  ${_("Contact your {platform_name} partner manager to update these settings.").format(platform_name=settings.PLATFORM_NAME)}
                 </span>
               </div>
 

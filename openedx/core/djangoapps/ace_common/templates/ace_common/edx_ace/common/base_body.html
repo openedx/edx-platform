@@ -173,7 +173,7 @@
                         <td>
                             &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/>
                             <br/>
-                            {% trans "Our mailing address is" as tmsg %}{{ tmsg | force_escape }}:<br/>
+                            {% trans "Our mailing address is:" as tmsg %}{{ tmsg | force_escape }}<br/>
                             {{ contact_mailing_address }}
                         </td>
                     </tr>

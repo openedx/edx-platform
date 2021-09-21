@@ -327,6 +327,7 @@ class LtiProfile(models.Model):
         null=True,
         on_delete=models.CASCADE,
         related_name='contentlibraries_lti_profile',
+        # Translators: 'Open edX' is a trademark, please keep this untranslated
         verbose_name=_('open edx user'),
     )
 
