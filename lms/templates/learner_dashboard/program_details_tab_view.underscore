@@ -7,7 +7,7 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link btn-link active" id="home-tab" data-toggle="tab" data-target="#journey" type="button" role="tab" aria-controls="journey" aria-selected="true">Journey</button>
       </li>
-      <% if (programDiscussionEnabled) { %>
+      <% if (discussionFragment.enabled) { %>
       <li class="nav-item" role="presentation">
         <button class="nav-link btn-link" id="profile-tab" data-toggle="tab" data-target="#community" type="button" role="tab" aria-controls="community" aria-selected="false">Community</button>
       </li>
@@ -101,9 +101,9 @@
 </article>
 
   </div>
-  <% if (programDiscussionEnabled) { %>
-      <div class="tab-pane fade" id="community" role="tabpanel" aria-labelledby="community-tab">Community tab content</div>
-   <% } %>
+  <% if (discussionFragment.enabled) { %>
+       <div class="tab-pane fade" id="community" role="tabpanel" aria-labelledby="community-tab"><%= HtmlUtils.HTML(discussionFragment.iframe) %></div>
+  <% } %>
   <div class="tab-pane fade" id="live" role="tabpanel" aria-labelledby="live-tab">Live tab content</div>
   <div class="tab-pane fade" id="pathways" role="tabpanel" aria-labelledby="pathaways-tab">
 <% if (creditPathways.length > 0) { %>

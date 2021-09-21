@@ -21,6 +21,7 @@ ProgramDetailsFactory({
     industryPathways: ${industry_pathways | n, dump_js_escaped_json},
     creditPathways: ${credit_pathways | n, dump_js_escaped_json},
     programDiscussionEnabled: ${program_discussions_enabled | n, dump_js_escaped_json},
+    discussionFragment: ${discussion_fragment, | n, dump_js_escaped_json}
 });
 </%static:webpack>
 </%block>
