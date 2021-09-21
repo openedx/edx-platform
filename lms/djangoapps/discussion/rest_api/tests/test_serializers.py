@@ -180,6 +180,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         })
         expected = self.expected_thread_data({
             "author": self.author.username,
+            "can_delete": False,
             "vote_count": 4,
             "comment_count": 6,
             "unread_comment_count": 3,
@@ -312,6 +313,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
+            "can_delete": False,
         }
 
         assert self.serialize(comment) == expected
