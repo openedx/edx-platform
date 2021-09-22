@@ -1,0 +1,16 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Dear {% endblocktrans %}{{ name }},
+
+
+{% if from_users|length > 1 %}
+{% blocktrans %}You have {% endblocktrans %}{{ unread_count }}{% blocktrans %}unread message(s) waiting for your response from following users:{% endblocktrans %}
+{% for user in from_users %}
+  -{{ user }}
+{% endfor %}
+{% else %}
+{% blocktrans %}You have {% endblocktrans %}{{ unread_count }}{% blocktrans %}unread message(s) waiting for your response from {% endblocktrans %}{{ from_users.0 }}.
+{% endif %}
+{% blocktrans %}Login your platform to view all new messages {% endblocktrans %} {{ messenger_url }}.
+
+{% blocktrans %}This email was automatically sent from {{ platform_name }} to {{ email }}{% endblocktrans %}
+{% endautoescape %}

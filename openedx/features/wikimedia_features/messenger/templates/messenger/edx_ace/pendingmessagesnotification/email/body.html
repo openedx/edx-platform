@@ -1,0 +1,58 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>{% blocktrans %}Hi {% endblocktrans %}{{ name }},</p>
+
+            {% if from_users|length > 1 %}
+                 <p>{% blocktrans %}You have {% endblocktrans %}
+                <span style="font-weight:bold">{{ unread_count }}</span>
+                {% blocktrans %}unread message(s) waiting for your response from following users:{% endblocktrans %}</p>
+
+                <ul>
+                {% for user in from_users %}
+                    <li>{{ user }}</li>
+                {% endfor %}
+                </ul>
+
+            {% else %}
+                <p>{% blocktrans %}You have {% endblocktrans %}
+                <span style="font-weight:bold">{{ unread_count }}</span>
+                {% blocktrans %}unread message(s) waiting for your response from {% endblocktrans %}<span style="font-weight:bold">{{ from_users.0 }}</span>.</p>
+            {% endif %}
+
+            <p>{% blocktrans %}Login your platform to view all new messages.{% endblocktrans %}</p>
+            <a
+                href={{messenger_url}}
+                class="blue pull-right"
+
+                style="
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    -webkit-border-radius: 4px;
+                    -moz-border-radius: 4px;
+                    background-color: #005686;
+                    border-top: 12px solid #005686;
+                    border-bottom: 12px solid #005686;
+                    border-right: 50px solid #005686;
+                    border-left: 50px solid #005686;
+                    display: inline-block;
+                "
+            >
+                {% blocktrans %} <font color="#ffffff"><b>View Messenger</b></font>{% endblocktrans %}
+            </a>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}This email was automatically sent from {{ platform_name }} to {{ email }}{% endblocktrans %}
+                <br />
+            </p>
+
+        </td>
+    </tr>
+</table>
+{% endblock %}

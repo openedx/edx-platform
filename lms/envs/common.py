@@ -4688,3 +4688,10 @@ DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
 ################# Settings for Chrome-specific origin trials ########
 # Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
 CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
+
+
+################# Wikimedia Custom Settings ####################
+DEFAULT_LOGO = '/static/wikilearn/images/logo.png'
+
+# username that will be used as a request_user for email tasks.
+EMAIL_ADMIN = 'email_admin'
