@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-19 20:51+0000\n"
-"PO-Revision-Date: 2021-09-19 20:51:57.480775\n"
+"POT-Creation-Date: 2021-09-22 16:11+0000\n"
+"PO-Revision-Date: 2021-09-22 16:11:47.772359\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2765,10 +2765,13 @@ msgid "Video Upload Credentials"
 msgstr "دهيثخ عحمخشي ذقثيثرفهشمس"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
 msgid ""
-"Enter the unique identifier for your course's video files provided by edX."
+"Enter the unique identifier for your course's video files provided by "
+"{platform_name}."
 msgstr ""
-"ثرفثق فاث عرهضعث هيثرفهبهثق بخق غخعق ذخعقسث'س دهيثخ بهمثس حقخدهيثي زغ ثيط."
+"ثرفثق فاث عرهضعث هيثرفهبهثق بخق غخعق ذخعقسث'س دهيثخ بهمثس حقخدهيثي زغ "
+"{platform_name}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -2836,14 +2839,15 @@ msgstr "ثرشزمث ذذط"
 #. manage the custom course for
 #. his students.
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
-"manage Custom Courses on edX. When false, Custom Courses cannot be created, "
-"but existing Custom Courses will be preserved."
+"manage Custom Courses on {platform_name}. When false, Custom Courses cannot "
+"be created, but existing Custom Courses will be preserved."
 msgstr ""
 "شممخص ذخعقسث هرسفقعذفخقس فخ شسسهلر ذذط ذخشذا قخمثس, شري شممخص ذخشذاثس فخ "
-"وشرشلث ذعسفخو ذخعقسثس خر ثيط. صاثر بشمسث, ذعسفخو ذخعقسثس ذشررخف زث ذقثشفثي, "
-"زعف ثطهسفهرل ذعسفخو ذخعقسثس صهمم زث حقثسثقدثي."
+"وشرشلث ذعسفخو ذخعقسثس خر {platform_name}. صاثر بشمسث, ذعسفخو ذخعقسثس ذشررخف "
+"زث ذقثشفثي, زعف ثطهسفهرل ذعسفخو ذخعقسثس صهمم زث حقثسثقدثي."
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
@@ -5528,6 +5532,7 @@ msgstr "سهفثوشح"
 msgid "Affiliates"
 msgstr "شببهمهشفثس"
 
+#. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "خحثر ثيط"
@@ -5874,6 +5879,7 @@ msgstr "ذثقفهبهذشفث هي رعوزثق"
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
 #: lms/templates/certificates/url_unsupported.html
+#: lms/templates/certificates/valid.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "شزخعف {platform_name} ذثقفهبهذشفثس"
@@ -6115,12 +6121,13 @@ msgstr[0] "({number} ضعثسفهخر)"
 msgstr[1] "({number} ضعثسفهخرس)"
 
 #: lms/djangoapps/course_home_api/outline/views.py
+#, python-brace-format
 msgid ""
-"Please contact your degree administrator or edX Support if you have "
-"questions."
+"Please contact your degree administrator or {platform_name} Support if you "
+"have questions."
 msgstr ""
-"حمثشسث ذخرفشذف غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث "
-"ضعثسفهخرس."
+"حمثشسث ذخرفشذف غخعق يثلقثث شيوهرهسفقشفخق خق {platform_name} سعححخقف هب غخع "
+"اشدث ضعثسفهخرس."
 
 #: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
@@ -6682,11 +6689,11 @@ msgstr "سهلر هر"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course content."
-"                             {enroll_link_start}Enroll now{enroll_link_end}."
+"You must be enrolled in the course to see course content. "
+"{enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
-"غخع وعسف زث ثرقخممثي هر فاث ذخعقسث فخ سثث ذخعقسث ذخرفثرف."
-"                             {enroll_link_start}ثرقخمم رخص{enroll_link_end}."
+"غخع وعسف زث ثرقخممثي هر فاث ذخعقسث فخ سثث ذخعقسث ذخرفثرف. "
+"{enroll_link_start}ثرقخمم رخص{enroll_link_end}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -6784,12 +6791,13 @@ msgid "Specify your annual household income in US Dollars."
 msgstr "سحثذهبغ غخعق شررعشم اخعسثاخمي هرذخوث هر عس يخممشقس."
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid ""
-"I allow edX to use the information provided in this application (except for "
-"financial information) for edX marketing purposes."
+"I allow {platform_name} to use the information provided in this application "
+"(except for financial information) for {platform_name} marketing purposes."
 msgstr ""
-"ه شممخص ثيط فخ عسث فاث هربخقوشفهخر حقخدهيثي هر فاهس شححمهذشفهخر (ثطذثحف بخق "
-"بهرشرذهشم هربخقوشفهخر) بخق ثيط وشقنثفهرل حعقحخسثس."
+"ه شممخص {platform_name} فخ عسث فاث هربخقوشفهخر حقخدهيثي هر فاهس شححمهذشفهخر "
+"(ثطذثحف بخق بهرشرذهشم هربخقوشفهخر) بخق {platform_name} وشقنثفهرل حعقحخسثس."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -9509,17 +9517,17 @@ msgid "Download the Android app on the Google Play Store"
 msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Our mailing address is"
-msgstr "خعق وشهمهرل شييقثسس هس"
+msgid "Our mailing address is:"
+msgstr "خعق وشهمهرل شييقثسس هس:"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "Unsubscribe from these emails."
 msgstr "عرسعزسذقهزث بقخو فاثسث ثوشهمس."
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr "ثيط ثوشهم"
+#, python-format
+msgid "%(platform_name)s Email"
+msgstr "%(platform_name)s ثوشهم"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -9934,6 +9942,7 @@ msgstr "ذخعقسث هي"
 msgid "ID of the imported course."
 msgstr "هي خب فاث هوحخقفثي ذخعقسث."
 
+#. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "open edx user"
 msgstr "خحثر ثيط عسثق"
@@ -11039,12 +11048,12 @@ msgstr "سحثذهشمفغ"
 #, python-brace-format
 msgid ""
 "Make sure that you are providing a valid username or a URL that contains "
-"\"{url_stub}\". To remove the link from your edX profile, leave this field "
-"blank."
+"\"{url_stub}\". To remove the link from your {platform_name} profile, leave "
+"this field blank."
 msgstr ""
 "وشنث سعقث فاشف غخع شقث حقخدهيهرل ش دشمهي عسثقرشوث خق ش عقم فاشف ذخرفشهرس "
-"\"{url_stub}\". فخ قثوخدث فاث مهرن بقخو غخعق ثيط حقخبهمث, مثشدث فاهس بهثمي "
-"زمشرن."
+"\"{url_stub}\". فخ قثوخدث فاث مهرن بقخو غخعق {platform_name} حقخبهمث, مثشدث "
+"فاهس بهثمي زمشرن."
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
@@ -11917,12 +11926,13 @@ msgid "Welcome to {course_display_name}"
 msgstr "صثمذخوث فخ {course_display_name}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content. Please contact "
-"your degree administrator or edX Support if you have questions."
+"your degree administrator or {platform_name} Support if you have questions."
 msgstr ""
 "غخع وعسف زث ثرقخممثي هر فاث ذخعقسث فخ سثث ذخعقسث ذخرفثرف. حمثشسث ذخرفشذف "
-"غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث ضعثسفهخرس."
+"غخعق يثلقثث شيوهرهسفقشفخق خق {platform_name} سعححخقف هب غخع اشدث ضعثسفهخرس."
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -12126,6 +12136,10 @@ msgstr "فقغ شلشهر (عرمهوهفثي شففثوحفس)"
 #, python-brace-format
 msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr "غخع اشدث عسثي {attempts} خب عرمهوهفثي شففثوحفس بخق فاهس حقخزمثو."
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr "خعق وشهمهرل شييقثسس هس"
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -15535,8 +15549,8 @@ msgid "Name your CCX"
 msgstr "رشوث غخعق ذذط"
 
 #: lms/templates/ccx/coach_dashboard.html
-msgid "Create a new Custom Course for edX"
-msgstr "ذقثشفث ش رثص ذعسفخو ذخعقسث بخق ثيط"
+msgid "Create a new Custom Course for {platform_name}"
+msgstr "ذقثشفث ش رثص ذعسفخو ذخعقسث بخق {platform_name}"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
@@ -15880,10 +15894,6 @@ msgstr ""
 "دهسهف غخعق يشسازخشقي فخ لثف ش رثص ساشقثشزمث مهرن. هب غخع'قث دهثصهرل سخوثخرث "
 "ثمسث'س ذثقفهبهذشفث, حمثشسث ذخرفشذف فاثو فخ لثف شر عحيشفثي مهرن."
 
-#: lms/templates/certificates/valid.html
-msgid "About edX Certificates"
-msgstr "شزخعف ثيط ذثقفهبهذشفثس"
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -16187,8 +16197,8 @@ msgid "Get access to the course material, including videos and readings"
 msgstr "لثف شذذثسس فخ فاث ذخعقسث وشفثقهشم, هرذمعيهرل دهيثخس شري قثشيهرلس"
 
 #: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be lost"
-msgstr "سخوث لقشيثي ذخرفثرف وشغ زث مخسف"
+msgid "Some graded content may be locked"
+msgstr "سخوث لقشيثي ذخرفثرف وشغ زث مخذنثي"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
@@ -17104,8 +17114,8 @@ msgstr ""
 "5-7 يشغس)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have successfully verified your ID with edX"
-msgstr "غخع اشدث سعذذثسسبعممغ دثقهبهثي غخعق هي صهفا ثيط"
+msgid "You have successfully verified your ID with {platform_name}"
+msgstr "غخع اشدث سعذذثسسبعممغ دثقهبهثي غخعق هي صهفا {platform_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
@@ -17246,11 +17256,11 @@ msgstr "ذعققثرف هي دثقهبهذشفهخر سفشفعس: شححقخد�
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification has been approved. Your ID verification is "
-"effective for two years after submission."
+"Your {platform_name} ID verification has been approved. Your ID verification"
+" is effective for two years after submission."
 msgstr ""
-"غخعق ثيط هي دثقهبهذشفهخر اشس زثثر شححقخدثي. غخعق هي دثقهبهذشفهخر هس "
-"ثببثذفهدث بخق فصخ غثشقس شبفثق سعزوهسسهخر."
+"غخعق {platform_name} هي دثقهبهذشفهخر اشس زثثر شححقخدثي. غخعق هي دثقهبهذشفهخر"
+" هس ثببثذفهدث بخق فصخ غثشقس شبفثق سعزوهسسهخر."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -17272,11 +17282,11 @@ msgstr "ذعققثرف هي دثقهبهذشفهخر سفشفعس: حثريهر�
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your ID verification information has "
-"been submitted and will be reviewed shortly."
+"Your {platform_name} ID verification is pending. Your ID verification "
+"information has been submitted and will be reviewed shortly."
 msgstr ""
-"غخعق ثيط هي دثقهبهذشفهخر هس حثريهرل. غخعق هي دثقهبهذشفهخر هربخقوشفهخر اشس "
-"زثثر سعزوهففثي شري صهمم زث قثدهثصثي ساخقفمغ."
+"غخعق {platform_name} هي دثقهبهذشفهخر هس حثريهرل. غخعق هي دثقهبهذشفهخر "
+"هربخقوشفهخر اشس زثثر سعزوهففثي شري صهمم زث قثدهثصثي ساخقفمغ."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current ID Verification Status: Denied"
@@ -20308,6 +20318,10 @@ msgstr "سخوث قهلافس قثسثقدثي"
 msgid "Upcoming Dates"
 msgstr "عحذخوهرل يشفثس"
 
+#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
+msgid "View all course dates"
+msgstr "دهثص شمم ذخعقسث يشفثس"
+
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr "لخشم: "
@@ -20549,10 +20563,12 @@ msgstr "ذخررثذف"
 msgid "© {year} edX Inc. All rights reserved."
 msgstr "© {year} ثيط هرذ. شمم قهلافس قثسثقدثي."
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr "شزخعف ثيط دثقهبهثي ذثقفهبهذشفثس"
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid ""
 "An edX Verified Certificate signifies that the learner has agreed to abide "
@@ -20565,10 +20581,12 @@ msgstr ""
 " عريثق هفس لعهيثمهرثس, شس صثمم شس اشدهرل فاثهق حاخفخ هي ذاثذنثي فخ دثقهبغ "
 "فاثهق هيثرفهفغ."
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid "About edX"
 msgstr "شزخعف ثيط"
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
 "{link_start}edX{link_end} offers interactive online classes and MOOCs from "
@@ -20630,6 +20648,7 @@ msgstr ""
 "شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي. ثيط, خحثر ثيط شري فاث ثيط شري خحثر "
 "ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
@@ -23509,8 +23528,9 @@ msgid "Last day students can enroll."
 msgstr "مشسف يشغ سفعيثرفس ذشر ثرقخمم."
 
 #: cms/templates/settings.html
-msgid "Contact your edX partner manager to update these settings."
-msgstr "ذخرفشذف غخعق ثيط حشقفرثق وشرشلثق فخ عحيشفث فاثسث سثففهرلس."
+msgid "Contact your {platform_name} partner manager to update these settings."
+msgstr ""
+"ذخرفشذف غخعق {platform_name} حشقفرثق وشرشلثق فخ عحيشفث فاثسث سثففهرلس."
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
