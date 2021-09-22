@@ -7,7 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: d
 from django.db import transaction
 
 from common.djangoapps.student.models import User
-from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
 from openedx.core.djangoapps.enrollments import api as enrollment_api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.lib.log_utils import audit_log
@@ -69,9 +68,6 @@ def lms_enroll_user_in_course(
         except CourseEnrollmentError as error:
             log.exception("An error occurred while creating the new course enrollment for user "
                           "[%s] in course run [%s]", username, course_id)
-            raise error
-        except CourseUserGroup.DoesNotExist as error:
-            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
             raise error
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
