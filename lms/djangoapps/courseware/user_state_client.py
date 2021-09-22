@@ -12,6 +12,7 @@ from time import time
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -423,6 +424,15 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 state = json.loads(sm.state)
 
                 if state == {}:
+                    continue
+
+                try:
+                    sm.student
+                except ObjectDoesNotExist:
+                    log.warning(
+                        'The related user in student module record with the student_id %s does not exist',
+                        sm.student_id
+                    )
                     continue
 
                 yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)
