@@ -1020,5 +1020,5 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
 
 # Enhanced Staff Grader (ESG) URLs
 urlpatterns += [
-    url(r'^api/ora_staff_grader/', include(('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader'))),
+    url(r'^api/ora_staff_grader', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
 ]
