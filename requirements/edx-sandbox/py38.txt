@@ -88,5 +88,5 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   symmath
-tqdm==4.62.2
+tqdm==4.62.3
     # via nltk

@@ -558,7 +558,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.0.0
+edx-proctoring==4.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -654,7 +654,7 @@ future==0.18.2
     #   edx-celeryutils
     #   edx-enterprise
     #   pyjwkest
-geoip2==4.2.0
+geoip2==4.3.0
     # via -r requirements/edx/base.txt
 gitdb==4.0.7
     # via gitpython
@@ -1058,7 +1058,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.1
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==2.3.0
+pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.4.0
     # via
@@ -1315,7 +1315,7 @@ tableauserverclient==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-testfixtures==6.18.1
+testfixtures==6.18.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -1341,7 +1341,7 @@ tox==3.24.4
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
-tqdm==4.62.2
+tqdm==4.62.3
     # via
     #   -r requirements/edx/base.txt
     #   nltk

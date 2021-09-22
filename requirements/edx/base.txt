@@ -473,7 +473,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.in
-edx-proctoring==4.0.0
+edx-proctoring==4.0.1
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -545,7 +545,7 @@ future==0.18.2
     #   edx-celeryutils
     #   edx-enterprise
     #   pyjwkest
-geoip2==4.2.0
+geoip2==4.3.0
     # via -r requirements/edx/base.in
 glob2==0.7
     # via -r requirements/edx/base.in
@@ -1012,13 +1012,13 @@ sympy==1.6.2
     #   symmath
 tableauserverclient==0.16.0
     # via edx-enterprise
-testfixtures==6.18.1
+testfixtures==6.18.2
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
 tincan==1.0.0
     # via edx-event-routing-backends
-tqdm==4.62.2
+tqdm==4.62.3
     # via nltk
 typing-extensions==3.10.0.2
     # via aiohttp
