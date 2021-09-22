@@ -20,7 +20,6 @@ from uuid import uuid4
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.plugins import add_plugins
-from importlib.metadata import version
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
