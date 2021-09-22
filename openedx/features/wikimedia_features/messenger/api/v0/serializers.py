@@ -62,12 +62,6 @@ class InboxSerializer(serializers.ModelSerializer):
         super(InboxSerializer, self).__init__(*args, **kwargs)
         self.request = self.context.get('request')
 
-    def _get_last_message_date(self, msg_datetime):
-        if msg_datetime.date() == datetime.today().date():
-            return "Today"
-        else:
-            return msg_datetime.strftime('%x')
-
     def get_with_user(self, obj):
         if self.request:
             if obj.last_message.sender != self.request.user:

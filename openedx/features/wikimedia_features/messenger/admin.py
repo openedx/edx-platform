@@ -21,7 +21,7 @@ class InboxAdmin(admin.ModelAdmin):
     """
     Admin config for clearesult credits offered by the courses.
     """
-    search_fields = ('sender', 'receiver')
+    search_fields = ('last_message__sender__username', 'last_message__receiver__username')
     list_display = ('id', 'sender', 'receiver', 'message', 'unread_count')
 
     def sender(self, obj):
