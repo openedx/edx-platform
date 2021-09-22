@@ -10,7 +10,6 @@ from common.djangoapps.student.models import User
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
 from openedx.core.djangoapps.enrollments import api as enrollment_api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
-from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
@@ -62,7 +61,6 @@ def lms_enroll_user_in_course(
                 enrollment_attributes=None,
                 enterprise_uuid=enterprise_uuid,
             )
-            add_user_to_course_cohort(cohort_name, course_id, user)
             log.info('The user [%s] has been enrolled in course run [%s].', username, course_id)
             return response
         except CourseEnrollmentExistsError as error:
