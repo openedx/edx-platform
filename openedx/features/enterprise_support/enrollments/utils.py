@@ -23,7 +23,6 @@ def lms_enroll_user_in_course(
     course_id,
     mode,
     enterprise_uuid,
-    cohort_name=None,
     is_active=True,
 ):
     """
@@ -41,7 +40,6 @@ def lms_enroll_user_in_course(
      - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
      - mode (CourseMode): course mode
      - enterprise_uuid (str): id to identify the enterprise to enroll under
-     - cohort_name (str): Optional. If provided, user will be added to cohort
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
 
