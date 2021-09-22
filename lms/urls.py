@@ -1017,3 +1017,8 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
             name='courseware_xblock_handler_provider_state',
         )
     ]
+
+# Enhanced Staff Grader (ESG) URLs
+urlpatterns += [
+    url(r'^api/ora_staff_grader/', include(('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-gradder'))),
+]
