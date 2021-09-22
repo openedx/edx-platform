@@ -101,8 +101,6 @@
           "verify_identity_url": null,
           "verification_status": "none",
           "linkedin_add_to_profile_url": null,
-          "is_mfe_special_exams_enabled": false,
-          "is_mfe_proctored_exams_enabled": false,
           "user_needs_integrity_signature": false
         },
         "matchingRules": {
@@ -236,12 +234,6 @@
             "match": "type"
           },
           "$.body.verification_status": {
-            "match": "type"
-          },
-          "$.body.is_mfe_special_exams_enabled": {
-            "match": "type"
-          },
-          "$.body.is_mfe_proctored_exams_enabled": {
             "match": "type"
           },
           "$.body.user_needs_integrity_signature": {
