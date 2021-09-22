@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
@@ -25,6 +26,7 @@
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Grégory Petit <petit.gregory.51@gmail.com>, 2020
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
+# iderr <ibrahim@derraz.fr>, 2021
 # INARES <contact@inares.org>, 2015
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
@@ -97,6 +99,7 @@
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # harifetraram <harifetraram@gmail.com>, 2017
 # harifetraram <harifetraram@gmail.com>, 2017
+# iderr <ibrahim@derraz.fr>, 2021
 # John Burke <johnb@matinee.co.uk>, 2018
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
@@ -181,6 +184,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
 # 0169fee580ff5de3f9b7241d14f30af9_5f30934 <1948a2319336319ed4429b6139c8c1c2_916898>, 2020
 # Benjamin PENA <benjamin.pena@fun-mooc.fr>, 2019
 # Daniel Le Berre, 2014
@@ -209,9 +213,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-12 20:44+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-09-21 17:10+0000\n"
+"PO-Revision-Date: 2021-09-20 19:38+0000\n"
+"Last-Translator: Abdessamad Derraz <derraz.abdessamad@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -8720,25 +8724,31 @@ msgid "View Program Record"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Credit Opportunities"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Learn More"
 msgstr "En savoir plus"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Professional Opportunities"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
 msgstr "Félicitations !"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Votre Parcours d'apprentissage"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "To complete the program, you must earn a verified certificate for each "
@@ -8747,36 +8757,44 @@ msgstr ""
 "Afin de compléter ce programme, vous devez obtenir un certificat vérifié "
 "pour chacun de ces cours."
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "${listPrice}"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid " ${price} {currency} )"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
 msgstr "EN COURS"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "REMAINING COURSES"
 msgstr "RESTANT"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COMPLETED COURSES"
 msgstr "TERMINE"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "As you complete courses, you will see them listed here."
 msgstr ""
 "Au fur et à mesure que vous terminez des cours, vous les verrez apparaître "
 "ici."
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"

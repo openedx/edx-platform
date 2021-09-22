@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-19 20:51+0000\n"
-"PO-Revision-Date: 2021-09-19 20:51:57.465486\n"
+"POT-Creation-Date: 2021-09-22 16:11+0000\n"
+"PO-Revision-Date: 2021-09-22 16:11:47.478917\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8655,25 +8655,31 @@ msgid "View Program Record"
 msgstr "دهثص حقخلقشو قثذخقي"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Credit Opportunities"
 msgstr "شييهفهخرشم ذقثيهف خححخقفعرهفهثس"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Learn More"
 msgstr "مثشقر وخقث"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Professional Opportunities"
 msgstr "شييهفهخرشم حقخبثسسهخرشم خححخقفعرهفهثس"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
 msgstr "ذخرلقشفعمشفهخرس!"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "غخعق حقخلقشو تخعقرثغ"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "To complete the program, you must earn a verified certificate for each "
@@ -8682,34 +8688,42 @@ msgstr ""
 "فخ ذخوحمثفث فاث حقخلقشو, غخع وعسف ثشقر ش دثقهبهثي ذثقفهبهذشفث بخق ثشذا "
 "ذخعقسث."
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr "عحلقشيث شمم قثوشهرهرل ذخعقسثس ("
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "${listPrice}"
 msgstr "${listPrice}"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid " ${price} {currency} )"
 msgstr " ${price} {currency} )"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
 msgstr "ذخعقسثس هر حقخلقثسس"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "REMAINING COURSES"
 msgstr "قثوشهرهرل ذخعقسثس"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COMPLETED COURSES"
 msgstr "ذخوحمثفثي ذخعقسثس"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "As you complete courses, you will see them listed here."
 msgstr "شس غخع ذخوحمثفث ذخعقسثس, غخع صهمم سثث فاثو مهسفثي اثقث."
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"

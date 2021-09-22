@@ -123,7 +123,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-19 20:44+0000\n"
+"POT-Creation-Date: 2021-09-21 17:10+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -2898,10 +2898,11 @@ msgid "Video Upload Credentials"
 msgstr "Дані відео завантаження"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
 msgid ""
-"Enter the unique identifier for your course's video files provided by edX."
+"Enter the unique identifier for your course's video files provided by "
+"{platform_name}."
 msgstr ""
-"Введіть унікальний ідентифікатор для відео файлів курсу, що надано edX."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -2970,15 +2971,12 @@ msgstr "Включить CCX"
 #. manage the custom course for
 #. his students.
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
-"manage Custom Courses on edX. When false, Custom Courses cannot be created, "
-"but existing Custom Courses will be preserved."
+"manage Custom Courses on {platform_name}. When false, Custom Courses cannot "
+"be created, but existing Custom Courses will be preserved."
 msgstr ""
-"Дозвольте викладачам призначати тьюторів та надайте останнім право "
-"завідувати індивідуальними курсами в системі. Якщо вказати значення false, "
-"то це не вплине на вже сформовані індивідуальні курси, але створювати нові "
-"буде не можна."
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
@@ -5585,6 +5583,7 @@ msgstr "Карта сайту"
 msgid "Affiliates"
 msgstr "Філії"
 
+#. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
@@ -6162,9 +6161,10 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: lms/djangoapps/course_home_api/outline/views.py
+#, python-brace-format
 msgid ""
-"Please contact your degree administrator or edX Support if you have "
-"questions."
+"Please contact your degree administrator or {platform_name} Support if you "
+"have questions."
 msgstr ""
 
 #: lms/djangoapps/course_home_api/outline/views.py
@@ -6703,11 +6703,9 @@ msgstr "Увійти"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course content."
-"                             {enroll_link_start}Enroll now{enroll_link_end}."
+"You must be enrolled in the course to see course content. "
+"{enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
-" Ви повинні записатися на курс аби бачити контент курсу. "
-"{enroll_link_start}Записатися зараз{enroll_link_end}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -6800,12 +6798,11 @@ msgid "Specify your annual household income in US Dollars."
 msgstr "Вкажіть ваш сімейний річний дохід у доларах США"
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid ""
-"I allow edX to use the information provided in this application (except for "
-"financial information) for edX marketing purposes."
+"I allow {platform_name} to use the information provided in this application "
+"(except for financial information) for {platform_name} marketing purposes."
 msgstr ""
-"Я дозволяю edX використовувати інформацію, надану в даній заяві (за винятком"
-" фінансової інформації) у своїх маркетингових цілях."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -9472,17 +9469,17 @@ msgid "Download the Android app on the Google Play Store"
 msgstr "Завантажте Android додаток у Google Play Store"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Our mailing address is"
-msgstr "Наша поштова адреса - "
+msgid "Our mailing address is:"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "Unsubscribe from these emails."
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr "Електронна пошта edX"
+#, python-format
+msgid "%(platform_name)s Email"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -9871,6 +9868,7 @@ msgstr ""
 msgid "ID of the imported course."
 msgstr ""
 
+#. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "open edx user"
 msgstr ""
@@ -10932,8 +10930,8 @@ msgstr "Спеціальність"
 #, python-brace-format
 msgid ""
 "Make sure that you are providing a valid username or a URL that contains "
-"\"{url_stub}\". To remove the link from your edX profile, leave this field "
-"blank."
+"\"{url_stub}\". To remove the link from your {platform_name} profile, leave "
+"this field blank."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
@@ -11776,9 +11774,10 @@ msgid "Welcome to {course_display_name}"
 msgstr "Вітаємо на  {course_display_name}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content. Please contact "
-"your degree administrator or edX Support if you have questions."
+"your degree administrator or {platform_name} Support if you have questions."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -11958,6 +11957,10 @@ msgstr ""
 #, python-brace-format
 msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr ""
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr "Наша поштова адреса - "
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -15001,8 +15004,8 @@ msgid "Name your CCX"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
-msgid "Create a new Custom Course for edX"
-msgstr "Створити новий власний курс на edX"
+msgid "Create a new Custom Course for {platform_name}"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
@@ -15331,10 +15334,6 @@ msgid ""
 "else's certificate, please contact them to get an updated link."
 msgstr ""
 
-#: lms/templates/certificates/valid.html
-msgid "About edX Certificates"
-msgstr ""
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -15584,7 +15583,7 @@ msgid "Get access to the course material, including videos and readings"
 msgstr ""
 
 #: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be lost"
+msgid "Some graded content may be locked"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
@@ -16443,7 +16442,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have successfully verified your ID with edX"
+msgid "You have successfully verified your ID with {platform_name}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16564,8 +16563,8 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification has been approved. Your ID verification is "
-"effective for two years after submission."
+"Your {platform_name} ID verification has been approved. Your ID verification"
+" is effective for two years after submission."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16585,8 +16584,8 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your ID verification information has "
-"been submitted and will be reviewed shortly."
+"Your {platform_name} ID verification is pending. Your ID verification "
+"information has been submitted and will be reviewed shortly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -19317,6 +19316,10 @@ msgstr ""
 msgid "Upcoming Dates"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
+msgid "View all course dates"
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr ""
@@ -19543,10 +19546,12 @@ msgstr ""
 msgid "© {year} edX Inc. All rights reserved."
 msgstr ""
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr ""
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid ""
 "An edX Verified Certificate signifies that the learner has agreed to abide "
@@ -19555,10 +19560,12 @@ msgid ""
 "their identity."
 msgstr ""
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid "About edX"
 msgstr "Про edX"
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
 "{link_start}edX{link_end} offers interactive online classes and MOOCs from "
@@ -19609,6 +19616,7 @@ msgid ""
 "edX logos are registered trademarks of edX Inc."
 msgstr ""
 
+#. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
@@ -22223,7 +22231,7 @@ msgid "Last day students can enroll."
 msgstr "Останній день запису на курс."
 
 #: cms/templates/settings.html
-msgid "Contact your edX partner manager to update these settings."
+msgid "Contact your {platform_name} partner manager to update these settings."
 msgstr ""
 
 #: cms/templates/settings.html
