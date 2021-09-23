@@ -21,7 +21,20 @@ class CourseMetadataSerializer(serializers.Serializer):
 
 
 class OpenResponseMetadataSerializer(serializers.Serializer):
-    pass
+    name = serializers.CharField(source='display_name')
+    prompts = serializers.ListField()
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['type'] = 'team' if instance.teams_enabled else 'individual'
+        return ret
+
+    class Meta:
+        fields = [
+            'name',
+            'prompts',
+            'type',
+        ]
 
 
 class SubmissionsSummarySerializer(serializers.Serializer):
