@@ -55,7 +55,7 @@ class OuterAtomic(transaction.Atomic):
     def __init__(self, using, savepoint, name=None, durable=False):
         self.name = name
         self.durable = durable
-        if django.VERSION >= (3, 1):
+        if django.VERSION >= (3, 2):
             super().__init__(using, savepoint, durable)   # pylint: disable=too-many-function-args
         else:
             super().__init__(using, savepoint)
