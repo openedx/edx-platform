@@ -593,7 +593,7 @@ def get_course_run_details(course_run_key, fields):
     Returns:
         dict with language, start date, end date, and max_effort details about specified course run
     """
-    course_run_details = dict()
+    course_run_details = {}
     user, catalog_integration = check_catalog_integration_and_get_user(
         error_message_field=f'Data for course_run {course_run_key}'
     )
