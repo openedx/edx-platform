@@ -63,6 +63,5 @@ class WikiCourseApp(CourseApp):
         return {
             # The wiki cannot be enabled/disabled via the API yet.
             "enable": False,
-            # There is nothing to configure for Wiki yet.
-            "configure": False,
+            "configure": True,
         }
