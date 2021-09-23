@@ -3,11 +3,16 @@ from django.conf import settings
 from lms.djangoapps.arch_experiments.signals.handlers import ARCH_EXPERIMENTS_TOPIC
 import pulsar
 
+from lms.djangoapps.arch_experiments.signals.handlers import UnenrollMessage
+
 ARCH_EXPERIMENTS_CONSUMER = settings.PULSAR_CLIENT.subscribe(
     ARCH_EXPERIMENTS_TOPIC,
     settings.CONSUMER_GROUP_NAME,
     consumer_type=pulsar.ConsumerType.Shared,
+    schema=pulsar.schema.AvroSchema(UnenrollMessage),
 )
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
@@ -23,4 +28,3 @@ class Command(BaseCommand):
             except:
                 # Message failed to be processed
                 ARCH_EXPERIMENTS_CONSUMER.negative_acknowledge(msg)
-
