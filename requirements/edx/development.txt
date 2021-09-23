@@ -59,7 +59,7 @@ asgiref==3.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   uvicorn
-astroid==2.7.3
+astroid==2.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -235,7 +235,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-distlib==0.3.2
+distlib==0.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
@@ -903,7 +903,7 @@ mypy-extensions==0.4.3
     # via mypy
 mysqlclient==2.0.3
     # via -r requirements/edx/testing.txt
-newrelic==6.10.0.165
+newrelic==7.0.0.166
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -977,7 +977,7 @@ pillow==8.3.2
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-organizations
-pip-tools==6.2.0
+pip-tools==6.3.0
     # via -r requirements/edx/pip-tools.txt
 platformdirs==2.3.0
     # via
@@ -1132,7 +1132,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.1
     # via -r requirements/edx/testing.txt
-pytest-xdist[psutil]==2.3.0
+pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.txt
 python-dateutil==2.4.0
     # via
@@ -1381,7 +1381,7 @@ sphinxcontrib-devhelp==1.0.2
     # via sphinx
 sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
-sphinxcontrib-httpdomain==1.7.0
+sphinxcontrib-httpdomain==1.8.0
     # via sphinxcontrib-openapi
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
@@ -1465,9 +1465,11 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
+    #   astroid
     #   gitpython
     #   mypy
     #   pydantic
+    #   pylint
 ua-parser==0.10.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1483,7 +1485,7 @@ uritemplate==3.0.1
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
@@ -1508,7 +1510,7 @@ virtualenv==20.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-voluptuous==0.12.1
+voluptuous==0.12.2
     # via
     #   -r requirements/edx/testing.txt
     #   ora2

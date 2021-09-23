@@ -55,7 +55,7 @@ appdirs==1.4.4
     #   fs
 asgiref==3.4.1
     # via uvicorn
-astroid==2.7.3
+astroid==2.8.0
     # via
     #   pylint
     #   pylint-celery
@@ -224,7 +224,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.txt
-distlib==0.3.2
+distlib==0.3.3
     # via virtualenv
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -850,7 +850,7 @@ multidict==5.1.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==6.10.0.165
+newrelic==7.0.0.166
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -920,7 +920,9 @@ pillow==8.3.2
     #   edx-enterprise
     #   edx-organizations
 platformdirs==2.3.0
-    # via virtualenv
+    # via
+    #   pylint
+    #   virtualenv
 pluggy==1.0.0
     # via
     #   -r requirements/edx/coverage.txt
@@ -1057,7 +1059,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.1
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==2.3.0
+pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.4.0
     # via
@@ -1350,8 +1352,10 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
+    #   astroid
     #   gitpython
     #   pydantic
+    #   pylint
 ua-parser==0.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -1367,7 +1371,7 @@ uritemplate==3.0.1
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -1388,7 +1392,7 @@ vine==1.3.0
     #   celery
 virtualenv==20.8.0
     # via tox
-voluptuous==0.12.1
+voluptuous==0.12.2
     # via
     #   -r requirements/edx/base.txt
     #   ora2
