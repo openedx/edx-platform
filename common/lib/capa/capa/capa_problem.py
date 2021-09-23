@@ -301,7 +301,7 @@ class LoncapaProblem(object):
         """
         Reset internal state to unfinished, with no answers
         """
-        self.student_answers = dict()
+        self.student_answers = {}
         self.has_saved_answers = False
         self.correct_map = CorrectMap()
         self.done = False
@@ -310,7 +310,7 @@ class LoncapaProblem(object):
         """
         Set the student's answers to the responders' initial displays, if specified.
         """
-        initial_answers = dict()
+        initial_answers = {}
         for responder in self.responders.values():
             if hasattr(responder, 'get_initial_display'):
                 initial_answers.update(responder.get_initial_display())
@@ -318,7 +318,7 @@ class LoncapaProblem(object):
         self.student_answers = initial_answers
 
     def __str__(self):
-        return u"LoncapaProblem ({0})".format(self.problem_id)
+        return "LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
         """
@@ -486,7 +486,7 @@ class LoncapaProblem(object):
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
                 _ = get_gettext(self.capa_system.i18n)
-                raise Exception(_(u"Cannot rescore problems with possible file submissions"))
+                raise Exception(_("Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
@@ -506,7 +506,7 @@ class LoncapaProblem(object):
         (see capa_module)
         """
         # dict of (id, correct_answer)
-        answer_map = dict()
+        answer_map = {}
         for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             results = self.responder_answers[response]
             answer_map.update(results)
@@ -1157,7 +1157,7 @@ class LoncapaProblem(object):
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
             group_description_tags = response.findall('description')
-            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
+            group_label_tag_id = 'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
@@ -1168,7 +1168,7 @@ class LoncapaProblem(object):
 
             group_description_ids = []
             for index, group_description_tag in enumerate(group_description_tags):
-                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
+                group_description_tag_id = 'multiinput-group-description-{}-{}'.format(responsetype_id, index)
                 group_description_tag.tag = 'p'
                 group_description_tag.set('id', group_description_tag_id)
                 group_description_tag.set('class', 'multi-inputs-group-description question-description')
