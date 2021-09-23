@@ -37,5 +37,31 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
         ]
 
 
-class SubmissionsSummarySerializer(serializers.Serializer):
-    pass
+class GradeDataSerializer(serializers.Serializer):
+    pointsEarned = serializers.IntegerField()
+    pointsPossible = serializers.IntegerField()
+
+    class Meta:
+        fields = [ 'pointsEarned', 'pointsPossible' ]
+
+
+class SubmissionMetadataSerializer(serializers.Serializer):
+    submissionId = serializers.CharField()
+    username = serializers.CharField()
+    teamName = serializers.CharField()
+    dateSubmitted = serializers.DateTimeField()
+    gradeStatus = serializers.CharField()
+    lockStatus = serializers.CharField()
+    grade = GradeDataSerializer()
+
+    class Meta:
+        fields = [
+            'submissionId',
+            'username',
+            'teamName',
+            'dateSubmitted',
+            'gradeStatus',
+            'lockStatus',
+            'grade'
+        ]
+
