@@ -8,7 +8,7 @@ import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
-
+import django
 from django.db import DEFAULT_DB_ALIAS, transaction  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.cache_utils import get_cache
@@ -52,10 +52,13 @@ class OuterAtomic(transaction.Atomic):
     """
     ALLOW_NESTED = False
 
-    def __init__(self, using, savepoint, name=None, durable=False,):
+    def __init__(self, using, savepoint, name=None, durable=False):
         self.name = name
         self.durable = durable
-        super().__init__(using, savepoint, durable)
+        if django.VERSION >= (3, 1):
+            super().__init__(using, savepoint, durable)
+        else:
+            super().__init__(using, savepoint)
 
     def __enter__(self):
 
