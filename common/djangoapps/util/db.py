@@ -52,9 +52,10 @@ class OuterAtomic(transaction.Atomic):
     """
     ALLOW_NESTED = False
 
-    def __init__(self, using, savepoint, name=None):
+    def __init__(self, using, savepoint, durable=False, name=None):
         self.name = name
-        super().__init__(using, savepoint)
+        self.durable = durable
+        super().__init__(using, savepoint, durable)
 
     def __enter__(self):
 
@@ -84,7 +85,7 @@ class OuterAtomic(transaction.Atomic):
         super().__enter__()
 
 
-def outer_atomic(using=None, savepoint=True, name=None):
+def outer_atomic(using=None, savepoint=True, name=None, durable=False):
     """
     A variant of Django's atomic() which cannot be nested inside another atomic.
 
@@ -120,10 +121,10 @@ def outer_atomic(using=None, savepoint=True, name=None):
         TransactionManagementError: if already inside an atomic block.
     """
     if callable(using):
-        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint)(using)
+        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
     # Decorator: @outer_atomic(...) or context manager: with outer_atomic(...): ...
     else:
-        return OuterAtomic(using, savepoint, name)
+        return OuterAtomic(using, savepoint, name, durable)
 
 
 def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
