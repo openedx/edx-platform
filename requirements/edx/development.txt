@@ -556,7 +556,7 @@ edx-lint==5.1.0
     # via -r requirements/edx/testing.txt
 edx-milestones==0.3.2
     # via -r requirements/edx/testing.txt
-edx-name-affirmation==0.11.0
+edx-name-affirmation==1.0.0
     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.2
     # via
