@@ -173,7 +173,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         if course_module is None:
             return None, None, None
 
-        toc_chapters = list()
+        toc_chapters = []
         chapters = course_module.get_display_items()
 
         # Check for content which needs to be completed
@@ -201,7 +201,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             if chapter.hide_from_toc or local_hide_from_toc:
                 continue
 
-            sections = list()
+            sections = []
             for section in chapter.get_display_items():
                 # skip the section if it is hidden from the user
                 if section.hide_from_toc:

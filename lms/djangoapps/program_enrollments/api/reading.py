@@ -407,7 +407,7 @@ def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
         ProviderDoesNotExistsException
     """
     saml_providers = get_saml_providers_by_org_key(org_key)
-    found_users_by_external_keys = dict()
+    found_users_by_external_keys = {}
     # if the same external id exists in multiple providers (for this organization)
     # it is expected both providers return the same user
     for saml_provider in saml_providers:
