@@ -20,23 +20,49 @@
 
   <br>
 
-  <select name="course_categories" class="filter-selectbox">
+  <select name="course_categories" class="filter-selectbox" multiple>
     %for course in courses:
-      <p>course</p>
       <option value=${course}>${course.display_name_with_default}</option>
     %endfor
   </select>
 
   <br><br><br>
 
-  <p>
+  <p class ="single-course-report" style="display: block">
+    ${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}
+  </p>
+  <p class ="single-course-report" style="display: block">
     <input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['key']['get_students_features_url'] }" data-csv="true">
   </p>
 
+  <p class ="single-course-report" style="display: block">${_("Click to generate a CSV file that lists learners who can enroll in the course but have not yet done so.")}</p>
+  <p class ="single-course-report" style="display: block"><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['key']['get_students_who_may_enroll_url'] }" data-csv="true"></p>
+
+  <p class ="single-course-report" style="display: block">
+    ${_("Click to generate a CSV grade report for all currently enrolled students.")}
+  </p>
+  <p class ="single-course-report" style="display: block">
+    <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['key']['calculate_grades_csv_url'] }"/>
+    <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['key']['problem_grade_report_url'] }"/>
+  </p>
+  
+  <p class ="multiple-course-report" style="display: block">
+    ${_("Click to generate a CSV average grade report for multiple courses.")}
+  </p>
+  <p class ="multiple-course-report" style="display: block">
+    <input type="button" name="average-calculate-grades-csv" class="async-report-btn" value="${_("Generate Average Grade Report")}" data-endpoint="${ section_data['key']['average_calculate_grades_csv_url'] }"/>
+  </p>
   <br>
 
-  <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
-  <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
+  <p class ="single-course-report" style="display: block">
+    ${_("Click to download a CSV of anonymized student IDs:")}
+  </p>
+  <p class ="single-course-report" style="display: block">
+    <input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['key']['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
+  </p>
+
+  <div class="request-response" id="report-request-response" style="display: block"></div>
+  <div class="request-response-error" id="report-request-response-error" style="display: block"></div>
 
   <br><br>
 
@@ -47,6 +73,18 @@
   </p>
 
   <br><br>
+  <p>
+    ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
+        strong_start=HTML("<strong>"),
+        strong_end=HTML("</strong>"),
+        ul_start=HTML("<ul>"),
+        ul_end=HTML("</ul>"),
+        li_start=HTML("<li>"),
+        li_end=HTML("</li>"),
+    )}
+  </p>
+
+  <br>
   <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['key']['list_report_downloads_url'] }" ></div>
 % endif
 

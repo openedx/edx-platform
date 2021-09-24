@@ -6,7 +6,6 @@ from edx_django_utils.plugins import PluginSettings, PluginURLs
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
-
 class AdminDashboardConfig(AppConfig):
     name = 'openedx.features.wikimedia_features.admin_dashboard'
 
