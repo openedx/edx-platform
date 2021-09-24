@@ -24,4 +24,7 @@ urlpatterns += [
     url(
         'submission', FetchSubmissionView.as_view(), name='fetch-submission'
     ),
+    url(
+        'updateGrade', UpdateGradeView.as_view(), name='update-grade'
+    )
 ]

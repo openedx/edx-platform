@@ -80,4 +80,24 @@ class LockView(APIView):
             "lockStatus": submission['lockStatus']
         })
 
+class UpdateGradeView(RetrieveAPIView):
+    """ Submit a grade """
 
+    def update_grade_data(self, submission, grade_data):
+        submission['gradeData'] = grade_data
+        submission['score'] = grade_data['score']
+        submission['gradeStatus'] = 'graded'
+        submission['lockStatus'] = 'unlocked'
+
+    def post(self, request):
+        submission_id = request.query_params['submissionId']
+        grade_data = request.data
+
+        submission = fetch_submission(submission_id)
+
+        self.update_grade_data(submission, grade_data)
+        save_submission_update(submission)
+
+        return Response({
+            'gradeData': submission['gradeData']
+        })
