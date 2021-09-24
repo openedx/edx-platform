@@ -21,3 +21,10 @@ def get_ora_metadata(ora_location):
 
 def get_submissions(ora_location):  # pylint: disable=unused-argument
     return read_data_file("submissions.json")
+
+def fetch_submission(submission_id):
+    return read_data_file("submissions.json").get(submission_id)
+
+def fetch_response(submission_id):  # pylint: disable=unused-argument
+    # Right now, we use a single reponse
+    return read_data_file("responses.json").get("default")

@@ -15,4 +15,10 @@ urlpatterns += [
     url(
         'initialize', InitializeView.as_view(), name='initialize'
     ),
+    url(
+        'submissionStatus', FetchSubmissionStatusView.as_view(), name='fetch-submission-status'
+    ),
+    url(
+        'submission', FetchSubmissionView.as_view(), name='fetch-submission'
+    ),
 ]

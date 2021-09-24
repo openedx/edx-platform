@@ -19,3 +19,35 @@ class InitializeView(RetrieveAPIView):
             'oraMetadata': get_ora_metadata(ora_location),
             'submissions': get_submissions(ora_location)
         })
+
+
+class FetchSubmissionView(RetrieveAPIView):
+    """ Get a submission """
+
+    def get(self, request):
+        submission_id = request.query_params['submissionId']
+
+        submission = fetch_submission(submission_id)
+        response = fetch_response(submission_id)
+
+        return Response({
+            'gradeData': submission['gradeData'],
+            'response': response,
+            'gradeStatus': submission['gradeStatus'],
+        })
+
+
+
+class FetchSubmissionStatusView(RetrieveAPIView):
+    """ Get a submission status """
+
+    def get(self, request):
+        submission_id = request.query_params['submissionId']
+
+        submission = fetch_submission(submission_id)
+
+        return Response({
+            'gradeStatus': submission['gradeStatus'],
+            'lockStatus': submission['lockStatus'],
+            'gradeData': submission['gradeData']
+        })
