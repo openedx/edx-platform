@@ -224,7 +224,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.txt
-distlib==0.3.2
+distlib==0.3.3
     # via virtualenv
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -313,7 +313,7 @@ django-config-models==2.2.0
     #   edx-name-affirmation
     #   lti-consumer-xblock
     # via -r requirements/edx/base.txt
-django-cors-headers==3.2.0
+django-cors-headers==3.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -493,6 +493,7 @@ edx-ccx-keys==1.2.1
 edx-celeryutils==1.1.0
     # via
     #   -r requirements/edx/base.txt
+    #   edx-name-affirmation
     #   super-csv
 edx-completion==4.1.0
     # via -r requirements/edx/base.txt
@@ -506,6 +507,7 @@ edx-django-utils==4.4.0
     #   django-config-models
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-name-affirmation
     #   edx-rest-api-client
     #   edx-toggles
     #   edx-when
@@ -850,7 +852,7 @@ multidict==5.1.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==6.10.0.165
+newrelic==7.0.0.166
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1058,7 +1060,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.1
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==2.3.0
+pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.4.0
     # via
@@ -1368,7 +1370,7 @@ uritemplate==3.0.1
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -1389,7 +1391,7 @@ vine==1.3.0
     #   celery
 virtualenv==20.8.0
     # via tox
-voluptuous==0.12.1
+voluptuous==0.12.2
     # via
     #   -r requirements/edx/base.txt
     #   ora2
