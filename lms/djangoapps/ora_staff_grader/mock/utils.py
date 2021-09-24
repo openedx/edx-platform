@@ -19,5 +19,5 @@ def get_course_metadata(course_id):
 def get_ora_metadata(ora_location):
     return read_data_file("ora_metadata.json")[ora_location]
 
-def get_submissions(ora_location):
-    return read_data_file("submissions.json")[ora_location]
+def get_submissions(ora_location):  # pylint: disable=unused-argument
+    return read_data_file("submissions.json")
