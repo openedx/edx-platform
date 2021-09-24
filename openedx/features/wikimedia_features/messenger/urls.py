@@ -5,6 +5,7 @@ from django.conf.urls import include, url
 
 from  openedx.features.wikimedia_features.messenger.views import render_messenger_home
 
+app_name = 'messenger'
 
 urlpatterns = [
     url(
