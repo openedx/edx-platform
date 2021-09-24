@@ -22,6 +22,7 @@ define(
             '?config=TeX-MML-AM_HTMLorMML&delayStartupUntil=configured',
             'mathjax',
             function() {
+              if (typeof window.MathJax.Hub !== 'undefined') {  // for Devstack when internet connection is off
                 window.MathJax.Hub.Config({
                     tex2jax: {
                         inlineMath: [
@@ -34,7 +35,6 @@ define(
                         ]
                     }
                 });
-
                 // In order to eliminate all flashing during interactive
                 // preview, it is necessary to set processSectionDelay to 0
                 // (remove delay between input and output phases). This
@@ -42,6 +42,7 @@ define(
                 // the fast preview setting as shown in the context menu.
                 window.MathJax.Hub.processSectionDelay = 0;
                 window.MathJax.Hub.Configured();
+              }
             }
         );
         window.CodeMirror = CodeMirror;
