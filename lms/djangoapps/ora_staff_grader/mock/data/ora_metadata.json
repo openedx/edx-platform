@@ -1,0 +1,32 @@
+{
+    "block-a": {
+        "name": "Individual ORA",
+        "prompts": [
+            {
+                "description": "<p>Enter a text/files response.</p>"
+            }
+        ],
+        "type": "individual"
+    },
+    "block-b": {
+        "name": "Team ORA",
+        "prompts": [
+            {
+                "description": "<p>Enter a text/files response.</p>"
+            }
+        ],
+        "type": "team"
+    },
+    "block-c": {
+        "name": "Individual ORA, multiple prompts",
+        "prompts": [
+            {
+                "description": "<p>Enter a text/files response.</p>"
+            },
+            {
+                "description": "<p>Enter another text/files response.</p>"
+            }
+        ],
+        "type": "team"
+    }
+}
