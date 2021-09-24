@@ -3,6 +3,7 @@ Mock views for ESG
 """
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.views import APIView
 
 from lms.djangoapps.ora_staff_grader.mock.utils import *
 
@@ -51,3 +52,32 @@ class FetchSubmissionStatusView(RetrieveAPIView):
             'lockStatus': submission['lockStatus'],
             'gradeData': submission['gradeData']
         })
+
+
+class LockView(APIView):
+    """ Lock a submission for grading """
+
+    def lock_submission(self, submission, value):
+        """
+        Change lock status on a submission.
+        For now, that means updating to "in-progress" when requested
+        or to "unlocked" when a lock is released
+        """
+        submission['lockStatus'] = 'in-progress' if value else 'unlocked'
+        return submission
+
+
+    def post(self, request):
+        value = request.query_params['value'] == "true"  # Bool, whether to lock (True) or unlock (False) submission
+        submission_id = request.query_params['submissionId']
+
+        submission = fetch_submission(submission_id)
+
+        self.lock_submission(submission, value)
+        save_submission_update(submission)
+
+        return Response({
+            "lockStatus": submission['lockStatus']
+        })
+
+

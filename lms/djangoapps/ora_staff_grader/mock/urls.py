@@ -6,7 +6,7 @@ NOTE - This should be the same as ../urls.py
 
 from django.conf.urls import url
 
-from lms.djangoapps.ora_staff_grader.mock.views import InitializeView
+from lms.djangoapps.ora_staff_grader.mock.views import *
 
 
 urlpatterns = []
@@ -17,6 +17,9 @@ urlpatterns += [
     ),
     url(
         'submissionStatus', FetchSubmissionStatusView.as_view(), name='fetch-submission-status'
+    ),
+    url(
+        'submission/lock', LockView.as_view(), name='lock-submission'
     ),
     url(
         'submission', FetchSubmissionView.as_view(), name='fetch-submission'
