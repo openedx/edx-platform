@@ -542,7 +542,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
 
     :return: list of errors
     """
-    errors = list()
+    errors = []
     try:
         with transaction.atomic():
             # Create a new user

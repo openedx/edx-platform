@@ -238,7 +238,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     @ddt.data(
         # Default site configuration shows course number, org, and display name as subtitle.
-        (dict(),
+        ({},
          "Welcome to HogwartsX's Potions101!", "Introduction to Potions"),
 
         # Show org in title

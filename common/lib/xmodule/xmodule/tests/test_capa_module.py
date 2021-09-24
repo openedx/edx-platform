@@ -113,8 +113,7 @@ class CapaFactory:
             # since everything else is a string.
             field_data['attempts'] = int(attempts)
 
-        system = get_test_system(course_id=location.course_key)
-        system.user_is_staff = kwargs.get('user_is_staff', False)
+        system = get_test_system(course_id=location.course_key, user_is_staff=kwargs.get('user_is_staff', False))
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         module = ProblemBlock(
             system,
@@ -3155,7 +3154,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         </problem>
         """)
 
-        data = dict()
+        data = {}
         problem = CapaFactory.create(showanswer='always', xml=problem_xml)
         problem.runtime.replace_jump_to_id_urls = Mock()
         problem.get_answer(data)

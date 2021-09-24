@@ -369,7 +369,7 @@ class formula(object):
                 if (
                         tag == 'msup' and
                         len(k) == 2 and gettag(k[1]) == 'mrow' and
-                        gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'  # whew
+                        gettag(k[1][0]) == 'mo' and k[1][0].text == '\u200b'  # whew
                 ):
 
                     # replace the msup with 'X__Y'
@@ -384,7 +384,7 @@ class formula(object):
                 if (
                         tag == 'msubsup' and
                         len(k) == 3 and gettag(k[2]) == 'mrow' and
-                        gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'    # whew
+                        gettag(k[2][0]) == 'mo' and k[2][0].text == '\u200b'    # whew
                 ):
 
                     # replace the msubsup with 'X_Y__Z'

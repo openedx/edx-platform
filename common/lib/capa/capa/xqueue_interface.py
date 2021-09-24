@@ -93,7 +93,7 @@ class XQueueInterface(object):
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get('queue_name', u'')  # lint-amnesty, pylint: disable=unused-variable
+        queue_name = header_info.get('queue_name', '')  # lint-amnesty, pylint: disable=unused-variable
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)

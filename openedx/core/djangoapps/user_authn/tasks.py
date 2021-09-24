@@ -2,8 +2,10 @@
 This file contains celery tasks for sending email
 """
 
-
+import hashlib
 import logging
+import math
+
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
@@ -13,11 +15,52 @@ from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
 from edx_django_utils.monitoring import set_code_owner_attribute
+from rest_framework.status import HTTP_408_REQUEST_TIMEOUT
 
+from common.djangoapps.track import segment
+from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 log = logging.getLogger('edx.celery.task')
+
+
+def get_pwned_properties(pwned_response, password):
+    """
+    Derive different pwned parameters for analytics
+    """
+    properties = {}
+    if pwned_response == HTTP_408_REQUEST_TIMEOUT:
+        properties['vulnerability'] = 'unknown'
+        pwned_count = 0
+    else:
+        pwned_count = pwned_response.get(password, 0)
+        properties['vulnerability'] = 'yes' if pwned_count > 0 else 'no'
+
+    if pwned_count > 0:
+        properties['frequency'] = math.ceil(math.log10(pwned_count))
+
+    return properties
+
+
+@shared_task
+def check_pwned_password_and_send_track_event(user_id, password, internal_user=False):
+    """
+    Check the Pwned Databases and send its event to Segment
+    """
+    try:
+        password = hashlib.sha1(password.encode('utf-8')).hexdigest()
+        pwned_response = PwnedPasswordsAPI.range(password)
+        if pwned_response is not None:
+            properties = get_pwned_properties(pwned_response, password)
+            properties['internal_user'] = internal_user
+            segment.track(user_id, 'edx.bi.user.pwned.password.status', properties)
+    except Exception:  # pylint: disable=W0703
+        log.exception(
+            'Unable to get response from pwned password api for user_id: "%s"',
+            user_id,
+        )
+        return None  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @shared_task(bind=True)

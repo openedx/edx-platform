@@ -7,10 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: d
 from django.db import transaction
 
 from common.djangoapps.student.models import User
-from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup
 from openedx.core.djangoapps.enrollments import api as enrollment_api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
-from openedx.core.djangoapps.enrollments.utils import add_user_to_course_cohort
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.enrollments.exceptions import (
     CourseIdMissingException,
@@ -25,7 +23,6 @@ def lms_enroll_user_in_course(
     course_id,
     mode,
     enterprise_uuid,
-    cohort_name=None,
     is_active=True,
 ):
     """
@@ -43,7 +40,6 @@ def lms_enroll_user_in_course(
      - course_id (obj) : Course key obtained using CourseKey.from_string(course_id_input)
      - mode (CourseMode): course mode
      - enterprise_uuid (str): id to identify the enterprise to enroll under
-     - cohort_name (str): Optional. If provided, user will be added to cohort
      - is_active (bool): Optional. A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
 
@@ -62,7 +58,6 @@ def lms_enroll_user_in_course(
                 enrollment_attributes=None,
                 enterprise_uuid=enterprise_uuid,
             )
-            add_user_to_course_cohort(cohort_name, course_id, user)
             log.info('The user [%s] has been enrolled in course run [%s].', username, course_id)
             return response
         except CourseEnrollmentExistsError as error:
@@ -71,9 +66,6 @@ def lms_enroll_user_in_course(
         except CourseEnrollmentError as error:
             log.exception("An error occurred while creating the new course enrollment for user "
                           "[%s] in course run [%s]", username, course_id)
-            raise error
-        except CourseUserGroup.DoesNotExist as error:
-            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
             raise error
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.

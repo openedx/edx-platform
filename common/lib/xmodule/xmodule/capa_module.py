@@ -31,6 +31,11 @@ from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ID,
+)
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
@@ -113,7 +118,7 @@ class Randomization(String):
     to_json = from_json
 
 
-@XBlock.wants('user')
+@XBlock.needs('user')
 @XBlock.needs('i18n')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
@@ -784,9 +789,10 @@ class ProblemBlock(
         """
         if self.rerandomize == RANDOMIZATION.NEVER:
             self.seed = 1
-        elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
+        elif self.rerandomize == RANDOMIZATION.PER_STUDENT:
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, str(self.location).encode('utf-8'))
+            self.seed = randomization_bin(user_id, str(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -801,9 +807,13 @@ class ProblemBlock(
         if text is None:
             text = self.data
 
+        user_service = self.runtime.service(self, 'user')
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
+
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
-            anonymous_student_id=self.runtime.anonymous_student_id,
+            anonymous_student_id=anonymous_student_id,
             cache=self.runtime.cache,
             can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
             get_python_lib_zip=self.runtime.get_python_lib_zip,
@@ -812,7 +822,7 @@ class ProblemBlock(
             i18n=self.runtime.service(self, "i18n"),
             node_path=self.runtime.node_path,
             render_template=self.runtime.render_template,
-            seed=self.runtime.seed,      # Why do we do this if we have self.seed?
+            seed=seed,  # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.xqueue,
             matlab_api_key=self.matlab_api_key
@@ -1165,7 +1175,7 @@ class ProblemBlock(
 
         # Log this demand-hint request. Note that this only logs the last hint requested (although now
         # all previously shown hints are still displayed).
-        event_info = dict()
+        event_info = {}
         event_info['module_id'] = str(self.location)
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
@@ -1412,6 +1422,7 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
             return False
@@ -1419,7 +1430,7 @@ class ProblemBlock(
             return False
         elif self.showanswer == SHOWANSWER.NEVER:
             return False
-        elif self.runtime.user_is_staff:
+        elif user_is_staff:
             # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
@@ -1459,10 +1470,11 @@ class ProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return ShowCorrectness.correctness_available(
             show_correctness=self.show_correctness,
             due_date=self.close_date,
-            has_staff_access=self.runtime.user_is_staff,
+            has_staff_access=user_is_staff,
         )
 
     def update_score(self, data):
@@ -1482,7 +1494,7 @@ class ProblemBlock(
         self.set_score(self.score_from_lcp(self.lcp))
         self.publish_grade(grader_response=True)
 
-        return dict()  # No AJAX return is needed
+        return {}  # No AJAX return is needed
 
     def handle_ungraded_response(self, data):
         """
@@ -1505,7 +1517,7 @@ class ProblemBlock(
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
         self.set_state_from_lcp()
-        return dict()
+        return {}
 
     def handle_input_ajax(self, data):
         """
@@ -1533,7 +1545,7 @@ class ProblemBlock(
             indication of the correct answers that is not solely based on color
             (and also screen reader text).
         """
-        event_info = dict()
+        event_info = {}
         event_info['problem_id'] = str(self.location)
         self.track_function_unmask('showanswer', event_info)
         if not self.answer_available():  # lint-amnesty, pylint: disable=no-else-raise
@@ -1544,7 +1556,7 @@ class ProblemBlock(
 
         # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
-        new_answers = dict()
+        new_answers = {}
         for answer_id in answers:
             try:
                 answer_content = self.runtime.replace_urls(answers[answer_id])
@@ -1613,7 +1625,7 @@ class ProblemBlock(
           (e.g. 'input_1' and 'input_1[]', which both get mapped to 'input_1'
            in the returned dict)
         """
-        answers = dict()
+        answers = {}
 
         # webob.multidict.MultiDict is a view of a list of tuples,
         # so it will return a multi-value key once for each value.
@@ -1688,7 +1700,7 @@ class ProblemBlock(
           {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
            'contents' : html}
         """
-        event_info = dict()
+        event_info = {}
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
 
@@ -1777,7 +1789,8 @@ class ProblemBlock(
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
-            if self.runtime.user_is_staff:
+            user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            if user_is_staff:
                 msg = f"Staff debug info: {traceback.format_exc()}"
 
             # Otherwise, display just an error message,
@@ -2001,7 +2014,7 @@ class ProblemBlock(
         Returns a dict { 'success' : bool, 'msg' : message }
         The message is informative on success, and an error message on failure.
         """
-        event_info = dict()
+        event_info = {}
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
 
@@ -2061,7 +2074,7 @@ class ProblemBlock(
         If an error occurs, the dictionary will also have an
         `error` key containing an error message.
         """
-        event_info = dict()
+        event_info = {}
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
         _ = self.runtime.service(self, "i18n").ugettext

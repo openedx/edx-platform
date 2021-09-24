@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -25,10 +26,23 @@ from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_co
 
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
-class TestCohortSignals(TestCase):
+class TestCohortSignals(TestCase, OpenEdxEventsTestMixin):
     """
     Test cases to validate event emissions for various cohort-related workflows
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()

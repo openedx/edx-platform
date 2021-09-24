@@ -105,14 +105,14 @@ class OptionInputTest(unittest.TestCase):
         check("('a', 'b')", ['a', 'b'])
         check("('a b','b')", ['a b', 'b'])
         check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
-        check(u"('б','в')", [u'б', u'в'])
-        check(u"('б', 'в')", [u'б', u'в'])
-        check(u"('б в','в')", [u'б в', u'в'])
-        check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
+        check("('б','в')", ['б', 'в'])
+        check("('б', 'в')", ['б', 'в'])
+        check("('б в','в')", ['б в', 'в'])
+        check("('Мой \"кавыки\"место','в')", ['Мой \"кавыки\"место', 'в'])
 
         # check that escaping single quotes with leading backslash (\') properly works
         # note: actual input by user will be hasn\'t but json parses it as hasn\\'t
-        check(u"('hasnt','hasn't')", [u'hasnt', u'hasn\'t'])
+        check("('hasnt','hasn't')", ['hasnt', 'hasn\'t'])
 
 
 class ChoiceGroupTest(unittest.TestCase):
@@ -337,13 +337,13 @@ class TextLineTest(unittest.TestCase):
         # standard trailing text
         trailing_text.append(('m/s', 'm/s'))
         # unicode trailing text
-        trailing_text.append((u'\xc3', u'\xc3'))
+        trailing_text.append(('\xc3', '\xc3'))
         # html escaped trailing text
         # this is the only one we expect to change
         trailing_text.append(('a &lt; b', 'a < b'))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = u"""<textline id="prob_1_2"
+            xml_str = """<textline id="prob_1_2"
                             size="{size}"
                             trailing_text="{tt}"
                             />""".format(size=size, tt=xml_text)
@@ -757,7 +757,7 @@ class MatlabTest(unittest.TestCase):
         for index, value in enumerate(output_list):
             output_list[index] = value.replace('u\'', '\'').strip()
 
-        expected_string = u"""
+        expected_string = """
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
         \'value\': \'print "good evening"\', \'hidden\': \'\',
         \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
@@ -857,13 +857,13 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         self.maxDiff = None
-        expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
+        expected = fromstring('\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
 
     def test_rendering_with_invalid_queue_msg(self):
-        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
-                                    u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
+        self.the_input.queue_msg = ("<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
+                                    "\nans =\n\n\u0002\n\n</div><ul></ul></div>")
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
         self.maxDiff = None
@@ -1215,7 +1215,7 @@ class ChemicalEquationTest(unittest.TestCase):
         """
         # Simulate answering a problem that raises the exception
         with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
-            mock_render.side_effect = ParseException(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+            mock_render.side_effect = ParseException("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
             response = self.the_input.handle_ajax(
                 "preview_chemcalc",
                 {'formula': 'H2O + invalid chemistry'}
@@ -1290,13 +1290,13 @@ class FormulaEquationTest(unittest.TestCase):
         # standard trailing text
         trailing_text.append(('m/s', 'm/s'))
         # unicode trailing text
-        trailing_text.append((u'\xc3', u'\xc3'))
+        trailing_text.append(('\xc3', '\xc3'))
         # html escaped trailing text
         # this is the only one we expect to change
         trailing_text.append(('a &lt; b', 'a < b'))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = u"""<formulaequationinput id="prob_1_2"
+            xml_str = """<formulaequationinput id="prob_1_2"
                             size="{size}"
                             trailing_text="{tt}"
                             />""".format(size=size, tt=xml_text)
@@ -1634,7 +1634,7 @@ class TestStatus(unittest.TestCase):
         """
         statobj = inputtypes.Status('test')
         assert str(statobj) == 'test'
-        assert six.text_type(statobj) == u'test'
+        assert six.text_type(statobj) == 'test'
 
     def test_classes(self):
         """
@@ -1656,13 +1656,13 @@ class TestStatus(unittest.TestCase):
         Test that display names are correct
         """
         names = [
-            ('correct', u'correct'),
-            ('incorrect', u'incorrect'),
-            ('incomplete', u'incomplete'),
-            ('unanswered', u'unanswered'),
-            ('unsubmitted', u'unanswered'),
-            ('queued', u'processing'),
-            ('dave', u'dave'),
+            ('correct', 'correct'),
+            ('incorrect', 'incorrect'),
+            ('incomplete', 'incomplete'),
+            ('unanswered', 'unanswered'),
+            ('unsubmitted', 'unanswered'),
+            ('queued', 'processing'),
+            ('dave', 'dave'),
         ]
         for status, display_name in names:
             statobj = inputtypes.Status(status)
@@ -1675,10 +1675,10 @@ class TestStatus(unittest.TestCase):
         func = lambda t: t.upper()
         # status is in the mapping
         statobj = inputtypes.Status('queued', func)
-        assert statobj.display_name == u'PROCESSING'
+        assert statobj.display_name == 'PROCESSING'
 
         # status is not in the mapping
         statobj = inputtypes.Status('test', func)
-        assert statobj.display_name == u'test'
+        assert statobj.display_name == 'test'
         assert str(statobj) == 'test'
         assert statobj.classname == 'test'
