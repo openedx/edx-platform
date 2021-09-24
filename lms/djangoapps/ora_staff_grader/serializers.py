@@ -42,7 +42,7 @@ class GradeDataSerializer(serializers.Serializer):
     pointsPossible = serializers.IntegerField()
 
     class Meta:
-        fields = [ 'pointsEarned', 'pointsPossible' ]
+        fields = ['pointsEarned', 'pointsPossible']
 
 
 class SubmissionMetadataSerializer(serializers.Serializer):
@@ -64,4 +64,3 @@ class SubmissionMetadataSerializer(serializers.Serializer):
             'lockStatus',
             'grade'
         ]
-
