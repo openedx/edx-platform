@@ -1,6 +1,7 @@
 """ Overridden views from core """
 
-import waffle
+from six import text_type
+from waffle import switch_is_active
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +14,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response
@@ -48,7 +48,8 @@ from openedx.features.pakx.lms.overrides.utils import (
     get_resume_course_info,
     get_course_progress_percentage,
     get_courses_for_user,
-    get_featured_course
+    get_featured_course,
+    get_rating_classes_for_course
 )
 from student.models import CourseEnrollment
 from util.cache import cache_if_anonymous
@@ -145,7 +146,7 @@ def courses(request, section='in-progress'):
     completed_courses = []
 
     add_course_progress_to_enrolled_courses(request, courses_list)
-    show_only_enrolled_courses = waffle.switch_is_active('show_only_enrolled_courses')
+    show_only_enrolled_courses = switch_is_active('show_only_enrolled_courses')
 
     for course in courses_list:
         if show_only_enrolled_courses and not course.enrolled:
@@ -197,7 +198,7 @@ def overview_tab_view(request, course_id=None):
     return render_to_response('courseware/overview.html', context)
 
 
-def _get_course_about_context(request, course_id, category=None):
+def _get_course_about_context(request, course_id, category=None):  # pylint: disable=too-many-statements
     """
     context required for course about page
     """
@@ -228,11 +229,8 @@ def _get_course_about_context(request, course_id, category=None):
         else:
             course_target = reverse('about_course', args=[text_type(course.id)])
 
-        show_courseware_link = bool(
-            (
-                request.user.has_perm(VIEW_COURSEWARE, course)
-            ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
-        )
+        show_courseware_link = bool((request.user.has_perm(VIEW_COURSEWARE, course))
+                                    or settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
         # If the ecommerce checkout flow is enabled and the mode of the course is
         # professional or no id professional, we construct links for the enrollment
@@ -265,8 +263,7 @@ def _get_course_about_context(request, course_id, category=None):
         has_visited_course = None
         user_progress = 0
         if is_enrolled:
-            has_visited_course, resume_course_url, _ = get_resume_course_info(
-                request, course_id)
+            has_visited_course, resume_course_url, _ = get_resume_course_info(request, course_id)
             user_progress = get_course_progress_percentage(request, course_id)
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -277,7 +274,7 @@ def _get_course_about_context(request, course_id, category=None):
         active_reg_button = not (registered or is_course_full or not can_enroll)
 
         is_shib_course = uses_shib(course)
-        language =  dict(settings.ALL_LANGUAGES).get(course.language)
+        language = dict(settings.ALL_LANGUAGES).get(course.language)
 
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
@@ -329,7 +326,8 @@ def _get_course_about_context(request, course_id, category=None):
             'is_enrolled': is_enrolled,
             'resume_course_url': resume_course_url,
             'has_visited_course': has_visited_course,
-            'user_progress': user_progress
+            'user_progress': user_progress,
+            'course_rating': get_rating_classes_for_course(course_id)
         }
 
         return context
