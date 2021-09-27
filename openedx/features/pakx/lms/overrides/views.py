@@ -1,7 +1,5 @@
 """ Overridden views from core """
 
-from six import text_type
-from waffle import switch_is_active
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -14,6 +12,8 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
+from waffle import switch_is_active
 
 from course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response
@@ -45,11 +45,12 @@ from openedx.features.pakx.lms.overrides.forms import ContactUsForm
 from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
-    get_resume_course_info,
     get_course_progress_percentage,
     get_courses_for_user,
-    get_featured_course,
-    get_rating_classes_for_course
+    get_featured_course_data,
+    get_featured_course_set,
+    get_rating_classes_for_course,
+    get_resume_course_info
 )
 from student.models import CourseEnrollment
 from util.cache import cache_if_anonymous
@@ -71,17 +72,16 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     if extra_context is None:
         extra_context = {}
-    featured_course = get_featured_course()
 
-    courses_for_user = get_courses_for_user(user)
-
-    context = {'courses': courses_for_user, 'featured_course': featured_course,
-               'homepage_overlay_html': configuration_helpers.get_value('homepage_overlay_html'),
-               'show_partners': configuration_helpers.get_value('show_partners', True),
-               'show_homepage_promo_video': configuration_helpers.get_value('show_homepage_promo_video', False),
-               'homepage_course_max': configuration_helpers.get_value(
-                   'HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX
-               )}
+    context = {
+        'courses': get_courses_for_user(user),
+        'featured_course': get_featured_course_data(),
+        'featured_course_set': get_featured_course_set(),
+        'show_partners': configuration_helpers.get_value('show_partners', True),
+        'homepage_overlay_html': configuration_helpers.get_value('homepage_overlay_html'),
+        'show_homepage_promo_video': configuration_helpers.get_value('show_homepage_promo_video', False),
+        'homepage_course_max': configuration_helpers.get_value('HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX)
+    }
 
     # This appears to be an unused context parameter, at least for the master templates...
 

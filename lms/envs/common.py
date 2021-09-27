@@ -2575,6 +2575,10 @@ PAKX_INSTALLED_APPS = [
 
     # pakx admin app
     'openedx.features.pakx.lms.pakx_admin_app',
+
+    # custom settings app
+    'openedx.features.pakx.cms.custom_settings',
+
 ]
 
 INSTALLED_APPS.extend(PAKX_INSTALLED_APPS)
