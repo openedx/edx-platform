@@ -2015,6 +2015,7 @@ MIDDLEWARE = [
 
     'crum.CurrentRequestUserMiddleware',
 
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
 
