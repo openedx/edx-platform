@@ -58,7 +58,7 @@ from openedx.core.lib.courses import get_course_by_id
 from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
-_ = translation.ugettext
+_ = translation.gettext
 
 
 INVALID_CERTIFICATE_TEMPLATE_PATH = 'certificates/invalid.html'

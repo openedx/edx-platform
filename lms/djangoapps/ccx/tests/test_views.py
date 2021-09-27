@@ -15,7 +15,7 @@ from django.conf import settings
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import resolve, reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
