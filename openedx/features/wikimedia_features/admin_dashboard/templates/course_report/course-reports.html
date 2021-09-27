@@ -19,7 +19,7 @@
   <h3 class="hd hd-3">${_("Select course to generate it's report ")}</h3>
 
   <br>
-
+  
   <select name="course_categories" class="filter-selectbox" multiple>
     %for course in courses:
       <option value=${course}>${course.display_name_with_default}</option>
@@ -46,6 +46,13 @@
     <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['key']['problem_grade_report_url'] }"/>
   </p>
   
+  <p class ="single-course-report" style="display: block">
+    ${_("Click to generate a CSV progress report for all currently enrolled students.")}
+  </p>
+  <p class ="single-course-report" style="display: block">
+    <input type="button" name="progress-report-csv" class="async-report-btn" value="${_("Generate Progress Report")}" data-endpoint="${ section_data['key']['progress_report_csv_url'] }"/>
+  </p>
+
   <p class ="multiple-course-report" style="display: block">
     ${_("Click to generate a CSV average grade report for multiple courses.")}
   </p>

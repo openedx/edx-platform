@@ -6,7 +6,6 @@ and task submission logic, including handling the Celery backend.
 """
 
 
-import hashlib
 import json
 import logging
 
@@ -18,9 +17,9 @@ from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.db import outer_atomic
-from lms.djangoapps.courseware.courses import get_problems_in_section
 from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from openedx.features.wikimedia_features.admin_dashboard.models import PROGRESS,AdminReportTask
+from openedx.features.wikimedia_features.admin_dashboard.grades import CourseProgressReport
 
 
 log = logging.getLogger(__name__)
@@ -149,17 +148,6 @@ def _get_xmodule_instance_args(request, task_id):
                              'task_id': task_id,
                              }
     return xmodule_instance_args
-
-
-def _supports_rescore(descriptor):
-    """
-    Helper method to determine whether a given item supports rescoring.
-    In order to accommodate both XModules and XBlocks, we have to check
-    the descriptor itself then fall back on its module class.
-    """
-    return hasattr(descriptor, 'rescore') or (
-        hasattr(descriptor, 'module_class') and hasattr(descriptor.module_class, 'rescore')
-    )
 
 
 def _update_instructor_task(admin_report_task, task_result):
@@ -326,109 +314,11 @@ def get_status_from_instructor_task(admin_report_task):
     return status
 
 
-def check_arguments_for_rescoring(usage_key):
-    """
-    Do simple checks on the descriptor to confirm that it supports rescoring.
-
-    Confirms first that the usage_key is defined (since that's currently typed
-    in).  An ItemNotFoundException is raised if the corresponding module
-    descriptor doesn't exist.  NotImplementedError is raised if the
-    corresponding module doesn't support rescoring calls.
-
-    Note: the string returned here is surfaced as the error
-    message on the Admin dashboard when a rescore is
-    submitted for a non-rescorable block.
-    """
-    descriptor = modulestore().get_item(usage_key)
-    if not _supports_rescore(descriptor):
-        msg = _("This component cannot be rescored.")
-        raise NotImplementedError(msg)
-
-
-def check_arguments_for_overriding(usage_key, score):
-    """
-    Do simple checks on the descriptor to confirm that it supports overriding
-    the problem score and the score passed in is not greater than the value of
-    the problem or less than 0.
-    """
-    descriptor = modulestore().get_item(usage_key)
-    score = float(score)
-
-    # some weirdness around initializing the descriptor requires this
-    if not hasattr(descriptor.__class__, 'set_score'):
-        msg = _("This component does not support score override.")
-        raise NotImplementedError(msg)
-
-    if score < 0 or score > descriptor.max_score():
-        msg = _("Scores must be between 0 and the value of the problem.")
-        raise ValueError(msg)
-
-
-def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name
-    """
-    Grabs all problem descriptors in exam and checks each descriptor to
-    confirm that it supports re-scoring.
-
-    An ItemNotFoundException is raised if the corresponding module
-    descriptor doesn't exist for exam_key. NotImplementedError is raised if
-    any of the problem in entrance exam doesn't support re-scoring calls.
-    """
-    problems = list(get_problems_in_section(exam_key).values())
-    if any(not _supports_rescore(problem) for problem in problems):
-        msg = _("Not all problems in entrance exam support re-scoring.")
-        raise NotImplementedError(msg)
-
-
-def encode_problem_and_student_input(usage_key, student=None):
-    """
-    Encode optional usage_key and optional student into task_key and task_input values.
-
-    Args:
-        usage_key (Location): The usage_key identifying the problem.
-        student (User): the student affected
-    """
-
-    assert isinstance(usage_key, UsageKey)
-    if student is not None:
-        task_input = {'problem_url': str(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=str(usage_key))
-    else:
-        task_input = {'problem_url': str(usage_key)}
-        task_key_stub = "_{problem}".format(problem=str(usage_key))
-
-    # create the key value by using MD5 hash:
-    task_key = hashlib.md5(six.b(task_key_stub)).hexdigest()
-
-    return task_input, task_key
-
-
-def encode_entrance_exam_and_student_input(usage_key, student=None):
-    """
-    Encode usage_key and optional student into task_key and task_input values.
-
-    Args:
-        usage_key (Location): The usage_key identifying the entrance exam.
-        student (User): the student affected
-    """
-    assert isinstance(usage_key, UsageKey)
-    if student is not None:
-        task_input = {'entrance_exam_url': str(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=str(usage_key))
-    else:
-        task_input = {'entrance_exam_url': str(usage_key)}
-        task_key_stub = "_{entranceexam}".format(entranceexam=str(usage_key))
-
-    # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
-
-    return task_input, task_key
-
-
-def submit_task(request, task_type, task_class, course_key, task_input, task_key):
+def submit_task(request, task_type, task_class, course_id, task_input, task_key):
     """
     Helper method to submit a task.
 
-    Reserves the requested task, based on the `course_key`, `task_type`, and `task_key`,
+    Reserves the requested task, based on the `course_id`, `task_type`, and `task_key`,
     checking to see if the task is already running.  The `task_input` is also passed so that
     it can be stored in the resulting AdminReportTask entry.  Arguments are extracted from
     the `request` provided by the originating server request.  Then the task is submitted to run
@@ -440,10 +330,10 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
     """
     with outer_atomic():
         # check to see if task is already running, and reserve it otherwise:
-        admin_report_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
+        admin_report_task = _reserve_task(course_id, task_type, task_key, task_input, request.user)
 
     # make sure all data has been committed before handing off task to celery.
-
+    CourseProgressReport.REQUEST = request
     task_id = admin_report_task.task_id
     task_args = [admin_report_task.id, _get_xmodule_instance_args(request, task_id)]
     try:

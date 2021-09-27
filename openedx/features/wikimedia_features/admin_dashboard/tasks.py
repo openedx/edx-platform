@@ -28,14 +28,14 @@ from django.utils.translation import ugettext_noop
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from openedx.features.wikimedia_features.admin_dashboard.tasks_base import BaseAdminReportTask
-from openedx.features.wikimedia_features.admin_dashboard.grades import MultipleCourseGradeReport
+from openedx.features.wikimedia_features.admin_dashboard.grades import MultipleCourseGradeReport,  CourseProgressReport
 from openedx.features.wikimedia_features.admin_dashboard.runner import run_main_task
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 @shared_task(base=BaseAdminReportTask)
 @set_code_owner_attribute
-def task_calculate_grades_csv(entry_id, xmodule_instance_args):
+def task_average_calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Generate a grade report for multiple courses and push the results to an S3 bucket for download.
     """
@@ -47,4 +47,21 @@ def task_calculate_grades_csv(entry_id, xmodule_instance_args):
     )
 
     task_fn = partial(MultipleCourseGradeReport.generate, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@shared_task(base=BaseAdminReportTask)
+@set_code_owner_attribute
+def task_progress_report_csv(entry_id, xmodule_instance_args):
+    """
+    Generate a grade report for multiple courses and push the results to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    TASK_LOG.info(
+        "Task: %s, AdminReportTask ID: %s, Task type: %s, Preparing for task execution",
+        xmodule_instance_args.get('task_id'), entry_id, action_name
+    )
+
+    task_fn = partial(CourseProgressReport.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

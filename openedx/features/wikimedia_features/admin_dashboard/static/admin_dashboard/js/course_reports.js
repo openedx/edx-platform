@@ -57,9 +57,8 @@
             url: url,
             error: function(error) {
                 if (error.responseText) {
-                    errorMessage = JSON.parse(error.responseText);
+                    $('.request-response-error').text(error.responseText);
                 }
-                $('.request-response-error').text(errorMessage);
             },
             success: function(data) {
                 $('.request-response').text(data.status);
@@ -131,6 +130,11 @@
 
     $("input[name='average-calculate-grades-csv']").click(function() {
         let url_for_average_calculate_grades = '/admin_dashboard/average_calculate_grades_csv/' + course_name ;
+        AjaxCall(url_for_average_calculate_grades);
+    })
+
+    $("input[name='progress-report-csv']").click(function() {
+        let url_for_average_calculate_grades = '/admin_dashboard/progress_report_csv/' + course_name ;
         AjaxCall(url_for_average_calculate_grades);
     })
 }).call(this);
