@@ -19,7 +19,7 @@ import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from six.moves.urllib.parse import urljoin
 
 from common.djangoapps.edxmako.shortcuts import marketing_link

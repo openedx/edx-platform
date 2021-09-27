@@ -3,10 +3,10 @@ API URLs.
 """
 
 
-from django.conf.urls import include, url
+from django.urls import include, path
 
 app_name = 'commerce'
 urlpatterns = [
-    url(r'^v0/', include('lms.djangoapps.commerce.api.v0.urls')),
-    url(r'^v1/', include('lms.djangoapps.commerce.api.v1.urls')),
+    path('v0/', include('lms.djangoapps.commerce.api.v0.urls')),
+    path('v1/', include('lms.djangoapps.commerce.api.v1.urls')),
 ]
