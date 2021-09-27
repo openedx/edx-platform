@@ -8,7 +8,7 @@ import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
-
+import django
 from django.db import DEFAULT_DB_ALIAS, transaction  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.cache_utils import get_cache
@@ -52,9 +52,13 @@ class OuterAtomic(transaction.Atomic):
     """
     ALLOW_NESTED = False
 
-    def __init__(self, using, savepoint, name=None):
+    def __init__(self, using, savepoint, name=None, durable=False):
         self.name = name
-        super().__init__(using, savepoint)
+        self.durable = durable
+        if django.VERSION >= (3, 2):
+            super().__init__(using, savepoint, durable)   # pylint: disable=too-many-function-args
+        else:
+            super().__init__(using, savepoint)
 
     def __enter__(self):
 
@@ -84,7 +88,7 @@ class OuterAtomic(transaction.Atomic):
         super().__enter__()
 
 
-def outer_atomic(using=None, savepoint=True, name=None):
+def outer_atomic(using=None, savepoint=True, name=None, durable=False):
     """
     A variant of Django's atomic() which cannot be nested inside another atomic.
 
@@ -120,10 +124,10 @@ def outer_atomic(using=None, savepoint=True, name=None):
         TransactionManagementError: if already inside an atomic block.
     """
     if callable(using):
-        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint)(using)
+        return OuterAtomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
     # Decorator: @outer_atomic(...) or context manager: with outer_atomic(...): ...
     else:
-        return OuterAtomic(using, savepoint, name)
+        return OuterAtomic(using, savepoint, name, durable)
 
 
 def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
