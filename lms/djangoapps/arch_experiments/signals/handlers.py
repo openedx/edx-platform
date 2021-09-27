@@ -10,47 +10,23 @@ import io
 
 ARCH_EXPERIMENTS_TOPIC = "arch_experiment_topic"
 
+# Should be in Avro Spec Formated as a dict
+# as consumed by `fastavro`
+UNENROLL_SCHEMA_DEFINITION = {
+    "name": "Unenroll",
+    "type": "record",
+    "fields": [
+        {"name": "course", "type": "string"},
+        {"name": "mode", "type": "string"},
+        {"name": "user_id", "type": "int"},
+    ],
+}
 
-class UnenrollMessage(Record):
-    user_id = Integer(required=True)
-    course = String(required=True)
-    mode = String(required=True)
 
-
-class UnenrollSchema(Schema):
-    # Pulsar can't actually consume a JSON schema definition.
-    #    json_schema_definition = {
-    #        "$id": "https://edx.org/unenroll.schema.json",
-    #        "$schema": "https://json-schema.org/draft/2020-12/schema",
-    #        "title": "Unenroll",
-    #        "type": "object",
-    #        "properties": {
-    #            "user_id": {"type": "integer", "description": "The numeric id for the impacted user."},
-    #            "course": {"type": "string", "description": "The course identifier."},
-    #            "mode": {"type": "string", "description": "The mode they were enrolled in."},
-    #        },
-    #    }
-
-    avro_schema_definition = {
-        "name": "UnenrollMsg2",
-        "type": "record",
-        "fields": [
-            {"name": "course", "type": "string"},
-            {"name": "mode", "type": "string"},
-            {"name": "user_id", "type": "int"},
-            # {"name": "test_required", "type": "int", "default": 9}, # Added afterwards, required with default value.
-            # {"name": "test_required2", "type": "int", "default": 9}, # Added afterwards, required with default value.
-            # {"name": "test_optional", "type": ["int", "null"], "default": 9},
-            # {"name": "test_optional2", "type": ["int", "null"], "default": 9}, # Added after the fact
-            # {"name": "test_optional3", "type": ["int", "null"], "default": 9}, # Added after the fact
-        ],
-    }
-
-    def __init__(self):
-        # super().__init__(None, _pulsar.SchemaType.JSON, self.json_schema_definition, 'JSON')
-        # super().__init__(None, _pulsar.SchemaType.JSON, self.avro_schema_definition, "JSON")
-        super().__init__(None, _pulsar.SchemaType.AVRO, self.avro_schema_definition, "AVRO")
-        self.parsed_schema = parse_schema(self.avro_schema_definition)
+class EdxAvroSchema(Schema):
+    def __init__(self, avro_schema_definition: dict):
+        super().__init__(None, _pulsar.SchemaType.AVRO, avro_schema_definition, "AVRO")
+        self.parsed_schema = parse_schema(avro_schema_definition)
 
     def encode(self, obj):
         # Validate against schema.
@@ -59,20 +35,25 @@ class UnenrollSchema(Schema):
         return bytes_buffer.getvalue()
 
     def decode(self, data):
-        # TODO: Validate against schema
+        # Validate against schema
         bytes_buffer = io.BytesIO(data)
         d = schemaless_reader(bytes_buffer, self.parsed_schema)
         return d
 
+    # Probably can be removed, need to write some tests to verify.
     def _validate_object_type(self, obj):
         return isinstance(obj, dict)
 
 
+# Would be nice if this was created on-demand and in some sort of
+# connection pool potentially.  Though it is thread safe and we
+# may not need a connection pool.
+# Instantiating here will cause it to fail as a part of start up
+# rather than only failing if it doesn't work when we try to use it
+# from within a view or a signal handler.
 ARCH_EXPERIMENTS_PRODUCER = settings.PULSAR_CLIENT.create_producer(
-    # ARCH_EXPERIMENTS_TOPIC, schema=AvroSchema(UnenrollMessage)
-    #    ARCH_EXPERIMENTS_TOPIC, schema=JsonSchema(UnenrollMessage)
     ARCH_EXPERIMENTS_TOPIC,
-    schema=UnenrollSchema(),
+#    schema=EdxAvroSchema(UNENROLL_SCHEMA_DEFINITION),
 )
 
 
@@ -89,6 +70,6 @@ def transmit_unenrollment_to_event_bus(course_enrollment, **kwargs):
         mode=course_enrollment.mode,
     )
     ARCH_EXPERIMENTS_PRODUCER.send(
-        content=enrollment_data,
+        content=EdxAvroSchema(UNENROLL_SCHEMA_DEFINITION).encode(enrollment_data),
         partition_key=str(course_enrollment.id),
     )

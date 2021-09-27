@@ -1,15 +1,18 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from lms.djangoapps.arch_experiments.signals.handlers import ARCH_EXPERIMENTS_TOPIC, UnenrollSchema
 import pulsar
 
-from lms.djangoapps.arch_experiments.signals.handlers import UnenrollMessage
+from lms.djangoapps.arch_experiments.signals.handlers import (
+    EdxAvroSchema,
+    UNENROLL_SCHEMA_DEFINITION,
+    ARCH_EXPERIMENTS_TOPIC,
+)
 
 ARCH_EXPERIMENTS_CONSUMER = settings.PULSAR_CLIENT.subscribe(
     ARCH_EXPERIMENTS_TOPIC,
     settings.CONSUMER_GROUP_NAME,
     consumer_type=pulsar.ConsumerType.Shared,
-    schema=UnenrollSchema()
+    schema=EdxAvroSchema(UNENROLL_SCHEMA_DEFINITION),
 )
 
 
