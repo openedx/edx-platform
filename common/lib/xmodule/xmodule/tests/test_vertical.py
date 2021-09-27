@@ -13,7 +13,6 @@ from unittest.mock import Mock, patch
 import pytz
 import ddt
 from fs.memoryfs import MemoryFS
-from django.contrib.auth.models import AnonymousUser
 
 from . import get_test_system
 from .helpers import StubUserService
@@ -158,11 +157,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         now = datetime.now(pytz.UTC)
         self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
-            self.module_system._services['user'] = StubUserService(user=Mock(username=self.username))
+            self.module_system._services['user'] = StubUserService()
             self.module_system._services['completion'] = StubCompletionService(enabled=True,
                                                                                completion_value=completion_value)
         elif view == PUBLIC_VIEW:
-            self.module_system._services['user'] = StubUserService(user=AnonymousUser())
+            self.module_system._services['user'] = StubUserService(is_anonymous=True)
 
         html = self.module_system.render(
             self.vertical, view, self.default_context if context is None else context

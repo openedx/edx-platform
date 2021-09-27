@@ -37,7 +37,8 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         mocked_course = Mock(name='mocked_course', lti_passports=['lti_id:test_client:test_secret'])
         modulestore = Mock(name='modulestore')
         modulestore.get_course.return_value = mocked_course
-        self.xmodule.runtime.modulestore = modulestore
+        runtime = Mock(name='runtime', modulestore=modulestore, anonymous_student_id='student')
+        self.xmodule.runtime = runtime
         self.xmodule.lti_id = "lti_id"
 
         test_cases = (  # (before sanitize, after sanitize)
