@@ -55,11 +55,10 @@ def send_notification(message_type, data, subject, dest_emails, request_user, cu
     return_value = True
 
     base_root_url = current_site.configuration.get_value('LMS_ROOT_URL')
-    logo_path = current_site.configuration.get_value('LOGO', settings.DEFAULT_LOGO)
 
     message_context.update({
         "site_name":  current_site.configuration.get_value('platform_name'),
-        "logo_url": u'{base_url}{logo_path}'.format(base_url=base_root_url, logo_path=logo_path),
+        "logo_url": current_site.configuration.get_value('DEFAULT_EMAIL_LOGO_URL', settings.DEFAULT_EMAIL_LOGO_URL),
         "messenger_url": u'{base_url}{messenger_path}'.format(base_url=base_root_url, messenger_path=reverse("messenger:messenger_home"))
     })
 
