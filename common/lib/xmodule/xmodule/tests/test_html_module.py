@@ -4,7 +4,6 @@ import unittest
 from unittest.mock import Mock
 
 import ddt
-from django.contrib.auth.models import AnonymousUser
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
@@ -136,7 +135,8 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
     def test_substitution_without_anonymous_student_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
-        module_system = get_test_system(user=AnonymousUser())
+        module_system = get_test_system()
+        module_system.anonymous_student_id = None
         module = HtmlBlock(module_system, field_data, Mock())
         assert module.get_html() == sample_xml
 

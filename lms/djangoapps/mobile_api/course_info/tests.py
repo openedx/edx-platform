@@ -8,7 +8,10 @@ from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from rest_framework.test import APIClient  # pylint: disable=unused-import
 
+from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
+from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
@@ -16,6 +19,7 @@ from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory  # pylint: disable=unused-import
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 

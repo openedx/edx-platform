@@ -4,7 +4,6 @@ Utility methods for unit tests.
 
 
 import filecmp
-from unittest.mock import Mock
 
 from path import Path as path
 from xblock.reference.user_service import UserService, XBlockUser
@@ -35,10 +34,8 @@ class StubUserService(UserService):
     Stub UserService for testing the sequence module.
     """
 
-    def __init__(self, user=None, user_is_staff=False, anonymous_user_id=None, **kwargs):
-        self.user = user or Mock(name='StubUserService.user')
-        self.user_is_staff = user_is_staff
-        self.anonymous_user_id = anonymous_user_id
+    def __init__(self, is_anonymous=False, **kwargs):
+        self.is_anonymous = is_anonymous
         super().__init__(**kwargs)
 
     def get_current_user(self):
@@ -46,12 +43,9 @@ class StubUserService(UserService):
         Implements abstract method for getting the current user.
         """
         user = XBlockUser()
-        if self.user.is_authenticated:
-            user.opt_attrs['edx-platform.anonymous_user_id'] = self.anonymous_user_id
-            user.opt_attrs['edx-platform.user_is_staff'] = self.user_is_staff
-            user.opt_attrs['edx-platform.user_id'] = self.user.id
-            user.opt_attrs['edx-platform.username'] = self.user.username
-        else:
+        if self.is_anonymous:
             user.opt_attrs['edx-platform.username'] = 'anonymous'
             user.opt_attrs['edx-platform.is_authenticated'] = False
+        else:
+            user.opt_attrs['edx-platform.username'] = 'bilbo'
         return user

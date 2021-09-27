@@ -2,7 +2,6 @@
 Tests for the DjangoXBlockUserService.
 """
 
-import ddt
 import pytest
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -13,7 +12,6 @@ from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from common.djangoapps.xblock_django.user_service import (
     ATTR_KEY_IS_AUTHENTICATED,
-    ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_PREFERENCES,
@@ -23,7 +21,6 @@ from common.djangoapps.xblock_django.user_service import (
 )
 
 
-@ddt.ddt
 class UserServiceTestCase(TestCase):
     """
     Tests for the DjangoXBlockUserService.
@@ -45,7 +42,7 @@ class UserServiceTestCase(TestCase):
         assert xb_user.full_name is None
         self.assertListEqual(xb_user.emails, [])
 
-    def assert_xblock_user_matches_django(self, xb_user, dj_user, user_is_staff=False, anonymous_user_id=None):
+    def assert_xblock_user_matches_django(self, xb_user, dj_user):
         """
         A set of assertions for comparing a XBlockUser to a django User
         """
@@ -54,8 +51,7 @@ class UserServiceTestCase(TestCase):
         assert xb_user.full_name == dj_user.profile.name
         assert xb_user.opt_attrs[ATTR_KEY_USERNAME] == dj_user.username
         assert xb_user.opt_attrs[ATTR_KEY_USER_ID] == dj_user.id
-        assert xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] == user_is_staff
-        assert xb_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] == anonymous_user_id
+        assert not xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF]
         assert all((pref in USER_PREFERENCES_WHITE_LIST) for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES])
 
     def test_convert_anon_user(self):
@@ -67,25 +63,14 @@ class UserServiceTestCase(TestCase):
         assert xb_user.is_current_user
         self.assert_is_anon_xb_user(xb_user)
 
-    @ddt.data(
-        (False, None),
-        (True, None),
-        (False, 'abcdef0123'),
-        (True, 'abcdef0123'),
-    )
-    @ddt.unpack
-    def test_convert_authenticate_user(self, user_is_staff, anonymous_user_id):
+    def test_convert_authenticate_user(self):
         """
         Tests for convert_django_user_to_xblock_user behavior when django user is User.
         """
-        django_user_service = DjangoXBlockUserService(
-            self.user,
-            user_is_staff=user_is_staff,
-            anonymous_user_id=anonymous_user_id,
-        )
+        django_user_service = DjangoXBlockUserService(self.user)
         xb_user = django_user_service.get_current_user()
         assert xb_user.is_current_user
-        self.assert_xblock_user_matches_django(xb_user, self.user, user_is_staff, anonymous_user_id)
+        self.assert_xblock_user_matches_django(xb_user, self.user)
 
     def test_get_anonymous_user_id_returns_none_for_non_staff_users(self):
         """

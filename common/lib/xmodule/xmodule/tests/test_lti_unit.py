@@ -16,7 +16,6 @@ from webob.request import Request
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.fields import Timedelta
 from xmodule.lti_2_util import LTIError
 from xmodule.lti_module import LTIBlock
@@ -60,14 +59,13 @@ class LTIBlockTest(unittest.TestCase):
         self.system.get_real_user = Mock()
         self.system.publish = Mock()
         self.system.rebind_noauth_module_to_user = Mock()
+        self.user_id = self.system.anonymous_student_id
 
         self.xmodule = LTIBlock(
             self.system,
             DictFieldData({}),
             ScopeIds(None, None, None, BlockUsageLocator(self.system.course_id, 'lti', 'name'))
         )
-        current_user = self.system.service(self.xmodule, 'user').get_current_user()
-        self.user_id = current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         self.lti_id = self.xmodule.lti_id
         self.unquoted_resource_link_id = '{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
             self.xmodule.runtime.hostname

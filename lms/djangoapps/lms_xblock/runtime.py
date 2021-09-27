@@ -98,9 +98,13 @@ class UserTagsService:
 
     COURSE_SCOPE = user_course_tag_api.COURSE_SCOPE
 
-    def __init__(self, user, course_id):
-        self._user = user
-        self._course_id = course_id
+    def __init__(self, runtime):
+        self.runtime = runtime
+
+    def _get_current_user(self):
+        """Returns the real, not anonymized, current user."""
+        real_user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+        return real_user
 
     def get_tag(self, scope, key):
         """
@@ -113,8 +117,8 @@ class UserTagsService:
             raise ValueError(f"unexpected scope {scope}")
 
         return user_course_tag_api.get_course_tag(
-            self._user,
-            self._course_id, key
+            self._get_current_user(),
+            self.runtime.course_id, key
         )
 
     def set_tag(self, scope, key, value):
@@ -129,8 +133,8 @@ class UserTagsService:
             raise ValueError(f"unexpected scope {scope}")
 
         return user_course_tag_api.set_course_tag(
-            self._user,
-            self._course_id, key, value
+            self._get_current_user(),
+            self.runtime.course_id, key, value
         )
 
 
@@ -138,28 +142,25 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
-    def __init__(self, user, **kwargs):
+    def __init__(self, **kwargs):
         request_cache_dict = DEFAULT_REQUEST_CACHE.data
         store = modulestore()
-        course_id = kwargs.get('course_id')
 
         services = kwargs.setdefault('services', {})
+        user = kwargs.get('user')
         if user and user.is_authenticated:
-            services['completion'] = CompletionService(user=user, context_key=course_id)
+            services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store, user_id=user.id if user else None)
         services['partitions'] = PartitionService(
-            course_id=course_id,
+            course_id=kwargs.get('course_id'),
             cache=request_cache_dict
         )
         services['settings'] = SettingsService()
-        services['user_tags'] = UserTagsService(
-            user=user,
-            course_id=course_id,
-        )
+        services['user_tags'] = UserTagsService(self)
         if badges_enabled():
-            services['badging'] = BadgingService(course_id=course_id, modulestore=store)
+            services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
