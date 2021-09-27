@@ -1,0 +1,205 @@
+
+.select2-container {
+    display: block;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.select2-container * {
+    box-sizing: border-box;
+}
+
+.select2-container button {
+    background: none;
+    line-height: 1;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.select2-container--default .select2-selection--multiple {
+    border: 0 !important;
+    padding-bottom: 0;
+    margin-bottom: 30px;
+    pointer-events: none;
+}
+
+.select2-container--default .select2-search--inline .select2-search__field {
+    font: 16px/20px "Helvetica Neue", Helvetica, "Open Sans", Arial, sans-serif;
+    width: 100% !important;
+    height: 32px;
+    margin: 0;
+    padding: 5px 13px;
+    white-space: nowrap;
+}
+
+.select2-search {
+    pointer-events: auto;
+    float: left;
+    width: 288px;
+    padding: 0 25px;
+    background: #f8f9fa;
+    border: 1px solid #72777d;
+    position: relative;
+}
+.select2-search:after,
+.select2-search:before {
+    content: "\f002";
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    font-size: 20px;
+}
+
+.select2-search:after {
+    content: "\f107";
+    left: auto;
+    right: 5px;
+    top: 6px;
+}
+
+.select2-container .select2-selection--multiple .select2-selection__rendered {
+    padding-left: 20px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    height: 100%;
+    width: 24px;
+    font-size: 23px;
+    font-weight: normal;
+    padding: 0;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #fff;
+}
+
+.select2-container--default .select2-selection__choice__remove span {
+    display: block;
+    padding: 0 0 3px;
+}
+
+.select2-selection__rendered {
+    float: right;
+    width: calc(100% - 288px);
+    margin: 0;
+}
+
+.select2-selection__rendered li {
+    pointer-events: auto;
+}
+
+.select2-container--open .select2-dropdown {
+    max-width: 288px;
+    margin-top: 2px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    margin: 0 20px 10px 0;
+    border-radius: 20px;
+    background: #eaf3ff;
+    border: 2px solid #36c;
+    font-size: 14px;
+    padding: 6px 10px 8px 30px;
+}
+
+.admin-dashboard {
+    padding: 40px 0;
+}
+
+.download-section p {
+    margin-bottom: 1rem;
+}
+
+.admin-dashboard .download-section .table td {
+    padding: 10px;
+}
+
+.admin-dashboard .reports-table {
+    max-width: 600px;
+    margin-left: 50px;
+}
+
+.admin-dashboard h3 {
+    font: bold 22px/1.2 "Helvetica Neue", Helvetica, "Open Sans", Arial, sans-serif;
+    margin-bottom: 20px;
+}
+
+.admin-dashboard .info-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #888;
+}
+
+.admin-dashboard .table {
+    width: 100%;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 50px;
+}
+
+.admin-dashboard .table th {
+    text-align: left;
+    background: #ebebeb;
+    padding: 20px 10px;
+}
+
+.admin-dashboard .table th,
+.admin-dashboard .table td {
+    padding: 20px 10px;
+}
+
+.admin-dashboard .table td {
+    border-bottom: 1px solid #ccc;
+    vertical-align: middle;
+}
+
+.admin-dashboard .btn {
+    padding: 3px 13px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0;
+    background: #36c;
+}
+
+.admin-dashboard .btn:hover {
+    background: #244ea3;
+}
+
+.admin-dashboard .table .text {
+    display: block;
+}
+
+.admin-dashboard .table .info {
+    display: block;
+    color: #aaa;
+    font-size: 12px;
+    font-weight: normal;
+    padding-top: 10px;
+}
+
+.admin-dashboard .table .action {
+    text-align: center;
+    width: 175px;
+}
+
+.admin-dashboard .request-response,
+.admin-dashboard .request-response-error {
+    padding: 10px 20px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #a0050e;
+    background: #fbf3f3;
+}
+
+.admin-dashboard .request-response {
+    background: #f0ffec;
+    border-bottom-color: #05a02e;
+}

@@ -16,83 +16,127 @@
   <%block name="pagetitle">${_("Reports")}</%block>
 
 % if not course_discovery_enabled:
-  <h3 class="hd hd-3">${_("Select course to generate it's report ")}</h3>
 
-  <br>
-  
-  <select name="course_categories" class="filter-selectbox" multiple>
-    %for course in courses:
-      <option value=${course}>${course.display_name_with_default}</option>
-    %endfor
-  </select>
+  <div class="admin-dashboard">
+    <select id="select-courses" name="course_categories" class="filter-selectbox" multiple>
+      %for course in courses:
+        <option value=${course}>${course.display_name_with_default}</option>
+      %endfor
+    </select>
 
-  <br><br><br>
+    <div class="request-response" id="report-request-response" style="display: none"></div>
+    <div class="request-response-error" id="report-request-response-error" style="display: none"></div>
 
-  <p class ="single-course-report" style="display: block">
-    ${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}
-  </p>
-  <p class ="single-course-report" style="display: block">
-    <input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['key']['get_students_features_url'] }" data-csv="true">
-  </p>
-
-  <p class ="single-course-report" style="display: block">${_("Click to generate a CSV file that lists learners who can enroll in the course but have not yet done so.")}</p>
-  <p class ="single-course-report" style="display: block"><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['key']['get_students_who_may_enroll_url'] }" data-csv="true"></p>
-
-  <p class ="single-course-report" style="display: block">
-    ${_("Click to generate a CSV grade report for all currently enrolled students.")}
-  </p>
-  <p class ="single-course-report" style="display: block">
-    <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['key']['calculate_grades_csv_url'] }"/>
-    <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['key']['problem_grade_report_url'] }"/>
-  </p>
-  
-  <p class ="single-course-report" style="display: block">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>${_("Report Name")}</th>
+          <th class="action">${_("Actions")}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="single-course-report">
+          <td>
+            <span class="text">${_("List profile information for enrolled students")}</span>
+          </td>
+          <td class="action">
+            <button
+              class="btn btn-primary"
+              name="list-profiles-csv"
+              data-endpoint="${ section_data['key']['get_students_features_url'] }"
+              data-csv="true"
+            >${_("Download")}</button>
+          </td>
+        </tr>
+        <tr class="single-course-report">
+          <td>
+            <span class="text">${_("CSV Grade report for all currently enrolled students")}</span>
+          </td>
+          <td class="action">
+            <button
+              class="btn btn-primary"
+              name="calculate-grades-csv"
+              data-endpoint="${ section_data['key']['calculate_grades_csv_url'] }"
+            >${_("Download")}</button>
+          </td>
+        </tr>
+        <tr class="single-course-report">
+          <td>
+            <span class="text">${_("Anonymized student ID's")}</span>
+          </td>
+          <td class="action">
+            <button
+              name="list-anon-ids"
+              data-csv="true"
+              data-endpoint="${ section_data['key']['get_anon_ids_url'] }"
+              class="btn btn-primary ${'is-disabled' if disable_buttons else ''}"
+              aria-disabled="${'true' if disable_buttons else 'false'}"
+            >${_("Download")}</button>
+          </td>
+        </tr>
+        <tr class="single-course-report">
+          <td>
+            <span class="text">${_("CSV Problem Grade report for all currently enrolled students")}</span>
+          </td>
+          <td class="action">
+            <button
+              class="btn btn-primary"
+              name="problem-grade-report"
+              data-endpoint="${ section_data['key']['problem_grade_report_url'] }"
+            >${_("Download")}</button>
+          </td>
+        </tr>
+        <tr class="multiple-course-report">
+          <td>
+            <span class="text">${_("Average grade report for multiple courses")}</span>
+          </td>
+          <td class="action">
+            <button
+              name="average-calculate-grades-csv"
+              class="btn btn-primary"
+              value="${_("Generate Average Grade Report")}"
+              data-endpoint="${ section_data['key']['average_calculate_grades_csv_url'] }"
+            >${_("Download")}</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class ="single-course-report" style="display: block">
     ${_("Click to generate a CSV progress report for all currently enrolled students.")}
   </p>
   <p class ="single-course-report" style="display: block">
     <input type="button" name="progress-report-csv" class="async-report-btn" value="${_("Generate Progress Report")}" data-endpoint="${ section_data['key']['progress_report_csv_url'] }"/>
   </p>
-
-  <p class ="multiple-course-report" style="display: block">
-    ${_("Click to generate a CSV average grade report for multiple courses.")}
-  </p>
-  <p class ="multiple-course-report" style="display: block">
-    <input type="button" name="average-calculate-grades-csv" class="async-report-btn" value="${_("Generate Average Grade Report")}" data-endpoint="${ section_data['key']['average_calculate_grades_csv_url'] }"/>
-  </p>
-  <br>
-
-  <p class ="single-course-report" style="display: block">
-    ${_("Click to download a CSV of anonymized student IDs:")}
-  </p>
-  <p class ="single-course-report" style="display: block">
-    <input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['key']['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
-  </p>
-
-  <div class="request-response" id="report-request-response" style="display: block"></div>
-  <div class="request-response-error" id="report-request-response-error" style="display: block"></div>
-
-  <br><br>
-
-  <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
-  <br>
-  <p>
-      ${_("The reports listed below are available for download, identified by UTC date and time of generation.")}
-  </p>
-
-  <br><br>
-  <p>
-    ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
-        strong_start=HTML("<strong>"),
-        strong_end=HTML("</strong>"),
-        ul_start=HTML("<ul>"),
-        ul_end=HTML("</ul>"),
-        li_start=HTML("<li>"),
-        li_end=HTML("</li>"),
-    )}
-  </p>
-
-  <br>
-  <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['key']['list_report_downloads_url'] }" ></div>
+    <div class="download-section" style="display: none;">
+      <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
+      <p>${_("The reports listed below are available for download, identified by UTC date and time of generation.")}</p>
+      <div>
+        <table class="table reports-table">
+          <thead>
+            <tr>
+              <th>Report Name</th>
+            </tr>
+          </thead>
+          <tbody class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['key']['list_report_downloads_url'] }">
+          </tbody>
+        </table>
+      </div>
+      <div class="info-text">
+        ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
+            strong_start=HTML("<strong>"),
+            strong_end=HTML("</strong>"),
+            ul_start=HTML("<ul>"),
+            ul_end=HTML("</ul>"),
+            li_start=HTML("<li>"),
+            li_end=HTML("</li>"),
+        )}
+      </div>
+    </div>
+  </div>
 % endif
-
+<%block name="head_extra">
+    <link rel="stylesheet" type="text/css" href="/static/css/select2.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+</%block>
+<script type="text/javascript" src="${static.url('admin_dashboard/js/select2.min.js')}"></script>
 <script type="text/javascript" src="${static.url('admin_dashboard/js/course_reports.js')}"></script>
