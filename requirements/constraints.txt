@@ -24,10 +24,6 @@ django-celery-results<2.1
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
 
-# This version has `rename settings` but old names are preserved as aliases for backward compatibility.
-# stilling not supporting django32. Greater version has the support. Will update in next PR.
-django-cors-headers==3.5.0
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
