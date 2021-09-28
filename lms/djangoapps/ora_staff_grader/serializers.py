@@ -5,7 +5,9 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from rest_framework import serializers
 
 
-class CourseMetadataSerializer(serializers.Serializer):
+    """
+    Serialize top-level info about a course, used for creating header in ESG
+    """
     title = serializers.CharField(source='display_name')
     org = serializers.CharField(source='display_org_with_default')
     number = serializers.CharField(source='display_number_with_default')
@@ -20,7 +22,9 @@ class CourseMetadataSerializer(serializers.Serializer):
         ]
 
 
-class OpenResponseMetadataSerializer(serializers.Serializer):
+    """
+    Serialize ORA metadata, used for setting up views in ESG
+    """
     name = serializers.CharField(source='display_name')
     prompts = serializers.ListField()
 
@@ -37,7 +41,9 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
         ]
 
 
-class GradeDataSerializer(serializers.Serializer):
+    """
+    Grade data shape (points earned/possible) for use in SubmissionMetadataSerializer
+    """
     pointsEarned = serializers.IntegerField()
     pointsPossible = serializers.IntegerField()
 
@@ -45,7 +51,9 @@ class GradeDataSerializer(serializers.Serializer):
         fields = ['pointsEarned', 'pointsPossible']
 
 
-class SubmissionMetadataSerializer(serializers.Serializer):
+    """
+    Submission metadata for displaying submissions table in ESG
+    """
     submissionId = serializers.CharField()
     username = serializers.CharField()
     teamName = serializers.CharField()

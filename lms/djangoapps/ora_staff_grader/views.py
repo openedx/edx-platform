@@ -66,6 +66,9 @@ class InitializeView(RetrieveAPIView):
         })
 
     def get_submissions(self, request, course_id, usage_id):
+        """
+        Create an XBlock handler request (routed internally) to get a list of submissions (staff workflows)
+        """
         # Normally an XBlock.json_handler is routed through a POST request.
         # We have to pass along a fake POST request to work with the handler auth/routing tooling.
         proxy_request = clone_request(request, "POST")
