@@ -10,6 +10,13 @@ export default function useSelectedInbox(messagesPageNumber, setMessagesPageNumb
     const [messagesLoading, setMessagesLoading] = useState(false);
     const [messagesHasMore, setMessagesHasMore] = useState(false);
 
+    const loggedinUser = {
+        name: context.LOGIN_USER,
+        profileName : `${context.LOGIN_USER[0]}${context.LOGIN_USER.split(' ')[1] ? context.LOGIN_USER.split(' ')[1][0] : context.LOGIN_USER[1]}`,
+        hasProfileImage: context.LOGIN_USER_IMG.indexOf('default_50') === -1,
+        profileImage: context.LOGIN_USER_IMG
+    }
+
     const fetchSelectedInboxMessages = async(is_new_user, pageNumber) => {
         try {
             setMessagesLoading(true);
@@ -52,6 +59,7 @@ export default function useSelectedInbox(messagesPageNumber, setMessagesPageNumb
         selectedInboxMessages,
         setSelectedInboxMessages,
         messagesLoading,
-        messagesHasMore
+        messagesHasMore,
+        loggedinUser
     };
 }

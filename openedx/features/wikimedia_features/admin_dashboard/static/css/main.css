@@ -165,12 +165,11 @@
 .admin-dashboard .table th {
     text-align: left;
     background: #ebebeb;
-    padding: 20px 10px;
 }
 
 .admin-dashboard .table th,
 .admin-dashboard .table td {
-    padding: 20px 10px;
+    padding: 10px;
 }
 
 .admin-dashboard .table td {

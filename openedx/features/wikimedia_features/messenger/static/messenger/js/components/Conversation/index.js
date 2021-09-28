@@ -7,13 +7,15 @@ export default function Conversation({
     messagesLoading,
     updateLastMessage,
     lastMessageRef,
-    selectedInboxUser
+    selectedInboxUser,
+    loggedinUser
 }) {
 
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState('');
+    const [isReplying, setReplying] = useState(false);
 
     const handleSendMessageBtnClick = () => {
-        createMessage(message, setMessage, updateLastMessage);
+        createMessage(message, setMessage, updateLastMessage, setReplying);
     }
 
     const handleInputChange = (e) => {
@@ -22,12 +24,61 @@ export default function Conversation({
         e.target.style.height = `${e.target.scrollHeight}px`;
     }
 
+    const handleCancelReply = (e) => {
+        setReplying(false);
+        setMessage('');
+    }
+
     return (
         <div className="chat-container">
             <div className="chat-header">
-                <h2>{selectedInboxUser}&nbsp;</h2>
+                <h2>Inbox / {selectedInboxUser}&nbsp;</h2>
             </div>
             <div className="chat">
+                {
+                    isReplying && (
+                        <div className="chat-row">
+                            {
+                                loggedinUser.hasProfileImage ? (
+                                    <img src={loggedinUser.profileImage} alt={loggedinUser.name} />
+                                ) : (
+                                    <span className="img-placeholder" style={{background: '#a7f9e0'}}>{loggedinUser.profileName}</span>
+                                )
+                            }
+                            <div className="chat-detail">
+                                <div className="new-message">
+                                    <textarea
+                                        className="new-message-input"
+                                        value={message}
+                                        placeholder="Type your message..."
+                                        onChange={handleInputChange}
+                                    ></textarea>
+                                    <div className="btn-box">
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={handleSendMessageBtnClick}
+                                            disabled={!message.length}
+                                        >Send</button>
+                                        <button
+                                            className="btn btn-default"
+                                            onClick={(e) => handleCancelReply(e)}
+                                        >Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    selectedInboxMessages.length > 0 && !messagesLoading && !isReplying && (
+                        <div className="chat-reply">
+                            <button
+                                className="btn btn-default"
+                                onClick={(e) => setReplying(true)}
+                            >Reply</button>
+                        </div>
+                    )
+                }
                 {selectedInboxMessages && !messagesLoading && selectedInboxMessages.map(
                     (message, index) => {
                         let setRef = (selectedInboxMessages.length === index + 1 ) ? true : false;
@@ -54,19 +105,6 @@ export default function Conversation({
                         <Spinner />
                     )
                 }
-            </div>
-            <div className="new-message">
-                <textarea
-                    className="new-message-input"
-                    value={message}
-                    placeholder="Type your message..."
-                    onChange={handleInputChange}
-                ></textarea>
-                <button
-                    className="btn-primary"
-                    onClick={handleSendMessageBtnClick}
-                    disabled={!message.length}
-                ><i className="fa fa-send"></i></button>
             </div>
         </div>
     )

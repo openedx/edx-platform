@@ -23,7 +23,8 @@ export default function MessengerContent({ context }) {
         selectedInboxMessages,
         setSelectedInboxMessages,
         messagesLoading,
-        messagesHasMore
+        messagesHasMore,
+        loggedinUser
     } = useSelectedInbox(messagesPageNumber, setMessagesPageNumber, context);
 
     const {
@@ -69,6 +70,7 @@ export default function MessengerContent({ context }) {
                     updateLastMessage = { updateLastMessage }
                     lastMessageRef = { lastMessageRef }
                     selectedInboxUser = { selectedInboxUser }
+                    loggedinUser = { loggedinUser }
                 />
                 <div
                     className="chat-overlay"
