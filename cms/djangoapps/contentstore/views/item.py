@@ -1309,7 +1309,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
         # Update with gating info
         xblock_info.update(_get_gating_info(course, xblock))
-
+        if is_xblock_unit:
+            # if xblock is a Unit we add the discussion_enabled option
+            xblock_info['discussion_enabled'] = xblock.discussion_enabled
         if xblock.category == 'sequential':
             # Entrance exam subsection should be hidden. in_entrance_exam is
             # inherited metadata, all children will have it.
