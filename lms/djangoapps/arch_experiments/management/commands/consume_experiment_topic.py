@@ -4,7 +4,7 @@ import pulsar
 
 from lms.djangoapps.arch_experiments.signals.handlers import (
     EdxAvroSchema,
-    UNENROLL_SCHEMA_DEFINITION,
+    CONSUMER_UNENROLL_SCHEMA_DEFINITION,
     ARCH_EXPERIMENTS_TOPIC,
 )
 
@@ -12,7 +12,7 @@ ARCH_EXPERIMENTS_CONSUMER = settings.PULSAR_CLIENT.subscribe(
     ARCH_EXPERIMENTS_TOPIC,
     settings.CONSUMER_GROUP_NAME,
     consumer_type=pulsar.ConsumerType.Shared,
-    schema=EdxAvroSchema(UNENROLL_SCHEMA_DEFINITION),
+    schema=EdxAvroSchema(CONSUMER_UNENROLL_SCHEMA_DEFINITION),
 )
 
 
