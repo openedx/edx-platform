@@ -148,7 +148,7 @@ cryptography==3.4.8
     #   social-auth-core
 cssutils==2.3.0
     # via pynliner
-ddt==1.4.2
+ddt==1.4.3
     # via
     #   xblock-drag-and-drop-v2
     #   xblock-poll
@@ -226,7 +226,7 @@ django==2.2.24
     #   rest-condition
     #   super-csv
     #   xss-utils
-django-appconf==1.0.4
+django-appconf==1.0.5
     # via
     #   -r requirements/edx/base.in
     #   django-statici18n
@@ -271,7 +271,7 @@ django-fernet-fields==0.6
     #   edx-enterprise
     #   edx-event-routing-backends
     #   edxval
-django-filter==2.4.0
+django-filter==21.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -303,7 +303,7 @@ django-model-utils==4.1.1
     #   edxval
     #   ora2
     #   super-csv
-django-mptt==0.13.3
+django-mptt==0.13.4
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -323,15 +323,15 @@ django-pyfs==3.1.0
     # via -r requirements/edx/base.in
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
-git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e#egg=django-ratelimit-backend
+django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
     # via -r requirements/edx/github.in
-git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776#egg=django-require==1.0.12
+django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/github.in
 django-sekizai==2.0.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.2.1
+django-ses==2.3.0
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -444,7 +444,7 @@ edx-drf-extensions==7.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.28.19
+edx-enterprise==3.28.20
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -547,7 +547,7 @@ future==0.18.2
     #   edx-celeryutils
     #   edx-enterprise
     #   pyjwkest
-geoip2==4.3.0
+geoip2==4.4.0
     # via -r requirements/edx/base.in
 glob2==0.7
     # via -r requirements/edx/base.in
@@ -657,14 +657,14 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   xblock
-maxminddb==2.1.0
+maxminddb==2.2.0
     # via geoip2
 mock==4.0.3
     # via
     #   -r requirements/edx/paver.txt
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
+mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/github.in
 mongoengine==0.23.1
     # via -r requirements/edx/base.in
@@ -754,7 +754,7 @@ pycountry==20.7.3
     # via -r requirements/edx/base.in
 pycparser==2.20
     # via cffi
-pycryptodomex==3.10.1
+pycryptodomex==3.10.4
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -873,7 +873,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==3.5.3
     # via -r requirements/edx/base.in
-regex==2021.8.28
+regex==2021.9.24
     # via nltk
 requests==2.26.0
     # via
@@ -965,15 +965,13 @@ six==1.16.0
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
-    #   social-auth-app-django
 slumber==0.7.1
     # via
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-social-auth-app-django==4.0.0
+social-auth-app-django==5.0.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
     #   edx-auth-backends
 social-auth-core==4.1.0
@@ -1091,9 +1089,9 @@ xblock==1.5.1
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-drag-and-drop-v2==2.3.5
+xblock-drag-and-drop-v2 @ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5
     # via -r requirements/edx/github.in
-git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
+xblock-poll @ git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d
     # via -r requirements/edx/github.in
 xblock-utils==2.2.0
     # via
