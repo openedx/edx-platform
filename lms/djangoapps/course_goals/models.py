@@ -17,6 +17,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.courseware.masquerade import is_masquerading
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -124,8 +125,11 @@ class UserActivity(models.Model):
         Once the only_if_mobile_app argument is removed the request argument can be removed as well.
 
         The return value is the id of the object that was created, or retrieved.
-        A return value of None signifies that there was an issue with the parameters (or the user was masquerading).
+        A return value of None signifies that a user activity record was not stored or retrieved
         '''
+        if not COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled(course_key):
+            return None
+
         if not (user and user.id) or not course_key:
             return None
 

@@ -19,7 +19,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -28,7 +28,7 @@ User = get_user_model()
 
 
 @ddt.ddt
-@override_waffle_flag(RECORD_USER_ACTIVITY_FLAG, active=True)
+@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
 class UserActivityTests(UrlResetMixin, ModuleStoreTestCase):
     """
     Testing Course Goals User Activity

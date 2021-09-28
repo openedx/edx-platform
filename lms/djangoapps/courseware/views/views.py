@@ -55,7 +55,6 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
     course_home_mfe_progress_tab_is_active
@@ -1734,11 +1733,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             staff_access,
         )
 
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            # Record user activity for tracking progress towards a user's course goals (for mobile app)
-            UserActivity.record_user_activity(
-                request.user, usage_key.course_key, request=request, only_if_mobile_app=True
-            )
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(
+            request.user, usage_key.course_key, request=request, only_if_mobile_app=True
+        )
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'

@@ -13,7 +13,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
@@ -95,9 +94,8 @@ class DatesTabView(RetrieveAPIView):
             reset_masquerade_data=True,
         )
 
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            # Record user activity for tracking progress towards a user's course goals (for mobile app)
-            UserActivity.record_user_activity(request.user, course.id, request=request, only_if_mobile_app=True)
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(request.user, course.id, request=request, only_if_mobile_app=True)
 
         if not CourseEnrollment.is_enrolled(request.user, course_key) and not is_staff:
             return Response('User not enrolled.', status=401)
