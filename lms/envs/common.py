@@ -3141,9 +3141,6 @@ INSTALLED_APPS = [
 
     'ratelimitbackend',
 
-    # Backends for receiving edX LMS events
-    'event_routing_backends.apps.EventRoutingBackendsConfig',
-
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
