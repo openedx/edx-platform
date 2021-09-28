@@ -29,6 +29,7 @@ class Command(BaseCommand):
 
         while True:
             for message in BrokerOutboxMessage.objects.all():
+                print(f"Processing {message}")
                 with transaction.atomic():
                     producer = TOPICS_TO_PRODUCERS[message.topic_name]
                     producer.send(
