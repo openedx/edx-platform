@@ -116,13 +116,32 @@
     margin-bottom: 1rem;
 }
 
+.download-section .report-downloads-list {
+    border: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+}
+
+.download-section .report-downloads-list li {
+    border-top: 1px solid #ccc;
+    padding: 6px 10px;
+}
+
+.download-section .report-downloads-list li:first-child {
+    border-top: 0;
+}
+
 .admin-dashboard .download-section .table td {
     padding: 10px;
 }
 
-.admin-dashboard .reports-table {
+.admin-dashboard .report-downloads-list {
     max-width: 600px;
+    max-height: 275px;
     margin-left: 50px;
+    overflow-y: auto;
 }
 
 .admin-dashboard h3 {

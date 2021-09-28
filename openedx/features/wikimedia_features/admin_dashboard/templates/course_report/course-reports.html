@@ -111,15 +111,12 @@
       <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
       <p>${_("The reports listed below are available for download, identified by UTC date and time of generation.")}</p>
       <div>
-        <table class="table reports-table">
-          <thead>
-            <tr>
-              <th>Report Name</th>
-            </tr>
-          </thead>
-          <tbody class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['key']['list_report_downloads_url'] }">
-          </tbody>
-        </table>
+        <ul
+          class="report-downloads-list"
+          id="report-downloads-list"
+          data-endpoint="${ section_data['key']['list_report_downloads_url'] }"
+          style="display: none;"
+        ></ul>
       </div>
       <div class="info-text">
         ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(

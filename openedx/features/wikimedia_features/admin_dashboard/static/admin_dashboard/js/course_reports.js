@@ -20,22 +20,23 @@
     };
 
     ReportDownloads = function(){
-        $('.reports-table').show();
         $.ajax({
             type: 'POST',
             dataType: 'json',
             url: endpoint,
             success: function(data) {
-                $('.download-section').show();
-                if (data.downloads.length && $('#report-downloads-table').find('a').length == 0){
+                if (data.downloads.length > 0) {
+                    $('.download-section, #report-downloads-list').show();
+                }
+                if (data.downloads.length && $('#report-downloads-list').find('a').length == 0){
                     for (let i = 0; i < data.downloads.length; i++) {
-                        $('#report-downloads-table').append('<tr><td>'+data.downloads[i]['link']+'</td></tr>');
+                        $('#report-downloads-list').append('<li>'+data.downloads[i]['link']+'</li>');
                     }
                 }
-                else if (data.downloads.length > $('#report-downloads-table').find('a').length){
-                    let newReportsFetched = data.downloads.length - $('#report-downloads-table').find('a').length;
+                else if (data.downloads.length > $('#report-downloads-list').find('a').length){
+                    let newReportsFetched = data.downloads.length - $('#report-downloads-list').find('a').length;
                     for (let i = newReportsFetched; i > 0; i--) {
-                        $('#report-downloads-table').prepend('<tr><td>'+data.downloads[i-1]['link']+'</td></tr>');
+                        $('#report-downloads-list').prepend('<li>'+data.downloads[i-1]['link']+'</li>');
                     }
                 }
             },
@@ -59,16 +60,17 @@
                 if (error.responseText) {
                     $('.request-response-error').text(error.responseText);
                 }
+                $('.request-response-error').text(errorMessage).show();
             },
             success: function(data) {
-                $('.request-response').text(data.status);
+                $('.request-response').text(data.status).show();
             }
         });
     };
 
     setInterval(function() {
         ReportDownloads();
-    }, 5000);
+    }, 20000);
 
     $('#select-courses').select2({
         placeholder: "Browse Courses",
@@ -76,8 +78,7 @@
 
     $('select').change(function (e) {
         e.preventDefault();
-        $('#report-request-response,#report-request-response-error,#report-downloads-table').empty();
-        $('.reports-table').hide();
+        $('#report-request-response,#report-request-response-error,#report-downloads-list').empty().hide();
         let display_type;
         let list_of_elements = $('.single-course-report');
         if ($(this).val())
