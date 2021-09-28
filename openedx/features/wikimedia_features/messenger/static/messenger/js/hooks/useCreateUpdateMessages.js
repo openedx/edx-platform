@@ -9,7 +9,7 @@ export default function useCreateUpdateMessages(
     const { client, notification } = useClient();
     let currentInbox = {};
 
-    const createMessage = async(message, setMessage, updateLastMessage) => {
+    const createMessage = async(message, setMessage, updateLastMessage, setReplying) => {
         try {
             const createdMessage = (await client.post(context.MESSAGE_URL, {
                 receiver: selectedInboxUser,
@@ -18,6 +18,7 @@ export default function useCreateUpdateMessages(
             if (createdMessage) {
                 setSelectedInboxMessages((prevMsgs) => [createdMessage, ...prevMsgs]);
                 setMessage("");
+                setReplying(false);
                 updateLastMessage(message);
             }
             notification(toast.success, "Message has been sent.");

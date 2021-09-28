@@ -32,7 +32,7 @@ export default function Inbox({
         <div className="chat-sidebar">
             <div className="chat-sidebar-header">
                 <div className="btn-box">
-                    <strong className="text">Chats</strong>
+                    <strong className="text">Inbox</strong>
                     <button className="btn btn-primary btn-lg start-new-msg-btn" data-toggle="modal" data-target="#messageModalCenter">
                         <span className="icon-plus">+</span>New Message
                     </button>
