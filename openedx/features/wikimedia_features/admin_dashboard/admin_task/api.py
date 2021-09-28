@@ -15,9 +15,10 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.instructor import permissions
 from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.instructor.views.api import require_course_permission as course_permission
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.features.wikimedia_features.admin_dashboard.admin_task.api_helper import AlreadyRunningError, QueueConnectionError, submit_task
-from openedx.features.wikimedia_features.admin_dashboard.tasks import task_calculate_grades_csv
+from openedx.features.wikimedia_features.admin_dashboard.tasks import task_average_calculate_grades_csv, task_progress_report_csv
 
 log = logging.getLogger(__name__)
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -85,18 +86,52 @@ def average_calculate_grades_csv(request, course_id):
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
     report_type = _('grade')
-    submit_calculate_grades_csv(request, course_id)
+    submit_average_calculate_grades_csv(request, course_id)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
     return JsonResponse({"status": success_status})
 
-def submit_calculate_grades_csv(request, course_key):
+
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@course_permission(permissions.CAN_RESEARCH)
+@common_exceptions_400
+def progress_report_csv(request, course_id):
+    """
+    Request a CSV showing students' progress for all units in the
+    course.
+
+    AlreadyRunningError is raised if the course's grades are already being
+    updated.
+    """
+    report_type = _('progress')
+    submit_progress_report_csv(request, course_id)
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+    return JsonResponse({"status": success_status})
+
+
+def submit_average_calculate_grades_csv(request, course_key):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
     task_type = 'grade_course'
-    task_class = task_calculate_grades_csv
+    task_class = task_average_calculate_grades_csv
     task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_progress_report_csv(request, course_id):
+    """
+    Submits a task to generate a CSV grade report containing problem
+    values.
+    """
+    task_type = 'progress_info_csv'
+    task_class = task_progress_report_csv
+    task_input = {}
+    task_key = ""
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
