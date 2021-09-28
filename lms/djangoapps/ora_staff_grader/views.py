@@ -13,7 +13,11 @@ from rest_framework.request import clone_request
 from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.courseware.module_render import handle_xblock_callback
-from lms.djangoapps.ora_staff_grader.serializers import CourseMetadataSerializer, OpenResponseMetadataSerializer, SubmissionMetadataSerializer
+from lms.djangoapps.ora_staff_grader.serializers import (
+    CourseMetadataSerializer,
+    OpenResponseMetadataSerializer,
+    SubmissionMetadataSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
@@ -42,7 +46,7 @@ class InitializeView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         course_id = request.query_params['course_id']
         ora_location = request.query_params['ora_location']
 

@@ -5,6 +5,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from rest_framework import serializers
 
 
+class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serialize top-level info about a course, used for creating header in ESG
     """
@@ -22,6 +23,7 @@ from rest_framework import serializers
         ]
 
 
+class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serialize ORA metadata, used for setting up views in ESG
     """
@@ -41,6 +43,7 @@ from rest_framework import serializers
         ]
 
 
+class GradeDataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Grade data shape (points earned/possible) for use in SubmissionMetadataSerializer
     """
@@ -51,6 +54,7 @@ from rest_framework import serializers
         fields = ['pointsEarned', 'pointsPossible']
 
 
+class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Submission metadata for displaying submissions table in ESG
     """
