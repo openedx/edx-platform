@@ -8,6 +8,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
@@ -496,8 +497,12 @@ class RegistrationView(APIView):
             return response
 
         # PKX-463 - authentication after account activation
-        return redirect('/login')
-        # response = self._create_response(request, {}, status_code=200)
+        messages.success(
+            request,
+            _('In order to sign in, you need to activate your account. We have sent an activation link to your email.'),
+            extra_tags='account-activation'
+        )
+        return self._create_response(request, {}, status_code=200)
         # set_logged_in_cookies(request, response, user)
 
     def _handle_duplicate_email_username(self, request, data):

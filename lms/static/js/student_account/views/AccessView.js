@@ -204,6 +204,7 @@
                             hideAuthWarnings: this.hideAuthWarnings
                         });
 
+                        this.nextUrl = '/login'
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                         this.listenTo(this.subview.register, 'auth-complete', this.authComplete);
                     },
