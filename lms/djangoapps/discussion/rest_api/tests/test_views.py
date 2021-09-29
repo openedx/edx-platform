@@ -413,10 +413,10 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         (2, ModuleStoreEnum.Type.mongo, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
         (2, ModuleStoreEnum.Type.mongo, 2,
          {"Test Topic 1": {"id": "test_topic_1"}, "Test Topic 2": {"id": "test_topic_2"}}),
-        (2, ModuleStoreEnum.Type.split, 3, {"Test Topic 1": {"id": "test_topic_1"}}),
-        (2, ModuleStoreEnum.Type.split, 3,
+        (2, ModuleStoreEnum.Type.split, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
+        (2, ModuleStoreEnum.Type.split, 2,
          {"Test Topic 1": {"id": "test_topic_1"}, "Test Topic 2": {"id": "test_topic_2"}}),
-        (10, ModuleStoreEnum.Type.split, 3, {"Test Topic 1": {"id": "test_topic_1"}}),
+        (10, ModuleStoreEnum.Type.split, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
     )
     @ddt.unpack
     def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):

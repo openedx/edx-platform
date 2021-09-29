@@ -163,6 +163,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         assert self.draft_mongo.has_item(other_child_loc), 'Oops, lost moved item'
 
 
+@pytest.mark.django_db  # required if using split modulestore
 class DraftPublishedOpTestCourseSetup(unittest.TestCase):
     """
     This class exists to test XML import and export between different modulestore
