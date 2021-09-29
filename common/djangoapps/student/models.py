@@ -337,7 +337,11 @@ def email_exists_or_retired(email):
     """
     Check an email against the User model for existence.
     """
-    return User.objects.filter(email=email).exists() or is_email_retired(email)
+    return (
+        User.objects.filter(email=email).exists() or
+        is_email_retired(email) or
+        AccountRecovery.objects.filter(secondary_email=email).exists()
+    )
 
 
 def get_retired_username_by_username(username):

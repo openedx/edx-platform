@@ -53,7 +53,7 @@ from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILU
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AccountRecoveryFactory, UserFactory
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
@@ -247,6 +247,48 @@ class RegistrationViewValidationErrorTest(
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
+                    )
+                }],
+                "error_code": "duplicate-email"
+            }
+        )
+
+    def test_register_duplicate_email_validation_error_with_recovery(self):
+        # Register the user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Create recovery object
+        user = User.objects.get(email=self.EMAIL)
+        account_recovery = AccountRecoveryFactory(user=user)
+
+        # Try to create a user with the recovery email address
+        response = self.client.post(self.url, {
+            "email": account_recovery.secondary_email,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+
+        assert response.status_code == 409
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        account_recovery.secondary_email
                     )
                 }],
                 "error_code": "duplicate-email"
