@@ -606,10 +606,16 @@ def _cert_info(user, enrollment, cert_status):
 
         # If the grade is passing, the status is one of these statuses, and request certificate
         # is enabled for a course then we need to provide the option to the learner
+        cert_gen_enabled = (
+            has_self_generated_certificates_enabled(course_overview.id) or
+            auto_certificate_generation_enabled()
+        )
+        passing_grade = persisted_grade and persisted_grade.passed
         if (
             status_dict['status'] != CertificateStatuses.downloadable and
-            (has_self_generated_certificates_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
-            persisted_grade and persisted_grade.passed
+            cert_gen_enabled and
+            passing_grade and
+            course_overview.has_any_active_web_certificate
         ):
             status_dict['status'] = CertificateStatuses.requesting
 
