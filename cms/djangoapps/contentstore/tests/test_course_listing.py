@@ -157,8 +157,8 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(len(list(courses_iter)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3),
-        (ModuleStoreEnum.Type.mongo, 2)
+        (ModuleStoreEnum.Type.split, 2),
+        (ModuleStoreEnum.Type.mongo, 1)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -239,8 +239,8 @@ class TestCourseListing(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 2, 2)
+        (ModuleStoreEnum.Type.split, 2, 2),
+        (ModuleStoreEnum.Type.mongo, 1, 1)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):
@@ -289,7 +289,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # Calls:
         #    1) query old mongo
         #    2) get_more on old mongo
-        #    3) query split (but no courses so no fetching of data)
+        #    3) query split (handled with MySQL only)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_course_listing_errored_deleted_courses(self, store):

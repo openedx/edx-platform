@@ -743,7 +743,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             self.partition_id,
             self.group1_id,
         )
-        with pytest.raises(IntegrityError):
+        with pytest.raises(IntegrityError), self.allow_transaction_exception():
             self._link_cohort_partition_group(
                 self.first_cohort,
                 self.partition_id,

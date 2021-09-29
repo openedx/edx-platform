@@ -224,22 +224,16 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             )
 
     @ddt.data(
-        *product(
-            ((ModuleStoreEnum.Type.mongo, 5), (ModuleStoreEnum.Type.split, 3)),
-            (True, False),
-        )
+        (ModuleStoreEnum.Type.mongo, 5, True, 23),
+        (ModuleStoreEnum.Type.mongo, 5, False, 13),
+        (ModuleStoreEnum.Type.split, 2, True, 24),
+        (ModuleStoreEnum.Type.split, 2, False, 14),
     )
     @ddt.unpack
-    def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
-        store_type, expected_mongo_queries = store_type_tuple
+    def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
-
-            if with_storage_backing:
-                num_sql_queries = 23
-            else:
-                num_sql_queries = 13
 
             self._get_blocks(
                 course,
