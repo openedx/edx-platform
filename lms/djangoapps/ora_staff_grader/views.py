@@ -47,15 +47,15 @@ class InitializeView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        course_id = request.query_params['course_id']
         ora_location = request.query_params['ora_location']
-
-        # Get course metadata
-        course_metadata = get_course_overview_or_none(course_id)
 
         # Get ORA block
         ora_usage_key = UsageKey.from_string(ora_location)
         openassessment_block = modulestore().get_item(ora_usage_key)
+
+        # Get course metadata
+        course_id = str(ora_usage_key.course_key)
+        course_metadata = get_course_overview_or_none(course_id)
 
         # Get list of submissions for the ORA
         submissions_metadata = self.get_submissions(request, course_id, ora_location)
