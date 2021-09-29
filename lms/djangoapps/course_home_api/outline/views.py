@@ -255,9 +255,10 @@ class OutlineTabView(RetrieveAPIView):
 
                     course_goals = {
                         'selected_goal': None,
-                        'number_of_days_goals_enabled': True,
+                        'weekly_learning_goal_enabled': True,
                     }
-
+                    # TODO: Check if there is a unit test for goals set with the old flags and then \
+                    #  queried here with the new flags - will there be a problem with these values missing?
                     selected_goal = get_course_goal(request.user, course_key)
                     if selected_goal:
                         course_goals['selected_goal'] = {
