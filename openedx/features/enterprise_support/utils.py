@@ -415,16 +415,20 @@ def is_enterprise_learner(user):
     Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
-        user (User): Django User object.
+        user (User): Django User object or Django User object id.
 
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
+    try:
+        user_id = int(user)
+    except TypeError:
+        user_id = user.id
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user_id)
     if cache.get(cached_is_enterprise_key):
         return True
 
-    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+    if EnterpriseCustomerUser.objects.filter(user_id=user_id).exists():
         # Cache the enterprise user for one hour.
         cache.set(cached_is_enterprise_key, True, 3600)
         return True

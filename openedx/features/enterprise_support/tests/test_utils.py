@@ -469,6 +469,7 @@ class TestEnterpriseUtils(TestCase):
         ) as mock_cache_set:
             EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
             assert is_enterprise_learner(self.user)
+            assert is_enterprise_learner(self.user.id)
 
         assert mock_cache_set.called
 
