@@ -12,6 +12,7 @@ class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstr
     title = serializers.CharField(source='display_name')
     org = serializers.CharField(source='display_org_with_default')
     number = serializers.CharField(source='display_number_with_default')
+    courseId = serializers.CharField(source='id')
 
     class Meta:
         model = CourseOverview
@@ -20,6 +21,7 @@ class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstr
             'title',
             'org',
             'number',
+            'courseId',
         ]
 
 
