@@ -1478,6 +1478,7 @@ INSTALLED_APPS = [
 
     # For CMS
     'cms.djangoapps.contentstore.apps.ContentstoreConfig',
+    'common.djangoapps.split_modulestore_django.apps.SplitModulestoreDjangoBackendAppConfig',
 
     'openedx.core.djangoapps.contentserver',
     'cms.djangoapps.course_creators',
