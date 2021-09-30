@@ -103,7 +103,7 @@ class RequestUtilTestCase(unittest.TestCase):
         mock_capture_cookie_sizes.is_enabled.return_value = False
         middleware = CookieMonitoringMiddleware()
 
-        cookies_dict = {'a':'b'}
+        cookies_dict = {'a': 'b'}
 
         factory = RequestFactory()
         for name, value in cookies_dict.items():
