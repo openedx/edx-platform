@@ -65,7 +65,7 @@ class TaskProgress:
         return progress_dict
 
 
-def run_main_task(entry_id, task_fcn, action_name):
+def run_main_task(entry_id, task_fcn, action_name, user_id):
     """
     Applies the `task_fcn` to the arguments defined in `entry_id` AdminReportTask.
 
@@ -117,7 +117,7 @@ def run_main_task(entry_id, task_fcn, action_name):
         raise ValueError(message)
 
     # Now do the work
-    task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+    task_progress = task_fcn(entry_id, course_id, task_input, action_name, user_id)
 
     # Release any queries that the connection has been hanging onto
     reset_queries()

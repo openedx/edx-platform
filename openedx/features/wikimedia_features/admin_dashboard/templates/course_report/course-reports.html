@@ -42,10 +42,11 @@
           <td class="action">
             <button
               class="btn btn-primary"
+              disabled
               name="list-profiles-csv"
               data-endpoint="${ section_data['key']['get_students_features_url'] }"
               data-csv="true"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
         <tr class="single-course-report">
@@ -55,9 +56,10 @@
           <td class="action">
             <button
               class="btn btn-primary"
+              disabled
               name="calculate-grades-csv"
               data-endpoint="${ section_data['key']['calculate_grades_csv_url'] }"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
         <tr class="single-course-report">
@@ -70,8 +72,9 @@
               data-csv="true"
               data-endpoint="${ section_data['key']['get_anon_ids_url'] }"
               class="btn btn-primary ${'is-disabled' if disable_buttons else ''}"
+              disabled
               aria-disabled="${'true' if disable_buttons else 'false'}"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
         <tr class="single-course-report">
@@ -81,9 +84,10 @@
           <td class="action">
             <button
               class="btn btn-primary"
+              disabled
               name="problem-grade-report"
               data-endpoint="${ section_data['key']['problem_grade_report_url'] }"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
         <tr class="single-course-report">
@@ -93,28 +97,32 @@
           <td class="action">
             <button
               class="btn btn-primary"
+              disabled
               name="progress-report-csv"
               data-endpoint="${ section_data['key']['progress_report_csv_url'] }"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
         <tr class="multiple-course-report">
           <td>
             <span class="text">${_("Average grade report for multiple courses")}</span>
+            <span class="info-text">${_("Different grading schemes can affect the comparison.")}</span>
+            
           </td>
           <td class="action">
             <button
               name="average-calculate-grades-csv"
               class="btn btn-primary"
+              disabled
               value="${_("Generate Average Grade Report")}"
               data-endpoint="${ section_data['key']['average_calculate_grades_csv_url'] }"
-            >${_("Download")}</button>
+            >${_("Generate")}</button>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="download-section" style="display: none;">
-      <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
+      <h3 class="hd hd-3">${_("Reports Available for Generate")}</h3>
       <p>${_("The reports listed below are available for download, identified by UTC date and time of generation.")}</p>
       <div>
         <ul

@@ -9,6 +9,7 @@ from datetime import datetime
 from itertools import chain
 from time import time
 
+from django.test import RequestFactory
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import CourseKey
@@ -29,6 +30,7 @@ from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
 
+from openedx.features.wikimedia_features.admin_dashboard.utils import upload_multiple_course_csv_to_report_store
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.wikimedia_features.admin_dashboard.runner import TaskProgress
 from lms.djangoapps.instructor_task.tasks_helper.utils import upload_csv_to_report_store
@@ -258,7 +260,7 @@ class MultipleCourseGradeReport:
     USER_BATCH_SIZE = 100
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name, user_id):
         """
         Public method to generate a grade report.
         """
@@ -330,10 +332,10 @@ class MultipleCourseGradeReport:
         Creates and uploads a CSV for the given headers and rows.
         """
         date = datetime.now(UTC)
-        upload_csv_to_report_store([success_headers] + success_rows, 'avarage_grade_report', context.course_id, date)
+        upload_multiple_course_csv_to_report_store([success_headers] + success_rows, 'multiple_courses_grade_report', context.course_id, date)
         if len(error_rows) > 0:
             error_rows = [error_headers] + error_rows
-            upload_csv_to_report_store(error_rows, 'avarage_grade_report_err', context.course_id, date)
+            upload_multiple_course_csv_to_report_store(error_rows, 'multiple_courses_grade_report_err', context.course_id, date)
 
     def _batch_users(self, context):
         """
@@ -437,10 +439,9 @@ class CourseProgressReport:
     """
     # Batch size for chunking the list of enrollees in the course.
     USER_BATCH_SIZE = 100
-    REQUEST = None
-    
+
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,user_id):
         """
         Public method to generate a Progress report.
         """
@@ -448,38 +449,41 @@ class CourseProgressReport:
         task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
         with modulestore().bulk_operations(course_key):
             context = _CourseGradeReportContext(task_id, _entry_id, course_key, _task_input, action_name)
-            return CourseProgressReport()._generate(context,course_id)  # lint-amnesty, pylint: disable=protected-access
+            return CourseProgressReport()._generate(context, course_id, user_id)  # lint-amnesty, pylint: disable=protected-access
 
-    def _generate(self, context, course_id):
+    def _generate(self, context, course_id,user_id):
         """
         Internal method for generating a Progress report for the given context.
         """
         context.update_status('Starting progress')
-        success_headers = self._success_headers(course_id)
-        batched_rows = self._batched_rows(context)
+        success_headers = self._success_headers(course_id, user_id)
+        batched_rows = self._batched_rows(context, user_id)
 
         context.update_status('Compiling progress')
         success_rows = self._compile(context, batched_rows)
 
-        context.update_status('Uploading progress')
+        context.update_status('Uploading prxogress')
         self._upload(context, success_headers, success_rows)
 
         return context.update_status('Completed progress')
 
-    def _success_headers(self, course_id):
+    def _success_headers(self, course_id,user_id):
         """
         Returns a list of all applicable column headers for this progress report.
         """
         
         return (
             ["Student ID", "Email", "Username"] +
-            self._unit_header(course_id)
+            self._unit_header(course_id, user_id)
         )
 
-    def _unit_header(self, course_id):
+    def _unit_header(self, course_id,user_id):
+        request = RequestFactory().get(u'/')
+        request.user = get_user_model().objects.get(id=user_id)
+
         course_unit_header = []
         course_blocks = get_course_outline_block_tree(
-        self.REQUEST, course_id, self.REQUEST.user
+        request, course_id, request.user
         )
         if 'children' in course_blocks:
             for section in course_blocks['children']:
@@ -512,18 +516,20 @@ class CourseProgressReport:
             date = datetime.now(UTC)
             upload_csv_to_report_store([success_headers] + success_rows, 'progress_report', context.course_id, date)
 
-    def _batched_rows(self, context):
+    def _batched_rows(self, context, user_id):
         """
         A generator of batches of (success_rows) for this report.
         """
         for users in MultipleCourseGradeReport()._batch_users(context):
             users = [u for u in users if u is not None]
-            yield self._rows_for_users(context, users)
+            yield self._rows_for_users(context, users, user_id)
 
-    def _user_unit_progress(self, user, course_id_string):
+    def _user_unit_progress(self, user, course_id_string, user_id):
+        request = RequestFactory().get(u'/')
+        request.user = get_user_model().objects.get(id=user_id)
         course_unit_progress = []
         course_blocks = get_course_outline_block_tree(
-                    self.REQUEST, course_id_string, user
+                    request, course_id_string, user
         )
         if 'children' in course_blocks:
             for section in course_blocks['children']:
@@ -539,7 +545,7 @@ class CourseProgressReport:
                                     course_unit_progress.append(complete_unit)
         return  course_unit_progress      
 
-    def _rows_for_users(self, context, users):
+    def _rows_for_users(self, context, users, user_id):
         """
         Returns a list of rows for the given users for this report.
         """
@@ -549,6 +555,6 @@ class CourseProgressReport:
                 course_id_string = six.text_type(context.course_id)
                 success_rows.append(
                     [user.id, user.email, user.username] +
-                    self._user_unit_progress(user, course_id_string)
+                    self._user_unit_progress(user, course_id_string, user_id)
                 )
             return success_rows

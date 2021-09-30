@@ -35,7 +35,7 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 
 @shared_task(base=BaseAdminReportTask)
 @set_code_owner_attribute
-def task_average_calculate_grades_csv(entry_id, xmodule_instance_args):
+def task_average_calculate_grades_csv(entry_id, xmodule_instance_args, user_id):
     """
     Generate a grade report for multiple courses and push the results to an S3 bucket for download.
     """
@@ -47,12 +47,12 @@ def task_average_calculate_grades_csv(entry_id, xmodule_instance_args):
     )
 
     task_fn = partial(MultipleCourseGradeReport.generate, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
+    return run_main_task(entry_id, task_fn, action_name, user_id)
 
 
 @shared_task(base=BaseAdminReportTask)
 @set_code_owner_attribute
-def task_progress_report_csv(entry_id, xmodule_instance_args):
+def task_progress_report_csv(entry_id, xmodule_instance_args, user_id):
     """
     Generate a grade report for multiple courses and push the results to an S3 bucket for download.
     """
@@ -64,4 +64,4 @@ def task_progress_report_csv(entry_id, xmodule_instance_args):
     )
 
     task_fn = partial(CourseProgressReport.generate, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
+    return run_main_task(entry_id, task_fn, action_name, user_id)

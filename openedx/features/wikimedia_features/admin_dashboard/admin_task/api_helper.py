@@ -9,12 +9,9 @@ and task submission logic, including handling the Celery backend.
 import json
 import logging
 
-import six
 from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
@@ -332,10 +329,9 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
         # check to see if task is already running, and reserve it otherwise:
         admin_report_task = _reserve_task(course_id, task_type, task_key, task_input, request.user)
 
-    # make sure all data has been committed before handing off task to celery.
-    CourseProgressReport.REQUEST = request
+    # make sure all data has been committed before handing off task to celery. 
     task_id = admin_report_task.task_id
-    task_args = [admin_report_task.id, _get_xmodule_instance_args(request, task_id)]
+    task_args = [admin_report_task.id, _get_xmodule_instance_args(request, task_id), request.user.id]
     try:
         task_class.apply_async(task_args, task_id=task_id)
 

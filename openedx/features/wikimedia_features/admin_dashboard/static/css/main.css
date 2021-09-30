@@ -189,6 +189,10 @@
     background: #244ea3;
 }
 
+.admin-dashboard .btn:disabled {
+    color: #fff;
+}
+
 .admin-dashboard .table .text {
     display: block;
 }
