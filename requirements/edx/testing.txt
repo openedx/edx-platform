@@ -539,7 +539,7 @@ edx-lint==5.2.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.2
     # via -r requirements/edx/base.txt
-edx-name-affirmation==1.0.1
+edx-name-affirmation==1.0.2
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.2
     # via
