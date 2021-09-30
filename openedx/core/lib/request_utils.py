@@ -24,8 +24,8 @@ COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables more detailed capturing of cookie sizes for monitoring purposes. This can be useful for tracking
-#       down large cookies if requests are nearing limits on the total size of cookies. See the CookieMonitoringMiddleware
-#       docstring for details on the monitoring custom attributes that will be set.
+#       down large cookies if requests are nearing limits on the total size of cookies. See the
+#       CookieMonitoringMiddleware docstring for details on the monitoring custom attributes that will be set.
 # .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
 #       monitoring. Only enable temporarily, or lower TOP_N_COOKIES_CAPTURED and TOP_N_COOKIE_GROUPS_CAPTURED django
 #       settings to capture less data.
