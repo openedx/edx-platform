@@ -15,6 +15,12 @@ class ContactUsForm(ModelForm):
                 'invalid': _('Invalid email format. Email should be like joey@pakistanx.com'),
             },
         }
+        help_texts = {
+            'email': _('user@website.com'),
+            'organization': _('Advent Organization'),
+            'phone': _('04235608000 or 03317758391'),
+            'message': _('Maximum words (4000)'),
+        }
 
     def __init__(self, *args, **kwargs):
         super(ContactUsForm, self).__init__(*args, **kwargs)
