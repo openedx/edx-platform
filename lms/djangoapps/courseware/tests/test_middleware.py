@@ -20,6 +20,19 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+    @staticmethod
+    def get_headers(cache_response):
+        """
+        Django 3.2 has no ._headers
+        See https://docs.djangoproject.com/en/3.2/releases/3.2/#requests-and-responses
+        """
+        if hasattr(cache_response, '_headers'):
+            headers = cache_response._headers.copy()  # pylint: disable=protected-access
+        else:
+            headers = {k.lower(): (k, v) for k, v in cache_response.items()}
+
+        return headers
+
     def test_process_404(self):
         """A 404 should not trigger anything"""
         request = RequestFactory().get("dummy_url")
@@ -39,5 +52,6 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
             request, exception
         )
         assert response.status_code == 302
-        target_url = response._headers['location'][1]  # lint-amnesty, pylint: disable=protected-access
+        headers = self.get_headers(response)
+        target_url = headers['location'][1]
         assert target_url.endswith(test_url)

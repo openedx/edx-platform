@@ -6,6 +6,7 @@ Helper functions for the course complete event that was originally included with
 import hashlib
 import logging
 
+import django
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -35,6 +36,13 @@ def course_slug(course_key, mode):
         f"{str(course_key)}{str(mode)}".encode('utf-8')
     ).hexdigest()[:7]
     base_slug = slugify(str(course_key) + f'_{mode}_')[:248]
+
+    # slugify() now removes leading and trailing dashes and underscores.
+    # Reference: Django 3.2 Release Notes https://docs.djangoproject.com/en/3.2/releases/3.2/#miscellaneous
+    # TODO: Remove this condition and make this return as default when platform is upgraded to 3.2
+    if django.VERSION >= (3, 2):
+        return f'{base_slug}_{digest}'
+
     return base_slug + digest
 
 
