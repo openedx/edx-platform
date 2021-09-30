@@ -106,7 +106,7 @@ VIDEO_SUPPORTED_FILE_FORMATS = {
     '.mov': 'video/quicktime',
 }
 
-VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
+VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 3
 
 # maximum time for video to remain in upload state
 MAX_UPLOAD_HOURS = 24
@@ -188,6 +188,7 @@ class StatusDisplayStrings(object):
     #### EOL ####
     _STATUS_MAP["vimeo_encoding"] = _IN_PROGRESS
     _STATUS_MAP["vimeo_upload"] = _IN_PROGRESS
+    _STATUS_MAP["upload_completed_encoding"] = _IN_PROGRESS
     _STATUS_MAP["vimeo_not_found"] = 'Video no encontrado'
     _STATUS_MAP["vimeo_patch_failed"] = 'Error Patch'
     #### END EOL ####
