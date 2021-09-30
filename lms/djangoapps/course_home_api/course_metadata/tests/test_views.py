@@ -41,8 +41,8 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert not response.data.get('is_staff')
-        # 'Course', 'Wiki', 'Progress' tabs
-        assert len(response.data.get('tabs', [])) == 4
+        # 'Course', and 'Progress' tabs
+        assert len(response.data.get('tabs', [])) == 3
 
     @ddt.data(True, False)
     def test_get_authenticated_not_enrolled(self, has_previously_enrolled):
@@ -61,8 +61,8 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.data['is_staff']
         # This differs for a staff user because they also receive the Instructor tab
-        # 'Course', 'Wiki', 'Progress', and 'Instructor' tabs
-        assert len(response.data.get('tabs', [])) == 5
+        # 'Course', 'Progress', and 'Instructor' tabs
+        assert len(response.data.get('tabs', [])) == 4
 
     def test_get_masqueraded_user(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
