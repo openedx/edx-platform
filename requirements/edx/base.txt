@@ -44,6 +44,8 @@ aniso8601==9.0.1
     # via edx-tincan-py35
 appdirs==1.4.4
     # via fs
+asgiref==3.4.1
+    # via django
 async-timeout==3.0.1
     # via aiohttp
 attrs==21.2.0
@@ -134,6 +136,8 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
+coverage==6.0
+    # via edx-i18n-tools
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
 cryptography==3.4.8
@@ -161,9 +165,8 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==2.2.24
+django==3.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-appconf

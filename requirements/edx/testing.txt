@@ -53,7 +53,10 @@ appdirs==1.4.4
     #   -r requirements/edx/base.txt
     #   fs
 asgiref==3.4.1
-    # via uvicorn
+    # via
+    #   -r requirements/edx/base.txt
+    #   django
+    #   uvicorn
 astroid==2.6.6
     # via
     #   pylint
@@ -180,7 +183,9 @@ coreschema==0.0.4
     #   drf-yasg
 coverage[toml]==6.0
     # via
+    #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
+    #   edx-i18n-tools
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.txt
@@ -226,7 +231,6 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
