@@ -23,7 +23,7 @@ COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID
 # .. toggle_name: request_utils.capture_cookie_sizes
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables detailed capturing of cookie sizes for monitoring purposes. This can be useful for tracking
+# .. toggle_description: Enables more detailed capturing of cookie sizes for monitoring purposes. This can be useful for tracking
 #       down large cookies if requests are nearing limits on the total size of cookies. See the CookieMonitoringMiddleware
 #       docstring for details on the monitoring custom attributes that will be set.
 # .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
@@ -146,9 +146,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         """
 
-        if (request.META.get('HTTP_COOKIE', None)):
+        if request.META.get('HTTP_COOKIE', None):
             set_custom_attribute('cookies.header.size', len(request.META['HTTP_COOKIE'].encode('utf-8')))
-
 
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
