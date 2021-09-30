@@ -57,6 +57,7 @@ appdirs==1.4.4
 asgiref==3.4.1
     # via
     #   -r requirements/edx/testing.txt
+    #   django
     #   uvicorn
 astroid==2.6.6
     # via
@@ -193,6 +194,7 @@ coreschema==0.0.4
 coverage[toml]==6.0
     # via
     #   -r requirements/edx/testing.txt
+    #   edx-i18n-tools
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/testing.txt
@@ -238,9 +240,8 @@ distlib==0.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==2.2.24
+django==3.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
