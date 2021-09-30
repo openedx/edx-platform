@@ -2,6 +2,8 @@
 Views for course info API
 """
 
+import logging
+
 from django.contrib.auth import get_user_model
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -12,11 +14,13 @@ from rest_framework.views import APIView
 from common.djangoapps.static_replace import make_static_urls_absolute
 from lms.djangoapps.courseware.courses import get_course_info_section_module
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.lib.xblock_utils import get_course_update_items
 
 from ..decorators import mobile_course_access, mobile_view
 
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 
 @mobile_view()
@@ -152,6 +156,12 @@ class CourseGoalsRecordUserActivity(APIView):
                 'Provided course key is not valid',
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        if not COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled(course_key):
+            log.warning('For this mobile request, user activity is not enabled for this user {} and course {}'.format(
+                str(user_id), str(course_key))
+            )
+            return Response(status=(200))
 
         # Populate user activity for tracking progress towards a user's course goals
         UserActivity.record_user_activity(user, course_key)

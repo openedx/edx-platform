@@ -8,11 +8,12 @@ from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
 from rest_framework.test import APIClient  # pylint: disable=unused-import
 
 from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from xmodule.html_module import CourseInfoBlock
@@ -229,7 +230,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         self.login_and_enroll()
 
 
-@override_waffle_flag(RECORD_USER_ACTIVITY_FLAG, active=True)
+@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
 class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals User Activity API.
@@ -278,3 +279,21 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
 
         response = self.client.post(self.apiUrl, post_data)
         assert response.status_code == 400
+
+    @override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=False)
+    @patch('lms.djangoapps.mobile_api.course_info.views.log')
+    def test_flag_disabled(self, mock_logger):
+        '''
+        Test the API behavior when the goals flag is disabled
+        '''
+        post_data = {
+            'user_id': self.user.id,
+            'course_key': self.course.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 200
+        mock_logger.warning.assert_called_with(
+            'For this mobile request, user activity is not enabled for this user {} and course {}'.format(
+                str(self.user.id), str(self.course.id))
+        )

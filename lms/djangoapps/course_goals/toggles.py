@@ -19,14 +19,3 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_goals')
 # .. toggle_target_removal_date: 2021-09-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-859
 COURSE_GOALS_NUMBER_OF_DAYS_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'number_of_days_goals', __name__)
-
-# .. toggle_name: course_goals.record_user_activity
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables populating user activity for tracking a user's progress towards course goals
-# .. toggle_warnings: None
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-09-16
-# .. toggle_target_removal_date: 2021-11-16
-# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-905
-RECORD_USER_ACTIVITY_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'record_user_activity', __name__)

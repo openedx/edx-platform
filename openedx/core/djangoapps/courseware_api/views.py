@@ -22,7 +22,6 @@ from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
@@ -456,8 +455,7 @@ class CoursewareInformation(RetrieveAPIView):
             username=username,
         )
         # Record course goals user activity for learning mfe courseware on web
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            UserActivity.record_user_activity(self.request.user, course_key)
+        UserActivity.record_user_activity(self.request.user, course_key)
 
         return overview
 

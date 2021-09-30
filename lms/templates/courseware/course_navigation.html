@@ -7,7 +7,6 @@
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_student
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 
 from django.conf import settings
 from django.urls import reverse
@@ -44,8 +43,7 @@ masquerading_as_student = is_masquerading_as_student(request.user, course.id)
     tab_list = get_course_tab_list(request.user, course)
 
     # Record course goals user activity for (web) courseware and course tabs that are outside of the learning mfe
-    if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-        UserActivity.record_user_activity(user, course.id)
+    UserActivity.record_user_activity(user, course.id)
     %>
     % if uses_bootstrap:
         <nav class="navbar course-tabs pb-0 navbar-expand" aria-label="${_('Course')}">
