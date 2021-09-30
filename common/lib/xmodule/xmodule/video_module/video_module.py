@@ -871,7 +871,7 @@ class VideoBlock(
             from edxval.api import _get_video
             update_video_vimeo(str(course_key))
             video_list = []
-            vimeo_list = EolVimeoVideo.objects.filter(course_key=course_key, status='upload_completed').values('edx_video_id')
+            vimeo_list = EolVimeoVideo.objects.filter(course_key=course_key, status__in=['upload_completed', 'upload_completed_encoding']).values('edx_video_id')
             for video in vimeo_list:
                 aux = _get_video(video['edx_video_id'])
                 video_list.append({'edx_video_id': video['edx_video_id'], 'display_name': aux.client_video_id})
