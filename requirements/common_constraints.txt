@@ -18,10 +18,10 @@
 
 
 # using LTS django version
-Django<2.3
+
 
 # latest version is causing e2e failures in edx-platform.
-# See  comment.
+# See pyjwt[crypto]<2.0.0 comment.
 drf-jwt<1.19.1
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.

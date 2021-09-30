@@ -48,13 +48,15 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
-    #   tincan
 appdirs==1.4.4
     # via
     #   -r requirements/edx/base.txt
     #   fs
 asgiref==3.4.1
-    # via uvicorn
+    # via
+    #   -r requirements/edx/base.txt
+    #   django
+    #   uvicorn
 astroid==2.6.6
     # via
     #   pylint
@@ -227,7 +229,6 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -265,7 +266,6 @@ distlib==0.3.3
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-i18n-tools
     #   edx-milestones
     #   edx-name-affirmation
@@ -309,7 +309,6 @@ django-config-models==2.2.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-name-affirmation
     #   lti-consumer-xblock
     # via -r requirements/edx/base.txt
@@ -334,7 +333,6 @@ django-fernet-fields==0.6
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edxval
 django-filter==21.1
     # via
@@ -378,7 +376,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.0.0
+django-mysql==4.1.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -528,8 +526,6 @@ edx-enterprise==3.28.20
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-routing-backends==4.1.0
-    # via -r requirements/edx/base.txt
 edx-i18n-tools==0.7.0
     # via
     #   -r requirements/edx/base.txt
@@ -591,7 +587,6 @@ edx-toggles==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
-    #   edx-event-routing-backends
     #   edx-name-affirmation
     #   edxval
     #   ora2
@@ -599,7 +594,6 @@ edx-user-state-client==1.3.2
     # via -r requirements/edx/base.txt
 edx-when==2.2.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
 edxval==2.0.3
@@ -620,7 +614,6 @@ enmerkar-underscore==2.1.0
 event-tracking==1.1.1
     # via
     #   -r requirements/edx/base.txt
-    #   edx-event-routing-backends
     #   edx-proctoring
     #   edx-search
 execnet==1.9.0
@@ -631,7 +624,7 @@ faker==8.14.0
     # via factory-boy
 fastapi==0.68.1
     # via pact-python
-filelock==3.1.0
+filelock==3.2.0
     # via
     #   tox
     #   virtualenv
@@ -706,7 +699,6 @@ ipaddress==1.0.23
 isodate==0.6.0
     # via
     #   -r requirements/edx/base.txt
-    #   edx-event-routing-backends
     #   python3-saml
 isort==5.9.3
     # via
@@ -747,7 +739,6 @@ jsonfield2==3.0.3
     #   -r requirements/edx/base.txt
     #   edx-celeryutils
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-proctoring
     #   edx-submissions
     #   lti-consumer-xblock
@@ -1071,7 +1062,6 @@ python-dateutil==2.4.0
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-proctoring
     #   faker
     #   freezegun
@@ -1111,7 +1101,6 @@ pytz==2021.1
     #   django-ses
     #   edx-completion
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-proctoring
     #   edx-submissions
     #   edx-tincan-py35
@@ -1121,7 +1110,6 @@ pytz==2021.1
     #   interchange
     #   olxcleaner
     #   ora2
-    #   tincan
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.txt
@@ -1152,7 +1140,6 @@ requests==2.26.0
     #   edx-bulk-grades
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-event-routing-backends
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
@@ -1315,7 +1302,7 @@ tableauserverclient==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-testfixtures==6.18.2
+testfixtures==6.18.3
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -1325,10 +1312,6 @@ text-unidecode==1.3
     #   -r requirements/edx/base.txt
     #   faker
     #   python-slugify
-tincan==1.0.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-event-routing-backends
 toml==0.10.2
     # via
     #   pylint
@@ -1460,7 +1443,7 @@ yarl==1.6.3
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.5.0
+zipp==3.6.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
