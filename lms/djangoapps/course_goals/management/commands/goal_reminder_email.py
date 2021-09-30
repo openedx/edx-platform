@@ -96,10 +96,6 @@ class Command(BaseCommand):
         Helpful notes for the function:
             weekday() returns an int 0-6 with Monday being 0 and Sunday being 6
         """
-        goal = CourseGoal.objects.filter()[0]
-        send_ace_message(goal)
-        return
-
         today = date.today()
         sunday_date = today + timedelta(days=SUNDAY_WEEKDAY - today.weekday())
         monday_date = today - timedelta(days=today.weekday())
