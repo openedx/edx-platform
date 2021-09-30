@@ -146,8 +146,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         """
 
-        if request.META.get('HTTP_COOKIE', None):
-            set_custom_attribute('cookies.header.size', len(request.META['HTTP_COOKIE'].encode('utf-8')))
+        raw_header_cookie = request.META.get('HTTP_COOKIE', '')
+        set_custom_attribute('cookies.header.size', len(raw_header_cookie.encode('utf-8')))
 
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
