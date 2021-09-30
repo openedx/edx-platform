@@ -57,6 +57,7 @@ appdirs==1.4.4
 asgiref==3.4.1
     # via
     #   -r requirements/edx/testing.txt
+    #   django
     #   uvicorn
 astroid==2.6.6
     # via
@@ -238,9 +239,8 @@ distlib==0.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==2.2.24
+django==3.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -323,8 +323,6 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cookies-samesite==0.9.0
-    # via -r requirements/edx/testing.txt
 django-cors-headers==3.10.0
     # via -r requirements/edx/testing.txt
 django-countries==7.2.1
@@ -1438,10 +1436,6 @@ typing-extensions==3.10.0.2
     #   gitpython
     #   mypy
     #   pydantic
-ua-parser==0.10.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
