@@ -116,15 +116,27 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
         assert current_goals[0].days_per_week == 5
         assert current_goals[0].subscribed_to_reminders is False
 
-    def test_add_without_required_arguments(self):
+    def test_add_without_subscribed_to_reminders(self):
         """ Ensures if required arguments are not provided, post does not succeed. """
-        response = self.save_course_goal(None, None)
+        response = self.save_course_goal(1, None)
         assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
         self.assertContains(
             response=response,
-            text="'days_per_week' and 'subscribed_to_reminders' are required.",
+            text="'subscribed_to_reminders' is required.",
             status_code=400
         )
+
+    def test_add_without_days_per_week(self):
+        """ Allow unsubscribing without providing the days_per_week argument """
+        response = self.save_course_goal(1, True)
+
+        current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
+        assert len(current_goals) == 1
+        assert current_goals[0].subscribed_to_reminders is True
+
+        response = self.save_course_goal(None, False)
+        current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
+        assert current_goals[0].subscribed_to_reminders is False
 
     def test_add_invalid_goal(self):
         """ Ensures an incorrectly formatted post does not succeed. """

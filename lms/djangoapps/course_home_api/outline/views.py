@@ -421,11 +421,11 @@ def save_course_goal(request):
 
     if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
         # If body doesn't contain the required goals fields, return 400 to client.
-        if days_per_week is None or subscribed_to_reminders is None:
-            raise ParseError("'days_per_week' and 'subscribed_to_reminders' are required.")
+        if subscribed_to_reminders is None:
+            raise ParseError("'subscribed_to_reminders' is required.")
 
         try:
-            add_course_goal(request.user, course_id, days_per_week, subscribed_to_reminders)
+            add_course_goal(request.user, course_id, subscribed_to_reminders, days_per_week)
             return Response({
                 'header': _('Your course goal has been successfully set.'),
                 'message': _('Course goal updated successfully.'),
