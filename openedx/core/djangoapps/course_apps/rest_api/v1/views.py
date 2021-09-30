@@ -71,7 +71,8 @@ class CourseAppSerializer(serializers.Serializer):  # pylint: disable=abstract-m
             "documentation_links": instance.documentation_links,
         }
         if hasattr(instance, "legacy_link"):
-            data["legacy_link"] = request.build_absolute_uri(instance.legacy_link(course_key))
+            course_legacy_link = instance.legacy_link(course_key)
+            data["legacy_link"] = request.build_absolute_uri(course_legacy_link) if course_legacy_link else ''
         return data
 
 
