@@ -3,18 +3,29 @@ Command to trigger sending reminder emails for learners to achieve their Course 
 """
 from datetime import date, timedelta
 import logging
+import six
 
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from django.urls import reverse
+from edx_ace import ace
+from edx_ace.message import Message
+from edx_ace.recipient import Recipient
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.course_goals.models import CourseGoal, CourseGoalReminderStatus, UserActivity
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_experience import course_home_url_name
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +33,53 @@ MONDAY_WEEKDAY = 0
 SUNDAY_WEEKDAY = 6
 
 
-def ace_send():
-    """Just here as a mock hook for tests - drop this once we fix AA-909"""
+def send_ace_message(goal):
+    """
+    Send an email reminding users to stay on track for their learning goal in this course
+
+    Arguments:
+        goal (CourseGoal): Goal object
+    """
+    user = goal.user
+    try:
+        course = CourseOverview.get_from_id(goal.course_key)
+    except CourseOverview.DoesNotExist:
+        log.error("Goal Reminder course not found.")
+
+    course_name = course.display_name
+
+    site = Site.objects.get_current()
+    message_context = get_base_template_context(site)
+
+    course_home_url = reverse(course_home_url_name(course.id), args=[str(course.id)])
+    course_home_absolute_url_parts = ("https", site.name, course_home_url, '', '', '')
+    course_home_absolute_url = six.moves.urllib.parse.urlunparse(course_home_absolute_url_parts)
+
+    goals_unsubscribe_url = reverse(
+        'course-home:unsubscribe-from-course-goal',
+        kwargs={'token': goal.unsubscribe_token}
+    )
+
+    message_context.update({
+        'email': user.email,
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'course_name': course_name,
+        'days_per_week': goal.days_per_week,
+        'course_url': course_home_absolute_url,
+        'goals_unsubscribe_url': goals_unsubscribe_url,
+        'unsubscribe_url': None,  # We don't want to include the default unsubscribe link
+    })
+
+    msg = Message(
+        name="goalreminder",
+        app_label="course_goals",
+        recipient=Recipient(user.id, user.email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        context=message_context
+    )
+
+    with emulate_http_request(site, user):
+        ace.send(msg)
 
 
 class Command(BaseCommand):
@@ -104,9 +160,7 @@ class Command(BaseCommand):
         # Essentially, if today is Sunday, days_left_in_week should be 1 since they have Sunday to hit their goal.
         days_left_in_week = SUNDAY_WEEKDAY - today.weekday() + 1
         if required_days_left == days_left_in_week:
-            # TODO: hook up email AA-909
-            # ace.send(msg)
-            ace_send()  # temporary for tests, drop with AA-909 and just mock ace.send directly
+            send_ace_message(goal)
             CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})
             return True
 
