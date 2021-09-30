@@ -552,9 +552,20 @@ class UserCelebrationAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
+
+@admin.register(PendingNameChange)
+class PendingNameChangeAdmin(admin.ModelAdmin):
+    """Admin interface for the Pending Name Change model"""
+    readonly_fields = ('user', )
+    list_display = ('user', 'new_name', 'rationale')
+    search_fields = ('user', 'new_name')
+
+    class Meta:
+        model = PendingNameChange
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
-admin.site.register(PendingNameChange)
 admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
