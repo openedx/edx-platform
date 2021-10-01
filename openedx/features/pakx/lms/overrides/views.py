@@ -45,6 +45,7 @@ from openedx.features.pakx.lms.overrides.forms import ContactUsForm
 from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
+    get_course_card_data,
     get_course_progress_percentage,
     get_courses_for_user,
     get_featured_course_data,
@@ -221,6 +222,7 @@ def _get_course_about_context(request, course_id, category=None):  # pylint: dis
         modes = CourseMode.modes_for_course_dict(course_key)
         registered = registered_for_course(course, request.user)
 
+        course_map = get_course_card_data(course)
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
@@ -327,6 +329,10 @@ def _get_course_about_context(request, course_id, category=None):  # pylint: dis
             'resume_course_url': resume_course_url,
             'has_visited_course': has_visited_course,
             'user_progress': user_progress,
+            'org_name': course_map['org_name'],
+            'org_short_logo': course_map['org_logo_url'],
+            'org_description': course_map['org_description'],
+            'publisher_logo': course_map['publisher_logo_url'],
             'course_rating': get_rating_classes_for_course(course_id)
         }
 

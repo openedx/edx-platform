@@ -2,7 +2,8 @@
 
 from datetime import datetime
 from logging import getLogger
-from re import compile as re_compile, findall
+from re import compile as re_compile
+from re import findall
 
 from completion.models import BlockCompletion
 from django.conf import settings
@@ -12,7 +13,6 @@ from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
-from organizations.models import Organization
 from six import text_type
 
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
@@ -27,6 +27,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
 from pakx_feedback.feedback_app.models import UserFeedbackModel
 from student.models import CourseEnrollment
+from util.organizations_helpers import get_organization_by_short_name
 
 log = getLogger(__name__)
 
@@ -50,22 +51,28 @@ def get_course_card_data(course, org_prefetched=False):
 
     :returns (dict): dict of course card data
     """
+    if not isinstance(course, CourseOverview):
+        course = CourseOverview.objects.filter(id=course.id).first()
+
     pakx_short_logo = '/static/pakx/images/mooc/pX.png'
     course_custom_setting = get_or_create_course_overview_content(course.id)
 
     if not org_prefetched:
-        course_org = Organization.objects.filter(short_name__iexact=course.org).first()
-        org_logo_url = course_org and course_org.logo
-        org_name = course.org
+        course_org = get_organization_by_short_name(course.org)
+        org_description = course_org.get('description')
+        org_logo_url = course_org.get('logo')
+        org_name = course_org.get('name')
     else:
         org_name = course.custom_settings.course_set.publisher_org.name
         org_logo_url = course.custom_settings.course_set.publisher_org.logo
+        org_description = course.custom_settings.course_set.publisher_org.description
 
     return {
         'key': course.id,
         'org_name': org_name,
         'effort': course.effort,
         'image': course.course_image_url,
+        'org_description': org_description,
         'name': course.display_name_with_default,
         'org_logo_url': org_logo_url or pakx_short_logo,
         'short_description': course_custom_setting.card_description,
