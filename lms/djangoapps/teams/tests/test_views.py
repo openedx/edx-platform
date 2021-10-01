@@ -379,7 +379,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 'admin': AdminFactory.create(password=cls.test_password)
             }
 
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
