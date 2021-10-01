@@ -23,6 +23,9 @@ class CourseAppStatus(TimeStampedModel):
 
     history = HistoricalRecords()
 
+    def __str__(self):
+        return f'CourseAppStatus(course_key="{self.course_key}", app_id="{self.app_id}", enabled="{self.enabled}"'
+
     @classmethod
     def get_all_app_status_data_for_course(cls, course_key: CourseKey) -> Dict[str, bool]:
         """
