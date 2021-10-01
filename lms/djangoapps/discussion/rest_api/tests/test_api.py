@@ -734,6 +734,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
                 "abuse_flagged_count": None,
+                "can_delete": False,
             }),
             self.expected_thread_data({
                 "id": "test_thread_id_1",
@@ -744,6 +745,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "type": "question",
                 "title": "Another Test Title",
                 "raw_body": "More content",
+                "preview_body": "More content",
                 "rendered_body": "<p>More content</p>",
                 "vote_count": 9,
                 "comment_count": 19,
@@ -758,6 +760,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 ),
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "abuse_flagged_count": None,
+                "can_delete": False,
             }),
         ]
 
@@ -1353,6 +1356,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "editable_fields": ["abuse_flagged", "voted"],
                 "child_count": 0,
                 "children": [],
+                "can_delete": False,
             },
             {
                 "id": "test_comment_2",
@@ -1375,6 +1379,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "editable_fields": ["abuse_flagged", "voted"],
                 "child_count": 0,
                 "children": [],
+                "can_delete": False,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1688,8 +1693,12 @@ class CreateThreadTest(
             "course_id": str(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "read": True,
+            "editable_fields": [
+                "abuse_flagged", "closed", "following", "pinned", "raw_body", "read", "title", "topic_id", "type",
+                "voted"
+            ],
         })
-        self.assertEqual(actual, expected)
+        assert actual == expected
         self.assertEqual(
             httpretty.last_request().parsed_body,   # lint-amnesty, pylint: disable=no-member
             {
@@ -1970,6 +1979,7 @@ class CreateCommentTest(
             "children": [],
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
         assert actual == expected
         expected_url = (
@@ -2051,6 +2061,7 @@ class CreateCommentTest(
             "children": [],
             "editable_fields": ["abuse_flagged", "endorsed", "raw_body", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
         assert actual == expected
         expected_url = (
@@ -2305,6 +2316,7 @@ class UpdateThreadTest(
         assert actual == self.expected_thread_data({
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
+            'preview_body': 'Edited body',
             'topic_id': 'original_topic',
             'read': True,
             'title': 'Original Title'
@@ -2684,6 +2696,7 @@ class UpdateCommentTest(
             "children": [],
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
         assert actual == expected
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
@@ -3322,6 +3335,7 @@ class RetrieveThreadTest(
         self.register_thread()
         self.request.user = non_author_user
         assert get_thread(self.request, self.thread_id) == self.expected_thread_data({
+            'can_delete': False,
             'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
             'unread_comment_count': 1
         })

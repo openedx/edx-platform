@@ -1,7 +1,7 @@
 """
 Discussion API permission logic
 """
-
+from typing import Dict, Set, Union
 
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
@@ -54,46 +54,61 @@ def get_initializable_comment_fields(context):
     return ret
 
 
-def get_editable_fields(cc_content, context):
+def _filter_fields(editable_fields: Dict[str, bool]) -> Set[str]:
+    """
+    Helper function that returns only the keys marked as True.
+    Args:
+        editable_fields (Dict[str, bool]): A mapping of strings to a bool value
+            that indicates whether they should be in the output set
+
+    Returns:
+        Set[str] a set of fields that have a true value.
+    """
+    return {field for field, is_editable in editable_fields.items() if is_editable}
+
+
+def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Set[str]:
     """
     Return the set of fields that the requester can edit on the given content
     """
-
     # For closed thread:
     # no edits, except 'abuse_flagged' and 'read' are allowed for thread
     # no edits, except 'abuse_flagged' is allowed for comment
-    ret = {"abuse_flagged"}
-    if cc_content["type"] == "thread" and cc_content["closed"]:
-        ret |= {"read"}
-        return ret
-    if cc_content["type"] == "comment" and context["thread"]["closed"]:
-        return ret
+    is_thread = cc_content["type"] == "thread"
+    is_comment = cc_content["type"] == "comment"
+    is_privileged = context["is_requester_privileged"]
+    # True if we're dealing with a closed thread or a comment in a closed thread
+    is_thread_closed = cc_content["closed"] if is_thread else context["thread"]["closed"]
 
-    # Shared fields
-    ret |= {"voted"}
-    if _is_author_or_privileged(cc_content, context):
-        ret |= {"raw_body"}
+    # Map each field to the condition in which it's editable.
+    editable_fields = {
+        "abuse_flagged": True,
+        "closed": is_thread and is_privileged,
+        "pinned": is_thread and is_privileged,
+        "read": is_thread,
+    }
 
-    # Thread fields
-    if cc_content["type"] == "thread":
-        ret |= {"following", "read"}
-        if _is_author_or_privileged(cc_content, context):
-            ret |= {"topic_id", "type", "title"}
-        if context["is_requester_privileged"] and context["discussion_division_enabled"]:
-            ret |= {"group_id"}
+    if is_thread_closed:
+        # Return only editable fields
+        return _filter_fields(editable_fields)
 
-    # Comment fields
-    if (
-            cc_content["type"] == "comment" and (
-                context["is_requester_privileged"] or (
-                    _is_author(context["thread"], context) and
-                    context["thread"]["thread_type"] == "question"
-                )
-            )
-    ):
-        ret |= {"endorsed"}
-
-    return ret
+    is_author = _is_author(cc_content, context)
+    editable_fields.update({
+        "voted": True,
+        "raw_body": is_privileged or is_author,
+        "following": is_thread,
+        "topic_id": is_thread and (is_author or is_privileged),
+        "type": is_thread and (is_author or is_privileged),
+        "title": is_thread and (is_author or is_privileged),
+        "group_id": is_thread and is_privileged and context["discussion_division_enabled"],
+        "endorsed": (
+            is_comment and
+            (is_privileged or
+             (_is_author(context["thread"], context) and context["thread"]["thread_type"] == "question"))
+        )
+    })
+    # Return only editable fields
+    return _filter_fields(editable_fields)
 
 
 def can_delete(cc_content, context):

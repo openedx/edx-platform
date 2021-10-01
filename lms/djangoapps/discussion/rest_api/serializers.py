@@ -7,6 +7,8 @@ from urllib.parse import urlencode, urlunparse
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
 from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
@@ -21,6 +23,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 from lms.djangoapps.discussion.rest_api.permissions import (
     NON_UPDATABLE_COMMENT_FIELDS,
     NON_UPDATABLE_THREAD_FIELDS,
+    can_delete,
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
@@ -120,11 +123,13 @@ class _ContentSerializer(serializers.Serializer):
     voted = serializers.SerializerMethodField()
     vote_count = serializers.SerializerMethodField()
     editable_fields = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
 
     non_updatable_fields = set()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._rendered_body = None
 
         for field in self.non_updatable_fields:
             setattr(self, f"validate_{field}", self._validate_non_updatable)
@@ -183,7 +188,9 @@ class _ContentSerializer(serializers.Serializer):
         """
         Returns the rendered body content.
         """
-        return render_body(obj["body"])
+        if self._rendered_body is None:
+            self._rendered_body = render_body(obj["body"])
+        return self._rendered_body
 
     def get_abuse_flagged(self, obj):
         """
@@ -211,6 +218,12 @@ class _ContentSerializer(serializers.Serializer):
         """
         return sorted(get_editable_fields(obj, self.context))
 
+    def get_can_delete(self, obj):
+        """
+        Returns if the current user can delete this thread/comment.
+        """
+        return can_delete(obj, self.context)
+
 
 class ThreadSerializer(_ContentSerializer):
     """
@@ -228,10 +241,11 @@ class ThreadSerializer(_ContentSerializer):
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
+    preview_body = serializers.SerializerMethodField()
     abuse_flagged_count = serializers.SerializerMethodField(required=False)
     title = serializers.CharField(validators=[validate_not_blank])
-    pinned = serializers.SerializerMethodField(read_only=True)
-    closed = serializers.BooleanField(read_only=True)
+    pinned = serializers.SerializerMethodField()
+    closed = serializers.BooleanField(required=False)
     following = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField(read_only=True)
     unread_comment_count = serializers.SerializerMethodField(read_only=True)
@@ -324,6 +338,13 @@ class ThreadSerializer(_ContentSerializer):
         if not obj["read"] and obj["comments_count"] == obj["unread_comments_count"]:
             return obj["unread_comments_count"] + 1
         return obj["unread_comments_count"]
+
+    def get_preview_body(self, obj):
+        """
+        Returns a cleaned and truncated version of the thread's body to display in a
+        preview capacity.
+        """
+        return Truncator(strip_tags(self.get_rendered_body(obj))).words(10, )
 
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
