@@ -23,9 +23,9 @@ COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID
 # .. toggle_name: request_utils.capture_cookie_sizes
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables capturing of cookie sizes for monitoring purposes. This can be useful for tracking
-#       down large cookies and avoiding hitting limits on the total size of cookies. See the CookieMonitoringMiddleware
-#       docstring for details on the monitoring custom attributes that will be set.
+# .. toggle_description: Enables more detailed capturing of cookie sizes for monitoring purposes. This can be useful for tracking
+#       down large cookies if requests are nearing limits on the total size of cookies. See the
+#       CookieMonitoringMiddleware docstring for details on the monitoring custom attributes that will be set.
 # .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
 #       monitoring. Only enable temporarily, or lower TOP_N_COOKIES_CAPTURED and TOP_N_COOKIE_GROUPS_CAPTURED django
 #       settings to capture less data.
@@ -123,6 +123,10 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         Attributes that are added by this middleware:
 
+        cookies.header.size: The total size in bytes of the cookie header
+
+        If CAPTURE_COOKIE_SIZES is enabled, additional attributes will be added:
+
         cookies.<N>.name: The name of the Nth largest cookie
         cookies.<N>.size: The size of the Nth largest cookie
         cookies..group.<N>.name: The name of the Nth largest cookie.
@@ -141,6 +145,10 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         - TOP_N_COOKIE_GROUPS_CAPTURED
 
         """
+
+        raw_header_cookie = request.META.get('HTTP_COOKIE', '')
+        set_custom_attribute('cookies.header.size', len(raw_header_cookie.encode('utf-8')))
+
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
 
