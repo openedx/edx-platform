@@ -153,7 +153,7 @@ class CookieTests(TestCase):
         self._set_use_jwt_cookie_header(self.request)
         response = cookies_api.get_response_with_refreshed_jwt_cookies(self.request, self.user)
         data = json.loads(response.content.decode('utf8').replace("'", '"'))
-        assert data['success'] == True
+        assert data['success'] is True
         assert data['user_id'] == self.user.id
         assert data['expires_epoch_seconds'] > 0
         assert data['expires'] != 'not-found'
