@@ -106,3 +106,9 @@ pylint<2.10.0
 # Feel free to loosen this constraint if/when it is confirmed that a later
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
+
+# The next major release of edx-drf-extensions removes support for
+# rest_condition, and this is being handled in
+# https://github.com/edx/edx-platform/pull/28663
+# Till that PR is merged, keep to a version below 8 to avoid breaking things.
+edx-drf-extensions<8.0.0
