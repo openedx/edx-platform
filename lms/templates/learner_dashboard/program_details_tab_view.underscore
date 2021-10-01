@@ -19,7 +19,6 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#pathways" type="button" role="tab" aria-controls="pathways" aria-selected="false">Pathways</button>
       </li>
-      <% } %>
     </ul>
 </div>
 <div class="tab-content" id="ProgramTabContent">
@@ -99,6 +98,7 @@
         </div>
     </div>
 </article>
+<aside class="js-program-sidebar program-sidebar"></aside>
 
   </div>
   <% if (discussionFragment.enabled) { %>
@@ -157,9 +157,7 @@
        <% } %>
     </aside>
 <% } %>
-  Pathways tab content
   </div>
 </div>
 <% } %>
 
-<aside class="js-program-sidebar program-sidebar"></aside>

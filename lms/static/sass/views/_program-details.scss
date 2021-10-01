@@ -260,6 +260,11 @@ $btn-color-primary: $primary-dark;
     }
   }
 
+  .tab-pane {
+    .program-details-content {
+       padding-left: 40px;
+     }
+   }
   .course-list-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
