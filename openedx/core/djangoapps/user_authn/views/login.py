@@ -25,6 +25,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute
+from eventtracking import tracker
 from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
 
@@ -350,6 +351,22 @@ def _track_user_login(user, request):
             'provider': None
         },
     )
+
+    # Send a standard event-tracking event
+    # .. pii: Username is sent to any configured event-tracking backend.  PII sent to Segment retired directly through Segment API call in Tubular. Tracking logs retained.   # pylint: disable=line-too-long
+    # .. pii_types: username
+    # .. pii_retirement: retained, third_party
+    track_data = {
+        'user_id': user.id,
+        'username': user.username,
+        'auth_data': {}
+    }
+
+    track_event_name = 'edx.user.account.authenticated'
+    context = tracker.get_tracker().resolve_context()
+
+    with tracker.get_tracker().context(track_event_name, context):
+        tracker.emit(name=track_event_name, data=track_data)
 
 
 def _create_message(site, root_url, allowed_domain):
