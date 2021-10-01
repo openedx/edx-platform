@@ -7,6 +7,7 @@ import unittest
 import ddt
 import mock
 
+from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
 from third_party_auth import pipeline
 from third_party_auth.tests import testutil
 from third_party_auth.tests.specs.base import IntegrationTestMixin
@@ -98,3 +99,61 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
             mock_uuid.return_value = uuid4
             final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
             self.assertEqual(expected_username, final_username['username'])
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class PipelineLoginAnalyticsTest(IntegrationTestMixin, testutil.TestCase):
+    """
+    Tests for login_analytics step in the TPA pipeline.
+    """
+
+    def setUp(self):
+        super(PipelineLoginAnalyticsTest, self).setUp()
+        self.provider = self.configure_dummy_provider(
+            enabled=True,
+            name="Test Dummy Provider",
+            slug='test',
+            backend_name='dummy'
+        )
+
+    def test_tpa_login_tracking_event(self):
+        """
+        Test successful third party auth login produces correct tracking log event.
+        """
+        dummy_extra_data = {"foo_extra_1": "something", "foo_extra_2": "something else"}
+        social = UserSocialAuthFactory.create(slug=self.provider.slug)
+        user = social.user
+        uid = social.uid
+        social.extra_data = dummy_extra_data
+        social.save()
+        expected_track_data = {
+            'user_id': user.id,
+            'username': user.username,
+            'auth_data': {
+                'tpa_auth_entry': pipeline.AUTH_ENTRY_LOGIN,
+                'tpa_provider': 'dummy',
+                'tpa_social_uid': uid,
+                'tpa_social_extra_data': dummy_extra_data
+            }
+        }
+        expected_segment_track_props = {
+            'category': "conversion",
+            'label': None,
+            'provider': 'dummy'
+        }
+
+        __, strategy = self.get_request_and_strategy()
+        pipeline_kws = {'uid': social.uid, 'user': user, 'social': social}
+
+        # don't decorate whole test method with these since they can be called creating UserSocialAuth
+        with mock.patch("third_party_auth.pipeline.tracker.emit") as mock_tracker_emit:
+            with mock.patch("third_party_auth.pipeline.segment.track") as mock_segment_track:
+                pipeline.login_analytics(
+                    strategy=strategy, backend=self.provider.backend_class(),
+                    pipeline_index=0, auth_entry='login', **pipeline_kws
+                )
+                mock_tracker_emit.assert_called_once_with(name='edx.user.account.authenticated', data=expected_track_data)
+                mock_segment_track.assert_called_once_with(
+                    user.id, 'edx.bi.user.account.authenticated',
+                    expected_segment_track_props
+                )
