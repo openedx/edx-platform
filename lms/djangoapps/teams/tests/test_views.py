@@ -13,6 +13,7 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.signals import post_save
 from django.urls import reverse
@@ -373,16 +374,15 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 teams_configuration=teams_configuration_2
             )
 
-            cls.users = {
-                'staff': AdminFactory.create(password=cls.test_password),
-                'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
-                'admin': AdminFactory.create(password=cls.test_password)
-            }
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.topics_count = 6
+        cls.users = {
+            'staff': AdminFactory.create(password=cls.test_password),
+            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
+            'admin': AdminFactory.create(password=cls.test_password)
+        }
         cls.create_and_enroll_student(username='student_enrolled')
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_on_team_2_private_set_1', mode=CourseMode.MASTERS)
@@ -598,6 +598,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             student_inactive.is_active = False
             student_inactive.save()
         else:
+            if user not in self.users:
+                missing_user = User.objects.get(username=user)
+                self.users[missing_user.username] = missing_user
+
             self.client.login(username=self.users[user].username, password=self.test_password)
 
     def make_call(self, url, expected_status=200, method='get', data=None, content_type=None, **kwargs):
