@@ -140,7 +140,7 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _clean_accept_headers(self, request):
         """
-        Modify the Accept header to remove any language that is not
+        Modify the Accept-Language header to remove any language that is not
         either in the released (or beta) languages or a region or
         other variant of one of those languages.
         """
