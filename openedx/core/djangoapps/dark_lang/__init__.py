@@ -3,8 +3,8 @@ Language Translation Dark Launching
 ===================================
 
 This app adds the ability to launch language translations that
-are only accessible through the use of a specific query parameter
-(and are not activated by browser settings).
+are only accessible through the use of a hidden preferences page
+at /update_lang/ (and are not activated by browser settings).
 
 Installation
 ------------

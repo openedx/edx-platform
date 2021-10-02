@@ -77,7 +77,7 @@ class DarkLangMiddleware(MiddlewareMixin):
     @property
     def beta_langs(self):
         """
-        Current list of released languages
+        Current list of beta languages
         """
         language_options = DarkLangConfig.current().beta_languages_list
         if settings.LANGUAGE_CODE not in language_options:
@@ -86,7 +86,9 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         """
-        Prevent user from requesting un-released languages except by using the preview-lang query string.
+        Clean unsupported languages out of browser's stated language
+        preferences, and apply any dark language override that the
+        user has selected.
         """
         if not DarkLangConfig.current().enabled:
             return
@@ -105,7 +107,7 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _set_site_or_microsite_language(self, request, response):
         """
-        Apply language specified in site configuration.
+        Apply default language specified in site configuration.
         """
         language = get_value('LANGUAGE_CODE', None)
         if language:
@@ -113,7 +115,11 @@ class DarkLangMiddleware(MiddlewareMixin):
             set_language_cookie(request, response, language)
 
     def _fuzzy_match(self, lang_code):
-        """Returns a fuzzy match for lang_code"""
+        """
+        Returns the first released (or possibly beta) language with the
+        same primary language subtag as the given language code, or
+        None if no match.
+        """
         match = None
         dark_lang_config = DarkLangConfig.current()
 
@@ -134,8 +140,9 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _clean_accept_headers(self, request):
         """
-        Remove any language that is not either in ``self.released_langs`` or
-        a territory of one of those languages.
+        Modify the Accept header to remove any language that is not
+        either in the released (or beta) languages or a region or
+        other variant of one of those languages.
         """
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
         if accept is None or accept == '*':
@@ -154,7 +161,8 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _activate_preview_language(self, request, response):
         """
-        Check the user's dark language setting in the session and apply it
+        Set the session's language code to the user's dark language preference,
+        if present.
         """
         auth_user = request.user.is_authenticated
         preview_lang = None
