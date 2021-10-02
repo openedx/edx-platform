@@ -1057,6 +1057,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         yet_another_student_username = 'yet_another_student'
         self.create_and_enroll_student(username=another_student_username)
         self.create_and_enroll_student(username=yet_another_student_username)
+
+        self._add_missing_user(another_student_username)
+        self._add_missing_user(yet_another_student_username)
+
         self.solar_team.add_user(self.users[another_student_username])
         self.solar_team.add_user(self.users[yet_another_student_username])
 
@@ -1069,6 +1073,15 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
         assert team_names == [self.solar_team.name, self.masters_only_team.name]
+
+    def _add_missing_user(self, missing_user):
+        """
+        django32 TestCase.setUpTestData() are now isolated for each test method.
+        In case of missing user adding this to list.
+        """
+        if missing_user not in self.users:
+            missing_user = User.objects.get(username=missing_user)
+            self.users[missing_user.username] = missing_user
 
 
 @ddt.ddt
