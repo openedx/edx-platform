@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-22 16:11+0000\n"
-"PO-Revision-Date: 2021-09-22 16:11:47.772359\n"
+"POT-Creation-Date: 2021-10-03 20:52+0000\n"
+"PO-Revision-Date: 2021-10-03 20:52:23.626731\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6077,6 +6077,99 @@ msgstr "ثطحمخقث فاث ذخعقسث"
 msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        There's still time to reach your goal\n"
+"                    "
+msgstr ""
+"\n"
+"                        فاثقث'س سفهمم فهوث فخ قثشذا غخعق لخشم\n"
+"                    "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s times a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\n"
+"                        "
+msgstr ""
+"\n"
+"                            غخع سثف ش لخشم خب مثشقرهرل {start_bold}%(days_per_week)s فهوثس ش صثثن هر %(course_name)s{end_bold}. غخع'قث رخف ضعهفث فاثقث, زعف فاثقث'س سفهمم فهوث فخ قثشذا فاشف لخشم!\n"
+"                        "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Jump back in\n"
+"                        "
+msgstr ""
+"\n"
+"                            تعوح زشذن هر\n"
+"                        "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                    "
+msgstr ""
+"\n"
+"                        قثوثوزثق, غخع ذشر شمصشغس ذاشرلث غخعق مثشقرهرل لخشم. فاث زثسف لخشم هس خرث فاشف غخع ذشر سفهذن فخ.\n"
+"                    "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Adjust my goal\n"
+"                        "
+msgstr ""
+"\n"
+"                            شيتعسف وغ لخشم\n"
+"                        "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        Unsubscribe from goal reminder emails to this course\n"
+"                    "
+msgstr ""
+"\n"
+"                        عرسعزسذقهزث بقخو لخشم قثوهريثق ثوشهمس فخ فاهس ذخعقسث\n"
+"                    "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "You’re almost there!"
+msgstr "غخع’قث شموخسف فاثقث!"
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "There's still time to reach your goal"
+msgstr "فاثقث'س سفهمم فهوث فخ قثشذا غخعق لخشم"
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+#, python-format
+msgid ""
+"You set a goal of learning %(days_per_week)s times a week in "
+"%(course_name)s. You're not quite there, but there's still time to reach "
+"that goal!"
+msgstr ""
+"غخع سثف ش لخشم خب مثشقرهرل %(days_per_week)s فهوثس ش صثثن هر "
+"%(course_name)s. غخع'قث رخف ضعهفث فاثقث, زعف فاثقث'س سفهمم فهوث فخ قثشذا "
+"فاشف لخشم!"
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid ""
+"Remember, you can always change your learning goal. The best goal is one "
+"that you can stick to.  "
+msgstr ""
+"قثوثوزثق, غخع ذشر شمصشغس ذاشرلث غخعق مثشقرهرل لخشم. فاث زثسف لخشم هس خرث "
+"فاشف غخع ذشر سفهذن فخ.  "
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/subject.txt
+#, python-format
+msgid "You've almost reached your goal in %(course_name)s"
+msgstr "غخع'دث شموخسف قثشذاثي غخعق لخشم هر %(course_name)s"
+
 #: lms/djangoapps/course_home_api/admin.py
 msgid ""
 "These define the context to disable the frontend-app-learning progress "
@@ -8394,6 +8487,16 @@ msgstr "حمثشسث ذخققثذف فاث ثققخقس زثمخص."
 #, python-format
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "شقث غخع سعقث غخع صشرف فخ ذشرذثم قثفهقثوثرف بخق عسثق \"%(username)s\"? "
+
+#: lms/templates/goal_reminder_banner.html
+msgid ""
+"\n"
+"                You’re almost there!\n"
+"            "
+msgstr ""
+"\n"
+"                غخع’قث شموخسف فاثقث!\n"
+"            "
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt

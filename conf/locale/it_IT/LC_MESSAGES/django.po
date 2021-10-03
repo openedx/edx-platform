@@ -124,7 +124,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
+"POT-Creation-Date: 2021-09-26 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -5700,6 +5700,8 @@ msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
+"© {org_name}. Tutti i diritti riservati eccetto dove indicato.  edX, Open "
+"edX ed i rispettivi logo sono marchi registrati di edX Inc."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -6828,7 +6830,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Calculator"
-msgstr ""
+msgstr "Calcolatore "
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide an in-course calculator for simple and complex calculations."
@@ -6836,14 +6838,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Proctoring"
-msgstr ""
+msgstr "Supervisione"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
-#: cms/templates/edit-tabs.html
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
 msgid "Custom pages"
 msgstr "Pagine personalizzate "
 
@@ -9914,6 +9916,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
 msgstr "Esegui upgrade ora"
 
@@ -10615,7 +10618,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "technical support"
-msgstr ""
+msgstr "supporto tecnico"
 
 #: openedx/core/djangoapps/discussions/models.py
 #, python-brace-format
@@ -10670,7 +10673,7 @@ msgstr "L'ID del provider/strumento di discussione"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Program UUID"
-msgstr ""
+msgstr "UUID programma"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
@@ -12515,6 +12518,7 @@ msgstr "Continua"
 msgid "Shift due dates"
 msgstr "Sposta date di scadenza"
 
+#: openedx/features/personalized_learner_schedules/call_to_action.py
 #: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
@@ -12529,6 +12533,9 @@ msgid ""
 "due assignments into the future. Don’t worry—you won’t lose any of the "
 "progress you’ve made when you shift your due dates."
 msgstr ""
+"Per rispettare la tempistica, è possibile aggiornare questa pianificazione e"
+" spostare i compiti scaduti nel futuro. Non preoccuparti—quando le date di "
+"scadenza vengono spostate, non viene perso alcun progresso. "
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -17444,7 +17451,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View grades"
-msgstr ""
+msgstr "Visualizza valutazioni "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
@@ -20888,7 +20895,7 @@ msgstr "Date imminenti "
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
 msgid "View all course dates"
-msgstr ""
+msgstr "Visualizza tutte le date del corso "
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -24717,7 +24724,7 @@ msgstr "Questo blocco contiene più componenti. "
 
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Pages & Resources"
-msgstr ""
+msgstr "Pagine & Risorse"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
