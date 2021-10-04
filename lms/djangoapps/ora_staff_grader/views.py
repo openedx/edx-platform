@@ -74,7 +74,7 @@ class InitializeView(RetrieveAPIView):
         """
         Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
         """
-        return call_xblock_json_handler(request, usage_id, 'list_staff_workflows')
+        return call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
 
     def get_rubric_config(self, request, usage_id):
         """

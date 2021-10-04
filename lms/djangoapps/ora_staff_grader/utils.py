@@ -9,7 +9,7 @@ from rest_framework.request import clone_request
 from lms.djangoapps.courseware.module_render import handle_xblock_callback
 
 
-def call_xblock_json_handler(request, usage_id, handler_name, data={}):
+def call_xblock_json_handler(request, usage_id, handler_name, data):
     """
     Create an internally-routed XBlock.json_handler request.
     The internal auth code/param unpacking requires a POST request with payload in the body.
