@@ -16,9 +16,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core import types
 from openedx.core.lib.api.view_utils import validate_course_key
-
 from .api import get_user_course_outline_details
 from .api.permissions import can_call_public_api, can_see_content_as_other_users
 from .data import CourseOutlineData
@@ -187,7 +185,7 @@ class CourseOutlineView(APIView):
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
-    def _determine_user(self, request, course_key: CourseKey) -> types.User:
+    def _determine_user(self, request, course_key: CourseKey) -> User:
         """
         For which user should we get an outline?
 
