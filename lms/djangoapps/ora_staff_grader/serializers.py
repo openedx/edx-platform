@@ -31,11 +31,10 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
     """
     name = serializers.CharField(source='display_name')
     prompts = serializers.ListField()
+    type = serializers.SerializerMethodField()
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['type'] = 'team' if instance.teams_enabled else 'individual'
-        return ret
+    def get_type(self, instance):
+        return 'team' if instance.teams_enabled else 'individual'
 
     class Meta:
         fields = [
