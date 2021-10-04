@@ -16,7 +16,7 @@ click==7.1.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
-cryptography==3.4.8
+cryptography==35.0.0
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.10.0
     # via matplotlib
@@ -71,7 +71,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.9.24
+regex==2021.9.30
     # via nltk
 scipy==1.7.1
     # via
