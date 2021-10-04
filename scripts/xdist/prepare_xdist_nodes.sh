@@ -15,6 +15,10 @@ if [[ -z ${TOXENV+x} ]] || [[ ${TOXENV} == 'null' ]]; then
     DJANGO_REQUIREMENT="requirements/edx/django.txt"
 elif [[ ${TOXENV} == *'django30'* ]]; then
     DJANGO_REQUIREMENT="requirements/edx/django30.txt"
+elif [[ ${TOXENV} == *'django31'* ]]; then
+    DJANGO_REQUIREMENT="requirements/edx/django31.txt"
+elif [[ ${TOXENV} == *'django32'* ]]; then
+    DJANGO_REQUIREMENT="requirements/edx/django32.txt"
 fi
 
 ip_list=$(<pytest_worker_ips.txt)
