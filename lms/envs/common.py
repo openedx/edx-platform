@@ -1715,7 +1715,6 @@ LANGUAGES = [
     ('en', 'English'),
     ('rtl', 'Right-to-Left Test Language'),
     ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-    ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('am', 'አማርኛ'),  # Amharic
     ('ar', 'العربية'),  # Arabic
