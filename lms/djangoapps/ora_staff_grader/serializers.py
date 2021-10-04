@@ -44,9 +44,9 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
         ]
 
 
-class GradeDataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
-    Grade data shape (points earned/possible) for use in SubmissionMetadataSerializer
+    Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
     pointsEarned = serializers.IntegerField()
     pointsPossible = serializers.IntegerField()
@@ -65,7 +65,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
     dateSubmitted = serializers.DateTimeField()
     gradeStatus = serializers.CharField()
     lockStatus = serializers.CharField()
-    grade = GradeDataSerializer()
+    score = ScoreSerializer()
 
     class Meta:
         fields = [
@@ -75,5 +75,5 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
             'dateSubmitted',
             'gradeStatus',
             'lockStatus',
-            'grade'
+            'score'
         ]
