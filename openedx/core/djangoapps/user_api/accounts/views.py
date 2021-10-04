@@ -450,7 +450,7 @@ class NameChangeView(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 return Response(
-                    'The name given was identical to the current name.',
+                    {'new_name': 'The profile name given was identical to the current name.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
