@@ -70,6 +70,9 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
 
             anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
             if anonymous_cookie_lang:
+                # User logged in during this request, so update their
+                # language preference from the existing cookie (or
+                # enterprise customer preference, which also sets this.)
                 user_pref = anonymous_cookie_lang
                 set_user_preference(current_user, LANGUAGE_KEY, anonymous_cookie_lang)
             else:
