@@ -2,11 +2,12 @@
 Unit tests for SafeSessionMiddleware
 """
 
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import ddt
 
 from crum import set_current_request
+from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
@@ -14,17 +15,21 @@ from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.core.djangolib.testing.utils import get_mock_request, CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes, mark_user_change_as_expected
+from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes, mark_user_change_as_expected,\
+USER_MISMATCH_CACHE_KEY
 from .test_utils import TestSafeSessionsLogMixin
 
 
-class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
+@ddt.ddt
+class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, CacheIsolationTestCase):
     """
     Test class for SafeSessionMiddleware.process_request
     """
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super().setUp()
@@ -71,42 +76,42 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         """
         assert SafeSessionMiddleware.get_user_id_from_session(self.request) == self.user.id
 
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", False)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
-    def test_success(self, mock_log_request_user_changes):
-        self.client.login(username=self.user.username, password='test')
-        session_id = self.client.session.session_key
-        safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
+    @ddt.unpack
+    @ddt.data(
+        {'toggle': True, 'cache_flag': True, 'should_log': True},
+        {'toggle': True, 'cache_flag': False, 'should_log': False},
+        {'toggle': False, 'cache_flag': True, 'should_log': False},
+        {'toggle': False, 'cache_flag': False, 'should_log': False},
+    )
+    def test_success(self, mock_log_request_user_changes, toggle, cache_flag, should_log):
+        with patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", toggle):
+            self.client.login(username=self.user.username, password='test')
+            cache.set(USER_MISMATCH_CACHE_KEY, cache_flag)
+            session_id = self.client.session.session_key
+            safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
 
-        # pre-verify steps 3, 4, 5
-        assert getattr(self.request, 'session', None) is None
-        assert getattr(self.request, 'safe_cookie_verified_user_id', None) is None
+            # pre-verify steps 3, 4, 5
+            assert getattr(self.request, 'session', None) is None
+            assert getattr(self.request, 'safe_cookie_verified_user_id', None) is None
 
-        # verify step 1: safe cookie data is parsed
-        self.assert_response(safe_cookie_data)
-        self.assert_user_in_session()
+            # verify step 1: safe cookie data is parsed
+            self.assert_response(safe_cookie_data)
+            self.assert_user_in_session()
 
-        # verify step 2: cookie value is replaced with parsed session_id
-        assert self.request.COOKIES[settings.SESSION_COOKIE_NAME] == session_id
+            # verify step 2: cookie value is replaced with parsed session_id
+            assert self.request.COOKIES[settings.SESSION_COOKIE_NAME] == session_id
 
-        # verify step 3: session set in request
-        assert self.request.session is not None
+            # verify step 3: session set in request
+            assert self.request.session is not None
 
-        # verify steps 4, 5: user_id stored for later verification
-        assert self.request.safe_cookie_verified_user_id == self.user.id
+            # verify steps 4, 5: user_id stored for later verification
+            assert self.request.safe_cookie_verified_user_id == self.user.id
 
-        # verify extra request_user_logging not called.
-        assert not mock_log_request_user_changes.called
-
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
-    def test_log_request_user_on(self, mock_log_request_user_changes):
-        self.client.login(username=self.user.username, password='test')
-        session_id = self.client.session.session_key
-        safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
-
-        self.assert_response(safe_cookie_data)
-        assert mock_log_request_user_changes.called
+            if should_log:
+                assert mock_log_request_user_changes.called
+            else:
+                assert not mock_log_request_user_changes.called
 
     def test_success_no_cookies(self):
         self.assert_response()
@@ -136,17 +141,24 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
 
 
 @ddt.ddt
-class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
+class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, CacheIsolationTestCase):
     """
     Test class for SafeSessionMiddleware.process_response
     """
 
+    ENABLED_CACHES = ['default']
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.MOCK_USER = UserFactory()
+
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create()
+        self.user = self.MOCK_USER
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
-        self.request.session = {}
+        self.request.session = MagicMock()
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
 
@@ -159,8 +171,9 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
             set_request_user - If True, the user is set on the request
                 object.
             set_session_cookie - If True, a session_id is set in the
-                session cookie in the response.
+                session cookie in the response.c
         """
+        print('assert response')
         if set_request_user:
             self.request.user = self.user
             SafeSessionMiddleware.set_user_id_in_session(self.request, self.user)
@@ -188,30 +201,90 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
             self.assert_response(set_request_user=set_request_user, set_session_cookie=set_session_cookie)
             assert mock_delete_cookie.called == expect_delete_called
 
-    def test_success(self):
+    @patch("django.core.cache.cache.set")
+    @patch("django.core.cache.cache.touch")
+    def test_success(self, mock_cache_set, mock_cache_touch):
         with self.assert_not_logged():
             self.assert_response(set_request_user=True, set_session_cookie=True)
+        assert not mock_cache_set.called
+        assert not mock_cache_touch.called
 
-    def test_confirm_user_at_step_2(self):
+    @patch("django.core.cache.cache.set")
+    @patch("django.core.cache.cache.touch")
+    def test_confirm_user_at_step_2(self, mock_cache_set, mock_cache_touch):
         self.request.safe_cookie_verified_user_id = self.user.id
         with self.assert_not_logged():
             self.assert_response(set_request_user=True, set_session_cookie=True)
+        assert not mock_cache_set.called
+        assert not mock_cache_touch.called
 
-    def test_different_user_at_step_2_error(self):
-        self.request.safe_cookie_verified_user_id = "different_user"
+    @patch("django.core.cache.cache.set")
+    @ddt.unpack
+    @ddt.data(
+        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'response',
+         'change_session': True},
+        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'session',
+         'change_session': True},
+        {'change_response_user': True, 'change_session_user': True, 'mismatch_location': 'both',
+         'change_session': True},
+        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'response',
+         'change_session': False},
+        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'session',
+         'change_session': False},
+        {'change_response_user': True, 'change_session_user': True, 'mismatch_location': 'both',
+         'change_session': False},
+    )
+    def test_different_user_at_step_2_error(self, mock_cache_set, change_response_user,
+                                            change_session_user, mismatch_location, change_session):
+        new_user = UserFactory()
+        self.request.safe_cookie_verified_user_id = self.user.id
+        session_user_id = self.user.id
 
-        with self.assert_logged_for_request_user_mismatch("different_user", self.user.id, 'warning', self.request.path):
-            self.assert_response(set_request_user=True, set_session_cookie=True)
+        if change_response_user:
+            self.request.user = new_user
+        if change_session_user:
+            session_user_id = new_user.id
 
-        with self.assert_logged_for_session_user_mismatch("different_user", self.user.id, self.request.path):
-            self.assert_response(set_request_user=True, set_session_cookie=True)
+        self.request.safe_cookie_session_id = "some_other_session" if change_session else "some_session_id"
+        self.request.session.configure_mock(**{'session_key': 'some_session_id'})
 
-    def test_anonymous_user(self):
+        log_session_suffix = 'Session id has changed.' if change_session else 'Session id has not changed'
+
+        with patch("openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware.get_user_id_from_session",
+                   return_value=session_user_id):
+            if not mismatch_location == 'both':
+                with self.assert_logged_with_message(
+                    (
+                        "SafeCookieData user at request '{}' does not match user in {}: '{}' "
+                        "for request path '{}'. {}"
+                    ).format(
+                        self.MOCK_USER.id, mismatch_location, new_user.id, self.request.path, log_session_suffix
+                    ),
+                    log_level='warning',
+                ):
+                    self.assert_response(set_request_user=False, set_session_cookie=True)
+                    assert mock_cache_set.called
+            else:
+                with self.assert_logged_with_message(
+                    (
+                        "SafeCookieData user at request '{}' does not match user in session: '{}' "
+                        "or user in response: {} for request path '{}'. {}"
+                    ).format(
+                        self.MOCK_USER.id, new_user.id, new_user.id, self.request.path, log_session_suffix
+                    ),
+                    log_level='warning',
+                ):
+                    self.assert_response(set_request_user=False, set_session_cookie=True)
+                    assert mock_cache_set.called
+
+    @patch("django.core.cache.cache.set")
+    def test_anonymous_user(self, mock_cache_set):
         self.request.safe_cookie_verified_user_id = self.user.id
         self.request.user = AnonymousUser()
         self.request.session[SESSION_KEY] = self.user.id
         with self.assert_no_error_logged():
             self.assert_response(set_request_user=False, set_session_cookie=True)
+        assert not mock_cache_set.called
 
     def test_update_cookie_data_at_step_3(self):
         self.assert_response(set_request_user=True, set_session_cookie=True)
