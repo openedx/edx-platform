@@ -1,6 +1,7 @@
 """Get log settings."""
 
 
+import django
 import logging
 import platform
 import sys
@@ -129,9 +130,15 @@ def log_python_warnings():
     try:
         # There are far too many of these deprecation warnings in startup to output for every management command;
         # suppress them until we've fixed at least the most common ones as reported by the test suite
-        from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
-        warnings.simplefilter('ignore', RemovedInDjango20Warning)
-        warnings.simplefilter('ignore', RemovedInDjango21Warning)
+
+        if django.VERSION >= (3, 2):
+            from django.utils.deprecation import RemovedInDjango40Warning, RemovedInDjango41Warning
+            warnings.simplefilter('ignore', RemovedInDjango40Warning)
+            warnings.simplefilter('ignore', RemovedInDjango41Warning)
+        else:
+            from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
+            warnings.simplefilter('ignore', RemovedInDjango20Warning)
+            warnings.simplefilter('ignore', RemovedInDjango21Warning)
     except ImportError:
         pass
     logging.captureWarnings(True)
