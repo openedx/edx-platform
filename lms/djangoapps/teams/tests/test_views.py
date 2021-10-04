@@ -8,6 +8,7 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 from uuid import UUID
+from copy import deepcopy
 
 import ddt
 import pytz
@@ -372,16 +373,16 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 display_name='Circuits',
                 teams_configuration=teams_configuration_2
             )
+            cls.users = {
+                'staff': AdminFactory.create(password=cls.test_password),
+                'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
+                'admin': AdminFactory.create(password=cls.test_password)
+            }
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.topics_count = 6
-        cls.users = {
-            'staff': AdminFactory.create(password=cls.test_password),
-            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
-            'admin': AdminFactory.create(password=cls.test_password)
-        }
         cls.create_and_enroll_student(username='student_enrolled')
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_on_team_2_private_set_1', mode=CourseMode.MASTERS)
@@ -582,7 +583,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 status='enrolled'
             )
 
-        return user.username
+        return deepcopy(user.username)
 
     def login(self, user):
         """Given a user string, logs the given user in.
