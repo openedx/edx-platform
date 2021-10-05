@@ -60,6 +60,9 @@ jobs:
           FLUSH PRIVILEGES;
         EOF
 
+    - name: Check mysql version
+      run: mysql --version
+
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/bok_choy.yml
