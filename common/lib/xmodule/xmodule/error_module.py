@@ -11,6 +11,7 @@ import sys
 
 from lxml import etree
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, ScopeIds, String
 
@@ -43,6 +44,7 @@ class ErrorFields:
     display_name = String(scope=Scope.settings)
 
 
+@XBlock.needs('mako')
 class ErrorBlock(
     ErrorFields,
     XModuleDescriptorToXBlockMixin,
@@ -62,7 +64,7 @@ class ErrorBlock(
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.system.render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,
@@ -209,7 +211,7 @@ class NonStaffErrorBlock(ErrorBlock):  # pylint: disable=abstract-method
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.system.render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
             'staff_access': False,
             'data': '',
             'error': '',

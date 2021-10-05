@@ -705,7 +705,7 @@ def get_module_system_for_user(
 
     mako_service = MakoService()
     if settings.FEATURES.get("LICENSING", False):
-        block_wrappers.append(wrap_with_license)
+        block_wrappers.append(partial(wrap_with_license, mako_service=mako_service))
 
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly

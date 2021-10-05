@@ -188,7 +188,7 @@ def _preview_module_system(request, descriptor, field_data):
     mako_service = MakoService(namespace_prefix='lms.')
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
-        wrappers.insert(0, wrap_with_license)
+        wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
