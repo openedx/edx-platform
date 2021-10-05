@@ -196,12 +196,10 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
                 with patch('third_party_auth.pipeline.get', return_value=pipeline_partial):
                     with patch('third_party_auth.pipeline.running', return_value=True):
                         with patch('third_party_auth.is_enabled', return_value=True):
-                            with patch('third_party_auth.views.USER_ACCOUNT_ACTIVATED') as mock_signal:
-                                reg.skip_email_verification = True
-                                inactive_user_view(request)
-                                self.assertEqual(user.is_active, True)
-                                self.assertEqual(email.called, False, msg='method should not have been called')
-                                mock_signal.send_robust.assert_called_once_with(None, user=user), 'Verify signal'
+                            reg.skip_email_verification = True
+                            inactive_user_view(request)
+                            self.assertEqual(user.is_active, True)
+                            self.assertEqual(email.called, False, msg='method should not have been called')
 
     @patch('student.views.management.compose_activation_email')
     def test_send_email_to_inactive_user(self, email):
