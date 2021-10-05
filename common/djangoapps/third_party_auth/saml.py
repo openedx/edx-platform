@@ -94,10 +94,10 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         except KeyError as ex:
             log.warning(
                 u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
-                u'Provider: {idp_name}, Message:'.format(
+                u'Provider: {idp_name}, Message: {message}'.format(
+                    message=ex.message,
                     idp_name=response.get('idp_name')
-                ),
-                exc_info=True
+                )
             )
             raise IncorrectConfigurationException(self)
 
