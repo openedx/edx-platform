@@ -459,9 +459,8 @@ docutils==0.17.1
     #   botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.txt
-drf-jwt==1.19.0
+drf-jwt==1.19.1
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
 drf-yasg==1.20.0
@@ -507,6 +506,7 @@ edx-django-utils==4.4.0
     #   super-csv
 edx-drf-extensions==8.0.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-completion
     #   edx-enterprise

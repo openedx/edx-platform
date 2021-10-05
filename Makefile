@@ -114,6 +114,8 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/edx-auth-backends<4.0.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/drf-jwt<1.19.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
