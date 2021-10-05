@@ -476,8 +476,9 @@ def _log_and_monitor_expected_errors(request, exception, caller):
             set_custom_attribute('checked_error_expected_from', 'multiple')
             return
 
-        # Currently, it seems unexpected that middleware and drf will both handle different uncaught exceptions.
-        # We will monitor for this and adjust accordingly if it turns out this is a common case.
+        # We have confirmed using monitoring that it is very rare that middleware and drf handle different uncaught exceptions.
+        # We will leave this attribute in place, but it is not worth investing in a workaround, especially given that
+        # New Relic now offers its own expected error functionality, and this functionality may be simplified or removed.
         set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
         log.warning(
             "Unexpected scenario where different exceptions are handled by _log_and_monitor_expected_errors. "
