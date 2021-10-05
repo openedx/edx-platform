@@ -298,7 +298,6 @@ django==2.2.24
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-    #   rest-condition
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
@@ -463,7 +462,6 @@ djangorestframework==3.12.4
     #   edx-proctoring
     #   edx-submissions
     #   ora2
-    #   rest-condition
     #   super-csv
 djangorestframework-xml==2.0.0
     # via
@@ -526,7 +524,7 @@ edx-django-utils==4.4.0
     #   edx-when
     #   ora2
     #   super-csv
-edx-drf-extensions==7.0.1
+edx-drf-extensions==8.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -538,7 +536,7 @@ edx-drf-extensions==7.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.28.22
+edx-enterprise==3.28.24
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -639,7 +637,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.txt
-faker==8.14.1
+faker==8.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -896,7 +894,7 @@ newrelic==7.0.0.166
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
-nltk==3.6.3
+nltk==3.6.4
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1231,10 +1229,6 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-rest-condition==1.0.3
-    # via
-    #   -r requirements/edx/testing.txt
-    #   edx-drf-extensions
 ruamel.yaml==0.17.16
     # via
     #   -r requirements/edx/testing.txt

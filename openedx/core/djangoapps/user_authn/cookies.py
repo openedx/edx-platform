@@ -170,6 +170,7 @@ def get_response_with_refreshed_jwt_cookies(request, user):
     response.content = json.dumps(
         {
             'success': True,
+            'user_id': user.id,
             'response_epoch_seconds': current_time,
             'response_http_date': http_date(current_time),
             'expires': expires_date if expires_date else 'not-found',

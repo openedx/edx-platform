@@ -77,8 +77,6 @@ class TestGenerate(TestCase):
         .mo files should exist, and be recently created (modified
         after start of test suite)
         """
-        # Change dummy_locales to not have Esperanto present.
-        self.configuration.dummy_locales = ['fake2']
 
         generate.main(verbosity=0, strict=False)
         for locale in self.configuration.translated_locales:

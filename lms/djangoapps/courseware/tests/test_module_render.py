@@ -573,6 +573,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         csrf_token = get_token(request)
         request._post = {'csrfmiddlewaretoken': f'{csrf_token}-dummy'}  # pylint: disable=protected-access
         request.user = self.mock_user
+        request.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+
         response = render.handle_xblock_callback(
             request,
             str(self.course_key),
@@ -590,6 +592,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         csrf_token = get_token(request)
         request._post = {'csrfmiddlewaretoken': csrf_token}  # pylint: disable=protected-access
         request.user = self.mock_user
+        request.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+
         response = render.handle_xblock_callback(
             request,
             str(self.course_key),
