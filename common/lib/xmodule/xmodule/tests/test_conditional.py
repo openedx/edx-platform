@@ -166,7 +166,8 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
         html = modules['cond_module'].render(STUDENT_VIEW).content
-        expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
+        mako_service = modules['cond_module'].xmodule_runtime.service(modules['cond_module'], 'mako')
+        expected = mako_service.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].ajax_url,
             'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
@@ -241,7 +242,8 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
         module = self.get_module_for_location(location)
         html = module.render(STUDENT_VIEW).content
-        html_expect = module.xmodule_runtime.render_template(
+        mako_service = module.xmodule_runtime.service(module, 'mako')
+        html_expect = mako_service.render_template(
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name

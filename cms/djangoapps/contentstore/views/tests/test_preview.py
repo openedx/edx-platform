@@ -169,6 +169,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
+@XBlock.needs("mako")
 @XBlock.needs("user")
 @XBlock.needs("teams_configuration")
 class PureXBlock(XBlock):
@@ -180,7 +181,7 @@ class PureXBlock(XBlock):
         Renders the output that a student will see.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.render_template('edxmako.html', context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('edxmako.html', context))
         return fragment
 
 
