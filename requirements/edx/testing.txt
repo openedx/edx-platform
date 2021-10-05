@@ -200,7 +200,7 @@ cssutils==2.3.0
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
-ddt==1.4.3
+ddt==1.4.4
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -702,7 +702,7 @@ itypes==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   coreapi
-jinja2==3.0.1
+jinja2==3.0.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
@@ -841,7 +841,7 @@ newrelic==7.0.0.166
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-nltk==3.6.4
+nltk==3.6.3
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -865,7 +865,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.6.0
     # via -r requirements/edx/base.txt
-ora2==3.6.22
+ora2==3.7.0
     # via -r requirements/edx/base.txt
 packaging==21.0
     # via
