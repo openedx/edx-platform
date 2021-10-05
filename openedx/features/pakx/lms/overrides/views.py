@@ -1,4 +1,5 @@
 """ Overridden views from core """
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -12,6 +13,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
+from pytz import utc
 from six import text_type
 from waffle import switch_is_active
 
@@ -51,7 +53,8 @@ from openedx.features.pakx.lms.overrides.utils import (
     get_featured_course_data,
     get_featured_course_set,
     get_rating_classes_for_course,
-    get_resume_course_info
+    get_resume_course_info,
+    is_course_enroll_able
 )
 from student.models import CourseEnrollment
 from util.cache import cache_if_anonymous
@@ -258,6 +261,11 @@ def _get_course_about_context(request, course_id, category=None):  # pylint: dis
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
+        can_enroll = can_enroll and is_course_enroll_able(course)
+        current_date = datetime.now(utc)
+        days_in_course_start = (course.start - current_date).days if (
+                course.start and course.start > current_date) else None
+
         invitation_only = course.invitation_only
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
 
@@ -331,6 +339,7 @@ def _get_course_about_context(request, course_id, category=None):  # pylint: dis
             'user_progress': user_progress,
             'org_name': course_map['org_name'],
             'org_short_logo': course_map['org_logo_url'],
+            'days_in_course_start': days_in_course_start,
             'org_description': course_map['org_description'],
             'publisher_logo': course_map['publisher_logo_url'],
             'course_rating': get_rating_classes_for_course(course_id)

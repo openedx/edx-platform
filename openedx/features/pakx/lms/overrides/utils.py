@@ -13,6 +13,7 @@ from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
+from pytz import utc
 from six import text_type
 
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
@@ -28,6 +29,7 @@ from openedx.features.pakx.cms.custom_settings.models import CourseOverviewConte
 from pakx_feedback.feedback_app.models import UserFeedbackModel
 from student.models import CourseEnrollment
 from util.organizations_helpers import get_organization_by_short_name
+from xmodule import course_metadata_utils
 
 log = getLogger(__name__)
 
@@ -426,6 +428,18 @@ def get_date_diff_in_days(future_date):
 
     current_date = datetime.now().date()
     return (future_date.date() - current_date).days
+
+
+def is_course_enroll_able(course):
+    """
+    return a boolean whether the course is enroll-able or not
+    :param course: course object
+    :return: boolean flag if a course can be enroll-able or not
+    """
+    is_course_ended = course_metadata_utils.has_course_ended(course.end)
+    is_enrollment_ended = course_metadata_utils.has_course_ended(course.enrollment_end)
+    is_enrollment_not_started = datetime.now(utc) < course.enrollment_start if course.enrollment_start else False
+    return not is_course_ended and not is_enrollment_ended and not is_enrollment_not_started
 
 
 def validate_text_for_emoji(text):

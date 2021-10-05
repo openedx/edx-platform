@@ -59,7 +59,7 @@ def get_user_enrollment_same_org_filter(user):
     return Q(courseenrollment__user__profile__organization__short_name__iregex=get_user_org(user))
 
 
-def get_roles_q_filters(roles, user):
+def get_roles_q_filters(roles):
     """
     return Q filter to be used for filter user queryset
     :param roles: request params to filter roles
@@ -156,19 +156,25 @@ def get_org_users_qs(user):
     )
 
 
-def get_available_course_qs(user):
+def get_enroll_able_course_qs():
+    """
+    :return: Q filter for enroll-able courses based on course enrollment & course_end dates
+    """
     now = datetime.now(pytz.UTC)
     # A Course is "enroll-able" if its enrollment start date has passed,
     # is now, or is None, and its enrollment end date is in the future or is None.
-
     return (
-        (
-            Q(enrollment_start__lte=now) | Q(enrollment_start__isnull=True)
-        ) &
-        (
-            Q(enrollment_end__gt=now) | Q(enrollment_end__isnull=True)
-        ) & get_course_overview_same_org_filter(user)
+        (Q(enrollment_start__lte=now) | Q(enrollment_start__isnull=True)) &
+        (Q(enrollment_end__gt=now) | Q(enrollment_end__isnull=True)) &
+        (Q(end_date__gt=now) | Q(end_date__isnull=True))
     )
+
+
+def get_user_available_course_qs(user):
+    """
+    :return: Q filter for enroll-able courses for a user based on its org and course enrollment & course_end dates
+    """
+    return get_enroll_able_course_qs() & get_course_overview_same_org_filter(user)
 
 
 def send_registration_email(user, password, protocol, is_public_registration=False):
