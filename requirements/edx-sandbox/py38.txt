@@ -42,7 +42,7 @@ networkx==2.5.1
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-nltk==3.6.4
+nltk==3.6.3
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
