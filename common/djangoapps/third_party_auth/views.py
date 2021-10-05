@@ -18,7 +18,6 @@ from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 
-from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from .models import SAMLConfiguration, SAMLProviderConfig
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
@@ -55,8 +54,6 @@ def inactive_user_view(request):
             user.is_active = True
             user.save()
             activated = True
-            USER_ACCOUNT_ACTIVATED.send_robust(None, user=user)
-            beeline.add_context_field('activation_signal_sent', True)
     if not activated:
         compose_and_send_activation_email(user, profile)
         beeline.add_context_field('activation_email_sent', True)
