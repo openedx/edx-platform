@@ -1080,7 +1080,7 @@ TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
 
-LANGUAGE_COOKIE = lms.envs.common.LANGUAGE_COOKIE
+LANGUAGE_COOKIE_NAME = lms.envs.common.LANGUAGE_COOKIE_NAME
 
 LANGUAGES = lms.envs.common.LANGUAGES
 LANGUAGE_DICT = dict(LANGUAGES)
