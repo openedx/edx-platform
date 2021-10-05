@@ -24,16 +24,13 @@ django-celery-results<2.1
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
 
-# greater version has breaking changes `settings have been renamed`. Check https://github.com/adamchainz/django-cors-headers/blob/main/HISTORY.rst#350-2020-08-25
-django-cors-headers==3.2.0
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.28.16
+edx-enterprise==3.28.24
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -105,7 +102,3 @@ pylint<2.10.0
 # Feel free to loosen this constraint if/when it is confirmed that a later
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
-
-# as of right now (Sep 8 2021), we need to not use the latest edx-when
-# version which might be causing issues with course publishing
-edx-when==2.1.0

@@ -13,7 +13,6 @@ from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.course_metadata.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
@@ -117,8 +116,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
         )
 
         # Record course goals user activity for (web) learning mfe course tabs
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            UserActivity.record_user_activity(request.user, course_key)
+        UserActivity.record_user_activity(request.user, course_key)
 
         data = {
             'course_id': course.id,

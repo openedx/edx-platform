@@ -542,7 +542,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
 
     :return: list of errors
     """
-    errors = list()
+    errors = []
     try:
         with transaction.atomic():
             # Create a new user
@@ -2739,7 +2739,9 @@ def reset_due_date(request, course_id):
     unit = find_unit(course, request.POST.get('url'))
     reason = strip_tags(request.POST.get('reason', ''))
 
-    original_due_date = get_date_for_block(course_id, unit.location)
+    version = getattr(course, 'course_version', None)
+
+    original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
 
     set_due_date_extension(course, unit, student, None, request.user, reason=reason)
     if not original_due_date:

@@ -46,6 +46,8 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         expected = {
             "abuse_flagged", "course_id", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
         }
+        if is_privileged:
+            expected |= {"closed", "pinned"}
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
         assert actual == expected
@@ -81,6 +83,8 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_editable_fields(thread, context)
         expected = {"abuse_flagged", "following", "read", "voted"}
+        if is_privileged:
+            expected |= {"closed", "pinned"}
         if is_author or is_privileged:
             expected |= {"topic_id", "type", "title", "raw_body"}
         if is_privileged and is_cohorted:

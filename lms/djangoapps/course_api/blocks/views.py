@@ -14,7 +14,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -311,9 +310,8 @@ class BlocksInCourseView(BlocksView):
         response = super().list(request, course_usage_key,
                                 hide_access_denials=hide_access_denials)
 
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            # Record user activity for tracking progress towards a user's course goals (for mobile app)
-            UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
 
         calculate_completion = any('completion' in param
                                    for param in request.query_params.getlist('requested_fields', []))

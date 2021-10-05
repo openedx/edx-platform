@@ -341,7 +341,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
     header_accept = request_headers.get('HTTP_ACCEPT', '')
     accepts_text_html = any(
         mime_type in header_accept
-        for mime_type in {'*/*', 'text/*', 'text/html'}
+        for mime_type in ['*/*', 'text/*', 'text/html']
     )
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.
@@ -606,10 +606,16 @@ def _cert_info(user, enrollment, cert_status):
 
         # If the grade is passing, the status is one of these statuses, and request certificate
         # is enabled for a course then we need to provide the option to the learner
+        cert_gen_enabled = (
+            has_self_generated_certificates_enabled(course_overview.id) or
+            auto_certificate_generation_enabled()
+        )
+        passing_grade = persisted_grade and persisted_grade.passed
         if (
             status_dict['status'] != CertificateStatuses.downloadable and
-            (has_self_generated_certificates_enabled(course_overview.id) or auto_certificate_generation_enabled()) and
-            persisted_grade and persisted_grade.passed
+            cert_gen_enabled and
+            passing_grade and
+            course_overview.has_any_active_web_certificate
         ):
             status_dict['status'] = CertificateStatuses.requesting
 

@@ -39,7 +39,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
+from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, CourseOverviewTab
 from .factories import CourseOverviewFactory
 
 
@@ -396,7 +396,23 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             with check_mongo_calls_range(max_finds=max_mongo_calls, min_finds=min_mongo_calls):
                 _course_overview_2 = CourseOverview.get_from_id(course.id)
 
-    def test_course_overview_saving_race_condition(self):
+    # The CourseOverviewTab and CourseOverviewImageSet objects can't be filtered with course overview object as it is
+    # created with `None` as 'id' - We are going to mock this to as this isn't being tested in this test case, instead
+    # we are testing that on the first request course overview is created and stored and for the second request
+    # it gives IntegrityError - It is just to mimic race condition.
+    # Also we are mocking the RequestCache to disable caching as we want to mimic race condition and we want both
+    # requests to be served without involving cache
+    @mock.patch(
+        'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.filter',
+        mock.Mock(return_value=CourseOverviewTab.objects.none())
+    )
+    @mock.patch(
+        'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewImageSet.objects.filter',
+        mock.Mock(return_value=CourseOverviewImageSet.objects.none())
+    )
+    @mock.patch('openedx.core.lib.cache_utils.RequestCache', mock.Mock(return_value=None))
+    @mock.patch('openedx.core.djangoapps.content.course_overviews.models.log')
+    def test_course_overview_saving_race_condition(self, mock_log):
         """
         Tests that the following scenario will not cause an unhandled exception:
         - Multiple concurrent requests are made for the same non-existent CourseOverview.
@@ -444,6 +460,13 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                         # including after an IntegrityError exception the 2nd time.
                         for _ in range(2):
                             assert isinstance(CourseOverview.get_from_id(course.id), CourseOverview)
+
+                        # Make sure that tbe second call skips the cache and
+                        # IntegrityError is triggered and handled gracefully
+                        mock_log.info.assert_called_with(
+                            "Multiple CourseOverviews for course %s requested simultaneously; will only save one.",
+                            course.id
+                        )
 
     def test_course_overview_version_update(self):
         """

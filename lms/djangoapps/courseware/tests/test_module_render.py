@@ -573,6 +573,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         csrf_token = get_token(request)
         request._post = {'csrfmiddlewaretoken': f'{csrf_token}-dummy'}  # pylint: disable=protected-access
         request.user = self.mock_user
+        request.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+
         response = render.handle_xblock_callback(
             request,
             str(self.course_key),
@@ -590,6 +592,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         csrf_token = get_token(request)
         request._post = {'csrfmiddlewaretoken': csrf_token}  # pylint: disable=protected-access
         request.user = self.mock_user
+        request.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+
         response = render.handle_xblock_callback(
             request,
             str(self.course_key),
@@ -1589,7 +1593,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.course.static_asset_path = ""
 
     @override_settings(DEFAULT_COURSE_ABOUT_IMAGE_URL='test.png')
-    @override_settings(STATIC_URL='static/')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_image_for_split_course(self, store):
         """
@@ -1600,7 +1603,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.course.course_image = ''
 
         url = course_image_url(self.course)
-        assert 'static/test.png' == url
+        assert '/static/test.png' == url
 
     def test_get_course_info_section(self):
         self.course.static_asset_path = "toy_course_dir"

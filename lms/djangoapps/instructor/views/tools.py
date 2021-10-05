@@ -125,11 +125,13 @@ def get_units_with_due_date(course):
     """
     units = []
 
+    version = getattr(course, 'course_version', None)
+
     # Pass in a schedule here so that we get back any relative dates in the course, but actual value
     # doesn't matter, since we don't care about the dates themselves, just whether they exist.
     # Thus we don't save or care about this temporary schedule object.
     schedule = Schedule(start_date=course.start)
-    course_dates = api.get_dates_for_course(course.id, schedule=schedule)
+    course_dates = api.get_dates_for_course(course.id, schedule=schedule, published_version=version)
 
     def visit(node):
         """
@@ -173,7 +175,8 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
     # We normally set dates at the subsection level. But technically dates can be anywhere down the tree (and
     # usually are in self paced courses, where the subsection date gets propagated down).
     # So find all children that we need to set the date on, then set those dates.
-    course_dates = api.get_dates_for_course(course.id, user=student)
+    version = getattr(course, 'course_version', None)
+    course_dates = api.get_dates_for_course(course.id, user=student, published_version=version)
     blocks_to_set = {unit}  # always include the requested unit, even if it doesn't appear to have a due date now
 
     def visit(node):
@@ -191,8 +194,9 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
     for block in blocks_to_set:
         if due_date:
             try:
-                api.set_date_for_block(course.id, block.location, 'due', due_date, user=student, reason=reason,
-                                       actor=actor)
+                api.set_date_for_block(
+                    course.id, block.location, 'due', due_date, user=student, reason=reason, actor=actor
+                )
             except api.MissingDateError as ex:
                 raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location)) from ex
             except api.InvalidDateError as ex:

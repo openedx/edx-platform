@@ -32,6 +32,7 @@ import importlib.util
 import sys
 import os
 
+import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
@@ -729,7 +730,7 @@ FEATURES = {
     # .. toggle_description: When set to True, language selector will be visible in the footer.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
-    # .. toggle_warnings: LANGUAGE_COOKIE is required to use footer-language-selector, set it if it has not been set.
+    # .. toggle_warnings: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
@@ -1707,14 +1708,13 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
-LANGUAGE_COOKIE = "openedx-language-preference"
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
     ('en', 'English'),
     ('rtl', 'Right-to-Left Test Language'),
     ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-    ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('am', 'አማርኛ'),  # Amharic
     ('ar', 'العربية'),  # Arabic
@@ -2014,6 +2014,7 @@ MIDDLEWARE = [
 
     'crum.CurrentRequestUserMiddleware',
 
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
 
@@ -2123,6 +2124,13 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
+
+if django.VERSION >= (3, 1):
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    MIDDLEWARE.remove(
+        'django_cookies_samesite.middleware.CookiesSameSite'
+    )
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -3140,9 +3148,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
-
-    # Backends for receiving edX LMS events
-    'event_routing_backends.apps.EventRoutingBackendsConfig',
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',

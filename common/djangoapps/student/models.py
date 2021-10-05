@@ -61,7 +61,11 @@ from openedx_events.learning.data import (
     UserData,
     UserPersonalData,
 )
-from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
+from openedx_events.learning.signals import (
+    COURSE_ENROLLMENT_CHANGED,
+    COURSE_ENROLLMENT_CREATED,
+    COURSE_UNENROLLMENT_COMPLETED,
+)
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
@@ -652,7 +656,7 @@ class UserProfile(models.Model):
     def get_meta(self):  # pylint: disable=missing-function-docstring
         js_str = self.meta
         if not js_str:
-            js_str = dict()
+            js_str = {}
         else:
             js_str = json.loads(self.meta)
 
@@ -1417,12 +1421,40 @@ class CourseEnrollment(models.Model):
             self.mode = mode
             mode_changed = True
 
+        try:
+            course_data = CourseData(
+                course_key=self.course_id,
+                display_name=self.course.display_name,
+            )
+        except CourseOverview.DoesNotExist:
+            course_data = CourseData(
+                course_key=self.course_id,
+            )
+
         if activation_changed or mode_changed:
             self.save()
             self._update_enrollment_in_request_cache(
                 self.user,
                 self.course_id,
                 CourseEnrollmentState(self.mode, self.is_active),
+            )
+
+            COURSE_ENROLLMENT_CHANGED.send_event(
+                enrollment=CourseEnrollmentData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=course_data,
+                    mode=self.mode,
+                    is_active=self.is_active,
+                    creation_date=self.created,
+                )
             )
 
         if activation_changed:
@@ -1432,6 +1464,24 @@ class CourseEnrollment(models.Model):
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
                 self.send_signal(EnrollStatusChange.unenroll)
+
+                COURSE_UNENROLLMENT_COMPLETED.send_event(
+                    enrollment=CourseEnrollmentData(
+                        user=UserData(
+                            pii=UserPersonalData(
+                                username=self.user.username,
+                                email=self.user.email,
+                                name=self.user.profile.name,
+                            ),
+                            id=self.user.id,
+                            is_active=self.user.is_active,
+                        ),
+                        course=course_data,
+                        mode=self.mode,
+                        is_active=self.is_active,
+                        creation_date=self.created,
+                    )
+                )
 
         if mode_changed:
             # If mode changed to one that requires proctoring, send proctoring requirements email

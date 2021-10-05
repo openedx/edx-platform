@@ -13,6 +13,7 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.signals import post_save
 from django.urls import reverse
@@ -597,6 +598,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             student_inactive.is_active = False
             student_inactive.save()
         else:
+            if user not in self.users:
+                missing_user = User.objects.get(username=user)
+                self.users[missing_user.username] = missing_user
+
             self.client.login(username=self.users[user].username, password=self.test_password)
 
     def make_call(self, url, expected_status=200, method='get', data=None, content_type=None, **kwargs):
@@ -1052,6 +1057,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         yet_another_student_username = 'yet_another_student'
         self.create_and_enroll_student(username=another_student_username)
         self.create_and_enroll_student(username=yet_another_student_username)
+
+        self._add_missing_user(another_student_username)
+        self._add_missing_user(yet_another_student_username)
+
         self.solar_team.add_user(self.users[another_student_username])
         self.solar_team.add_user(self.users[yet_another_student_username])
 
@@ -1064,6 +1073,15 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
         assert team_names == [self.solar_team.name, self.masters_only_team.name]
+
+    def _add_missing_user(self, missing_user):
+        """
+        django32 TestCase.setUpTestData() are now isolated for each test method.
+        In case of missing user adding this to list.
+        """
+        if missing_user not in self.users:
+            missing_user = User.objects.get(username=missing_user)
+            self.users[missing_user.username] = missing_user
 
 
 @ddt.ddt

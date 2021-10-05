@@ -10,17 +10,13 @@ except ImportError:  # pragma: no cover
 def get_enterprise_event_context(user_id, course_id):
     """
     Creates an enterprise context from a `course_id` anf `user_id`.
-
     Example Returned Context::
-
         {
             'enterprise_uuid': '1a0fbcbe-49e5-42f1-8e83-4cddfa592f22'
         }
-
     Arguments:
         user_id: id of user object.
         course_id: id of course object.
-
     Returns:
         dict: A dictionary representing the enterprise uuid.
     """

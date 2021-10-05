@@ -4,7 +4,6 @@ Discussion API internal interface
 
 import itertools
 from collections import defaultdict
-from enum import Enum
 from typing import List, Literal, Optional
 from urllib.parse import urlencode, urlunparse
 
@@ -12,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
+from enum import Enum
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
@@ -103,13 +103,10 @@ def _get_course(course_key, user):
     """
     try:
         course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
-    except Http404:
+    except (Http404, CourseAccessRedirect) as err:
         # Convert 404s into CourseNotFoundErrors.
-        raise CourseNotFoundError("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
-    except CourseAccessRedirect:
         # Raise course not found if the user cannot access the course
-        # since it doesn't make sense to redirect an API.
-        raise CourseNotFoundError("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseNotFoundError("Course not found.") from err
     if not any(tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs):
         raise DiscussionDisabledError("Discussion is disabled for the course.")
     return course
@@ -143,10 +140,10 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
             if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
                 raise ThreadNotFoundError("Thread not found.")
         return cc_thread, context
-    except CommentClientRequestError:
+    except CommentClientRequestError as err:
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
-        raise ThreadNotFoundError("Thread not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ThreadNotFoundError("Thread not found.") from err
 
 
 def _get_comment_and_context(request, comment_id):
@@ -161,8 +158,8 @@ def _get_comment_and_context(request, comment_id):
         cc_comment = Comment(id=comment_id).retrieve()
         _, context = _get_thread_and_context(request, cc_comment["thread_id"])
         return cc_comment, context
-    except CommentClientRequestError:
-        raise CommentNotFoundError("Comment not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+    except CommentClientRequestError as err:
+        raise CommentNotFoundError("Comment not found.") from err
 
 
 def _is_user_author_or_privileged(cc_content, context):
@@ -833,6 +830,8 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 _handle_voted_field(form_value, cc_content, api_content, request, context)
             elif field == "read":
                 _handle_read_field(api_content, form_value, context["cc_requester"], cc_content)
+            elif field == "pinned":
+                _handle_pinned_field(form_value, cc_content, context["cc_requester"])
             else:
                 raise ValidationError({field: ["Invalid Key"]})
 
@@ -879,6 +878,22 @@ def _handle_read_field(api_content, form_value, user, cc_content):
         api_content["unread_comment_count"] = 0
 
 
+def _handle_pinned_field(pin_thread: bool, cc_content: Thread, user: User):
+    """
+    Pins or unpins a thread
+
+    Arguments:
+
+        pin_thread (bool): Value of field from API
+        cc_content (Thread): The thread on which to operate
+        user (User): The user performing the action
+    """
+    if pin_thread:
+        cc_content.pin(user, cc_content.id)
+    else:
+        cc_content.un_pin(user, cc_content.id)
+
+
 def create_thread(request, thread_data):
     """
     Create a thread.
@@ -902,8 +917,8 @@ def create_thread(request, thread_data):
     try:
         course_key = CourseKey.from_string(course_id)
         course = _get_course(course_key, user)
-    except InvalidKeyError:
-        raise ValidationError({"course_id": ["Invalid value."]})  # lint-amnesty, pylint: disable=raise-missing-from
+    except InvalidKeyError as err:
+        raise ValidationError({"course_id": ["Invalid value."]}) from err
 
     if not discussion_open_for_user(course, user):
         raise DiscussionBlackOutException
@@ -1143,8 +1158,8 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         num_pages = (comments_count + page_size - 1) // page_size if comments_count else 1
         paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
-    except CommentClientRequestError:
-        raise CommentNotFoundError("Comment not found")  # lint-amnesty, pylint: disable=raise-missing-from
+    except CommentClientRequestError as err:
+        raise CommentNotFoundError("Comment not found") from err
 
 
 def delete_thread(request, thread_id):

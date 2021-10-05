@@ -719,6 +719,7 @@ MIDDLEWARE = [
 
     'crum.CurrentRequestUserMiddleware',
 
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
@@ -1079,7 +1080,7 @@ TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
 
-LANGUAGE_COOKIE = lms.envs.common.LANGUAGE_COOKIE
+LANGUAGE_COOKIE_NAME = lms.envs.common.LANGUAGE_COOKIE_NAME
 
 LANGUAGES = lms.envs.common.LANGUAGES
 LANGUAGE_DICT = dict(LANGUAGES)
@@ -1473,9 +1474,6 @@ INSTALLED_APPS = [
     # Tracking
     'common.djangoapps.track',
     'eventtracking.django.apps.EventTrackingConfig',
-
-    # Backends for receiving edX LMS events
-    'event_routing_backends.apps.EventRoutingBackendsConfig',
 
     # For asset pipelining
     'common.djangoapps.edxmako.apps.EdxMakoConfig',

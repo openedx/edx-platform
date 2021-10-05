@@ -1,5 +1,4 @@
 """Course app config for courseware apps."""
-from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from typing import Dict, Optional
 
 from django import urls
@@ -7,10 +6,13 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_noop as _
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.modulestore.django import modulestore
 
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
+from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()
@@ -89,7 +91,7 @@ class TextbooksCourseApp(CourseApp):
         """
         Returns if the textbook app is globally enabled.
         """
-        return TEXTBOOK_ENABLED
+        return len(CourseOverview.get_from_id(course_key).pdf_textbooks) > 0
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
@@ -211,7 +213,8 @@ class ProctoringCourseApp(CourseApp):
 
     @staticmethod
     def legacy_link(course_key: CourseKey):
-        return get_proctored_exam_settings_url(course_key)
+        if not proctoring_settings_modal_view_enabled(course_key):
+            return get_proctored_exam_settings_url(course_key)
 
 
 class CustomPagesCourseApp(CourseApp):
@@ -237,9 +240,9 @@ class CustomPagesCourseApp(CourseApp):
     def is_enabled(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
         """
         Returns if the custom pages app is enabled.
-        For now this feature is enabled without any manual setup
+        For now this feature is disabled without any manual setup
         """
-        return True
+        return False
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:

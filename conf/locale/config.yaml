@@ -94,7 +94,6 @@ locales:
 # The locales used for fake-accented English, for testing.
 dummy_locales:
     - eo
-    - fake2
     - rtl  # Fake testing language for Arabic
 
 # Directories we don't search for strings.

@@ -1165,7 +1165,7 @@ class ProblemBlock(
 
         # Log this demand-hint request. Note that this only logs the last hint requested (although now
         # all previously shown hints are still displayed).
-        event_info = dict()
+        event_info = {}
         event_info['module_id'] = str(self.location)
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
@@ -1482,7 +1482,7 @@ class ProblemBlock(
         self.set_score(self.score_from_lcp(self.lcp))
         self.publish_grade(grader_response=True)
 
-        return dict()  # No AJAX return is needed
+        return {}  # No AJAX return is needed
 
     def handle_ungraded_response(self, data):
         """
@@ -1505,7 +1505,7 @@ class ProblemBlock(
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
         self.set_state_from_lcp()
-        return dict()
+        return {}
 
     def handle_input_ajax(self, data):
         """
@@ -1533,7 +1533,7 @@ class ProblemBlock(
             indication of the correct answers that is not solely based on color
             (and also screen reader text).
         """
-        event_info = dict()
+        event_info = {}
         event_info['problem_id'] = str(self.location)
         self.track_function_unmask('showanswer', event_info)
         if not self.answer_available():  # lint-amnesty, pylint: disable=no-else-raise
@@ -1544,7 +1544,7 @@ class ProblemBlock(
 
         # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
-        new_answers = dict()
+        new_answers = {}
         for answer_id in answers:
             try:
                 answer_content = self.runtime.replace_urls(answers[answer_id])
@@ -1613,7 +1613,7 @@ class ProblemBlock(
           (e.g. 'input_1' and 'input_1[]', which both get mapped to 'input_1'
            in the returned dict)
         """
-        answers = dict()
+        answers = {}
 
         # webob.multidict.MultiDict is a view of a list of tuples,
         # so it will return a multi-value key once for each value.
@@ -1688,7 +1688,7 @@ class ProblemBlock(
           {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
            'contents' : html}
         """
-        event_info = dict()
+        event_info = {}
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
 
@@ -2001,7 +2001,7 @@ class ProblemBlock(
         Returns a dict { 'success' : bool, 'msg' : message }
         The message is informative on success, and an error message on failure.
         """
-        event_info = dict()
+        event_info = {}
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
 
@@ -2061,7 +2061,7 @@ class ProblemBlock(
         If an error occurs, the dictionary will also have an
         `error` key containing an error message.
         """
-        event_info = dict()
+        event_info = {}
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
         _ = self.runtime.service(self, "i18n").ugettext

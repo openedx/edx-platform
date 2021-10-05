@@ -4,7 +4,6 @@ Course API Views
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -23,7 +22,6 @@ from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
@@ -38,8 +36,6 @@ from lms.djangoapps.courseware.toggles import (
     courseware_legacy_is_visible,
     courseware_mfe_is_visible,
     course_exit_page_is_active,
-    mfe_special_exams_is_active,
-    mfe_proctored_exams_is_active,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -120,14 +116,6 @@ class CoursewareMeta:
             is_global_staff=self.original_user_is_global_staff,
             is_course_staff=self.original_user_is_staff
         )
-
-    @property
-    def is_mfe_special_exams_enabled(self):
-        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_special_exams_is_active(self.course_key)
-
-    @property
-    def is_mfe_proctored_exams_enabled(self):
-        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and mfe_proctored_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
@@ -467,8 +455,7 @@ class CoursewareInformation(RetrieveAPIView):
             username=username,
         )
         # Record course goals user activity for learning mfe courseware on web
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            UserActivity.record_user_activity(self.request.user, course_key)
+        UserActivity.record_user_activity(self.request.user, course_key)
 
         return overview
 

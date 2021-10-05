@@ -260,7 +260,7 @@ class ChooseModeView(View):
         # and happy path version is ready to be rolled out to all users.
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
             if not error:  # TODO: Remove by executing REV-2355
-                if not enterprise_customer:  # TODO: Remove by executing REV-2342
+                if not enterprise_customer_for_request(request):  # TODO: Remove by executing REV-2342
                     if fbe_is_on:
                         return render_to_response("course_modes/fbe.html", context)
                     else:

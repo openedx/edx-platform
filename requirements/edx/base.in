@@ -83,7 +83,6 @@ edx-django-sites-extensions
 edx-django-utils>=4.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
-edx-event-routing-backends
 edx-milestones
 edx-name-affirmation
 edx-organizations
@@ -142,7 +141,6 @@ python3-openid ; python_version>='3'
 python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
-rest-condition                      # DRF's recommendation for supporting complex permissions
 social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database

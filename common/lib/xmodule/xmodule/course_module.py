@@ -998,6 +998,19 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings, default=False
     )
+
+    course_wide_js = List(
+        display_name=_("Course-wide Custom JS"),
+        help=_('Enter Javascript resource URLs you want to be loaded globally throughout the course pages.'),
+        scope=Scope.settings,
+    )
+
+    course_wide_css = List(
+        display_name=_("Course-wide Custom CSS"),
+        help=_('Enter CSS resource URLs you want to be loaded globally throughout the course pages.'),
+        scope=Scope.settings,
+    )
+
     other_course_settings = Dict(
         display_name=_("Other Course Settings"),
         help=_(

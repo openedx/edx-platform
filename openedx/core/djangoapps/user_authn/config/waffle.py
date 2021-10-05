@@ -23,3 +23,17 @@ ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = LegacyWaffleSwitch(
     'enable_login_using_thirdparty_auth_only',
     __name__
 )
+
+# .. toggle_name: user_authn.enable_pwned_password_api
+# .. toggle_implementation: WaffleSwitch
+# .. toggle_default: False
+# .. toggle_description: When enabled, user password's vulnerability would be checked via pwned password database
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-09-22
+# .. toggle_target_removal_date: 2021-12-31
+# .. toggle_tickets: VAN-664
+ENABLE_PWNED_PASSWORD_API = LegacyWaffleSwitch(
+    _WAFFLE_SWITCH_NAMESPACE,
+    'enable_pwned_password_api',
+    __name__
+)

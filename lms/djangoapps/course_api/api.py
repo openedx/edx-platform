@@ -22,6 +22,8 @@ from lms.djangoapps.courseware.courses import (
     get_permission_for_course_about
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.learning_sequences.api import get_course_outline
+from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData
 from openedx.core.lib.api.view_utils import LazySequence
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -235,9 +237,18 @@ def get_due_dates(request, course_key, user):
                 url: the deep link to the block
                 date: the due date for the block
     """
+    try:
+        outline = get_course_outline(course_key)
+    except (ValueError, CourseOutlineData.DoesNotExist):
+        # Either this course is Old Mongo-backed or doesn't have a generated course outline.
+        course_version = None
+    else:
+        course_version = outline.published_version
+
     dates = get_dates_for_course(
         course_key,
         user,
+        published_version=course_version
     )
 
     store = modulestore()

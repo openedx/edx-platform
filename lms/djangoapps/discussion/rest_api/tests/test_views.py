@@ -545,6 +545,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "updated_at": "2015-04-28T11:11:11Z",
             "vote_count": 4,
             "comment_count": 6,
+            "can_delete": False,
             "unread_comment_count": 3,
             "voted": True,
             "author": self.author.username,
@@ -849,7 +850,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
-            "raw_body": "Test body",
+            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
         }
         response = self.client.post(
             self.url,
@@ -858,13 +859,18 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({'read': True})
+        assert response_data == self.expected_thread_data({
+            "read": True,
+            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
+            "preview_body": "Test This is a very long body that will be…",
+            "rendered_body": "<h1>Test</h1>\n<p>This is a very long body that will be truncated for the preview.</p>",
+        })
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
-            'body': ['Test body'],
+            "body": ["# Test \n This is a very long body that will be truncated for the preview."],
             'user_id': [str(self.user.id)]
         }
 
@@ -914,6 +920,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         assert response_data == self.expected_thread_data({
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
+            'preview_body': 'Edited body',
             'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date',
@@ -1017,6 +1024,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         assert response_data == self.expected_thread_data({
             'author': str(thread_owner_user.username),
             'comment_count': 1,
+            'can_delete': False,
             'read': True,
             'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
             'response_count': 2
@@ -1119,6 +1127,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1149,6 +1158,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "voted": True,
             "vote_count": 4,
             "raw_body": "Test body",
+            "can_delete": False,
             "rendered_body": "<p>Test body</p>",
             "created_at": "2015-05-11T00:00:00Z",
             "updated_at": "2015-05-11T11:11:11Z",
@@ -1312,8 +1322,8 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.register_get_thread_response(thread)
         response = self.client.get(self.url, {"thread_id": self.thread_id})
         expected_comments = [
-            self.expected_response_comment(overrides={"id": "test_response_1", "child_count": 2}),
-            self.expected_response_comment(overrides={"id": "test_response_2", "child_count": 3}),
+            self.expected_response_comment(overrides={"id": "test_response_1", "child_count": 2, "can_delete": False}),
+            self.expected_response_comment(overrides={"id": "test_response_2", "child_count": 3, "can_delete": False}),
         ]
         self.assert_response_correct(
             response,
@@ -1507,6 +1517,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "children": [],
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
         response = self.client.post(
             self.url,
@@ -1592,6 +1603,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "children": [],
             "editable_fields": [],
             "child_count": 0,
+            "can_delete": True,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1776,6 +1788,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "abuse_flagged_any_user": None,
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
+            "can_delete": True,
         }
 
         response = self.client.get(self.url)

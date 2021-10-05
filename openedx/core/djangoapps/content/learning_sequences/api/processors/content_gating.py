@@ -27,7 +27,7 @@ class ContentGatingOutlineProcessor(OutlineProcessor):
         self.required_content = None
         self.can_skip_entrance_exam = False
 
-    def load_data(self):
+    def load_data(self, full_course_outline):
         """
         Get the required content for the course, and whether
         or not the user can skip the entrance exam.

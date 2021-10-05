@@ -7,7 +7,7 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
-from django.contrib.auth import get_backends, login, get_user_model
+from django.contrib.auth import get_backends, login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
 from django.http import HttpRequest
@@ -420,7 +420,10 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    user_id = user.id if isinstance(user, get_user_model()) else user
+    try:
+        user_id = int(user)
+    except TypeError:
+        user_id = user.id
     cached_is_enterprise_key = get_is_enterprise_cache_key(user_id)
     if cache.get(cached_is_enterprise_key):
         return True

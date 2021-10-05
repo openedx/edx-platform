@@ -1,0 +1,85 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+{% load static %}
+{% block content %}
+{# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+{# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
+<table style="font-family: Inter;" width="calc(100% + 2.5rem)" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            {% include "goal_reminder_banner.html" %}
+            <style>
+                @media only screen and (max-width: 600px) {
+                    .goal-reminder-body-wrapper {
+                        margin-left: 0 !important;
+                    }
+                }
+            </style>
+            <div class="goal-reminder-body-wrapper" style="margin-top: 2.25rem; margin-left: 1.0625rem;">
+                <h1 style="
+                    font-size: 1.375rem;
+                    font-style: normal;
+                    font-weight: 700;
+                    line-height: 1.75rem;
+                    text-align: left;
+                    ">
+                    {% filter force_escape %}{% blocktrans %}
+                        There's still time to reach your goal
+                    {% endblocktrans %}{% endfilter %}
+                </h1>
+
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                        {% blocktrans asvar goal_text %}
+                            You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
+                        {% endblocktrans %}
+                    {% endfilter %}
+                    {% interpolate_html goal_text start_bold='<b>'|safe end_bold='</b>'|safe %}
+                    <br />
+                 </p>
+
+                <a style="color: white; text-decoration: none; display: inline-block;"
+                    href="{{course_url}}" target="_blank">
+                    <div style="padding: 0.5rem 0.75rem; background: #D23228; margin-bottom: 1rem;">
+                        {% filter force_escape %}{% blocktrans %}
+                            Jump back in
+                        {% endblocktrans %}{% endfilter %}
+                    </div>                
+                </a>
+
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}{% blocktrans %}
+                        Remember, you can always change your learning goal. The best goal is one that you can stick to.
+                    {% endblocktrans %}{% endfilter %}
+                    <br />
+                </p>
+
+                <a style="color: #D23228; text-decoration: none; display: inline-block; border: 0.0625rem solid #F2F0EF;"
+                   href="{{course_url}}" target="_blank">
+                    <div style="padding: 0.5rem 0.75rem; background: white;">
+                        {% filter force_escape %}{% blocktrans %}
+                            Adjust my goal
+                        {% endblocktrans %}{% endfilter %}
+                    </div>                
+                </a>
+
+                <a style="
+                        color: #00688D;
+                        display: block;
+                        font-size: 0.875rem;
+                        margin: 0.9375rem auto 0 auto;
+                        text-align: center;
+                        text-decoration: none;
+                        width: 11.5625rem;
+                    "
+                    href="{{goals_unsubscribe_url}}" target="_blank">
+                    {% filter force_escape %}{% blocktrans %}
+                        Unsubscribe from goal reminder emails to this course
+                    {% endblocktrans %}{% endfilter %}
+                </a>
+            </div>
+        </td>
+    </tr>
+</table>
+{% endblock %}

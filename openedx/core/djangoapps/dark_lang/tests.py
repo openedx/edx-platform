@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import Mock
 
 import ddt
+from django.conf import settings
 from django.http import HttpRequest
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -368,3 +369,38 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
             'zh-cn;q=1.0, zh-tw;q=0.5, zh-hk;q=0.3',
             self.process_middleware_request(accept='zh-Hans;q=1.0, zh-Hant-TW;q=0.5, zh-HK;q=0.3')
         )
+
+    def test_language_cookie_is_set(self):
+        site_lang = settings.LANGUAGE_CODE
+        url = '/dashboard'
+
+        response = self.client.get(url)
+        assert response.cookies.get(settings.LANGUAGE_COOKIE_NAME).value == ''
+        assert response['Content-Language'] == site_lang
+
+        # Set preview language
+        self._post_set_preview_lang("es-419")
+
+        # Check if view has cookies and language set to desired preview language
+        response = self.client.get(url)
+        assert settings.LANGUAGE_COOKIE_NAME in response.cookies
+        assert response.cookies.get(settings.LANGUAGE_COOKIE_NAME).value == 'es-419'
+        assert response['Content-Language'] == 'es-419'
+
+        # Change preview language
+        self._post_set_preview_lang("eo")
+
+        # Check if view has cookies and language set to desired preview language
+        response = self.client.get(url)
+        assert settings.LANGUAGE_COOKIE_NAME in response.cookies
+        assert response.cookies.get(settings.LANGUAGE_COOKIE_NAME).value == 'eo'
+        assert response['Content-Language'] == 'eo'
+
+        # Reset preview language
+        self._post_clear_preview_lang()
+
+        # Check if view has cookies and language set to default language
+        response = self.client.get(url)
+        assert settings.LANGUAGE_COOKIE_NAME in response.cookies
+        assert response.cookies.get(settings.LANGUAGE_COOKIE_NAME).value == ''
+        assert response['Content-Language'] == site_lang

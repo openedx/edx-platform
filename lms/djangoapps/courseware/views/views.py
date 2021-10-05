@@ -55,7 +55,6 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import RECORD_USER_ACTIVITY_FLAG
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
     course_home_mfe_progress_tab_is_active
@@ -934,7 +933,10 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if request.user.has_perm(VIEW_COURSE_HOME, course):
-            course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
+            if course_home_legacy_is_active(course.id):
+                course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
+            else:
+                course_target = get_learning_mfe_home_url(course_key=course.id, view_name='home')
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -1734,11 +1736,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             staff_access,
         )
 
-        if RECORD_USER_ACTIVITY_FLAG.is_enabled():
-            # Record user activity for tracking progress towards a user's course goals (for mobile app)
-            UserActivity.record_user_activity(
-                request.user, usage_key.course_key, request=request, only_if_mobile_app=True
-            )
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(
+            request.user, usage_key.course_key, request=request, only_if_mobile_app=True
+        )
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
@@ -1808,6 +1809,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'render_course_wide_assets': True,
 
             **optimization_flags,
         }
