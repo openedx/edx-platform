@@ -1748,7 +1748,6 @@ class ModuleSystemShim:
     """
 
     @property
-<<<<<<< HEAD
     def anonymous_student_id(self):
         """
         Returns the anonymous user ID for the current user and course.
