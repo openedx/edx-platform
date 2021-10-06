@@ -2,6 +2,7 @@
 Fragments for rendering programs.
 """
 
+
 import json
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -199,6 +200,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         # if pathway caching did not complete fully (no pathway_ids)
         except KeyError:
             pass
+
         urls = {
             'program_listing_url': reverse('program_listing_view'),
             'track_selection_url': strip_course_id(
