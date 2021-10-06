@@ -23,6 +23,8 @@ from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_goals.api import get_course_goal
+from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     CoursewareMicrofrontendDisabledAccessError,
@@ -48,6 +50,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.discounts.utils import generate_offer_data
@@ -211,6 +214,26 @@ class CoursewareMeta:
         return celebrations
 
     @property
+    def course_goals(self):
+        """
+        Returns a dict of course goals
+        """
+        if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
+            course_goals = {
+                'goal_options': [],
+                'selected_goal': None
+            }
+            user_is_enrolled = CourseEnrollment.is_enrolled(self.effective_user, self.course_key)
+            if (user_is_enrolled and ENABLE_COURSE_GOALS.is_enabled(self.course_key)):
+                selected_goal = get_course_goal(self.effective_user, self.course_key)
+                if selected_goal:
+                    course_goals['selected_goal'] = {
+                        'days_per_week': selected_goal.days_per_week,
+                        'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
+                    }
+            return course_goals
+
+    @property
     def user_has_passing_grade(self):
         """ Returns a boolean on if the effective_user has a passing grade in the course """
         if not self.effective_user.is_anonymous:
@@ -357,6 +380,10 @@ class CoursewareInformation(RetrieveAPIView):
             * masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
             * upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
             * upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
+        course_goals:
+            selected_goal:
+                days_per_week: (int) The number of days the learner wants to learn per week
+                subscribed_to_reminders: (bool) Whether the learner wants email reminders about their goal
         * effort: A textual description of the weekly hours of effort expected
             in the course.
         * end: Date the course ends, in ISO 8601 notation
