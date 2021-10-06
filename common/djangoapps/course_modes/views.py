@@ -240,6 +240,7 @@ class ChooseModeView(View):
         if waffle.switch_is_active('local_currency'):
             if 'edx-price-l10n' not in request.COOKIES:
                 currency_data = get_currency_data()
+                LOG.info('[Track Selection Check] Currency data: [%s], for course [%s]', currency_data, course_id)
                 try:
                     context['currency_data'] = json.dumps(currency_data)
                 except TypeError:
@@ -294,12 +295,17 @@ class ChooseModeView(View):
         course = modulestore().get_course(course_key)
         if not user.has_perm(ENROLL_IN_COURSE, course):
             error_msg = _("Enrollment is closed")
+            LOG.info('[Track Selection Check] Error: [%s], for course [%s]', error_msg, course_id)
             return self.get(request, course_id, error=error_msg)
 
         requested_mode = self._get_requested_mode(request.POST)
 
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
+            LOG.info(
+                '[Track Selection Check] Error: requested enrollment mode [%s] is not supported for course [%s]',
+                requested_mode, course_id
+            )
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode == 'audit':
@@ -320,20 +326,38 @@ class ChooseModeView(View):
         if requested_mode == 'verified':
             amount = request.POST.get("contribution") or \
                 request.POST.get("contribution-other-amt") or 0
+            LOG.info(
+                '[Track Selection Check][%s] Requested verified mode - '
+                'contribution: [%s], contribution other amount: [%s]',
+                course_id, request.POST.get("contribution"), request.POST.get("contribution-other-amt")
+            )
 
             try:
                 # Validate the amount passed in and force it into two digits
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
+                LOG.info(
+                    '[Track Selection Check][%s] Requested verified mode - Error: [%s]',
+                    course_id, error_msg
+                )
                 return self.get(request, course_id, error=error_msg)
 
             # Check for minimum pricing
             if amount_value < mode_info.min_price:
                 error_msg = _("No selected price or selected price is too low.")
+                LOG.info(
+                    '[Track Selection Check][%s] Requested verified mode - Error: '
+                    'amount value [%s] is less than minimum price [%s]',
+                    course_id, amount_value, mode_info.min_price
+                )
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
+            LOG.info(
+                '[Track Selection Check] Donation for course [%s]: [%s], amount value: [%s]',
+                course_id, donation_for_course, amount_value
+            )
             donation_for_course[str(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
