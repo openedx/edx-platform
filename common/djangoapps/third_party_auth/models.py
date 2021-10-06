@@ -331,8 +331,26 @@ class ProviderConfig(ConfigurationModel):
     def enabled_for_current_site(self):
         """
         Determines if the provider is able to be used with the current site.
+
+        Appsembler: We will skip same verification if the backend is Auth0.
+                    Auth0 will handle this for us.
         """
-        return self.enabled and self.site_id == Site.objects.get_current(get_current_request()).id
+        same_site = self.site_id == Site.objects.get_current(get_current_request()).id
+        is_auth0_enabled = self.is_auth0_enabled()
+
+        return self.enabled and (is_auth0_enabled or same_site)
+
+    def is_auth0_enabled(self):
+        is_auth0_enabled = False
+
+        if self.backend_name == "tahoe-auth0":
+            from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+            is_auth0_enabled = configuration_helpers.get_value(
+                'ENABLE_TAHOE_AUTH0',
+                settings.FEATURES.get('ENABLE_TAHOE_AUTH0', False),
+            )
+
+        return is_auth0_enabled
 
 
 class OAuth2ProviderConfig(ProviderConfig):
