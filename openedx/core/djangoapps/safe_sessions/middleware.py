@@ -358,7 +358,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 user_id_in_session = self.get_user_id_from_session(request)
-                self._verify_user(request, user_id_in_session)  # Step 2
+                self._verify_user(request, response, user_id_in_session)  # Step 2
 
                 # Use the user_id marked in the session instead of the
                 # one in the request in case the user is not set in the
@@ -390,12 +390,23 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return redirect_to_login(request.path)
 
     @staticmethod
-    def _verify_user(request, userid_in_session):
+    def _verify_user(request, response, userid_in_session):
         """
         Logs an error if the user marked at the time of process_request
         does not match either the current user in the request or the
         given userid_in_session.
         """
+        # It's expected that a small number of views may change the
+        # user over the course of the request. We have exemptions for
+        # the user changing to/from None, but the login view can
+        # sometimes change the user from one value to another between
+        # the request and response phases, specifically when the login
+        # page is used during an active session.
+        #
+        # The relevant views set a flag to indicate the exemption.
+        if getattr(response, 'safe_sessions_expected_user_change', None):
+            return
+
         if hasattr(request, 'safe_cookie_verified_user_id'):
             if hasattr(request.user, 'real_user'):
                 # If a view overrode the request.user with a masqueraded user, this will
@@ -584,3 +595,15 @@ def log_request_user_changes(request):
                     pass
             return super().__setattr__(name, value)
     request.__class__ = SafeSessionRequestWrapper
+
+
+def mark_user_change_as_expected(response, new_user_id):
+    """
+    Indicate to the safe-sessions middleware that it is expected that
+    the user is changing between the request and response phase of
+    the current request.
+
+    The new_user_id may be None or an LMS user ID, and may be the same
+    as the previous user ID.
+    """
+    response.safe_sessions_expected_user_change = {'new_user_id': new_user_id}

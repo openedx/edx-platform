@@ -11,6 +11,7 @@ from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from oauth2_provider.models import Application
 
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
@@ -80,6 +81,7 @@ class LogoutView(TemplateView):
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
 
+        mark_user_change_as_expected(response, None)
         return response
 
     def _build_logout_url(self, url):
