@@ -2,7 +2,6 @@
 Fragments for rendering programs.
 """
 
-
 import json
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -200,7 +199,15 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         # if pathway caching did not complete fully (no pathway_ids)
         except KeyError:
             pass
-
+        industry_pathways = [
+            {'id': 252, 'description': 'Vote great next carry.', 'destination_url': 'http://cole-freeman.biz/',
+             'email': 'gordonryan@yahoo.com', 'name': 'Her forward authority wrong.', 'org_name': 'Schaefer Group',
+             'pathway_type': 'industry', 'program_uuids': ['81712909-0da5-41d5-bb04-cc06cd7d3100']}]
+        credit_pathways = [
+            {'id': 252, 'description': 'Vote great neaaxt carry.', 'destination_url': 'http://cole-freeman.biz/',
+             'email': 'gordonryan@yahoo.com', 'name': 'Her forward authority wrong.', 'org_name': 'Schaefer Group',
+             'pathway_type': 'industry', 'program_uuids': ['81712909-0da5-41d5-bb04-cc06cd7d3100']}]
+        # credit_pathways =
         urls = {
             'program_listing_url': reverse('program_listing_view'),
             'track_selection_url': strip_course_id(
