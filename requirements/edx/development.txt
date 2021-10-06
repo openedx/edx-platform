@@ -194,7 +194,6 @@ coreschema==0.0.4
 coverage[toml]==6.0
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-i18n-tools
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/testing.txt
@@ -324,8 +323,6 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cookies-samesite==0.9.0
-    # via -r requirements/edx/testing.txt
 django-cors-headers==3.10.0
     # via -r requirements/edx/testing.txt
 django-countries==7.2.1
@@ -637,7 +634,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.txt
-faker==8.16.0
+faker==9.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1439,10 +1436,6 @@ typing-extensions==3.10.0.2
     #   gitpython
     #   mypy
     #   pydantic
-ua-parser==0.10.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
