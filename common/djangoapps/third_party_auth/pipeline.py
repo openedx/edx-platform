@@ -83,7 +83,6 @@ from social_core.utils import module_member, slugify
 
 import third_party_auth
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -722,8 +721,9 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
 
 @partial.partial
-def login_analytics(strategy=None, backend=None, pipeline_index=None, current_partial=None, auth_entry=None, *args, **kwargs):
-    """ Sends login info to Segment (bi) and event tracking backends."""
+def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):
+    """ Sends login info to Segment """
+
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'
@@ -734,41 +734,8 @@ def login_analytics(strategy=None, backend=None, pipeline_index=None, current_pa
         segment.track(kwargs['user'].id, event_name, {
             'category': "conversion",
             'label': None,
-            'provider': backend.name
+            'provider': kwargs['backend'].name
         })
-
-    # .. pii: Username, possibly any other social login data including fullname, email, profile URLs, 'other' possible PII sent with social auth.  Retirement will depend on configured event-tracking backends.  PII sent to Segment retired directly through Segment API call in Tubular. Tracking logs retained.   # pylint: disable=line-too-long
-    # .. pii_types: name, username, email_address, birth_date, external_service, image, other
-    # .. pii_retirement: retained, third_party
-    user = kwargs['user']
-    track_data = {
-        'user_id': user.id,
-        'username': user.username,
-        'auth_data': {
-            'tpa_auth_entry': auth_entry,
-            'tpa_provider': backend.name,
-        }
-    }
-
-    # re: PII: Of default enabled social auth backends, only SAML, by default, saves all extra_data
-    # to UserSocialAuth.  This can be configured in SAMLConfiguration object by setting
-    # GET_ALL_EXTRA_DATA to False.  Individual extra_data fields can be specified for storage by
-    # overriding other_config_str in SAMLConfiguration.
-    try:
-        user_social_auth = social_django.models.UserSocialAuth.objects.get(user=user)
-        track_data['auth_data'].update({
-            'tpa_social_uid': user_social_auth.uid,
-            'tpa_social_extra_data': user_social_auth.extra_data
-        })
-    except social_django.models.UserSocialAuth.NotFound:
-        pass
-
-    track_event_name = 'edx.user.account.authenticated'
-    user_tpa_context = dict()
-    user_tpa_context.update(tracker.get_tracker().resolve_context())
-
-    with tracker.get_tracker().context(track_event_name, user_tpa_context):
-        tracker.emit(name=track_event_name, data=track_data)
 
 
 @partial.partial
