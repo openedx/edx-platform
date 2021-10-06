@@ -99,6 +99,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
 @ddt.ddt
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     """
     Tests for the courseware REST API
@@ -164,6 +165,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 assert found, 'external link not in course tabs'
 
                 assert not response.data['user_has_passing_grade']
+
+                # This import errors in cms if it is imported at the top level
+                from lms.djangoapps.course_goals.api import get_course_goal
+                selected_goal = get_course_goal(self.user, self.course.id)
+                if selected_goal:
+                    assert response.data['course_goals']['selected_goal'] == {
+                        'days_per_week': selected_goal.days_per_week,
+                        'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
+                    }
+
                 if enrollment_mode == 'audit':
                     assert response.data['verify_identity_url'] is None
                     assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
@@ -201,6 +212,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['course_access']['has_access']
+                assert response.data['course_goals'] is None
             else:
                 assert not response.data['course_access']['has_access']
 

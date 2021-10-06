@@ -5,6 +5,7 @@ Course API Serializers.  Representing course catalog data
 from rest_framework import serializers
 
 from lms.djangoapps.course_home_api.progress.serializers import CertificateDataSerializer
+from lms.djangoapps.course_home_api.outline.serializers import CourseGoalsSerializer
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -81,6 +82,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     access_expiration = serializers.DictField()
     can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
+    course_goals = CourseGoalsSerializer()
     effort = serializers.CharField()
     end = serializers.DateTimeField()
     enrollment = serializers.DictField()
