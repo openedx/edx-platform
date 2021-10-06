@@ -22,7 +22,7 @@ class AdminMethod(Protocol):
 
 def _admin_display(
     boolean: Optional[bool] = None, description: Optional[str] = None
-) -> Callable[[Any], AdminMethod]:
+) -> Callable[[Any], int]:
     """
     Decorator for functions that need to be annotated with attributes from AdminMethod.
 
