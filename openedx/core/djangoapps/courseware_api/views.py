@@ -6,6 +6,7 @@ from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -32,6 +33,7 @@ from lms.djangoapps.courseware.access_response import (
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
+from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.toggles import (
@@ -466,11 +468,28 @@ class CoursewareInformation(RetrieveAPIView):
 
     serializer_class = CourseInfoSerializer
 
+    def set_last_seen_courseware_timezone(self, user):
+        """
+        The timezone in the user's account is frequently not set.
+        This method sets a user's recent timezone that can be used as a fallback
+        """
+        cache_key = 'browser_timezone_{}'.format(str(user.id))
+        browser_timezone = self.request.query_params.get('browser_timezone', None)
+        cached_value = TieredCache.get_cached_response(cache_key)
+        if not cached_value.is_found:
+            if browser_timezone:
+                TieredCache.set_all_tiers(cache_key, str(browser_timezone), 86400)  # Refresh the cache daily
+                LastSeenCoursewareTimezone.objects.update_or_create(
+                    user=user,
+                    last_seen_courseware_timezone=browser_timezone,
+                )
+
     def get_object(self):
         """
         Return the requested course object, if the user has appropriate
         permissions.
         """
+        original_user = self.request.user
         if self.request.user.is_staff:
             username = self.request.GET.get('username', '') or self.request.user.username
         else:
@@ -483,6 +502,9 @@ class CoursewareInformation(RetrieveAPIView):
         )
         # Record course goals user activity for learning mfe courseware on web
         UserActivity.record_user_activity(self.request.user, course_key)
+
+        # Record a user's browser timezone
+        self.set_last_seen_courseware_timezone(original_user)
 
         return overview
 
