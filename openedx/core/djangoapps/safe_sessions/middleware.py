@@ -77,9 +77,8 @@ Custom Attributes:
 
 import inspect
 from base64 import b64encode
-from contextlib import contextmanager
 from hashlib import sha256
-from logging import ERROR, getLogger
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -359,13 +358,12 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 user_id_in_session = self.get_user_id_from_session(request)
-                with controlled_logging(request, log):
-                    self._verify_user(request, user_id_in_session)  # Step 2
+                self._verify_user(request, user_id_in_session)  # Step 2
 
-                    # Use the user_id marked in the session instead of the
-                    # one in the request in case the user is not set in the
-                    # request, for example during Anonymous API access.
-                    self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
+                # Use the user_id marked in the session instead of the
+                # one in the request in case the user is not set in the
+                # request, for example during Anonymous API access.
+                self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
 
             except SafeCookieError:
                 _mark_cookie_for_deletion(request)
@@ -586,30 +584,3 @@ def log_request_user_changes(request):
                     pass
             return super().__setattr__(name, value)
     request.__class__ = SafeSessionRequestWrapper
-
-
-def _is_from_logout(request):
-    """
-    Returns whether the request has come from logout action to see if
-    'is_from_logout' attribute is present.
-    """
-    return getattr(request, 'is_from_logout', False)
-
-
-@contextmanager
-def controlled_logging(request, logger):
-    """
-    Control the logging by changing logger's level if
-    the request is from logout.
-    """
-    default_level = None
-    from_logout = _is_from_logout(request)
-    if from_logout:
-        default_level = logger.getEffectiveLevel()
-        logger.setLevel(ERROR)
-
-    try:
-        yield
-    finally:
-        if from_logout:
-            logger.setLevel(default_level)
