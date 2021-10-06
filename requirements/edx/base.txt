@@ -136,8 +136,6 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-coverage==6.0
-    # via edx-i18n-tools
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
 cryptography==3.4.8
@@ -244,8 +242,6 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cookies-samesite==0.9.0
-    # via -r requirements/edx/base.in
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.in
 django-countries==7.2.1
@@ -994,8 +990,6 @@ tqdm==4.62.3
     # via nltk
 typing-extensions==3.10.0.2
     # via aiohttp
-ua-parser==0.10.0
-    # via django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in

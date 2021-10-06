@@ -1,2 +1,1 @@
 django==3.2.8
-django-cookies-samesite==0.9.0
