@@ -59,21 +59,25 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
     """
     Submission metadata for displaying submissions table in ESG
     """
-    submissionId = serializers.CharField()
+    submissionUuid = serializers.CharField()
     username = serializers.CharField()
     teamName = serializers.CharField()
     dateSubmitted = serializers.DateTimeField()
-    gradeStatus = serializers.CharField()
+    dateGraded = serializers.DateTimeField()
+    gradedBy = serializers.CharField()
+    gradingStatus = serializers.CharField()
     lockStatus = serializers.CharField()
     score = ScoreSerializer()
 
     class Meta:
         fields = [
-            'submissionId',
+            'submissionUuid',
             'username',
             'teamName',
             'dateSubmitted',
-            'gradeStatus',
+            'dateGraded',
+            'gradedBy',
+            'gradingStatus',
             'lockStatus',
             'score'
         ]
