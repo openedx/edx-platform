@@ -6,7 +6,7 @@ Utility functions used by the badging app.
 from django.conf import settings
 
 
-def site_prefix():
+def site_prefix() -> float:
     """
     Get the prefix for the site URL-- protocol and server name.
     """
