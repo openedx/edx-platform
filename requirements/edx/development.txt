@@ -526,7 +526,6 @@ edx-django-utils==4.4.0
     #   super-csv
 edx-drf-extensions==8.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-completion
     #   edx-enterprise
@@ -540,7 +539,7 @@ edx-enterprise==3.30.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-edx-i18n-tools==0.7.0
+edx-i18n-tools==0.8.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
@@ -569,7 +568,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.0.4
+edx-proctoring==4.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -641,7 +640,7 @@ faker==8.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.68.1
+fastapi==0.68.2
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1288,7 +1287,6 @@ six==1.16.0
     #   edx-django-release-util
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-i18n-tools
     #   edx-lint
     #   edx-milestones
     #   edx-rbac
