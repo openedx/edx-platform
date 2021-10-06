@@ -424,7 +424,6 @@ edx-django-utils==4.4.0
     #   super-csv
 edx-drf-extensions==8.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-completion
     #   edx-enterprise
@@ -438,7 +437,7 @@ edx-enterprise==3.30.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-edx-i18n-tools==0.7.0
+edx-i18n-tools==0.8.1
     # via ora2
 edx-milestones==0.3.2
     # via -r requirements/edx/base.in
@@ -921,7 +920,6 @@ six==1.16.0
     #   edx-django-release-util
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-i18n-tools
     #   edx-milestones
     #   edx-rbac
     #   event-tracking
