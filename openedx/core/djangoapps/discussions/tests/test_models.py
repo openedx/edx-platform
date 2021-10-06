@@ -9,7 +9,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from organizations.models import Organization
 
-from ..models import DEFAULT_PROVIDER_TYPE
+from ..models import DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE
 from ..models import DiscussionsConfiguration
 from ..models import ProviderFilter
 
@@ -197,10 +197,10 @@ class DiscussionsConfigurationModelTest(TestCase):
 
     def test_is_enabled_nonexistent(self):
         """
-        Assert that discussions are disabled, when no configuration exists
+        Assert that discussions are enabled by default even when no configuration exists
         """
-        is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_without_config)
-        assert not is_enabled
+        is_enabled = DiscussionsConfiguration.is_enabled(context_key=self.course_key_without_config)
+        assert is_enabled == DEFAULT_CONFIG_ENABLED
 
     def test_is_enabled_default(self):
         """
@@ -211,21 +211,21 @@ class DiscussionsConfigurationModelTest(TestCase):
 
     def test_is_enabled_explicit(self):
         """
-        Assert that discussions can be explitly disabled
+        Assert that discussions can be explicitly disabled
         """
         is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
         assert not is_enabled
 
     def test_get_nonexistent_defaults_to_legacy(self):
         """
-        Assert we get a "legacy" model back for nonexistent records
+        Assert we get default provider "legacy" and default enabled model instance back for nonexistent records
         """
         configuration = DiscussionsConfiguration.get(self.course_key_without_config)
         assert configuration is not None
-        assert not configuration.enabled
+        assert configuration.enabled == DEFAULT_CONFIG_ENABLED
+        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
         assert not configuration.lti_configuration
         assert not configuration.plugin_configuration
-        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
 
     def test_get_defaults(self):
         """
