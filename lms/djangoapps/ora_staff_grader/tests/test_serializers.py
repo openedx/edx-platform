@@ -4,7 +4,11 @@ Tests for ESG Serializers
 from django.test import TestCase
 from unittest.mock import Mock
 
-from lms.djangoapps.ora_staff_grader.serializers import CourseMetadataSerializer, OpenResponseMetadataSerializer
+from lms.djangoapps.ora_staff_grader.serializers import (
+    CourseMetadataSerializer,
+    OpenResponseMetadataSerializer,
+    SubmissionMetadataSerializer,
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -74,3 +78,79 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "prompts": self.prompts,
             "type": "team"
         }
+
+
+class TestSubmissionMetadataSerializer(TestCase):
+    """
+    Tests for SubmissionMetadataSerializer. Implicitly, this also exercises ScoreSerializer.
+
+    SubmissionMetadata comes from the ORA list_staff_workflows XBlock.json_handler and has the shape:
+
+    "<submission_uuid>": {
+        "submissionUuid": "<submission_uuid>",
+        "username": "<username/empty>",
+        "teamName": "<team_name/empty>",
+        "dateSubmitted": "<yyyy-mm-dd HH:MM:SS>",
+        "dateGraded": "<yyyy-mm-dd HH:MM:SS/None>",
+        "gradedBy": "<username/empty>",
+        "gradingStatus": "<ungraded/graded>",
+        "lockStatus": "<locked/unlocked/in-progress",
+        "score": {
+            "pointsEarned": <num>,
+            "pointsPossible": <num>
+        }
+    }
+
+    Right now, this is just passed through without any transforms.
+    """
+    submission_data = {
+        "a": {
+            "submissionUuid": "a",
+            "username": "foo",
+            "teamName": "",
+            "dateSubmitted": "1969-07-16 13:32:00",
+            "dateGraded": "None",
+            "gradedBy": "",
+            "gradingStatus": "ungraded",
+            "lockStatus": "unlocked",
+            "score": {
+                "pointsEarned": 0,
+                "pointsPossible": 10
+            }
+        },
+        "b": {
+            "submissionUuid": "b",
+            "username": "",
+            "teamName": "bar",
+            "dateSubmitted": "1969-07-20 20:17:40",
+            "dateGraded": "None",
+            "gradedBy": "",
+            "gradingStatus": "ungraded",
+            "lockStatus": "in-progress",
+            "score": {
+                "pointsEarned": 0,
+                "pointsPossible": 10
+            }
+        },
+        "c": {
+            "submissionUuid": "c",
+            "username": "baz",
+            "teamName": "",
+            "dateSubmitted": "1969-07-21 21:35:00",
+            "dateGraded": "1969-07-24 16:44:00",
+            "gradedBy": "buz",
+            "gradingStatus": "graded",
+            "lockStatus": "unlocked",
+            "score": {
+                "pointsEarned": 9,
+                "pointsPossible": 10
+            }
+        }
+    }
+
+    def test_submission_serialize(self):
+        for submission_id, submission_data in self.submission_data.items():
+            data = SubmissionMetadataSerializer(submission_data).data
+
+            # For each submission, data is just passed through
+            assert self.submission_data[submission_id] == data
