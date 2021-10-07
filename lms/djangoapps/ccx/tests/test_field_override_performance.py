@@ -271,22 +271,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 34
+    QUERY_COUNT = 33
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (QUERY_COUNT, 2),
-        ('no_overrides', 2, True, False): (QUERY_COUNT, 2),
-        ('no_overrides', 3, True, False): (QUERY_COUNT, 2),
-        ('ccx', 1, True, False): (QUERY_COUNT, 2),
-        ('ccx', 2, True, False): (QUERY_COUNT, 2),
-        ('ccx', 3, True, False): (QUERY_COUNT, 2),
-        ('ccx', 1, True, True): (QUERY_COUNT + 3, 2),
-        ('ccx', 2, True, True): (QUERY_COUNT + 3, 2),
-        ('ccx', 3, True, True): (QUERY_COUNT + 3, 2),
-        ('no_overrides', 1, False, False): (QUERY_COUNT, 2),
-        ('no_overrides', 2, False, False): (QUERY_COUNT, 2),
-        ('no_overrides', 3, False, False): (QUERY_COUNT, 2),
-        ('ccx', 1, False, False): (QUERY_COUNT, 2),
-        ('ccx', 2, False, False): (QUERY_COUNT, 2),
-        ('ccx', 3, False, False): (QUERY_COUNT, 2),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, False): (QUERY_COUNT, 3),
+        ('ccx', 2, True, False): (QUERY_COUNT, 3),
+        ('ccx', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 2, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 2, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 2, 3),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 3),
+        ('ccx', 1, False, False): (QUERY_COUNT, 3),
+        ('ccx', 2, False, False): (QUERY_COUNT, 3),
+        ('ccx', 3, False, False): (QUERY_COUNT, 3),
     }

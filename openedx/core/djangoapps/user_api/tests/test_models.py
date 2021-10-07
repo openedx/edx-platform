@@ -23,8 +23,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
     def test_duplicate_user_key(self):
         user = UserFactory.create()
         UserPreferenceFactory.create(user=user, key="testkey", value="first")
-        with self.allow_transaction_exception():
-            pytest.raises(IntegrityError, UserPreferenceFactory.create)
+        pytest.raises(IntegrityError, UserPreferenceFactory.create)
 
     def test_arbitrary_values(self):
         user = UserFactory.create()
