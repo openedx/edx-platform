@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import connections, transaction
+from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -330,30 +330,6 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
         assert settings.CONTENTSTORE == cls.__old_contentstores.pop()
         cls.end_cache_isolation()
         cls.enable_all_signals()
-
-    @staticmethod
-    def allow_transaction_exception():
-        """
-        Context manager to wrap modulestore-using test code that may throw an exception.
-
-        (Use this if a modulestore test is failing with TransactionManagementError during cleanup.)
-
-        Details:
-        Some test cases that purposely throw an exception may normally cause the end_modulestore_isolation() cleanup
-        step to fail with
-            TransactionManagementError:
-            An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
-        This happens because the test is wrapped in an implicit transaction and when the exception occurs, django won't
-        allow any subsequent database queries in the same transaction - in particular, the queries needed to clean up
-        split modulestore's SplitModulestoreCourseIndex table after the test.
-
-        By wrapping the inner part of the test in this atomic() call, we create a savepoint so that if an exception is
-        thrown, Django merely rolls back to the savepoint and the overall transaction continues, including the eventual
-        cleanup step.
-
-        This method mostly exists to provide this docstring/explanation; the code itself is trivial.
-        """
-        return transaction.atomic()
 
 
 class ModuleStoreTestUsersMixin():
