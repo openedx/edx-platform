@@ -546,7 +546,7 @@ edx-i18n-tools==0.8.1
     #   ora2
 edx-lint==5.2.0
     # via -r requirements/edx/testing.txt
-edx-milestones==0.3.2
+edx-milestones==0.3.3
     # via -r requirements/edx/testing.txt
 edx-name-affirmation==1.0.2
     # via -r requirements/edx/testing.txt
