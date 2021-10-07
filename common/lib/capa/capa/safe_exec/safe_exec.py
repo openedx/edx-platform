@@ -11,7 +11,7 @@ import six
 from six import text_type
 
 from . import lazymod
-from .helpers import is_codejail_rest_service_enabled, send_safe_exec_request
+from .remote_exec import is_codejail_rest_service_enabled, get_remote_exec
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
@@ -151,10 +151,11 @@ def safe_exec(
             "python_path": python_path,
             "limit_overrides_context": limit_overrides_context,
             "slug": slug,
-            "unsafely": unsafely
+            "unsafely": unsafely,
+            "extra_files": extra_files,
         }
 
-        emsg, exception = send_safe_exec_request(data, extra_files)
+        emsg, exception = get_remote_exec(data)
 
     else:
         # Decide which code executor to use.
