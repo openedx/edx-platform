@@ -1439,7 +1439,6 @@ class RegistrationViewTestV1(
             "goals": self.GOALS,
             "country": self.COUNTRY,
             "honor_code": "true",
-            "opt": "true"
         })
         self.assertHttpOK(response)
 

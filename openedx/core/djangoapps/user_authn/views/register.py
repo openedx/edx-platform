@@ -99,7 +99,7 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-REGISTRATION_OPT = 'registration_opt'
+REGISTRATION_OPT_IN = 'marketing_emails_opt_in'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "registration"])
 
@@ -272,7 +272,8 @@ def create_account_with_params(request, params):
 
     try:
         _record_registration_attributions(request, new_user)
-        _record_opt_in_attribute(request.data.get('opt', None), new_user)
+        if settings.MARKETING_EMAILS_OPT_IN:
+            _record_opt_in_attribute(params.get('marketing_emails_opt_in'), new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
@@ -361,6 +362,8 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
                 'country': str(profile.country),
+                'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
+                                                     params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -379,9 +382,9 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_goal_set': bool(profile.goals),
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
+            'marketing_emails_opt_in': settings.MARKETING_EMAILS_OPT_IN and
+                                       params.get('marketing_emails_opt_in') == 'true',
         }
-        if params.get('opt'):
-            properties['opt_in']: bool(params.get('opt'))
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary
         # fix until we implement this behavior outside of the LMS.
@@ -454,12 +457,12 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
     )
 
 
-def _record_opt_in_attribute(opt, user):
+def _record_opt_in_attribute(opt_in, user):
     """
     Attribute this user's registration based on form data
     """
-    if user and opt:
-        UserAttribute.set_user_attribute(user, REGISTRATION_OPT, opt)
+    if user and opt_in:
+        UserAttribute.set_user_attribute(user, REGISTRATION_OPT_IN, opt_in)
 
 
 def _record_registration_attributions(request, user):
