@@ -1,6 +1,8 @@
 """
 Views for Enhanced Staff Grader
 """
+from django.http.response import HttpResponseBadRequest
+from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import UsageKey
@@ -44,7 +46,10 @@ class InitializeView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        ora_location = request.query_params['ora_location']
+        ora_location = request.query_params.get('ora_location')
+
+        if not ora_location:
+            return HttpResponseBadRequest(_("Query must contain an ora_location param."))
 
         # Get ORA block
         ora_usage_key = UsageKey.from_string(ora_location)
