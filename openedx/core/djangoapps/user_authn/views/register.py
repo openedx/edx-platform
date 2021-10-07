@@ -361,6 +361,8 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
                 'country': str(profile.country),
+                'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
+                                                     params.get('marketing_opt_in') == 'false' else 'subscribed',
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -379,6 +381,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_goal_set': bool(profile.goals),
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
+            'marketing_opt_in': settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_opt_in') == 'true',
         }
         if params.get('opt'):
             properties['opt_in']: bool(params.get('opt'))
