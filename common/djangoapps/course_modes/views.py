@@ -258,17 +258,17 @@ class ChooseModeView(View):
         fbe_is_on = deadline and gated_content
 
         # Route to correct Track Selection page.
-        # REV-2133 TODO Value Prop: remove waffle flag after testing is completed
-        # and happy path version is ready to be rolled out to all users.
+        # REV-2378 TODO Value Prop: remove waffle flag after all edge cases for track selection are completed.
         if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
-            if not error:  # TODO: Remove by executing REV-2355
-                if not enterprise_customer_for_request(request):  # TODO: Remove by executing REV-2342
-                    if fbe_is_on:
-                        return render_to_response("course_modes/fbe.html", context)
-                    else:
-                        return render_to_response("course_modes/unfbe.html", context)
+            if not enterprise_customer_for_request(request):  # TODO: Remove by executing REV-2342
+                if error:
+                    return render_to_response("course_modes/error.html", context)
+                if fbe_is_on:
+                    return render_to_response("course_modes/fbe.html", context)
+                else:
+                    return render_to_response("course_modes/unfbe.html", context)
 
-        # If error or enterprise_customer, failover to old choose.html page
+        # If enterprise_customer, failover to old choose.html page
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
