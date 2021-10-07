@@ -442,7 +442,7 @@ edx-enterprise==3.30.4
     #   -r requirements/edx/base.in
 edx-i18n-tools==0.8.1
     # via ora2
-edx-milestones==0.3.2
+edx-milestones==0.3.3
     # via -r requirements/edx/base.in
 edx-name-affirmation==1.0.2
     # via -r requirements/edx/base.in
