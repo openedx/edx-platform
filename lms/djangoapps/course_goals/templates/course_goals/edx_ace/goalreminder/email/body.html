@@ -31,7 +31,9 @@
 
                 <p style="color: rgba(0,0,0,.75);">
                     {% filter force_escape %}
-                        {% blocktrans asvar goal_text %}
+                        {% blocktrans count count=days_per_week asvar goal_text %}
+                            You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!"
+                            {% plural %}
                             You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
                         {% endblocktrans %}
                     {% endfilter %}
@@ -71,7 +73,7 @@
                         margin: 0.9375rem auto 0 auto;
                         text-align: center;
                         text-decoration: none;
-                        width: 11.5625rem;
+                        width: 13rem;
                     "
                     href="{{goals_unsubscribe_url}}" target="_blank">
                     {% filter force_escape %}{% blocktrans %}
