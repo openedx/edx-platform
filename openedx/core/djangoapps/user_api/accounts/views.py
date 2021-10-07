@@ -20,7 +20,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.translation import ugettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -649,7 +649,10 @@ class AccountRetirementPartnerReportView(ViewSet):
         try:
             # if the user has ever launched a managed Zoom xblock,
             # we'll notify Zoom to delete their records.
-            if user.launchlog_set.filter(managed=True).count():
+            
+            # We use models.Value(1) to make use of the indexing on the field. MySQL does not
+            # support boolean types natively, and checking for False will cause a table scan.
+            if user.launchlog_set.filter(managed=models.Value(1)).count():
                 orgs.add('zoom')
         except AttributeError:
             # Zoom XBlock not installed
