@@ -260,7 +260,9 @@ def get_course(request, course_key):
         "following_thread_list_url": get_thread_list_url(request, course_key, following=True),
         "topics_url": request.build_absolute_uri(
             reverse("course_topics", kwargs={"course_id": course_key})
-        )
+        ),
+        "allow_anonymous": course.allow_anonymous,
+        "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
     }
 
 

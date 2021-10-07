@@ -105,7 +105,9 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
             is_comment and
             (is_privileged or
              (_is_author(context["thread"], context) and context["thread"]["thread_type"] == "question"))
-        )
+        ),
+        "anonymous": is_author and context["course"].allow_anonymous,
+        "anonymous_to_peers": is_author and context["course"].allow_anonymous_to_peers,
     })
     # Return only editable fields
     return _filter_fields(editable_fields)

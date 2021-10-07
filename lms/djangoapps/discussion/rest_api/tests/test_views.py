@@ -163,6 +163,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True"
                 ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+                "allow_anonymous": True,
+                "allow_anonymous_to_peers": False,
             }
         )
 
@@ -887,8 +889,10 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
-            "body": ["# Test \n This is a very long body that will be truncated for the preview."],
-            'user_id': [str(self.user.id)]
+            'body': ['# Test \n This is a very long body that will be truncated for the preview.'],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_error(self):
@@ -938,7 +942,10 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
-            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'editable_fields': [
+                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'title', 'topic_id', 'type', 'voted'
+            ],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date',
             'comment_count': 1,
@@ -1018,7 +1025,10 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         assert response_data == self.expected_thread_data({
             'comment_count': 1,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'editable_fields': [
+                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'title', 'topic_id', 'type', 'voted'
+            ],
             'response_count': 2
         })
 
@@ -1145,6 +1155,8 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1532,9 +1544,11 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response = self.client.post(
             self.url,
@@ -1548,7 +1562,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
-            'user_id': [str(self.user.id)]
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_error(self):
@@ -1621,6 +1637,8 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "editable_fields": [],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1635,7 +1653,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         assert response_data == self.expected_response_data({
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
-            'editable_fields': ['abuse_flagged', 'raw_body', 'voted'],
+            'editable_fields': ['abuse_flagged', 'anonymous', 'raw_body', 'voted'],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date'
         })
@@ -1803,9 +1821,11 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "vote_count": 0,
             "abuse_flagged": False,
             "abuse_flagged_any_user": None,
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
 
         response = self.client.get(self.url)
