@@ -184,8 +184,8 @@ class TabsAPITests(CourseTestCase):
         """
         Test that toggling the visibility via the API works.
         """
-        self.check_toggle_tab_visibility("wiki", True)
         self.check_toggle_tab_visibility("wiki", False)
+        self.check_toggle_tab_visibility("wiki", True)
 
     def test_toggle_tab_visibility_fail(self):
         """
