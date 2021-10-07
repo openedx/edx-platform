@@ -649,7 +649,6 @@ class AccountRetirementPartnerReportView(ViewSet):
         try:
             # if the user has ever launched a managed Zoom xblock,
             # we'll notify Zoom to delete their records.
-            
             # We use models.Value(1) to make use of the indexing on the field. MySQL does not
             # support boolean types natively, and checking for False will cause a table scan.
             if user.launchlog_set.filter(managed=models.Value(1)).count():
