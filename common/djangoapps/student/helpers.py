@@ -767,28 +767,21 @@ def get_resume_urls_for_enrollments(user, enrollments):
     resume_course_urls = OrderedDict()
     for enrollment in enrollments:
         try:
-            log.warning('GETTING_BLOCK_KEY')
             block_key = get_key_to_last_completed_block(user, enrollment.course_id)
-            log.warning('BLOCK_KEY_GOT: ' + block_key.block_id)
             try:
                 block_data = get_course_blocks(user, block_key)
             except UsageKeyNotInBlockStructure:
-                log.warning('TESTGOT_UsageKeyNotInBlockStructure')
                 url_to_block = ''
             else:
                 keys = [key.block_id for key in list(block_data.get_block_keys())]
-                log.warning('GOT BLOCK DATA ')
-                log.warning(keys)
                 if block_key in block_data:
                     url_to_block = reverse(
                         'jump_to',
                         kwargs={'course_id': enrollment.course_id, 'location': block_key}
                     )
                 else:
-                    log.warning('TESTGOT_BlockKey_Not_In')
                     url_to_block = ''
         except UnavailableCompletionData:
-            log.warning('TESTGOT_UnavailableCompletionData')
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
     return resume_course_urls

@@ -19,7 +19,7 @@ from testfixtures import LogCapture
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_resume_urls_for_enrollments
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 LOGGER_NAME = "common.djangoapps.student.helpers"
@@ -162,18 +162,16 @@ class TestLoginHelper(TestCase):
         assert next_page == expected_url
 
 
-class TestResumeURLs(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
+class TestResumeURLs(ModuleStoreTestCase, CompletionWaffleTestMixin):
     """Test enrollment resume URL generation"""
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course_1 = CourseFactory.create(course='resume_course_1')
-        cls.course_2 = CourseFactory.create(course='resume_course_2')
 
     def setUp(self):
         super().setUp()
+        self.start_modulestore_isolation()
+        self.addCleanup(self.end_modulestore_isolation)
         self.override_waffle_switch(True)
+        self.course_1 = CourseFactory.create(course='resume_course_1')
+        self.course_2 = CourseFactory.create(course='resume_course_2')
         self.user = UserFactory()
         self.enrollments = [
             CourseEnrollmentFactory.create(user=self.user, course_id=self.course_1.id),
