@@ -48,12 +48,17 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
+anyio==3.3.2
+    # via starlette
 appdirs==1.4.4
     # via
     #   -r requirements/edx/base.txt
     #   fs
 asgiref==3.4.1
-    # via uvicorn
+    # via
+    #   -r requirements/edx/base.txt
+    #   django
+    #   uvicorn
 astroid==2.6.6
     # via
     #   pylint
@@ -226,7 +231,6 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -308,6 +312,7 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
+django-cookies-samesite==0.9.0
     # via -r requirements/edx/base.txt
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.txt
@@ -613,9 +618,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==9.0.0
+faker==9.2.0
     # via factory-boy
-fastapi==0.68.2
+fastapi==0.70.0
     # via pact-python
 filelock==3.3.0
     # via
@@ -669,6 +674,7 @@ icalendar==4.0.8
 idna==3.2
     # via
     #   -r requirements/edx/base.txt
+    #   anyio
     #   requests
     #   yarl
 importlib-metadata==4.8.1
@@ -718,7 +724,7 @@ jmespath==0.10.0
     #   -r requirements/edx/base.txt
     #   boto3
     #   botocore
-joblib==1.0.1
+joblib==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -940,7 +946,7 @@ pycparser==2.20
     # via
     #   -r requirements/edx/base.txt
     #   cffi
-pycryptodomex==3.10.4
+pycryptodomex==3.11.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -1241,6 +1247,8 @@ slumber==0.7.1
     #   edx-rest-api-client
 smmap==4.0.0
     # via gitdb
+sniffio==1.2.0
+    # via anyio
 social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -1266,7 +1274,7 @@ sqlparse==0.4.2
     #   django
 staff-graded-xblock==1.5.1
     # via -r requirements/edx/base.txt
-starlette==0.14.2
+starlette==0.16.0
     # via fastapi
 stevedore==3.4.0
     # via

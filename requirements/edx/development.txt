@@ -50,6 +50,10 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-tincan-py35
+anyio==3.3.2
+    # via
+    #   -r requirements/edx/testing.txt
+    #   starlette
 appdirs==1.4.4
     # via
     #   -r requirements/edx/testing.txt
@@ -57,6 +61,7 @@ appdirs==1.4.4
 asgiref==3.4.1
     # via
     #   -r requirements/edx/testing.txt
+    #   django
     #   uvicorn
 astroid==2.6.6
     # via
@@ -238,9 +243,8 @@ distlib==0.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==2.2.24
+django==3.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -636,11 +640,11 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.txt
-faker==9.0.0
+faker==9.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.68.2
+fastapi==0.70.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -703,6 +707,7 @@ icalendar==4.0.8
 idna==3.2
     # via
     #   -r requirements/edx/testing.txt
+    #   anyio
     #   requests
     #   yarl
 imagesize==1.2.0
@@ -758,7 +763,7 @@ jmespath==0.10.0
     #   -r requirements/edx/testing.txt
     #   boto3
     #   botocore
-joblib==1.0.1
+joblib==1.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -962,7 +967,7 @@ pillow==8.3.2
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-organizations
-pip-tools==6.3.0
+pip-tools==6.3.1
     # via -r requirements/edx/pip-tools.txt
 platformdirs==2.4.0
     # via
@@ -1002,7 +1007,7 @@ pycparser==2.20
     # via
     #   -r requirements/edx/testing.txt
     #   cffi
-pycryptodomex==3.10.4
+pycryptodomex==3.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
@@ -1323,6 +1328,10 @@ smmap==4.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   gitdb
+sniffio==1.2.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   anyio
 snowballstemmer==2.1.0
     # via sphinx
 social-auth-app-django==5.0.0
@@ -1371,7 +1380,7 @@ sqlparse==0.4.2
     #   django-debug-toolbar
 staff-graded-xblock==1.5.1
     # via -r requirements/edx/testing.txt
-starlette==0.14.2
+starlette==0.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
