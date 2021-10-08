@@ -6,6 +6,7 @@ GROUP_ORGANIZATION_ADMIN = 'Organization Admins'
 SELF_ACTIVE_STATUS_CHANGE_ERROR_MSG = "User can't change their own activation status."
 ENROLLMENT_COURSE_EXPIRED_MSG = 'Enrollment date is passed for selected courses. ' \
                                 'Refresh the page to get the updated course list.'
+ENROLLMENT_COURSE_DIFF_ORG_ERROR_MSG = "The user's organization does not match with selected course(s)."
 ENROLLMENT_SUCCESS_MESSAGE = 'Enrollment task has been started successfully!\n' \
                              'Please refresh the page after couple of minutes to get the updated stats.'
 
