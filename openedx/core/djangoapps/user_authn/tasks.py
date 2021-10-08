@@ -44,7 +44,6 @@ def get_pwned_properties(pwned_response, password):
 
 
 @shared_task
-@set_code_owner_attribute
 def check_pwned_password_and_send_track_event(user_id, password, internal_user=False):
     """
     Check the Pwned Databases and send its event to Segment
