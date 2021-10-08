@@ -236,6 +236,7 @@ class ChooseModeView(View):
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
+        # REV-2415 TODO: remove [Track Selection Check] logs introduced by REV-2355 for error handling check
         context['currency_data'] = []
         if waffle.switch_is_active('local_currency'):
             if 'edx-price-l10n' not in request.COOKIES:
