@@ -1,6 +1,6 @@
 """
 This module contains various configuration settings via
-waffle switches for the learner_dashboard app.
+waffle switches for the teams app.
 """
 
 from edx_toggles.toggles import WaffleFlag
