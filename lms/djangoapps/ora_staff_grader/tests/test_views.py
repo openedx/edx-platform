@@ -14,6 +14,7 @@ class TestInitializeView(APITestCase):
     Tests for the /initialize view, creating setup data for ESG
     """
     view_name = 'ora-staff-grader:initialize'
+    api_url = reverse(view_name)
 
     @classmethod
     def setUpClass(cls):
@@ -29,17 +30,18 @@ class TestInitializeView(APITestCase):
         """ Log in as staff """
         self.client.login(username=self.staff.username, password=self.password)
 
-    def api_url(self, ora_location):
-        """ Create the request URL for hitting /initialize """
-        kwargs = {}
-        if ora_location:
-            kwargs['ora_location'] = ora_location
-        return reverse(self.view_name, kwargs=kwargs)
-
     def test_missing_ora_location(self):
         """ Missing ora_location param should return 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
-        response = self.client.get(self.api_url(None))
+        response = self.client.get(self.api_url)
 
         assert response.status_code == 400
         assert response.content.decode() == "Query must contain an ora_location param."
+
+    def test_bad_ora_location(self):
+        """ Bad ORA location should return a 404 and error message """
+        self.client.login(username=self.staff.username, password=self.password)
+        response = self.client.get(self.api_url, {'ora_location': 'not_a_real_location'})
+
+        assert response.status_code == 404
+        assert response.content.decode() == "Invalid ora_location."
