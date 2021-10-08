@@ -49,15 +49,15 @@ class TestGoalReminderEmailCommand(TestCase):
         kwargs.setdefault('overview__end', datetime(2021, 4, 1, tzinfo=UTC))  # Have it end in the future
         goal = CourseGoalFactory(**kwargs)
 
-        with freeze_time('2021-02-01'):  # Create enrollment before March
+        with freeze_time('2021-02-01 10:00:00'):  # Create enrollment before March
             CourseEnrollmentFactory(user=goal.user, course_id=goal.course_key)
 
         return goal
 
-    def call_command(self, day=TUESDAY, expect_sent=None, expect_send_count=None):
+    def call_command(self, day=TUESDAY, expect_sent=None, expect_send_count=None, time=None):
         """Calls the management command with a frozen time and optionally checks whether we sent an email"""
         with mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.send_ace_message') as mock_send:  # pylint: disable=line-too-long
-            with freeze_time(f'2021-03-0{day + 1}'):  # March 2021 starts on a Monday
+            with freeze_time(time or f'2021-03-0{day + 1} 10:00:00'):  # March 2021 starts on a Monday
                 call_command('goal_reminder_email')
 
         if expect_sent is not None:
@@ -107,6 +107,12 @@ class TestGoalReminderEmailCommand(TestCase):
             UserActivityFactory(user=goal.user, course_key=goal.course_key, date=datetime(2021, 3, day + 1, tzinfo=UTC))
 
         self.call_command(day=current_day, expect_sent=expect_sent)
+
+    def test_will_send_at_the_right_time(self):
+        """ We only send the emails from 9am-12pm in the user's time"""
+        self.make_valid_goal()
+        self.call_command(expect_sent=False, time='2021-03-02 8:00:00')
+        self.call_command(expect_sent=True, time='2021-03-02 10:00:00')
 
     def test_feature_disabled(self):
         self.make_valid_goal()

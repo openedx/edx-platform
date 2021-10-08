@@ -259,6 +259,16 @@ $btn-color-primary: $primary-dark;
       @include margin-left(calc((100% - 1180px) / 2));
     }
   }
+  .tab-content{
+      .tab-pane {
+          .program-details-content {
+              padding-left: 40px;
+          }
+          .js-program-pathways {
+              padding-left: 40px;
+          }
+      }
+  }
 
   .course-list-heading {
     font-family: $font-family-sans-serif;

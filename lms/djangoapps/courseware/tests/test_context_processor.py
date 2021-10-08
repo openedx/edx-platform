@@ -2,14 +2,18 @@
 Unit tests for courseware context_processor
 """
 
-
+from pytz import timezone
 from unittest.mock import Mock
 from django.contrib.auth.models import AnonymousUser
 
-from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.context_processor import (
+    get_user_timezone_or_last_seen_timezone_or_utc,
+    user_timezone_locale_prefs,
+)
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
@@ -20,7 +24,7 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(password='foo')
         self.request = Mock()
         self.request.user = self.user
 
@@ -43,3 +47,20 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         assert context['user_language'] is None
         assert context['user_timezone'] is not None
         assert context['user_timezone'] == 'Asia/Tokyo'
+
+    def test_get_user_timezone_or_last_seen_timezone_or_utc(self):
+        # We default to UTC
+        course = CourseFactory()
+        time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
+        assert time_zone == timezone('UTC')
+
+        # We record the timezone when a user hits the courseware api
+        self.client.login(username=self.user.username, password='foo')
+        self.client.get(f'/api/courseware/course/{course.id}?browser_timezone=America/New_York')
+        time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
+        assert time_zone == timezone('America/New_York')
+
+        # If a user has their timezone set, then we use that setting
+        set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
+        time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
+        assert time_zone == timezone('Asia/Tokyo')

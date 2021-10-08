@@ -99,6 +99,7 @@
         </div>
     </div>
 </article>
+<aside class="js-program-sidebar program-sidebar"></aside>
 
   </div>
   <% if (discussionFragment.enabled) { %>
@@ -157,9 +158,7 @@
        <% } %>
     </aside>
 <% } %>
-  Pathways tab content
   </div>
 </div>
 <% } %>
 
-<aside class="js-program-sidebar program-sidebar"></aside>

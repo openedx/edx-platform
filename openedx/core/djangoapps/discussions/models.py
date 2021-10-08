@@ -26,6 +26,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 log = logging.getLogger(__name__)
 
 DEFAULT_PROVIDER_TYPE = 'legacy'
+DEFAULT_CONFIG_ENABLED = True
 
 ProviderExternalLinks = namedtuple(
     'ProviderExternalLinks',
@@ -403,7 +404,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         except cls.DoesNotExist:
             configuration = cls(
                 context_key=context_key,
-                enabled=False,
+                enabled=DEFAULT_CONFIG_ENABLED,
                 provider_type=DEFAULT_PROVIDER_TYPE,
             )
         return configuration
