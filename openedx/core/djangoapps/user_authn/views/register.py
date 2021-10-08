@@ -362,7 +362,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
                 'gender': profile.gender_display,
                 'country': str(profile.country),
                 'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
-                                                     params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
+                    params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -384,6 +384,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
         }
         if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:
             properties['marketing_emails_opt_in'] = params.get('marketing_emails_opt_in') == 'true'
+            properties['is_active'] = params.get('marketing_emails_opt_in') == 'true'
 
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary
