@@ -1,37 +1,10 @@
-# Run commitlint on the commit messasges in a pull request.
+# Run commitlint on the commit messages in a pull request.
 
 name: Lint Commit Messages
 
 on:
   - pull_request
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   commitlint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Check for a local configuration file
-        id: check
-        run: |
-          if [[ ! -f commitlint.config.js ]]; then
-            echo "::set-output name=need::yes"
-          fi
-
-      - name: Download configuration if needed
-        if: steps.check.outputs.need == 'yes'
-        uses: wei/wget@v1
-        with:
-          args: -O commitlint.config.js https://raw.githubusercontent.com/edx/edx-lint/HEAD/edx_lint/files/commitlint.config.js
-
-      - name: Run commitlint
-        uses: wagoid/commitlint-github-action@v4
-        with:
-          helpURL: https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
+    uses: edx/.github/.github/workflows/commitlint.yml@master
