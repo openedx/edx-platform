@@ -1,15 +1,17 @@
 """
 Views for Enhanced Staff Grader
 """
-from django.http.response import HttpResponseBadRequest
+from django.http.response import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.ora_staff_grader.serializers import (
     CourseMetadataSerializer,
@@ -52,8 +54,11 @@ class InitializeView(RetrieveAPIView):
             return HttpResponseBadRequest(_("Query must contain an ora_location param."))
 
         # Get ORA block
-        ora_usage_key = UsageKey.from_string(ora_location)
-        openassessment_block = modulestore().get_item(ora_usage_key)
+        try:
+            ora_usage_key = UsageKey.from_string(ora_location)
+            openassessment_block = modulestore().get_item(ora_usage_key)
+        except (InvalidKeyError, ItemNotFoundError):
+            return HttpResponseNotFound(_("Invalid ora_location."))
 
         # Get course metadata
         course_id = str(ora_usage_key.course_key)
