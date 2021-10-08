@@ -338,9 +338,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         # But then user changes unexpectedly
         self.request.user = UserFactory.create()
 
-        with self.assert_logged_with_message(
-            "SafeCookieData user at request '1' does not match user at response: '2' for request path '/'", 'warning'
-        ):
+        with self.assert_logged_for_request_user_mismatch(self.user.id, self.request.user.id, 'warning', '/'):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
