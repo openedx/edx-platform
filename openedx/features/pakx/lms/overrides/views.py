@@ -11,7 +11,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.generic import View
+from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from six import text_type
@@ -43,7 +43,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
-from openedx.features.pakx.lms.overrides.forms import ContactUsForm
+from openedx.features.pakx.lms.overrides.forms import AboutUsForm
 from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
@@ -376,45 +376,44 @@ def course_about_category(request, category, course_id):
     return render_to_response('courseware/course_about.html', _get_course_about_context(request, course_id, category))
 
 
-def business_view(request, *args, **kwargs):
-    """Business View"""
-    return render_to_response('overrides/business.html', {})
-
-
-class ContactUsView(View):
+class AboutUsView(TemplateView):
     """
     View for viewing and submitting contact us form.
     """
+    template_name = 'overrides/about_us.html'
+    success_redirect = '/about_us/'
 
-    def get_context_data(self, request):
-        context = {
-            'tags': ['LMS'],
-            'form': ContactUsForm(),
-            'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
-            'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
-            'custom_fields': settings.ZENDESK_CUSTOM_FIELDS
-        }
-        if request.user.is_authenticated:
-            context['course_id'] = request.session.get('course_id', '')
+    def get_context_data(self, user=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] = ['LMS']
+        context['platform_name'] = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+        context['support_email'] = configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL)
+        context['custom_fields'] = settings.ZENDESK_CUSTOM_FIELDS
 
+        initial_data = {}
+        if user:
+            initial_data.update({
+                'email': user.email,
+                'full_name': (user.profile.name or user.get_full_name()).title().strip(),
+                'organization': getattr(user.profile.organization, 'name', ''),
+            })
+        if 'business' in self.success_redirect:
+            initial_data.update({'message': 'Not Available. Submitted from Business Page'})
+
+        context['form'] = AboutUsForm(initial=initial_data)
         return context
 
     def get(self, request):
-        context = self.get_context_data(request)
+        user = request.user if request.user.is_authenticated else None
+        context = self.get_context_data(user=user)
+        context['course_id'] = request.session.get('course_id', '')
 
-        if request.user.is_authenticated:
-            context['form'] = ContactUsForm(initial={
-                'email': request.user.email,
-                'full_name': (request.user.profile.name or request.user.get_full_name()).title().strip(),
-                'organization': getattr(request.user.profile.organization, 'name', ''),
-            })
-
-        return render_to_response("support/contact_us.html", context)
+        return render_to_response(self.template_name, context)
 
     def post(self, request):
         form_data = request.POST.copy()
 
-        form = ContactUsForm(form_data)
+        form = AboutUsForm(form_data)
         if form.is_valid():
             instance = form.save(commit=False)
             if request.user.is_authenticated:
@@ -429,10 +428,26 @@ class ContactUsView(View):
 
             messages.success(
                 self.request,
-                _(u'Thanks for contacting us. Our team member will contact you soon.')
+                _(u'Thank you for contacting us! Our team will get in touch with you soon')
             )
-            return HttpResponseRedirect('/support/contact_us/')
+            return HttpResponseRedirect(self.success_redirect)
 
-        context = self.get_context_data(request)
+        context = self.get_context_data()
         context['form'] = form
-        return render_to_response("support/contact_us.html", context)
+        return render_to_response(self.template_name, context)
+
+
+class PartnerWithUsView(AboutUsView):
+    """
+    View for partner-with-us page.
+    """
+    template_name = "overrides/partner_with_us.html"
+    success_redirect = '/partner-with-us/'
+
+
+class BusinessView(AboutUsView):
+    """
+    View for business page.
+    """
+    template_name = 'overrides/business.html'
+    success_redirect = '/business/#get-started'

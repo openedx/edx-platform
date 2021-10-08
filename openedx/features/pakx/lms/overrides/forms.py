@@ -6,7 +6,7 @@ from openedx.features.pakx.lms.overrides.utils import validate_text_for_emoji
 from .models import ContactUs
 
 
-class ContactUsForm(ModelForm):
+class AboutUsForm(ModelForm):
     class Meta:
         model = ContactUs
         fields = ('full_name', 'email', 'organization', 'phone', 'message')
@@ -17,13 +17,12 @@ class ContactUsForm(ModelForm):
         }
         help_texts = {
             'email': _('user@website.com'),
-            'organization': _('Advent Organization'),
             'phone': _('04235608000 or 03317758391'),
             'message': _('Maximum words (4000)'),
         }
 
     def __init__(self, *args, **kwargs):
-        super(ContactUsForm, self).__init__(*args, **kwargs)
+        super(AboutUsForm, self).__init__(*args, **kwargs)
         for key, field in self.fields.items():
             if field.required:
                 field.label = field.label + '*'
