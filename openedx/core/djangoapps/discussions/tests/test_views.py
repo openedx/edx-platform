@@ -19,8 +19,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..models import AVAILABLE_PROVIDER_MAP
-
+from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE
 
 DATA_LEGACY_COHORTS = {
     'divided_inline_discussions': [],
@@ -144,8 +143,8 @@ class DataTest(AuthorizedApiTest):
         """
         data = response.json()
         assert response.status_code == self.expected_response_code
-        assert not data['enabled']
-        assert data['provider_type'] == 'legacy'
+        assert data['enabled'] == DEFAULT_CONFIG_ENABLED
+        assert data['provider_type'] == DEFAULT_PROVIDER_TYPE
         assert data['providers']['available']['legacy'] == AVAILABLE_PROVIDER_MAP['legacy']
         assert not [
             name for name, spec in data['providers']['available'].items()
@@ -265,7 +264,7 @@ class DataTest(AuthorizedApiTest):
             'non-existent-key': 'value',
         }
         response = self._post(payload)
-        self._assert_defaults(response)
+        assert response.status_code == self.expected_response_code
 
     def test_configuration_valid(self):
         """

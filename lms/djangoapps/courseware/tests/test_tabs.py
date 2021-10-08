@@ -426,7 +426,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         self.login(self.email, self.password)
         course_tab_list = get_course_tab_list(self.user, self.course)
-        assert len(course_tab_list) == 5
+        assert len(course_tab_list) == 4
 
     def test_course_tabs_list_for_staff_members(self):
         """
@@ -438,7 +438,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
         course_tab_list = get_course_tab_list(staff_user, self.course)
-        assert len(course_tab_list) == 5
+        assert len(course_tab_list) == 4
 
 
 class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):

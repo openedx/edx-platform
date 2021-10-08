@@ -4,6 +4,7 @@ Most of the functionality is covered in test_views.py.
 """
 
 
+import datetime
 import itertools
 import unicodedata
 from unittest.mock import Mock, patch
@@ -18,6 +19,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
 from edx_toggles.toggles.testutils import override_waffle_flag
+from pytz import UTC
 from social_django.models import UserSocialAuth
 from common.djangoapps.student.models import (
     AccountRecovery,
@@ -362,6 +364,35 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert "Value 'undecided' is not valid for field 'gender'" in field_errors['gender']['developer_message']
         assert 'Valid e-mail address required.' in field_errors['email']['developer_message']
         assert 'Full Name cannot contain the following characters: < >' in field_errors['name']['user_message']
+
+    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
+    def test_validate_name_change_same_name(self):
+        """
+        Test that saving the user's profile name without changing it should not raise an error.
+        """
+        account_settings = get_account_settings(self.default_request)[0]
+
+        # Add name change history to the profile metadeta; if the user has at least one certificate,
+        # too many name changes will trigger the verification requirement, but this should only happen
+        # if the name has actually been changed
+        user_profile = UserProfile.objects.get(user=self.user)
+        meta = user_profile.get_meta()
+        meta['old_names'] = []
+        for num in range(3):
+            meta['old_names'].append(
+                [f'old_name_{num}', 'test', datetime.datetime.now(UTC).isoformat()]
+            )
+        user_profile.set_meta(meta)
+        user_profile.save()
+
+        with patch(
+            'openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
+            return_value=['mock_certificate']
+        ):
+            update_account_settings(self.user, {'name': account_settings['name']})
+            # The name should not be added to profile metadata
+            updated_meta = user_profile.get_meta()
+            self.assertEqual(meta, updated_meta)
 
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=False))

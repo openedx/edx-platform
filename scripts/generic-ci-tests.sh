@@ -68,9 +68,14 @@ END
 # if specified tox environment is supported, prepend paver commands
 # with tox env invocation
 if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
+    echo "TOX_ENV: ${TOX_ENV}"
     TOX=""
 elif tox -l |grep -q "${TOX_ENV}"; then
-    TOX="tox -r -e ${TOX_ENV} --"
+    if [[ "${TOX_ENV}" == 'quality-django32' ]]; then
+        TOX=""
+    else
+        TOX="tox -r -e ${TOX_ENV} --"
+    fi
 else
     echo "${TOX_ENV} is not currently supported. Please review the"
     echo "tox.ini file to see which environments are supported"

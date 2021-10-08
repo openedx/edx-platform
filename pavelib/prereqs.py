@@ -23,8 +23,11 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
 # prerequisites are installed for builds on circleci.com
-if 'TOXENV' in os.environ:
+toxenv = os.environ.get('TOXENV')
+if toxenv and toxenv != 'quality-django32':
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
+elif toxenv and toxenv == 'quality-django32':
+    PYTHON_REQ_FILES = ['requirements/edx/testing.txt', 'requirements/edx/django32.txt']
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 

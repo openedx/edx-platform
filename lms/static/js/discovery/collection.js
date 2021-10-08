@@ -73,8 +73,8 @@
                 var results = response.results || [];
                 this.latestModelsCount = results.length;
                 this.totalCount = response.total;
-                if (typeof response.facets !== 'undefined') {
-                    this.facets = response.facets;
+                if (typeof response.aggs !== 'undefined') {
+                    this.facets = response.aggs;
                 } else {
                     this.facets = [];
                 }

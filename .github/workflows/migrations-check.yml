@@ -8,12 +8,12 @@ on:
       - master
 
 jobs:
-  run_tests:
-    name: Migrations Test
+  check_migrations:
+    name: check migrations
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-18.04 ]
         python-version: [ 3.8 ]
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Required Packages
+    - name: Install system Packages
       run: |
         sudo apt-get update
         sudo apt-get install -y libxmlsec1-dev
@@ -47,6 +47,10 @@ jobs:
       run: |
         pip install -r requirements/pip.txt
         pip install -r requirements/edx/development.txt
+        pip uninstall -y mysqlclient
+        pip install --no-binary mysqlclient mysqlclient
+        pip uninstall -y xmlsec
+        pip install --no-binary xmlsec xmlsec
 
     - name: Initiate Services
       run: |
