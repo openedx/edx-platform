@@ -362,7 +362,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
                 'gender': profile.gender_display,
                 'country': str(profile.country),
                 'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
-                    params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
+                                   params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
