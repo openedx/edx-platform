@@ -991,6 +991,9 @@ COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
+# VAN-754 - Year of birth field put behind a flag to make it available for OpenedX.
+COLLECT_YEAR_OF_BIRTH = True
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
