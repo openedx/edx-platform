@@ -281,7 +281,7 @@ class CourseEnrolmentViewSet(viewsets.ModelViewSet):
         if not is_courses_enroll_able(request.data["course_keys"]):
             return Response(ENROLLMENT_COURSE_EXPIRED_MSG, status=status.HTTP_400_BAD_REQUEST)
 
-        if is_courses_user_have_same_org(request.data["course_keys"], request.user):
+        if not is_courses_user_have_same_org(request.data["course_keys"], request.user):
             return Response(ENROLLMENT_COURSE_DIFF_ORG_ERROR_MSG, status=status.HTTP_400_BAD_REQUEST)
 
         user_qs = get_org_users_qs(request.user).filter(id__in=request.data["user_ids"]).values_list('id', flat=True)
