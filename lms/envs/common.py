@@ -917,6 +917,18 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
+
+    # .. toggle_name: FEATURES['DISABLE_UNENROLLMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the disabling of course unenrollment through REST API. 
+    #   This is disabled by default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-10-11
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
+    'DISABLE_UNENROLLMENT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
