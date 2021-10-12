@@ -708,6 +708,15 @@ urlpatterns += [
             namespace='subscriptions_api',
         )
     ),
+
+    # Course Rating
+    url(
+        r'^api/v1/',
+        include(
+            'openedx.features.course_rating.api.v1.urls',
+            namespace='course_rating_api',
+        )
+    ),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):

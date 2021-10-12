@@ -41,11 +41,13 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
+    COURSE_OUTLINE_PAGE_SWITCH,
     default_course_url_name,
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
@@ -451,7 +453,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'disable_accordion': not COURSE_OUTLINE_PAGE_SWITCH.is_enabled(),
             'show_search': show_search,
         }
         courseware_context.update(
@@ -468,10 +470,15 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+        course_block_tree = get_course_outline_block_tree(
+            request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
+        )
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,
-            table_of_contents['chapters'],
+            course_block_tree,
+            self.chapter_url_name,
+            self.section_url_name
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -573,7 +580,7 @@ class CoursewareIndex(View):
         return section_context
 
 
-def render_accordion(request, course, table_of_contents):
+def render_accordion(request, course, table_of_contents, active_section, active_subsection):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -581,9 +588,12 @@ def render_accordion(request, course, table_of_contents):
     """
     context = dict(
         [
-            ('toc', table_of_contents),
+            ('blocks', table_of_contents),
+            ('course', course),
             ('course_id', six.text_type(course.id)),
             ('csrf', csrf(request)['csrf_token']),
+            ('active_section', active_section),
+            ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
         ] + list(TEMPLATE_IMPORTS.items())
     )
