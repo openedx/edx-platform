@@ -24,9 +24,10 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.request_utils import get_request_or_stub
+# pylint: disable=too-many-statements
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
-from pakx_feedback.feedback_app.models import UserFeedbackModel
+from pakx_feedback.feedback_app.models import UserFeedbackModel   # pylint: disable=import-error
 from student.models import CourseEnrollment
 from util.organizations_helpers import get_organization_by_short_name
 from xmodule import course_metadata_utils
@@ -260,12 +261,8 @@ def _accumulate_total_block_counts(total_block_type_counts):
 
     Accumulates all types of completable course blocks except html, problem and video
     into an 'other' category.
-
-    Arguments:
-        total_block_type_counts (dict): Total block type counts of required course
-
-    Returns:
-        accumulated_data (dict): Accumulated block type counts
+    :param total_block_type_counts: (dict) Total block type counts of required course
+    :returns: accumulated_data (dict): Accumulated block type counts
     """
 
     accumulated_data = {

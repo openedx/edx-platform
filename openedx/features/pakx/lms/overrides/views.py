@@ -264,7 +264,7 @@ def _get_course_about_context(request, course_id, category=None):  # pylint: dis
         can_enroll = can_enroll and is_course_enroll_able(course)
         current_date = datetime.now(utc)
         days_in_course_start = (course.start - current_date).days if (
-                course.start and course.start > current_date) else None
+            course.start and course.start > current_date) else None
 
         invitation_only = course.invitation_only
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
@@ -380,8 +380,21 @@ class AboutUsView(TemplateView):
     """
     View for viewing and submitting contact us form.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.initial_data = {}
+
     template_name = 'overrides/about_us.html'
     success_redirect = '/about_us/'
+
+    def populate_form_initial_data(self, user=None):
+        if user:
+            self.initial_data.update({
+                'email': user.email,
+                'full_name': (user.profile.name or user.get_full_name()).title().strip(),
+                'organization': getattr(user.profile.organization, 'name', ''),
+            })
 
     def get_context_data(self, user=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -390,17 +403,9 @@ class AboutUsView(TemplateView):
         context['support_email'] = configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL)
         context['custom_fields'] = settings.ZENDESK_CUSTOM_FIELDS
 
-        initial_data = {}
-        if user:
-            initial_data.update({
-                'email': user.email,
-                'full_name': (user.profile.name or user.get_full_name()).title().strip(),
-                'organization': getattr(user.profile.organization, 'name', ''),
-            })
-        if 'business' in self.success_redirect:
-            initial_data.update({'message': 'Not Available. Submitted from Business Page'})
+        self.populate_form_initial_data(user)
 
-        context['form'] = AboutUsForm(initial=initial_data)
+        context['form'] = AboutUsForm(initial=self.initial_data)
         return context
 
     def get(self, request):
@@ -451,3 +456,19 @@ class BusinessView(AboutUsView):
     """
     template_name = 'overrides/business.html'
     success_redirect = '/business/#get-started'
+
+    def populate_form_initial_data(self, user=None):
+        super().populate_form_initial_data(user)
+        self.initial_data.update({'message': 'Not Available. Submitted from Business Page'})
+
+
+class MarketingCampaignPage(AboutUsView):
+    """
+    View for business page.
+    """
+    template_name = 'overrides/marketing_campaign.html'
+    success_redirect = '/workplace-harassment/#get-started'
+
+    def populate_form_initial_data(self, user=None):
+        super().populate_form_initial_data(user)
+        self.initial_data.update({'message': 'Not Available. Submitted from Marketing campaign Page'})
