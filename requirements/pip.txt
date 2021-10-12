@@ -1,2 +1,2 @@
-pip==20.3.4
+pip==20.3.4  # when updating this constraint, also remove the pip-tools constraint from constraints.txt
 wheel==0.35.1
