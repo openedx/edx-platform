@@ -100,7 +100,3 @@ pylint<2.10.0
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
-# pip==20.3.4 conflicts with the pip-tools>6.3.0 and causes following error
-# ImportError: cannot import name 'get_installed_distributions' from 'pip._internal.utils.misc'
-# Remove this constraint when upgrading pip version in pip.txt
-pip-tools==6.3.0
