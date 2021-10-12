@@ -771,7 +771,6 @@ lxml==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -1090,7 +1089,6 @@ pytz==2021.3
     # via
     #   -r requirements/edx/base.txt
     #   babel
-    #   capa
     #   celery
     #   django
     #   django-ses
