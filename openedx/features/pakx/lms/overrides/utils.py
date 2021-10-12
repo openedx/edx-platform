@@ -121,8 +121,11 @@ def get_rating_course(course_id):
     :return: (dict) {'rating': 4.3, 'total_responses': 34}
     """
 
-    course_rating = UserFeedbackModel.objects.filter(course_id=course_id).aggregate(rating=Avg('experience'),
-                                                                                    total_responses=Count('experience'))
+    course_rating = UserFeedbackModel.objects.filter(
+        course_id=course_id
+    ).aggregate(
+        rating=Avg('experience'), total_responses=Count('experience')
+    )
     if course_rating.get("rating"):
         course_rating.update({"rating": round(course_rating.get("rating") * 2.0) / 2.0})
     return course_rating
@@ -131,6 +134,7 @@ def get_rating_course(course_id):
 def get_rating_classes_for_course(course_id):
     """
     Get total number of responses and stars classes for given course ID
+    This method is intended to be used in HTML templates to display star classes
     :param course_id: (CourseKeyField) course Key
 
     :return: (dict) {1:'fa-star', 2: 'fa-star', 3: 'fa-star', 4: 'fa-star-half-o', 5: 'fa-star-o'
