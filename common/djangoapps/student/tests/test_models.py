@@ -5,6 +5,7 @@ from unittest import mock
 
 import ddt
 import pytz
+import pytest
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -249,6 +250,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         assert enrollment_refetched.all()[0] == enrollment
 
 
+@pytest.mark.skip()
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
 class UserCelebrationTests(SharedModuleStoreTestCase):
