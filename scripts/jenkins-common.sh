@@ -50,8 +50,7 @@ sed -i "s|^/home/jenkins/shallow-clone|`pwd`|" -- \
     $VENV_PATH/edx-venv/lib/python*/site-packages/*.egg-link
 pip install pip==21.3
 pip install -qr requirements/edx/pip-tools.txt
-pip install -qr requirements/edx/testing.txt
-pip install -qr requirements/edx/django.txt
+pip-sync -q requirements/edx/testing.txt requirements/edx/django.txt
 
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin
