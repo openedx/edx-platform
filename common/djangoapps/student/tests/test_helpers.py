@@ -3,24 +3,18 @@
 
 import logging
 import unittest
-from collections import OrderedDict
 from unittest.mock import patch
 
 import ddt
-from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from opaque_keys.edx.locator import BlockUsageLocator
 from testfixtures import LogCapture
 
-from common.djangoapps.student.helpers import get_next_url_for_login_page, get_resume_urls_for_enrollments
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 LOGGER_NAME = "common.djangoapps.student.helpers"
 
