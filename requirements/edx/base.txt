@@ -44,8 +44,6 @@ aniso8601==9.0.1
     # via edx-tincan-py35
 appdirs==1.4.4
     # via fs
-asgiref==3.4.1
-    # via django
 async-timeout==3.0.1
     # via aiohttp
 attrs==21.2.0
@@ -163,8 +161,9 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==3.2.8
+django==2.2.24
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-appconf
@@ -242,6 +241,8 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
+django-cookies-samesite==0.9.0
+    # via -r requirements/edx/base.in
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.in
 django-countries==7.2.1
@@ -990,6 +991,8 @@ tqdm==4.62.3
     # via nltk
 typing-extensions==3.10.0.2
     # via aiohttp
+ua-parser==0.10.0
+    # via django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in
