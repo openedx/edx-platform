@@ -446,7 +446,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 if is_request_response_mismatch and not is_request_session_mismatch:
                     log.warning(
                         (
-                            "SafeCookieData user at request '{}' does not match user in response: '{}' "
+                            "SafeCookieData user in initial request '{}' does not match user at response time: '{}' "
                             "for request path '{}'. {}"
                         ).format(  # pylint: disable=logging-format-interpolation
                             request.safe_cookie_verified_user_id, request.user.id, request.path,
@@ -457,7 +457,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 elif is_request_session_mismatch and not is_request_response_mismatch:
                     log.warning(
                         (
-                            "SafeCookieData user at request '{}' does not match user in session: '{}' "
+                            "SafeCookieData user in initial request '{}' does not match user in session: '{}' "
                             "for request path '{}'. {}"
                         ).format(  # pylint: disable=logging-format-interpolation
                             request.safe_cookie_verified_user_id, userid_in_session, request.path,
@@ -469,8 +469,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     # both session user and user in response are different than user in request
                     log.warning(
                         (
-                            "SafeCookieData user at request '{}' does not match user in session: '{}' "
-                            "or user in response: {} for request path '{}'. {}"
+                            "SafeCookieData user in initial request '{}' does not match user in session: '{}' "
+                            "or user at response time: {} for request path '{}'. {}"
                         ).format(  # pylint: disable=logging-format-interpolation
                             request.safe_cookie_verified_user_id, userid_in_session, request.user.id, request.path,
                             log_session_suffix

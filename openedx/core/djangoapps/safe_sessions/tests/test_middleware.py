@@ -220,15 +220,15 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, CacheIsolationTes
     @patch("django.core.cache.cache.set")
     @ddt.unpack
     @ddt.data(
-        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'response',
+        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'at response time',
          'change_session': True},
-        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'session',
+        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'in session',
          'change_session': True},
         {'change_response_user': True, 'change_session_user': True, 'mismatch_location': 'both',
          'change_session': True},
-        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'response',
+        {'change_response_user': True, 'change_session_user': False, 'mismatch_location': 'at response time',
          'change_session': False},
-        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'session',
+        {'change_response_user': False, 'change_session_user': True, 'mismatch_location': 'in session',
          'change_session': False},
         {'change_response_user': True, 'change_session_user': True, 'mismatch_location': 'both',
          'change_session': False},
@@ -254,7 +254,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, CacheIsolationTes
             if not mismatch_location == 'both':
                 with self.assert_logged_with_message(
                     (
-                        "SafeCookieData user at request '{}' does not match user in {}: '{}' "
+                        "SafeCookieData user in initial request '{}' does not match user {}: '{}' "
                         "for request path '{}'. {}"
                     ).format(
                         self.MOCK_USER.id, mismatch_location, new_user.id, self.request.path, log_session_suffix
@@ -266,8 +266,8 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, CacheIsolationTes
             else:
                 with self.assert_logged_with_message(
                     (
-                        "SafeCookieData user at request '{}' does not match user in session: '{}' "
-                        "or user in response: {} for request path '{}'. {}"
+                        "SafeCookieData user in initial request '{}' does not match user in session: '{}' "
+                        "or user at response time: {} for request path '{}'. {}"
                     ).format(
                         self.MOCK_USER.id, new_user.id, new_user.id, self.request.path, log_session_suffix
                     ),
@@ -412,7 +412,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
         with self.assert_logged_with_message(
             (
-                "SafeCookieData user at request '{}' does not match user in response: '{}' "
+                "SafeCookieData user in initial request '{}' does not match user at response time: '{}' "
                 "for request path '{}'. Session id has not changed"
             ).format(
                 self.user.id, self.request.user.id, self.request.path
