@@ -122,7 +122,7 @@ REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
 @transaction.non_atomic_requests
-def create_account_with_params(request, params):
+def create_account_with_params(request, params):  # pylint: disable=too-many-statements
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -168,6 +168,9 @@ def create_account_with_params(request, params):
     if is_registration_api_v1(request):
         if 'confirm_email' in extra_fields:
             del extra_fields['confirm_email']
+
+    if not settings.COLLECT_YEAR_OF_BIRTH and 'year_of_birth' in params:
+        params['year_of_birth'] = ''
 
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).

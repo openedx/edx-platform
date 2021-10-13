@@ -262,6 +262,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'enterprise_slug_login_url': get_enterprise_slug_login_url(),
             'is_enterprise_enable': enterprise_enabled(),
             'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),
+            'collect_year_of_birth': settings.COLLECT_YEAR_OF_BIRTH,
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,

@@ -336,6 +336,9 @@ class RegistrationFormFactory:
 
     def __init__(self):
 
+        if not settings.COLLECT_YEAR_OF_BIRTH and 'year_of_birth' in self.EXTRA_FIELDS:
+            self.EXTRA_FIELDS.remove('year_of_birth')
+
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
         self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
