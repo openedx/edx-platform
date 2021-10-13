@@ -25,4 +25,5 @@ pip --version
 pip install -qr requirements/edx/pip-tools.txt
 pip install -qr requirements/edx/testing.txt
 pip install -r "${DJANGO_REQUIREMENT}"
+pip freeze | grep django-ratelimit-backend
 mkdir reports
