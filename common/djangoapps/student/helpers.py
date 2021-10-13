@@ -773,7 +773,6 @@ def get_resume_urls_for_enrollments(user, enrollments):
             except UsageKeyNotInBlockStructure:
                 url_to_block = ''
             else:
-                keys = [key.block_id for key in list(block_data.get_block_keys())]
                 if block_key in block_data:
                     url_to_block = reverse(
                         'jump_to',
