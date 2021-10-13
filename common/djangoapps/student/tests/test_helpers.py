@@ -172,7 +172,7 @@ class TestResumeURLs(ModuleStoreTestCase, CompletionWaffleTestMixin):
         self.override_waffle_switch(True)
         self.course_1 = CourseFactory.create(course='resume_course_1')
         self.course_2 = CourseFactory.create(course='resume_course_2')
-        self.user = UserFactory()
+        self.user = UserFactory(username='resume_user')
         self.enrollments = [
             CourseEnrollmentFactory.create(user=self.user, course_id=self.course_1.id),
             CourseEnrollmentFactory.create(user=self.user, course_id=self.course_2.id),
