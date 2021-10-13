@@ -49,7 +49,7 @@ source $VENV_PATH/edx-venv/bin/activate
 sed -i "s|^/home/jenkins/shallow-clone|`pwd`|" -- \
     $VENV_PATH/edx-venv/lib/python*/site-packages/*.egg-link
 pip --version
-pip install pip==21.3
+pip install pip==21.2.4
 pip install -qr requirements/edx/pip-tools.txt
 pip install -qr requirements/edx/testing.txt
 pip install -qr requirements/edx/django.txt
