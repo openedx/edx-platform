@@ -53,10 +53,7 @@ appdirs==1.4.4
     #   -r requirements/edx/base.txt
     #   fs
 asgiref==3.4.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   django
-    #   uvicorn
+    # via uvicorn
 astroid==2.6.6
     # via
     #   pylint
@@ -229,6 +226,7 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -310,6 +308,7 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
+    # via -r requirements/edx/base.txt
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.txt
 django-countries==7.2.1
@@ -1325,6 +1324,10 @@ typing-extensions==3.10.0.2
     #   aiohttp
     #   gitpython
     #   pydantic
+ua-parser==0.10.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt

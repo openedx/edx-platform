@@ -16,7 +16,7 @@
 celery<5.0.0
 
 # edx-platform currently only supported for Django 2.2.x
-django<3.3
+django<2.3
 
 # Newer versions need celery >= 5.0
 django-celery-results<2.1
