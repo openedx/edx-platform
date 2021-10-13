@@ -3,6 +3,17 @@ This module defines SafeSessionMiddleware that makes use of a
 SafeCookieData that cryptographically binds the user to the session id
 in the cookie.
 
+The primary goal is to avoid and detect situations where a session is
+corrupted and the client becomes logged in as the wrong user. This
+could happen via cache corruption (which we've seen before) or a
+request handling bug. It's unlikely to happen again, but would be a
+critical issue, so we've built in some checks to make sure the user on
+the session doesn't change over the course of the session or between
+the request and response phases.
+
+The secondary goal is to improve upon Django's session handling by
+including cryptographically enforced expiration.
+
 The implementation is inspired in part by the proposal in the paper
 <http://www.cse.msu.edu/~alexliu/publications/Cookie/cookie.pdf>
 but deviates in a number of ways; mostly it just uses the technique
@@ -66,9 +77,8 @@ Custom Attributes:
 
 import inspect
 from base64 import b64encode
-from contextlib import contextmanager
 from hashlib import sha256
-from logging import ERROR, getLogger
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -278,7 +288,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         Step 4. Once the session is retrieved, verify that the user
         bound in the safe_cookie_data matches the user attached to the
-        server's session information.
+        server's session information. Otherwise, reject the request
+        (bypass the view and return an error or redirect).
 
         Step 5. If all is successful, the now verified user_id is stored
         separately in the request object so it is available for another
@@ -313,6 +324,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 if LOG_REQUEST_USER_CHANGES:
                     log_request_user_changes(request)
             else:
+                # Return an error or redirect, and don't continue to
+                # the underlying view.
                 return self._on_user_authentication_failed(request)
 
     def process_response(self, request, response):
@@ -345,13 +358,12 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 user_id_in_session = self.get_user_id_from_session(request)
-                with controlled_logging(request, log):
-                    self._verify_user(request, user_id_in_session)  # Step 2
+                self._verify_user(request, response, user_id_in_session)  # Step 2
 
-                    # Use the user_id marked in the session instead of the
-                    # one in the request in case the user is not set in the
-                    # request, for example during Anonymous API access.
-                    self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
+                # Use the user_id marked in the session instead of the
+                # one in the request in case the user is not set in the
+                # request, for example during Anonymous API access.
+                self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
 
             except SafeCookieError:
                 _mark_cookie_for_deletion(request)
@@ -378,12 +390,23 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return redirect_to_login(request.path)
 
     @staticmethod
-    def _verify_user(request, userid_in_session):
+    def _verify_user(request, response, userid_in_session):
         """
         Logs an error if the user marked at the time of process_request
         does not match either the current user in the request or the
         given userid_in_session.
         """
+        # It's expected that a small number of views may change the
+        # user over the course of the request. We have exemptions for
+        # the user changing to/from None, but the login view can
+        # sometimes change the user from one value to another between
+        # the request and response phases, specifically when the login
+        # page is used during an active session.
+        #
+        # The relevant views set a flag to indicate the exemption.
+        if getattr(response, 'safe_sessions_expected_user_change', None):
+            return
+
         if hasattr(request, 'safe_cookie_verified_user_id'):
             if hasattr(request.user, 'real_user'):
                 # If a view overrode the request.user with a masqueraded user, this will
@@ -431,6 +454,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         except KeyError:
             return None
 
+    # TODO move to test code, maybe rename, get rid of old Django compat stuff
     @staticmethod
     def set_user_id_in_session(request, user):
         """
@@ -573,28 +597,13 @@ def log_request_user_changes(request):
     request.__class__ = SafeSessionRequestWrapper
 
 
-def _is_from_logout(request):
+def mark_user_change_as_expected(response, new_user_id):
     """
-    Returns whether the request has come from logout action to see if
-    'is_from_logout' attribute is present.
-    """
-    return getattr(request, 'is_from_logout', False)
+    Indicate to the safe-sessions middleware that it is expected that
+    the user is changing between the request and response phase of
+    the current request.
 
-
-@contextmanager
-def controlled_logging(request, logger):
+    The new_user_id may be None or an LMS user ID, and may be the same
+    as the previous user ID.
     """
-    Control the logging by changing logger's level if
-    the request is from logout.
-    """
-    default_level = None
-    from_logout = _is_from_logout(request)
-    if from_logout:
-        default_level = logger.getEffectiveLevel()
-        logger.setLevel(ERROR)
-
-    try:
-        yield
-    finally:
-        if from_logout:
-            logger.setLevel(default_level)
+    response.safe_sessions_expected_user_change = {'new_user_id': new_user_id}
