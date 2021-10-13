@@ -19,7 +19,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request, CacheIsolatio
 from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes, mark_user_change_as_expected,\
-USER_MISMATCH_CACHE_KEY
+RECENT_USER_MISMATCH_CACHE_KEY
 from .test_utils import TestSafeSessionsLogMixin
 
 
@@ -87,7 +87,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, CacheIsolationTest
     def test_success(self, mock_log_request_user_changes, toggle, cache_flag, should_log):
         with patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", toggle):
             self.client.login(username=self.user.username, password='test')
-            cache.set(USER_MISMATCH_CACHE_KEY, cache_flag)
+            cache.set(RECENT_USER_MISMATCH_CACHE_KEY, cache_flag)
             session_id = self.client.session.session_key
             safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
 
@@ -171,9 +171,8 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, CacheIsolationTes
             set_request_user - If True, the user is set on the request
                 object.
             set_session_cookie - If True, a session_id is set in the
-                session cookie in the response.c
+                session cookie in the response.
         """
-        print('assert response')
         if set_request_user:
             self.request.user = self.user
             SafeSessionMiddleware.set_user_id_in_session(self.request, self.user)
@@ -411,11 +410,19 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         # But then user changes unexpectedly
         self.request.user = UserFactory.create()
 
-        with self.assert_logged_for_request_user_mismatch(self.user.id, self.request.user.id, 'warning', '/'):
+        with self.assert_logged_with_message(
+            (
+                "SafeCookieData user at request '{}' does not match user in response: '{}' "
+                "for request path '{}'. Session id has not changed"
+            ).format(
+                self.user.id, self.request.user.id, self.request.path
+            ),
+            log_level='warning',
+        ):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
-        assert response.status_code == 200
-        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-mismatch")
+            assert response.status_code == 200
+            mock_attr.assert_called_once_with("safe_sessions.user_mismatch", "request-response-mismatch")
 
     def test_no_warn_on_expected_user_change(self):
         """

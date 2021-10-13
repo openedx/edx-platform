@@ -107,7 +107,7 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
 LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
-USER_MISMATCH_CACHE_KEY = 'safe_sessions.middleware.recent_user_mismatch_detected'
+RECENT_USER_MISMATCH_CACHE_KEY = 'safe_sessions.middleware.recent_user_mismatch_detected'
 
 log = getLogger(__name__)
 
@@ -327,9 +327,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
                 request.safe_cookie_session_id = safe_cookie_data.session_id
-                if cache.get(USER_MISMATCH_CACHE_KEY, False) and LOG_REQUEST_USER_CHANGES:
+                if cache.get(RECENT_USER_MISMATCH_CACHE_KEY, False) and LOG_REQUEST_USER_CHANGES:
                     # Note: this logging will only be enabled after we have already detected a user mismatch,
-                    # so we will miss the logs for the initial request that activated the logging.
+                    #   so we will miss the logs for the initial request that activated the logging.
                     log_request_user_changes(request)
             else:
                 # Return an error or redirect, and don't continue to
@@ -417,6 +417,12 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             return
 
         if hasattr(request, 'safe_cookie_verified_user_id'):
+
+            if hasattr(request.user, 'real_user'):
+                # If a view overrode the request.user with a masqueraded user, this will
+                #   revert/clean-up that change during response processing.
+                request.user = request.user.real_user
+
             # The user at response time (and in the session) is expected to be None when the user
             # is logging out so do not treat it as a mismatch
             is_request_response_mismatch = request.safe_cookie_verified_user_id != request.user.id\
@@ -424,18 +430,12 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             is_request_session_mismatch = request.safe_cookie_verified_user_id != userid_in_session\
                 and userid_in_session is not None
 
-            if hasattr(request.user, 'real_user'):
-                # If a view overrode the request.user with a masqueraded user, this will
-                # revert/clean-up that change during response processing.
-                request.user = request.user.real_user
-
-            session_at_response = 'None'
+            session_at_response = None
             if hasattr(request, 'session') and hasattr(request.session, 'session_key'):
                 session_at_response = request.session.session_key
 
             if is_request_response_mismatch or is_request_session_mismatch:
-                if not cache.touch(USER_MISMATCH_CACHE_KEY, 300):
-                    cache.set(USER_MISMATCH_CACHE_KEY, True, 300)
+                cache.set(RECENT_USER_MISMATCH_CACHE_KEY, True, 300)
                 session_has_changed = not request.safe_cookie_session_id == session_at_response
                 # remove the stored old session id for security
                 del request.safe_cookie_session_id
@@ -443,7 +443,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 # for security, don't log the actual session id, just whether or not it changed
                 log_session_suffix = 'Session id has changed.' if session_has_changed else 'Session id has not changed'
 
-                if not is_request_session_mismatch:
+                if is_request_response_mismatch and not is_request_session_mismatch:
                     log.warning(
                         (
                             "SafeCookieData user at request '{}' does not match user in response: '{}' "
@@ -454,7 +454,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                         ),
                     )
                     set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
-                if not is_request_response_mismatch:
+                elif is_request_session_mismatch and not is_request_response_mismatch:
                     log.warning(
                         (
                             "SafeCookieData user at request '{}' does not match user in session: '{}' "
