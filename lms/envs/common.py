@@ -245,7 +245,7 @@ FEATURES = {
 
     # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to run
     # migrations if you enable this; we don't create tables by default.
-    'ENABLE_THIRD_PARTY_AUTH': False,
+    'ENABLE_THIRD_PARTY_AUTH': True,
 
     # Toggle to enable alternate urls for marketing links
     'ENABLE_MKTG_SITE': False,
