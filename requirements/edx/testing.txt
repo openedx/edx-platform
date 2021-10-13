@@ -48,6 +48,8 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
+anyio==3.3.3
+    # via starlette
 appdirs==1.4.4
     # via
     #   -r requirements/edx/base.txt
@@ -68,6 +70,7 @@ attrs==21.2.0
     #   aiohttp
     #   edx-ace
     #   openedx-events
+    #   outcome
     #   pytest
 babel==2.9.1
     # via
@@ -126,7 +129,7 @@ celery==4.4.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2021.5.30
+certifi==2021.10.8
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -141,7 +144,7 @@ chardet==4.0.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.6
+charset-normalizer==2.0.7
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -178,7 +181,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.0.1
+coverage[toml]==6.0.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -549,7 +552,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.1.1
+edx-proctoring==4.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -613,9 +616,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==9.0.0
+faker==9.3.1
     # via factory-boy
-fastapi==0.68.2
+fastapi==0.70.0
     # via pact-python
 filelock==3.3.0
     # via
@@ -666,9 +669,10 @@ httpretty==0.9.7
     #   -r requirements/edx/testing.in
 icalendar==4.0.8
     # via -r requirements/edx/base.txt
-idna==3.2
+idna==3.3
     # via
     #   -r requirements/edx/base.txt
+    #   anyio
     #   requests
     #   yarl
 importlib-metadata==4.8.1
@@ -718,7 +722,7 @@ jmespath==0.10.0
     #   -r requirements/edx/base.txt
     #   boto3
     #   botocore
-joblib==1.0.1
+joblib==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -768,7 +772,6 @@ lxml==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -835,11 +838,11 @@ multidict==5.2.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==7.0.0.166
+newrelic==7.2.1.168
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-nltk==3.6.3
+nltk==3.6.5
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -873,7 +876,7 @@ packaging==21.0
     #   py2neo
     #   pytest
     #   tox
-pact-python==1.4.4
+pact-python==1.4.5
     # via -r requirements/edx/testing.in
 pansi==2020.7.3
     # via
@@ -928,11 +931,11 @@ py==1.10.0
     #   pytest
     #   pytest-forked
     #   tox
-py2neo==2021.2.0
+py2neo==2021.2.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-pycodestyle==2.7.0
+pycodestyle==2.8.0
     # via -r requirements/edx/testing.in
 pycountry==20.7.3
     # via -r requirements/edx/base.txt
@@ -940,7 +943,7 @@ pycparser==2.20
     # via
     #   -r requirements/edx/base.txt
     #   cffi
-pycryptodomex==3.10.4
+pycryptodomex==3.11.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -1087,7 +1090,6 @@ pytz==2021.3
     # via
     #   -r requirements/edx/base.txt
     #   babel
-    #   capa
     #   celery
     #   django
     #   django-ses
@@ -1118,7 +1120,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
 redis==3.5.3
     # via -r requirements/edx/base.txt
-regex==2021.9.30
+regex==2021.10.8
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1241,6 +1243,8 @@ slumber==0.7.1
     #   edx-rest-api-client
 smmap==4.0.0
     # via gitdb
+sniffio==1.2.0
+    # via anyio
 social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -1264,9 +1268,9 @@ sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   django
-staff-graded-xblock==1.5.1
+staff-graded-xblock==1.6.0
     # via -r requirements/edx/base.txt
-starlette==0.14.2
+starlette==0.16.0
     # via fastapi
 stevedore==3.4.0
     # via
@@ -1334,7 +1338,7 @@ unicodecsv==0.14.1
     #   edx-enterprise
 unidiff==0.7.0
     # via -r requirements/edx/testing.in
-uritemplate==3.0.1
+uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt
     #   coreapi
