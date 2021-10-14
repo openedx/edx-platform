@@ -478,6 +478,7 @@ class CoursewareIndex(View):
             self.course,
             course_block_tree,
             self.chapter_url_name,
+            self.section_url_name
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -579,7 +580,7 @@ class CoursewareIndex(View):
         return section_context
 
 
-def render_accordion(request, course, table_of_contents, active_section):
+def render_accordion(request, course, table_of_contents, active_section, active_subsection):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -592,6 +593,7 @@ def render_accordion(request, course, table_of_contents, active_section):
             ('course_id', six.text_type(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('active_section', active_section),
+            ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
         ] + list(TEMPLATE_IMPORTS.items())
     )
