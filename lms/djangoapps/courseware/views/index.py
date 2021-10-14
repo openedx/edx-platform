@@ -41,6 +41,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
+    COURSE_OUTLINE_PAGE_SWITCH,
     default_course_url_name,
     RELATIVE_DATES_FLAG,
 )
@@ -452,7 +453,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'disable_accordion': not COURSE_OUTLINE_PAGE_SWITCH.is_enabled(),
             'show_search': show_search,
         }
         courseware_context.update(
