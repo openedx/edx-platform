@@ -432,7 +432,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     log.info('\n'.join(request.debug_user_changes))
 
                 session_id_changed = hasattr(request.session, 'session_key') and\
-                                     request.safe_cookie_verified_session_id != request.session.session_key
+                    request.safe_cookie_verified_session_id != request.session.session_key
                 # delete old session id for security
                 del request.safe_cookie_verified_session_id
 

@@ -362,7 +362,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         SafeSessionMiddleware.set_user_id_in_session(self.request, different_user)
         self.request.user = UserFactory.create()
         with self.assert_logged_for_both_mismatch(self.user.id, different_user.id,
-                                                                        self.request.user.id, self.request.path, False):
+                                                  self.request.user.id, self.request.path, False):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
