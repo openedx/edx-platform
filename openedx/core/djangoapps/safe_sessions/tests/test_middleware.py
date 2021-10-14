@@ -17,7 +17,7 @@ from django.test.utils import override_settings
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes
+from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes, mark_user_change_as_expected
 from .test_utils import TestSafeSessionsLogMixin
 
 
@@ -263,9 +263,9 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
                 settings.SESSION_COOKIE_NAME
             ]
 
-    def verify_success(self):
+    def set_up_for_success(self):
         """
-        Verifies success path.
+        Set up request for success path -- everything up until process_response().
         """
         self.client.login(username=self.user.username, password='test')
         self.request.user = self.user
@@ -280,6 +280,12 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
         assert self.request.safe_cookie_verified_user_id == self.user.id
         self.cookies_from_request_to_response()
+
+    def verify_success(self):
+        """
+        Verifies success path.
+        """
+        self.set_up_for_success()
 
         with self.assert_not_logged():
             response = SafeSessionMiddleware().process_response(self.request, self.client.response)
@@ -321,6 +327,41 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def test_error_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
         self.verify_error(401)
+
+    def test_warn_on_user_change(self):
+        """
+        Verifies that warnings are emitted and custom attributes set if
+        the user changes unexpectedly between request and response.
+        """
+        self.set_up_for_success()
+
+        # But then user changes unexpectedly
+        self.request.user = UserFactory.create()
+
+        with self.assert_logged_for_request_user_mismatch(self.user.id, self.request.user.id, 'warning', '/'):
+            with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
+                response = SafeSessionMiddleware().process_response(self.request, self.client.response)
+        assert response.status_code == 200
+        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-mismatch")
+
+    def test_no_warn_on_expected_user_change(self):
+        """
+        Verifies that no warnings is emitted when the user change is expected.
+        This might happen on a login, for example.
+        """
+        self.set_up_for_success()
+
+        # User changes...
+        new_user = UserFactory.create()
+        self.request.user = new_user
+        # ...but so does session, and view sets a flag to say it's OK.
+        mark_user_change_as_expected(self.client.response, new_user.id)
+
+        with self.assert_no_warning_logged():
+            with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
+                response = SafeSessionMiddleware().process_response(self.request, self.client.response)
+        assert response.status_code == 200
+        mock_attr.assert_not_called()
 
 
 @ddt.ddt
