@@ -32,3 +32,12 @@ class AboutUsForm(ModelForm):
         value = self.cleaned_data['organization']
         validate_text_for_emoji(value)
         return value
+
+
+class MarketingForm(AboutUsForm):
+
+    def __init__(self, *args, **kwargs):
+        super(MarketingForm, self).__init__(*args, **kwargs)
+        for key, field in self.fields.items():
+            self.fields[key].widget.attrs.update({'class': 'form-control',
+                                                  'placeholder': field.help_text or field.label})

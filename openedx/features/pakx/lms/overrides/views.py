@@ -43,7 +43,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
-from openedx.features.pakx.lms.overrides.forms import AboutUsForm
+from openedx.features.pakx.lms.overrides.forms import AboutUsForm, MarketingForm
 from openedx.features.pakx.lms.overrides.tasks import send_contact_us_email
 from openedx.features.pakx.lms.overrides.utils import (
     add_course_progress_to_enrolled_courses,
@@ -381,12 +381,13 @@ class AboutUsView(TemplateView):
     View for viewing and submitting contact us form.
     """
 
+    form_class = AboutUsForm
+    success_redirect = '/about_us/'
+    template_name = 'overrides/about_us.html'
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.initial_data = {}
-
-    template_name = 'overrides/about_us.html'
-    success_redirect = '/about_us/'
 
     def populate_form_initial_data(self, user=None):
         if user:
@@ -404,8 +405,7 @@ class AboutUsView(TemplateView):
         context['custom_fields'] = settings.ZENDESK_CUSTOM_FIELDS
 
         self.populate_form_initial_data(user)
-
-        context['form'] = AboutUsForm(initial=self.initial_data)
+        context['form'] = self.form_class(initial=self.initial_data)
         return context
 
     def get(self, request):
@@ -417,8 +417,7 @@ class AboutUsView(TemplateView):
 
     def post(self, request):
         form_data = request.POST.copy()
-
-        form = AboutUsForm(form_data)
+        form = self.form_class(form_data)
         if form.is_valid():
             instance = form.save(commit=False)
             if request.user.is_authenticated:
@@ -446,8 +445,9 @@ class PartnerWithUsView(AboutUsView):
     """
     View for partner-with-us page.
     """
-    template_name = "overrides/partner_with_us.html"
+
     success_redirect = '/partner-with-us/'
+    template_name = "overrides/partner_with_us.html"
 
 
 class BusinessView(AboutUsView):
@@ -466,6 +466,8 @@ class MarketingCampaignPage(AboutUsView):
     """
     View for business page.
     """
+
+    form_class = MarketingForm
     template_name = 'overrides/marketing_campaign.html'
     success_redirect = '/workplace-harassment/#get-started'
 
