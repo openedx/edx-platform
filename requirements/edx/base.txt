@@ -98,7 +98,7 @@ celery==4.4.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2021.5.30
+certifi==2021.10.8
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -110,7 +110,7 @@ chardet==4.0.0
     # via
     #   aiohttp
     #   pysrt
-charset-normalizer==2.0.6
+charset-normalizer==2.0.7
     # via
     #   -r requirements/edx/paver.txt
     #   requests
@@ -545,7 +545,7 @@ html5lib==1.1
     #   ora2
 icalendar==4.0.8
     # via -r requirements/edx/base.in
-idna==3.2
+idna==3.3
     # via
     #   -r requirements/edx/paver.txt
     #   requests
@@ -568,7 +568,7 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-joblib==1.0.1
+joblib==1.1.0
     # via nltk
 jsondiff==1.3.0
     # via edx-enterprise
@@ -605,7 +605,6 @@ lxml==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -660,11 +659,11 @@ multidict==5.2.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.in
-newrelic==7.0.0.166
+newrelic==7.2.1.168
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
-nltk==3.6.3
+nltk==3.6.5
     # via
     #   -r requirements/edx/base.in
     #   chem
@@ -726,7 +725,7 @@ psutil==5.8.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
-py2neo==2021.2.0
+py2neo==2021.2.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -734,7 +733,7 @@ pycountry==20.7.3
     # via -r requirements/edx/base.in
 pycparser==2.20
     # via cffi
-pycryptodomex==3.10.4
+pycryptodomex==3.11.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -819,7 +818,6 @@ pytz==2021.3
     # via
     #   -r requirements/edx/base.in
     #   babel
-    #   capa
     #   celery
     #   django
     #   django-ses
@@ -850,7 +848,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==3.5.3
     # via -r requirements/edx/base.in
-regex==2021.9.30
+regex==2021.10.8
     # via nltk
 requests==2.26.0
     # via
@@ -962,7 +960,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.in
     #   django
-staff-graded-xblock==1.5.1
+staff-graded-xblock==1.6.0
     # via -r requirements/edx/base.in
 stevedore==3.4.0
     # via
@@ -997,7 +995,7 @@ unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
-uritemplate==3.0.1
+uritemplate==4.1.1
     # via
     #   coreapi
     #   drf-yasg
