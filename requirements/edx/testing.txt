@@ -55,7 +55,10 @@ appdirs==1.4.4
     #   -r requirements/edx/base.txt
     #   fs
 asgiref==3.4.1
-    # via uvicorn
+    # via
+    #   -r requirements/edx/base.txt
+    #   django
+    #   uvicorn
 astroid==2.6.6
     # via
     #   pylint
@@ -135,7 +138,7 @@ certifi==2021.10.8
     #   elasticsearch
     #   py2neo
     #   requests
-cffi==1.14.6
+cffi==1.15.0
     # via
     #   -r requirements/edx/base.txt
     #   cryptography
@@ -229,7 +232,6 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -311,7 +313,6 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-    # via -r requirements/edx/base.txt
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.txt
 django-countries==7.2.1
@@ -348,7 +349,7 @@ django-js-asset==1.2.2
     #   django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/base.txt
-django-model-utils==4.1.1
+django-model-utils==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   django-user-tasks
@@ -687,7 +688,7 @@ inflection==0.5.1
     #   drf-yasg
 iniconfig==1.1.1
     # via pytest
-interchange==2021.0.3
+interchange==2021.0.4
     # via
     #   -r requirements/edx/base.txt
     #   py2neo
@@ -931,7 +932,7 @@ py==1.10.0
     #   pytest
     #   pytest-forked
     #   tox
-py2neo==2021.2.1
+py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1107,7 +1108,7 @@ pytz==2021.3
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.txt
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1328,10 +1329,6 @@ typing-extensions==3.10.0.2
     #   aiohttp
     #   gitpython
     #   pydantic
-ua-parser==0.10.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt
