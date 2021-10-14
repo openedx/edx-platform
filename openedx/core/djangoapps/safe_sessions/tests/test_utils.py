@@ -1,8 +1,7 @@
 """
 Shared test utilities for Safe Sessions tests
 """
-
-
+import pytest
 from contextlib import contextmanager
 from unittest.mock import patch
 
@@ -22,6 +21,16 @@ class TestSafeSessionsLogMixin:
             yield
             assert mock_log.called
             self.assertRegex(mock_log.call_args_list[0][0][0], log_string)
+
+    @contextmanager
+    def assert_regex_not_logged(self, log_string, log_level='error'):
+        """
+        Asserts that the logger was called with the given
+        log_level and with a regex of the given string.
+        """
+        with pytest.raises(AssertionError):
+            with self.assert_logged(log_string, log_level=log_level):
+                yield
 
     @contextmanager
     def assert_logged_with_message(self, log_string, log_level='error'):
@@ -147,6 +156,26 @@ class TestSafeSessionsLogMixin:
                 "for request path '{}'. {}"
             ).format(
                 user_at_request, user_in_session, request_path, session_suffix
+            ),
+            log_level='warning',
+        ):
+            yield
+
+    @contextmanager
+    def assert_logged_for_both_mismatch(self, user_at_request, user_in_session, user_at_response, request_path,
+                                        session_changed):
+        """
+        Asserts that warning was logged when request.user
+        was not equal to user at session
+        """
+        session_suffix = 'Session changed.' if session_changed else 'Session did not change.'
+
+        with self.assert_logged_with_message(
+            (
+                "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
+                "or user at response time: '{}' for request path '{}'. {}"
+            ).format(
+                user_at_request, user_in_session, user_at_response, request_path, session_suffix
             ),
             log_level='warning',
         ):

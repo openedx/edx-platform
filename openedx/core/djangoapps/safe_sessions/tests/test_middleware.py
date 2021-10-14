@@ -150,35 +150,6 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
 
-    def set_up_for_success(self):
-        """
-        Set up request for success path -- everything up until process_response().
-        """
-        self.client.login(username=self.user.username, password='test')
-        self.request.user = self.user
-
-        session_id = self.client.session.session_key
-        safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
-        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
-
-        with self.assert_not_logged():
-            response = SafeSessionMiddleware().process_request(self.request)
-        assert response is None
-
-        assert self.request.safe_cookie_verified_user_id == self.user.id
-        assert self.request.safe_cookie_verified_session_id == session_id
-        self.cookies_from_request_to_response()
-
-    def cookies_from_request_to_response(self):
-        """
-        Transfers the cookies from the request object to the response
-        object.
-        """
-        if self.request.COOKIES.get(settings.SESSION_COOKIE_NAME):
-            self.client.response.cookies[settings.SESSION_COOKIE_NAME] = self.request.COOKIES[
-                settings.SESSION_COOKIE_NAME
-            ]
-
     def assert_response(self, set_request_user=False, set_session_cookie=False):
         """
         Calls SafeSessionMiddleware.process_response and verifies
@@ -221,18 +192,11 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         with self.assert_not_logged():
             self.assert_response(set_request_user=True, set_session_cookie=True)
 
+    # error case is tested in TestSafeSessionMiddleware since it requires more setup
     def test_confirm_user_at_step_2(self):
         self.request.safe_cookie_verified_user_id = self.user.id
         with self.assert_not_logged():
             self.assert_response(set_request_user=True, set_session_cookie=True)
-
-    def test_different_user_in_session_step_2_error(self):
-        self.set_up_for_success()
-        different_user = UserFactory()
-        SafeSessionMiddleware.set_user_id_in_session(self.request, different_user)
-        with self.assert_logged_for_session_user_mismatch(self.user.id, different_user.id, self.request.path,
-                                                          False):
-            self.assert_response(set_request_user=False, set_session_cookie=True)
 
     def test_anonymous_user(self):
         self.request.safe_cookie_verified_user_id = self.user.id
@@ -357,7 +321,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
         self.verify_error(401)
 
-    def test_warn_on_user_change(self):
+    def test_warn_on_user_change_before_response(self):
         """
         Verifies that warnings are emitted and custom attributes set if
         the user changes unexpectedly between request and response.
@@ -372,6 +336,51 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
         mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-mismatch")
+
+    def test_warn_on_user_change_from_session(self):
+        """
+        Verifies that warnings are emitted and custom attributes set if
+        the user in the request does not match the user in the session.
+        """
+        self.set_up_for_success()
+        different_user = UserFactory()
+        SafeSessionMiddleware.set_user_id_in_session(self.request, different_user)
+        with self.assert_logged_for_session_user_mismatch(self.user.id, different_user.id, self.request.path,
+                                                          False):
+            with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
+                response = SafeSessionMiddleware().process_response(self.request, self.client.response)
+        assert response.status_code == 200
+        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-session-mismatch")
+
+    def test_warn_on_user_change_in_both(self):
+        """
+        Verifies that warnings are emitted and custom attributes set if
+        the user in the initial request does not match the user at response time or the user in the session.
+        """
+        self.set_up_for_success()
+        different_user = UserFactory()
+        SafeSessionMiddleware.set_user_id_in_session(self.request, different_user)
+        self.request.user = UserFactory.create()
+        with self.assert_logged_for_both_mismatch(self.user.id, different_user.id,
+                                                                        self.request.user.id, self.request.path, False):
+            with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
+                response = SafeSessionMiddleware().process_response(self.request, self.client.response)
+        assert response.status_code == 200
+        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-and-session-mismatch")
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
+    def test_warn_with_verbose_logging(self):
+        self.set_up_for_success()
+        self.request.user = UserFactory.create()
+        with self.assert_logged('SafeCookieData: Changing request user. ', log_level='info'):
+            SafeSessionMiddleware().process_response(self.request, self.client.response)
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", False)
+    def test_warn_without_verbose_logging(self):
+        self.set_up_for_success()
+        self.request.user = UserFactory.create()
+        with self.assert_regex_not_logged('SafeCookieData: Changing request user. ', log_level='info'):
+            SafeSessionMiddleware().process_response(self.request, self.client.response)
 
     def test_no_warn_on_expected_user_change(self):
         """
@@ -408,7 +417,7 @@ class TestTrackRequestUserChanges(TestCase):
         track_request_user_changes(request)
         request.user = UserFactory.create()
 
-        assert "Setting for the first time" in request.user_changes[0]
+        assert "Setting for the first time" in request.debug_user_changes[0]
 
     def test_user_change_logging(self):
         request = get_mock_request()
@@ -420,19 +429,19 @@ class TestTrackRequestUserChanges(TestCase):
 
         # Verify that we don't log if set to same as current value.
         request.user = original_user
-        assert len(request.user_changes) == 0
+        assert len(request.debug_user_changes) == 0
 
         # Verify logging on change.
         request.user = new_user
-        assert len(request.user_changes) == 1
-        assert f"Changing request user. Originally {original_user.id!r}" in request.user_changes[0]
-        assert f"will become {new_user.id!r}" in request.user_changes[0]
+        assert len(request.debug_user_changes) == 1
+        assert f"Changing request user. Originally {original_user.id!r}" in request.debug_user_changes[0]
+        assert f"will become {new_user.id!r}" in request.debug_user_changes[0]
 
         # Verify change back logged.
         request.user = original_user
-        assert len(request.user_changes) == 2
+        assert len(request.debug_user_changes) == 2
         expected_msg = f"Originally {original_user.id!r}, now {new_user.id!r} and will become {original_user.id!r}"
-        assert expected_msg in request.user_changes[1]
+        assert expected_msg in request.debug_user_changes[1]
 
     def test_user_change_with_no_ids(self):
         request = get_mock_request()
@@ -440,8 +449,8 @@ class TestTrackRequestUserChanges(TestCase):
 
         track_request_user_changes(request)
         request.user = object()
-        assert "Setting for the first time, but user has no id" in request.user_changes[0]
+        assert "Setting for the first time, but user has no id" in request.debug_user_changes[0]
 
         request.user = object()
-        assert len(request.user_changes) == 2
-        assert "Changing request user but user has no id." in request.user_changes[1]
+        assert len(request.debug_user_changes) == 2
+        assert "Changing request user but user has no id." in request.debug_user_changes[1]
