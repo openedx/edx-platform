@@ -429,8 +429,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if request_user_object_mismatch or session_user_mismatch:
                 # Log accumulated information stored on request for each change of user
                 if hasattr(request, 'debug_user_changes'):
-                    log.warn('An unsafe user transition was found. It either needs to be fixed or exempted.\n'
-                             + '\n'.join(request.debug_user_changes))
+                    log.warning('An unsafe user transition was found. It either needs to be fixed or exempted.\n {}'
+                             .format('\n'.join(request.debug_user_changes)))
 
                 session_id_changed = hasattr(request.session, 'session_key') and\
                     request.safe_cookie_verified_session_id != request.session.session_key
