@@ -15,8 +15,8 @@
 # celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
 celery<5.0.0
 
-# edx-platform currently only supported for Django 2.2.x
-django<2.3
+# edx-platform currently only supported for Django 3.2.x
+django<3.3
 
 # Newer versions need celery >= 5.0
 django-celery-results<2.1

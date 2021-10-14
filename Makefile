@@ -106,6 +106,8 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	# This is a temporary solution to override the real common_constraints.txt
 	# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
 	# See BOM-2721 for more details.
+	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
@@ -120,17 +122,6 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	# Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
-	mv requirements/edx/testing.tmp requirements/edx/testing.txt
-
-	# to avoid multiple entries remove it from django and django30 first and add later.
-	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django.txt
-	sed -i '/^[dD]jango-cookies-samesite==/d' requirements/edx/django30.txt
-	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django.txt
-	grep -e "^django-cookies-samesite==" requirements/edx/base.txt >> requirements/edx/django30.txt
-
-	# removing django-cookies-samesite from all testing.txt file. It is not require for django32.
-	# at the time of django32 final upgrade job remove this package from base.in
-	sed '/^[dD]jango-cookies-samesite==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
 upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
