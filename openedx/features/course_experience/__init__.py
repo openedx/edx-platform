@@ -7,7 +7,9 @@ from django.utils.translation import ugettext as _
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import ( 
+    CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+)
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
