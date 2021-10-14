@@ -44,6 +44,8 @@ aniso8601==9.0.1
     # via edx-tincan-py35
 appdirs==1.4.4
     # via fs
+asgiref==3.4.1
+    # via django
 async-timeout==3.0.1
     # via aiohttp
 attrs==21.2.0
@@ -104,7 +106,7 @@ certifi==2021.10.8
     #   elasticsearch
     #   py2neo
     #   requests
-cffi==1.14.6
+cffi==1.15.0
     # via cryptography
 chardet==4.0.0
     # via
@@ -161,9 +163,8 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==2.2.24
+django==3.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-appconf
@@ -241,8 +242,6 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cookies-samesite==0.9.0
-    # via -r requirements/edx/base.in
 django-cors-headers==3.10.0
     # via -r requirements/edx/base.in
 django-countries==7.2.1
@@ -277,7 +276,7 @@ django-js-asset==1.2.2
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/base.in
-django-model-utils==4.1.1
+django-model-utils==4.2.0
     # via
     #   -r requirements/edx/base.in
     #   django-user-tasks
@@ -552,7 +551,7 @@ idna==3.3
     #   yarl
 inflection==0.5.1
     # via drf-yasg
-interchange==2021.0.3
+interchange==2021.0.4
     # via py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.in
@@ -725,7 +724,7 @@ psutil==5.8.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
-py2neo==2021.2.1
+py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -835,7 +834,7 @@ pytz==2021.3
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.in
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   -r requirements/edx/base.in
     #   code-annotations
@@ -989,8 +988,6 @@ tqdm==4.62.3
     # via nltk
 typing-extensions==3.10.0.2
     # via aiohttp
-ua-parser==0.10.0
-    # via django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in

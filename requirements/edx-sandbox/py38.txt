@@ -8,7 +8,7 @@ common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
 common/lib/symmath
     # via -r requirements/edx-sandbox/py38.in
-cffi==1.14.6
+cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
