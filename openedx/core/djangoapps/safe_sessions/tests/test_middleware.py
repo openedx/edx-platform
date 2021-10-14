@@ -372,14 +372,14 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def test_warn_with_verbose_logging(self):
         self.set_up_for_success()
         self.request.user = UserFactory.create()
-        with self.assert_logged('SafeCookieData: Changing request user. ', log_level='info'):
+        with self.assert_logged('SafeCookieData: Changing request user. ', log_level='warn'):
             SafeSessionMiddleware().process_response(self.request, self.client.response)
 
     @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", False)
     def test_warn_without_verbose_logging(self):
         self.set_up_for_success()
         self.request.user = UserFactory.create()
-        with self.assert_regex_not_logged('SafeCookieData: Changing request user. ', log_level='info'):
+        with self.assert_regex_not_logged('SafeCookieData: Changing request user. ', log_level='warn'):
             SafeSessionMiddleware().process_response(self.request, self.client.response)
 
     def test_no_warn_on_expected_user_change(self):

@@ -23,9 +23,9 @@ class TestSafeSessionsLogMixin:
             self.assertRegex(mock_log.call_args_list[0][0][0], log_string)
 
     @contextmanager
-    def assert_regex_not_logged(self, log_string, log_level='error'):
+    def assert_regex_not_logged(self, log_string, log_level):
         """
-        Asserts that the logger was called with the given
+        Asserts that the logger was not called with the given
         log_level and with a regex of the given string.
         """
         with pytest.raises(AssertionError):
@@ -172,8 +172,8 @@ class TestSafeSessionsLogMixin:
 
         with self.assert_logged_with_message(
             (
-                "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
-                "or user at response time: '{}' for request path '{}'. {}"
+                "SafeCookieData user at initial request '{}' matches neither user in session: '{}' "
+                "nor user at response time: '{}' for request path '{}'. {}"
             ).format(
                 user_at_request, user_in_session, user_at_response, request_path, session_suffix
             ),

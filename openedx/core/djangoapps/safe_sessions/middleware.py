@@ -429,7 +429,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if request_user_object_mismatch or session_user_mismatch:
                 # Log accumulated information stored on request for each change of user
                 if hasattr(request, 'debug_user_changes'):
-                    log.info('\n'.join(request.debug_user_changes))
+                    log.warn('An unsafe user transition was found. It either needs to be fixed or exempted.\n'
+                             + '\n'.join(request.debug_user_changes))
 
                 session_id_changed = hasattr(request.session, 'session_key') and\
                     request.safe_cookie_verified_session_id != request.session.session_key
@@ -461,8 +462,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 else:
                     log.warning(
                         (
-                            "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
-                            "or user at response time: '{}' for request path '{}'. {}"
+                            "SafeCookieData user at initial request '{}' matches neither user in session: '{}' "
+                            "nor user at response time: '{}' for request path '{}'. {}"
                         ).format(  # pylint: disable=logging-format-interpolation
                             request.safe_cookie_verified_user_id, userid_in_session, request.user.id, request.path,
                             log_suffix
