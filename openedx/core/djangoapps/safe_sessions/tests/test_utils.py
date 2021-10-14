@@ -115,34 +115,38 @@ class TestSafeSessionsLogMixin:
             yield
 
     @contextmanager
-    def assert_logged_for_request_user_mismatch(self, user_at_request, user_at_response, log_level, request_path):
+    def assert_logged_for_request_user_mismatch(self, user_at_request, user_at_response, log_level, request_path,
+                                                session_changed):
         """
         Asserts that warning was logged when request.user
         was not equal to user at response
         """
+        session_suffix = 'Session changed.' if session_changed else 'Session did not change.'
         with self.assert_logged_with_message(
             (
-                "SafeCookieData user at request '{}' does not match user at response: '{}' "
-                "for request path '{}'"
+                "SafeCookieData user at initial request '{}' does not match user at response time: '{}' "
+                "for request path '{}'. {}"
             ).format(
-                user_at_request, user_at_response, request_path
+                user_at_request, user_at_response, request_path, session_suffix
             ),
             log_level=log_level,
         ):
             yield
 
     @contextmanager
-    def assert_logged_for_session_user_mismatch(self, user_at_request, user_in_session, request_path):
+    def assert_logged_for_session_user_mismatch(self, user_at_request, user_in_session, request_path, session_changed):
         """
         Asserts that warning was logged when request.user
         was not equal to user at session
         """
+        session_suffix = 'Session changed.' if session_changed else 'Session did not change.'
+
         with self.assert_logged_with_message(
             (
-                "SafeCookieData user at request '{}' does not match user in session: '{}' "
-                "for request path '{}'"
+                "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
+                "for request path '{}'. {}"
             ).format(
-                user_at_request, user_in_session, request_path
+                user_at_request, user_in_session, request_path, session_suffix
             ),
             log_level='warning',
         ):
