@@ -17,7 +17,7 @@ class CatalogIntegration(ConfigurationModel):
     .. no_pii:
     """
     API_NAME = 'catalog'
-    CACHE_KEY = 'catalog.api.data'
+    CACHE_KEY = 'catalog.api.v1.data'
 
     # TODO Replace all usages of this field with a call to get_internal_api_url().
     internal_api_url = models.URLField(
