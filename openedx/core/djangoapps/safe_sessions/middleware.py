@@ -411,8 +411,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         # page is used during an active session.
         #
         # The relevant views set a flag to indicate the exemption.
-       # if getattr(response, 'safe_sessions_expected_user_change', None):
-        #   return
+        if getattr(response, 'safe_sessions_expected_user_change', None):
+            return
 
         if hasattr(request, 'safe_cookie_verified_user_id'):
             if hasattr(request.user, 'real_user'):
