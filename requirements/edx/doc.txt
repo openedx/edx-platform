@@ -50,7 +50,7 @@ python-slugify==4.0.1
     #   code-annotations
 pytz==2021.3
     # via babel
-pyyaml==5.4.1
+pyyaml==6.0
     # via code-annotations
 requests==2.26.0
     # via sphinx
