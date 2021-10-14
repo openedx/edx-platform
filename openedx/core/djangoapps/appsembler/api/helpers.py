@@ -1,3 +1,5 @@
+import beeline
+
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.appsembler.api.v1.mixins import TahoeAuthMixin
@@ -21,6 +23,7 @@ def as_course_key(course_id):
             type(course_id)))
 
 
+@beeline.traced(name='appsembler.skip_registration_email_for_registration_api')
 def skip_registration_email_for_registration_api(request):
     """
     Helper to check if the Registration API caller has requested email to be skipped.
@@ -32,5 +35,6 @@ def skip_registration_email_for_registration_api(request):
     if request and request.method == 'POST':
         # TODO: RED-1647 add TahoeAuthMixin permission checks
         skip_email = not request.POST.get('send_activation_email', True)
+        beeline.add_context_field('appsembler__skip_email', skip_email)
 
     return skip_email
