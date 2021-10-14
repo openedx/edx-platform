@@ -1439,6 +1439,7 @@ class CourseEnrollment(models.Model):
                 CourseEnrollmentState(self.mode, self.is_active),
             )
 
+            # .. event_implemented_name: COURSE_ENROLLMENT_CHANGED
             COURSE_ENROLLMENT_CHANGED.send_event(
                 enrollment=CourseEnrollmentData(
                     user=UserData(
@@ -1465,6 +1466,7 @@ class CourseEnrollment(models.Model):
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
                 self.send_signal(EnrollStatusChange.unenroll)
 
+                # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
                 COURSE_UNENROLLMENT_COMPLETED.send_event(
                     enrollment=CourseEnrollmentData(
                         user=UserData(
@@ -1671,7 +1673,7 @@ class CourseEnrollment(models.Model):
         enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
         enrollment.send_signal(EnrollStatusChange.enroll)
 
-        # Announce user's enrollment
+        # .. event_implemented_name: COURSE_ENROLLMENT_CREATED
         COURSE_ENROLLMENT_CREATED.send_event(
             enrollment=CourseEnrollmentData(
                 user=UserData(

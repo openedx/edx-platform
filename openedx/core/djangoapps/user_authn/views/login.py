@@ -303,7 +303,7 @@ def _handle_successful_authentication_and_login(user, request):
         request.session.set_expiry(604800 * 4)
         log.debug("Setting user session expiry to 4 weeks")
 
-        # Announce user's login
+        # .. event_implemented_name: SESSION_LOGIN_COMPLETED
         SESSION_LOGIN_COMPLETED.send_event(
             user=UserData(
                 pii=UserPersonalData(
