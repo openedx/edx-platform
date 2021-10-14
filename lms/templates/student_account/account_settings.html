@@ -48,6 +48,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         extendedProfileFields = ${ extended_profile_fields | n, dump_js_escaped_json },
         displayAccountDeletion = ${ enable_account_deletion | n, dump_js_escaped_json};
         isSecondaryEmailFeatureEnabled = ${ bool(is_secondary_email_feature_enabled()) | n, dump_js_escaped_json },
+        collectYearOfBirth = ${ bool(collect_year_of_birth) | n, dump_js_escaped_json },
 
     AccountSettingsFactory(
         fieldsData,
@@ -61,6 +62,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         platformName,
         contactEmail,
         allowEmailChange,
+        collectYearOfBirth,
         socialPlatforms,
 
         syncLearnerProfileData,
