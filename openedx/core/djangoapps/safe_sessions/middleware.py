@@ -421,10 +421,12 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 request.user = request.user.real_user
 
             # determine if the request.user is different now than it was on the initial request
-            request_user_object_mismatch = request.safe_cookie_verified_user_id != request.user.id
+            request_user_object_mismatch = request.safe_cookie_verified_user_id != request.user.id and\
+                request.user.id is not None
 
             # determine if the current session user is different than the user in the initial request
-            session_user_mismatch = request.safe_cookie_verified_user_id != userid_in_session
+            session_user_mismatch = request.safe_cookie_verified_user_id != userid_in_session and\
+                userid_in_session is not None
 
             if request_user_object_mismatch or session_user_mismatch:
                 # Log accumulated information stored on request for each change of user
