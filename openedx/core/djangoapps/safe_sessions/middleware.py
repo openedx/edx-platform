@@ -96,9 +96,13 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_name: LOG_REQUEST_USER_CHANGES
 # .. toggle_implementation: SettingToggle
 # .. toggle_default: False
-# .. toggle_description: Turn this toggle on to log anytime the `user` attribute of the request object gets
-#   changed.  This will also log the location where the change is coming from to quickly find issues.
-# .. toggle_warnings: This logging will be very verbose and so should probably not be left on all the time.
+# .. toggle_description: Turn this toggle on to provide additional debugging information in the case of a user
+#      verification error. It will track anytime the `user` attribute of a request object is changed and store this
+#      information on the request. This will also track the location where the change is coming from to quickly find
+#      issues. If user verification fails at response time, all of the information about these
+#      changes will be logged.
+# .. toggle_warnings: Adds some processing overhead to all requests to gather debug info. Will also double the logging
+#      for failed verification checks.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
@@ -316,13 +320,16 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             # return the response.
             return process_request_response
 
+        # Note: request.session.get(SESSION_KEY) and request.session.session_key are different things. The former
+        #   contains the session user, the latter is the session id
         if cookie_data_string and request.session.get(SESSION_KEY):
 
             user_id = self.get_user_id_from_session(request)
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
+                request.safe_cookie_verified_session_id = request.session.session_key
                 if LOG_REQUEST_USER_CHANGES:
-                    log_request_user_changes(request)
+                    track_request_user_changes(request)
             else:
                 # Return an error or redirect, and don't continue to
                 # the underlying view.
@@ -412,30 +419,57 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 # If a view overrode the request.user with a masqueraded user, this will
                 #   revert/clean-up that change during response processing.
                 request.user = request.user.real_user
-            # The user at response time is expected to be None when the user
-            # is logging out.  We won't log that.
-            if request.safe_cookie_verified_user_id != request.user.id and request.user.id is not None:
-                log.warning(
-                    (
-                        "SafeCookieData user at request '{}' does not match user at response: '{}' "
-                        "for request path '{}'"
-                    ).format(  # pylint: disable=logging-format-interpolation
-                        request.safe_cookie_verified_user_id, request.user.id, request.path,
-                    ),
-                )
-                set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
-            # The user session at response time is expected to be None when the user
-            # is logging out.  We won't log that.
-            if request.safe_cookie_verified_user_id != userid_in_session and userid_in_session is not None:
-                log.warning(
-                    (
-                        "SafeCookieData user at request '{}' does not match user in session: '{}' "
-                        "for request path '{}'"
-                    ).format(  # pylint: disable=logging-format-interpolation
-                        request.safe_cookie_verified_user_id, userid_in_session, request.path,
-                    ),
-                )
-                set_custom_attribute("safe_sessions.user_mismatch", "request-session-mismatch")
+
+            # determine if the request.user is different now than it was on the initial request
+            request_user_object_mismatch = request.safe_cookie_verified_user_id != request.user.id
+
+            # determine if the current session user is different than the user in the initial request
+            session_user_mismatch = request.safe_cookie_verified_user_id != userid_in_session
+
+            if request_user_object_mismatch or session_user_mismatch:
+                # Log accumulated information stored on request for each change of user
+                if hasattr(request, 'debug_user_changes'):
+                    log.warning('An unsafe user transition was found. It either needs to be fixed or exempted.\n {}'
+                                .format('\n'.join(request.debug_user_changes)))
+
+                session_id_changed = hasattr(request.session, 'session_key') and\
+                    request.safe_cookie_verified_session_id != request.session.session_key
+                # delete old session id for security
+                del request.safe_cookie_verified_session_id
+
+                log_suffix = 'Session changed.' if session_id_changed else 'Session did not change.'
+
+                if request_user_object_mismatch and not session_user_mismatch:
+                    log.warning(
+                        (
+                            "SafeCookieData user at initial request '{}' does not match user at response time: '{}' "
+                            "for request path '{}'. {}"
+                        ).format(  # pylint: disable=logging-format-interpolation
+                            request.safe_cookie_verified_user_id, request.user.id, request.path, log_suffix
+                        ),
+                    )
+                    set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
+                elif session_user_mismatch and not request_user_object_mismatch:
+                    log.warning(
+                        (
+                            "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
+                            "for request path '{}'. {}"
+                        ).format(  # pylint: disable=logging-format-interpolation
+                            request.safe_cookie_verified_user_id, userid_in_session, request.path, log_suffix
+                        ),
+                    )
+                    set_custom_attribute("safe_sessions.user_mismatch", "request-session-mismatch")
+                else:
+                    log.warning(
+                        (
+                            "SafeCookieData user at initial request '{}' matches neither user in session: '{}' "
+                            "nor user at response time: '{}' for request path '{}'. {}"
+                        ).format(  # pylint: disable=logging-format-interpolation
+                            request.safe_cookie_verified_user_id, userid_in_session, request.user.id, request.path,
+                            log_suffix
+                        ),
+                    )
+                    set_custom_attribute("safe_sessions.user_mismatch", "request-response-and-session-mismatch")
 
     @staticmethod
     def get_user_id_from_session(request):
@@ -542,12 +576,12 @@ def _delete_cookie(request, response):
         )
 
 
-def log_request_user_changes(request):
+def track_request_user_changes(request):
     """
-    Instrument the request object so that we log changes to the `user` attribute. This is done by
-    changing the `__class__` attribute of the request object to point to a new class we created
-    on the fly which is exactly the same as the underlying request class but with an override for
-    the `__setattr__` function to catch the attribute chages.
+    Instrument the request object so that we store changes to the `user` attribute for future logging
+    if needed for debugging user mismatches. This is done by changing the `__class__` attribute of the request
+    object to point to a new class we created on the fly which is exactly the same as the underlying request class but
+    with an override for the `__setattr__` function to catch the attribute changes.
     """
     original_user = getattr(request, 'user', None)
 
@@ -563,28 +597,31 @@ def log_request_user_changes(request):
                 # Written this way in case you need more of the stack for debugging.
                 location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:12])
 
+                if not hasattr(self, 'debug_user_changes'):
+                    self.debug_user_changes = []  # pylint: disable=attribute-defined-outside-init
+
                 if not hasattr(request, name):
                     original_user = value
                     if hasattr(value, 'id'):
-                        log.info(
+                        self.debug_user_changes.append(
                             f"SafeCookieData: Setting for the first time: {value.id!r}\n"
                             f"{location}"
                         )
                     else:
-                        log.info(
+                        self.debug_user_changes.append(
                             f"SafeCookieData: Setting for the first time, but user has no id: {value!r}\n"
                             f"{location}"
                         )
                 elif value != getattr(request, name):
                     current_user = getattr(request, name)
                     if hasattr(value, 'id'):
-                        log.info(
+                        self.debug_user_changes.append(
                             f"SafeCookieData: Changing request user. "
                             f"Originally {original_user.id!r}, now {current_user.id!r} and will become {value.id!r}\n"
                             f"{location}"
                         )
                     else:
-                        log.info(
+                        self.debug_user_changes.append(
                             f"SafeCookieData: Changing request user but user has no id. "
                             f"Originally {original_user!r}, now {current_user!r} and will become {value!r}\n"
                             f"{location}"
