@@ -374,6 +374,7 @@ class RegistrationFormFactory(object):
             HttpResponse
         """
         form_desc = FormDescription("post", reverse("user_api_registration"))
+        form_desc._field_overrides['country']['defaultValue'] = "PK"
         self._apply_third_party_auth_overrides(request, form_desc)
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
@@ -900,9 +901,8 @@ class RegistrationFormFactory(object):
             "country",
             label=country_label,
             instructions=country_instructions,
-            field_type="select",
+            field_type="hidden",
             options=list(countries),
-            include_default_option=True,
             required=required,
             error_messages={
                 "required": error_msg
