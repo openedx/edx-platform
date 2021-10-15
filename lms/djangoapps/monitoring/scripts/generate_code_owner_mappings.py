@@ -38,6 +38,7 @@ EDX_REPO_APPS = {
     'super_csv': 'https://github.com/edx/super-csv',
     'wiki': 'https://github.com/edx/django-wiki',
     'lti_consumer': 'https://github.com/edx/xblock-lti-consumer',
+    'notices': 'https://github.com/edx/platform-plugin-notices',
 }
 
 # Maps edx-platform installed Django apps to the third-party repo that contains
