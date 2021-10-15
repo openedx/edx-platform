@@ -589,7 +589,6 @@ def track_request_user_changes(request):
         """
         A wrapper class for the request object.
         """
-        debug_user_changes = []
 
         def __setattr__(self, name, value):
             nonlocal original_user
@@ -597,6 +596,9 @@ def track_request_user_changes(request):
                 stack = inspect.stack()
                 # Written this way in case you need more of the stack for debugging.
                 location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:12])
+
+                if not hasattr(self, 'debug_user_changes'):
+                    self.debug_user_changes = []
 
                 if not hasattr(request, name):
                     original_user = value
