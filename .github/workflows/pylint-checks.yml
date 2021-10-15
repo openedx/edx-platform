@@ -1,4 +1,4 @@
-name: CI
+name: Pylint checks
 
 on:
   pull_request:
