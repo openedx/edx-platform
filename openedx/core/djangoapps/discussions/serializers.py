@@ -203,7 +203,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         course_key = instance.context_key
         payload = super().to_representation(instance)
         lti_configuration_data = {}
-        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value.id)
+        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value)
         if supports_lti:
             lti_configuration = LtiSerializer(instance.lti_configuration, context={
                 'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
@@ -220,7 +220,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             if legacy_settings.is_valid(raise_exception=True):
                 plugin_configuration = legacy_settings.data
         features_list = [
-            {'id': feature.value.id, 'feature_support_type': feature.value.feature_support_type}
+            {'id': feature.value, 'feature_support_type': feature.feature_support_type}
             for feature in Features
         ]
         payload.update({
@@ -259,7 +259,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         Update LtiConfiguration
         """
         lti_configuration_data = validated_data.get('lti_configuration')
-        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value.id)
+        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value)
         if not supports_lti:
             instance.lti_configuration = None
         elif lti_configuration_data:
