@@ -598,7 +598,7 @@ def track_request_user_changes(request):
                 location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:12])
 
                 if not hasattr(self, 'debug_user_changes'):
-                    self.debug_user_changes = [] # pylint: disable=attribute-defined-outside-init
+                    self.debug_user_changes = []  # pylint: disable=attribute-defined-outside-init
 
                 if not hasattr(request, name):
                     original_user = value
