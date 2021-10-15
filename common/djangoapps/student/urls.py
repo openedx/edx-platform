@@ -17,7 +17,7 @@ urlpatterns = [
     path('accounts/disable_account_ajax', views.disable_account_ajax, name="disable_account_ajax"),
     path('accounts/manage_user_standing', views.manage_user_standing, name='manage_user_standing'),
 
-    path('change_email_settings', views.change_email_settings, name='change_email_settings'),
+    path('api/change_email_settings', views.change_email_settings, name='change_email_settings'),
 
     re_path(fr'^course_run/{settings.COURSE_ID_PATTERN}/refund_status$',
             views.course_run_refund_status,
@@ -28,5 +28,4 @@ urlpatterns = [
         views.activate_secondary_email,
         name='activate_secondary_email'
     ),
-
 ]
