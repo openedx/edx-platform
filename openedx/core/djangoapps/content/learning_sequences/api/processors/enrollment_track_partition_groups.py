@@ -1,7 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 from datetime import datetime
-from typing import Dict
+from typing import cast, Dict, Optional
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core import types
@@ -30,19 +30,22 @@ class EnrollmentTrackPartitionGroupsOutlineProcessor(OutlineProcessor):
     """
     def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         super().__init__(course_key, user, at_time)
-        self.enrollment_track_groups: Dict[str, Group] = {}
-        self.user_group = None
+        self.enrollment_track_groups: Dict[int, Group] = {}
+        self.user_group: Optional[Group] = None
 
     def load_data(self, full_course_outline) -> None:
         """
         Pull track groups for this course and which group the user is in.
         """
         user_partition = create_enrollment_track_partition_with_course_id(self.course_key)
-        self.enrollment_track_groups = get_user_partition_groups(
-            self.course_key,
-            [user_partition],
-            self.user,
-            partition_dict_key='id'
+        self.enrollment_track_groups = cast(
+            Dict[int, Group],
+            get_user_partition_groups(
+                self.course_key,
+                [user_partition],
+                self.user,
+                partition_dict_key='id',
+            )
         )
         self.user_group = self.enrollment_track_groups.get(ENROLLMENT_TRACK_PARTITION_ID)
 

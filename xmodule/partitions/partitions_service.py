@@ -45,7 +45,7 @@ def get_all_partitions_for_course(course, active_only=False):
 
 
 def get_user_partition_groups(course_key: str, user_partitions: list, user: User,
-                              partition_dict_key: str = 'name') -> Dict[str, Group]:
+                              partition_dict_key: str = 'name') -> Dict[object, Group]:
     """
     Collect group ID for each partition in this course for this user.
      Arguments:
