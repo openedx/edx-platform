@@ -23,7 +23,7 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Fetch master for comparison
+    - name: Fetch base branch for comparison
       run: git fetch --depth=1 origin ${{ github.base_ref }}
 
     - name: Install Required System Packages
