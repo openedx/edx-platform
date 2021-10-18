@@ -135,7 +135,7 @@ class FormDescription:
 
     def add_field(
             self, name, label="", field_type="text", default="",
-            placeholder="", instructions="", required=True, restrictions=None,
+            placeholder="", instructions="", toggled=None, required=True, restrictions=None,
             options=None, include_default_option=False, error_messages=None,
             supplementalLink="", supplementalText=""
     ):
@@ -158,6 +158,10 @@ class FormDescription:
 
             instructions (unicode): Short instructions for using the field
                 (e.g. "This is the email address you used when you registered.")
+
+            toggled (boolean): Whether the field is optional and conditionally shown.
+                In case the field is not set, the field will be treated as toggled
+                if not set to required.
 
             required (boolean): Whether the field is required or optional.
 
@@ -202,6 +206,7 @@ class FormDescription:
             "defaultValue": default,
             "placeholder": placeholder,
             "instructions": instructions,
+            "toggled": toggled if toggled is not None else not required,
             "required": required,
             "restrictions": {},
             "errorMessages": {},
@@ -268,6 +273,7 @@ class FormDescription:
                     "label": "Cheese or Wine?",
                     "defaultValue": "cheese",
                     "type": "select",
+                    "toggled": False,
                     "required": True,
                     "placeholder": "",
                     "instructions": "",
@@ -283,6 +289,7 @@ class FormDescription:
                     "label": "comments",
                     "defaultValue": "",
                     "type": "text",
+                    "toggled": True,
                     "required": False,
                     "placeholder": "Any comments?",
                     "instructions": "Please enter additional comments here."

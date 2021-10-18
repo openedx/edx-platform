@@ -101,7 +101,8 @@
                         field,
                         len = data.length,
                         requiredFields = [],
-                        optionalFields = [];
+                        optionalFields = [],
+                        notToggledOptionalFields = [];
 
                     this.fields = data;
 
@@ -123,12 +124,18 @@
                                 // input elements that are visible on the page.
                                 this.hasOptionalFields = true;
                             }
-                            optionalFields.push(field);
+
+                            if (field.toggled) {
+                                optionalFields.push(field);
+                            } else {
+                                notToggledOptionalFields.push(field);
+                            }
                         }
                     }
 
                     html = this.renderFields(requiredFields, 'required-fields');
 
+                    html.push.apply(html, this.renderFields(notToggledOptionalFields, 'not-toggled-optional-fields'));
                     html.push.apply(html, this.renderFields(
                       optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
                     ));
@@ -250,6 +257,14 @@
                         window.analytics.track('edx.bi.user.register.optional_fields_selected');
                         $('.optional-fields').toggleClass('hidden');
                     });
+
+                    // Since the honor TOS text has a composed css selector, it is more future proof
+                    // to insert the not toggled optional fields before .honor_tos_combined's parent
+                    // that is the container for the honor TOS text and checkbox.
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.not-toggled-optional-fields').insertBefore(
+                        $('.honor_tos_combined').parent()
+                    );
 
                     // We are swapping the order of these elements here because the honor code agreement
                     // is a required checkbox field and the optional fields toggle is a cosmetic

@@ -88,6 +88,7 @@
                                 defaultValue: '',
                                 type: 'email',
                                 required: true,
+                                toggled: false,
                                 instructions: 'Enter your email.',
                                 restrictions: {}
                             },
@@ -98,6 +99,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
+                                toggled: false,
                                 instructions: 'Enter your email.',
                                 restrictions: {}
                             },
@@ -108,6 +110,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
+                                toggled: false,
                                 instructions: 'Enter your username.',
                                 restrictions: {}
                             },
@@ -118,6 +121,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
+                                toggled: false,
                                 instructions: 'Enter your username.',
                                 restrictions: {}
                             },
@@ -128,6 +132,7 @@
                                 defaultValue: '',
                                 type: 'password',
                                 required: true,
+                                toggled: false,
                                 instructions: 'Enter your password.',
                                 restrictions: {}
                             },
@@ -144,6 +149,7 @@
                                     {value: 'b', name: "Bachelor's degree"}
                                 ],
                                 required: false,
+                                toggled: true,
                                 instructions: 'Select your education level.',
                                 restrictions: {}
                             },
@@ -160,6 +166,7 @@
                                     {value: 'o', name: 'Other'}
                                 ],
                                 required: false,
+                                toggled: true,
                                 instructions: 'Select your gender.',
                                 restrictions: {}
                             },
@@ -176,6 +183,7 @@
                                     {value: 2014, name: '2014'}
                                 ],
                                 required: false,
+                                toggled: true,
                                 instructions: 'Select your year of birth.',
                                 restrictions: {}
                             },
@@ -186,6 +194,7 @@
                                 defaultValue: '',
                                 type: 'textarea',
                                 required: false,
+                                toggled: true,
                                 instructions: 'Enter your mailing address.',
                                 restrictions: {}
                             },
@@ -196,6 +205,7 @@
                                 defaultValue: '',
                                 type: 'textarea',
                                 required: false,
+                                toggled: true,
                                 instructions: "If you'd like, tell us why you're interested in edX.",
                                 restrictions: {}
                             },
@@ -206,11 +216,12 @@
                                 defaultValue: '',
                                 type: 'checkbox',
                                 required: true,
+                                toggled: false,
                                 instructions: '',
                                 restrictions: {},
                                 supplementalLink: '/honor',
                                 supplementalText: 'Review the Terms of Service and Honor Code'
-                            }
+                            },
                         ]
                     };
                 var createRegisterView = function(that, formFields) {
@@ -500,6 +511,27 @@
 
                 // Form button should be disabled on success.
                     expect(view.$submitButton).toHaveAttr('disabled');
+                });
+
+                it('shows optional not toggled fields', function() {
+                    var formFields = FORM_DESCRIPTION.fields
+                    formFields.push({
+                        placeholder: '',
+                        name: 'not_toggled_custom_optional_field',
+                        label: 'Not toggled custom optional field.',
+                        defaultValue: '',
+                        type: 'checkbox',
+                        required: false,
+                        toggled: false,
+                        instructions: 'Check this field if you would like to.',
+                        restrictions: {}
+                    })
+
+                    createRegisterView(this, formFields);
+                    var elementClasses = view.$('.not-toggled-optional-fields').attr('class');
+                    // Expect the toggled optional fields container does not have other
+                    // classes assigned, like .hidden
+                    expect(elementClasses).toEqual('not-toggled-optional-fields');
                 });
 
                 it('hides optional fields by default', function() {
