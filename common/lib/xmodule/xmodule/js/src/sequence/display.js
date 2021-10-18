@@ -285,6 +285,7 @@
 
                 this.sr_container.focus();
             }
+            document.getElementById('seq-position').innerHTML = newPosition;
         };
 
         Sequence.prototype.goto = function(event) {
@@ -335,6 +336,7 @@
                 }, true);
                 alert(alertText);  // eslint-disable-line no-alert
             }
+            document.getElementById('seq-position').innerHTML = newPosition;
         };
 
         Sequence.prototype.selectNext = function(event) {
