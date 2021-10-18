@@ -575,6 +575,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
+        #######################
+        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
+        return super().get_course_index(key, ignore_case=ignore_case)
+        #######################
         if key.version_guid and not key.org:
             # I don't think it was intentional, but with the MongoPersistenceBackend, using a key with only a version
             # guid and no org/course/run value would not raise an error, but would always return None. So we need to be
@@ -615,6 +619,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
             org_target: If specified, this is an ORG filter so that only course_indexs are
                 returned for the specified ORG
         """
+        #######################
+        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
+        force_mongo = True
+        #######################
         if force_mongo:
             # For data migration purposes, this argument will read from MongoDB instead of MySQL
             return super().find_matching_course_indexes(
