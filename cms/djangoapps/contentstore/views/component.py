@@ -405,7 +405,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in advanced_component_types.keys() and category not in categories:
+            if category in advanced_component_types.keys() and category not in categories:  # pylint: disable=consider-iterating-dictionary
                 # boilerplates not supported for advanced components
                 try:
                     component_display_name = xblock_type_display_name(category, default_display_name=category)

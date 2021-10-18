@@ -422,7 +422,7 @@ class CourseTabList(List):
 
         # find one of the discussion tab types in the course tabs
         for tab in course.tabs:
-            if tab.type == 'discussion' or tab.type == 'external_discussion':
+            if tab.type in ('discussion', 'external_discussion'):
                 return tab
         return None
 

@@ -916,7 +916,7 @@ def _create_or_rerun_course(request):
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=str(error))}
         )
-    except PermissionDenied as error:
+    except PermissionDenied as error:  # pylint: disable=unused-variable
         log.info(
             "User does not have the permission to create course in this organization"
             "or course creation is disabled."

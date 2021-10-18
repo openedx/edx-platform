@@ -647,7 +647,7 @@ class CourseImportManager(ImportManager):
                 courselike_key.course,
                 courselike_key.run
             )
-            if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
+            if course.wiki_slug in (original_unique_wiki_slug, courselike_key.course):
                 course.wiki_slug = '{}.{}.{}'.format(
                     course.id.org,
                     course.id.course,
