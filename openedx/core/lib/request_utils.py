@@ -18,7 +18,7 @@ from rest_framework.views import exception_handler
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
-COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
+COURSE_REGEX = re.compile(fr'^(.*?/course(s)?/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
 
 # .. toggle_name: request_utils.capture_cookie_sizes
 # .. toggle_implementation: WaffleFlag
