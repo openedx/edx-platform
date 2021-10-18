@@ -39,6 +39,7 @@ from common.djangoapps import third_party_auth
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import (
@@ -586,6 +587,7 @@ class RegistrationView(APIView):
                 path='/',
                 secure=request.is_secure()
             )  # setting the cookie to show account activation dialogue in platform and learning MFE
+        mark_user_change_as_expected(response, user.id)
         return response
 
     def _handle_duplicate_email_username(self, request, data):
