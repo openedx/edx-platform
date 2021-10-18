@@ -518,6 +518,36 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
             self.assertRedirects(response, redirect_url)
 
+    @ddt.data(
+        (False, {'audit_mode': True}, 'Enrollment is closed', 302),
+        (True, {'verified_mode': True, 'contribution': 'abc'}, 'Invalid amount selected', 200),
+        (False, {'verified_mode': True, 'contribution': '1.23'}, 'Enrollment is closed', 302),
+        (True, {'verified_mode': True, 'contribution': '0.1'}, 'No selected price or selected price is too low.', 200),
+    )
+    @ddt.unpack
+    @patch('django.contrib.auth.models.PermissionsMixin.has_perm')
+    def test_errors(self, has_perm, post_params, error_msg, status_code, mock_has_perm):
+        """
+        Test the error template is rendered on different types of errors.
+        When CourseMode is 'honor' or 'audit', get request is called with error msg,
+        but the get method redirects to dashboard.
+        """
+        # Create course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        # Value Prop TODO (REV-2378): remove waffle flag from tests once flag is removed.
+        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
+            mock_has_perm.return_value = has_perm
+            url = reverse('course_modes_choose', args=[str(self.course.id)])
+            response = self.client.post(url, post_params)
+            self.assertEqual(response.status_code, status_code)
+            if has_perm:
+                self.assertContains(response, error_msg)
+                self.assertContains(response, 'Sorry, we were unable to enroll you')
+            else:
+                self.assertTrue(CourseEnrollment.is_enrollment_closed(self.user, self.course))
+
     def _assert_fbe_page(self, response, min_price=None, **_):
         """
         Assert fbe.html was rendered.
