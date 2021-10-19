@@ -2,7 +2,6 @@
 Tests for ESG views
 """
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 from unittest.mock import patch
 
