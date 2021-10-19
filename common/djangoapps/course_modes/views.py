@@ -152,6 +152,10 @@ class ChooseModeView(View):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
             params = six.moves.urllib.parse.urlencode({'course_closed': enrollment_end_date})
+            LOG.info(
+                '[Track Selection Check] Enrollment is closed redirect for course [%s], user [%s]',
+                course_id, request.user.username
+            )
             return redirect('{}?{}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
@@ -296,7 +300,10 @@ class ChooseModeView(View):
         course = modulestore().get_course(course_key)
         if not user.has_perm(ENROLL_IN_COURSE, course):
             error_msg = _("Enrollment is closed")
-            LOG.info('[Track Selection Check] Error: [%s], for course [%s]', error_msg, course_id)
+            LOG.info(
+                '[Track Selection Check] Error: [%s], for course [%s], user [%s]',
+                error_msg, course_id, request.user.username
+            )
             return self.get(request, course_id, error=error_msg)
 
         requested_mode = self._get_requested_mode(request.POST)
