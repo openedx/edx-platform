@@ -467,7 +467,8 @@ class MongoPersistenceBackend:
             if not last_update_already_set:
                 course_index['last_update'] = datetime.datetime.now(pytz.utc)
             # Update the course index:
-            self.course_index.replace_one(query, course_index, upsert=False,)
+            result = self.course_index.replace_one(query, course_index, upsert=False,)
+            return result.modified_count == 1
 
     def delete_course_index(self, course_key):
         """
@@ -670,17 +671,31 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # See https://github.com/edx/edx-platform/pull/5200 for context
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:
-        index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
+        try:
+            index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
+        except SplitModulestoreCourseIndex.DoesNotExist:
+            #######################
+            # TEMP: Maybe the data migration hasn't (completely) run yet?
+            data = SplitModulestoreCourseIndex.fields_from_v1_schema(course_index)
+            if super().get_course_index(data["course_id"]) is None:
+                raise  # This course doesn't exist in MySQL or in MongoDB
+            # This course record exists in MongoDB but not yet in MySQL
+            index_obj = SplitModulestoreCourseIndex(**data)
+            if from_index:
+                index_obj.last_update = from_index["last_update"]  # Make sure this won't get marked as a collision
+            #######################
 
         # Check for collisions:
-        if from_index and index_obj.last_update != from_index["last_update"]:
-            # "last_update not only tells us when this course was last updated but also helps prevent collisions"
-            log.warning(
-                "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
-                "is enabled, as it slows down parallel queries. New index was: %s",
-                course_index,
-            )
-            return  # Collision; skip this update
+        # Except this collision logic doesn't work when using both MySQL and MongoDB together, one for writes and one
+        # for reads, so we're temporarily defering to Mongo's colision logic.
+        # if from_index and index_obj.last_update != from_index["last_update"]:
+        #     # "last_update not only tells us when this course was last updated but also helps prevent collisions"
+        #     log.warning(
+        #         "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
+        #         "is enabled, as it slows down parallel queries. \nNew index was: %s\nFrom index was: %s",
+        #         course_index, from_index,
+        #     )
+        #     return  # Collision; skip this update
 
         # Apply updates to the index entry. While doing so, track which branch versions were changed (if any).
         changed_branches = []
@@ -703,10 +718,11 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
             # which branch(es) were changed, not anything more useful than that.
             index_obj._change_reason = f'Updated {" and ".join(changed_branches)} branch'  # pylint: disable=protected-access
 
-        # Save the course index entry and create a historical record:
-        index_obj.save()
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
-        super().update_course_index(course_index, from_index, course_context, last_update_already_set=True)
+        mongo_updated = super().update_course_index(course_index, from_index, course_context, last_update_already_set=True)
+        if mongo_updated:
+            # Save the course index entry and create a historical record:
+            index_obj.save()
 
     def delete_course_index(self, course_key):
         """
