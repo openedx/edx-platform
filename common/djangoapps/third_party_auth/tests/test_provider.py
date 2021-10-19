@@ -9,8 +9,8 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.test.utils import CaptureQueriesContext
 from mock import Mock, patch
 
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from third_party_auth import provider
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration, with_site_configuration_context
+from third_party_auth import provider, models
 from third_party_auth.tests import testutil
 
 SITE_DOMAIN_A = 'professionalx.example.com'
@@ -160,8 +160,54 @@ class RegistryTest(testutil.TestCase):
         prov = self.configure_google_provider(visible=True, enabled=True, site=Site.objects.get_current())
         self.assertEqual(prov.enabled_for_current_site, True)
 
+    def test_is_auth0_disabled_for_no_tahoe_auth0(self):
+        prov = self.configure_oauth_provider(enabled=True, backend_name="dummy")
+
+        with with_site_configuration_context(configuration={"ENABLE_TAHOE_AUTH0": True}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+                self.assertEqual(prov.enabled_for_current_site, False)
+
+    def test_is_auth0_enabled_for_site_configuration(self):
+        """
+        Verify that Tahoe Auth0 is enabled when the Site Configuration asks for it.
+        """
+        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-auth0")
+
+        with with_site_configuration_context(configuration={"ENABLE_TAHOE_AUTH0": True}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+                self.assertEqual(prov.enabled_for_current_site, True)
+
+            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": False}):
+                self.assertEqual(prov.enabled_for_current_site, True)
+
+    def test_is_auth0_publicly_configured(self):
+        """
+        Verify that Tahoe Auth0 is enabled or disabled based on the public setting
+        if the Site Configuration doesn't specify a custom value.
+        """
+        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-auth0")
+
+        with with_site_configuration_context(configuration={}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+                self.assertEqual(prov.enabled_for_current_site, True)
+
+            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": False}):
+                self.assertEqual(prov.enabled_for_current_site, False)
+
     @with_site_configuration(SITE_DOMAIN_A)
-    def test_provider_disabled_for_mismatching_site(self):
+    @patch.object(models.ProviderConfig, "is_auth0_enabled", return_value=True)
+    def test_provider_enabled_for_mismatching_site_with_auth0_enabled(self, mock_is_auth0_enabled):
+        """
+        Verify that enabled_for_current_site returns True when Auth0 provider is configured
+        for a different site.
+        """
+        site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
+        prov = self.configure_oauth_provider(enabled=True, site=site_b, backend_name="tahoe-auth0")
+        self.assertEqual(prov.enabled_for_current_site, True)
+
+    @with_site_configuration(SITE_DOMAIN_A)
+    @patch.object(models.ProviderConfig, "is_auth0_enabled", return_value=False)
+    def test_provider_disabled_for_mismatching_site(self, mock_is_auth0_enabled):
         """
         Verify that enabled_for_current_site returns False when the provider is configured for a different site.
         """
