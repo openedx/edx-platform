@@ -432,7 +432,7 @@ edx-drf-extensions==8.0.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.30.12
+edx-enterprise==3.30.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
