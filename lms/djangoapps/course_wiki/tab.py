@@ -21,6 +21,17 @@ class WikiTab(EnrolledTab):
     is_hideable = True
     is_default = False
 
+    def __init__(self, tab_dict):
+        # Default to hidden
+        super().__init__({"is_hidden": True, **tab_dict})
+
+    def to_json(self):
+        json_val = super().to_json()
+        # Persist that the tab is *not* hidden
+        if not self.is_hidden:
+            json_val.update({"is_hidden": False})
+        return json_val
+
     @classmethod
     def is_enabled(cls, course, user=None):
         """

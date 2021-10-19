@@ -34,6 +34,7 @@ show_verbose() {
     echo "Files linted is based on the following:"
     echo "- Current commit: ${current_branch_hash}"
     echo "- Main commit: ${MAIN_COMMIT}"
+    echo "- Target branch: ${TARGET_BRANCH}"
     echo "- Merge base command: ${merge_base_command}"
     echo "- Merge base: ${merge_base}"
     echo "- Diff command: ${diff_command}"

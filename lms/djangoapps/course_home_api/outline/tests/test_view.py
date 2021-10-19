@@ -266,7 +266,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             'selected_goal': {
                 'days_per_week': 1,
                 'subscribed_to_reminders': True
-            }
+            },
+            'weekly_learning_goal_enabled': True
         }
         assert course_goals == expected_course_goals
 

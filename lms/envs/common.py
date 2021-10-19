@@ -989,6 +989,11 @@ RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
+MARKETING_EMAILS_OPT_IN = False
+
+# VAN-754 - Year of birth field put behind a flag to make it available for OpenedX.
+COLLECT_YEAR_OF_BIRTH = True
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -1623,6 +1628,29 @@ CODE_JAIL = {
 #       r"Harvard/XY123.1/.*"
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
+
+# Cojail REST service
+ENABLE_CODEJAIL_REST_SERVICE = False
+# .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
+# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_description: Set the python package.module.function that is reponsible of
+#   calling the remote service in charge of jailed code execution
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_name: CODE_JAIL_REST_SERVICE_HOST
+# .. setting_default: 'http://127.0.0.1:8550'
+# .. setting_description: Set the codejail remote service host
+CODE_JAIL_REST_SERVICE_HOST = 'http://127.0.0.1:8550'
+# .. setting_name: CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT
+# .. setting_default: 0.5
+# .. setting_description: Set the number of seconds LMS will wait to establish an internal
+#   connection to the codejail remote service.
+CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT = 0.5  # time in seconds
+# .. setting_name: CODE_JAIL_REST_SERVICE_READ_TIMEOUT
+# .. setting_default: 3.5
+# .. setting_description: Set the number of seconds LMS will wait for a response from the
+#   codejail remote service endpoint.
+CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
+
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here

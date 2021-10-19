@@ -4,11 +4,11 @@
 #
 #    make upgrade
 #
-certifi==2021.5.30
+certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.6
+charset-normalizer==2.0.7
     # via requests
-idna==3.2
+idna==3.3
     # via requests
 requests==2.26.0
     # via -r scripts/xblock/requirements.in

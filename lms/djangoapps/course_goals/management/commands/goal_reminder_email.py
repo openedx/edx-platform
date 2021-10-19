@@ -1,7 +1,7 @@
 """
 Command to trigger sending reminder emails for learners to achieve their Course Goals
 """
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import logging
 import six
 
@@ -16,6 +16,7 @@ from edx_ace.recipient import Recipient
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from lms.djangoapps.course_goals.models import CourseGoal, CourseGoalReminderStatus, UserActivity
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -159,6 +160,13 @@ class Command(BaseCommand):
         # The weekdays are 0 indexed, but we want this to be 1 to match required_days_left.
         # Essentially, if today is Sunday, days_left_in_week should be 1 since they have Sunday to hit their goal.
         days_left_in_week = SUNDAY_WEEKDAY - today.weekday() + 1
+
+        # We want to email users in the morning of their timezone
+        user_timezone = get_user_timezone_or_last_seen_timezone_or_utc(goal.user)
+        now_in_users_timezone = datetime.now(user_timezone)
+        if not 9 <= now_in_users_timezone.hour < 12:
+            return False
+
         if required_days_left == days_left_in_week:
             send_ace_message(goal)
             CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})

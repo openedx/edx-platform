@@ -132,6 +132,7 @@ class CohortMembership(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean(validate_unique=False)
 
+        # .. event_implemented_name: COHORT_MEMBERSHIP_CHANGED
         COHORT_MEMBERSHIP_CHANGED.send_event(
             cohort=CohortData(
                 user=UserData(

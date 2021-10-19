@@ -11,6 +11,7 @@ import six
 from six import text_type
 
 from . import lazymod
+from .remote_exec import is_codejail_rest_service_enabled, get_remote_exec
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
@@ -143,28 +144,42 @@ def safe_exec(
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
-    # Decide which code executor to use.
-    if unsafely:
-        exec_fn = codejail_not_safe_exec
-    else:
-        exec_fn = codejail_safe_exec
+    if is_codejail_rest_service_enabled():
+        data = {
+            "code": code_prolog + LAZY_IMPORTS + code,
+            "globals_dict": globals_dict,
+            "python_path": python_path,
+            "limit_overrides_context": limit_overrides_context,
+            "slug": slug,
+            "unsafely": unsafely,
+            "extra_files": extra_files,
+        }
 
-    # Run the code!  Results are side effects in globals_dict.
-    try:
-        exec_fn(
-            code_prolog + LAZY_IMPORTS + code,
-            globals_dict,
-            python_path=python_path,
-            extra_files=extra_files,
-            limit_overrides_context=limit_overrides_context,
-            slug=slug,
-        )
-    except SafeExecException as e:
-        # Saving SafeExecException e in exception to be used later.
-        exception = e
-        emsg = text_type(e)
+        emsg, exception = get_remote_exec(data)
+
     else:
-        emsg = None
+        # Decide which code executor to use.
+        if unsafely:
+            exec_fn = codejail_not_safe_exec
+        else:
+            exec_fn = codejail_safe_exec
+
+        # Run the code!  Results are side effects in globals_dict.
+        try:
+            exec_fn(
+                code_prolog + LAZY_IMPORTS + code,
+                globals_dict,
+                python_path=python_path,
+                extra_files=extra_files,
+                limit_overrides_context=limit_overrides_context,
+                slug=slug,
+            )
+        except SafeExecException as e:
+            # Saving SafeExecException e in exception to be used later.
+            exception = e
+            emsg = text_type(e)
+        else:
+            emsg = None
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.

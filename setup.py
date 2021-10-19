@@ -46,7 +46,7 @@ setup(
             "progress = lms.djangoapps.courseware.plugins:ProgressCourseApp",
             "teams = lms.djangoapps.teams.plugins:TeamsCourseApp",
             "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",
-            "wiki = lms.djangoapps.course_wiki.plugins:WikiCourseApp",
+            "wiki = lms.djangoapps.course_wiki.plugins.course_app:WikiCourseApp",
             "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
         ],
         "openedx.course_tool": [
