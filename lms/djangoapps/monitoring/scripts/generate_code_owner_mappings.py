@@ -18,7 +18,7 @@ import re
 import click
 
 # Maps edx-platform installed Django apps to the edx repo that contains
-# the app code.
+# the app code. Please add in alphabetical order.
 EDX_REPO_APPS = {
     'bulk_grades': 'https://github.com/edx/edx-bulk-grades',
     'coaching': 'https://github.com/edx/platform-plugin-coaching',
@@ -31,28 +31,29 @@ EDX_REPO_APPS = {
     'edxval': 'https://github.com/edx/edx-val',
     'enterprise': 'https://github.com/edx/edx-enterprise',
     'enterprise_learner_portal': 'https://github.com/edx/edx-enterprise',
+    'eventtracking': 'https://github.com/edx/event-tracking',
     'help_tokens': 'https://github.com/edx/help-tokens',
     'integrated_channels': 'https://github.com/edx/edx-enterprise',
+    'lti_consumer': 'https://github.com/edx/xblock-lti-consumer',
+    'notices': 'https://github.com/edx/platform-plugin-notices',
     'organizations': 'https://github.com/edx/edx-organizations',
     'search': 'https://github.com/edx/edx-search',
     'super_csv': 'https://github.com/edx/super-csv',
     'wiki': 'https://github.com/edx/django-wiki',
-    'lti_consumer': 'https://github.com/edx/xblock-lti-consumer',
-    'notices': 'https://github.com/edx/platform-plugin-notices',
 }
 
 # Maps edx-platform installed Django apps to the third-party repo that contains
-# the app code.
+# the app code. Please add in alphabetical order.
 THIRD_PARTY_APPS = {
+    'corsheaders': 'https://github.com/adamchainz/django-cors-headers',
     'django': 'https://github.com/django/django',
     'django_object_actions': 'https://github.com/crccheck/django-object-actions',
     'drf_yasg': 'https://github.com/axnsan12/drf-yasg',
+    'edx_sga': 'https://github.com/mitodl/edx-sga',
     'lx_pathway_plugin': 'https://github.com/open-craft/lx-pathway-plugin',
     'rest_framework': 'https://github.com/encode/django-rest-framework',
     'simple_history': 'https://github.com/treyhunner/django-simple-history',
     'social_django': 'https://github.com/python-social-auth/social-app-django',
-    'corsheaders': 'https://github.com/adamchainz/django-cors-headers',
-    'edx_sga': 'https://github.com/mitodl/edx-sga',
 }
 
 
