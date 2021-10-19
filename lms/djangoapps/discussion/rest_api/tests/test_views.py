@@ -335,13 +335,24 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
     """
     Tests for CourseTopicsView
     """
+
     def setUp(self):
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
         super().setUp()
         self.url = reverse("course_topics", kwargs={"course_id": str(self.course.id)})
+        self.thread_counts_map = {
+            "courseware-1": {"discussion": 2, "question": 3},
+            "courseware-2": {"discussion": 4, "question": 5},
+            "courseware-3": {"discussion": 7, "question": 2},
+        }
+        self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
 
     def create_course(self, modules_count, module_store, topics):
         """
@@ -367,7 +378,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 discussion_target=f'Discussion {i}',
                 publish_item=False,
             )
-        return course_url
+        return course_url, course.id
 
     def make_discussion_xblock(self, topic_id, category, subcategory, **kwargs):
         """
@@ -405,6 +416,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "children": [],
                     "thread_list_url":
                         "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=test_topic",
+                    "thread_counts": {"discussion": 0, "question": 0},
                 }],
             }
         )
@@ -420,7 +432,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
-        course_url = self.create_course(modules_count, module_store, topics)
+        course_url, course_id = self.create_course(modules_count, module_store, topics)
+        self.register_get_course_commentable_counts_response(course_id, {})
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):
                 self.client.get(course_url)
@@ -461,12 +474,14 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                             "id": "topic_id_1",
                             "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                                "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
-                            "name": "test_target_1"
+                            "name": "test_target_1",
+                            "thread_counts": {"discussion": 0, "question": 0},
                         }],
                         "id": None,
                         "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                            "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
-                        "name": "test_category_1"
+                        "name": "test_category_1",
+                        "thread_counts": None,
                     },
                     {
                         "children":
@@ -475,12 +490,14 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                                 "id": "topic_id_2",
                                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                                    "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
-                                "name": "test_target_2"
+                                "name": "test_target_2",
+                                "thread_counts": {"discussion": 0, "question": 0},
                             }],
                         "id": None,
                         "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                            "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
-                        "name": "test_category_2"
+                        "name": "test_category_2",
+                        "thread_counts": None,
                     }
                 ]
             }
