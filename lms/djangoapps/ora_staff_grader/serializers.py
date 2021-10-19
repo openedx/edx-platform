@@ -48,11 +48,17 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
-    pointsEarned = serializers.IntegerField()
-    pointsPossible = serializers.IntegerField()
+    pointsEarned = serializers.IntegerField(default=0)
+    pointsPossible = serializers.IntegerField(default=0)
 
     class Meta:
         fields = ['pointsEarned', 'pointsPossible']
+
+    def to_representation(self, instance):
+        """ An empty dict should return None instead """
+        if ('pointsEarned' not in instance) and ('pointsPossible' not in instance):
+            return None
+        return super().to_representation(instance)
 
 
 class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method

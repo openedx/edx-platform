@@ -158,3 +158,34 @@ class TestSubmissionMetadataSerializer(TestCase):
 
             # For each submission, data is just passed through
             assert self.submission_data[submission_id] == data
+
+    def test_empty_score(self):
+        """
+        An empty score dict should be serialized as None
+        """
+        submission =  {
+            "submissionUuid": "empty-score",
+            "username": "WOPR",
+            "dateSubmitted": "1983-06-03 00:00:00",
+            "dateGraded": None,
+            "gradedBy": None,
+            "gradingStatus": "ungraded",
+            "lockStatus": "unlocked",
+            "score": {}
+        }
+
+        expected_output =  {
+            "submissionUuid": "empty-score",
+            "username": "WOPR",
+            "teamName": None,
+            "dateSubmitted": "1983-06-03 00:00:00",
+            "dateGraded": None,
+            "gradedBy": None,
+            "gradingStatus": "ungraded",
+            "lockStatus": "unlocked",
+            "score": None
+        }
+
+        data = SubmissionMetadataSerializer(submission).data
+
+        assert data == expected_output
