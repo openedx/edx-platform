@@ -167,7 +167,7 @@ class TestActivateAccount(TestCase):
         self.assertContains(response, 'Your account could not be activated')
 
     @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
-    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_settings(FEATURES={**FEATURES_WITH_AUTHN_MFE_ENABLED, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     def test_authenticated_account_activation_with_valid_next_url(self):
         """
