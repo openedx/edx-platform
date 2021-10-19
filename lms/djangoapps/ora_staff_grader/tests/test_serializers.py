@@ -108,13 +108,13 @@ class TestSubmissionMetadataSerializer(TestCase):
     Right now, this is just passed through without any transforms.
     """
     submission_data = {
-        "a": {
-            "submissionUuid": "a",
+        "ungraded": {
+            "submissionUuid": "ungraded",
             "username": "foo",
-            "teamName": "",
+            "teamName": None,
             "dateSubmitted": "1969-07-16 13:32:00",
-            "dateGraded": "None",
-            "gradedBy": "",
+            "dateGraded": None,
+            "gradedBy": None,
             "gradingStatus": "ungraded",
             "lockStatus": "unlocked",
             "score": {
@@ -122,24 +122,10 @@ class TestSubmissionMetadataSerializer(TestCase):
                 "pointsPossible": 10
             }
         },
-        "b": {
-            "submissionUuid": "b",
-            "username": "",
-            "teamName": "bar",
-            "dateSubmitted": "1969-07-20 20:17:40",
-            "dateGraded": "None",
-            "gradedBy": "",
-            "gradingStatus": "ungraded",
-            "lockStatus": "in-progress",
-            "score": {
-                "pointsEarned": 0,
-                "pointsPossible": 10
-            }
-        },
-        "c": {
-            "submissionUuid": "c",
+        "graded": {
+            "submissionUuid": "graded",
             "username": "baz",
-            "teamName": "",
+            "teamName": None,
             "dateSubmitted": "1969-07-21 21:35:00",
             "dateGraded": "1969-07-24 16:44:00",
             "gradedBy": "buz",
@@ -158,6 +144,44 @@ class TestSubmissionMetadataSerializer(TestCase):
 
             # For each submission, data is just passed through
             assert self.submission_data[submission_id] == data
+
+    def test_missing_team_name(self):
+        """
+        Individual submissions may have a missing or emtpy "teamName".
+        The field should be added to serialized output with null value.
+        """
+        submission =  {
+            "submissionUuid": "individual",
+            "username": "Buzz",
+            "dateSubmitted": "1969-07-21 21:35:00",
+            "dateGraded": "1969-07-24 16:44:00",
+            "gradedBy": "Houston",
+            "gradingStatus": "ungraded",
+            "lockStatus": "unlocked",
+            "score": {
+                "pointsEarned": 10,
+                "pointsPossible": 10
+            }
+        }
+
+        expected_output = {
+            "submissionUuid": "individual",
+            "username": "Buzz",
+            "teamName": None,
+            "dateSubmitted": "1969-07-21 21:35:00",
+            "dateGraded": "1969-07-24 16:44:00",
+            "gradedBy": "Houston",
+            "gradingStatus": "ungraded",
+            "lockStatus": "unlocked",
+            "score": {
+                "pointsEarned": 10,
+                "pointsPossible": 10
+            }
+        }
+
+        data = SubmissionMetadataSerializer(submission).data
+
+        assert data == expected_output
 
     def test_empty_score(self):
         """
