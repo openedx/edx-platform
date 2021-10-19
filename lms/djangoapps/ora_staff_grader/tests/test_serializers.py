@@ -91,21 +91,19 @@ class TestSubmissionMetadataSerializer(TestCase):
     SubmissionMetadata comes from the ORA list_staff_workflows XBlock.json_handler and has the shape:
 
     "<submission_uuid>": {
-        "submissionUuid": "<submission_uuid>",
-        "username": "<username/empty>",
-        "teamName": "<team_name/empty>",
-        "dateSubmitted": "<yyyy-mm-dd HH:MM:SS>",
-        "dateGraded": "<yyyy-mm-dd HH:MM:SS/None>",
-        "gradedBy": "<username/empty>",
-        "gradingStatus": "<ungraded/graded>",
-        "lockStatus": "<locked/unlocked/in-progress",
-        "score": {
-            "pointsEarned": <num>,
-            "pointsPossible": <num>
+        "submissionUuid": uuid,
+        "username": string or None,
+        "teamName": string orNone,
+        "dateSubmitted": string(yyyy-mm-dd HH:MM:SS),
+        "dateGraded": string(yyyy-mm-dd HH:MM:SS) or None,
+        "gradedBy": string or None,
+        "gradingStatus": "ungraded" or "graded",
+        "lockStatus": "locked", "unlocked", or "in-progress",
+        "score": {} or {
+            "pointsEarned": int,
+            "pointsPossible": int,
         }
     }
-
-    Right now, this is just passed through without any transforms.
     """
     submission_data = {
         "ungraded": {
