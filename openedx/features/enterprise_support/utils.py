@@ -420,6 +420,12 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
+    # Prevent a circular import.
+    from openedx.features.enterprise_support.api import enterprise_enabled
+
+    if not enterprise_enabled():
+        return False
+
     try:
         user_id = int(user)
     except TypeError:
@@ -432,6 +438,7 @@ def is_enterprise_learner(user):
         # Cache the enterprise user for one hour.
         cache.set(cached_is_enterprise_key, True, 3600)
         return True
+
     return False
 
 
