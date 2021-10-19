@@ -85,7 +85,7 @@ class TestInitializeView(SharedModuleStoreTestCase, APITestCase):
         }
 
         # Rubric data is passed through directly, so we can use a toy data payload
-        mock_get_rubric_config.return_value = { "foo": "bar" }
+        mock_get_rubric_config.return_value = {"foo": "bar"}
 
         self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url, {'ora_location': self.ora_usage_key})
