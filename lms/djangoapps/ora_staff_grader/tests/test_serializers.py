@@ -24,6 +24,8 @@ class TestCourseMetadataSerializer(SharedModuleStoreTestCase):
     course_id = "course-v1:Oxford+TT101+2054"
 
     def setUp(self):
+        super().setUp()
+
         self.course_overview = CourseOverviewFactory.create(
             org=self.course_org,
             display_name=self.course_name,
@@ -53,6 +55,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
     mock_ora_instance = None
 
     def setUp(self):
+        super().setUp()
+
         self.mock_ora_instance = Mock(name='openassessment-block')
         self.mock_ora_instance.display_name = self.display_name
         self.mock_ora_instance.prompts = self.prompts
