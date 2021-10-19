@@ -148,7 +148,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         Individual submissions may have a missing or emtpy "teamName".
         The field should be added to serialized output with null value.
         """
-        submission =  {
+        submission = {
             "submissionUuid": "individual",
             "username": "Buzz",
             "dateSubmitted": "1969-07-21 21:35:00",
@@ -185,7 +185,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         """
         An empty score dict should be serialized as None
         """
-        submission =  {
+        submission = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
             "dateSubmitted": "1983-06-03 00:00:00",
@@ -196,7 +196,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "score": {}
         }
 
-        expected_output =  {
+        expected_output = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
             "teamName": None,
