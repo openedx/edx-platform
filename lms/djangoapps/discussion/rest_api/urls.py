@@ -16,7 +16,8 @@ from lms.djangoapps.discussion.rest_api.views import (
     CourseView,
     ReplaceUsernamesView,
     RetireUserView,
-    ThreadViewSet
+    ThreadViewSet,
+    UploadFileView,
 )
 
 ROUTER = SimpleRouter()
@@ -30,6 +31,11 @@ urlpatterns = [
         ),
         CourseDiscussionSettingsAPIView.as_view(),
         name="discussion_course_settings",
+    ),
+    url(
+        fr"^v1/courses/{settings.COURSE_ID_PATTERN}/upload$",
+        UploadFileView.as_view(),
+        name="upload_file",
     ),
     url(
         r"^v1/courses/{}/roles/(?P<rolename>[A-Za-z0-9+ _-]+)/?$".format(
