@@ -63,7 +63,7 @@ asgiref==3.4.1
     #   -r requirements/edx/testing.txt
     #   django
     #   uvicorn
-astroid==2.6.6
+astroid==2.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -969,6 +969,7 @@ pip-tools==6.4.0
 platformdirs==2.4.0
     # via
     #   -r requirements/edx/testing.txt
+    #   pylint
     #   virtualenv
 pluggy==1.0.0
     # via
@@ -1039,9 +1040,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.9.6
+pylint==2.11.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
@@ -1440,9 +1440,15 @@ typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
+    #   astroid
     #   gitpython
     #   mypy
     #   pydantic
+    #   pylint
+ua-parser==0.10.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   django-cookies-samesite
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt

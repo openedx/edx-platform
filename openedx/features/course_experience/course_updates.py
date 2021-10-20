@@ -93,7 +93,7 @@ def get_current_update_for_user(request, course):
         return None
 
     update_hash = _calculate_update_hash(updates[0])
-    if update_hash in dismissed_hashes:
+    if update_hash in dismissed_hashes:  # pylint: disable=unsupported-membership-test
         return None
 
     return updates[0]['content']

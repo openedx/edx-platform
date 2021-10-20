@@ -74,7 +74,7 @@ class Features(Enum):
         self.feature_support_type = feature_support_type
 
     @property
-    def value(self):
+    def value(self):  # pylint: disable=invalid-overridden-method
         return self.feature_id
 
     @property

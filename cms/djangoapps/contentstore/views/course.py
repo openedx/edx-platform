@@ -1,7 +1,6 @@
 """
 Views related to operations on course objects
 """
-# pylint: disable=filter-builtin-not-iterating
 
 
 import copy

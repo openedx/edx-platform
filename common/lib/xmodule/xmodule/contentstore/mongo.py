@@ -324,7 +324,7 @@ class MongoContentStore(ContentStore):
         count = 0
         assets = []
         try:
-            result = cursor.next()  # lint-amnesty, pylint: disable=next-method-called
+            result = cursor.next()
             if result:
                 count = result['count']
                 assets = list(result['results'])

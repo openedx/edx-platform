@@ -14,7 +14,7 @@ MANAGED_TEAM_MAX_TEAM_SIZE = 200
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 
 
-class TeamsConfig:  # pylint: disable=eq-without-hash
+class TeamsConfig:
     """
     Configuration for the Course Teams feature on a course run.
 
@@ -155,7 +155,7 @@ class TeamsConfig:  # pylint: disable=eq-without-hash
         return self.default_max_team_size
 
 
-class TeamsetConfig:  # pylint: disable=eq-without-hash
+class TeamsetConfig:
     """
     Configuration for a team-set within a course run.
 

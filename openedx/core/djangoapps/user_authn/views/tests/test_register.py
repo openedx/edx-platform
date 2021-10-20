@@ -660,12 +660,12 @@ class RegistrationViewTestV1(
         self._assert_reg_absent_field(
             no_extra_fields_setting,
             {
-                "name": u"favorite_editor",
-                "type": u"select",
+                "name": "favorite_editor",
+                "type": "select",
                 "required": False,
-                "label": u"Favorite Editor",
-                "placeholder": u"cat",
-                "defaultValue": u"vim",
+                "label": "Favorite Editor",
+                "placeholder": "cat",
+                "defaultValue": "vim",
                 "errorMessages": {
                     'required': 'This field is required.',
                     'invalid_choice': 'Select a valid choice. %(value)s is not one of the available choices.',
