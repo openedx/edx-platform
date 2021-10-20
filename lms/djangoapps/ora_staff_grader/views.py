@@ -13,11 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.serializers import (
-    CourseMetadataSerializer,
-    OpenResponseMetadataSerializer,
-    SubmissionMetadataSerializer
-)
+from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -53,32 +49,26 @@ class InitializeView(RetrieveAPIView):
         if not ora_location:
             return HttpResponseBadRequest(_("Query must contain an ora_location param."))
 
+        response_data = {}
+
         # Get ORA block
         try:
             ora_usage_key = UsageKey.from_string(ora_location)
-            openassessment_block = modulestore().get_item(ora_usage_key)
+            response_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
         except (InvalidKeyError, ItemNotFoundError):
             return HttpResponseNotFound(_("Invalid ora_location."))
 
         # Get course metadata
         course_id = str(ora_usage_key.course_key)
-        course_metadata = get_course_overview_or_none(course_id)
+        response_data['courseMetadata'] = get_course_overview_or_none(course_id)
 
         # Get list of submissions for this ORA
-        submissions_metadata = self.get_submissions(request, ora_location)
+        response_data['submissions'] = self.get_submissions(request, ora_location)
 
         # Get the rubric config for this ORA
-        rubric_config = self.get_rubric_config(request, ora_location)
+        response_data['rubricConfig'] = self.get_rubric_config(request, ora_location)
 
-        return Response({
-            'courseMetadata': CourseMetadataSerializer(course_metadata).data,
-            'oraMetadata': OpenResponseMetadataSerializer(openassessment_block).data,
-            'submissions': {
-                submission_id: SubmissionMetadataSerializer(submission).data
-                for (submission_id, submission) in submissions_metadata.items()
-            },
-            'rubricConfig': rubric_config,
-        })
+        return Response(InitializeSerializer(response_data).data)
 
     def get_submissions(self, request, usage_id):
         """

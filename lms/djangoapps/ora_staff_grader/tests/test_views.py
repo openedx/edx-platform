@@ -70,10 +70,10 @@ class TestInitializeView(SharedModuleStoreTestCase, APITestCase):
             "a": {
                 "submissionUuid": "a",
                 "username": "foo",
-                "teamName": "",
+                "teamName": None,
                 "dateSubmitted": "1969-07-16 13:32:00",
-                "dateGraded": "None",
-                "gradedBy": "",
+                "dateGraded": None,
+                "gradedBy": None,
                 "gradingStatus": "ungraded",
                 "lockStatus": "unlocked",
                 "score": {

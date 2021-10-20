@@ -6,8 +6,8 @@ from unittest.mock import Mock
 
 from lms.djangoapps.ora_staff_grader.serializers import (
     CourseMetadataSerializer,
+    InitializeSerializer,
     OpenResponseMetadataSerializer,
-    SubmissionMetadataSerializer,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -79,109 +79,99 @@ class TestOpenResponseMetadataSerializer(TestCase):
         }
 
 
-class TestSubmissionMetadataSerializer(TestCase):
+class TestInitializeSerializer(TestCase):
     """
-    Tests for SubmissionMetadataSerializer. Implicitly, this also exercises ScoreSerializer.
-
-    SubmissionMetadata comes from the ORA list_staff_workflows XBlock.json_handler and has the shape:
-
-    "<submission_uuid>": {
-        "submissionUuid": uuid,
-        "username": string or None,
-        "teamName": string orNone,
-        "dateSubmitted": string(yyyy-mm-dd HH:MM:SS),
-        "dateGraded": string(yyyy-mm-dd HH:MM:SS) or None,
-        "gradedBy": string or None,
-        "gradingStatus": "ungraded" or "graded",
-        "lockStatus": "locked", "unlocked", or "in-progress",
-        "score": {} or {
-            "pointsEarned": int,
-            "pointsPossible": int,
-        }
-    }
+    Tests for InitializeSerializer
     """
-    submission_data = {
-        "ungraded": {
-            "submissionUuid": "ungraded",
-            "username": "foo",
-            "teamName": None,
-            "dateSubmitted": "1969-07-16 13:32:00",
-            "dateGraded": None,
-            "gradedBy": None,
-            "gradingStatus": "ungraded",
-            "lockStatus": "unlocked",
-            "score": {
-                "pointsEarned": 0,
-                "pointsPossible": 10
-            }
-        },
-        "graded": {
-            "submissionUuid": "graded",
-            "username": "baz",
-            "teamName": None,
-            "dateSubmitted": "1969-07-21 21:35:00",
-            "dateGraded": "1969-07-24 16:44:00",
-            "gradedBy": "buz",
-            "gradingStatus": "graded",
-            "lockStatus": "unlocked",
-            "score": {
-                "pointsEarned": 9,
-                "pointsPossible": 10
-            }
+    def set_up_ora(self):
+        """ Create a mock Open Repsponse Assessment for serialization """
+        ora_data = {
+            "display_name": "Week 1: Time Travel Paradoxes",
+            "prompts": ["<p>In your own words, explain a famous time travel paradox</p>"],
+            "teams_enabled": False
         }
-    }
 
-    def test_submission_serialize(self):
-        for submission_id, submission_data in self.submission_data.items():
-            data = SubmissionMetadataSerializer(submission_data).data
+        return Mock(name='openassessment-block', **ora_data)
 
-            # For each submission, data is just passed through
-            assert self.submission_data[submission_id] == data
+    def set_up_course_metadata(self):
+        course_org = "Oxford"
+        course_name = "Introduction to Time Travel"
+        course_number = "TT101"
+        course_run = "2054"
+        course_id = "course-v1:Oxford+TT101+2054"
 
-    def test_missing_team_name(self):
-        """
-        Individual submissions may have a missing or emtpy "teamName".
-        The field should be added to serialized output with null value.
-        """
-        submission = {
-            "submissionUuid": "individual",
-            "username": "Buzz",
-            "dateSubmitted": "1969-07-21 21:35:00",
-            "dateGraded": "1969-07-24 16:44:00",
-            "gradedBy": "Houston",
-            "gradingStatus": "ungraded",
-            "lockStatus": "unlocked",
-            "score": {
-                "pointsEarned": 10,
-                "pointsPossible": 10
+        return CourseOverviewFactory.create(
+            org=course_org,
+            display_name=course_name,
+            display_number_with_default=course_number,
+            run=course_run,
+        )
+
+    def setUp(self):
+        super().setUp()
+
+        self.mock_ora_instance = self.set_up_ora()
+        self.mock_course_metadata = self.set_up_course_metadata()
+
+        # Submissions data gets some minor transforms
+        # This test data does not undergo any transforms so we can do easier comparison tests
+        self.mock_submissions_data = {
+            "space-oddity": {
+                "submissionUuid": "space-oddity",
+                "username": "Major Tom",
+                "teamName": None,
+                "dateSubmitted": "1969-06-20 00:00:00",
+                "dateGraded": "1969-07-11 00:00:00",
+                "gradedBy": "Ground Control",
+                "gradingStatus": "graded",
+                "lockStatus": "unlocked",
+                "score": {
+                    "pointsEarned": 10,
+                    "pointsPossible": 10,
+                }
             }
         }
 
-        expected_output = {
-            "submissionUuid": "individual",
-            "username": "Buzz",
-            "teamName": None,
-            "dateSubmitted": "1969-07-21 21:35:00",
-            "dateGraded": "1969-07-24 16:44:00",
-            "gradedBy": "Houston",
-            "gradingStatus": "ungraded",
-            "lockStatus": "unlocked",
-            "score": {
-                "pointsEarned": 10,
-                "pointsPossible": 10
-            }
+        # Rubric data is passed through without transforms, we can create a toy response
+        self.mock_rubric_data = {"foo": "bar"}
+
+    def test_serializer_shape(self):
+        """ Simplest test, is the structure correct? """
+        input_data = {
+            "courseMetadata": self.mock_course_metadata,
+            "oraMetadata": self.mock_ora_instance,
+            "submissions": self.mock_submissions_data,
+            "rubricConfig": self.mock_rubric_data,
         }
 
-        data = SubmissionMetadataSerializer(submission).data
+        output_data = InitializeSerializer(input_data).data
 
-        assert data == expected_output
+        assert output_data.keys() == input_data.keys()
 
-    def test_empty_score(self):
+    def test_serializer_output(self):
+        input_data = {
+            "courseMetadata": self.mock_course_metadata,
+            "oraMetadata": self.mock_ora_instance,
+            "submissions": self.mock_submissions_data,
+            "rubricConfig": self.mock_rubric_data,
+        }
+
+        output_data = InitializeSerializer(input_data).data
+
+        # Check that each of the sub-serializers assembles data correctly
+        assert output_data['courseMetadata'] == CourseMetadataSerializer(self.mock_course_metadata).data
+        assert output_data['oraMetadata'] == OpenResponseMetadataSerializer(self.mock_ora_instance).data
+        assert output_data['submissions'] == self.mock_submissions_data
+        assert output_data['rubricConfig'] == self.mock_rubric_data
+
+    def test_submissions_transforms(self):
         """
-        An empty score dict should be serialized as None
+        Submissions get special transforms to deal with empty/missing fields:
+        - teamName/username are added if omitted, with a value of None
+        - Empty score dict is replaced with None
         """
-        submission = {
-            "submissionUuid": "empty-score",
+        submission_data = {
+            "submissionUuid": "empty_fields_test",
             "username": "WOPR",
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
@@ -191,8 +181,8 @@ class TestSubmissionMetadataSerializer(TestCase):
             "score": {}
         }
 
-        expected_output = {
-            "submissionUuid": "empty-score",
+        expected_submission_transform = {
+            "submissionUuid": "empty_fields_test",
             "username": "WOPR",
             "teamName": None,
             "dateSubmitted": "1983-06-03 00:00:00",
@@ -203,6 +193,6 @@ class TestSubmissionMetadataSerializer(TestCase):
             "score": None
         }
 
-        data = SubmissionMetadataSerializer(submission).data
+        transformed_submission = InitializeSerializer.transform_submission(submission_data)
 
-        assert data == expected_output
+        assert transformed_submission == expected_submission_transform

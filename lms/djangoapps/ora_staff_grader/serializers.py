@@ -44,46 +44,43 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
         ]
 
 
-class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
-    """
-    Score (points earned/possible) for use in SubmissionMetadataSerializer
-    """
-    pointsEarned = serializers.IntegerField(default=0)
-    pointsPossible = serializers.IntegerField(default=0)
-
-    class Meta:
-        fields = ['pointsEarned', 'pointsPossible']
-
-    def to_representation(self, instance):
-        """ An empty dict should return None instead """
-        if ('pointsEarned' not in instance) and ('pointsPossible' not in instance):
-            return None
-        return super().to_representation(instance)
-
-
-class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
-    """
-    Submission metadata for displaying submissions table in ESG
-    """
-    submissionUuid = serializers.CharField()
-    username = serializers.CharField(allow_null=True)
-    teamName = serializers.CharField(allow_null=True)
-    dateSubmitted = serializers.DateTimeField()
-    dateGraded = serializers.DateTimeField(allow_null=True)
-    gradedBy = serializers.CharField(allow_null=True)
-    gradingStatus = serializers.CharField()
-    lockStatus = serializers.CharField()
-    score = ScoreSerializer(allow_null=True)
+class InitializeSerializer(serializers.Serializer):
+    courseMetadata = CourseMetadataSerializer()
+    oraMetadata = OpenResponseMetadataSerializer()
+    submissions = serializers.DictField()
+    rubricConfig = serializers.DictField()
 
     class Meta:
         fields = [
-            'submissionUuid',
-            'username',
-            'teamName',
-            'dateSubmitted',
-            'dateGraded',
-            'gradedBy',
-            'gradingStatus',
-            'lockStatus',
-            'score'
+            'courseMetadata',
+            'oraMetadata',
+            'submissions',
+            'rubricConfig',
         ]
+
+    @staticmethod
+    def transform_submission(submission):
+        """ Basic data transforms for submissions """
+
+        # Add teamName if omitted, this is allowed for individual responses
+        if 'teamName' not in submission:
+            submission['teamName'] = None
+
+        # Add username if omitted, this is allowed for team responses
+        if 'username' not in submission:
+            submission['username'] = None
+
+        # An empty score dict should be transformed to None
+        if not submission['score']:
+            submission['score'] = None
+
+        return submission
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Some basic transforms/cleanup for Submissions
+        for (submission_id, submission) in representation['submissions'].items():
+            representation['submissions'][submission_id] = self.transform_submission(submission)
+
+        return representation
