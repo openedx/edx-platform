@@ -1,6 +1,8 @@
 """
 Serializers for Enhanced Staff Grader (ESG)
 """
+# pylint: disable=abstract-method
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework import serializers
 
