@@ -122,8 +122,9 @@ class Command(BaseCommand):
 
         count = 0
         course_goals = course_goals.exclude(course_key__in=courses_to_exclude).select_related('user').order_by('user')
-        with emulate_http_request(site=Site.objects.get_current()):  # emulate a request for waffle's benefit
-            for goal in course_goals:
+        for goal in course_goals:
+            # emulate a request for waffle's benefit
+            with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
                 if self.handle_goal(goal, today, sunday_date, monday_date):
                     count += 1
 
