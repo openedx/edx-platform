@@ -160,8 +160,7 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMES
 # As django-cookies-samesite package is set to be removed from base requirements when we upgrade to Django 3.2,
 # we should follow the settings name provided by Django.
 # https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-samesite
-if django.VERSION >= (3, 1):
-    SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
+SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 
 AWS_SES_REGION_NAME = ENV_TOKENS.get('AWS_SES_REGION_NAME', 'us-east-1')
 AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')
