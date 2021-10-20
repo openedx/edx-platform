@@ -45,6 +45,9 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
 
 
 class InitializeSerializer(serializers.Serializer):
+    """
+    Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
+    """
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField()

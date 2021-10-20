@@ -94,11 +94,11 @@ class TestInitializeSerializer(TestCase):
         return Mock(name='openassessment-block', **ora_data)
 
     def set_up_course_metadata(self):
+        """ Create mock course metadata for serialization """
         course_org = "Oxford"
         course_name = "Introduction to Time Travel"
         course_number = "TT101"
         course_run = "2054"
-        course_id = "course-v1:Oxford+TT101+2054"
 
         return CourseOverviewFactory.create(
             org=course_org,
@@ -134,19 +134,6 @@ class TestInitializeSerializer(TestCase):
 
         # Rubric data is passed through without transforms, we can create a toy response
         self.mock_rubric_data = {"foo": "bar"}
-
-    def test_serializer_shape(self):
-        """ Simplest test, is the structure correct? """
-        input_data = {
-            "courseMetadata": self.mock_course_metadata,
-            "oraMetadata": self.mock_ora_instance,
-            "submissions": self.mock_submissions_data,
-            "rubricConfig": self.mock_rubric_data,
-        }
-
-        output_data = InitializeSerializer(input_data).data
-
-        assert output_data.keys() == input_data.keys()
 
     def test_serializer_output(self):
         input_data = {
