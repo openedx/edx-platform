@@ -107,10 +107,13 @@ class ProctoredExamSettingsView(APIView):
 
     def post(self, request, course_id):
         """ POST handler """
-        serializer = ProctoredExamSettingsSerializer if request.user.is_staff else LimitedProctoredExamSettingsSerializer
+        serializer = ProctoredExamSettingsSerializer if request.user.is_staff \
+            else LimitedProctoredExamSettingsSerializer
         exam_config = serializer(data=request.data.get('proctored_exam_settings', {}))
         valid_request = exam_config.is_valid()
-        if not request.user.is_staff and valid_request and ProctoredExamSettingsSerializer(data=request.data.get('proctored_exam_settings', {})).is_valid():
+        if not request.user.is_staff and valid_request and ProctoredExamSettingsSerializer(
+            data=request.data.get('proctored_exam_settings', {})
+        ).is_valid():
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):

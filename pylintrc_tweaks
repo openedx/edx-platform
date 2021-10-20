@@ -26,7 +26,9 @@ disable+ =
     consider-using-with,
     unspecified-encoding,
     unused-variable,
+    unused-argument,
     unsubscriptable-object,
+    abstract-method,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
