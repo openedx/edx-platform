@@ -9,7 +9,7 @@ import logging
 import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles

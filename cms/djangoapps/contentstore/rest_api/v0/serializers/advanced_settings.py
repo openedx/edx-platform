@@ -1,7 +1,7 @@
 """ Serializers for course advanced settings"""
 from typing import Type, Dict as DictType
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import Field as SerializerField
 from xblock.fields import (
