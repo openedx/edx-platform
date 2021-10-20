@@ -476,7 +476,7 @@ edx-rest-api-client==5.4.0
     #   edx-proctoring
 edx-search==3.1.0
     # via -r requirements/edx/base.in
-edx-sga==0.16.0
+edx-sga==0.17.2
     # via -r requirements/edx/base.in
 edx-submissions==3.4.0
     # via
@@ -542,7 +542,7 @@ html5lib==1.1
     # via
     #   -r requirements/edx/base.in
     #   ora2
-icalendar==4.0.8
+icalendar==4.0.9
     # via -r requirements/edx/base.in
 idna==3.3
     # via
@@ -658,7 +658,7 @@ multidict==5.2.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.in
-newrelic==7.2.1.168
+newrelic==7.2.2.169
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -713,7 +713,7 @@ pbr==5.6.0
     #   stevedore
 piexif==1.1.3
     # via -r requirements/edx/base.in
-pillow==8.3.2
+pillow==8.4.0
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -747,7 +747,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==2.2.0
+pyjwt[crypto]==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   drf-jwt
@@ -961,7 +961,7 @@ sqlparse==0.4.2
     #   django
 staff-graded-xblock==1.6.0
     # via -r requirements/edx/base.in
-stevedore==3.4.0
+stevedore==3.5.0
     # via
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
