@@ -208,7 +208,7 @@ def _create_library(request):
             )
         # Give the user admin ("Instructor") role for this library:
         add_instructor(new_lib.location.library_key, request.user, request.user)
-    except PermissionDenied as error:
+    except PermissionDenied as error:  # pylint: disable=unused-variable
         log.info(
             "User does not have the permission to create LIBRARY in this organization."
             "User: '%s' Org: '%s' LIBRARY #: '%s'.",
