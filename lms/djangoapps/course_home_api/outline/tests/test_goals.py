@@ -17,7 +17,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_goals.models import CourseGoal
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
