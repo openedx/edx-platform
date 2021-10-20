@@ -12,7 +12,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 from pytz import UTC
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from xmodule.util.misc import get_short_labeler
 
