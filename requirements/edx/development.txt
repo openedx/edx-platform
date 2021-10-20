@@ -608,7 +608,7 @@ edx-toggles==4.2.0
     #   ora2
 edx-user-state-client==1.3.2
     # via -r requirements/edx/testing.txt
-edx-when==2.2.1
+edx-when==2.2.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
