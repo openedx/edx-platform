@@ -85,7 +85,7 @@ class DiscussionTopic:
 
     def __init__(
         self,
-        topic_id: str,
+        topic_id: Optional[str],
         name: str,
         thread_list_url: str,
         children: Optional[List[DiscussionTopic]] = None,
@@ -94,7 +94,9 @@ class DiscussionTopic:
         self.id = topic_id  # pylint: disable=invalid-name
         self.name = name
         self.thread_list_url = thread_list_url
-        self.children: List[DiscussionTopic] = children or []  # children are of same type i.e. DiscussionTopic
+        self.children = children or []  # children are of same type i.e. DiscussionTopic
+        if not children and not thread_counts:
+            thread_counts = {"discussion": 0, "question": 0}
         self.thread_counts = thread_counts
 
 
@@ -312,7 +314,7 @@ def get_courseware_topics(
                     xblock.discussion_target,
                     get_thread_list_url(request, course_key, [xblock.discussion_id]),
                     None,
-                    thread_counts.get(xblock.discussion_id, {"discussion": 0, "question": 0}),
+                    thread_counts.get(xblock.discussion_id),
                 )
                 children.append(discussion_topic)
 
@@ -365,7 +367,7 @@ def get_non_courseware_topics(
             discussion_topic = DiscussionTopic(
                 entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
                 None,
-                thread_counts.get(entry["id"], {"discussion": 0, "question": 0})
+                thread_counts.get(entry["id"])
             )
             non_courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
 
