@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.http.request import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 

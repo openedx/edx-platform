@@ -7,7 +7,7 @@ import re
 from datetime import datetime, timedelta
 
 import crum
-from django.utils.translation import get_language, pgettext, ugettext
+from django.utils.translation import get_language, pgettext, gettext
 from pytz import UnknownTimeZoneError, timezone, utc
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -142,7 +142,7 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
         # string for formatting dates in a long form.  For example, the
         # American English form is "%A, %B %d %Y".
         # See http://strftime.org for details.
-        format = ugettext("LONG_DATE_FORMAT")
+        format = gettext("LONG_DATE_FORMAT")
         if format == "LONG_DATE_FORMAT":
             format = DEFAULT_LONG_DATE_FORMAT
     elif format == "DATE_TIME":  # lint-amnesty, pylint: disable=comparison-with-callable
@@ -150,7 +150,7 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
         # string for formatting dates with times.  For example, the American
         # English form is "%b %d, %Y at %H:%M".
         # See http://strftime.org for details.
-        format = ugettext("DATE_TIME_FORMAT")
+        format = gettext("DATE_TIME_FORMAT")
         if format == "DATE_TIME_FORMAT":
             format = DEFAULT_DATE_TIME_FORMAT
     elif format == "DAY_AND_TIME":  # lint-amnesty, pylint: disable=comparison-with-callable
@@ -186,7 +186,7 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
             # format string for formatting dates in a brief form.  For example,
             # the American English form is "%b %d %Y".
             # See http://strftime.org for details.
-            actual_format = ugettext("SHORT_DATE_FORMAT")
+            actual_format = gettext("SHORT_DATE_FORMAT")
             if actual_format == "SHORT_DATE_FORMAT":
                 actual_format = DEFAULT_SHORT_DATE_FORMAT
             if "%x" in actual_format:
@@ -198,7 +198,7 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
             # Translators: the translation for "TIME_FORMAT" must be a format
             # string for formatting times.  For example, the American English
             # form is "%H:%M:%S". See http://strftime.org for details.
-            actual_format = ugettext("TIME_FORMAT")
+            actual_format = gettext("TIME_FORMAT")
             if actual_format == "TIME_FORMAT":
                 actual_format = DEFAULT_TIME_FORMAT
             if "%X" in actual_format:

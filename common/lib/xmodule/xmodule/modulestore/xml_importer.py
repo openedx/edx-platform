@@ -29,7 +29,7 @@ import re
 from abc import abstractmethod
 
 import xblock
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
