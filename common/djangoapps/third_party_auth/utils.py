@@ -11,9 +11,6 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     get_current_organization,
     get_single_user_organization
 )
-from openedx.core.djangoapps.appsembler.multi_tenant_emails.exceptions import (
-    SAMLUnusableUsernameDueToMTE
-)
 
 logger = logging.getLogger(__name__)
 
@@ -47,21 +44,8 @@ def user_exists(details):
                     user = User.objects.get(username=username)
                 except User.DoesNotExist:
                     return False
-
-                if get_single_user_organization(user) == current_org:
-                    return True
                 else:
-                    logger.info(
-                        'SAMLUnusableUsernameDueToMTE: Cannot use username '
-                        '(%s) in (%s) because it is already taken in a '
-                        'different organization (%s)',
-                        username,
-                        current_org.short_name,
-                        get_single_user_organization(user)
-                    )
-                    raise SAMLUnusableUsernameDueToMTE(
-                        'The username is already taken in a different organization'
-                    )
+                    return True
 
         else:
             return User.objects.filter(**user_queryset_filter).exists()
