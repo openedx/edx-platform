@@ -303,6 +303,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             response = self.client.get(self.url)
 
         assert response.status_code == 200
+        assert response.data['username'] == masquerade_role or username
         if expect_course_access:
             assert response.data['course_access']['has_access']
         else:
@@ -313,24 +314,20 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
-                with mock.patch('common.djangoapps.track.segment.track') as mock_segment_track:
-                    response = self.client.get(self.url, content_type='application/json')
-                    celebrations = response.json()['celebrations']
-                    assert celebrations['streak_length_to_celebrate'] == 3
-                    assert celebrations['streak_discount_enabled'] is True
-                    mock_segment_track.assert_called_once()
+                response = self.client.get(self.url, content_type='application/json')
+                celebrations = response.json()['celebrations']
+                assert celebrations['streak_length_to_celebrate'] == 3
+                assert celebrations['streak_discount_enabled'] is True
 
     def test_streak_segment_suppressed_for_unverified(self):
         """ Test that metadata endpoint does not return a discount and signal is not sent if flag is not set """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=False):
             with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
-                with mock.patch('common.djangoapps.track.segment.track') as mock_segment_track:
-                    response = self.client.get(self.url, content_type='application/json')
-                    celebrations = response.json()['celebrations']
-                    assert celebrations['streak_length_to_celebrate'] == 3
-                    assert celebrations['streak_discount_enabled'] is False
-                    mock_segment_track.assert_not_called()
+                response = self.client.get(self.url, content_type='application/json')
+                celebrations = response.json()['celebrations']
+                assert celebrations['streak_length_to_celebrate'] == 3
+                assert celebrations['streak_discount_enabled'] is False
 
     @ddt.data(
         (None, False, False, False),
