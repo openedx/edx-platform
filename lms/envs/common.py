@@ -2609,6 +2609,7 @@ INSTALLED_APPS = [
 
     # Edly apps
     'openedx.features.edly',
+    'openedx.features.course_rating',
     'edly_panel_app',
     'xss_utils',
 
