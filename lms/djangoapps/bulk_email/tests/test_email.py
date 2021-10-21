@@ -288,7 +288,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         assert len(mail.outbox) == (1 + len(self.staff))
         assert len([e.to[0] for e in mail.outbox]) == len([self.instructor.email] + [s.email for s in self.staff])
 
-    @override_settings(DEFAULT_FROM_EMAIL='test@example.com', EMAIL_USE_COURSE_ID_FROM_FOR_BULK=True)
+    @override_settings(DEFAULT_FROM_EMAIL='test@example.com', BULK_EMAIL_DEFAULT_FROM_EMAIL=None, EMAIL_USE_COURSE_ID_FROM_FOR_BULK=False)  # lint-amnesty, pylint: disable=line-too-long
     def test_email_from_address(self):
         """
         Make sure the from_address should be the DEFAULT_FROM_EMAIL when corresponding flag is enabled.
