@@ -13,6 +13,7 @@ from unittest.mock import patch
 import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -26,6 +27,7 @@ from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.views.dashboard import check_for_unacknowledged_notices
 from common.djangoapps.util.milestones_helpers import (
     get_course_milestones,
     remove_prerequisite_course,
@@ -905,3 +907,114 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
             assert expected_button in dashboard_html
             assert unexpected_button not in dashboard_html
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid for the LMS')
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_NOTICES"), 'Notices plugin is not enabled')
+class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
+    """
+    Tests for the Dashboard redirect functionality introduced via the Notices plugin.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=PASSWORD)
+        self.path = reverse('dashboard')
+
+    def test_check_for_unacknowledged_notices(self):
+        """
+        Happy path. Verifies that we return a URL in the proper form for a user that has an unack'd Notice.
+        """
+        context = {
+            "plugins": {
+                "notices": {
+                    "unacknowledged_notices": [
+                        '/notices/render/1/',
+                        '/notices/render/2/',
+                    ],
+                }
+            }
+        }
+
+        path = reverse("notices:notice-detail", kwargs={"pk": 1})
+        expected_results = f"{settings.LMS_ROOT_URL}{path}?next={settings.LMS_ROOT_URL}/dashboard/"
+
+        results = check_for_unacknowledged_notices(context)
+        assert results == expected_results
+
+    def test_check_for_unacknowledged_notices_no_unacknowledged_notices(self):
+        """
+        Verifies that we will return None if the user has no unack'd Notices in the plugin context data.
+        """
+        context = {
+            "plugins": {
+                "notices": {
+                    "unacknowledged_notices": [],
+                }
+            }
+        }
+
+        results = check_for_unacknowledged_notices(context)
+        assert results is None
+
+    def test_check_for_unacknowledged_notices_incorrect_data(self):
+        """
+        Verifies that we will return None (and no Exceptions are thrown) if the plugin context data doesn't match the
+        expected form.
+        """
+        context = {
+            "plugins": {
+                "notices": {
+                    "incorrect_key": [
+                        '/notices/render/1/',
+                        '/notices/render/2/',
+                    ],
+                }
+            }
+        }
+
+        results = check_for_unacknowledged_notices(context)
+
+        assert results is None
+
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    def test_user_with_unacknowledged_notice(self, mock_notices):
+        """
+        Verifies that we will redirect the learner to the URL returned from the `check_for_unacknowledged_notices`
+        function.
+        """
+        mock_notices.return_value = reverse("about")
+
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': True}):
+            response = self.client.get(self.path)
+
+        assert response.status_code == 302
+        assert response.url == "/about"
+        mock_notices.assert_called_once()
+
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    def test_user_with_unacknowledged_notice_no_notices(self, mock_notices):
+        """
+        Verifies that we will NOT redirect the user if the result of calling the `check_for_unacknowledged_notices`
+        function is None.
+        """
+        mock_notices.return_value = None
+
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': True}):
+            response = self.client.get(self.path)
+
+        assert response.status_code == 200
+        mock_notices.assert_called_once()
+
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    def test_user_with_unacknowledged_notice_plugin_disabled(self, mock_notices):
+        """
+        Verifies that the `check_for_unacknowledged_notices` function is NOT called if the feature is disabled.
+        """
+        mock_notices.return_value = None
+
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': False}):
+            response = self.client.get(self.path)
+
+        assert response.status_code == 200
+        mock_notices.assert_not_called()
