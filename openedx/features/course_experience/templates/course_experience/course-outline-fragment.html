@@ -32,13 +32,15 @@ dates_banner_displayed = False
         % endif
     </div>
     % if course_sections is not None:
-        <button class="btn btn-primary"
-                id="expand-collapse-outline-all-button"
-                aria-expanded="false"
-                aria-controls="course-outline-block-tree"
-                >
-          <span class="expand-collapse-outline-all-extra-padding" id="expand-collapse-outline-all-span">${_("Expand All")}</span>
-        </button>
+        <div class="expand-collapse-outline-holder">
+            <button class="btn btn-primary"
+                    id="expand-collapse-outline-all-button"
+                    aria-expanded="false"
+                    aria-controls="course-outline-block-tree"
+                    >
+              <span class="expand-collapse-outline-all-extra-padding" id="expand-collapse-outline-all-span">${_("Expand All")}</span>
+            </button>
+        </div>
         <ol class="block-tree accordion"
             id="course-outline-block-tree"
             aria-labelledby="expand-collapse-outline-all-button">
@@ -55,7 +57,7 @@ dates_banner_displayed = False
                         <span class="fa fa-chevron-right ${ 'fa-rotate-90' if section_is_auto_opened else '' }" aria-hidden="true"></span>
                         <h3 class="section-title">${ section['display_name'] }</h3>
             % if section.get('complete'):
-                            <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                            <span class="complete-checkmark icon ei-check-circle" aria-hidden="true"></span>
                             <span class="sr">${_("Completed")}</span>
             % endif
                     </button>
@@ -100,7 +102,7 @@ dates_banner_displayed = False
                             % endif
                                       </h4>
                             % if subsection.get('complete'):
-                                <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                                <span class="complete-checkmark fa fa-check icon ei-check" aria-hidden="true"></span>
                                 <span class="sr">${_("Completed")}</span>
                             % endif
                             % if needs_prereqs:
