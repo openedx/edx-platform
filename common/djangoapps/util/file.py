@@ -9,8 +9,8 @@ from datetime import datetime
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import DefaultStorage, get_valid_filename
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from pytz import UTC
 
 
@@ -59,7 +59,7 @@ def store_uploaded_file(
         file_extension = os.path.splitext(uploaded_file.name)[1].lower()
         if file_extension not in allowed_file_types:
             file_types = "', '".join(allowed_file_types)
-            msg = ungettext(
+            msg = ngettext(
                 "The file must end with the extension '{file_types}'.",
                 "The file must end with one of the following extensions: '{file_types}'.",
                 len(allowed_file_types)).format(file_types=file_types)
