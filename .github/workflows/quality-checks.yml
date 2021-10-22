@@ -70,6 +70,7 @@ jobs:
         ./scripts/all-tests.sh
 
     - name: Save Job Artifacts
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: Build-Artifacts
