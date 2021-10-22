@@ -499,6 +499,7 @@ class DiscussionTopicSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     thread_list_url = serializers.CharField(read_only=True)
     children = serializers.SerializerMethodField()
+    thread_counts = serializers.DictField(read_only=True)
 
     def get_children(self, obj):
         """
