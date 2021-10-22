@@ -1,11 +1,10 @@
 """
 Discussion API internal interface
 """
-from __future__ import annotations
 
 import itertools
 from collections import defaultdict
-from typing import Dict, List, Literal, Optional, Set, Tuple
+from typing import List, Literal, Optional
 from urllib.parse import urlencode, urlunparse
 
 from django.contrib.auth import get_user_model
@@ -21,7 +20,6 @@ from rest_framework.request import Request
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
-from openedx.core.djangoapps.django_comment_common.comment_client.course import get_course_commentable_counts
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
@@ -37,7 +35,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from xmodule.course_module import CourseBlock
 from .exceptions import (
     CommentNotFoundError,
     DiscussionBlackOutException,
@@ -83,21 +80,11 @@ class DiscussionTopic:
     Class for discussion topic structure
     """
 
-    def __init__(
-        self,
-        topic_id: Optional[str],
-        name: str,
-        thread_list_url: str,
-        children: Optional[List[DiscussionTopic]] = None,
-        thread_counts: Dict[str, int] = None,
-    ):
+    def __init__(self, topic_id, name, thread_list_url, children=None):
         self.id = topic_id  # pylint: disable=invalid-name
         self.name = name
         self.thread_list_url = thread_list_url
-        self.children = children or []  # children are of same type i.e. DiscussionTopic
-        if not children and not thread_counts:
-            thread_counts = {"discussion": 0, "question": 0}
-        self.thread_counts = thread_counts
+        self.children: List[DiscussionTopic] = children or []  # children are of same type i.e. DiscussionTopic
 
 
 class DiscussionEntity(Enum):
@@ -261,13 +248,7 @@ def get_course(request, course_key):
     }
 
 
-def get_courseware_topics(
-    request: Request,
-    course_key: CourseKey,
-    course: CourseBlock,
-    topic_ids: Optional[List[str]],
-    thread_counts: Dict[str, Dict[str, int]],
-) -> Tuple[List[Dict], Set[str]]:
+def get_courseware_topics(request, course_key, course, topic_ids):
     """
     Returns a list of topic trees for courseware-linked topics.
 
@@ -278,8 +259,6 @@ def get_courseware_topics(
         course: The course for which topics are requested.
         topic_ids: A list of topic IDs for which details are requested.
             This is optional. If None then all course topics are returned.
-        thread_counts: A map of the thread ids to the count of each type of thread in them
-           e.g. discussion, question
 
     Returns:
         A list of courseware topics and a set of existing topics among
@@ -313,8 +292,6 @@ def get_courseware_topics(
                     xblock.discussion_id,
                     xblock.discussion_target,
                     get_thread_list_url(request, course_key, [xblock.discussion_id]),
-                    None,
-                    thread_counts.get(xblock.discussion_id),
                 )
                 children.append(discussion_topic)
 
@@ -327,20 +304,13 @@ def get_courseware_topics(
                 category,
                 get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_xblocks(category)]),
                 children,
-                None,
             )
             courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
 
     return courseware_topics, existing_topic_ids
 
 
-def get_non_courseware_topics(
-    request: Request,
-    course_key: CourseKey,
-    course: CourseBlock,
-    topic_ids: Optional[List[str]],
-    thread_counts: Dict[str, Dict[str, int]]
-) -> Tuple[List[Dict], Set[str]]:
+def get_non_courseware_topics(request, course_key, course, topic_ids):
     """
     Returns a list of topic trees that are not linked to courseware.
 
@@ -351,8 +321,6 @@ def get_non_courseware_topics(
         course: The course for which topics are requested.
         topic_ids: A list of topic IDs for which details are requested.
             This is optional. If None then all course topics are returned.
-        thread_counts: A map of the thread ids to the count of each type of thread in them
-           e.g. discussion, question
 
     Returns:
         A list of non-courseware topics and a set of existing topics among
@@ -365,9 +333,7 @@ def get_non_courseware_topics(
     for name, entry in sorted_topics:
         if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
-                entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
-                None,
-                thread_counts.get(entry["id"])
+                entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]])
             )
             non_courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
 
@@ -377,7 +343,7 @@ def get_non_courseware_topics(
     return non_courseware_topics, existing_topic_ids
 
 
-def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Optional[Set[str]] = None):
+def get_course_topics(request, course_key, topic_ids=None):
     """
     Returns the course topic listing for the given course and user; filtered
     by 'topic_ids' list if given.
@@ -397,13 +363,10 @@ def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Option
         DiscussionNotFoundError: If topic/s not found for given topic_ids.
     """
     course = _get_course(course_key, request.user)
-    thread_counts = get_course_commentable_counts(course.id)
 
-    courseware_topics, existing_courseware_topic_ids = get_courseware_topics(
-        request, course_key, course, topic_ids, thread_counts
-    )
+    courseware_topics, existing_courseware_topic_ids = get_courseware_topics(request, course_key, course, topic_ids)
     non_courseware_topics, existing_non_courseware_topic_ids = get_non_courseware_topics(
-        request, course_key, course, topic_ids, thread_counts,
+        request, course_key, course, topic_ids
     )
 
     if topic_ids:

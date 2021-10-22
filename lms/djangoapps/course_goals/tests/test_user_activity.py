@@ -3,7 +3,7 @@ Unit tests for user activity methods.
 """
 
 from datetime import datetime, timedelta
-from unittest.mock import Mock
+
 
 import ddt
 from django.contrib.auth import get_user_model
@@ -173,7 +173,6 @@ class UserActivityTests(UrlResetMixin, ModuleStoreTestCase):
         '/api/discussion/v1/courses/{COURSE_ID}/',
         '/api/discussion/v1/course_topics/{COURSE_ID}',
     )
-    @patch('lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts', Mock(return_value={}))
     def test_mobile_app_user_activity_calls(self, url):
         url = url.replace('{COURSE_ID}', str(self.course.id))
         with patch.object(UserActivity, 'record_user_activity') as record_user_activity_mock:
