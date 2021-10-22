@@ -8,8 +8,8 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
 
@@ -399,7 +399,7 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
         PreferenceValidationError: the supplied key and/or value for a user preference are invalid.
     """
     if preference_value is None or str(preference_value).strip() == '':
-        format_string = ugettext_noop("Preference '{preference_key}' cannot be set to an empty value.")
+        format_string = gettext_noop("Preference '{preference_key}' cannot be set to an empty value.")
         raise PreferenceValidationError({
             preference_key: {
                 "developer_message": format_string.format(preference_key=preference_key),
@@ -430,8 +430,8 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
             }
         })
     if preference_key == "time_zone" and preference_value not in common_timezones_set:
-        developer_message = ugettext_noop("Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
-        user_message = ugettext_noop("Value '{preference_value}' is not a valid time zone selection.")
+        developer_message = gettext_noop("Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
+        user_message = gettext_noop("Value '{preference_value}' is not a valid time zone selection.")
         raise PreferenceValidationError({
             preference_key: {
                 "developer_message": developer_message.format(

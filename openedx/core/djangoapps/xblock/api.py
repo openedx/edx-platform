@@ -12,7 +12,7 @@ import logging
 import threading
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator
 from rest_framework.exceptions import NotFound
