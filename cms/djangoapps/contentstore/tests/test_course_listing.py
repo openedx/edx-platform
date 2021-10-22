@@ -157,8 +157,8 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(len(list(courses_iter)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2),
-        (ModuleStoreEnum.Type.mongo, 1)
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -239,8 +239,8 @@ class TestCourseListing(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 2),
-        (ModuleStoreEnum.Type.mongo, 1, 1)
+        (ModuleStoreEnum.Type.split, 3, 3),
+        (ModuleStoreEnum.Type.mongo, 2, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):

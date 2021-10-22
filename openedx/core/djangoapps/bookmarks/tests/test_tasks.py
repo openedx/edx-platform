@@ -108,10 +108,10 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.mongo, 4, 3, 5),
         (ModuleStoreEnum.Type.mongo, 2, 4, 6),
         # (ModuleStoreEnum.Type.mongo, 4, 4, 6), Too slow.
-        (ModuleStoreEnum.Type.split, 2, 2, 2),
-        (ModuleStoreEnum.Type.split, 4, 2, 2),
-        (ModuleStoreEnum.Type.split, 2, 3, 2),
-        (ModuleStoreEnum.Type.split, 2, 4, 2),
+        (ModuleStoreEnum.Type.split, 2, 2, 3),
+        (ModuleStoreEnum.Type.split, 4, 2, 3),
+        (ModuleStoreEnum.Type.split, 2, 3, 3),
+        (ModuleStoreEnum.Type.split, 2, 4, 3),
     )
     @ddt.unpack
     def test_calculate_course_xblocks_data_queries(self, store_type, children_per_block, depth, expected_mongo_calls):
