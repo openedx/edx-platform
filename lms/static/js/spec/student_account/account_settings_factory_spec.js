@@ -26,7 +26,8 @@ define(['backbone',
                     1,
                     Helpers.PLATFORM_NAME,
                     Helpers.CONTACT_EMAIL,
-                    true
+                    true,
+                    Helpers.COLLECT_YEAR_OF_BIRTH
                 );
                 return context.accountSettingsView;
             };
@@ -164,6 +165,7 @@ define(['backbone',
                     Helpers.PLATFORM_NAME,
                     Helpers.CONTACT_EMAIL,
                     true,
+                    Helpers.COLLECT_YEAR_OF_BIRTH,
                     '',
 
                     Helpers.SYNC_LEARNER_PROFILE_DATA,

@@ -22,6 +22,7 @@
             platformName,
             contactEmail,
             allowEmailChange,
+            collectYearOfBirth,
             socialPlatforms,
             syncLearnerProfileData,
             enterpriseName,
@@ -38,7 +39,7 @@
                 emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
                 fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
-                fieldItem, emailFieldViewIndex, focusId,
+                fieldItem, emailFieldViewIndex, focusId, yearOfBirthViewIndex,
                 tabIndex = 0;
 
             $accountSettingsElement = $('.wrapper-account-settings');
@@ -245,6 +246,13 @@
                     ]
                 }
             ];
+
+            if (!collectYearOfBirth){
+              yearOfBirthViewIndex = aboutSectionsData[1]['fields'].findIndex(function (field) {
+	              return field['view']['options']['valueAttribute']=== 'year_of_birth';
+                });
+              aboutSectionsData[1]['fields'].splice(yearOfBirthViewIndex,1)
+}
 
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
