@@ -144,6 +144,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             }
         }
     }
+
     def test_submission_serialize(self):
         for submission_id, submission_data in self.submission_data.items():
             data = SubmissionMetadataSerializer(submission_data).data
@@ -155,7 +156,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         """
         An empty score dict should be serialized as None
         """
-        submission =  {
+        submission = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
             "dateSubmitted": "1983-06-03 00:00:00",
@@ -166,7 +167,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "score": {}
         }
 
-        expected_output =  {
+        expected_output = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
             "teamName": None,
