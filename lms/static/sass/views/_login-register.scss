@@ -508,6 +508,14 @@ ul.fa-ul{
     /** FROM _accounts.scss - end **/
   }
 
+
+  .optional-fields {
+      &.full-length-fields {
+          .select-gender {
+              width: 100%;
+          }
+      }
+  }
   .input-block {
     width: 100%;
     border-color: $gray;

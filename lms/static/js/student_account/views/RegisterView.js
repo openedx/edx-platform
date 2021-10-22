@@ -64,7 +64,8 @@
                     this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
                     this.registerFormSubmitButtonText =
                         data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
-                    this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled || false;
+                    this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled;
+                    this.collectYearOfBirth = data.collectYearOfBirth;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.model, 'validation', this.renderLiveValidations);
@@ -128,7 +129,9 @@
 
                     html = this.renderFields(requiredFields, 'required-fields');
 
-                    html.push.apply(html, this.renderFields(optionalFields, 'optional-fields'));
+                    html.push.apply(html, this.renderFields(
+                      optionalFields, `optional-fields ${this.collectYearOfBirth ? '' : 'full-length-fields'}`
+                    ));
 
                     this.render(html.join(''));
                 },
