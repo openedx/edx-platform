@@ -62,7 +62,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
   <div class="auto_enroll auto_enroll_csv membership-section">
     <h3 class="hd hd-3">${_("Register/Enroll Students")}</h3>
-    <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}</p>
+    <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines. Optionally, extra columns can be provided: cohort and course mode, in that order. These extra columns may be blank.")}</p>
     <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
       <div class="customBrowseBtn">
         <label for="browseBtn-auto-enroll">${_("Upload a CSV for bulk enrollment")}</label>
@@ -73,6 +73,19 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
       </div>
       <button type="submit" class="btn-blue" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">${_("Upload CSV")}</button>
+      <div class="enroll-option">
+          <label class="has-hint">
+            <input type="checkbox" name="email-students" id="csv-email-students" value="Notify-students-by-email" aria-describedby="heading-batch-enrollment"
+                   ${'checked="yes"' if settings.FEATURES.get('BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT') else ''}>
+              <span class="label-text">${_("Notify users by email")}</span>
+              <div class="hint email-students-hint">
+                  <span class="hint-caret"></span>
+                  <p id="csv-email-students-tip">
+                      ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
+                  </p>
+              </div>
+          </label>
+      </div>
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     </form>
     <div class="results"></div>
