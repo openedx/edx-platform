@@ -17,7 +17,7 @@ class CourseRatingViewSet(viewsets.ModelViewSet):
     permission_classes = (CustomCourseRatingPermission,)
     serializer_class = CourseRatingSerializer
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['is_approved']
+    filter_fields = ['is_approved', 'user']
 
     def get_queryset(self):
         """
