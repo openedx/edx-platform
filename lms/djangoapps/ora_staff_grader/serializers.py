@@ -1,6 +1,8 @@
 """
 Serializers for Enhanced Staff Grader (ESG)
 """
+# pylint: disable=abstract-method
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework import serializers
 
@@ -48,11 +50,17 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
-    pointsEarned = serializers.IntegerField()
-    pointsPossible = serializers.IntegerField()
+    pointsEarned = serializers.IntegerField(default=0)
+    pointsPossible = serializers.IntegerField(default=0)
 
     class Meta:
         fields = ['pointsEarned', 'pointsPossible']
+
+    def to_representation(self, instance):
+        """ An empty dict should return None instead """
+        if ('pointsEarned' not in instance) and ('pointsPossible' not in instance):
+            return None
+        return super().to_representation(instance)
 
 
 class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -60,14 +68,14 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
     Submission metadata for displaying submissions table in ESG
     """
     submissionUuid = serializers.CharField()
-    username = serializers.CharField()
-    teamName = serializers.CharField()
+    username = serializers.CharField(allow_null=True)
+    teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
-    dateGraded = serializers.DateTimeField()
-    gradedBy = serializers.CharField()
+    dateGraded = serializers.DateTimeField(allow_null=True)
+    gradedBy = serializers.CharField(allow_null=True)
     gradingStatus = serializers.CharField()
     lockStatus = serializers.CharField()
-    score = ScoreSerializer()
+    score = ScoreSerializer(allow_null=True)
 
     class Meta:
         fields = [
@@ -80,4 +88,22 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
             'gradingStatus',
             'lockStatus',
             'score'
+        ]
+
+
+class InitializeSerializer(serializers.Serializer):
+    """
+    Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
+    """
+    courseMetadata = CourseMetadataSerializer()
+    oraMetadata = OpenResponseMetadataSerializer()
+    submissions = serializers.DictField(child=SubmissionMetadataSerializer())
+    rubricConfig = serializers.DictField()
+
+    class Meta:
+        fields = [
+            'courseMetadata',
+            'oraMetadata',
+            'submissions',
+            'rubricConfig',
         ]
