@@ -58,6 +58,7 @@ class TeamsConfigTests(TestCase):
     }
 
     OUTPUT_DATA_1 = {
+        "enabled": True,
         "max_team_size": 5,
         "team_sets": [
             {
@@ -111,6 +112,7 @@ class TeamsConfigTests(TestCase):
     }
 
     OUTPUT_DATA_2 = {
+        "enabled": True,
         "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
         "team_sets": [
             {
@@ -122,10 +124,29 @@ class TeamsConfigTests(TestCase):
             },
         ],
     }
+    INPUT_DATA_3 = {
+        # For a blank config, "enabled" should be automatically added and set to False since no teamsets exist.
+    }
+    OUTPUT_DATA_3 = {
+        "enabled": False,
+        "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
+        "team_sets": [],
+    }
+    INPUT_DATA_4 = {
+        # If teamsets are provided, "enabled" should be automatically added and set to True.
+        "team_sets": [dict(id="test-teamset", name="test", description="test")]
+    }
+    OUTPUT_DATA_4 = {
+        "enabled": True,
+        "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
+        "team_sets": [dict(id="test-teamset", name="test", description="test", type="open", max_team_size=None)],
+    }
 
     @ddt.data(
         (INPUT_DATA_1, OUTPUT_DATA_1),
         (INPUT_DATA_2, OUTPUT_DATA_2),
+        (INPUT_DATA_3, OUTPUT_DATA_3),
+        (INPUT_DATA_4, OUTPUT_DATA_4),
     )
     @ddt.unpack
     def test_teams_config_round_trip(self, input_data, expected_output_data):
