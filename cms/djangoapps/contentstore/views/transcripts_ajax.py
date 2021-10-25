@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey

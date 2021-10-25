@@ -17,7 +17,7 @@ attribute is set and the FEATURE['ENABLE_EXPORT_GIT'] is set.
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
