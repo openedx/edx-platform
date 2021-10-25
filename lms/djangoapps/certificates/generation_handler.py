@@ -21,6 +21,7 @@ from lms.djangoapps.certificates.utils import has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import is_beta_tester
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
@@ -168,7 +169,7 @@ def _can_generate_certificate_common(user, course_key, enrollment_mode):
                  f'certificate. Certificate cannot be generated.')
         return False
 
-    if not IDVerificationService.user_is_verified(user):
+    if _required_verification_missing(course_key, user):
         log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
         return False
 
@@ -217,7 +218,9 @@ def _set_regular_cert_status(user, course_key, enrollment_mode, course_grade):
     if status is not None:
         return status
 
-    if IDVerificationService.user_is_verified(user) and not _is_passing_grade(course_grade) and cert is not None:
+    if not _required_verification_missing(course_key, user) \
+            and not _is_passing_grade(course_grade) \
+            and cert is not None:
         if cert.status != CertificateStatuses.notpassing:
             course_grade_val = _get_grade_value(course_grade)
             cert.mark_notpassing(mode=enrollment_mode, grade=course_grade_val, source='certificate_generation')
@@ -238,7 +241,7 @@ def _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cer
             cert.invalidate(mode=enrollment_mode, source='certificate_generation')
         return CertificateStatuses.unavailable
 
-    if not IDVerificationService.user_is_verified(user) and _has_passing_grade_or_is_allowlisted(user, course_key,
+    if _required_verification_missing(course_key, user) and _has_passing_grade_or_is_allowlisted(user, course_key,
                                                                                                  course_grade):
         if cert is None:
             _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
@@ -397,3 +400,10 @@ def _is_mode_now_eligible(enrollment_mode, cert):
     if modes_api.is_eligible_for_certificate(enrollment_mode) and not modes_api.is_eligible_for_certificate(cert.mode):
         return True
     return False
+
+
+def _required_verification_missing(course_key, user):
+    """
+    Return true if IDV is required for this course and the user does not have it
+    """
+    return not is_integrity_signature_enabled(course_key) and not IDVerificationService.user_is_verified(user)
