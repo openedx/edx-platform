@@ -20,6 +20,7 @@ from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from edx_django_utils.cache import RequestCache
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -31,6 +32,7 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
     """
     Exports course drafts.
     """
+    RequestCache(namespace="course_index_cache").clear()
     # NOTE: we need to explicitly implement the logic for setting the vertical's parent
     # and index here since the XML modulestore cannot load draft modules
     with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):

@@ -108,6 +108,8 @@ from xmodule.partitions.partitions_service import PartitionService
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 
+from edx_django_utils.cache import RequestCache
+
 log = logging.getLogger(__name__)
 
 # ==============================================================================
@@ -1410,6 +1412,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         if not (course_key.course and course_key.run and course_key.org):
             return None
+        #clear the course index request cache to smooth out collisions with cloning
+        RequestCache(namespace="course_index_cache").clear()
         index = self.get_course_index(course_key)
         return index
 

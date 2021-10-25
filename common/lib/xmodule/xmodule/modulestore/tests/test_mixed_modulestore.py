@@ -368,7 +368,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    fake: one w/ wildcard version
     # split: has one lookup for the course and then one for the course items
     #    but the active_versions check is done in MySQL
-    @ddt.data((ModuleStoreEnum.Type.mongo, [1, 1], 0), (ModuleStoreEnum.Type.split, [2, 2], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [1, 1], 0), (ModuleStoreEnum.Type.split, [2, 1], 0))
     @ddt.unpack
     def test_has_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -391,7 +391,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # split:
     #   problem: active_versions, structure
     #   non-existent problem: ditto
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [3, 2], 0), (ModuleStoreEnum.Type.split, 0, [2, 2], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [3, 2], 0), (ModuleStoreEnum.Type.split, 0, [2, 1], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -414,7 +414,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # Split:
     #    mysql: fetch course's active version from SplitModulestoreCourseIndex, spurious refetch x2
     #    find: get structure
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 14, 0), (ModuleStoreEnum.Type.split, 0, 4, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 14, 0), (ModuleStoreEnum.Type.split, 0, 3, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -522,7 +522,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #    find: definitions (calculator field), structures
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 5), (ModuleStoreEnum.Type.split, 3, 3, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1043,7 +1043,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          executed twice, possibly unnecessarily)
     #   find: 2 reads of structure, definition (s/b lazy; so, unnecessary),
     #         plus 1 wildcard find in draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 0, 6, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 0, 5, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -1638,7 +1638,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    8-9. get vertical, compute inheritance
     #    10-11. get other vertical_x1b (why?) and compute inheritance
     # Split: loading structure from mongo (also loads active version from MySQL, not tracked here)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [12, 3], 0), (ModuleStoreEnum.Type.split, 0, [3, 2], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [12, 3], 0), (ModuleStoreEnum.Type.split, 0, [3, 1], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_mysql, num_finds, num_sends):
         """
@@ -1802,6 +1802,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # Find the version_guid of our course by diving into Split Mongo.
         split = self._get_split_modulestore()
         course_index = split.get_course_index(self.course.location.course_key)
+        log.warning(f"Banana course index: {course_index}")
         original_version_guid = course_index["versions"]["published-branch"]
 
         # Reset course to currently-published version.
