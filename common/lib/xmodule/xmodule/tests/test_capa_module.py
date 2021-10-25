@@ -2562,25 +2562,32 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
     def test_solutions_not_indexed(self):
         xml = textwrap.dedent("""
             <problem>
-                <solution>
-                <div class="detailed-solution">
-                <p>Explanation</p>
+                <solution>Test solution.</solution>
+                <solution explanation-id="solution0">Test solution with attribute.</solution>
+                <solutionset>
+                    Test solutionset.
+                    <solution explanation-id="solution1">Test solution within solutionset.</solution>
+                </solutionset>
 
-                <p>This is what the 1st solution.</p>
+                <targetedfeedback>Test feedback.</targetedfeedback>
+                <targetedfeedback explanation-id="feedback0">Test feedback with attribute.</targetedfeedback>
+                <targetedfeedbackset>
+                    Test FeedbackSet.
+                    <targetedfeedback explanation-id="feedback1">Test feedback within feedbackset.</targetedfeedback>
+                </targetedfeedbackset>
 
-                </div>
-                </solution>
+                <answer>Test answer.</answer>
+                <answer type="loncapa/python">Test answer with attribute.</answer>
 
-                <solution>
-                <div class="detailed-solution">
-                <p>Explanation</p>
+                <script>Test script.</script>
+                <script type="loncapa/python">Test script with attribute.</script>
 
-                <p>This is the 2nd solution.</p>
+                <style>Test style.</style>
+                <style media="all and (max-width: 1920px)">Test style with attribute.</style>
 
-                </div>
-                </solution>
-
-
+                <choicehint>Test choicehint.</choicehint>
+                <hint>Test hint.</hint>
+                <hintpart>Test hintpart.</hintpart>
             </problem>
         """)
         name = "Blank Common Capa Problem"
@@ -2695,7 +2702,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Non latin Input"
         descriptor = self._create_descriptor(sample_text_input_problem_xml, name=name)
-        capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+        capa_content = " Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
 
         descriptor_dict = descriptor.index_dictionary()
         assert descriptor_dict['content']['capa_content'] == smart_str(capa_content)
