@@ -5,7 +5,7 @@ Public views
 
 from django.conf import settings
 from django.shortcuts import redirect
-from django.utils.http import urlquote_plus
+from urllib.parse import quote_plus
 from waffle.decorators import waffle_switch
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -47,7 +47,7 @@ def _build_next_param(request):
         # Warning: do not use `build_absolute_uri` when `next_url` is empty because `build_absolute_uri` would
         # build use the login url for the next url, which would cause a login redirect loop.
         absolute_next_url = request.build_absolute_uri(next_url)
-        return '?next=' + urlquote_plus(absolute_next_url)
+        return '?next=' + quote_plus(absolute_next_url)
     return ''
 
 

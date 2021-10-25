@@ -7,8 +7,8 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.urls import resolve
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 
@@ -348,7 +348,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         'category': 'courseware_index'
     }
 
-    UNNAMED_MODULE_NAME = ugettext_lazy("(Unnamed)")
+    UNNAMED_MODULE_NAME = gettext_lazy("(Unnamed)")
 
     @classmethod
     def normalize_structure_key(cls, structure_key):

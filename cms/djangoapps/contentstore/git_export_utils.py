@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore

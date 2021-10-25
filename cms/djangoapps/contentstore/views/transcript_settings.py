@@ -9,7 +9,7 @@ import os
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.http import HttpResponse, HttpResponseNotFound
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edxval.api import (
     create_or_update_video_transcript,
