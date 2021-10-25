@@ -10,9 +10,6 @@ from mock import patch
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from .test_utils import with_organization_context, create_org_user
-from openedx.core.djangoapps.appsembler.multi_tenant_emails.exceptions import (
-    SAMLUnusableUsernameDueToMTE
-)
 from third_party_auth.utils import user_exists
 from organizations.models import Organization
 
@@ -124,12 +121,10 @@ class TestMultiTenantEmailsUtils(TestCase):
             'third_party_auth.utils.get_current_organization',
             return_value=Organization.objects.filter(name=self.RED).first()
         ):
-            with self.assertRaises(SAMLUnusableUsernameDueToMTE):
-                user_exists({'username': 'blue_user'})
+            assert user_exists({'username': 'blue_user'})
 
         with patch(
             'third_party_auth.utils.get_current_organization',
             return_value=Organization.objects.filter(name=self.BLUE).first()
         ):
-            with self.assertRaises(SAMLUnusableUsernameDueToMTE):
-                user_exists({'username': 'red_user'})
+            assert user_exists({'username': 'red_user'})
