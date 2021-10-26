@@ -429,6 +429,23 @@ class DiscussionsConfiguration(TimeStampedModel):
     def get_available_providers(cls, context_key: CourseKey) -> list[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
 
+    @classmethod
+    def lti_discussion_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Checks if LTI discussion is enabled for this course.
+
+        Arguments:
+            course_key: course locator.
+        Returns:
+            Boolean indicating weather or not this course has lti discussion enabled.
+        """
+        course_discussion = cls.get(course_key)
+        return (
+            course_discussion.enabled
+            and course_discussion.provider_type != DEFAULT_PROVIDER_TYPE
+            and course_discussion.lti_configuration is not None
+        )
+
 
 class ProgramDiscussionsConfiguration(TimeStampedModel):
     """
