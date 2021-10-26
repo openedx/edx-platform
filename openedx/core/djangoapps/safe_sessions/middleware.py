@@ -320,11 +320,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             # return the response.
             return process_request_response
 
-        # Note: request.session.get(SESSION_KEY) and request.session.session_key are different things. The former
-        #   contains the session user, the latter is the session id
-        if cookie_data_string and request.session.get(SESSION_KEY):
+        user_id = self.get_user_id_from_session(request)
+        if cookie_data_string and user_id is not None:
 
-            user_id = self.get_user_id_from_session(request)
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
                 request.safe_cookie_verified_session_id = request.session.session_key
@@ -483,14 +481,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         Return the user_id stored in the session of the request.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # return request.session[SESSION_KEY]
         from django.contrib.auth import _get_user_session_key
         try:
+            # Django call to get the user id which is serialized in the session.
             return _get_user_session_key(request)
         except KeyError:
             return None
@@ -502,12 +495,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Stores the user_id in the session of the request.
         Used by unit tests.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # request.session[SESSION_KEY] = user.id
+        # Django's request.session[SESSION_KEY] should contain the user serialized to a string, which
+        #   is different from the request.session.session_key (or session id).
         request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
 
     @staticmethod
