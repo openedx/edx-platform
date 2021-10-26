@@ -393,6 +393,11 @@ class DiscussionsConfiguration(TimeStampedModel):
         has_support = bool(feature in features)
         return has_support
 
+    def supports_lti(self) -> bool:
+        """Returns a boolean indicating if the provider supports lti discussion view."""
+        return self.provider_type != DEFAULT_PROVIDER_TYPE and self.lti_configuration is not None
+
+
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
         """
@@ -440,11 +445,8 @@ class DiscussionsConfiguration(TimeStampedModel):
             Boolean indicating weather or not this course has lti discussion enabled.
         """
         course_discussion = cls.get(course_key)
-        return (
-            course_discussion.enabled
-            and course_discussion.provider_type != DEFAULT_PROVIDER_TYPE
-            and course_discussion.lti_configuration is not None
-        )
+        return course_discussion.enabled and course_discussion.supports_lti()
+
 
 
 class ProgramDiscussionsConfiguration(TimeStampedModel):
