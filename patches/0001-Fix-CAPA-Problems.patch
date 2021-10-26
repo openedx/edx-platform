@@ -1,0 +1,54 @@
+From 30447f796aedcd3d584fb2c4da9b7ff9a3ec9f76 Mon Sep 17 00:00:00 2001
+From: Awais Jibran <awaisdar001@gmail.com>
+Date: Mon, 3 Feb 2020 14:55:03 +0500
+Subject: [PATCH] Fix CAPA Problems
+
+Awais Jibran <awaisdar001@gmail.com>
+---
+ common/lib/capa/capa/capa_problem.py            |  1 +
+ common/lib/capa/capa/tests/test_capa_problem.py | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/common/lib/capa/capa/capa_problem.py b/common/lib/capa/capa/capa_problem.py
+index 1571ad54b8..b1753066ea 100644
+--- a/common/lib/capa/capa/capa_problem.py
++++ b/common/lib/capa/capa/capa_problem.py
+@@ -64,6 +64,7 @@ html_transforms = {
+ 
+ # These should be removed from HTML output, including all subelements
+ html_problem_semantics = [
++    "additional_answer",
+     "codeparam",
+     "responseparam",
+     "answer",
+diff --git a/common/lib/capa/capa/tests/test_capa_problem.py b/common/lib/capa/capa/tests/test_capa_problem.py
+index f3f06c3936..c1e3c34935 100644
+--- a/common/lib/capa/capa/tests/test_capa_problem.py
++++ b/common/lib/capa/capa/tests/test_capa_problem.py
+@@ -190,6 +190,23 @@ class CAPAProblemTest(unittest.TestCase):
+             }
+         )
+ 
++    def test_additional_answer_is_skipped_from_resulting_html(self):
++        """Tests that additional_answer element is not present in transformed HTML"""
++        xml = """
++        <problem>
++            <p>Be sure to check your spelling.</p>
++            <stringresponse answer="War" type="ci">
++                <label>___ requires sacrifices.</label>
++                <description>Anyone who looks the world as if it was a game of chess deserves to lose.</description>
++                <additional_answer answer="optional acceptable variant of the correct answer"/>
++                <textline size="40"/>
++            </stringresponse>
++        </problem>
++        """
++        problem = new_loncapa_problem(xml)
++        self.assertEqual(len(problem.extracted_tree.xpath('//additional_answer')), 0)
++        self.assertNotIn('additional_answer', problem.get_html())
++
+     def test_non_accessible_inputtype(self):
+         """
+         Verify that tag with question text is not removed when inputtype is not fully accessible.
+-- 
+2.25.0
+

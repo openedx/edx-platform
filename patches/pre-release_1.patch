@@ -1,0 +1,85 @@
+Index: openedx/features/lti_course_tab/tab.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openedx/features/lti_course_tab/tab.py b/openedx/features/lti_course_tab/tab.py
+--- a/openedx/features/lti_course_tab/tab.py	(revision c98748ffb1e55cb9e1fde892fa45e7765e645847)
++++ b/openedx/features/lti_course_tab/tab.py	(date 1635233399111)
+@@ -276,11 +276,7 @@
+ 
+     @classmethod
+     def is_enabled(cls, course, user=None):
++        """Check if the tab is enabled."""
+         if super().is_enabled(course, user):
+-            config = DiscussionsConfiguration.get(course.id)
+-            return (
+-                config.enabled and
+-                config.lti_configuration is not None
+-            )
+-        else:
+-            return False
++            return DiscussionsConfiguration.lti_discussion_enabled(course.id)
++        return False
+Index: lms/djangoapps/discussion/rest_api/api.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/djangoapps/discussion/rest_api/api.py b/lms/djangoapps/discussion/rest_api/api.py
+--- a/lms/djangoapps/discussion/rest_api/api.py	(revision c98748ffb1e55cb9e1fde892fa45e7765e645847)
++++ b/lms/djangoapps/discussion/rest_api/api.py	(date 1635233261450)
+@@ -66,7 +66,7 @@
+     get_group_id_for_user,
+     is_commentable_divided,
+ )
+-
++from xmodule.tabs import CourseTabList
+ 
+ User = get_user_model()
+ 
+@@ -107,8 +107,11 @@
+         # Convert 404s into CourseNotFoundErrors.
+         # Raise course not found if the user cannot access the course
+         raise CourseNotFoundError("Course not found.") from err
+-    if not any(tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs):
++
++    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
++    if not (discussion_tab and discussion_tab.is_enabled(course, user)):
+         raise DiscussionDisabledError("Discussion is disabled for the course.")
++
+     return course
+ 
+ 
+Index: openedx/core/djangoapps/discussions/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openedx/core/djangoapps/discussions/models.py b/openedx/core/djangoapps/discussions/models.py
+--- a/openedx/core/djangoapps/discussions/models.py	(revision c98748ffb1e55cb9e1fde892fa45e7765e645847)
++++ b/openedx/core/djangoapps/discussions/models.py	(date 1635233399088)
+@@ -429,6 +429,23 @@
+     def get_available_providers(cls, context_key: CourseKey) -> list[str]:
+         return ProviderFilter.current(course_key=context_key).available_providers
+ 
++    @classmethod
++    def lti_discussion_enabled(cls, course_key: CourseKey) -> bool:
++        """
++        Checks if LTI discussion is enabled for this course.
++
++        Arguments:
++            course_key: course locator.
++        Returns:
++            Boolean indicating weather or not this course has lti discussion enabled.
++        """
++        course_discussion = cls.get(course_key)
++        return (
++            course_discussion.enabled
++            and course_discussion.provider_type != DEFAULT_PROVIDER_TYPE
++            and course_discussion.lti_configuration is not None
++        )
++
+ 
+ class ProgramDiscussionsConfiguration(TimeStampedModel):
+     """

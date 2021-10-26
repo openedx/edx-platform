@@ -1,0 +1,17 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("This Course Unavailable In Your Country")}</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="outside-app">
+    <p>
+      <!-- Use this file to add embargo message for stanford theme, if you want to use the default embargo message then
+       simply remove this file.-->
+    </p>
+    </section>
+</main>
