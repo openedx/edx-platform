@@ -28,3 +28,12 @@ class CourseAverageRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseAverageRating
         fields = ['average_rating', 'total_raters']
+
+
+class CourseAverageRatingListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for "CourseAverageRatingListSerializer" model
+    """
+    class Meta:
+        model = CourseAverageRating
+        fields = ['course', 'average_rating', 'total_raters']

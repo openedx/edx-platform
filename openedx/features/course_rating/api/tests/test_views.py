@@ -111,3 +111,33 @@ class CourseRatingViewSet(TestCase):
         response = client.put(api_url, params, content_type='application/json')
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['rating'] == params['rating']
+
+
+class CourseAverageRatingAPIView(TestCase):
+    """
+    Unit tests for CourseAverageRatingAPIView View.
+    """
+
+    def setUp(self):
+        """
+        Setup data for test cases.
+        """
+        self.user = EdlyUserFactory(password=USER_PASSWORD)
+        self.request = RequestFactory()
+        self.site = SiteFactory()
+        self.request.site = self.site
+        self.request.user = self.user
+        self.client = Client(SERVER_NAME=self.request.site.domain)
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+        self.course = 'course-v1:edX+DemoX+Demo_Course'
+        self.comment = 'Dummy test comment'
+        self.user_course_rating = CourseRatingFactory(user=self.user, comment=self.comment, rating=5)
+        self.url = reverse('course_rating_api:course_average_rating')
+        super(CourseAverageRatingAPIView, self).setUp()
+
+    def test_request_data_(self):
+        """
+        Verify request data.
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
