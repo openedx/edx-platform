@@ -125,7 +125,7 @@ class CloneCourseTest(CourseTestCase):
         )
 
         # try to hit the generic exception catch
-        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoConnection.insert_course_index', Mock(side_effect=Exception)):  # lint-amnesty, pylint: disable=line-too-long
+        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoPersistenceBackend.insert_course_index', Mock(side_effect=Exception)):  # lint-amnesty, pylint: disable=line-too-long
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])

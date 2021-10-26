@@ -393,7 +393,15 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
     def test_hidden_after_due(self, is_past_due, masquerade_config, expected_hidden, expected_banner):
         """Validate the metadata when hide-after-due is set for a sequence"""
         due = datetime.now() + timedelta(days=-1 if is_past_due else 1)
-        sequence = ItemFactory(parent=self.chapter, category='sequential', hide_after_due=True, due=due)
+        sequence = ItemFactory(
+            parent_location=self.chapter.location,
+            # ^ It is very important that we use parent_location=self.chapter.location (and not parent=self.chapter), as
+            # chapter is a class attribute and passing it by value will update its .children=[] which will then leak
+            # into other tests and cause errors if the children no longer exist.
+            category='sequential',
+            hide_after_due=True,
+            due=due,
+        )
 
         CourseEnrollment.enroll(self.user, self.course.id)
 

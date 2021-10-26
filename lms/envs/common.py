@@ -2927,6 +2927,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.courseware',
     'lms.djangoapps.coursewarehistoryextended',
     'common.djangoapps.student.apps.StudentConfig',
+    'common.djangoapps.split_modulestore_django.apps.SplitModulestoreDjangoBackendAppConfig',
 
     'lms.djangoapps.static_template_view',
     'lms.djangoapps.staticbook',

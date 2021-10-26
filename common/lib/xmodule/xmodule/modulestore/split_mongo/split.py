@@ -101,7 +101,7 @@ from xmodule.modulestore.exceptions import (
     VersionConflictError
 )
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
-from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, MongoConnection
+from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, DjangoFlexPersistenceBackend
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.partitions.partitions_service import PartitionService
 
@@ -651,7 +651,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         super().__init__(contentstore, **kwargs)
 
-        self.db_connection = MongoConnection(**doc_store_config)
+        self.db_connection = DjangoFlexPersistenceBackend(**doc_store_config)
 
         if default_class is not None:
             module_path, __, class_name = default_class.rpartition('.')

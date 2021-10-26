@@ -379,7 +379,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.split, 2, 2, 2),
         (ModuleStoreEnum.Type.split, 4, 2, 2),
         (ModuleStoreEnum.Type.split, 2, 3, 2),
-        # (ModuleStoreEnum.Type.split, 4, 3, 2),
+        # (ModuleStoreEnum.Type.split, 4, 3, 1),
         (ModuleStoreEnum.Type.split, 2, 4, 2),
     )
     @ddt.unpack
