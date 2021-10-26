@@ -115,6 +115,8 @@ class TestMongoAssetMetadataStorage(TestCase):
         So we can use the below date comparison
         """
         for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:  # lint-amnesty, pylint: disable=redefined-outer-name
+            if attr == "edited_on":
+                continue  # The edited_on gets updated during save, so comparing it makes tests flaky.
             if isinstance(getattr(mdata1, attr), datetime):
                 self._assert_datetimes_equal(getattr(mdata1, attr), getattr(mdata2, attr))
             else:
