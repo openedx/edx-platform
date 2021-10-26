@@ -369,6 +369,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # split: has one lookup for the course and then one for the course items
     #    but the active_versions check is done in MySQL
     @ddt.data((ModuleStoreEnum.Type.mongo, [1, 1], 0), (ModuleStoreEnum.Type.split, [2, 1], 0))
+
     @ddt.unpack
     def test_has_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)

@@ -144,6 +144,7 @@ def account_settings_context(request):
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
         'beta_language': beta_language,
+        'collect_year_of_birth': settings.COLLECT_YEAR_OF_BIRTH,
     }
 
     enterprise_customer = enterprise_customer_for_request(request)

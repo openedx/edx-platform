@@ -30,7 +30,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.30.10
+edx-enterprise==3.31.1
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -89,10 +89,6 @@ click<8.0.0
 # a testing requirement. Installing it would cause a bunch of new tool packages to become base
 # requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
 edxval<2.1
-
-# pylint>=2.10.0 introduced a lot of new pylint warnings.
-# A separate PR will be needed to remove the pin and fix all the pylint warnings
-pylint<2.10.0
 
 # At the time of writing this comment, we do not know whether py2neo>=2022
 # will support our currently-deployed Neo4j version (3.5).

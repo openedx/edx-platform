@@ -14,7 +14,7 @@ import pytz
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 

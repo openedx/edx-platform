@@ -381,6 +381,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.split, 2, 3, 1),
         # (ModuleStoreEnum.Type.split, 4, 3, 1),
         (ModuleStoreEnum.Type.split, 2, 4, 1),
+
     )
     @ddt.unpack
     def test_get_path_queries(self, store_type, children_per_block, depth, expected_mongo_calls):

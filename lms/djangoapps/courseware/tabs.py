@@ -210,7 +210,7 @@ class HtmlTextbookTabs(TextbookTabsBase):
             )
 
 
-class LinkTab(CourseTab):  # lint-amnesty, pylint: disable=eq-without-hash
+class LinkTab(CourseTab):
     """
     Abstract class for tabs that contain external links.
     """

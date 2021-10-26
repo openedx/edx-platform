@@ -21,10 +21,9 @@ def get_enterprise_event_context(user_id, course_id):
         dict: A dictionary representing the enterprise uuid.
     """
     # Prevent a circular import.
-    from openedx.features.enterprise_support.api import enterprise_enabled
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     context = {}
-    if enterprise_enabled() and is_enterprise_learner(user_id):
+    if is_enterprise_learner(user_id):
         uuids = EnterpriseCourseEnrollment.get_enterprise_uuids_with_user_and_course(str(user_id), str(course_id))
         if uuids:
             context.update({"enterprise_uuid": str(uuids[0])})

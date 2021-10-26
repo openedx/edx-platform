@@ -588,13 +588,13 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
         return super().get_course_index(key, ignore_case=ignore_case)
         #######################
-        if key.version_guid and not key.org:
+        if key.version_guid and not key.org:  # pylint: disable=unreachable
             # I don't think it was intentional, but with the MongoPersistenceBackend, using a key with only a version
             # guid and no org/course/run value would not raise an error, but would always return None. So we need to be
             # compatible with that.
             # e.g. test_split_modulestore.py:SplitModuleCourseTests.test_get_course -> get_course(key with only version)
             #      > _load_items > cache_items > begin bulk operations > get_course_index > results in this situation.
-            log.info("DjangoFlexPersistenceBackend: get_course_index without org/course/run will always return None")
+            log.warning("DjangoFlexPersistenceBackend: get_course_index without org/course/run will always return None")
             return None
         # We never include the branch or the version in the course key in the SplitModulestoreCourseIndex table:
         key = key.for_branch(None).version_agnostic()
@@ -659,6 +659,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         Create the course_index in the db
         """
         RequestCache(namespace="course_index_cache").clear()
+
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
@@ -729,7 +730,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
             index_obj._change_reason = f'Updated {" and ".join(changed_branches)} branch'  # pylint: disable=protected-access
 
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
-        mongo_updated = super().update_course_index(course_index, from_index, course_context, last_update_already_set=True)
+        mongo_updated = super().update_course_index(
+            course_index, from_index, course_context, last_update_already_set=True
+        )
         if mongo_updated:
             # Save the course index entry and create a historical record:
             index_obj.save()

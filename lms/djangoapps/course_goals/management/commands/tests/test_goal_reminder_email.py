@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
@@ -118,6 +119,15 @@ class TestGoalReminderEmailCommand(TestCase):
         self.make_valid_goal()
         with override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=False):
             self.call_command(expect_sent=False)
+
+    def test_feature_enabled_for_user(self):
+        goal = self.make_valid_goal()
+        with override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=None):
+            # We want to ensure that when we set up a fake request
+            # it works correctly if the flag is only enabled for specific users
+            flag = get_waffle_flag_model().get(COURSE_GOALS_NUMBER_OF_DAYS_GOALS.name)
+            flag.users.add(goal.user)
+            self.call_command(expect_sent=True)
 
     def test_never_enrolled(self):
         self.make_valid_goal()

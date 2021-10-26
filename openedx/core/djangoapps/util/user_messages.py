@@ -21,7 +21,7 @@ from enum import Enum
 
 from django.conf import settings
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_toggles.toggles import SettingToggle
 
 from openedx.core.djangolib.markup import HTML, Text

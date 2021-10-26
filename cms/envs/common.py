@@ -474,6 +474,9 @@ FEATURES = {
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
+# VAN-754 - Year of birth field put behind a flag to make it available for openedX.
+COLLECT_YEAR_OF_BIRTH = True
+
 ENABLE_JASMINE = False
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to

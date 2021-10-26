@@ -280,7 +280,7 @@ def make_mock_request_impl(  # lint-amnesty, pylint: disable=missing-function-do
     return mock_request_impl
 
 
-class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, suffix):
         self.suffix = suffix
 
@@ -288,7 +288,7 @@ class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docs
         return other.endswith(self.suffix)
 
 
-class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, expected_values):
         self.expected_values = expected_values
 
@@ -445,7 +445,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             assert 'This is a private discussion. You do not have permissions to view this discussion' in html
 
 
-class AllowPlusOrMinusOneInt(int):  # pylint: disable=eq-without-hash
+class AllowPlusOrMinusOneInt(int):
     """
     A workaround for the fact that assertNumQueries doesn't let you
     specify a range or any tolerance. An 'int' that is 'equal to' its value,

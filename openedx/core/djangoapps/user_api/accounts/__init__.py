@@ -61,7 +61,7 @@ EMAIL_CONFLICT_MSG = _(
     "It looks like {email_address} belongs to an existing account. "
     "Try again with a different email address."
 )
-AUTHN_EMAIL_CONFLICT_MSG = _("It looks like this email address is already registered")
+AUTHN_EMAIL_CONFLICT_MSG = _("This email is already associated with an existing or previous edX account")
 USERNAME_CONFLICT_MSG = _(
     "It looks like {username} belongs to an existing account. "
     "Try again with a different username."

@@ -1,6 +1,5 @@
 """ Tests for tab functions (just primitive). """
 
-
 import json
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -25,12 +24,15 @@ class TabsPageTests(CourseTestCase):
         # Set the URL for tests
         self.url = reverse_course_url('tabs_handler', self.course.id)
 
-        # add a static tab to the course, for code coverage
-        self.test_tab = ItemFactory.create(
-            parent_location=self.course.location,
-            category="static_tab",
-            display_name="Static_1"
-        )
+        # add 4 static tabs to the course, for code coverage
+        self.test_tabs = []
+        for i in range(1, 5):
+            tab = ItemFactory.create(
+                parent_location=self.course.location,
+                category="static_tab",
+                display_name=f"Static_{i}"
+            )
+        self.test_tabs.append(tab)
         self.reload_course()
 
     def check_invalid_tab_id_response(self, resp):
@@ -39,7 +41,6 @@ class TabsPageTests(CourseTestCase):
         self.assertEqual(resp.status_code, 400)
         resp_content = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", resp_content)
-        self.assertIn("invalid_tab_id", resp_content['error'])
 
     def test_not_implemented(self):
         """Verify not implemented errors"""
@@ -85,15 +86,15 @@ class TabsPageTests(CourseTestCase):
         # reorder the last two tabs
         tab_ids[num_orig_tabs - 1], tab_ids[num_orig_tabs - 2] = tab_ids[num_orig_tabs - 2], tab_ids[num_orig_tabs - 1]
 
-        # remove the middle tab
+        # remove the third to the last tab, the removed tab has to be a static tab
         # (the code needs to handle the case where tabs requested for re-ordering is a subset of the tabs in the course)
-        removed_tab = tab_ids.pop(num_orig_tabs // 2)
+        removed_tab = tab_ids.pop(num_orig_tabs - 3)
         self.assertEqual(len(tab_ids), num_orig_tabs - 1)
 
-        # post the request
+        # post the request with the reordered static tabs only
         resp = self.client.ajax_post(
             self.url,
-            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]},
+            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids if 'static' in tab_id]},
         )
         self.assertEqual(resp.status_code, 204)
 
@@ -178,7 +179,7 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        preview_url = f'/xblock/{self.test_tab.location}/{STUDENT_VIEW}'
+        preview_url = f'/xblock/{self.test_tabs[0].location}/{STUDENT_VIEW}'
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)

@@ -166,6 +166,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         (ModuleStoreEnum.Type.mongo, 1, 39, False),
         (ModuleStoreEnum.Type.split, 2, 39, True),
         (ModuleStoreEnum.Type.split, 2, 39, False),
+
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -223,8 +224,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 22),
-        (ModuleStoreEnum.Type.split, 3, 22),
+        (ModuleStoreEnum.Type.mongo, 1, 23),
+        (ModuleStoreEnum.Type.split, 3, 23),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):

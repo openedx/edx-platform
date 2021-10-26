@@ -3,7 +3,7 @@ User Auth Views Utils
 """
 from django.conf import settings
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from ipware.ip import get_client_ip
 
 from common.djangoapps import third_party_auth

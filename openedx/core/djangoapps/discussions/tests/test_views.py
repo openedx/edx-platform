@@ -150,12 +150,7 @@ class DataTest(AuthorizedApiTest):
             name for name, spec in data['providers']['available'].items()
             if "messages" not in spec
         ], "Found available providers without messages field"
-        assert data['lti_configuration'] == {
-            'lti_1p1_client_key': '',
-            'lti_1p1_client_secret': '',
-            'lti_1p1_launch_url': '',
-            'version': None
-        }
+        assert data['lti_configuration'] == {}
         assert data['plugin_configuration'] == {
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,

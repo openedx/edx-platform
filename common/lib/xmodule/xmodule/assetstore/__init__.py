@@ -285,4 +285,4 @@ class CourseAssetsFromStorage:
         """
         Iterates over the items of the asset dict. (Python 3 naming convention)
         """
-        return self.iteritems()  # lint-amnesty, pylint: disable=dict-iter-method
+        return self.iteritems()

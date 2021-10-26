@@ -159,6 +159,10 @@ class CoursewareMeta:
         return self.course.license
 
     @property
+    def username(self):
+        return self.effective_user.username
+
+    @property
     def course_access(self) -> dict:
         """
         Can the user load this course in the learning micro-frontend?

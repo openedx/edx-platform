@@ -241,7 +241,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         blocks = get_course_date_blocks(course, user, request, num_assignments=2)
         assert len(blocks) == len(expected_blocks)
         assert {type(b) for b in blocks} == set(expected_blocks)
-        assignment_blocks = filter(  # pylint: disable=filter-builtin-not-iterating
+        assignment_blocks = filter(
             lambda b: isinstance(b, CourseAssignmentDate), blocks
         )
         for assignment in assignment_blocks:
@@ -267,7 +267,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
         assert len(blocks) == len(expected_blocks)
         assert {type(b) for b in blocks} == set(expected_blocks)
-        assignment_blocks = filter(  # pylint: disable=filter-builtin-not-iterating
+        assignment_blocks = filter(
             lambda b: isinstance(b, CourseAssignmentDate), blocks
         )
         for assignment in assignment_blocks:

@@ -42,11 +42,15 @@ class TabsAPITests(CourseTestCase):
         )
 
         # add a static tab to the course, for code coverage
-        self.test_tab = ItemFactory.create(
-            parent_location=self.course.location,
-            category="static_tab",
-            display_name="Static_1",
-        )
+        # add 4 static tabs to the course, for code coverage
+        self.test_tabs = []
+        for i in range(1, 5):
+            tab = ItemFactory.create(
+                parent_location=self.course.location,
+                category="static_tab",
+                display_name=f"Static_{i}"
+            )
+        self.test_tabs.append(tab)
         self.reload_course()
 
     def check_invalid_response(self, resp):
@@ -107,13 +111,13 @@ class TabsAPITests(CourseTestCase):
         # reorder the last two tabs
         tab_ids[num_orig_tabs - 1], tab_ids[num_orig_tabs - 2] = tab_ids[num_orig_tabs - 2], tab_ids[num_orig_tabs - 1]
 
-        # remove the middle tab
+        # remove the third to the last tab, the removed tab has to be a static tab
         # (the code needs to handle the case where tabs requested for re-ordering is a subset of the tabs in the course)
-        removed_tab = tab_ids.pop(num_orig_tabs // 2)
-        assert len(tab_ids) == num_orig_tabs - 1
+        removed_tab = tab_ids.pop(num_orig_tabs - 3)
+        self.assertEqual(len(tab_ids), num_orig_tabs - 1)
 
         # post the request
-        resp = self.make_reorder_tabs_request([{"tab_id": tab_id} for tab_id in tab_ids])
+        resp = self.make_reorder_tabs_request([{"tab_id": tab_id} for tab_id in tab_ids if 'static' in tab_id])
         assert resp.status_code == 204
 
         # reload the course and verify the new tab order

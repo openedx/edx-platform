@@ -18,7 +18,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
@@ -102,7 +102,8 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 MARKETING_EMAILS_OPT_IN = 'marketing_emails_opt_in'
 # used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
+# providing_args=["user", "registration"]
+REGISTER_USER = Signal()
 
 
 # .. toggle_name: registration.enable_failure_logging
@@ -122,7 +123,7 @@ REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
 @transaction.non_atomic_requests
-def create_account_with_params(request, params):
+def create_account_with_params(request, params):  # pylint: disable=too-many-statements
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -168,6 +169,9 @@ def create_account_with_params(request, params):
     if is_registration_api_v1(request):
         if 'confirm_email' in extra_fields:
             del extra_fields['confirm_email']
+
+    if not settings.COLLECT_YEAR_OF_BIRTH and 'year_of_birth' in params:
+        params['year_of_birth'] = ''
 
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).
@@ -784,6 +788,7 @@ class RegistrationValidationView(APIView):
     def name_handler(self, request):
         """ Validates whether fullname is valid """
         name = request.data.get('name')
+        self.username_suggestions = generate_username_suggestions(name)
         return get_name_validation_error(name)
 
     def username_handler(self, request):
