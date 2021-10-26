@@ -464,6 +464,7 @@ class DiscussionsConfiguration(TimeStampedModel):
             and discussion_provider.lti_configuration is not None
         )
 
+
 class ProgramDiscussionsConfiguration(TimeStampedModel):
     """
     Associates a program with a discussion provider and configuration
