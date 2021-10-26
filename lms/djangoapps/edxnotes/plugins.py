@@ -26,6 +26,7 @@ class EdxNotesTab(EnrolledTab):
     type = "edxnotes"
     title = _("Notes")
     view_name = "edxnotes"
+    priority = 50
 
     @classmethod
     def is_enabled(cls, course, user=None):

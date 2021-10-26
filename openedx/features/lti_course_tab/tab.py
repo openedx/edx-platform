@@ -195,6 +195,7 @@ class LtiCourseTab(LtiCourseLaunchMixin, EnrolledTab):
     A tab to add custom LTI components to a course in a tab.
     """
     type = 'lti_tab'
+    priority = 120
     is_default = False
     allow_multiple = True
 
@@ -266,6 +267,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
     Course tab that loads the associated LTI-based discussion provider in a tab.
     """
     type = 'lti_discussion'
+    priority = 41
     allow_multiple = False
     is_dynamic = True
     title = gettext_lazy("Discussion")

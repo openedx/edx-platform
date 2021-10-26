@@ -20,6 +20,7 @@ class WikiTab(EnrolledTab):
     view_name = "course_wiki"
     is_hideable = True
     is_default = False
+    priority = 70
 
     def __init__(self, tab_dict):
         # Default to hidden
