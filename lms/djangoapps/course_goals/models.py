@@ -4,7 +4,6 @@ Course Goals Models
 
 import uuid
 import logging
-import pytz
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
@@ -18,7 +17,7 @@ from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.courseware.masquerade import is_masquerading
 from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # Each goal is represented by a goal key and a string description.
@@ -139,8 +138,7 @@ class UserActivity(models.Model):
         if is_masquerading(user, course_key):
             return None
 
-        user_preferences = get_user_preferences(user)
-        timezone = pytz.timezone(user_preferences.get('time_zone', 'UTC'))
+        timezone = get_user_timezone_or_last_seen_timezone_or_utc(user)
         now = datetime.now(timezone)
         date = now.date()
 
