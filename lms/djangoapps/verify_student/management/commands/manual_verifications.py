@@ -104,7 +104,6 @@ class Command(BaseCommand):
                     user=user,
                     name=user.profile.name,
                     status='approved',
-                    created_at=earliest_allowed_verification_date(),
                 ))
             else:
                 log.info(f'Skipping email {user.email}, existing verification found.')
