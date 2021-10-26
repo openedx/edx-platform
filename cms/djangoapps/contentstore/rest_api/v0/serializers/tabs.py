@@ -71,23 +71,7 @@ class CourseTabSerializer(serializers.Serializer):  # pylint: disable=abstract-m
 class TabIDLocatorSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """Serializer for tab locations, used to identify a tab in a course."""
 
-    tab_id = serializers.CharField(required=False, help_text=_("ID of tab to update"))
-    tab_locator = UsageKeyField(required=False, help_text=_("Location (Usage Key) of tab to update"))
-
-    def validate(self, attrs: Dict) -> Dict:
-        """
-        Validates that either the ``tab_id`` or ``tab_locator`` are specified, but not both.
-
-        Args:
-            attrs (Dict): A dictionary of attributes to validate
-        """
-        has_tab_id = "tab_id" in attrs
-        has_tab_locator = "tab_locator" in attrs
-        if has_tab_locator ^ has_tab_id:
-            return super().validate(attrs)
-        raise serializers.ValidationError(
-            {"non_field_errors": _("Need to supply either a valid tab_id or a tab_location.")}
-        )
+    tab_locator = UsageKeyField(required=True, help_text=_("Location (Usage Key) of tab to update"))
 
 
 class CourseTabUpdateSerializer(serializers.Serializer):  # pylint: disable=abstract-method

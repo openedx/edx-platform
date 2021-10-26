@@ -81,6 +81,7 @@ class InstructorDashboardTab(CourseTab):
     title = ugettext_noop('Instructor')
     view_name = "instructor_dashboard"
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
+    priority = 300
 
     @classmethod
     def is_enabled(cls, course, user=None):

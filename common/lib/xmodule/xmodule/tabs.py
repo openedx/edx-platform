@@ -302,6 +302,7 @@ class StaticTab(CourseTab):
     type = 'static_tab'
     is_default = False  # A static tab is never added to a course by default
     allow_multiple = True
+    priority = 100
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
@@ -406,6 +407,7 @@ class CourseTabList(List):
             CourseTab.load('wiki'),
             CourseTab.load('progress'),
         ])
+        course.tabs.sort(key=lambda tab: tab.priority or float('inf'))
 
     @staticmethod
     def get_discussion(course):
