@@ -320,11 +320,37 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             # return the response.
             return process_request_response
 
-        # Note: request.session.get(SESSION_KEY) and request.session.session_key are different things. The former
-        #   contains the session user, the latter is the session id
-        if cookie_data_string and request.session.get(SESSION_KEY):
+        # TODO: Verify that safe_cookie_data.session_id is same as request.session.session_key
+        #   - Just to be safe. Are there any issues with this check?
 
-            user_id = self.get_user_id_from_session(request)
+        # TODO: Log the following additional debug info with user mismatches:
+        #   - Note: use something like hashlib.sha1(....session-id....).hexdigest()[:8] for each of the following
+        #   - cookie_data_string[2:34] should be safe_cookie_data.session_id (hashed)
+        #   - request.session.session_key (request time) (request.safe_cookie_verified_session_id)
+        #   - request.session.session_key (response time) (hashed)
+
+        # TODO: Log DRF Authentication information, also hashed as appropriate.
+        #   - AUTHORIZATION header (JWT, Bearer), note: jwt vs bearer not hashed or appended
+        #   - JWT Cookies
+        #   - Note: There could be discrepancies between auth presented and what actually gets checked, so we
+        #       may only want to log what was actually used.
+        #       - Could relate to possible clean-up of related edx-drf-extensions code:
+        #           - See request_auth_type_guess: https://github.com/edx/edx-drf-extensions/blob/9148df8030aea6915ecb0efd78bc989d4507dbc9/edx_rest_framework_extensions/middleware.py#L135-L162
+        #           - See BearerAuthentication attributes: https://github.com/edx/edx-drf-extensions/blob/9148df8030aea6915ecb0efd78bc989d4507dbc9/edx_rest_framework_extensions/auth/bearer/authentication.py#L39-L59
+        #           - Could we expose functions/custom attributes that better details which authentication was successful
+        #               and a hash of what was used for authentication?
+
+        # TODO: - If safesession mismatch is found, use memcached to temporarily turn on additional logging.
+        #   - Additional logs for 1 minute
+        #   - Log all the same logging stuff as INFO (or WARN if simpler), for any requests by either of the two mismatched
+        #       users, the initial and final user ids.
+        #   - Note: if multiple mimatches hit in the same time, we should be able to add additional user ids, so we may
+        #       want the user_id to be part of the cache key, and just set two cache keys.
+        #   - Becca may have a PR with something like this already started.
+
+        user_id = self.get_user_id_from_session(request)
+        if cookie_data_string and user_id is not None:
+
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
                 request.safe_cookie_verified_session_id = request.session.session_key
@@ -449,6 +475,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if request_user_object_mismatch or session_user_mismatch:
                 # Log accumulated information stored on request for each change of user
                 if hasattr(request, 'debug_user_changes'):
+                    # TODO: Can we append this to the below log warnings to get a single message?
                     log.warning('An unsafe user transition was found. It either needs to be fixed or exempted.\n {}'
                                 .format('\n'.join(request.debug_user_changes)))
 
@@ -496,12 +523,6 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         Return the user_id stored in the session of the request.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # return request.session[SESSION_KEY]
         from django.contrib.auth import _get_user_session_key
         try:
             return _get_user_session_key(request)
@@ -515,12 +536,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Stores the user_id in the session of the request.
         Used by unit tests.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # request.session[SESSION_KEY] = user.id
+        # Note: request.session.get(SESSION_KEY) and request.session.session_key are different things. The former
+        #   contains the session user, the latter is the session id
         request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
 
     @staticmethod
