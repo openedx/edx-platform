@@ -444,8 +444,8 @@ class DiscussionsConfiguration(TimeStampedModel):
         Returns:
             Boolean indicating weather or not this course has lti discussion enabled.
         """
-        course_discussion = cls.get(course_key)
-        return course_discussion.enabled and course_discussion.supports_lti()
+        discussion_provider = cls.get(course_key)
+        return discussion_provider.enabled and discussion_provider.supports_lti()
 
 
 
