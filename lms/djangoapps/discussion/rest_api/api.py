@@ -66,7 +66,7 @@ from ..django_comment_client.utils import (
     get_group_id_for_user,
     is_commentable_divided,
 )
-
+from xmodule.tabs import CourseTabList
 
 User = get_user_model()
 
@@ -107,8 +107,11 @@ def _get_course(course_key, user):
         # Convert 404s into CourseNotFoundErrors.
         # Raise course not found if the user cannot access the course
         raise CourseNotFoundError("Course not found.") from err
-    if not any(tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs):
+
+    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
+    if not (discussion_tab and discussion_tab.is_enabled(course, user)):
         raise DiscussionDisabledError("Discussion is disabled for the course.")
+
     return course
 
 

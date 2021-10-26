@@ -276,11 +276,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
 
     @classmethod
     def is_enabled(cls, course, user=None):
+        """Check if the tab is enabled."""
         if super().is_enabled(course, user):
-            config = DiscussionsConfiguration.get(course.id)
-            return (
-                config.enabled and
-                config.lti_configuration is not None
-            )
-        else:
-            return False
+            return DiscussionsConfiguration.lti_discussion_enabled(course.id)
+        return False

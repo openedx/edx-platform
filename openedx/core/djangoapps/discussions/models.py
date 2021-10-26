@@ -41,7 +41,7 @@ class Features(Enum):
 
     # Basic Supported Features
     PRIMARY_DISCUSSION_APP_EXPERIENCE = ('primary-discussion-app-experience', 'basic')
-    LTI_BASIC_CONFIGURATION = ('lti-basic-configuration', 'basic')
+    BASIC_CONFIGURATION = ('basic-configuration', 'basic')
     # DISCUSSION_PAGE = ('discussion-page', 'basic')
 
     # Partially Supported Features
@@ -104,7 +104,7 @@ def pii_sharing_required_message(provider_name):
 AVAILABLE_PROVIDER_MAP = {
     'legacy': {
         'features': [
-            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.BASIC_CONFIGURATION.value,
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
@@ -130,7 +130,7 @@ AVAILABLE_PROVIDER_MAP = {
     'ed-discuss': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.BASIC_CONFIGURATION.value,
             Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
             Features.LTI_ADVANCED_SHARING_MODE.value,
@@ -156,7 +156,7 @@ AVAILABLE_PROVIDER_MAP = {
     'inscribe': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.BASIC_CONFIGURATION.value,
             Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
@@ -183,7 +183,7 @@ AVAILABLE_PROVIDER_MAP = {
     'piazza': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.BASIC_CONFIGURATION.value,
             Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
@@ -206,7 +206,7 @@ AVAILABLE_PROVIDER_MAP = {
     'yellowdig': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.BASIC_CONFIGURATION.value,
             Features.QUESTION_DISCUSSION_SUPPORT.value,
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
@@ -393,6 +393,10 @@ class DiscussionsConfiguration(TimeStampedModel):
         has_support = bool(feature in features)
         return has_support
 
+    def supports_lti(self) -> bool:
+        """Returns a boolean indicating if the provider supports lti discussion view."""
+        return self.provider_type != DEFAULT_PROVIDER_TYPE
+
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
         """
@@ -428,6 +432,23 @@ class DiscussionsConfiguration(TimeStampedModel):
     @classmethod
     def get_available_providers(cls, context_key: CourseKey) -> list[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
+
+    @classmethod
+    def lti_discussion_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Checks if LTI discussion is enabled for this course.
+
+        Arguments:
+            course_key: course locator.
+        Returns:
+            Boolean indicating weather or not this course has lti discussion enabled.
+        """
+        discussion_provider = cls.get(course_key)
+        return (
+            discussion_provider.enabled
+            and discussion_provider.supports_lti()
+            and discussion_provider.lti_configuration is not None
+        )
 
 
 class ProgramDiscussionsConfiguration(TimeStampedModel):
