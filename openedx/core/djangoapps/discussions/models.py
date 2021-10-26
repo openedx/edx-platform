@@ -397,7 +397,6 @@ class DiscussionsConfiguration(TimeStampedModel):
         """Returns a boolean indicating if the provider supports lti discussion view."""
         return self.provider_type != DEFAULT_PROVIDER_TYPE
 
-
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
         """
