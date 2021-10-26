@@ -579,7 +579,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
     # Course indexes are cached within the process using their key and ignore_case atrributes as keys.
     @request_cached(
         "course_index_cache",
-        arg_map_function=lambda arg: str(arg) if not isinstance(arg,DjangoFlexPersistenceBackend) else "")
+        arg_map_function=lambda arg: str(arg) if not isinstance(arg, DjangoFlexPersistenceBackend) else "")
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
