@@ -114,7 +114,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         Verify badge spec creation works.
         """
         self.handler._get_access_token = Mock(return_value='12345')
-        self.handler._create_badge(self.badge_class)
+        with self.allow_transaction_exception():
+            self.handler._create_badge(self.badge_class)
         args, kwargs = post.call_args
         assert args[0] == 'https://example.com/v2/issuers/test-issuer/badgeclasses'
         assert kwargs['files']['image'][0] == self.badge_class.image.name
