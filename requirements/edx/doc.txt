@@ -22,7 +22,7 @@ docutils==0.17.1
     # via sphinx
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/doc.in
-gitdb==4.0.7
+gitdb==4.0.9
     # via gitpython
 gitpython==3.1.24
     # via -r requirements/edx/doc.in
@@ -42,7 +42,7 @@ pbr==5.6.0
     # via stevedore
 pygments==2.10.0
     # via sphinx
-pyparsing==2.4.7
+pyparsing==3.0.1
     # via packaging
 python-slugify==4.0.1
     # via
@@ -56,7 +56,7 @@ requests==2.26.0
     # via sphinx
 six==1.16.0
     # via edx-sphinx-theme
-smmap==4.0.0
+smmap==5.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx

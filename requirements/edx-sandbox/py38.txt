@@ -59,7 +59,7 @@ pillow==8.4.0
     # via matplotlib
 pycparser==2.20
     # via cffi
-pyparsing==2.4.7
+pyparsing==3.0.1
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -71,7 +71,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.10.8
+regex==2021.10.23
     # via nltk
 scipy==1.7.1
     # via
