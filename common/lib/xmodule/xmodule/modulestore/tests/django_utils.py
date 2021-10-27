@@ -275,7 +275,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
     """
     MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
     CONTENTSTORE = functools.partial(contentstore_config)
-    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache', 'course_index_cache']
 
     # List of modulestore signals enabled for this test. Defaults to an empty
     # list. The list of signals available is found on the SignalHandler class,
