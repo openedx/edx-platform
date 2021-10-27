@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
 from django.http import Http404, HttpResponseBadRequest
 from django.urls import reverse
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -196,7 +196,7 @@ def cohort_handler(request, course_key_string, cohort_id=None):
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
             if name != cohort.name:
                 if cohorts.is_cohort_exists(course_key, name):
-                    err_msg = ugettext("A cohort with the same name already exists.")
+                    err_msg = gettext("A cohort with the same name already exists.")
                     return JsonResponse({"error": str(err_msg)}, 400)
                 cohort.name = name
                 cohort.save()

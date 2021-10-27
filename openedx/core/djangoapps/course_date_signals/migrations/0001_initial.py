@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
-                ('enabled', models.NullBooleanField(default=None, verbose_name='Enabled')),
+                ('enabled', models.BooleanField(default=None, verbose_name='Enabled', null=True)),
                 ('org', models.CharField(blank=True, db_index=True, help_text='Configure values for all course runs associated with this Organization. This is the organization string (i.e. edX, MITx).', max_length=255, null=True)),
                 ('org_course', models.CharField(blank=True, db_index=True, help_text="Configure values for all course runs associated with this course. This is should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50).", max_length=255, null=True, validators=[openedx.core.djangoapps.config_model_utils.models.validate_course_in_org], verbose_name='Course in Org')),
                 ('changed_by', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Changed by')),

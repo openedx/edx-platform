@@ -5,9 +5,9 @@ from django.conf import settings
 from django.forms.utils import flatatt
 from django.forms.widgets import CheckboxInput
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import format_html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -25,7 +25,7 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
             final_attrs['checked'] = 'checked'
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(value)
+            final_attrs['value'] = force_str(value)
 
         # Translators: link_start and link_end are HTML tags for a link to the terms of service.
         # platform_name is the name of this Open edX installation.

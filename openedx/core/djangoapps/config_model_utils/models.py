@@ -18,7 +18,7 @@ from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -62,7 +62,7 @@ class StackedConfigurationModel(ConfigurationModel):
     KEY_FIELDS = ('site', 'org', 'org_course', 'course')
     STACKABLE_FIELDS = ('enabled',)
 
-    enabled = models.NullBooleanField(default=None, verbose_name=_("Enabled"))
+    enabled = models.BooleanField(default=None, verbose_name=_("Enabled"), null=True)
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
