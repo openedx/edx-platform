@@ -162,9 +162,9 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
 
     @ddt.data(
         ('vertical_block', ModuleStoreEnum.Type.mongo, 13),
-        ('vertical_block', ModuleStoreEnum.Type.split, 6),
+        ('vertical_block', ModuleStoreEnum.Type.split, 5),
         ('html_block', ModuleStoreEnum.Type.mongo, 14),
-        ('html_block', ModuleStoreEnum.Type.split, 6),
+        ('html_block', ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
     def test_courseware_html(self, block_name, default_store, mongo_calls):

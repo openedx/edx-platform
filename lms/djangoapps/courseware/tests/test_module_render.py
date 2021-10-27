@@ -1016,7 +1016,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 1))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 0))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -1056,7 +1056,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 1))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 0))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):

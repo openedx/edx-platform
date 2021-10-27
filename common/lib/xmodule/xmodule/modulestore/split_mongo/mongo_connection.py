@@ -25,7 +25,8 @@ from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-
+from openedx.core.lib.cache_utils import request_cached
+from edx_django_utils.cache import RequestCache
 
 log = logging.getLogger(__name__)
 
@@ -260,6 +261,9 @@ class MongoPersistenceBackend:
         # Set a write concern of 1, which makes writes complete successfully to the primary
         # only before returning. Also makes pymongo report write errors.
         kwargs['w'] = 1
+
+        #make sure the course index cache is fresh.
+        RequestCache(namespace="course_index_cache").clear()
 
         self.database = connect_to_mongodb(
             db, host,
@@ -532,6 +536,7 @@ class MongoPersistenceBackend:
         """
         Closes any open connections to the underlying databases
         """
+        RequestCache(namespace="course_index_cache").clear()
         self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
@@ -546,6 +551,7 @@ class MongoPersistenceBackend:
 
         If connections is True, then close the connection to the database as well.
         """
+        RequestCache(namespace="course_index_cache").clear()
         connection = self.database.client
 
         if database:
@@ -571,7 +577,13 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
 
     # Structures and definitions are only supported in MongoDB for now.
     # Course indexes are read from MySQL and written to both MongoDB and MySQL
-
+    # Course indexes are cached within the process using their key and ignore_case atrributes as keys.
+    # This method is request cached. The keys to the cache are the arguements to the method.
+    # The `self` arguement is discarded as a key using an isinstance check.
+    # This is because the DjangoFlexPersistenceBackend could be different in reference to the same course key.
+    @request_cached(
+        "course_index_cache",
+        arg_map_function=lambda arg: str(arg) if not isinstance(arg, DjangoFlexPersistenceBackend) else "")
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
@@ -650,6 +662,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Create the course_index in the db
         """
+        # clear the whole course_index request cache, required for sucessfully cloning a course.
+        # This is a relatively large hammer for the problem, but we mostly only use one course at a time.
+        RequestCache(namespace="course_index_cache").clear()
+
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
@@ -669,6 +685,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # "last_update not only tells us when this course was last updated but also helps prevent collisions"
         # This code is just copying the behavior of the existing MongoPersistenceBackend
         # See https://github.com/edx/edx-platform/pull/5200 for context
+        RequestCache(namespace="course_index_cache").clear()
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:
         try:
@@ -730,6 +747,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
+        RequestCache(namespace="course_index_cache").clear()
         SplitModulestoreCourseIndex.objects.filter(course_id=course_key).delete()
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
         super().delete_course_index(course_key)
@@ -738,6 +756,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Reset data for testing.
         """
+        RequestCache(namespace="course_index_cache").clear()
         try:
             SplitModulestoreCourseIndex.objects.all().delete()
         except TransactionManagementError as err:
