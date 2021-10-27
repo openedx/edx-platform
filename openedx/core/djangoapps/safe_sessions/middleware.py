@@ -392,23 +392,10 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         # Mobile apps have custom handling of authentication failures. They
         # should *not* be redirected to the website's login page.
         if is_request_from_mobile_app(request):
+            set_custom_attribute("safe_sessions.auth_failure", "mobile")
             return HttpResponse(status=401)
 
-        # .. toggle_name: REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE
-        # .. toggle_implementation: SettingToggle
-        # .. toggle_default: True
-        # .. toggle_description: Turn this toggle off to roll out new functionality,
-        #      which returns a 401 rather than redirecting to login, when HTML is not expected by the client.
-        # .. toggle_use_cases: temporary
-        # .. toggle_creation_date: 2021-10-18
-        # .. toggle_target_removal_date: 2021-10-22
-        # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1911
-        REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE = getattr(settings,
-                                                                 'REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE',
-                                                                 True
-                                                                 )
-
-        if REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE or 'text/html' in request.META.get('HTTP_ACCEPT', ''):
+        if 'text/html' in request.META.get('HTTP_ACCEPT', ''):
             set_custom_attribute("safe_sessions.auth_failure", "redirect_to_login")
             return redirect_to_login(request.path)
         set_custom_attribute("safe_sessions.auth_failure", "401")
