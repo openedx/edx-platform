@@ -545,6 +545,12 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             if has_perm:
                 self.assertContains(response, error_msg)
                 self.assertContains(response, 'Sorry, we were unable to enroll you')
+
+                # Check for CTA button on error page
+                marketing_root = settings.MKTG_URLS.get('ROOT')
+                search_courses_url = urljoin(marketing_root, '/search?tab=course')
+                self.assertContains(response, search_courses_url)
+                self.assertContains(response, '<span>Explore all courses</span>')
             else:
                 self.assertTrue(CourseEnrollment.is_enrollment_closed(self.user, self.course))
 
