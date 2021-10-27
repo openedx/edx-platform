@@ -2,20 +2,23 @@
 Test app view logic
 """
 # pylint: disable=test-inherits-tests
-import itertools
-from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+import unittest
+from contextlib import contextmanager
 
 import ddt
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from xmodule.modulestore.tests.django_utils import CourseUserType
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE
 
 DATA_LEGACY_COHORTS = {
@@ -42,6 +45,7 @@ DATA_LTI_CONFIGURATION = {
 }
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'URLs are only configured in LMS')
 class ApiTest(ModuleStoreTestCase, APITestCase):
     """
     Test basic API operations
@@ -290,34 +294,30 @@ class DataTest(AuthorizedApiTest):
         """
         Check validation of basic configuration
         """
-        response = self._post(payload)
-        assert status.is_client_error(response.status_code)
-        assert 'enabled' in response.json()
+        with self.assertRaises(ValidationError):
+            response = self._post(payload)
         response = self._get()
         self._assert_defaults(response)
 
-    @ddt.data(
-        *DATA_LTI_CONFIGURATION.items()
-    )
-    @ddt.unpack
-    def test_post_lti_valid(self, key, value):
+    def test_post_lti_valid(self):
         """
         Check we can set LTI configuration
         """
         provider_type = 'piazza'
-        payload = {
-            'enabled': True,
-            'provider_type': provider_type,
-            'lti_configuration': {
-                key: value,
+        for key, value in DATA_LTI_CONFIGURATION.items():
+            payload = {
+                'enabled': True,
+                'provider_type': provider_type,
+                'lti_configuration': {
+                    key: value,
+                }
             }
-        }
-        self._post(payload)
-        response = self._get()
-        data = response.json()
-        assert data['enabled']
-        assert data['provider_type'] == provider_type
-        assert data['lti_configuration'][key] == value
+            response = self._post(payload)
+            response = self._get()
+            data = response.json()
+            assert data['enabled']
+            assert data['provider_type'] == provider_type
+            assert data['lti_configuration'][key] == value
 
     def test_post_lti_invalid(self):
         """
@@ -480,48 +480,6 @@ class DataTest(AuthorizedApiTest):
         assert data['enabled']
         assert data['provider_type'] == 'legacy'
         assert not data['plugin_configuration']['allow_anonymous']
-
-    @ddt.data(
-        *itertools.product(
-            ["enable_in_context", "enable_graded_units", "unit_level_visibility"],
-            [True, False],
-        ),
-        ("provider_type", "piazza"),
-    )
-    @ddt.unpack
-    def test_change_course_fields(self, field, value):
-        """
-        Test changing fields that are saved to the course
-        """
-        payload = {
-            field: value
-        }
-        response = self._post(payload)
-        data = response.json()
-        assert data[field] == value
-        course = self.store.get_course(self.course.id)
-        assert course.discussions_settings[field] == value
-
-    def test_change_plugin_configuration(self):
-        """
-        Test changing plugin config that is saved to the course
-        """
-        payload = {
-            "provider_type": "piazza",
-            "plugin_configuration": {
-                "allow_anonymous": False,
-                "custom_field": "custom_value",
-            },
-        }
-        response = self._post(payload)
-        data = response.json()
-        assert data["plugin_configuration"] == payload["plugin_configuration"]
-        course = self.store.get_course(self.course.id)
-        # Only configuration fields not stored in the course, or
-        # directly in the model should be stored here.
-        assert course.discussions_settings["piazza"] == {
-            "custom_field": "custom_value",
-        }
 
     @ddt.data(*[
         user_type.name for user_type in CourseUserType

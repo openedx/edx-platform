@@ -22,9 +22,9 @@ from six.moves.urllib.parse import urljoin
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
 from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_accessible_discussion_xblocks_by_course_id,
     permalink
 )
-from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks_by_course_id
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

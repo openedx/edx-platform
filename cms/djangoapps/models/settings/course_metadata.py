@@ -75,7 +75,6 @@ class CourseMetadata:
         'default_tab',
         'highlights_enabled_for_messaging',
         'is_onboarding_exam',
-        'discussions_settings',
     ]
 
     @classmethod
