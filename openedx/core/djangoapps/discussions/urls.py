@@ -8,7 +8,7 @@ from .views import DiscussionsConfigurationView
 
 urlpatterns = [
     url(
-        r'^v0/(?P<course_key_string>.+)$',
+        r'^api/v0/(?P<course_key_string>.+)$',
         DiscussionsConfigurationView.as_view(),
         name='discussions',
     ),
