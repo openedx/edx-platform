@@ -532,7 +532,7 @@ edx-lint==5.2.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.3.3
     # via -r requirements/edx/base.txt
-edx-name-affirmation==1.0.3
+edx-name-affirmation==2.0.0
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.2
     # via
@@ -553,7 +553,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.4.1
+edx-proctoring==4.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack

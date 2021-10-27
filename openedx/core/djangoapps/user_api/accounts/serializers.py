@@ -13,7 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
 
-from edx_name_affirmation.toggles import is_verified_name_enabled
 
 from common.djangoapps.student.models import (
     LanguageProficiency,
@@ -170,7 +169,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "extended_profile_fields": None,
             "phone_number": None,
             "pending_name_change": None,
-            "is_verified_name_enabled": is_verified_name_enabled(),
         }
 
         if user_profile:
