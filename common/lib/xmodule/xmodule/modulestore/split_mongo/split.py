@@ -108,8 +108,6 @@ from xmodule.partitions.partitions_service import PartitionService
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 
-from edx_django_utils.cache import RequestCache
-
 log = logging.getLogger(__name__)
 
 # ==============================================================================
