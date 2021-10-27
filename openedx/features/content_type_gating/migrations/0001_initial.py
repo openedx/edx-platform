@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('enabled', models.BooleanField(default=None, null=True, verbose_name='Enabled')),
                 ('org', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
                 ('enabled_as_of', models.DateField(blank=True, default=None, null=True, verbose_name='Enabled As Of')),
-                ('studio_override_enabled', models.NullBooleanField(default=None, verbose_name='Studio Override Enabled')),
+                ('studio_override_enabled', models.BooleanField(default=None, verbose_name='Studio Override Enabled', null=True)),
                 ('changed_by', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Changed by')),
                 ('course', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='course_overviews.CourseOverview')),
                 ('site', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='sites.Site')),
