@@ -20,7 +20,7 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
@@ -35,6 +35,7 @@ class CourseUserType(Enum):
     """
     ANONYMOUS = 'anonymous'
     COURSE_STAFF = 'course_staff'
+    COURSE_INSTRUCTOR = 'course_instructor'
     ENROLLED = 'enrolled'
     GLOBAL_STAFF = 'global_staff'
     UNENROLLED = 'unenrolled'
@@ -371,18 +372,22 @@ class ModuleStoreTestUsersMixin():
             return AnonymousUser()
 
         is_enrolled = user_type is CourseUserType.ENROLLED
-        is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
 
         # Set up the test user
-        if is_unenrolled_staff:
+        if user_type is CourseUserType.UNENROLLED_STAFF:
             user = StaffFactory(course_key=course.id, password=self.TEST_PASSWORD)
         elif user_type is CourseUserType.GLOBAL_STAFF:
             user = AdminFactory(password=self.TEST_PASSWORD)
+        elif user_type is CourseUserType.COURSE_INSTRUCTOR:
+            user = InstructorFactory(course_key=course.id, password=self.TEST_PASSWORD)
         else:
             user = UserFactory(password=self.TEST_PASSWORD)
+
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
         if is_enrolled:
             CourseEnrollment.enroll(user, course.id)
+
         return user
 
 
