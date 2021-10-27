@@ -419,6 +419,7 @@ edx-django-utils==4.4.0
     #   edx-rest-api-client
     #   edx-toggles
     #   edx-when
+    #   event-tracking
     #   ora2
     #   super-csv
 edx-drf-extensions==8.0.0
@@ -509,7 +510,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.1.0
     # via -r requirements/edx/base.in
-event-tracking==1.1.1
+event-tracking==1.1.4
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
