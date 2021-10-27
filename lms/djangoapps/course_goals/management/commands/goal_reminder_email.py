@@ -73,7 +73,8 @@ def send_ace_message(goal):
         app_label="course_goals",
         recipient=Recipient(user.id, user.email),
         language=get_user_preference(user, LANGUAGE_KEY),
-        context=message_context
+        context=message_context,
+        options={'transactional': True},
     )
 
     with emulate_http_request(site, user):
