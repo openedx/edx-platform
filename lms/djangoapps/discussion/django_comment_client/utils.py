@@ -90,10 +90,10 @@ def has_discussion_privileges(user, course_id):
     Returns:
       bool
     """
-    # get_role_ids returns a dictionary of only admin, moderator and community TAs.
     roles = get_role_ids(course_id)
-    for role in roles:
-        if user.id in roles[role]:
+
+    for user_ids in roles.values():
+        if user.id in user_ids:
             return True
     return False
 
