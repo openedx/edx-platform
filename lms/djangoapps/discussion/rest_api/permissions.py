@@ -89,8 +89,14 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     is_thread = cc_content["type"] == "thread"
     is_comment = cc_content["type"] == "comment"
     is_privileged = context["is_requester_privileged"]
-    # True if we're dealing with a closed thread or a comment in a closed thread
-    is_thread_closed = cc_content["closed"] if is_thread else context["thread"]["closed"]
+
+    if is_thread:
+        is_thread_closed = cc_content["closed"]
+    elif context.get("thread"):
+        is_thread_closed = context["thread"]["closed"]
+    else:
+        # No editable fields when outside thread context
+        return set()
 
     # Map each field to the condition in which it's editable.
     editable_fields = {

@@ -100,6 +100,16 @@ class Model:
     def find(cls, id):  # pylint: disable=redefined-builtin
         return cls(id=id)
 
+    @classmethod
+    def retrieve_all(cls, params=None):
+        return perform_request(
+            'get',
+            cls.url(action='get_all'),
+            params,
+            metric_tags=[f'model_class:{cls.__name__}'],
+            metric_action='model.retrieve_all',
+        )
+
     def _update_from_response(self, response_data):
         for k, v in response_data.items():
             if k in self.accessible_fields:

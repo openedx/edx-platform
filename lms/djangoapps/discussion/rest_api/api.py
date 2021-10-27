@@ -152,6 +152,10 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
+
+        if retrieve_kwargs.get("flagged_comments") and not context["is_requester_privileged"]:
+            raise ValidationError("Only privileged users can request flagged comments")
+
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
                 not context["is_requester_privileged"] and
@@ -722,7 +726,7 @@ def get_thread_list(
     })
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fields=None):
+def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None):
     """
     Return the list of comments in the given thread.
 
@@ -741,6 +745,8 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
 
         page_size: The number of comments to retrieve per page
 
+        flagged: Filter comments by flagged for abuse status.
+
         requested_fields: Indicates which additional fields to return for
         each comment. (i.e. ['profile_image'])
 
@@ -757,6 +763,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
             "with_responses": True,
             "recursive": False,
             "user_id": request.user.id,
+            "flagged_comments": flagged,
             "response_skip": response_skip,
             "response_limit": page_size,
         }
@@ -1215,6 +1222,74 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         return paginator.get_paginated_response(results)
     except CommentClientRequestError as err:
         raise CommentNotFoundError("Comment not found") from err
+
+
+def get_user_comments(
+    request: Request,
+    author: User,
+    course_key: CourseKey,
+    flagged: bool = False,
+    page: int = 1,
+    page_size: int = 10,
+    requested_fields: Optional[List[str]] = None,
+):
+    """
+    Returns the list of comments made by the user in the requested course.
+
+    Arguments:
+
+        request: The django request object.
+
+        author: The user to get comments from.
+
+        course_key: The course locator to filter the comments.
+
+        flagged: Filter comments by flagged status.
+
+        page: The page number (1-indexed) to retrieve
+
+        page_size: The number of comments to retrieve per page
+
+        requested_fields: Indicates which additional fields to return for
+        each child comment. (i.e. ['profile_image'])
+
+    Returns:
+
+        A paginated result containing a list of comments.
+    """
+    course = _get_course(course_key, request.user)
+    context = get_context(course, request)
+
+    if flagged and not context["is_requester_privileged"]:
+        raise ValidationError("Only privileged users can filter comments by flagged status")
+
+    try:
+        response = Comment.retrieve_all({
+            'user_id': author.id,
+            'course_id': str(course_key),
+            'flagged': flagged,
+            'page': page,
+            'per_page': page_size,
+        })
+    except CommentClientRequestError as err:
+        raise CommentNotFoundError("Comment not found") from err
+
+    response_comments = response["collection"]
+    if not response_comments and page != 1:
+        raise PageNotFoundError("Page not found (No results on this page).")
+
+    results = _serialize_discussion_entities(
+        request,
+        context,
+        response_comments,
+        requested_fields,
+        DiscussionEntity.comment,
+    )
+
+    comment_count = response["comment_count"]
+    num_pages = response["num_pages"]
+    paginator = DiscussionAPIPagination(request, page, num_pages, comment_count)
+    return paginator.get_paginated_response(results)
 
 
 def delete_thread(request, thread_id):
