@@ -495,8 +495,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Stores the user_id in the session of the request.
         Used by unit tests.
         """
-        # Django's request.session[SESSION_KEY] should contain the user serialized to a string, which
-        #   is different from the request.session.session_key (or session id).
+        # Django's request.session[SESSION_KEY] should contain the user serialized to a string.
+        #   This is different from request.session.session_key, which holds the session id.
         request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
 
     @staticmethod
