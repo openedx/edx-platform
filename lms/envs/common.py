@@ -922,7 +922,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to disable self-unenrollments via REST API. 
-    #   This also hides the "Unenroll" button on the learner dashboard.
+    #   This also hides the "Unenroll" button on the Learner Dashboard.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-10-11
     # .. toggle_target_removal_date: None
