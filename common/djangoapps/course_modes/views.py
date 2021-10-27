@@ -11,6 +11,7 @@ import six
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from babel.dates import format_datetime
 from babel.numbers import get_currency_symbol
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -23,6 +24,7 @@ from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
+from urllib.parse import urljoin
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price, get_verified_track_links
@@ -133,7 +135,6 @@ class ChooseModeView(View):
                 if purchase_workflow == "bulk" and professional_mode.bulk_sku:
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
-
         course = modulestore().get_course(course_key)
 
         # If there isn't a verified mode available, then there's nothing
@@ -191,6 +192,7 @@ class ChooseModeView(View):
             "nav_hidden": True,
             "content_gating_enabled": gated_content,
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
+            "search_courses_url": urljoin(settings.MKTG_URLS.get('ROOT'), '/search?tab=course'),
         }
         context.update(
             get_experiment_user_metadata_context(
