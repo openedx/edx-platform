@@ -25,7 +25,6 @@ from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.lib.cache_utils import request_cached
 from edx_django_utils.cache import RequestCache
 
