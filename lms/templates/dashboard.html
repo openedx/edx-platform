@@ -211,7 +211,7 @@ from common.djangoapps.student.models import CourseEnrollment
                 # checks if we can unenroll based on the value of unfulfilled_entitlement
                 can_unenroll_unfulfilled_entitlement = cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 # compares the three different parameters by which we can unenroll 
-                can_unenroll =  can_unenroll_partner_managed_enrollment or can_unenroll_unfulfilled_entitlement and (not disable_unenrollment)
+                can_unenroll = (can_unenroll_partner_managed_enrollment or can_unenroll_unfulfilled_entitlement) and not disable_unenrollment
                 credit_status = credit_statuses.get(session_id)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
