@@ -32,7 +32,6 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
     """
     Exports course drafts.
     """
-    RequestCache(namespace="course_index_cache").clear()
     # NOTE: we need to explicitly implement the logic for setting the vertical's parent
     # and index here since the XML modulestore cannot load draft modules
     with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):

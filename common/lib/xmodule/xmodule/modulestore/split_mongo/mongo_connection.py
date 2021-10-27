@@ -260,8 +260,10 @@ class MongoPersistenceBackend:
         """
         # Set a write concern of 1, which makes writes complete successfully to the primary
         # only before returning. Also makes pymongo report write errors.
-        RequestCache(namespace="course_index_cache").clear()
         kwargs['w'] = 1
+
+        #make sure the course index cache is fresh.
+        RequestCache(namespace="course_index_cache").clear()
 
         self.database = connect_to_mongodb(
             db, host,
@@ -576,6 +578,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
     # Structures and definitions are only supported in MongoDB for now.
     # Course indexes are read from MySQL and written to both MongoDB and MySQL
     # Course indexes are cached within the process using their key and ignore_case atrributes as keys.
+    # This method is request cached. The keys to the cache are the arguements to the method.
+    # The `self` arguement is discarded as a key using an isinstance check.
+    # This is because the DjangoFlexPersistenceBackend could be different in reference to the same course key.
     @request_cached(
         "course_index_cache",
         arg_map_function=lambda arg: str(arg) if not isinstance(arg, DjangoFlexPersistenceBackend) else "")
@@ -657,6 +662,8 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Create the course_index in the db
         """
+        # clear the whole course_index request cache, required for sucessfully cloning a course.
+        # This is a relatively large hammer for the problem, but we mostly only use one course at a time.
         RequestCache(namespace="course_index_cache").clear()
 
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
