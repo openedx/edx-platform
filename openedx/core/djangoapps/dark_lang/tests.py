@@ -257,16 +257,6 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         session[LANGUAGE_SESSION_KEY] = session_language
         session.save()
 
-    @with_site_configuration(configuration={'LANGUAGE_CODE': 'rel'})
-    def test_site_configuration_language(self):
-        # `LANGUAGE_CODE` in site configuration should override session lang
-        self._set_client_session_language('notrel')
-        self.client.get('/home')
-        self.assert_session_lang_equals(
-            'rel',
-            self.client.session
-        )
-
     def test_preview_lang_with_released_language(self):
         # Preview lang should always override selection
         self._post_set_preview_lang('rel')

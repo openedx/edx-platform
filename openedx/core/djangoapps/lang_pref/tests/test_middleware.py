@@ -266,3 +266,81 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         mock_is_mobile_request.return_value = True
         response = self.middleware.process_response(self.request, response)
         response.delete_cookie.assert_called()
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_value')
+    def test_process_request_uses_site_wide_language_over_user_preferences(
+        self,
+        mock_get_value,
+    ):
+        """
+        Test that process_request method uses site-wide language when set over
+        the language set in user preferences.
+        """
+        mock_get_value.return_value = 'ar'
+
+        self.middleware.process_request(self.request)
+
+        assert self.request.session.get(LANGUAGE_SESSION_KEY, None) == 'ar'
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.set_user_preference')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_value')
+    def test_process_request_does_not_save_lang_from_cookies_when_site_wide_language_is_set(
+        self,
+        mock_get_value,
+        mock_set_user_preference,
+    ):
+        """
+        Test that process_request method doesn't save language from cookies as
+        user preference when site-wide language is set.
+        """
+        mock_get_value.return_value = 'ar'
+        self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'en'
+
+        self.middleware.process_request(self.request)
+
+        mock_set_user_preference.assert_not_called()
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware.update_accept_language')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.set_user_preference')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_value')
+    def test_process_request_updates_accept_language(
+        self,
+        mock_get_value,
+        mock_set_user_preference,
+        mock_update_accept_language,
+    ):
+        """
+        Test that process_request method updates accept language meta request
+        header when site-wide language is set.
+        """
+        mock_get_value.return_value = 'ar'
+        self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'en'
+
+        self.middleware.process_request(self.request)
+
+        mock_update_accept_language.assert_called_with(self.request, 'ar')
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_user_preference')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_value')
+    def test_process_response_uses_site_wide_language_over_user_preferences(
+        self,
+        mock_get_value,
+        mock_get_user_preference,
+    ):
+        """
+        Test that process_response method uses site-wide language when set over
+        the language set in user preferences.
+        """
+        mock_get_user_preference.return_value = 'en'
+        mock_get_value.return_value = 'ar'
+        response = mock.Mock(spec=HttpResponse)
+
+        self.middleware.process_response(self.request, response)
+
+        response.set_cookie.assert_called_with(
+            settings.LANGUAGE_COOKIE,
+            value='ar',
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            max_age=COOKIE_DURATION,
+            secure=self.request.is_secure(),
+        )
