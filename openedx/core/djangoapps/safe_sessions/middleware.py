@@ -381,9 +381,10 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
     @staticmethod
     def _on_user_authentication_failed(request):
         """
-        To be called when user authentication fails when processing
-        requests in the middleware. Sets a flag to delete the user's
-        cookie and redirects the user to the login page.
+        To be called when user authentication fails when processing requests in the middleware.
+        Sets a flag to delete the user's cookie and does one of the following:
+        - Raises 401 for mobile requests and requests that are not specifically requesting a HTML response.
+        - Redirects to login in case request expects a HTML response.
         """
         _mark_cookie_for_deletion(request)
 
@@ -393,6 +394,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             set_custom_attribute("safe_sessions.auth_failure", "mobile")
             return HttpResponse(status=401)
 
+        # only redirect to login if client is expecting html
         if 'text/html' in request.META.get('HTTP_ACCEPT', ''):
             set_custom_attribute("safe_sessions.auth_failure", "redirect_to_login")
             return redirect_to_login(request.path)
