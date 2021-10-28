@@ -9,7 +9,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
