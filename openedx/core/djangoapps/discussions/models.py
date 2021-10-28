@@ -119,6 +119,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
         ],
+        'supports_lti': False,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -144,6 +145,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
         ],
+        'supports_lti': False,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -171,6 +173,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.IN_PLATFORM_NOTIFICATIONS.value,
             Features.USER_MENTIONS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -198,6 +201,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.IN_PLATFORM_NOTIFICATIONS.value,
             Features.DISCUSSION_CONTENT_PROMPTS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -221,6 +225,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.WCAG_2_0_SUPPORT.value,
             Features.BLACKOUT_DISCUSSION_DATES.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='https://piazza.com/product/overview',
             configuration='https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',  # pylint: disable=line-too-long
@@ -246,6 +251,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
             configuration='',
@@ -445,7 +451,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     def supports_lti(self) -> bool:
         """Returns a boolean indicating if the provider supports lti discussion view."""
-        return self.provider_type != DEFAULT_PROVIDER_TYPE
+        return AVAILABLE_PROVIDER_MAP.get(self.provider_type, {}).get('supports_lti', False)
 
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
