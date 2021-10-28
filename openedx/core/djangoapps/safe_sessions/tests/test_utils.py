@@ -33,14 +33,16 @@ class TestSafeSessionsLogMixin:
                 yield
 
     @contextmanager
-    def assert_logged_with_message(self, log_string, log_level='error'):
+    def assert_logged_with_message(self, log_substring, log_level='error'):
         """
         Asserts that the logger with the given log_level was called
-        with a string.
+        with a substring.
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.' + log_level) as mock_log:
             yield
-            mock_log.assert_any_call(log_string)
+            log_messages = [call.args[0] for call in mock_log.call_args_list]
+            assert any(log_substring in msg for msg in log_messages), \
+                f"Expected to find log substring in one of: {log_messages}"
 
     @contextmanager
     def assert_not_logged(self):
@@ -134,7 +136,7 @@ class TestSafeSessionsLogMixin:
         with self.assert_logged_with_message(
             (
                 "SafeCookieData user at initial request '{}' does not match user at response time: '{}' "
-                "for request path '{}'. {}"
+                "for request path '{}'.\n{}"
             ).format(
                 user_at_request, user_at_response, request_path, session_suffix
             ),
@@ -153,7 +155,7 @@ class TestSafeSessionsLogMixin:
         with self.assert_logged_with_message(
             (
                 "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
-                "for request path '{}'. {}"
+                "for request path '{}'.\n{}"
             ).format(
                 user_at_request, user_in_session, request_path, session_suffix
             ),
@@ -173,7 +175,7 @@ class TestSafeSessionsLogMixin:
         with self.assert_logged_with_message(
             (
                 "SafeCookieData user at initial request '{}' matches neither user in session: '{}' "
-                "nor user at response time: '{}' for request path '{}'. {}"
+                "nor user at response time: '{}' for request path '{}'.\n{}"
             ).format(
                 user_at_request, user_in_session, user_at_response, request_path, session_suffix
             ),
