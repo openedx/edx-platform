@@ -1,7 +1,7 @@
 """Models providing Programs support for the LMS and Studio."""
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class ProgramsApiConfig(ConfigurationModel):
