@@ -256,21 +256,21 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                       </button>
                       <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                         <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
-                          % if can_unenroll:
-                            <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
-                              <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
-                                  <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
-                                    data-course-id="${course_overview.id}"
-                                    data-course-number="${course_overview.number}"
-                                    data-course-name="${course_overview.display_name_with_default}"
-                                    data-dashboard-index="${dashboard_index}"
-                                    data-course-refund-url="${course_refund_url}"
-                                    data-course-is-paid-course="${is_paid_course}"
-                                    data-course-cert-name-long="${cert_name_long}"
-                                    data-course-enrollment-mode="${enrollment.mode}">
-                                    ${_('Unenroll')}
-                                  </a>
-                            </li>
+                        % if can_unenroll:
+                          <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
+                            <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
+                                <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
+                                  data-course-id="${course_overview.id}"
+                                  data-course-number="${course_overview.number}"
+                                  data-course-name="${course_overview.display_name_with_default}"
+                                  data-dashboard-index="${dashboard_index}"
+                                  data-course-refund-url="${course_refund_url}"
+                                  data-course-is-paid-course="${is_paid_course}"
+                                  data-course-cert-name-long="${cert_name_long}"
+                                  data-course-enrollment-mode="${enrollment.mode}">
+                                  ${_('Unenroll')}
+                                </a>
+                          </li>
                         % elif partner_managed_enrollment:
                           <li class="actions-item" id="actions-item-enrolled-by-partner-${dashboard_index}" role="menuitem">
                             <a class="action action-message action-unenroll-managed-enrollment">
