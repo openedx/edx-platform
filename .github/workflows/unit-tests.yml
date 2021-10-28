@@ -52,4 +52,4 @@ jobs:
 
       - name: run tests
         run: |
-          pytest ${{ matrix.module-name }}
+          pytest ${{ matrix.path }}
