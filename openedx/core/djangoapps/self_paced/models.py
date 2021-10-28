@@ -5,7 +5,7 @@ Configuration for self-paced courses.
 
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class SelfPacedConfiguration(ConfigurationModel):
