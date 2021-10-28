@@ -573,7 +573,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "user can see their certificate for the course"
         ),
         scope=Scope.settings,
-        default=CertificatesDisplayBehaviors.END.value,
+        default=CertificatesDisplayBehaviors.END,
     )
     course_image = String(
         display_name=_("Course About Page Image"),
