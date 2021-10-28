@@ -124,19 +124,20 @@ class TeamsConfigTests(TestCase):
             },
         ],
     }
-    INPUT_DATA_3 = {
-        # For a blank config, "enabled" should be automatically added and set to False since no teamsets exist.
-    }
+    INPUT_DATA_3 = {}
     OUTPUT_DATA_3 = {
+        # When starting with a default blank config, there are no teamsets configured, and as such, teamsets is
+        # disabled, so after processing the config the "enabled" field should be set to False.
         "enabled": False,
         "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
         "team_sets": [],
     }
     INPUT_DATA_4 = {
-        # If teamsets are provided, "enabled" should be automatically added and set to True.
         "team_sets": [dict(id="test-teamset", name="test", description="test")]
     }
     OUTPUT_DATA_4 = {
+        # If teamsets are provided, but a value for "enabled" isn't, then the presence of teamsets indicates that
+        # teams should be considered enabled, and the "enabled" field should be set to True.
         "enabled": True,
         "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
         "team_sets": [dict(id="test-teamset", name="test", description="test", type="open", max_team_size=None)],
