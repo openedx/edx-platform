@@ -12,6 +12,8 @@ jobs:
     runs-on: [ self-hosted ]
     strategy:
       matrix:
+        python-version: [ "3.8" ]
+        django-version: [ "3.2" ]
         include:
           - module-name: lms-1
             path: "lms/djangoapps/badges/ lms/djangoapps/branding/ lms/djangoapps/bulk_email/ lms/djangoapps/bulk_enroll/ lms/djangoapps/bulk_user_retirement/ lms/djangoapps/ccx/ lms/djangoapps/certificates/ lms/djangoapps/commerce/"
