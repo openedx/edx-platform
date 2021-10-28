@@ -56,7 +56,8 @@ class DiscussionsConfigurationView(APIView):
             partial=True,
         )
         if serializer.is_valid(raise_exception=True):
-            if serializer.validated_data['provider_type'] != configuration.provider_type:
+            new_provider_type = serializer.validated_data.get('provider_type', None)
+            if new_provider_type is not None and new_provider_type != configuration.provider_type:
                 check_course_permissions(course, request.user, 'change_provider')
 
             serializer.save()

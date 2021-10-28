@@ -406,6 +406,16 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "If false, they are sorted chronologically by creation date and time."
         )
     )
+    discussions_settings = Dict(
+        display_name=_("Discussions Plugin Settings"),
+        scope=Scope.settings,
+        help=_("Settings for discussions plugins."),
+        default={
+            "enable_in_context": True,
+            "enable_graded_units": False,
+            "unit_level_visibility": False,
+        }
+    )
     announcement = Date(
         display_name=_("Course Announcement Date"),
         help=_("Enter the date to announce your course."),

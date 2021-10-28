@@ -4,14 +4,15 @@ Provide django models to back the discussions app
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from collections import namedtuple
+from typing import List, Type, TypeVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
+from enum import Enum
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
@@ -232,17 +233,14 @@ AVAILABLE_PROVIDER_MAP = {
 }
 
 
-def get_supported_providers() -> list[str]:
+def get_supported_providers() -> List[str]:
     """
     Return the list of supported discussion providers
 
     TODO: Load this from entry points?
     """
-    providers = [
-        'legacy',
-        'piazza',
-    ]
-    return providers
+
+    return list(AVAILABLE_PROVIDER_MAP.keys())
 
 
 class ProviderFilter(StackedConfigurationModel):
@@ -304,7 +302,7 @@ class ProviderFilter(StackedConfigurationModel):
         )
 
     @property
-    def available_providers(self) -> list[str]:
+    def available_providers(self) -> List[str]:
         """
         Return a filtered list of available providers
         """
@@ -324,10 +322,13 @@ class ProviderFilter(StackedConfigurationModel):
         return _providers
 
     @classmethod
-    def get_available_providers(cls, course_key: CourseKey) -> list[str]:
+    def get_available_providers(cls, course_key: CourseKey) -> List[str]:
         _filter = cls.current(course_key=course_key)
         providers = _filter.available_providers
         return providers
+
+
+T = TypeVar('T', bound='DiscussionsConfiguration')
 
 
 class DiscussionsConfiguration(TimeStampedModel):
@@ -356,6 +357,21 @@ class DiscussionsConfiguration(TimeStampedModel):
         null=True,
         help_text=_("The LTI configuration data for this context/provider."),
     )
+    enable_in_context = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If enabled, discussion topics will be created for each non-graded unit in the course. "
+            "A UI for discussions will show up with each unit."
+        )
+    )
+    enable_graded_units = models.BooleanField(
+        default=False,
+        help_text=_("If enabled, discussion topics will be created for graded units as well.")
+    )
+    unit_level_visibility = models.BooleanField(
+        default=False,
+        help_text=_("If enabled, discussions will need to be manually enabled for each unit.")
+    )
     plugin_configuration = JSONField(
         blank=True,
         default={},
@@ -366,6 +382,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         max_length=100,
         verbose_name=_("Discussion provider"),
         help_text=_("The discussion tool/provider's id"),
+        default=DEFAULT_PROVIDER_TYPE,
     )
     history = HistoricalRecords()
 
@@ -407,9 +424,8 @@ class DiscussionsConfiguration(TimeStampedModel):
         configuration = cls.get(context_key)
         return configuration.enabled
 
-    # pylint: disable=undefined-variable
     @classmethod
-    def get(cls, context_key: CourseKey) -> cls:
+    def get(cls: Type[T], context_key: CourseKey) -> T:
         """
         Lookup a model by context_key
         """
@@ -423,14 +439,12 @@ class DiscussionsConfiguration(TimeStampedModel):
             )
         return configuration
 
-    # pylint: enable=undefined-variable
-
     @property
-    def available_providers(self) -> list[str]:
+    def available_providers(self) -> List[str]:
         return ProviderFilter.current(course_key=self.context_key).available_providers
 
     @classmethod
-    def get_available_providers(cls, context_key: CourseKey) -> list[str]:
+    def get_available_providers(cls, context_key: CourseKey) -> List[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
 
     @classmethod
