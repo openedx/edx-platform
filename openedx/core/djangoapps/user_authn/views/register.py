@@ -170,7 +170,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         if 'confirm_email' in extra_fields:
             del extra_fields['confirm_email']
 
-    if not settings.COLLECT_YEAR_OF_BIRTH and 'year_of_birth' in params:
+    if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in params:
         params['year_of_birth'] = ''
 
     # registration via third party (Google, Facebook) using mobile application

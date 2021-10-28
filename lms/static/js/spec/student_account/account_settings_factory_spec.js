@@ -27,7 +27,7 @@ define(['backbone',
                     Helpers.PLATFORM_NAME,
                     Helpers.CONTACT_EMAIL,
                     true,
-                    Helpers.COLLECT_YEAR_OF_BIRTH
+                    Helpers.ENABLE_COPPA_COMPLIANCE
                 );
                 return context.accountSettingsView;
             };
@@ -165,7 +165,7 @@ define(['backbone',
                     Helpers.PLATFORM_NAME,
                     Helpers.CONTACT_EMAIL,
                     true,
-                    Helpers.COLLECT_YEAR_OF_BIRTH,
+                    Helpers.ENABLE_COPPA_COMPLIANCE,
                     '',
 
                     Helpers.SYNC_LEARNER_PROFILE_DATA,
