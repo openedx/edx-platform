@@ -336,7 +336,7 @@ class RegistrationFormFactory:
 
     def __init__(self):
 
-        if not settings.COLLECT_YEAR_OF_BIRTH and 'year_of_birth' in self.EXTRA_FIELDS:
+        if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
             self.EXTRA_FIELDS.remove('year_of_birth')
 
         # Backwards compatibility: Honor code is required by default, unless

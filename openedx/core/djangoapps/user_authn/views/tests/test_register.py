@@ -2062,7 +2062,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         ]
 
     @override_settings(
-        COLLECT_YEAR_OF_BIRTH=False,
+        ENABLE_COPPA_COMPLIANCE=True,
         REGISTRATION_EXTRA_FIELDS={
             "level_of_education": "optional",
             "gender": "optional",
@@ -2080,8 +2080,8 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
     )
     def test_year_of_birth_field_with_feature_flag(self):
         """
-        Test that year of birth is not returned when COLLECT_YEAR_OF_BIRTH is
-        set to False.
+        Test that year of birth is not returned when ENABLE_COPPA_COMPLIANCE is
+        set to True.
         """
         response = self.client.get(self.url)
         self.assertHttpOK(response)
