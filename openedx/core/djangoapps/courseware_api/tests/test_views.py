@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
 
+from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -21,6 +22,7 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory, LinkedInAddToProfileConfigurationFactory
 )
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
+from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.courseware.toggles import (
@@ -358,6 +360,14 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         courseware_data = response.json()
         assert 'user_needs_integrity_signature' in courseware_data
         assert courseware_data['user_needs_integrity_signature'] == needs_integrity_signature
+
+    def test_set_last_seen_courseware_timezone_no_integrity_error(self):
+        # Previously this function was trying to create duplicate records
+        # that would bump into a uniqueness constraint causing an integrity error
+        self.client.get(self.url, {'browser_timezone': 'America/New_York'})
+        TieredCache.dangerous_clear_all_tiers()
+        self.client.get(self.url, {'browser_timezone': 'Asia/Tokyo'})
+        assert len(LastSeenCoursewareTimezone.objects.filter()) == 1
 
 
 @ddt.ddt

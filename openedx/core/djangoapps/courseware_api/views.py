@@ -485,7 +485,7 @@ class CoursewareInformation(RetrieveAPIView):
                 TieredCache.set_all_tiers(cache_key, str(browser_timezone), 86400)  # Refresh the cache daily
                 LastSeenCoursewareTimezone.objects.update_or_create(
                     user=user,
-                    last_seen_courseware_timezone=browser_timezone,
+                    defaults={'last_seen_courseware_timezone': browser_timezone},
                 )
 
     def get_object(self):
