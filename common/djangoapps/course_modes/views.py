@@ -14,7 +14,7 @@ from babel.numbers import get_currency_symbol
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -288,9 +288,10 @@ class ChooseModeView(View):
             course_id (unicode): The slash-separated course key.
 
         Returns:
-            Status code 400 when the requested mode is unsupported. When the honor mode
-            is selected, redirects to the dashboard. When the verified mode is selected,
-            returns error messages if the indicated contribution amount is invalid or
+            When the requested mode is unsupported, returns error message.
+            When the honor mode is selected, redirects to the dashboard.
+            When the verified mode is selected, returns error messages
+            if the indicated contribution amount is invalid or
             below the minimum, otherwise redirects to the verification flow.
 
         """
@@ -316,7 +317,8 @@ class ChooseModeView(View):
                 '[Track Selection Check] Error: requested enrollment mode [%s] is not supported for course [%s]',
                 requested_mode, course_id
             )
-            return HttpResponseBadRequest(_("Enrollment mode not supported"))
+            error_msg = _("Enrollment mode not supported")
+            return self.get(request, course_id, error=error_msg)
 
         if requested_mode == 'audit':
             # If the learner has arrived at this screen via the traditional enrollment workflow,

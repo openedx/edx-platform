@@ -401,17 +401,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         assert mode == CourseMode.DEFAULT_MODE_SLUG
         assert is_active is True
 
-    def test_unsupported_enrollment_mode_failure(self):
-        # Create the supported course modes
-        for mode in ('honor', 'verified'):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
-
-        # Choose an unsupported mode (POST request)
-        choose_track_url = reverse('course_modes_choose', args=[str(self.course.id)])
-        response = self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['unsupported'])
-
-        assert 400 == response.status_code
-
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_default_mode_creation(self):
         # Hit the mode creation endpoint with no querystring params, to create an honor mode
@@ -520,17 +509,21 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     @ddt.data(
         (False, {'audit_mode': True}, 'Enrollment is closed', 302),
-        (True, {'verified_mode': True, 'contribution': 'abc'}, 'Invalid amount selected', 200),
         (False, {'verified_mode': True, 'contribution': '1.23'}, 'Enrollment is closed', 302),
+        (True, {'verified_mode': True, 'contribution': 'abc'}, 'Invalid amount selected', 200),
         (True, {'verified_mode': True, 'contribution': '0.1'}, 'No selected price or selected price is too low.', 200),
+        (True, {'unsupported_mode': True}, 'Enrollment mode not supported', 200),
     )
     @ddt.unpack
     @patch('django.contrib.auth.models.PermissionsMixin.has_perm')
     def test_errors(self, has_perm, post_params, error_msg, status_code, mock_has_perm):
         """
         Test the error template is rendered on different types of errors.
-        When CourseMode is 'honor' or 'audit', get request is called with error msg,
-        but the get method redirects to dashboard.
+        When the chosen CourseMode is 'honor' or 'audit' via POST,
+        it redirects to dashboard, but if there's an error in the process,
+        it shows the error template.
+        If the user does not have permission to enroll, GET is called with error message,
+        but it also redirects to dashboard.
         """
         # Create course modes
         for mode in ('audit', 'honor', 'verified'):
@@ -540,8 +533,11 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
             mock_has_perm.return_value = has_perm
             url = reverse('course_modes_choose', args=[str(self.course.id)])
+
+            # Choose mode (POST request)
             response = self.client.post(url, post_params)
             self.assertEqual(response.status_code, status_code)
+
             if has_perm:
                 self.assertContains(response, error_msg)
                 self.assertContains(response, 'Sorry, we were unable to enroll you')
