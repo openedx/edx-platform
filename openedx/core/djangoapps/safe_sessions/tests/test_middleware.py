@@ -409,7 +409,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
-        mock_attr.assert_not_called()
+        assert 'safe_sessions.user_mismatch' not in [call.args[0] for call in mock_attr.call_args_list]
 
 
 @ddt.ddt

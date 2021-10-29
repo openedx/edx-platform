@@ -300,6 +300,20 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         final verification before sending the response (in
         process_response).
         """
+        # 2021-10-29: Temporary debugging attr to answer the question
+        # "are browsers sometimes sending in multiple session
+        # cookies?" We've observed behavior that might be consistent
+        # with this, perhaps due to an additional cookie set on the
+        # wrong domain, and assuming that the cookies *occasionally*
+        # are sent in a different order. -- timmc
+        try:
+            set_custom_attribute(
+                'safe_sessions.session_cookie_count',
+                request.headers.get('Cookie', '').count(settings.SESSION_COOKIE_NAME + '=')
+            )
+        except:  # pylint: disable=bare-except
+            pass
+
         cookie_data_string = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if cookie_data_string:
 
@@ -359,6 +373,26 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         """
         response = super().process_response(request, response)  # Step 1
+
+        # 2021-10-29: Temporary debugging attrs, to answer the
+        # question "are we calling _verify_user on too few responses?"
+        # We should probably be calling it on every response, and it
+        # looks like we might be missing most responses -- some
+        # testing shows that most of my LMS responses do *not* get a
+        # newly coined session cookie, but I seem to recall that that
+        # used to happen. If so, we may have at some point stopped
+        # calling _verify_user as often as we should. -- timmc
+        try:
+            set_custom_attribute(
+                'safe_sessions.request_had_valid_session',
+                hasattr(request, 'safe_cookie_verified_session_id')
+            )
+            set_custom_attribute(
+                'safe_sessions.response_has_session_cookie',
+                _is_cookie_present(response)
+            )
+        except:  # pylint: disable=bare-except
+            pass
 
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
@@ -538,7 +572,7 @@ def _is_cookie_present(response):
     """
     Returns whether the session cookie is present in the response.
     """
-    return (
+    return bool(
         response.cookies.get(settings.SESSION_COOKIE_NAME) and  # cookie in response
         response.cookies[settings.SESSION_COOKIE_NAME].value  # cookie is not empty
     )
