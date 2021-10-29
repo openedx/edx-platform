@@ -5,20 +5,28 @@
 {% block content %}
 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
 {# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
-<table style="font-family: Inter, Arial, sans-serif;" width="calc(100% + 2.5rem)" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-        <td>
+<table style="font-family: Inter, Arial, sans-serif; width: 100%;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr style="width:inherit;">
+        <td style="width:inherit;">
             {% include "goal_reminder_banner.html" %}
             <style>
+                .goal-reminder-body-wrapper {
+                    margin: 2.25rem 1.25rem 0 1.0625rem;
+                }
                 @media only screen and (max-width: 600px) {
                     .goal-reminder-body-wrapper {
                         margin-left: 0 !important;
                     }
                 }
+                @media only screen and (max-width: 425px) {
+                    .goal-reminder-body-wrapper {
+                        margin-top: 0 !important;
+                    }
+                }
             </style>
-            <div class="goal-reminder-body-wrapper" style="margin-top: 2.25rem; margin-left: 1.0625rem;">
+            <div class="goal-reminder-body-wrapper" style="width:inherit;">
                 <h1 style="
-                    font-size: 1.375rem;
+                    font-size: 1.25rem;
                     font-style: normal;
                     font-weight: 700;
                     line-height: 1.75rem;
