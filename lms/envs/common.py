@@ -4527,9 +4527,6 @@ CONTENT_TYPE_GATE_GROUP_IDS = {
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
-
 
 # Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'

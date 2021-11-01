@@ -927,9 +927,6 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = ENV_TOKENS.get(
 ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
 ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
-
 # How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
 
@@ -1029,8 +1026,6 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
-        'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
