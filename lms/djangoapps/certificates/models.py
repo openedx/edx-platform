@@ -19,7 +19,6 @@ from django.dispatch import receiver
 
 from django.utils.translation import ugettext_lazy as _
 from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -437,7 +436,7 @@ class GeneratedCertificate(models.Model):
         """
         name_to_use = student_api.get_name(user.id)
 
-        if is_verified_name_enabled() and should_use_verified_name_for_certs(user):
+        if should_use_verified_name_for_certs(user):
             verified_name_obj = get_verified_name(user, is_verified=True)
             if verified_name_obj:
                 name_to_use = verified_name_obj.verified_name

@@ -251,9 +251,6 @@ class AccountViewSet(ViewSet):
             * pending_name_change: If the user has an active name change request, returns the
               requested name.
 
-            * is_verified_name_enabled: Temporary flag to control verified name field - see
-              https://github.com/edx/edx-name-affirmation/blob/main/edx_name_affirmation/toggles.py
-
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
             rendered values to avoid script injections.

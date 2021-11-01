@@ -17,8 +17,6 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
-from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
-from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from social_django.models import UserSocialAuth
 from common.djangoapps.student.models import (
@@ -365,7 +363,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert 'Valid e-mail address required.' in field_errors['email']['developer_message']
         assert 'Full Name cannot contain the following characters: < >' in field_errors['name']['user_message']
 
-    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
     def test_validate_name_change_same_name(self):
         """
         Test that saving the user's profile name without changing it should not raise an error.
@@ -396,7 +393,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=False))
-    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
     def test_name_update_requires_idv(self):
         """
         Test that a name change is blocked through this API if it requires ID verification.
@@ -413,7 +409,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=True))
-    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
     def test_name_update_does_not_require_idv(self):
         """
         Test that the user can change their name if change does not require IDV.
@@ -618,7 +613,6 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'course_certificates': None,
             'phone_number': None,
             'pending_name_change': None,
-            'is_verified_name_enabled': False,
         }
 
     def test_normalize_password(self):
