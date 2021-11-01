@@ -874,6 +874,17 @@ def _course_uses_available_date(course):
     )
 
 
+def _course_uses_end_date(course):
+    """Returns if the course end date should be used"""
+    display_behavior_is_valid = course.certificates_display_behavior == CertificatesDisplayBehaviors.END
+
+    return (
+        _enabled_and_instructor_paced(course)
+        and course.end
+        and display_behavior_is_valid
+    )
+
+
 def available_date_for_certificate(course, certificate, certificate_available_date=None):
     """
     Returns the available date to use with a certificate
@@ -885,6 +896,8 @@ def available_date_for_certificate(course, certificate, certificate_available_da
     """
     if _course_uses_available_date(course):
         return certificate_available_date or course.certificate_available_date
+    if _course_uses_end_date(course):
+        return course.end
     return certificate.modified_date
 
 
