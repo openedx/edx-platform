@@ -3232,7 +3232,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         banner_text = get_expiration_banner_text(self.user, self.course)
         self.assertContains(response, banner_text, html=True)
 
-    @patch('openedx.core.lib.mobile_utils.is_request_from_mobile_app')
+    @patch('lms.djangoapps.courseware.views.views.is_request_from_mobile_app')
     def test_render_xblock_with_course_duration_limits_in_mobile_browser(self, mock_is_request_from_mobile_app):
         """
         Verify that expired banner message doesn't appear on xblock page in a mobile browser, if learner is enrolled
