@@ -291,7 +291,17 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
 
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=False)
     def test_success(self):
+        self.verify_success()
+
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=True)
+    def test_success_with_verify_all(self):
+        """
+        Test with verify-all feature enabled (non-default case). Remove this
+        test when feature toggle is permanently enabled, and remove override
+        from the pre-existing test_success.
+        """
         self.verify_success()
 
     def test_success_from_mobile_web_view(self):
@@ -308,6 +318,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         Verifies error path.
         """
         self.request.COOKIES[settings.SESSION_COOKIE_NAME] = 'not-a-safe-cookie'
+        self.request.session = self.client.session
 
         with self.assert_parse_error():
             request_response = SafeSessionMiddleware().process_request(self.request)
@@ -320,7 +331,18 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             SafeSessionMiddleware().process_response(self.request, self.client.response)
             assert mock_delete_cookie.called
 
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=False)
     def test_error(self):
+        self.request.META['HTTP_ACCEPT'] = 'text/html'
+        self.verify_error(302)
+
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=True)
+    def test_error_with_verify_all(self):
+        """
+        Test with verify-all feature enabled (non-default case). Remove this
+        test when feature toggle is permanently enabled, and remove override
+        from the pre-existing test_error.
+        """
         self.request.META['HTTP_ACCEPT'] = 'text/html'
         self.verify_error(302)
 
