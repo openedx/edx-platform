@@ -59,6 +59,16 @@ import '../helper.js'
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
+        it('can emit "complete_video" event when video is marked as complete', function() {
+            state.el.trigger('complete');
+            expect(Logger.log).toHaveBeenCalledWith('complete_video', {
+                id: 'id',
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
+            });
+        });
+
         it('can emit "speed_change_video" event', function() {
             state.el.trigger('speedchange', ['2.0', '1.0']);
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
@@ -199,6 +209,7 @@ import '../helper.js'
                 ready: plugin.onReady,
                 play: plugin.onPlay,
                 pause: plugin.onPause,
+                complete: plugin.onComplete,
                 'ended stop': plugin.onEnded,
                 seek: plugin.onSeek,
                 skip: plugin.onSkip,
