@@ -2,7 +2,7 @@
 Unified course experience settings and helper methods.
 """
 import crum
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 
