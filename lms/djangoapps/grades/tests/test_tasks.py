@@ -165,7 +165,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         (ModuleStoreEnum.Type.mongo, 1, 42, False),
         (ModuleStoreEnum.Type.split, 2, 42, True),
         (ModuleStoreEnum.Type.split, 2, 42, False),
-
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
