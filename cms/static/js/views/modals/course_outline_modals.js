@@ -521,6 +521,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             'change input.onboarding_exam': 'setSpecialExamWithoutRules',
             'focusout .field-time-limit input': 'timeLimitFocusout'
         },
+        startingExamType: '',
+
         notTimedExam: function(event) {
             event.preventDefault();
             this.$('.exam-options').hide();
@@ -575,6 +577,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.field-exam-review-rules').hide();
 
             if (!isTimeLimited) {
+                this.startingExamType = 'no_special_exam';
                 this.$('input.no_special_exam').prop('checked', true);
                 return;
             }
@@ -583,10 +586,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
             if (this.options.enable_proctored_exams && isProctoredExam) {
                 if (isOnboardingExam) {
+                    this.startingExamType = 'onboarding_exam';
                     this.$('input.onboarding_exam').prop('checked', true);
                 } else if (isPracticeExam) {
+                    this.startingExamType = 'practice_exam';
                     this.$('input.practice_exam').prop('checked', true);
                 } else {
+                    this.startingExamType = 'proctored_exam';
                     this.$('input.proctored_exam').prop('checked', true);
                     this.$('.field-exam-review-rules').show();
                 }
@@ -594,6 +600,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 // Since we have an early exit at the top of the method
                 // if the subsection is not time limited, then
                 // here we rightfully assume that it just a timed exam
+                this.startingExamType = 'timed_exam';
                 this.$('input.timed_exam').prop('checked', true);
             }
         },
@@ -631,20 +638,27 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var timeLimit = this.getExamTimeLimit();
             var examReviewRules = this.$('.field-exam-review-rules textarea').val();
 
+            var metadata = {
+                is_practice_exam: isPracticeExamChecked,
+                is_time_limited: !isNoSpecialExamChecked,
+                exam_review_rules: examReviewRules,
+                // We have to use the legacy field name
+                // as the Ajax handler directly populates
+                // the xBlocks fields. We will have to
+                // update this call site when we migrate
+                // seq_module.py to use 'is_proctored_exam'
+                is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
+                default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
+                is_onboarding_exam: isOnboardingExamChecked
+            };
+
+            // If setting as a proctored exam, set to hide after due by default
+            if (isProctoredExamChecked && this.startingExamType !== 'proctored_exam') {
+                metadata.hide_after_due = true;
+            }
+
             return {
-                metadata: {
-                    is_practice_exam: isPracticeExamChecked,
-                    is_time_limited: !isNoSpecialExamChecked,
-                    exam_review_rules: examReviewRules,
-                    // We have to use the legacy field name
-                    // as the Ajax handler directly populates
-                    // the xBlocks fields. We will have to
-                    // update this call site when we migrate
-                    // seq_module.py to use 'is_proctored_exam'
-                    is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
-                    default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
-                    is_onboarding_exam: isOnboardingExamChecked
-                }
+                metadata: metadata
             };
         }
     });
