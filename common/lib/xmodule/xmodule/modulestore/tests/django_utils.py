@@ -19,6 +19,7 @@ from django.test.utils import override_settings
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
+from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
@@ -27,7 +28,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-
 
 class CourseUserType(Enum):
     """
@@ -470,6 +470,12 @@ class SharedModuleStoreTestCase(
         cls.end_modulestore_isolation()
         super().tearDownClass()
 
+        # Overly broad hammer that breaks abstraction barrier to clear data from
+        # the table underlying the Django ORM backed modulestore active versions
+        # lookup. This has to go _after_ the super().tearDownClass call above,
+        # or it doesn't work.
+        SplitModulestoreCourseIndex.objects.all().delete()
+
     def setUp(self):
         # OverrideFieldData.provider_classes is always reset to `None` so
         # that they're recalculated for every test
@@ -529,6 +535,12 @@ class ModuleStoreTestCase(
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+
+        # Overly broad hammer that breaks abstraction barrier to clear data from
+        # the table underlying the Django ORM backed modulestore active versions
+        # lookup. This has to go _after_ the super().tearDownClass call above,
+        # or it doesn't work.
+        SplitModulestoreCourseIndex.objects.all().delete()
 
     def setUp(self):
         """
