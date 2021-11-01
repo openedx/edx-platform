@@ -30,25 +30,18 @@ class TeamsConfig:
     def __str__(self):
         """
         Return user-friendly string.
-
-        TODO move this code to __str__ after Py3 upgrade.
         """
         return f"Teams configuration for {len(self.teamsets)} team-sets"
-
-    def __str__(self):
-        """
-        Return user-friendly string.
-        """
-        return "Teams configuration for {} team-sets".format(len(self.teamsets))
 
     def __repr__(self):
         """
         Return developer-helpful string.
         """
-        return "<{} default_max_team_size={} teamsets=[{}]>".format(
+        return "<{} default_max_team_size={} teamsets=[{}] enabled={}>".format(
             self.__class__.__name__,
             self.default_max_team_size,
             ", ".join(repr(teamset) for teamset in self.teamsets),
+            self.is_enabled,
         )
 
     def __eq__(self, other):
@@ -77,6 +70,7 @@ class TeamsConfig:
         JSON-friendly dictionary containing cleaned data from this TeamsConfig.
         """
         return {
+            'enabled': self.is_enabled,
             'max_team_size': self.default_max_team_size,
             'team_sets': [
                 teamset.cleaned_data for teamset in self.teamsets
@@ -88,7 +82,16 @@ class TeamsConfig:
         """
         Whether the Course Teams feature is enabled for this course run.
         """
-        return bool(self.teamsets)
+        # Check if the enabled field is set, and teamsets are defined
+        has_teamsets = bool(self.teamsets)
+        return self._data.get('enabled', True) and has_teamsets
+
+    @is_enabled.setter
+    def is_enabled(self, value):
+        """
+        Setter to set value of enabled value
+        """
+        self._data['enabled'] = value
 
     @cached_property
     def teamsets(self):
