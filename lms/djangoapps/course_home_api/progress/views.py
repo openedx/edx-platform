@@ -25,7 +25,7 @@ from lms.djangoapps.courseware.courses import (
     get_course_blocks_completion_summary, get_course_with_access, get_studio_url,
 )
 from lms.djangoapps.courseware.masquerade import setup_masquerade
-from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.courseware.views.views import credit_course_requirements, get_cert_data
 
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -74,6 +74,11 @@ class ProgressTabView(RetrieveAPIView):
             letter_grade: (str) the user's letter grade based on the set grade range.
                                 If user is passing, value may be 'A', 'B', 'C', 'D', 'Pass', otherwise none
             percent: (float) the user's total graded percent in the course
+        credit_course_requirements: Object containing credit course requirements with the following fields:
+            eligibility_status: (str) Indicates if the user is eligible to receive credit. Value may be
+                "eligible", "not_eligible", or "partial_eligible"
+            requirements: List of requirements that must be fulfilled to be eligible to receive credit. See
+                `get_credit_requirement_status` for details on the fields
         end: (date) end date of the course
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
         grading_policy:
@@ -236,6 +241,7 @@ class ProgressTabView(RetrieveAPIView):
             'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade),
             'completion_summary': get_course_blocks_completion_summary(course_key, student),
             'course_grade': course_grade,
+            'credit_course_requirements': credit_course_requirements(course_key, student),
             'end': course.end,
             'enrollment_mode': enrollment_mode,
             'grading_policy': grading_policy,
