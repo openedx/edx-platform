@@ -93,7 +93,7 @@ class Command(BaseCommand):
         log.info(f'Creating manual verification for {total_emails} emails.')
         failed_emails = []
         for n in range(0, total_emails, batch_size):
-            failed_emails.extend(self._add_users_to_manual_verification(email_ids[n:n+batch_size]))
+            failed_emails.extend(self._add_users_to_manual_verification(email_ids[n:n + batch_size]))
 
         return total_emails, failed_emails
 
