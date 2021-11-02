@@ -392,6 +392,8 @@ class CommentsServiceMockMixin:
         Returns expected thread data in API response
         """
         response_data = {
+            "anonymous": False,
+            "anonymous_to_peers": False,
             "author": self.user.username,
             "author_label": None,
             "created_at": "1970-01-01T00:00:00Z",
@@ -403,7 +405,10 @@ class CommentsServiceMockMixin:
             "abuse_flagged_count": None,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
+            "editable_fields": [
+                "abuse_flagged", "anonymous", "following", "raw_body", "read",
+                "title", "topic_id", "type", "voted"
+            ],
             "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
