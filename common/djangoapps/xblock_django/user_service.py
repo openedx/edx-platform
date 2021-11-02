@@ -38,9 +38,8 @@ class DjangoXBlockUserService(UserService):
         """
         super().__init__(**kwargs)
         self._django_user = django_user
-        if self._django_user:
-            self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
-            self._django_user.anonymous_user_id = kwargs.get('anonymous_user_id', None)
+        self._user_is_staff = kwargs.get('user_is_staff', False)
+        self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
 
     def get_current_user(self):
         """
@@ -95,11 +94,11 @@ class DjangoXBlockUserService(UserService):
                 full_name = None
             xblock_user.full_name = full_name
             xblock_user.emails = [django_user.email]
-            xblock_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] = django_user.anonymous_user_id
+            xblock_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] = self._anonymous_user_id
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
             xblock_user.opt_attrs[ATTR_KEY_USERNAME] = django_user.username
-            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = django_user.user_is_staff
+            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = self._user_is_staff
             user_preferences = get_user_preferences(django_user)
             xblock_user.opt_attrs[ATTR_KEY_USER_PREFERENCES] = {
                 pref: user_preferences.get(pref)
