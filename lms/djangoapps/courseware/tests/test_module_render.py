@@ -2576,6 +2576,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory.create()
         cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
+        cls.problem_descriptor = ItemFactory(category="problem", parent=cls.course)
 
     def setUp(self):
         """
@@ -2636,6 +2637,40 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         assert runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+
+    def test_anonymous_student_id_bug(self):
+        """
+        Verifies that subsequent calls to get_module_system_for_user have no effect on each block runtime's
+        anonymous_student_id value.
+        """
+        problem_runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.problem_descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        # Ensure the problem block returns a per-user anonymous id
+        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+
+        vertical_runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        # Ensure the vertical block returns a per-course+user anonymous id
+        assert vertical_runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+
+        # Ensure the problem runtime's anonymous student ID is unchanged after the above call.
+        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
         runtime, _ = render.get_module_system_for_user(
