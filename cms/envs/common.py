@@ -1762,6 +1762,10 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'staffgradedxblock',
         'boilerplate_name': None
+    },
+    {
+        'component': 'edlyrating',
+        'boilerplate_name': None
     }
 ]
 
