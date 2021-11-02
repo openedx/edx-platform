@@ -4,7 +4,7 @@
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 from openedx.core.djangolib.markup import HTML, Text

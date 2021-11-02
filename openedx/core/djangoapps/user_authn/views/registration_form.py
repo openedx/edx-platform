@@ -13,7 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator, ValidationError, slug_re
 from django.forms import widgets
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_countries import countries
 
 from common.djangoapps import third_party_auth
@@ -336,6 +336,9 @@ class RegistrationFormFactory:
 
     def __init__(self):
 
+        if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
+            self.EXTRA_FIELDS.remove('year_of_birth')
+
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
         self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
@@ -423,7 +426,7 @@ class RegistrationFormFactory:
                             FormDescription.FIELD_TYPE_MAP.get(field.__class__))
                         if not field_type:
                             raise ImproperlyConfigured(
-                                u"Field type '{}' not recognized for registration extension field '{}'.".format(
+                                "Field type '{}' not recognized for registration extension field '{}'.".format(
                                     field_type,
                                     field_name
                                 )
@@ -592,7 +595,10 @@ class RegistrationFormFactory:
 
         # The labels are marked for translation in UserProfile model definition.
         # pylint: disable=translation-of-non-string
+
         options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]
+        if settings.ENABLE_COPPA_COMPLIANCE:
+            options = filter(lambda op: op[0] != 'el', options)
         form_desc.add_field(
             "level_of_education",
             label=education_level_label,

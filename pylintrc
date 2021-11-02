@@ -402,6 +402,11 @@ disable =
 	consider-using-enumerate,
 	no-member,
 	consider-using-with,
+	unspecified-encoding,
+	unused-variable,
+	unused-argument,
+	unsubscriptable-object,
+	abstract-method,
 
 [REPORTS]
 output-format = text
@@ -501,4 +506,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 2fed80f910c79d220c5d11096f45b6038a989882
+# 045e411ce43073160332d49d161ef210bcf2329f

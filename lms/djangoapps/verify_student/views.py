@@ -21,7 +21,6 @@ from django.utils.translation import ugettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from edx_rest_api_client.exceptions import SlumberBaseException
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
@@ -44,9 +43,6 @@ from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
-from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
 from xmodule.modulestore.django import modulestore
 
@@ -850,12 +846,6 @@ class SubmitPhotosView(View):
         if "full_name" in params:
             full_name = params["full_name"]
 
-        # If necessary, update the user's full name
-        if full_name is not None and not is_verified_name_enabled():
-            response = self._update_full_name(request, full_name)
-            if response is not None:
-                return response
-
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
         # a photo ID image if this is a re-verification.
@@ -943,36 +933,6 @@ class SubmitPhotosView(View):
             return None, HttpResponseBadRequest(msg)
 
         return params, None
-
-    def _update_full_name(self, request, full_name):
-        """
-        Update the user's full name.
-
-        Arguments:
-            user (User): The user to update.
-            full_name (unicode): The user's updated full name.
-
-        Returns:
-            error encoded as an HttpResponse or None indicating success
-
-        """
-        try:
-            update_account_settings(request.user, {"name": full_name})
-        except UserNotFound:
-            log.error(("No profile found for user {user_id}").format(user_id=request.user.id))
-            return HttpResponseBadRequest(_("No profile found for user"))
-        except AccountValidationError:
-            msg = _(
-                "Name must be at least {min_length} character long."
-            ).format(min_length=NAME_MIN_LENGTH)
-            log.error(
-                (
-                    "User {user_id} suffered ID verification error while submitting a full_name change"
-                ).format(
-                    user_id=request.user.id
-                )
-            )
-            return HttpResponseBadRequest(msg)
 
     def _validate_and_decode_image_data(self, request, face_data, photo_id_data=None):
         """

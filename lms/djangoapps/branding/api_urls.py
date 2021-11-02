@@ -3,10 +3,10 @@ Branding API endpoint urls.
 """
 
 
-from django.conf.urls import url
+from django.urls import path
 
 from lms.djangoapps.branding.views import footer
 
 urlpatterns = [
-    url(r"^footer$", footer, name="branding_footer"),
+    path('footer', footer, name="branding_footer"),
 ]

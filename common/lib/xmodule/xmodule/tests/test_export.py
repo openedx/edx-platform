@@ -14,7 +14,7 @@ import pytest
 import ddt
 import lxml.etree
 import pytz
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
@@ -202,6 +202,6 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
         # Initializing a lazy text object with Unicode
         unicode_text = "Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
-        lazy_text = ugettext_lazy(unicode_text)  # lint-amnesty, pylint: disable=translation-of-non-string
+        lazy_text = gettext_lazy(unicode_text)  # lint-amnesty, pylint: disable=translation-of-non-string
 
         assert unicode_text == self.encoder.default(lazy_text)

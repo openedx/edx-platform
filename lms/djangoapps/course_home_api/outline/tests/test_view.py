@@ -189,7 +189,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             user=self.user,
             course_id=self.course.id,
             key='view-welcome-message',
-            value=False if welcome_message_is_dismissed else True
+            value=not welcome_message_is_dismissed
         )
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         assert welcome_message_html == (None if welcome_message_is_dismissed else '<p>Welcome</p>')
@@ -354,7 +354,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             self.course.course_visibility = course_visibility
             self.course = self.update_course(self.course, self.user.id)
 
-        self.store.create_item(self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'})
+        self.store.create_item(
+            self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'}
+        )
         self.store.create_item(self.user.id, self.course.id, 'course_info', 'updates', fields={
             'items': [{
                 'content': '<p>Welcome</p>',
@@ -386,7 +388,14 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         response = self.client.get(self.url)
-        assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
+        assert response.data['verified_mode'] == {
+            'access_expiration_date': (enrollment.created + MIN_DURATION),
+            'currency': 'USD',
+            'currency_symbol': '$',
+            'price': 149,
+            'sku': 'ABCD1234',
+            'upgrade_url': '/dashboard'
+        }
 
     def test_hide_learning_sequences(self):
         """
@@ -416,7 +425,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
                 days_early_for_beta=None,
                 sections=[],
                 self_paced=False,
-                course_visibility=CourseVisibility.PRIVATE
+                course_visibility=CourseVisibility.PRIVATE  # pylint: disable=protected-access
             )
             replace_course_outline(new_learning_seq_outline)
             response = self.client.get(self.url)
@@ -425,7 +434,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0
+        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0  # pylint: disable=protected-access
         self.update_course(self.course, self.user.id)
         CourseGradeFactory().update(self.user, self.course)
         response = self.client.get(self.url)

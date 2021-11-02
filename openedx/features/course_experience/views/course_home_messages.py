@@ -4,14 +4,14 @@ View logic for handling course messages.
 
 
 from datetime import datetime
+from urllib.parse import quote_plus
 
 from babel.dates import format_date, format_timedelta
 from django.conf import settings
 from django.contrib import auth
 from django.template.loader import render_to_string
-from django.utils.http import urlquote_plus
 from django.utils.translation import get_language, to_locale
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from web_fragments.fragment import Fragment
@@ -123,11 +123,11 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             Text(sign_in_or_register_text).format(
                 sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                     sign_in_label=_('Sign in'),
-                    current_url=urlquote_plus(request.path),
+                    current_url=quote_plus(request.path),
                 ),
                 register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                     register_label=_('register'),
-                    current_url=urlquote_plus(request.path),
+                    current_url=quote_plus(request.path),
                 )
             ),
             title=Text(_('You must be enrolled in the course to see course content.'))

@@ -10,9 +10,8 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_name_affirmation.name_change_validator import NameChangeValidator
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -281,10 +280,7 @@ def _does_name_change_require_verification(user_profile, old_name, new_name):
 
     validator = NameChangeValidator(old_names_list, num_certs, old_name, new_name)
 
-    return (
-        is_verified_name_enabled()
-        and not validator.validate()
-    )
+    return not validator.validate()
 
 
 def _get_old_language_proficiencies_if_updating(user_profile, data):

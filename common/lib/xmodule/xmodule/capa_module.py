@@ -16,7 +16,7 @@ import traceback
 from bleach.sanitizer import Cleaner
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
 from pkg_resources import resource_string
@@ -1215,7 +1215,7 @@ class ProblemBlock(
 
         content = {
             'name': self.display_name_with_default,
-            'html': smart_text(html),
+            'html': smart_str(html),
             'weight': self.weight,
         }
 

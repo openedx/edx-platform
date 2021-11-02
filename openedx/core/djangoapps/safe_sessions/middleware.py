@@ -163,7 +163,7 @@ class SafeCookieData:
         safe_cookie_data = SafeCookieData(
             cls.CURRENT_VERSION,
             session_id,
-            key_salt=get_random_string(),
+            key_salt=get_random_string(12),
             signature=None,
         )
         safe_cookie_data.sign(user_id)
@@ -300,6 +300,20 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         final verification before sending the response (in
         process_response).
         """
+        # 2021-10-29: Temporary debugging attr to answer the question
+        # "are browsers sometimes sending in multiple session
+        # cookies?" We've observed behavior that might be consistent
+        # with this, perhaps due to an additional cookie set on the
+        # wrong domain, and assuming that the cookies *occasionally*
+        # are sent in a different order. -- timmc
+        try:
+            set_custom_attribute(
+                'safe_sessions.session_cookie_count',
+                request.headers.get('Cookie', '').count(settings.SESSION_COOKIE_NAME + '=')
+            )
+        except:  # pylint: disable=bare-except
+            pass
+
         cookie_data_string = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if cookie_data_string:
 
@@ -320,11 +334,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             # return the response.
             return process_request_response
 
-        # Note: request.session.get(SESSION_KEY) and request.session.session_key are different things. The former
-        #   contains the session user, the latter is the session id
-        if cookie_data_string and request.session.get(SESSION_KEY):
+        user_id = self.get_user_id_from_session(request)
+        if cookie_data_string and user_id is not None:
 
-            user_id = self.get_user_id_from_session(request)
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
                 request.safe_cookie_verified_session_id = request.session.session_key
@@ -362,6 +374,26 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         response = super().process_response(request, response)  # Step 1
 
+        # 2021-10-29: Temporary debugging attrs, to answer the
+        # question "are we calling _verify_user on too few responses?"
+        # We should probably be calling it on every response, and it
+        # looks like we might be missing most responses -- some
+        # testing shows that most of my LMS responses do *not* get a
+        # newly coined session cookie, but I seem to recall that that
+        # used to happen. If so, we may have at some point stopped
+        # calling _verify_user as often as we should. -- timmc
+        try:
+            set_custom_attribute(
+                'safe_sessions.request_had_valid_session',
+                hasattr(request, 'safe_cookie_verified_session_id')
+            )
+            set_custom_attribute(
+                'safe_sessions.response_has_session_cookie',
+                _is_cookie_present(response)
+            )
+        except:  # pylint: disable=bare-except
+            pass
+
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 user_id_in_session = self.get_user_id_from_session(request)
@@ -383,18 +415,25 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
     @staticmethod
     def _on_user_authentication_failed(request):
         """
-        To be called when user authentication fails when processing
-        requests in the middleware. Sets a flag to delete the user's
-        cookie and redirects the user to the login page.
+        To be called when user authentication fails when processing requests in the middleware.
+        Sets a flag to delete the user's cookie and does one of the following:
+        - Raises 401 for mobile requests and requests that are not specifically requesting a HTML response.
+        - Redirects to login in case request expects a HTML response.
         """
         _mark_cookie_for_deletion(request)
 
         # Mobile apps have custom handling of authentication failures. They
         # should *not* be redirected to the website's login page.
         if is_request_from_mobile_app(request):
+            set_custom_attribute("safe_sessions.auth_failure", "mobile")
             return HttpResponse(status=401)
 
-        return redirect_to_login(request.path)
+        # only redirect to login if client is expecting html
+        if 'text/html' in request.META.get('HTTP_ACCEPT', ''):
+            set_custom_attribute("safe_sessions.auth_failure", "redirect_to_login")
+            return redirect_to_login(request.path)
+        set_custom_attribute("safe_sessions.auth_failure", "401")
+        return HttpResponse(status=401)
 
     @staticmethod
     def _verify_user(request, response, userid_in_session):
@@ -478,14 +517,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         Return the user_id stored in the session of the request.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # return request.session[SESSION_KEY]
         from django.contrib.auth import _get_user_session_key
         try:
+            # Django call to get the user id which is serialized in the session.
             return _get_user_session_key(request)
         except KeyError:
             return None
@@ -497,12 +531,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Stores the user_id in the session of the request.
         Used by unit tests.
         """
-        # Starting in django 1.8, the user_id is now serialized
-        # as a string in the session.  Before, it was stored
-        # directly as an integer. If back-porting to prior to
-        # django 1.8, replace the implementation of this method
-        # with:
-        # request.session[SESSION_KEY] = user.id
+        # Django's request.session[SESSION_KEY] should contain the user serialized to a string.
+        #   This is different from request.session.session_key, which holds the session id.
         request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
 
     @staticmethod
@@ -542,7 +572,7 @@ def _is_cookie_present(response):
     """
     Returns whether the session cookie is present in the response.
     """
-    return (
+    return bool(
         response.cookies.get(settings.SESSION_COOKIE_NAME) and  # cookie in response
         response.cookies[settings.SESSION_COOKIE_NAME].value  # cookie is not empty
     )

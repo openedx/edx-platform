@@ -19,7 +19,7 @@ from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key

@@ -69,6 +69,9 @@ def get_course_tag(user, course_id, key):
     Returns:
         string value, or None if there is no value saved
     """
+    if user.is_anonymous:
+        return None
+
     if BulkCourseTags.is_prefetched(course_id):
         try:
             return BulkCourseTags.get_course_tag(user.id, course_id, key)

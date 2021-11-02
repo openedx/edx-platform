@@ -1758,6 +1758,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # If other use cases appear, consider removing the is_learning_mfe check or switching this
         # to be its own query parameter that can toggle the behavior.
         student_view_context['hide_access_error_blocks'] = is_learning_mfe and recheck_access
+        is_mobile_app = is_request_from_mobile_app(request)
+        student_view_context['is_mobile_app'] = is_mobile_app
 
         enable_completion_on_view_service = False
         completion_service = block.runtime.service(block, 'completion')
@@ -1807,7 +1809,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': is_learning_mfe,
-            'is_mobile_app': is_request_from_mobile_app(request),
+            'is_mobile_app': is_mobile_app,
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
             'render_course_wide_assets': True,
 

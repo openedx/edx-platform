@@ -15,7 +15,7 @@ from the same directory.
 import logging
 import os
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
@@ -63,10 +63,10 @@ XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
 
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
-STUDIO_NAME = ugettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
-STUDIO_SHORT_NAME = ugettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
+PLATFORM_NAME = gettext_lazy("édX")
+PLATFORM_DESCRIPTION = gettext_lazy("Open édX Platform")
+STUDIO_NAME = gettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = gettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
 
 ############################ STATIC FILES #############################
 

@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
@@ -208,7 +208,7 @@ def _create_library(request):
             )
         # Give the user admin ("Instructor") role for this library:
         add_instructor(new_lib.location.library_key, request.user, request.user)
-    except PermissionDenied as error:
+    except PermissionDenied as error:  # pylint: disable=unused-variable
         log.info(
             "User does not have the permission to create LIBRARY in this organization."
             "User: '%s' Org: '%s' LIBRARY #: '%s'.",

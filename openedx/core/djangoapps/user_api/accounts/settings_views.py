@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
@@ -144,6 +144,7 @@ def account_settings_context(request):
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
         'beta_language': beta_language,
+        'enable_coppa_compliance': settings.ENABLE_COPPA_COMPLIANCE,
     }
 
     enterprise_customer = enterprise_customer_for_request(request)

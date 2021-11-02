@@ -12,7 +12,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
 from django.http import HttpRequest
 from django.urls import NoReverseMatch, reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
@@ -420,6 +420,12 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
+    # Prevent a circular import.
+    from openedx.features.enterprise_support.api import enterprise_enabled
+
+    if not enterprise_enabled():
+        return False
+
     try:
         user_id = int(user)
     except TypeError:
@@ -432,6 +438,7 @@ def is_enterprise_learner(user):
         # Cache the enterprise user for one hour.
         cache.set(cached_is_enterprise_key, True, 3600)
         return True
+
     return False
 
 

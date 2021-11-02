@@ -29,7 +29,7 @@ import re
 from abc import abstractmethod
 
 import xblock
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -647,7 +647,7 @@ class CourseImportManager(ImportManager):
                 courselike_key.course,
                 courselike_key.run
             )
-            if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
+            if course.wiki_slug in (original_unique_wiki_slug, courselike_key.course):
                 course.wiki_slug = '{}.{}.{}'.format(
                     course.id.org,
                     course.id.course,

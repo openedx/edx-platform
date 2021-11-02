@@ -8,7 +8,7 @@ import logging
 from completion.models import BlockCompletion
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
 from xblock.completable import XBlockCompletionMode as CompletionMode

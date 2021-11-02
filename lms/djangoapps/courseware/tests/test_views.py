@@ -388,8 +388,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 164),
-        (ModuleStoreEnum.Type.split, 4, 160),
+        (ModuleStoreEnum.Type.mongo, 10, 227),
+        (ModuleStoreEnum.Type.split, 4, 210),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1294,7 +1294,7 @@ class StartDateTests(ModuleStoreTestCase):
     @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
     }))
-    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.gettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_studio_course(self):
@@ -1597,8 +1597,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 63, 44),
-        (True, 55, 38)
+        (False, 63, 45),
+        (True, 55, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -3212,6 +3212,46 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         for block in [self.problem_block, self.vertical_block]:
             response = self.get_response(usage_key=block.location)
             assert response.status_code == 200
+
+    def test_render_xblock_with_course_duration_limits(self):
+        """
+        Verify that expired banner message appears on xblock page, if learner is enrolled
+        in audit mode.
+        """
+        self.setup_course(ModuleStoreEnum.Type.split)
+        self.setup_user(admin=False, login=True)
+
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.AUDIT)
+
+        response = self.get_response(usage_key=self.vertical_block.location)
+        assert response.status_code == 200
+
+        banner_text = get_expiration_banner_text(self.user, self.course)
+        self.assertContains(response, banner_text, html=True)
+
+    @patch('lms.djangoapps.courseware.views.views.is_request_from_mobile_app')
+    def test_render_xblock_with_course_duration_limits_in_mobile_browser(self, mock_is_request_from_mobile_app):
+        """
+        Verify that expired banner message doesn't appear on xblock page in a mobile browser, if learner is enrolled
+        in audit mode.
+        """
+        mock_is_request_from_mobile_app.return_value = True
+        self.setup_course(ModuleStoreEnum.Type.split)
+        self.setup_user(admin=False, login=True)
+
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.AUDIT)
+
+        response = self.get_response(usage_key=self.vertical_block.location)
+        assert response.status_code == 200
+
+        banner_text = get_expiration_banner_text(self.user, self.course)
+        self.assertNotContains(response, banner_text, html=True)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests

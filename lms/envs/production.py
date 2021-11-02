@@ -160,8 +160,7 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMES
 # As django-cookies-samesite package is set to be removed from base requirements when we upgrade to Django 3.2,
 # we should follow the settings name provided by Django.
 # https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-samesite
-if django.VERSION >= (3, 1):
-    SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
+SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 
 AWS_SES_REGION_NAME = ENV_TOKENS.get('AWS_SES_REGION_NAME', 'us-east-1')
 AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')
@@ -300,7 +299,8 @@ TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 # Translation overrides
 LANGUAGE_DICT = dict(LANGUAGES)
 
-LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get('LANGUAGE_COOKIE_NAME')
+LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get(
+    'LANGUAGE_COOKIE_NAME', LANGUAGE_COOKIE_NAME)
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
@@ -927,9 +927,6 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = ENV_TOKENS.get(
 ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
 ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
-
 # How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
 
@@ -1029,8 +1026,6 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
-        'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')

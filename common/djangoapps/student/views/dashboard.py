@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
@@ -472,6 +472,22 @@ def get_dashboard_course_limit():
     return course_limit
 
 
+def check_for_unacknowledged_notices(context):
+    """
+    Checks the notices apps plugin context to see if there are any unacknowledged notices the user needs to take action
+    on. If so, build a redirect url to the first unack'd notice.
+    """
+    notice_url = None
+
+    notices = context.get("plugins", {}).get("notices", {}).get("unacknowledged_notices")
+    if notices:
+        # We will only show one notice to the user one at a time. Build a redirect URL to the first notice in the
+        # list of unacknowledged notices.
+        notice_url = f"{settings.LMS_ROOT_URL}{notices[0]}?next={settings.LMS_ROOT_URL}/dashboard/"
+
+    return notice_url
+
+
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
@@ -809,6 +825,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         context
     )
     context.update(context_from_plugins)
+
+    notice_url = check_for_unacknowledged_notices(context)
+    if notice_url:
+        return redirect(notice_url)
 
     course = None
     context.update(

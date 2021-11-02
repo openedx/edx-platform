@@ -134,8 +134,12 @@ case "$TEST_SUITE" in
                 run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || { EXIT=1; }
                 echo "Running xss linter report."
                 run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || { EXIT=1; }
-                echo "Running safe commit linter report."
-                run_paver_quality run_xsscommitlint || { EXIT=1; }
+                if [[ ! -z "$TARGET_BRANCH" ]]; then
+                    echo "Running safe commit linter report."
+                    run_paver_quality run_xsscommitlint || { EXIT=1; }
+                else
+                    echo "Skipping safe commit linter report."
+                fi
                 echo "Running PII checker on all Django models..."
                 run_paver_quality run_pii_check || { EXIT=1; }
                 echo "Running reserved keyword checker on all Django models..."

@@ -289,7 +289,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # Calls:
         #    1) query old mongo
         #    2) get_more on old mongo
-        #    3) query split (but no courses so no fetching of data)
+        #    3) query split (handled with MySQL only)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_course_listing_errored_deleted_courses(self, store):

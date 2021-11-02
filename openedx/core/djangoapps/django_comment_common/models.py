@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 from jsonfield.fields import JSONField
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -22,11 +22,11 @@ from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
-FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
-FORUM_ROLE_GROUP_MODERATOR = ugettext_noop('Group Moderator')
-FORUM_ROLE_COMMUNITY_TA = ugettext_noop('Community TA')
-FORUM_ROLE_STUDENT = ugettext_noop('Student')
+FORUM_ROLE_ADMINISTRATOR = gettext_noop('Administrator')
+FORUM_ROLE_MODERATOR = gettext_noop('Moderator')
+FORUM_ROLE_GROUP_MODERATOR = gettext_noop('Group Moderator')
+FORUM_ROLE_COMMUNITY_TA = gettext_noop('Community TA')
+FORUM_ROLE_STUDENT = gettext_noop('Student')
 
 
 @receiver(post_save, sender=CourseEnrollment)

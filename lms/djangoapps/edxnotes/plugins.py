@@ -13,6 +13,7 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.lib.courses import get_course_by_id
+from xmodule.tabs import CourseTab, CourseTabList
 
 User = get_user_model()
 
@@ -79,6 +80,12 @@ class EdxNotesCourseApp(CourseApp):
         """
         course = get_course_by_id(course_key)
         course.edxnotes = enabled
+        if enabled:
+            notes_tab = CourseTabList.get_tab_by_id(course.tabs, 'edxnotes')
+            if notes_tab is None:
+                # If the course doesn't already have the notes tab, add it.
+                notes_tab = CourseTab.load("edxnotes")
+                course.tabs.append(notes_tab)
         modulestore().update_item(course, user.id)
         return enabled
 

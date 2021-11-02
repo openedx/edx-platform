@@ -13,7 +13,7 @@ from functools import wraps
 from django import forms
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 LOGGER = logging.getLogger(__name__)
@@ -348,7 +348,7 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
         Forces evaluation of ugettext_lazy promises.
         """
         if isinstance(obj, Promise):
-            return force_text(obj)
+            return force_str(obj)
         super().default(obj)
 
 

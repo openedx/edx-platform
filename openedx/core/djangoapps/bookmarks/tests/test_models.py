@@ -376,11 +376,12 @@ class BookmarkModelTests(BookmarksTestsBase):
         # (ModuleStoreEnum.Type.mongo, 6, 3, 3), Too slow.
         (ModuleStoreEnum.Type.mongo, 2, 4, 4),
         # (ModuleStoreEnum.Type.mongo, 4, 4, 4),
-        (ModuleStoreEnum.Type.split, 2, 2, 2),
-        (ModuleStoreEnum.Type.split, 4, 2, 2),
-        (ModuleStoreEnum.Type.split, 2, 3, 2),
-        # (ModuleStoreEnum.Type.split, 4, 3, 2),
-        (ModuleStoreEnum.Type.split, 2, 4, 2),
+        (ModuleStoreEnum.Type.split, 2, 2, 1),
+        (ModuleStoreEnum.Type.split, 4, 2, 1),
+        (ModuleStoreEnum.Type.split, 2, 3, 1),
+        # (ModuleStoreEnum.Type.split, 4, 3, 1),
+        (ModuleStoreEnum.Type.split, 2, 4, 1),
+
     )
     @ddt.unpack
     def test_get_path_queries(self, store_type, children_per_block, depth, expected_mongo_calls):

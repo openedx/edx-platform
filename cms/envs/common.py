@@ -474,6 +474,16 @@ FEATURES = {
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 }
 
+# .. toggle_name: ENABLE_COPPA_COMPLIANCE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When True, inforces COPPA compliance and removes YOB field from registration form and accounnt
+# .. settings page. Also hide YOB banner from profile page.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-10-27
+# .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
+ENABLE_COPPA_COMPLIANCE = False
+
 ENABLE_JASMINE = False
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
@@ -829,6 +839,7 @@ XBLOCK_MIXINS = (
     EditInfoMixin,
     AuthoringMixin,
 )
+XBLOCK_EXTRA_MIXINS = ()
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
@@ -1370,13 +1381,15 @@ CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
 
 HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
 DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
+LOW_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.low'
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
+    DEFAULT_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
 }
 
 # Queues configuration
@@ -1478,6 +1491,7 @@ INSTALLED_APPS = [
 
     # For CMS
     'cms.djangoapps.contentstore.apps.ContentstoreConfig',
+    'common.djangoapps.split_modulestore_django.apps.SplitModulestoreDjangoBackendAppConfig',
 
     'openedx.core.djangoapps.contentserver',
     'cms.djangoapps.course_creators',
@@ -1512,7 +1526,6 @@ INSTALLED_APPS = [
 
     # Discussion
     'openedx.core.djangoapps.django_comment_common',
-    'openedx.core.djangoapps.discussions',
 
     # for course creator table
     'django.contrib.admin',
@@ -1798,6 +1811,7 @@ OPTIONAL_APPS = (
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
+    ('integrated_channels.degreed2', None),
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
@@ -2164,7 +2178,7 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE

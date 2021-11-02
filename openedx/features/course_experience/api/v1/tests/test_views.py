@@ -6,7 +6,6 @@ import ddt
 
 from django.urls import reverse
 from django.utils import timezone
-from unittest.mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -14,7 +13,6 @@ from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -23,7 +21,7 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
     """
     Tests for reset deadlines endpoint.
     """
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         # Need to supply tracker name for the EventTestMixin. Also, EventTestMixin needs to come
         # first in class inheritance so the setUp call here appropriately works
         super().setUp('openedx.features.course_experience.api.v1.views.tracker')

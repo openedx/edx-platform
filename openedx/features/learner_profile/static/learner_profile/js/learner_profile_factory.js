@@ -28,7 +28,11 @@
             var accountSettingsModel = new AccountSettingsModel(
                 _.extend(
                     options.account_settings_data,
-                    {default_public_account_fields: options.default_public_account_fields}
+                    {
+                    default_public_account_fields: options.default_public_account_fields,
+                    parental_consent_age_limit: options.parental_consent_age_limit,
+                    enable_coppa_compliance: options.enable_coppa_compliance
+                    }
                 ),
                 {parse: true}
             );

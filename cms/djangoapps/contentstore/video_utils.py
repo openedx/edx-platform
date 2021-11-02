@@ -10,7 +10,7 @@ import requests
 from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edxval.api import get_course_video_image_url, update_video_image
 
 # Youtube thumbnail sizes.
