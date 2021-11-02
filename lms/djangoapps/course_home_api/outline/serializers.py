@@ -123,6 +123,7 @@ class OutlineTabSerializer(DatesBannerSerializer, VerifiedModeSerializer):
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()
     enrollment_mode = serializers.CharField()
+    enable_proctored_exams = serializers.BooleanField()
     handouts_html = serializers.CharField()
     has_ended = serializers.BooleanField()
     offer = serializers.DictField()
