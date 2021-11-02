@@ -1,12 +1,42 @@
 """
 Various helpful utilities for ESG
 """
+from functools import wraps
 import json
+
+from django.http.response import HttpResponseBadRequest
 
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.request import clone_request
 
 from lms.djangoapps.courseware.module_render import handle_xblock_callback
+
+
+def require_params(param_names):
+    """
+    Adds the required query params to the view function. Returns 404 if param(s) missing.
+
+    Params:
+    - param_name (string): the query param to unpack
+
+    Raises:
+    - 404 if the param was not provided
+    """
+    def decorator(function):
+        @wraps(function)
+        def wrapped_function(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+            passed_parameters = []
+
+            for param_name in param_names:
+                param = request.query_params.get(param_name)
+
+                if not param:
+                    return HttpResponseBadRequest(f"Query requires the following query params: {', '.join(param_names)}")
+
+                passed_parameters.append(param)
+            return function(self, request, *passed_parameters, *args, **kwargs)
+        return wrapped_function
+    return decorator
 
 
 def call_xblock_json_handler(request, usage_id, handler_name, data):
