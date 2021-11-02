@@ -53,14 +53,14 @@ class TestInitializeView(BaseViewTest):
         response = self.client.get(self.api_url)
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query must contain an ora_location param."
+        assert response.content.decode() == "Query requires the following query params: ora_location"
 
     def test_bad_ora_location(self):
-        """ Bad ORA location should return a 404 and error message """
+        """ Bad ORA location should return a 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url, {'ora_location': 'not_a_real_location'})
 
-        assert response.status_code == 404
+        assert response.status_code == 400
         assert response.content.decode() == "Invalid ora_location."
 
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
@@ -112,7 +112,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url)
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query must contain an ora_location param."
+        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
 
     def test_blank_ora_location(self):
         """ Missing ora_location param should return 400 and error message """
@@ -120,7 +120,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': ''})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query must contain an ora_location param."
+        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
 
     def test_missing_submission_uuid(self):
         """ Missing submission_uuid param should return 400 and error message """
@@ -128,7 +128,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': Mock()})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query must contain a submission_uuid param."
+        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
 
     def test_blank_submission_uuid(self):
         """ Blank submission_uuid param should return 400 and error message """
@@ -136,7 +136,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': Mock(), 'submission_uuid': ''})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query must contain a submission_uuid param."
+        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_and_assessment_info')
