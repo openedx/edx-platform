@@ -154,7 +154,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             Each POST parameter is the configuration key.
             Each POST value is a JSON-encoded string value for the configuration.
         """
-        if self.path == "/set_config" or self.path == "/set_config/":
+        if self.path in ("/set_config", "/set_config/"):
 
             if len(self.post_dict) > 0:
                 for key, value in self.post_dict.items():

@@ -5,7 +5,7 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -157,6 +157,10 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
+
+    @property
+    def username(self):
+        return self.effective_user.username
 
     @property
     def course_access(self) -> dict:
@@ -481,7 +485,7 @@ class CoursewareInformation(RetrieveAPIView):
                 TieredCache.set_all_tiers(cache_key, str(browser_timezone), 86400)  # Refresh the cache daily
                 LastSeenCoursewareTimezone.objects.update_or_create(
                     user=user,
-                    last_seen_courseware_timezone=browser_timezone,
+                    defaults={'last_seen_courseware_timezone': browser_timezone},
                 )
 
     def get_object(self):

@@ -14,7 +14,7 @@ from django.db import IntegrityError
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 

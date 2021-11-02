@@ -639,7 +639,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         csv_content = b"test_student@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.url, {'students_list': uploaded_file})
+        response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
         assert len(data['row_errors']) == 0
@@ -660,7 +660,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         csv_content = b"\ntest_student@example.com,test_student_1,tester1,USA\n\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.url, {'students_list': uploaded_file})
+        response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
         assert len(data['row_errors']) == 0
@@ -742,10 +742,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         assert len(data['row_errors']) == 0
         assert len(data['warnings']) == 0
         assert len(data['general_errors']) == 1
-        assert data['general_errors'][0]['response'] ==\
-               'Data in row #1 must have exactly four columns: email, username, full name, and country'
-        # lint-amnesty, pylint: disable=line-too-long
-
+        assert data['general_errors'][0]['response'] == (
+            'Data in row #1 must have exactly four columns: email, username, '
+            'full name, and country.'
+        )
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 0
 

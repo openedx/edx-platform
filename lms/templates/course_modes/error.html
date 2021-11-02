@@ -1,0 +1,36 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from django.urls import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+<%block name="bodyclass">step-select-track verification-process</%block>
+<%block name="pagetitle">
+    ${_("Unable to enroll in {course_name}").format(course_name=course_name)}
+</%block>
+
+<%block name="header_extras">
+    <link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
+
+<%block name="content">
+    <div class="track-selection-container mx-auto">
+        <section class="wrapper m-4 error-container">
+            <header class="page-header mt-5">
+                <h3>${_("Sorry, we were unable to enroll you in")} ${_(course_name)}.</h3>
+            </header>
+            <p class="text-center p-1">${_("Error:")} ${_(error)}</p>
+            <ul class="list-actions">
+                <li class="text-center">
+                    <a href="${search_courses_url}" class="button error-button" title="${_('Explore all courses on edX')}">
+                        <span>${_("Explore all courses")}</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </div>
+</%block>

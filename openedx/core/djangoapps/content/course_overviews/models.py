@@ -13,7 +13,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import (
-    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, NullBooleanField, TextField
+    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 )
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
@@ -132,7 +132,7 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     # Course highlight info, used to guide course update emails
-    has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+    has_highlights = BooleanField(null=True, default=None)  # if None, you have to look up the answer yourself
 
     # Proctoring
     enable_proctored_exams = BooleanField(default=False)

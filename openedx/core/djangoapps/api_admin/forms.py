@@ -3,7 +3,7 @@
 
 from django import forms
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
 from openedx.core.djangoapps.api_admin.widgets import TermsOfServiceCheckboxInput

@@ -278,12 +278,14 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.course.teams_configuration = TeamsConfig(None)
         self.count = itertools.count()
 
-    def add_team_configuration(self, max_team_size=3, topics=None):
+    def add_team_configuration(self, max_team_size=3, topics=None, enabled=None):
         """ Add a team configuration to the course. """
         teams_config_data = {}
         teams_config_data["topics"] = [] if topics is None else topics
         if max_team_size is not None:
             teams_config_data["max_team_size"] = max_team_size
+        if enabled is not None:
+            teams_config_data["enabled"] = enabled
         self.course.teams_configuration = TeamsConfig(teams_config_data)
 
     def make_topic(self):
@@ -301,42 +303,84 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         }
 
     def test_teams_enabled_new_course(self):
+        """
+        Tests that teams are not enabled by default as no teamsets exist.
+        """
         # Make sure we can detect when no teams exist.
         assert not self.course.teams_enabled
+        assert not self.course.teams_configuration.is_enabled
 
-        # add topics
+    def test_teams_enabled_with_default(self):
+        """
+        Test that teams are automatically enabled if a teamset is added, but it can be disabled via the `enabled` field.
+        """
+        # Test that teams is enabled if topic are created
         self.add_team_configuration(max_team_size=4, topics=[self.make_topic()])
         assert self.course.teams_enabled
+        assert self.course.teams_configuration.is_enabled
 
-        # remove them again
-        self.add_team_configuration(max_team_size=4, topics=[])
+        # Test that teams are disabled if topic exists, but enabled is False
+        self.add_team_configuration(max_team_size=4, topics=[self.make_topic()], enabled=False)
         assert not self.course.teams_enabled
+        assert not self.course.teams_configuration.is_enabled
+
+    def test_teams_disabled_no_teamsets(self):
+        """
+        Test that teams is disabled if there are no teamsets whether enabled is set to true or false
+        """
+        self.add_team_configuration(max_team_size=4, topics=[], enabled=True)
+        assert not self.course.teams_enabled
+        assert not self.course.teams_configuration.is_enabled
+        self.add_team_configuration(max_team_size=4, topics=[], enabled=False)
+        assert not self.course.teams_enabled
+        assert not self.course.teams_configuration.is_enabled
 
     def test_teams_enabled_max_size_only(self):
+        """
+        Test that teams isn't enabled if only a max team size is configured.
+        """
         self.add_team_configuration(max_team_size=4)
         assert not self.course.teams_enabled
 
     def test_teams_enabled_no_max_size(self):
+        """
+        Test that teams is enabled if a max team size is missing but teamsets are created.s
+        """
         self.add_team_configuration(max_team_size=None, topics=[self.make_topic()])
         assert self.course.teams_enabled
 
     def test_teams_max_size_no_teams_configuration(self):
+        """
+        Test that the default maximum team size matches the configured maximum
+        """
         assert self.course.teams_configuration.default_max_team_size == DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 
     def test_teams_max_size_with_teams_configured(self):
+        """
+        Test that if you provide a custom global max_team_size, it reflects in the config.
+        """
         size = 4
         self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
         assert self.course.teams_enabled
         assert size == self.course.teams_configuration.default_max_team_size
 
     def test_teamsets_no_config(self):
+        """
+        Tests that no teamsets are configured by default.
+        """
         assert self.course.teamsets == []
 
     def test_teamsets_empty(self):
+        """
+        Test that if only the max team size is configured then there are no teamsets
+        """
         self.add_team_configuration(max_team_size=4)
         assert self.course.teamsets == []
 
     def test_teamsets_present(self):
+        """
+        Tests that if valid teamsets are added they show up in the config
+        """
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
         assert self.course.teams_enabled
@@ -347,6 +391,9 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         assert expected_teamsets_data == topics
 
     def test_teams_conf_cached_by_xblock_field(self):
+        """
+        Test that the teamsets are cached in the field so repeated queries don't perform re-computation
+        """
         self.add_team_configuration(max_team_size=5, topics=[self.make_topic()])
         cold_cache_conf = self.course.teams_configuration
         warm_cache_conf = self.course.teams_configuration

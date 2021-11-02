@@ -17,7 +17,7 @@ import ddt
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -2697,7 +2697,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
 
         descriptor_dict = descriptor.index_dictionary()
-        assert descriptor_dict['content']['capa_content'] == smart_text(capa_content)
+        assert descriptor_dict['content']['capa_content'] == smart_str(capa_content)
 
     def test_indexing_checkboxes_with_hints_and_feedback(self):
         name = "Checkboxes with Hints and Feedback"

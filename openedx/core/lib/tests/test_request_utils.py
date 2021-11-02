@@ -73,7 +73,6 @@ class RequestUtilTestCase(unittest.TestCase):
         """ Test course_id_from_url(). """
 
         assert course_id_from_url('/login') is None
-        assert course_id_from_url('/course/edX/maths/2020') is None
         assert course_id_from_url('/courses/edX/maths/') is None
         assert course_id_from_url('/api/courses/v1/blocks/edX/maths/2020') is None
         assert course_id_from_url('/api/courses/v1/blocks/course-v1:incidental+courseid+formatting') is None
@@ -82,8 +81,14 @@ class RequestUtilTestCase(unittest.TestCase):
         course_id = course_id_from_url('/courses/course-v1:edX+maths+2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
 
+        course_id = course_id_from_url('/course/course-v1:edX+maths+2020')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
+
         course_id = course_id_from_url('/courses/edX/maths/2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')
+
+        course_id = course_id_from_url('/course/edX/maths/2020')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
 
         course_id = course_id_from_url('/api/courses/v1/courses/course-v1:edX+maths+2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')

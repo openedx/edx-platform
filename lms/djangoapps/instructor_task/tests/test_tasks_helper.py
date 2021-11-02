@@ -371,11 +371,11 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 4),
-        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 4, 46),
+        (ModuleStoreEnum.Type.split, 3, 46),
     )
     @ddt.unpack
-    def test_query_counts(self, store_type, mongo_count):
+    def test_query_counts(self, store_type, mongo_count, expected_query_count):
         with self.store.default_store(store_type):
             experiment_group_a = Group(2, 'Expériment Group A')
             experiment_group_b = Group(3, 'Expériment Group B')
@@ -401,7 +401,6 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 46
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -2082,7 +2081,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(71):
+        with self.assertNumQueries(77):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(

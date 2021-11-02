@@ -21,9 +21,8 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
 from opaque_keys.edx.locator import CourseLocator
-from waffle.testutils import override_flag, override_switch
+from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -1259,20 +1258,17 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
 
     @ddt.data(True, False)
     def test_submit_photos_and_change_name(self, flag_on):
-        with override_flag(VERIFIED_NAME_FLAG.name, flag_on):
-            # Submit the photos, along with a name change
-            self._submit_photos(
-                face_image=self.IMAGE_DATA,
-                photo_id_image=self.IMAGE_DATA,
-                full_name=self.FULL_NAME
-            )
+        # Submit the photos, along with a name change
+        self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            full_name=self.FULL_NAME
+        )
 
-            # Check that the user's name was changed in the database if verified_name is off
-            self._assert_user_name(self.FULL_NAME, equality=not flag_on)
-            # Since we are giving a full name, it should be written into the attempt
-            # whether or not the user name was updated
-            attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
-            self.assertEqual(attempt.name, self.FULL_NAME)
+        # Since we are giving a full name, it should be written into the attempt
+        # whether or not the user name was updated
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        self.assertEqual(attempt.name, self.FULL_NAME)
 
     def test_submit_photos_sends_confirmation_email(self):
         self._submit_photos(
@@ -1362,15 +1358,6 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             'photo_id_image': image_data,
         }
         self._submit_photos(expected_status_code=status_code, **params)
-
-    def test_invalid_name(self):
-        response = self._submit_photos(
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            full_name="",
-            expected_status_code=400
-        )
-        assert response.content.decode('utf-8') == 'Name must be at least 1 character long.'
 
     def test_missing_required_param(self):
         # Missing face image parameter

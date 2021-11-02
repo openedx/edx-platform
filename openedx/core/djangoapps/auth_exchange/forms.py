@@ -6,8 +6,8 @@ from django import forms
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import CharField
 from django.conf import settings
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 from oauth2_provider.models import Application
 from requests import HTTPError
 from social_core.backends import oauth as social_oauth
@@ -55,7 +55,7 @@ class ScopeChoiceField(forms.ChoiceField):
             value = value.split(' ')
 
         # Split values into list
-        return ' '.join([smart_text(val) for val in value]).split(' ')
+        return ' '.join([smart_str(val) for val in value]).split(' ')
 
     def validate(self, value):
         """

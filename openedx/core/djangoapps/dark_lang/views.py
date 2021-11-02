@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from web_fragments.fragment import Fragment
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY

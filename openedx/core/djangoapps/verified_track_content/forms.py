@@ -4,7 +4,7 @@ Forms for configuring courses for verified track cohorting
 
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 

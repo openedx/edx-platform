@@ -796,7 +796,7 @@ class EnrollmentObjects:
         self.cea = cea
 
 
-class SettableEnrollmentState(EmailEnrollmentState):  # lint-amnesty, pylint: disable=eq-without-hash
+class SettableEnrollmentState(EmailEnrollmentState):
     """
     Settable enrollment state.
     Used for testing state changes.

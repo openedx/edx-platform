@@ -53,6 +53,7 @@ TEST_ASSISTANT_USER_ID = ModuleStoreEnum.UserID.test - 12
 
 
 @attr('mongo')
+@pytest.mark.django_db
 class SplitModuleTest(unittest.TestCase):
     '''
     The base set of tests manually populates a db w/ courses which have

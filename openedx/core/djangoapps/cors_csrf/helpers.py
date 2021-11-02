@@ -70,6 +70,7 @@ def is_cross_domain_request_allowed(request):
                     "`CORS_ORIGIN_ALLOW_ALL` to True in the settings."
                 ), referer_hostname
             )
+            log.info("Request host is '%s' and referer is '%s'", request.get_host(), referer)
         else:
             log.debug(
                 (

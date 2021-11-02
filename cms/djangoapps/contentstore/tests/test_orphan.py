@@ -103,7 +103,7 @@ class TestOrphan(TestOrphanBase):
         self.assertIn(str(location), orphans)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 9, 5),
+        (ModuleStoreEnum.Type.split, 5, 3),
         (ModuleStoreEnum.Type.mongo, 34, 12),
     )
     @ddt.unpack

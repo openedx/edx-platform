@@ -56,7 +56,7 @@ def index(request):
         )
         return redirect(marketing_urls.get('ROOT'))
 
-    domain = request.META.get('HTTP_HOST')
+    domain = request.headers.get('Host')
 
     # keep specialized logic for Edge until we can migrate over Edge to fully use
     # configuration.
@@ -257,7 +257,7 @@ def footer(request):
         raise Http404
 
     # Use the content type to decide what representation to serve
-    accepts = request.META.get('HTTP_ACCEPT', '*/*')
+    accepts = request.headers.get('Accept', '*/*')
 
     # Show the OpenEdX logo in the footer
     show_openedx_logo = bool(request.GET.get('show-openedx-logo', False))

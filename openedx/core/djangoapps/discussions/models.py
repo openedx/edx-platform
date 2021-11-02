@@ -4,14 +4,15 @@ Provide django models to back the discussions app
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from collections import namedtuple
+from typing import List, Type, TypeVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
+from enum import Enum
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
@@ -33,8 +34,6 @@ ProviderExternalLinks = namedtuple(
     ['learn_more', 'configuration', 'general', 'accessibility', 'contact_email']
 )
 
-ProviderFeature = namedtuple('ProviderFeature', ['id', 'feature_support_type'])
-
 
 class Features(Enum):
     """
@@ -42,34 +41,46 @@ class Features(Enum):
     """
 
     # Basic Supported Features
-    PRIMARY_DISCUSSION_APP_EXPERIENCE = ProviderFeature('primary-discussion-app-experience', 'basic')
-    LTI_BASIC_CONFIGURATION = ProviderFeature('lti-basic-configuration', 'basic')
-    # DISCUSSION_PAGE = ProviderFeature('discussion-page', 'basic')
+    PRIMARY_DISCUSSION_APP_EXPERIENCE = ('primary-discussion-app-experience', 'basic')
+    BASIC_CONFIGURATION = ('basic-configuration', 'basic')
+    # DISCUSSION_PAGE = ('discussion-page', 'basic')
 
     # Partially Supported Features
-    QUESTION_DISCUSSION_SUPPORT = ProviderFeature('question-discussion-support', 'partial')
-    COMMUNITY_TA_SUPPORT = ProviderFeature('community-ta-support', 'partial')
-    REPORT_FLAG_CONTENT_TO_MODERATORS = ProviderFeature('report/flag-content-to-moderators', 'partial')
-    LTI_ADVANCED_SHARING_MODE = ProviderFeature('lti-advanced-sharing-mode', 'partial')
-    AUTOMATIC_LEARNER_ENROLLMENT = ProviderFeature('automatic-learner-enrollment', 'partial')
-    ANONYMOUS_POSTING = ProviderFeature('anonymous-posting', 'partial')
-    INTERNATIONALIZATION_SUPPORT = ProviderFeature('internationalization-support', 'partial')
-    EMAIL_NOTIFICATIONS = ProviderFeature('email-notifications', 'partial')
-    WCAG_2_0_SUPPORT = ProviderFeature('wcag-2.0-support', 'partial')
-    BLACKOUT_DISCUSSION_DATES = ProviderFeature('blackout-discussion-dates', 'partial')
-    # WCAG_2_1 = ProviderFeature('wcag-2.1', 'partial')
-    # EMBEDDED_COURSE_SECTIONS = ProviderFeature('embedded-course-sections', 'basic')
+    QUESTION_DISCUSSION_SUPPORT = ('question-discussion-support', 'partial')
+    COMMUNITY_TA_SUPPORT = ('community-ta-support', 'partial')
+    REPORT_FLAG_CONTENT_TO_MODERATORS = ('report/flag-content-to-moderators', 'partial')
+    LTI_ADVANCED_SHARING_MODE = ('lti-advanced-sharing-mode', 'partial')
+    AUTOMATIC_LEARNER_ENROLLMENT = ('automatic-learner-enrollment', 'partial')
+    ANONYMOUS_POSTING = ('anonymous-posting', 'partial')
+    INTERNATIONALIZATION_SUPPORT = ('internationalization-support', 'partial')
+    EMAIL_NOTIFICATIONS = ('email-notifications', 'partial')
+    WCAG_2_0_SUPPORT = ('wcag-2.0-support', 'partial')
+    BLACKOUT_DISCUSSION_DATES = ('blackout-discussion-dates', 'partial')
+    # WCAG_2_1 = ('wcag-2.1', 'partial')
+    # EMBEDDED_COURSE_SECTIONS = ('embedded-course-sections', 'basic')
 
     # Fully Supported Features
-    COURSE_COHORT_SUPPORT = ProviderFeature('course-cohort-support', 'full')
-    RESEARCH_DATA_EVENTS = ProviderFeature('research-data-events', 'full')
+    COURSE_COHORT_SUPPORT = ('course-cohort-support', 'full')
+    RESEARCH_DATA_EVENTS = ('research-data-events', 'full')
 
     # Commonly Requested Features
-    IN_PLATFORM_NOTIFICATIONS = ProviderFeature('in-platform-notifications', 'common')
-    DISCUSSION_CONTENT_PROMPTS = ProviderFeature('discussion-content-prompts', 'common')
-    GRADED_DISCUSSIONS = ProviderFeature('graded-discussions', 'common')
-    DIRECT_MESSAGES_FROM_INSTRUCTORS = ProviderFeature('direct-messages-from-instructors', 'common')
-    USER_MENTIONS = ProviderFeature('user-mentions', 'common')
+    IN_PLATFORM_NOTIFICATIONS = ('in-platform-notifications', 'common')
+    DISCUSSION_CONTENT_PROMPTS = ('discussion-content-prompts', 'common')
+    GRADED_DISCUSSIONS = ('graded-discussions', 'common')
+    DIRECT_MESSAGES_FROM_INSTRUCTORS = ('direct-messages-from-instructors', 'common')
+    USER_MENTIONS = ('user-mentions', 'common')
+
+    def __init__(self, feature_id, feature_support_type):
+        self.feature_id = feature_id
+        self.feature_support_type = feature_support_type
+
+    @property
+    def value(self):  # pylint: disable=invalid-overridden-method
+        return self.feature_id
+
+    @property
+    def support(self):
+        return self.feature_support_type
 
 
 def pii_sharing_required_message(provider_name):
@@ -94,18 +105,18 @@ def pii_sharing_required_message(provider_name):
 AVAILABLE_PROVIDER_MAP = {
     'legacy': {
         'features': [
-            Features.LTI_BASIC_CONFIGURATION.value.id,
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value.id,
-            Features.QUESTION_DISCUSSION_SUPPORT.value.id,
-            Features.COMMUNITY_TA_SUPPORT.value.id,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value.id,
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value.id,
-            Features.ANONYMOUS_POSTING.value.id,
-            Features.INTERNATIONALIZATION_SUPPORT.value.id,
-            Features.WCAG_2_0_SUPPORT.value.id,
-            Features.BLACKOUT_DISCUSSION_DATES.value.id,
-            Features.COURSE_COHORT_SUPPORT.value.id,
-            Features.RESEARCH_DATA_EVENTS.value.id,
+            Features.BASIC_CONFIGURATION.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.COURSE_COHORT_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -119,19 +130,19 @@ AVAILABLE_PROVIDER_MAP = {
     },
     'ed-discuss': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value.id,
-            Features.LTI_BASIC_CONFIGURATION.value.id,
-            Features.QUESTION_DISCUSSION_SUPPORT.value.id,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value.id,
-            Features.LTI_ADVANCED_SHARING_MODE.value.id,
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value.id,
-            Features.ANONYMOUS_POSTING.value.id,
-            Features.INTERNATIONALIZATION_SUPPORT.value.id,
-            Features.EMAIL_NOTIFICATIONS.value.id,
-            Features.WCAG_2_0_SUPPORT.value.id,
-            Features.BLACKOUT_DISCUSSION_DATES.value.id,
-            Features.IN_PLATFORM_NOTIFICATIONS.value.id,
-            Features.USER_MENTIONS.value.id,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.BASIC_CONFIGURATION.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.LTI_ADVANCED_SHARING_MODE.value,
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.IN_PLATFORM_NOTIFICATIONS.value,
+            Features.USER_MENTIONS.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -145,20 +156,20 @@ AVAILABLE_PROVIDER_MAP = {
     },
     'inscribe': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value.id,
-            Features.LTI_BASIC_CONFIGURATION.value.id,
-            Features.QUESTION_DISCUSSION_SUPPORT.value.id,
-            Features.COMMUNITY_TA_SUPPORT.value.id,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value.id,
-            Features.LTI_ADVANCED_SHARING_MODE.value.id,
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value.id,
-            Features.ANONYMOUS_POSTING.value.id,
-            Features.INTERNATIONALIZATION_SUPPORT.value.id,
-            Features.EMAIL_NOTIFICATIONS.value.id,
-            Features.WCAG_2_0_SUPPORT.value.id,
-            Features.RESEARCH_DATA_EVENTS.value.id,
-            Features.IN_PLATFORM_NOTIFICATIONS.value.id,
-            Features.DISCUSSION_CONTENT_PROMPTS.value.id,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.BASIC_CONFIGURATION.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.LTI_ADVANCED_SHARING_MODE.value,
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+            Features.IN_PLATFORM_NOTIFICATIONS.value,
+            Features.DISCUSSION_CONTENT_PROMPTS.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='',
@@ -172,16 +183,16 @@ AVAILABLE_PROVIDER_MAP = {
     },
     'piazza': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value.id,
-            Features.LTI_BASIC_CONFIGURATION.value.id,
-            Features.QUESTION_DISCUSSION_SUPPORT.value.id,
-            Features.COMMUNITY_TA_SUPPORT.value.id,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value.id,
-            Features.LTI_ADVANCED_SHARING_MODE.value.id,
-            Features.ANONYMOUS_POSTING.value.id,
-            Features.EMAIL_NOTIFICATIONS.value.id,
-            Features.WCAG_2_0_SUPPORT.value.id,
-            Features.BLACKOUT_DISCUSSION_DATES.value.id,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.BASIC_CONFIGURATION.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.LTI_ADVANCED_SHARING_MODE.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='https://piazza.com/product/overview',
@@ -195,18 +206,18 @@ AVAILABLE_PROVIDER_MAP = {
     },
     'yellowdig': {
         'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value.id,
-            Features.LTI_BASIC_CONFIGURATION.value.id,
-            Features.QUESTION_DISCUSSION_SUPPORT.value.id,
-            Features.COMMUNITY_TA_SUPPORT.value.id,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value.id,
-            Features.EMAIL_NOTIFICATIONS.value.id,
-            Features.WCAG_2_0_SUPPORT.value.id,
-            Features.RESEARCH_DATA_EVENTS.value.id,
-            Features.IN_PLATFORM_NOTIFICATIONS.value.id,
-            Features.GRADED_DISCUSSIONS.value.id,
-            Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value.id,
-            Features.USER_MENTIONS.value.id,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.BASIC_CONFIGURATION.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+            Features.IN_PLATFORM_NOTIFICATIONS.value,
+            Features.GRADED_DISCUSSIONS.value,
+            Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+            Features.USER_MENTIONS.value,
         ],
         'external_links': ProviderExternalLinks(
             learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
@@ -222,17 +233,14 @@ AVAILABLE_PROVIDER_MAP = {
 }
 
 
-def get_supported_providers() -> list[str]:
+def get_supported_providers() -> List[str]:
     """
     Return the list of supported discussion providers
 
     TODO: Load this from entry points?
     """
-    providers = [
-        'legacy',
-        'piazza',
-    ]
-    return providers
+
+    return list(AVAILABLE_PROVIDER_MAP.keys())
 
 
 class ProviderFilter(StackedConfigurationModel):
@@ -294,7 +302,7 @@ class ProviderFilter(StackedConfigurationModel):
         )
 
     @property
-    def available_providers(self) -> list[str]:
+    def available_providers(self) -> List[str]:
         """
         Return a filtered list of available providers
         """
@@ -314,10 +322,13 @@ class ProviderFilter(StackedConfigurationModel):
         return _providers
 
     @classmethod
-    def get_available_providers(cls, course_key: CourseKey) -> list[str]:
+    def get_available_providers(cls, course_key: CourseKey) -> List[str]:
         _filter = cls.current(course_key=course_key)
         providers = _filter.available_providers
         return providers
+
+
+T = TypeVar('T', bound='DiscussionsConfiguration')
 
 
 class DiscussionsConfiguration(TimeStampedModel):
@@ -346,6 +357,21 @@ class DiscussionsConfiguration(TimeStampedModel):
         null=True,
         help_text=_("The LTI configuration data for this context/provider."),
     )
+    enable_in_context = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If enabled, discussion topics will be created for each non-graded unit in the course. "
+            "A UI for discussions will show up with each unit."
+        )
+    )
+    enable_graded_units = models.BooleanField(
+        default=False,
+        help_text=_("If enabled, discussion topics will be created for graded units as well.")
+    )
+    unit_level_visibility = models.BooleanField(
+        default=False,
+        help_text=_("If enabled, discussions will need to be manually enabled for each unit.")
+    )
     plugin_configuration = JSONField(
         blank=True,
         default={},
@@ -356,6 +382,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         max_length=100,
         verbose_name=_("Discussion provider"),
         help_text=_("The discussion tool/provider's id"),
+        default=DEFAULT_PROVIDER_TYPE,
     )
     history = HistoricalRecords()
 
@@ -383,6 +410,10 @@ class DiscussionsConfiguration(TimeStampedModel):
         has_support = bool(feature in features)
         return has_support
 
+    def supports_lti(self) -> bool:
+        """Returns a boolean indicating if the provider supports lti discussion view."""
+        return self.provider_type != DEFAULT_PROVIDER_TYPE
+
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
         """
@@ -393,9 +424,8 @@ class DiscussionsConfiguration(TimeStampedModel):
         configuration = cls.get(context_key)
         return configuration.enabled
 
-    # pylint: disable=undefined-variable
     @classmethod
-    def get(cls, context_key: CourseKey) -> cls:
+    def get(cls: Type[T], context_key: CourseKey) -> T:
         """
         Lookup a model by context_key
         """
@@ -409,15 +439,30 @@ class DiscussionsConfiguration(TimeStampedModel):
             )
         return configuration
 
-    # pylint: enable=undefined-variable
-
     @property
-    def available_providers(self) -> list[str]:
+    def available_providers(self) -> List[str]:
         return ProviderFilter.current(course_key=self.context_key).available_providers
 
     @classmethod
-    def get_available_providers(cls, context_key: CourseKey) -> list[str]:
+    def get_available_providers(cls, context_key: CourseKey) -> List[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
+
+    @classmethod
+    def lti_discussion_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Checks if LTI discussion is enabled for this course.
+
+        Arguments:
+            course_key: course locator.
+        Returns:
+            Boolean indicating weather or not this course has lti discussion enabled.
+        """
+        discussion_provider = cls.get(course_key)
+        return (
+            discussion_provider.enabled
+            and discussion_provider.supports_lti()
+            and discussion_provider.lti_configuration is not None
+        )
 
 
 class ProgramDiscussionsConfiguration(TimeStampedModel):

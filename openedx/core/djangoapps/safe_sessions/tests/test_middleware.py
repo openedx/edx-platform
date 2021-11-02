@@ -123,6 +123,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_no_user_in_session()
 
     def test_parse_error_at_step_1(self):
+        self.request.META['HTTP_ACCEPT'] = 'text/html'
         with self.assert_parse_error():
             self.assert_response('not-a-safe-cookie', success=False)
         self.assert_no_session()
@@ -130,6 +131,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     def test_invalid_user_at_step_4(self):
         self.client.login(username=self.user.username, password='test')
         safe_cookie_data = SafeCookieData.create(self.client.session.session_key, 'no_such_user')
+        self.request.META['HTTP_ACCEPT'] = 'text/html'
         with self.assert_incorrect_user_logged():
             self.assert_response(safe_cookie_data, success=False)
         self.assert_user_in_session()
@@ -314,7 +316,15 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             assert mock_delete_cookie.called
 
     def test_error(self):
+        self.request.META['HTTP_ACCEPT'] = 'text/html'
         self.verify_error(302)
+
+    @ddt.data(['text/html', 302], ['', 401])
+    @ddt.unpack
+    @override_settings(REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE=False)
+    def test_error_with_http_accept(self, http_accept, expected_response):
+        self.request.META['HTTP_ACCEPT'] = http_accept
+        self.verify_error(expected_response)
 
     @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'open edX Mobile App'])
     def test_error_from_mobile_app(self):
@@ -399,7 +409,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
-        mock_attr.assert_not_called()
+        assert 'safe_sessions.user_mismatch' not in [call.args[0] for call in mock_attr.call_args_list]
 
 
 @ddt.ddt

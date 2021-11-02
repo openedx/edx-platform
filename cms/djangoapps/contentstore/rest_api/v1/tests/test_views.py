@@ -87,7 +87,7 @@ class ProctoringExamSettingsTestMixin():
 class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStoreTestCase, APITestCase):
     """ Tests for proctored exam settings GETs """
     @classmethod
-    def get_expected_response_data(cls, course, user):
+    def get_expected_response_data(cls, course, user):  # pylint: disable=unused-argument
         return {
             'proctored_exam_settings': {
                 'enable_proctored_exams': course.enable_proctored_exams,

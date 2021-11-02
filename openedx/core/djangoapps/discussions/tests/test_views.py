@@ -2,22 +2,22 @@
 Test app view logic
 """
 # pylint: disable=test-inherits-tests
-from datetime import datetime, timedelta, timezone
-import unittest
+import itertools
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 import ddt
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
-
-from xmodule.modulestore.tests.django_utils import CourseUserType
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 
 from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE
 
@@ -45,7 +45,6 @@ DATA_LTI_CONFIGURATION = {
 }
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'URLs are only configured in LMS')
 class ApiTest(ModuleStoreTestCase, APITestCase):
     """
     Test basic API operations
@@ -57,14 +56,18 @@ class ApiTest(ModuleStoreTestCase, APITestCase):
         super().setUp()
         store = ModuleStoreEnum.Type.split
         self.course = CourseFactory.create(default_store=store)
-        self.url = reverse(
+        if self.USER_TYPE:
+            self.user = self.create_user_for_course(self.course, user_type=self.USER_TYPE)
+
+    @property
+    def url(self):
+        """Returns the discussion API url. """
+        return reverse(
             'discussions',
             kwargs={
                 'course_key_string': str(self.course.id),
             }
         )
-        if self.USER_TYPE:
-            self.user = self.create_user_for_course(self.course, user_type=self.USER_TYPE)
 
     def _get(self):
         return self.client.get(self.url)
@@ -131,6 +134,72 @@ class CourseStaffAuthorizedTest(AuthorizedApiTest):
     USER_TYPE = CourseUserType.UNENROLLED_STAFF
 
 
+class CourseInstructorAuthorizedTest(AuthorizedApiTest):
+    """
+    Course instructor should have the same access as Global Staff.
+    """
+
+    USER_TYPE = CourseUserType.COURSE_INSTRUCTOR
+
+
+class CourseDiscussionRoleAuthorizedTests(ApiTest):
+    """Test cases for discussion api for users with discussion privileges."""
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.student_role = RoleFactory(name='Student', course_id=self.course.id)
+        self.moderator_role = RoleFactory(name='Moderator', course_id=self.course.id)
+        self.community_ta_role = RoleFactory(name='Community TA', course_id=self.course.id)
+        self.student_user = UserFactory(password=self.TEST_PASSWORD)
+        self.moderator_user = UserFactory(password=self.TEST_PASSWORD)
+        self.community_ta_user = UserFactory(password=self.TEST_PASSWORD)
+        self.student_role.users.add(self.student_user)
+        self.moderator_role.users.add(self.moderator_user)
+        self.community_ta_role.users.add(self.community_ta_user)
+
+    def login(self, user):
+        """Login the given user."""
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
+    def test_student_role_access_get(self):
+        """Tests that student role does not have access to the API"""
+        self.login(self.student_user)
+        response = self._get()
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_student_role_access_post(self):
+        """Tests that student role does not have access to the API"""
+        self.login(self.student_user)
+        response = self._post({})
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_moderator_role_access_get(self):
+        """Tests that discussion moderator role have access to the API"""
+        self.login(self.moderator_user)
+        response = self._get()
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_moderator_role_access_post(self):
+        """Tests that discussion moderator role have access to the API"""
+        self.login(self.moderator_user)
+        response = self._post({})
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_community_ta_role_access_get(self):
+        """Tests that discussion community TA role have access to the API"""
+        self.login(self.community_ta_user)
+        response = self._get()
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_community_ta_role_access_post(self):
+        """Tests that discussion community TA role have access to the API"""
+        self.login(self.community_ta_user)
+        response = self._post({})
+        assert response.status_code == status.HTTP_200_OK
+
+
 @ddt.ddt
 class DataTest(AuthorizedApiTest):
     """
@@ -150,12 +219,7 @@ class DataTest(AuthorizedApiTest):
             name for name, spec in data['providers']['available'].items()
             if "messages" not in spec
         ], "Found available providers without messages field"
-        assert data['lti_configuration'] == {
-            'lti_1p1_client_key': '',
-            'lti_1p1_client_secret': '',
-            'lti_1p1_launch_url': '',
-            'version': None
-        }
+        assert data['lti_configuration'] == {}
         assert data['plugin_configuration'] == {
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,
@@ -299,30 +363,34 @@ class DataTest(AuthorizedApiTest):
         """
         Check validation of basic configuration
         """
-        with self.assertRaises(ValidationError):
-            response = self._post(payload)
+        response = self._post(payload)
+        assert status.is_client_error(response.status_code)
+        assert 'enabled' in response.json()
         response = self._get()
         self._assert_defaults(response)
 
-    def test_post_lti_valid(self):
+    @ddt.data(
+        *DATA_LTI_CONFIGURATION.items()
+    )
+    @ddt.unpack
+    def test_post_lti_valid(self, key, value):
         """
         Check we can set LTI configuration
         """
         provider_type = 'piazza'
-        for key, value in DATA_LTI_CONFIGURATION.items():
-            payload = {
-                'enabled': True,
-                'provider_type': provider_type,
-                'lti_configuration': {
-                    key: value,
-                }
+        payload = {
+            'enabled': True,
+            'provider_type': provider_type,
+            'lti_configuration': {
+                key: value,
             }
-            response = self._post(payload)
-            response = self._get()
-            data = response.json()
-            assert data['enabled']
-            assert data['provider_type'] == provider_type
-            assert data['lti_configuration'][key] == value
+        }
+        self._post(payload)
+        response = self._get()
+        data = response.json()
+        assert data['enabled']
+        assert data['provider_type'] == provider_type
+        assert data['lti_configuration'][key] == value
 
     def test_post_lti_invalid(self):
         """
@@ -485,6 +553,48 @@ class DataTest(AuthorizedApiTest):
         assert data['enabled']
         assert data['provider_type'] == 'legacy'
         assert not data['plugin_configuration']['allow_anonymous']
+
+    @ddt.data(
+        *itertools.product(
+            ["enable_in_context", "enable_graded_units", "unit_level_visibility"],
+            [True, False],
+        ),
+        ("provider_type", "piazza"),
+    )
+    @ddt.unpack
+    def test_change_course_fields(self, field, value):
+        """
+        Test changing fields that are saved to the course
+        """
+        payload = {
+            field: value
+        }
+        response = self._post(payload)
+        data = response.json()
+        assert data[field] == value
+        course = self.store.get_course(self.course.id)
+        assert course.discussions_settings[field] == value
+
+    def test_change_plugin_configuration(self):
+        """
+        Test changing plugin config that is saved to the course
+        """
+        payload = {
+            "provider_type": "piazza",
+            "plugin_configuration": {
+                "allow_anonymous": False,
+                "custom_field": "custom_value",
+            },
+        }
+        response = self._post(payload)
+        data = response.json()
+        assert data["plugin_configuration"] == payload["plugin_configuration"]
+        course = self.store.get_course(self.course.id)
+        # Only configuration fields not stored in the course, or
+        # directly in the model should be stored here.
+        assert course.discussions_settings["piazza"] == {
+            "custom_field": "custom_value",
+        }
 
     @ddt.data(*[
         user_type.name for user_type in CourseUserType

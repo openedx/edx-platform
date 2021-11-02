@@ -103,7 +103,7 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 _cached_toc = {}
 
 
-class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, title, book_url):
         self.title = title
         self.book_url = book_url
@@ -146,7 +146,7 @@ class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-with
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except, unused-variable
             pass
 
         # Get the table of contents from S3
@@ -406,6 +406,16 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "If false, they are sorted chronologically by creation date and time."
         )
     )
+    discussions_settings = Dict(
+        display_name=_("Discussions Plugin Settings"),
+        scope=Scope.settings,
+        help=_("Settings for discussions plugins."),
+        default={
+            "enable_in_context": True,
+            "enable_graded_units": False,
+            "unit_level_visibility": False,
+        }
+    )
     announcement = Date(
         display_name=_("Course Announcement Date"),
         help=_("Enter the date to announce your course."),
@@ -563,7 +573,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "user can see their certificate for the course"
         ),
         scope=Scope.settings,
-        default=CertificatesDisplayBehaviors.END,
+        default=CertificatesDisplayBehaviors.END.value,
     )
     course_image = String(
         display_name=_("Course About Page Image"),

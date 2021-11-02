@@ -21,7 +21,7 @@ from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models, transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -250,9 +250,6 @@ class AccountViewSet(ViewSet):
 
             * pending_name_change: If the user has an active name change request, returns the
               requested name.
-
-            * is_verified_name_enabled: Temporary flag to control verified name field - see
-              https://github.com/edx/edx-name-affirmation/blob/main/edx_name_affirmation/toggles.py
 
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
@@ -546,7 +543,7 @@ class DeactivateLogoutView(APIView):
                     ace.send(notification)
                 except Exception as exc:
                     log.exception('Error sending out deletion notification email')
-                    raise
+                    raise exc
 
                 # Log the user out.
                 logout(request)

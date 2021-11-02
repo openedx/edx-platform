@@ -481,6 +481,15 @@ class TestEnterpriseUtils(TestCase):
 
         assert not mock_cache_set.called
 
+    @mock.patch('django.core.cache.cache.set')
+    @mock.patch('django.core.cache.cache.get')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=False)
+    def test_is_enterprise_learner_enterprise_disabled(self, _, mock_cache_get, mock_cache_set):
+        assert not is_enterprise_learner(self.user)
+        assert not is_enterprise_learner(self.user.id)
+        assert not mock_cache_get.called
+        assert not mock_cache_set.called
+
     @mock.patch('openedx.features.enterprise_support.utils.reverse')
     def test_get_enterprise_slug_login_url_no_reverse_match(self, mock_reverse):
         mock_reverse.side_effect = NoReverseMatch

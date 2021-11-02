@@ -16,10 +16,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.instructor.access import update_forum_role
+from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
@@ -27,6 +27,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from xmodule.modulestore.django import modulestore
 from ..rest_api.api import (
     create_comment,
     create_thread,
@@ -51,7 +52,6 @@ from ..rest_api.forms import (
 from ..rest_api.serializers import (
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
-    DiscussionSettingsSerializer,
 )
 
 log = logging.getLogger(__name__)
@@ -87,6 +87,12 @@ class CourseView(DeveloperErrorViewMixin, APIView):
         * following_thread_list_url: thread_list_url with parameter following=True
 
         * topics_url: The URL of the topic listing for the course.
+
+        * allow_anonymous: A boolean which indicating whether anonymous posts
+            are allowed or not.
+
+        * allow_anonymous_to_peers: A boolean which indicating whether posts
+            anonymous to peers are allowed or not.
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
@@ -239,6 +245,12 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         * following (optional): A boolean indicating whether the user should
             follow the thread upon its creation; defaults to false
 
+        * anonymous (optional): A boolean indicating whether the post is
+        anonymous; defaults to false
+
+        * anonymous_to_peers (optional): A boolean indicating whether the post
+        is anonymous to peers; defaults to false
+
     **PATCH Parameters**:
 
         * abuse_flagged (optional): A boolean to mark thread as abusive
@@ -247,8 +259,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * read (optional): A boolean to mark thread as read
 
-        * topic_id, type, title, and raw_body are accepted with the same meaning
-        as in a POST request
+        * topic_id, type, title, raw_body, anonymous, and anonymous_to_peers
+        are accepted with the same meaning as in a POST request
 
         If "application/merge-patch+json" is not the specified content type,
         a 415 error is returned.
@@ -310,6 +322,11 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * abuse_flagged_count: The number of flags(reports) on and within the
             thread. Returns null if requesting user is not a moderator
+
+        * anonymous: A boolean indicating whether the post is anonymous
+
+        * anonymous_to_peers: A boolean indicating whether the post is
+        anonymous to peers
 
     **DELETE response values:
 
@@ -446,9 +463,16 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * raw_body: The comment's raw body text
 
+        * anonymous (optional): A boolean indicating whether the comment is
+        anonymous; defaults to false
+
+        * anonymous_to_peers (optional): A boolean indicating whether the
+        comment is anonymous to peers; defaults to false
+
     **PATCH Parameters**:
 
-        raw_body is accepted with the same meaning as in a POST request
+        * raw_body, anonymous and anonymous_to_peers are accepted with the same
+        meaning as in a POST request
 
         If "application/merge-patch+json" is not the specified content type,
         a 415 error is returned.
@@ -512,6 +536,11 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * editable_fields: The fields that the requesting user is allowed to
             modify with a PATCH request
+
+        * anonymous: A boolean indicating whether the comment is anonymous
+
+        * anonymous_to_peers: A boolean indicating whether the comment is
+        anonymous to peers
 
     **DELETE Response Value**
 

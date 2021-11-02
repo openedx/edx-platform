@@ -991,8 +991,15 @@ COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
-# VAN-754 - Year of birth field put behind a flag to make it available for OpenedX.
-COLLECT_YEAR_OF_BIRTH = True
+# .. toggle_name: ENABLE_COPPA_COMPLIANCE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When True, inforces COPPA compliance and removes YOB field from registration form and accounnt
+# .. settings page. Also hide YOB banner from profile page.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-10-27
+# .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
+ENABLE_COPPA_COMPLIANCE = False
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -2036,10 +2043,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
-    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
-    # Override was found here https://github.com/django/django/pull/11894
-    'django_cookies_samesite.middleware.CookiesSameSite',
-
     'crum.CurrentRequestUserMiddleware',
 
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
@@ -2152,13 +2155,6 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
-if django.VERSION >= (3, 1):
-    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
-    # Override was found here https://github.com/django/django/pull/11894
-    MIDDLEWARE.remove(
-        'django_cookies_samesite.middleware.CookiesSameSite'
-    )
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -2938,6 +2934,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.courseware',
     'lms.djangoapps.coursewarehistoryextended',
     'common.djangoapps.student.apps.StudentConfig',
+    'common.djangoapps.split_modulestore_django.apps.SplitModulestoreDjangoBackendAppConfig',
 
     'lms.djangoapps.static_template_view',
     'lms.djangoapps.staticbook',
@@ -3883,6 +3880,7 @@ OPTIONAL_APPS = [
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
+    ('integrated_channels.degreed2', None),
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
@@ -4039,7 +4037,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "activation_key",
         "pending_name_change",
-        "is_verified_name_enabled",
     ]
 )
 
@@ -4529,9 +4526,6 @@ CONTENT_TYPE_GATE_GROUP_IDS = {
 ############## Settings for the Discovery App ######################
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
-
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
 # Initialize to 'unknown', but read from JSON in production.py

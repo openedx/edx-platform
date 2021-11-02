@@ -13,8 +13,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_name_affirmation.api import create_verified_name, create_verified_name_config
 from edx_name_affirmation.statuses import VerifiedNameStatus
-from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from organizations import api as organizations_api
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -1582,16 +1581,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
     @ddt.data((True, VerifiedNameStatus.APPROVED),
               (True, VerifiedNameStatus.DENIED),
               (False, VerifiedNameStatus.PENDING))
     @ddt.unpack
     def test_certificate_view_verified_name(self, should_use_verified_name_for_certs, status):
         """
-        Test that if verified name functionality is enabled and the user has their preference set to use
-        verified name for certificates, their verified name will appear on the certificate rather than
-        their profile name.
+        Test that if the user has their preference set to use verified name for certificates,
+        their verified name will appear on the certificate rather than their profile name.
         """
         verified_name = 'Jonathan Doe'
         create_verified_name(self.user, verified_name, self.user.profile.name, status=status)

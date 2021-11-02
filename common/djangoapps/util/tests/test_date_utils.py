@@ -171,7 +171,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 2, 14, 16, 41, 17)
         assert expected == strftime_localized(dtime, fmt)
 
-    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.gettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "date(%Y.%m.%d)",
         "LONG_DATE_FORMAT": "date(%A.%Y.%B.%d)",
         "DATE_TIME_FORMAT": "date(%Y.%m.%d@%H.%M)",
@@ -191,7 +191,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 2, 14, 16, 41, 17)
         assert expected == strftime_localized(dtime, fmt)
 
-    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.gettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "oops date(%Y.%x.%d)",
         "TIME_FORMAT": "oops %Hh.%Xm.%Ss",
     }))

@@ -12,15 +12,16 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import connections
+from django.db import connections, transaction
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
+from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
@@ -35,6 +36,7 @@ class CourseUserType(Enum):
     """
     ANONYMOUS = 'anonymous'
     COURSE_STAFF = 'course_staff'
+    COURSE_INSTRUCTOR = 'course_instructor'
     ENROLLED = 'enrolled'
     GLOBAL_STAFF = 'global_staff'
     UNENROLLED = 'unenrolled'
@@ -275,7 +277,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
     """
     MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
     CONTENTSTORE = functools.partial(contentstore_config)
-    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache', 'course_index_cache']
 
     # List of modulestore signals enabled for this test. Defaults to an empty
     # list. The list of signals available is found on the SignalHandler class,
@@ -331,6 +333,30 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
         cls.end_cache_isolation()
         cls.enable_all_signals()
 
+    @staticmethod
+    def allow_transaction_exception():
+        """
+        Context manager to wrap modulestore-using test code that may throw an exception.
+
+        (Use this if a modulestore test is failing with TransactionManagementError during cleanup.)
+
+        Details:
+        Some test cases that purposely throw an exception may normally cause the end_modulestore_isolation() cleanup
+        step to fail with
+            TransactionManagementError:
+            An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+        This happens because the test is wrapped in an implicit transaction and when the exception occurs, django won't
+        allow any subsequent database queries in the same transaction - in particular, the queries needed to clean up
+        split modulestore's SplitModulestoreCourseIndex table after the test.
+
+        By wrapping the inner part of the test in this atomic() call, we create a savepoint so that if an exception is
+        thrown, Django merely rolls back to the savepoint and the overall transaction continues, including the eventual
+        cleanup step.
+
+        This method mostly exists to provide this docstring/explanation; the code itself is trivial.
+        """
+        return transaction.atomic()
+
 
 class ModuleStoreTestUsersMixin():
     """
@@ -347,18 +373,22 @@ class ModuleStoreTestUsersMixin():
             return AnonymousUser()
 
         is_enrolled = user_type is CourseUserType.ENROLLED
-        is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
 
         # Set up the test user
-        if is_unenrolled_staff:
+        if user_type is CourseUserType.UNENROLLED_STAFF:
             user = StaffFactory(course_key=course.id, password=self.TEST_PASSWORD)
         elif user_type is CourseUserType.GLOBAL_STAFF:
             user = AdminFactory(password=self.TEST_PASSWORD)
+        elif user_type is CourseUserType.COURSE_INSTRUCTOR:
+            user = InstructorFactory(course_key=course.id, password=self.TEST_PASSWORD)
         else:
             user = UserFactory(password=self.TEST_PASSWORD)
+
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
         if is_enrolled:
             CourseEnrollment.enroll(user, course.id)
+
         return user
 
 
@@ -441,6 +471,12 @@ class SharedModuleStoreTestCase(
         cls.end_modulestore_isolation()
         super().tearDownClass()
 
+        # Overly broad hammer that breaks abstraction barrier to clear data from
+        # the table underlying the Django ORM backed modulestore active versions
+        # lookup. This has to go _after_ the super().tearDownClass call above,
+        # or it doesn't work.
+        SplitModulestoreCourseIndex.objects.all().delete()
+
     def setUp(self):
         # OverrideFieldData.provider_classes is always reset to `None` so
         # that they're recalculated for every test
@@ -500,6 +536,12 @@ class ModuleStoreTestCase(
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+
+        # Overly broad hammer that breaks abstraction barrier to clear data from
+        # the table underlying the Django ORM backed modulestore active versions
+        # lookup. This has to go _after_ the super().tearDownClass call above,
+        # or it doesn't work.
+        SplitModulestoreCourseIndex.objects.all().delete()
 
     def setUp(self):
         """

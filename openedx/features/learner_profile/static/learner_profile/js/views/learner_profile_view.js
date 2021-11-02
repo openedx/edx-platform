@@ -107,10 +107,17 @@
                             Backbone.history.start();
                         }
                     } else {
-                        // xss-lint: disable=javascript-jquery-html
-                        $wrapperProfileBioElement.html(this.sectionTwoView.render().el);
+                        if(this.isCoppaCompliant())
+                            // xss-lint: disable=javascript-jquery-html
+                            $wrapperProfileBioElement.html(this.sectionTwoView.render().el);
                     }
                     return this;
+                },
+
+                isCoppaCompliant: function() {
+                   var enableCoppaCompliance = this.options.accountSettingsModel.get('enable_coppa_compliance'),
+                       isAboveAge = this.options.accountSettingsModel.isAboveMinimumAge();
+                   return !enableCoppaCompliance || (enableCoppaCompliance && isAboveAge);
                 },
 
                 renderFields: function() {
@@ -119,7 +126,7 @@
                         imageView,
                         settings;
 
-                    if (this.options.ownProfile) {
+                    if (this.options.ownProfile && this.isCoppaCompliant()) {
                         fieldView = this.options.accountPrivacyFieldView;
                         settings = this.options.accountSettingsModel;
                         fieldView.profileIsPrivate = !settings.get('year_of_birth');

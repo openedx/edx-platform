@@ -11,8 +11,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
+from edx_django_utils.plugins import pluggable_override
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -1116,6 +1117,7 @@ def _get_gating_info(course, xblock):
     return info
 
 
+@pluggable_override('OVERRIDE_CREATE_XBLOCK_INFO')
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,  # lint-amnesty, pylint: disable=too-many-statements
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
                        user=None, course=None, is_concise=False):
@@ -1134,6 +1136,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
+
+    You can customize the behavior of this function using the `OVERRIDE_CREATE_XBLOCK_INFO` pluggable override point.
+    For example:
+    >>> def create_xblock_info(default_fn, xblock, *args, **kwargs):
+    ...     xblock_info = default_fn(xblock, *args, **kwargs)
+    ...     xblock_info['icon'] = xblock.icon_override
+    ...     return xblock_info
     """
     is_library_block = isinstance(xblock.location, LibraryUsageLocator)
     is_xblock_unit = is_unit(xblock, parent_xblock)

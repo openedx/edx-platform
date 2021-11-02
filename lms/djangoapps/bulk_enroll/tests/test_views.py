@@ -107,7 +107,8 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         """ Test that non global staff users are forbidden from API use. """
         self.staff.is_staff = False
         self.staff.save()
-        response = self.request_bulk_enroll()
+        with self.allow_transaction_exception():
+            response = self.request_bulk_enroll()
         assert response.status_code == 403
 
     def test_missing_params(self):

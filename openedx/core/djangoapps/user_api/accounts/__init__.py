@@ -4,7 +4,7 @@ Account constants
 
 from django.conf import settings
 from django.utils.text import format_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # The maximum length for the bio ("about me") account field
 BIO_MAX_LENGTH = 300
@@ -61,7 +61,7 @@ EMAIL_CONFLICT_MSG = _(
     "It looks like {email_address} belongs to an existing account. "
     "Try again with a different email address."
 )
-AUTHN_EMAIL_CONFLICT_MSG = _("It looks like this email address is already registered")
+AUTHN_EMAIL_CONFLICT_MSG = _("This email is already associated with an existing or previous edX account")
 USERNAME_CONFLICT_MSG = _(
     "It looks like {username} belongs to an existing account. "
     "Try again with a different username."

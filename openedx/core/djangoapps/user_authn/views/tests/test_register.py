@@ -660,12 +660,12 @@ class RegistrationViewTestV1(
         self._assert_reg_absent_field(
             no_extra_fields_setting,
             {
-                "name": u"favorite_editor",
-                "type": u"select",
+                "name": "favorite_editor",
+                "type": "select",
                 "required": False,
-                "label": u"Favorite Editor",
-                "placeholder": u"cat",
-                "defaultValue": u"vim",
+                "label": "Favorite Editor",
+                "placeholder": "cat",
+                "defaultValue": "vim",
                 "errorMessages": {
                     'required': 'This field is required.',
                     'invalid_choice': 'Select a valid choice. %(value)s is not one of the available choices.',
@@ -1894,7 +1894,6 @@ class RegistrationViewTestV1(
 class RegistrationViewTestV2(RegistrationViewTestV1):
     """
     Test for registration api V2
-
     """
 
     # pylint: disable=test-inherits-tests
@@ -2055,6 +2054,51 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             "country",
             "gender",
             "year_of_birth",
+            "level_of_education",
+            "mailing_address",
+            "goals",
+            "honor_code",
+            "favorite_movie",
+        ]
+
+    @override_settings(
+        ENABLE_COPPA_COMPLIANCE=True,
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "state": "optional",
+            "country": "required",
+            "honor_code": "required",
+            "confirm_email": "required",
+        },
+        REGISTRATION_FIELD_ORDER=None,
+        REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
+    )
+    def test_year_of_birth_field_with_feature_flag(self):
+        """
+        Test that year of birth is not returned when ENABLE_COPPA_COMPLIANCE is
+        set to True.
+        """
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content.decode('utf-8'))
+        field_names = [field["name"] for field in form_desc["fields"]]
+        assert field_names == [
+            "email",
+            "name",
+            "username",
+            "password",
+            "confirm_email",
+            "city",
+            "state",
+            "country",
+            "gender",
             "level_of_education",
             "mailing_address",
             "goals",

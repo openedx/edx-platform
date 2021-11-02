@@ -34,7 +34,7 @@ from django.core.mail.message import forbid_multi_line_headers
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import override as override_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 
@@ -480,7 +480,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             task_id,
             email_id
         )
-        raise
+        raise exc
 
     # Exclude optouts (if not a retry):
     # Note that we don't have to do the optout logic at all if this is a retry,

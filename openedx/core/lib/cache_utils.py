@@ -11,7 +11,7 @@ import pickle
 
 import wrapt
 from django.db.models.signals import post_save, post_delete
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from edx_django_utils.cache import RequestCache, TieredCache
 
@@ -87,7 +87,7 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     the function's name, a stringified list of arguments
     and a stringified list of keyword arguments.
     """
-    arg_map_function = arg_map_function or force_text
+    arg_map_function = arg_map_function or force_str
 
     converted_args = list(map(arg_map_function, args))
     converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))

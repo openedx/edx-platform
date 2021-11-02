@@ -280,7 +280,7 @@ def make_mock_request_impl(  # lint-amnesty, pylint: disable=missing-function-do
     return mock_request_impl
 
 
-class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, suffix):
         self.suffix = suffix
 
@@ -288,7 +288,7 @@ class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docs
         return other.endswith(self.suffix)
 
 
-class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, expected_values):
         self.expected_values = expected_values
 
@@ -445,7 +445,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             assert 'This is a private discussion. You do not have permissions to view this discussion' in html
 
 
-class AllowPlusOrMinusOneInt(int):  # pylint: disable=eq-without-hash
+class AllowPlusOrMinusOneInt(int):
     """
     A workaround for the fact that assertNumQueries doesn't let you
     specify a range or any tolerance. An 'int' that is 'equal to' its value,
@@ -483,15 +483,15 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 7),
         (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 8),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 1, 2, 2, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 50, 2, 2, 21, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
         (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 7),
         (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 8),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 1, 2, 2, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 50, 2, 2, 21, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(

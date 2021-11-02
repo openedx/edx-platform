@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -405,7 +405,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in advanced_component_types.keys() and category not in categories:
+            if category in advanced_component_types.keys() and category not in categories:  # pylint: disable=consider-iterating-dictionary
                 # boilerplates not supported for advanced components
                 try:
                     component_display_name = xblock_type_display_name(category, default_display_name=category)
