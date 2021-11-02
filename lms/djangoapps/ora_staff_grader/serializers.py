@@ -37,6 +37,7 @@ class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstr
             'number',
             'courseId',
         ]
+        read_only_fields = fields
 
 
 class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -56,6 +57,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
             'prompts',
             'type',
         ]
+        read_only_fields = fields
 
 
 class ScoreField(serializers.Field):
@@ -99,6 +101,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
             'lockStatus',
             'score'
         ]
+        read_only_fields = fields
 
 
 class InitializeSerializer(serializers.Serializer):
@@ -117,6 +120,7 @@ class InitializeSerializer(serializers.Serializer):
             'submissions',
             'rubricConfig',
         ]
+        read_only_fields = fields
 
 
 class UploadedFileSerializer(serializers.Serializer):
