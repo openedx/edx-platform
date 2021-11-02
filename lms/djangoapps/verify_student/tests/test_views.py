@@ -21,6 +21,7 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
@@ -39,6 +40,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import encrypt_and_encode, rsa_encrypt
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -269,6 +271,36 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     )
     @ddt.unpack
     def test_start_flow_already_verified(self, course_mode, verification_status, payment_flow):
+        course = self._create_course(course_mode)
+        self._enroll(course.id)
+        self._set_verification_status(verification_status)
+        response = self._get_page(payment_flow, course.id)
+        self._assert_displayed_mode(response, course_mode)
+        self._assert_steps_displayed(
+            response,
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
+        )
+        self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
+        self._assert_requirements_displayed(response, [])
+
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
+    @ddt.data(
+        ("verified", "submitted", "verify_student_start_flow"),
+        ("verified", "approved", "verify_student_start_flow"),
+        ("verified", "error", "verify_student_start_flow"),
+        ("professional", "submitted", "verify_student_start_flow"),
+        ("no-id-professional", None, "verify_student_start_flow"),
+        ("verified", "submitted", "verify_student_begin_flow"),
+        ("verified", "approved", "verify_student_begin_flow"),
+        ("verified", "error", "verify_student_begin_flow"),
+        ("professional", "submitted", "verify_student_begin_flow"),
+        ("no-id-professional", None, "verify_student_begin_flow"),
+
+    )
+    @ddt.unpack
+    def test_start_flow_integrity_signature_enabled(self, course_mode, verification_status, payment_flow):
+        """ Verification steps excluded if integrity signature is enabled"""
         course = self._create_course(course_mode)
         self._enroll(course.id)
         self._set_verification_status(verification_status)

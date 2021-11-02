@@ -40,6 +40,7 @@ from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_d
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -244,6 +245,9 @@ class PayAndVerifyView(View):
         if redirect_url:
             return redirect(redirect_url)
 
+        # NOTE: Integrity signature (Honor Code) replaces id verification.
+        # Verification deadline will only be checked if this feature is not yet enabled.
+        #
         # If the verification deadline has passed
         # then show the user a message that he/she can't verify.
         #
@@ -254,11 +258,13 @@ class PayAndVerifyView(View):
         # 2) If set, verification deadlines are always AFTER upgrade deadlines, because why would you
         #   let someone upgrade into a verified track if they can't complete verification?
         #
-        verification_deadline = VerificationDeadline.deadline_for_course(course.id)
-        response = self._response_if_deadline_passed(course, self.VERIFICATION_DEADLINE, verification_deadline)
-        if response is not None:
-            log.info("Verification deadline for '%s' has passed.", course.id)
-            return response
+        verification_deadline = None
+        if not is_integrity_signature_enabled(course_key):
+            verification_deadline = VerificationDeadline.deadline_for_course(course.id)
+            response = self._response_if_deadline_passed(course, self.VERIFICATION_DEADLINE, verification_deadline)
+            if response is not None:
+                log.info("Verification deadline for '%s' has passed.", course.id)
+                return response
 
         # Retrieve the relevant course mode for the payment/verification flow.
         #
