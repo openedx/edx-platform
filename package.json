@@ -14,6 +14,9 @@
     "watch-webpack": "npm run webpack-dev -- --watch",
     "watch-sass": "scripts/watch_sass.sh"
   },
+  "browserslist": [
+    "extends @edx/browserslist-config"
+  ],
   "dependencies": {
     "@babel/core": "7.19.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
