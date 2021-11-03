@@ -4,19 +4,24 @@ Discussion API views
 
 
 import logging
+import uuid
 
+from django.core.exceptions import BadRequest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from common.djangoapps.util.file import store_uploaded_file
+from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
@@ -24,7 +29,7 @@ from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -53,6 +58,7 @@ from ..rest_api.serializers import (
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
 )
+from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +100,7 @@ class CourseView(DeveloperErrorViewMixin, APIView):
         * allow_anonymous_to_peers: A boolean which indicating whether posts
             anonymous to peers are allowed or not.
     """
+
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseKey.from_string(course_id)  # TODO: which class is right?
@@ -129,6 +136,7 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
         * non_courseware_topics: The list of topic trees that are not linked to
               courseware. Items are of the same format as in courseware_topics.
     """
+
     def get(self, request, course_id):
         """
         Implements the GET method as described in the class docstring.
@@ -605,6 +613,79 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
         return Response(update_comment(request, comment_id, request.data))
+
+
+class UploadFileView(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Upload a file to be attached to a thread or comment.
+
+    **URL Parameters**
+
+        * course_id:
+            The ID of the course where this thread or comment belongs.
+
+    **POST Upload File Parameters**
+
+        * thread_key:
+            If the upload belongs to a comment, refer to the parent
+            `thread_id`, otherwise it should be `"root"`.
+
+    **Example Requests**:
+        POST /api/discussion/v1/courses/{course_id}/upload/
+        Content-Type: multipart/form-data; boundary=--Boundary
+
+        ----Boundary
+        Content-Disposition: form-data; name="thread_key"
+
+        <thread_key>
+        ----Boundary
+        Content-Disposition: form-data; name="uploaded_file"; filename="<filename>.<ext>"
+        Content-Type: <mimetype>
+
+        <file_content>
+        ----Boundary--
+
+    **Response Values**
+
+        * location: The URL to access the uploaded file.
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthentication,
+        SessionAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
+    )
+
+    def post(self, request, course_id):
+        """
+        Handles a file upload.
+        """
+        thread_key = request.POST.get("thread_key", "root")
+        unique_file_name = f"{course_id}/{thread_key}/{uuid.uuid4()}"
+        try:
+            file_storage, stored_file_name = store_uploaded_file(
+                request, "uploaded_file", cc_settings.ALLOWED_UPLOAD_FILE_TYPES,
+                unique_file_name, max_file_size=cc_settings.MAX_UPLOAD_FILE_SIZE,
+            )
+        except ValueError:
+            raise BadRequest("no `uploaded_file` was provided")  # lint-amnesty, pylint: disable=raise-missing-from
+
+        file_absolute_url = file_storage.url(stored_file_name)
+
+        # this is a no-op in production, but is required in development,
+        # since the filesystem storage returns the path without a base_url
+        file_absolute_url = request.build_absolute_uri(file_absolute_url)
+
+        return Response(
+            {"location": file_absolute_url},
+            content_type="application/json",
+        )
 
 
 class RetireUserView(APIView):
