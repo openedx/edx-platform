@@ -70,7 +70,6 @@ django-webpack-loader               # Used to wire webpack bundles into the djan
 djangorestframework
 done-xblock
 edx-ace
-edx-analytics-data-api-client
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
