@@ -100,7 +100,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         "dateGraded": "<yyyy-mm-dd HH:MM:SS/None>",
         "gradedBy": "<username/empty>",
         "gradingStatus": "<ungraded/graded>",
-        "lockStatus": "<locked/unlocked/in-progress",
+        "lockStatus": "<locked/unlocked/in-progress>",
         "score": {
             "pointsEarned": <num>,
             "pointsPossible": <num>

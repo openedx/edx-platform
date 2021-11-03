@@ -14,9 +14,9 @@ class GradeStatusField(serializers.ChoiceField):
 
 
 class LockStatusField(serializers.ChoiceField):
-    """ Field that can have the values ['not-locked', 'locked', 'in-progress'] """
-    def __init__(self):
-        super().__init__(choices=['not-locked', 'locked', 'in-progress'])
+    """ Field that can have the values ['unlocked', 'locked', 'in-progress'] """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, choices=['unlocked', 'locked', 'in-progress'])
 
 
 class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -159,3 +159,17 @@ class SubmissionDetailResponseSerializer(serializers.Serializer):
     #  to be completed in AU-387
     #  gradeStatus = GradeStatusField()
     #  lockStatus = LockStatusField()
+
+
+class LockStatusSerializer(serializers.Serializer):
+    """
+    Info about the status of a submission lock, with extra metadata stripped out.
+    """
+    # lockStatus = serializers.CharField(source='lock_status')
+    lockStatus = LockStatusField(source='lock_status')
+
+    class Meta:
+        fields = [
+            'lockStatus'
+        ]
+        read_only_fields = fields
