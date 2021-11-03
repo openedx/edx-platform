@@ -69,7 +69,7 @@ django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
 done-xblock
-edx-ace
+edx-ace>=1.4.0                      # Uses the get_action_links method and templatetag for the goal reminder email feature
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations

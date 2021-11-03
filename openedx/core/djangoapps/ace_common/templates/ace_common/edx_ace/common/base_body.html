@@ -1,5 +1,8 @@
 {% load i18n %}
+<!-- These tags come from the ace_common djangoapp in edx ace -->
 {% load ace %}
+<!-- These tags come from the edx_ace app withinn the edx_ace repository -->
+{% load acetags %}
 
 {% get_current_language as LANGUAGE_CODE %}
 {% get_current_language_bidi as LANGUAGE_BIDI %}
@@ -159,7 +162,8 @@
                     <tr>
                         <!-- Actions -->
                         <td style="padding-bottom: 20px;">
-                            {% for action_link_url, action_link_text in channel.action_links %}
+                            {% get_action_links channel omit_unsubscribe_link=omit_unsubscribe_link as action_links %}
+                            {% for action_link_url, action_link_text in action_links %}
                                 <p>
                                     <a href="{{ action_link_url }}" style="color: #005686">
                                         <font color="#005686"><b>{{ action_link_text }}</b></font>

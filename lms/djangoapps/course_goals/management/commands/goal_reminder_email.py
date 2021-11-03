@@ -51,12 +51,26 @@ def send_ace_message(goal):
     site = Site.objects.get_current()
     message_context = get_base_template_context(site)
 
-    course_home_url = get_learning_mfe_home_url(course_key=goal.course_key)
+    course_home_url = get_learning_mfe_home_url(course_key=goal.course_key, view_name='home')
 
     goals_unsubscribe_url = settings.LEARNING_MICROFRONTEND_URL + reverse(
         'course-home:unsubscribe-from-course-goal',
         kwargs={'token': goal.unsubscribe_token}
     )
+
+    language = get_user_preference(user, LANGUAGE_KEY)
+
+    # Code to allow displaying different banner images for different languages
+    # However, we'll likely want to develop a better way to do this within edx-ace
+    image_url = settings.STATIC_URL
+    if image_url:
+        # If the image url is a relative url prepend the LMS ROOT
+        if 'http' not in image_url:
+            image_url = settings.LMS_ROOT_URL + settings.STATIC_URL
+        image_url += 'images/'
+
+        if language and language in ['es', 'es-419']:
+            image_url += 'spanish-'
 
     message_context.update({
         'email': user.email,
@@ -65,15 +79,16 @@ def send_ace_message(goal):
         'days_per_week': goal.days_per_week,
         'course_url': course_home_url,
         'goals_unsubscribe_url': goals_unsubscribe_url,
-        'image_url': settings.LMS_ROOT_URL + settings.STATIC_URL,
+        'image_url': image_url,
         'unsubscribe_url': None,  # We don't want to include the default unsubscribe link
+        'omit_unsubscribe_link': True,
     })
 
     msg = Message(
         name="goalreminder",
         app_label="course_goals",
         recipient=Recipient(user.id, user.email),
-        language=get_user_preference(user, LANGUAGE_KEY),
+        language=language,
         context=message_context,
         options={'transactional': True},
     )
