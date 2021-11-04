@@ -77,8 +77,9 @@ Custom Attributes:
 
 import inspect
 from base64 import b64encode
-from hashlib import sha256
+from hashlib import sha1, sha256
 from logging import getLogger
+from typing import Union
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -328,6 +329,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             else:
                 request.COOKIES[settings.SESSION_COOKIE_NAME] = safe_cookie_data.session_id  # Step 2
 
+                # Save off for debugging and logging in _verify_user
+                request.cookie_session_field = safe_cookie_data.session_id
+
         process_request_response = super().process_request(request)  # Step 3  # lint-amnesty, pylint: disable=assignment-from-no-return, super-with-arguments
         if process_request_response:
             # The process_request pipeline has been short circuited so
@@ -469,24 +473,52 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
             if request_user_object_mismatch or session_user_mismatch:
                 # Log accumulated information stored on request for each change of user
-                if hasattr(request, 'debug_user_changes'):
-                    log.warning('An unsafe user transition was found. It either needs to be fixed or exempted.\n {}'
-                                .format('\n'.join(request.debug_user_changes)))
+                extra_logs = []
 
-                session_id_changed = hasattr(request.session, 'session_key') and\
-                    request.safe_cookie_verified_session_id != request.session.session_key
+                response_session_id = getattr(getattr(request, 'session', None), 'session_key', None)
+
+                # A safe-session user mismatch could be caused by the
+                # wrong session being retrieved from cache. This
+                # additional logging should reveal any such mismatch
+                # (without revealing the actual session ID in logs).
+                sessions_raw = [
+                    ('parsed_cookie', request.cookie_session_field),
+                    ('at_request', request.safe_cookie_verified_session_id),
+                    ('at_response', response_session_id),
+                ]
+                # Note that this is an ordered list of pairs, not a
+                # dict, so that the output order is consistent.
+                session_hashes = [(k, obscure_token(v)) for (k, v) in sessions_raw]
+                session_id_changed = len(set(kv[1] for kv in sessions_raw)) > 1
+
                 # delete old session id for security
                 del request.safe_cookie_verified_session_id
+                del request.cookie_session_field
 
-                log_suffix = 'Session changed.' if session_id_changed else 'Session did not change.'
+                extra_logs.append('Session changed.' if session_id_changed else 'Session did not change.')
+
+                # Allow comparing session IDs in both logs and metrics
+                extra_logs.append(
+                    "Hash of session ID from various sources: " +
+                    '; '.join(f'{k}={v}' for (k, v) in session_hashes)
+                )
+                for source_name, id_hash in session_hashes:
+                    set_custom_attribute(f'safe_sessions.session_id_hash.{source_name}', id_hash)
+                set_custom_attribute('safe_sessions.session_id_changed', session_id_changed)
+
+                if hasattr(request, 'debug_user_changes'):
+                    extra_logs.append(
+                        'An unsafe user transition was found. It either needs to be fixed or exempted.\n' +
+                        '\n'.join(request.debug_user_changes)
+                    )
 
                 if request_user_object_mismatch and not session_user_mismatch:
                     log.warning(
                         (
                             "SafeCookieData user at initial request '{}' does not match user at response time: '{}' "
-                            "for request path '{}'. {}"
+                            "for request path '{}'.\n{}"
                         ).format(  # pylint: disable=logging-format-interpolation
-                            request.safe_cookie_verified_user_id, request.user.id, request.path, log_suffix
+                            request.safe_cookie_verified_user_id, request.user.id, request.path, '\n'.join(extra_logs)
                         ),
                     )
                     set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
@@ -494,9 +526,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     log.warning(
                         (
                             "SafeCookieData user at initial request '{}' does not match user in session: '{}' "
-                            "for request path '{}'. {}"
+                            "for request path '{}'.\n{}"
                         ).format(  # pylint: disable=logging-format-interpolation
-                            request.safe_cookie_verified_user_id, userid_in_session, request.path, log_suffix
+                            request.safe_cookie_verified_user_id, userid_in_session, request.path, '\n'.join(extra_logs)
                         ),
                     )
                     set_custom_attribute("safe_sessions.user_mismatch", "request-session-mismatch")
@@ -504,10 +536,10 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     log.warning(
                         (
                             "SafeCookieData user at initial request '{}' matches neither user in session: '{}' "
-                            "nor user at response time: '{}' for request path '{}'. {}"
+                            "nor user at response time: '{}' for request path '{}'.\n{}"
                         ).format(  # pylint: disable=logging-format-interpolation
                             request.safe_cookie_verified_user_id, userid_in_session, request.user.id, request.path,
-                            log_suffix
+                            '\n'.join(extra_logs)
                         ),
                     )
                     set_custom_attribute("safe_sessions.user_mismatch", "request-response-and-session-mismatch")
@@ -550,6 +582,34 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         # Update the cookie's value with the safe_cookie_data.
         cookies[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
+
+
+def obscure_token(value: Union[str, None]) -> Union[str, None]:
+    """
+    Return a short string that can be used to detect other occurrences
+    of this string without revealing the original. Return None if value
+    is None.
+
+    Outputs are intended to be *transient* and should not be stored or
+    compared long-term, as they are dependent on the value of
+    settings.SECRET_KEY, which can be rotated at any time.
+
+    WARNING: This code must only be used for *high-entropy inputs*
+    that an attacker cannot enumerate, predict, or guess for other
+    parties. In particular, it must not be used for sequential IDs or
+    timestamps, since an attacker possessing the pepper could
+    precompute the hashes. A non-cryptographic de-identification
+    technique must be used in such cases, such as a lookup table.
+    """
+    if value is None:
+        return None
+    else:
+        # Use of hashing (and in particular use of SECRET_KEY as a
+        # pepper) is overkill for safe-sessions, where at worst we
+        # might end up logging an occasional session ID prefix... but
+        # there's very little cost in overdoing it here, especially if
+        # the code ends up getting copied around.
+        return sha1((settings.SECRET_KEY + value).encode()).hexdigest()[:8]
 
 
 def _mark_cookie_for_deletion(request):
