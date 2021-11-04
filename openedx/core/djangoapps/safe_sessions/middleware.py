@@ -481,42 +481,46 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         # Log accumulated information stored on request for each change of user
         extra_logs = []
 
-        response_session_id = getattr(getattr(request, 'session', None), 'session_key', None)
+        # Attach extra logging and metrics, but don't fail the request if there's a bug in here.
+        try:
+            response_session_id = getattr(getattr(request, 'session', None), 'session_key', None)
 
-        # A safe-session user mismatch could be caused by the
-        # wrong session being retrieved from cache. This
-        # additional logging should reveal any such mismatch
-        # (without revealing the actual session ID in logs).
-        sessions_raw = [
-            ('parsed_cookie', request.cookie_session_field),
-            ('at_request', request.safe_cookie_verified_session_id),
-            ('at_response', response_session_id),
-        ]
-        # Note that this is an ordered list of pairs, not a
-        # dict, so that the output order is consistent.
-        session_hashes = [(k, obscure_token(v)) for (k, v) in sessions_raw]
-        session_id_changed = len(set(kv[1] for kv in sessions_raw)) > 1
+            # A safe-session user mismatch could be caused by the
+            # wrong session being retrieved from cache. This
+            # additional logging should reveal any such mismatch
+            # (without revealing the actual session ID in logs).
+            sessions_raw = [
+                ('parsed_cookie', request.cookie_session_field),
+                ('at_request', request.safe_cookie_verified_session_id),
+                ('at_response', response_session_id),
+            ]
+            # Note that this is an ordered list of pairs, not a
+            # dict, so that the output order is consistent.
+            session_hashes = [(k, obscure_token(v)) for (k, v) in sessions_raw]
+            session_id_changed = len(set(kv[1] for kv in sessions_raw)) > 1
 
-        # delete old session id for security
-        del request.safe_cookie_verified_session_id
-        del request.cookie_session_field
+            # delete old session id for security
+            del request.safe_cookie_verified_session_id
+            del request.cookie_session_field
 
-        extra_logs.append('Session changed.' if session_id_changed else 'Session did not change.')
+            extra_logs.append('Session changed.' if session_id_changed else 'Session did not change.')
 
-        # Allow comparing session IDs in both logs and metrics
-        extra_logs.append(
-            "Hash of session ID from various sources: " +
-            '; '.join(f'{k}={v}' for (k, v) in session_hashes)
-        )
-        for source_name, id_hash in session_hashes:
-            set_custom_attribute(f'safe_sessions.session_id_hash.{source_name}', id_hash)
-        set_custom_attribute('safe_sessions.session_id_changed', session_id_changed)
-
-        if hasattr(request, 'debug_user_changes'):
+            # Allow comparing session IDs in both logs and metrics
             extra_logs.append(
-                'An unsafe user transition was found. It either needs to be fixed or exempted.\n' +
-                '\n'.join(request.debug_user_changes)
+                "Hash of session ID from various sources: " +
+                '; '.join(f'{k}={v}' for (k, v) in session_hashes)
             )
+            for source_name, id_hash in session_hashes:
+                set_custom_attribute(f'safe_sessions.session_id_hash.{source_name}', id_hash)
+            set_custom_attribute('safe_sessions.session_id_changed', session_id_changed)
+
+            if hasattr(request, 'debug_user_changes'):
+                extra_logs.append(
+                    'An unsafe user transition was found. It either needs to be fixed or exempted.\n' +
+                    '\n'.join(request.debug_user_changes)
+                )
+        except BaseException as e:
+            log.error("SafeCookieData error while computing additional logs: %r", e)
 
         if request_user_object_mismatch and not session_user_mismatch:
             log.warning(
