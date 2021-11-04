@@ -292,7 +292,13 @@ def get_authenticated_user(auth_provider, username, uid):
     """
     match = social_django.models.DjangoStorage.user.get_social_auth(provider=auth_provider.backend_name, uid=uid)
 
+    beeline.add_context_field('user_match', match)
+    beeline.add_context_field('user_uid', uid)
+    beeline.add_context_field('auth_provider.backend_name', auth_provider.backend_name)
+
+    beeline.add_context_field('user_doesnotexist_exception', False)
     if not match or match.user.username != username:
+        beeline.add_context_field('user_doesnotexist_exception', True)
         raise User.DoesNotExist
 
     user = match.user
@@ -687,11 +693,14 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             beeline.add_context_field("has_cookie", has_cookie)
             if not has_cookie:
                 try:
+                    beeline.add_context_field("get_complete_url_valueerror_exception", False)
                     redirect_url = get_complete_url(current_partial.backend)
                 except ValueError:
                     # If for some reason we can't get the URL, just skip this step
                     # This may be overly paranoid, but it's far more important that
                     # the user log in successfully than that the cookie is set.
+                    beeline.add_context_field("get_complete_url_valueerror_exception", True)
+                    beeline.add_context_field("current_partial_backend", current_partial.backend)
                     pass
                 else:
                     response = redirect(redirect_url)
