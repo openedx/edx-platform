@@ -62,6 +62,7 @@ import base64
 import hashlib
 import hmac
 import json
+import beeline
 from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
@@ -266,6 +267,7 @@ def lift_quarantine(request):
     request.session.pop('third_party_auth_quarantined_modules', None)
 
 
+@beeline.traced(name='tpa_pipeline.get_authenticated_user') # TODO: Remove traced after debugging
 def get_authenticated_user(auth_provider, username, uid):
     """Gets a saved user authenticated by a particular backend.
 
@@ -643,6 +645,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
 
 @partial.partial
+@beeline.traced(name='tpa_pipeline.set_logged_in_cookies') # TODO: Remove traced after debugging
 def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=None, current_partial=None,
                           *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
@@ -674,6 +677,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             msg = "Your account is disabled"
             return JsonResponse(msg, status=403)
         request = strategy.request if strategy else None
+        beeline.add_context_field(strategy)
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
             # Check that the cookie isn't already set.
@@ -690,6 +694,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
                     pass
                 else:
                     response = redirect(redirect_url)
+                    beeline.add_context_field("redirect_url", redirect_url)
                     return user_authn_cookies.set_logged_in_cookies(request, response, user)
 
 
@@ -734,6 +739,7 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
             return association_response
 
 
+@beeline.traced(name='tpa_pipeline.user_details_force_sync') # TODO: Remove traced after debugging
 def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
     Update normally protected user details using data from provider.
@@ -821,6 +827,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                                      u'notification email. Username: {username}'.format(username=user.username))
 
 
+@beeline.traced(name='tpa_pipeline.set_id_verification_status') # TODO: Remove traced after debugging
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
     Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
