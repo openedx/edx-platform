@@ -7,6 +7,15 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from rest_framework import serializers
 
 
+class GradeStatusField(serializers.ChoiceField):
+  def __init__(self):
+    super().__init__(choices=['graded', 'ungraded'])
+
+
+class LockStatusField(serializers.ChoiceField):
+  def __init__(self):
+    super().__init__(choices=['not-locked', 'locked', 'in-progress'])
+
 class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serialize top-level info about a course, used for creating header in ESG
@@ -46,6 +55,13 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
         ]
 
 
+class ScoreField(serializers.Field):
+  def to_representation(self, value):
+    if ('pointsEarned' not in value) and ('pointsPossible' not in value):
+      return None
+    return ScoreSerializer(value).data
+
+
 class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
@@ -53,29 +69,19 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     pointsEarned = serializers.IntegerField(default=0)
     pointsPossible = serializers.IntegerField(default=0)
 
-    class Meta:
-        fields = ['pointsEarned', 'pointsPossible']
-
-    def to_representation(self, instance):
-        """ An empty dict should return None instead """
-        if ('pointsEarned' not in instance) and ('pointsPossible' not in instance):
-            return None
-        return super().to_representation(instance)
-
-
 class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Submission metadata for displaying submissions table in ESG
     """
-    submissionUuid = serializers.CharField()
+    submissionUuid = serializers.UUIDField()
     username = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
     gradedBy = serializers.CharField(allow_null=True)
-    gradingStatus = serializers.CharField()
-    lockStatus = serializers.CharField()
-    score = ScoreSerializer(allow_null=True)
+    gradingStatus = GradeStatusField()
+    lockStatus = LockStatusField()
+    score = ScoreField()
 
     class Meta:
         fields = [
@@ -107,3 +113,40 @@ class InitializeSerializer(serializers.Serializer):
             'submissions',
             'rubricConfig',
         ]
+
+class UploadedFileSerializer(serializers.Serializer):
+  """ Serializer for a file uploaded as a part of a response """
+  downloadURL = serializers.URLField(source='download_url')
+  description = serializers.CharField()
+  name = serializers.CharField()
+
+
+class ResponseSerializer(serializers.Serializer):
+  """ Serializer for the responseData api construct, which represents the contents of a submitted learner response """
+  files = serializers.ListField(child=UploadedFileSerializer(), allow_empty=True)
+  text = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+
+class AssessmentCriteriaSerializer(serializers.Serializer):
+  """ Serializer for information about a criterion, in the context of a completed assessment """
+  name = serializers.CharField()
+  feedback = serializers.CharField()
+  # to be completed in AU-410
+  # score = serializers.IntegerField()
+  selectedOption = serializers.CharField(source='option')
+
+
+class GradeDataSerializer(serializers.Serializer):
+  """ Serializer for the `gradeData` api construct, which represents a completed staff assessment """
+  score = ScoreField(required=False)
+  overallFeedback = serializers.CharField(source='feedback', required=False)
+  criteria = serializers.ListField(child=AssessmentCriteriaSerializer(), allow_empty=True, required=False)
+
+
+class SubmissionDetailResponseSerializer(serializers.Serializer):
+  """ Serializer for the response from the submission """
+  gradeData = GradeDataSerializer(source='assessment')
+  response = ResponseSerializer(source='submission')
+  #  to be completed in AU-387
+  #  gradeStatus = GradeStatusField()
+  #  lockStatus = LockStatusField()
