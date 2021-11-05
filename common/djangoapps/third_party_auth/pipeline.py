@@ -63,6 +63,7 @@ import beeline
 import hashlib
 import hmac
 import json
+import beeline
 from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
@@ -268,6 +269,7 @@ def lift_quarantine(request):
     request.session.pop('third_party_auth_quarantined_modules', None)
 
 
+@beeline.traced(name='tpa_pipeline.get_authenticated_user')  # TODO: Remove traced after debugging
 def get_authenticated_user(auth_provider, username, uid):
     """Gets a saved user authenticated by a particular backend.
 
@@ -292,7 +294,13 @@ def get_authenticated_user(auth_provider, username, uid):
     """
     match = social_django.models.DjangoStorage.user.get_social_auth(provider=auth_provider.backend_name, uid=uid)
 
+    beeline.add_context_field('user_match', match)
+    beeline.add_context_field('user_uid', uid)
+    beeline.add_context_field('auth_provider.backend_name', auth_provider.backend_name)
+
+    beeline.add_context_field('user_doesnotexist_exception', False)
     if not match or match.user.username != username:
+        beeline.add_context_field('user_doesnotexist_exception', True)
         raise User.DoesNotExist
 
     user = match.user
@@ -671,6 +679,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
 
 @partial.partial
+@beeline.traced(name='tpa_pipeline.set_logged_in_cookies')  # TODO: Remove traced after debugging
 def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=None, current_partial=None,
                           *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
@@ -702,22 +711,28 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             msg = "Your account is disabled"
             return JsonResponse(msg, status=403)
         request = strategy.request if strategy else None
+        beeline.add_context_field("strategy", strategy)
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
             has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
+            beeline.add_context_field("has_cookie", has_cookie)
             if not has_cookie:
                 try:
+                    beeline.add_context_field("get_complete_url_valueerror_exception", False)
                     redirect_url = get_complete_url(current_partial.backend)
                 except ValueError:
                     # If for some reason we can't get the URL, just skip this step
                     # This may be overly paranoid, but it's far more important that
                     # the user log in successfully than that the cookie is set.
+                    beeline.add_context_field("get_complete_url_valueerror_exception", True)
+                    beeline.add_context_field("current_partial_backend", current_partial.backend)
                     pass
                 else:
                     response = redirect(redirect_url)
+                    beeline.add_context_field("redirect_url", redirect_url)
                     return user_authn_cookies.set_logged_in_cookies(request, response, user)
 
 
@@ -799,6 +814,7 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
             return association_response
 
 
+@beeline.traced(name='tpa_pipeline.user_details_force_sync')  # TODO: Remove traced after debugging
 def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
     Update normally protected user details using data from provider.
@@ -886,6 +902,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                                      u'notification email. Username: {username}'.format(username=user.username))
 
 
+@beeline.traced(name='tpa_pipeline.set_id_verification_status')  # TODO: Remove traced after debugging
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
     Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
