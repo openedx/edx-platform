@@ -39,7 +39,9 @@ class CourseRatingSerializerTests(TestCase):
                 'average_rating': '3.00',
                 'total_raters': 1
             },
-            'course': 'course-v1:edX+DemoX+Demo_Course'
+            'course': 'course-v1:edX+DemoX+Demo_Course',
+            'course_title': '',
+            'username': self.user.username
         }
         super(CourseRatingSerializerTests, self).setUp()
 

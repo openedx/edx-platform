@@ -35,7 +35,7 @@ class CourseRatingViewSet(TestCase):
         self.course = 'course-v1:edX+DemoX+Demo_Course'
         self.comment = 'Dummy test comment'
         self.user_course_rating = CourseRatingFactory(user=self.user, comment=self.comment, rating=5)
-        self.url = reverse('course_rating_api:course_rating-list', kwargs={'course_id': self.course})
+        self.url = reverse('course_rating_api:course_rating-list')
         super(CourseRatingViewSet, self).setUp()
 
     def test_without_permission(self):
@@ -93,7 +93,6 @@ class CourseRatingViewSet(TestCase):
         api_url = reverse(
             'course_rating_api:course_rating-detail',
             kwargs={
-                'course_id': self.course,
                 'pk': response.json()['id']
             }
         )

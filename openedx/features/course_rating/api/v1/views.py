@@ -24,15 +24,8 @@ class CourseRatingViewSet(viewsets.ModelViewSet):
     permission_classes = (CustomCourseRatingPermission,)
     serializer_class = CourseRatingSerializer
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['is_approved', 'user']
-
-    def get_queryset(self):
-        """
-        Filter course ratings.
-        """
-        course_id = self.kwargs['course_id']
-        course_key = CourseKey.from_string(course_id)
-        return CourseRating.objects.filter(course=course_key)
+    filter_fields = ['is_approved', 'user', 'course']
+    queryset = CourseRating.objects.all()
 
 
 class CourseAverageRatingAPIView(ListAPIView):
