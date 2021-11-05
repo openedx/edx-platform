@@ -45,7 +45,7 @@ from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled as integrity_signature_toggle
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -314,12 +314,19 @@ class CoursewareMeta:
             )
 
     @property
+    def is_integrity_signature_enabled(self):
+        """
+        Course waffle flag for the integrity signature feature.
+        """
+        return integrity_signature_toggle(self.course_key)
+
+    @property
     def user_needs_integrity_signature(self):
         """
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
         if (
-            is_integrity_signature_enabled(self.course_key)
+            integrity_signature_toggle(self.course_key)
             and not self.is_staff
             and self.enrollment_object
             and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
