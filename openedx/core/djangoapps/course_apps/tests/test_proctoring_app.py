@@ -7,7 +7,7 @@ import ddt
 from django.conf import settings
 
 from lms.djangoapps.courseware.plugins import ProctoringCourseApp
-from testing.utils import skip_unless_cms
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, CourseUserType
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -37,7 +37,7 @@ class ProctoringCourseAppTestCase(ModuleStoreTestCase):
         Test that proctoring card's availability can configured using feature flag.
         """
         with patch.dict("django.conf.settings.FEATURES", {'ENABLE_PROCTORED_EXAMS': available_status}):
-            assert self.course.enable_proctored_exams == True
+            assert self.course.enable_proctored_exams is True
             assert ProctoringCourseApp().is_available(self.course.id) == available_status
 
     @ddt.data(True, False)
