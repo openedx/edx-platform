@@ -2,7 +2,6 @@
 Tests for ESG Serializers
 """
 import ddt
-from unittest.case import expectedFailure
 from django.test import TestCase
 from unittest.mock import Mock, MagicMock
 
