@@ -520,7 +520,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     '\n'.join(request.debug_user_changes)
                 )
         except BaseException as e:
-            log.error("SafeCookieData error while computing additional logs: %r", e)
+            log.exception("SafeCookieData error while computing additional logs.")
 
         if request_user_object_mismatch and not session_user_mismatch:
             log.warning(
