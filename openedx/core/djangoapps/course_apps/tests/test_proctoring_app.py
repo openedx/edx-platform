@@ -20,7 +20,7 @@ class ProctoringCourseAppTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Setup proctoring course app tests."""
-        super(ProctoringCourseAppTestCase, self).setUp()
+        super().setUp()
 
         self.course = CourseFactory.create(
             org='edX',
