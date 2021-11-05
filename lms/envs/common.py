@@ -948,6 +948,18 @@ FEATURES = {
     # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_REDIRECT_UNAUTHENTICATED_USERS_TO_LOGIN']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable this feature to redirect all unauthenticated users to login page. Used to make all
+    #   content private, where when it's disabled, there are some pages which can be viewed by unauthenticated users.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-11-12
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/439'
+    'ENABLE_REDIRECT_UNAUTHENTICATED_USERS_TO_LOGIN': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -2081,6 +2093,8 @@ MIDDLEWARE = [
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
+    'openedx.core.djangoapps.user_authn.middleware.RedirectUnauthenticatedToLoginMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
