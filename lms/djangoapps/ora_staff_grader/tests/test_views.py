@@ -223,7 +223,6 @@ class TestSubmissionLockView(APITestCase):
 
         self.client.login(username=self.staff.username, password=self.password)
 
-
     def url_with_params(self, params):
         """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
         query_dictionary = QueryDict('', mutable=True)
@@ -290,7 +289,6 @@ class TestSubmissionLockView(APITestCase):
         expected_value = {"lockStatus": "unlocked"}
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
-
 
     @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_delete_lock_contested(self, mock_xblock_handler):

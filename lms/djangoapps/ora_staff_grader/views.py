@@ -155,7 +155,7 @@ class SubmissionLockView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     @require_params(['ora_location', 'submissionId', 'value'])
-    def post(self, request, ora_location, submission_uuid, value,  *args, **kwargs):
+    def post(self, request, ora_location, submission_uuid, value, *args, **kwargs):
         # Validate ORA location
         try:
             UsageKey.from_string(ora_location)
