@@ -186,6 +186,13 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                 }
                 event.preventDefault();
                 if (data) {
+                    var LXCData = window.LXCData;
+                    // If the visual editor is enabled, update any settings that it controls:
+                    if (LXCData && LXCData.editorHasChanges) {
+                        data.metadata.max_attempts = LXCData.max_attempts;
+                        data.metadata.weight = LXCData.weight;
+                    }
+
                     ViewUtils.runOperationShowingMessage(gettext('Saving'),
                         function() {
                             return xblockInfo.save(data);
