@@ -22,7 +22,7 @@ class CustomCourseRatingPermission(permissions.BasePermission):
         elif request.method in ['POST']:
             return request.user.is_authenticated
 
-        elif request.method in ['PUT', 'DELETE']:
+        elif request.method in ['PUT', 'PATCH', 'DELETE']:
             obj = CourseRating.objects.get(pk=view.kwargs['pk'])
             if obj is not None:
                 return request.user.is_superuser or obj.user == request.user

@@ -41,7 +41,8 @@ class CourseRatingSerializerTests(TestCase):
             },
             'course': 'course-v1:edX+DemoX+Demo_Course',
             'course_title': '',
-            'username': self.user.username
+            'username': self.user.username,
+            'moderated_by_username': self.moderator.username
         }
         super(CourseRatingSerializerTests, self).setUp()
 

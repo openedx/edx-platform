@@ -6,7 +6,6 @@ from rest_framework.generics import ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 import organizations
-from opaque_keys.edx.keys import CourseKey
 
 from openedx.features.course_rating.api.v1.serializers import (
     CourseAverageRatingListSerializer,
