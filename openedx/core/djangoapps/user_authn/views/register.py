@@ -287,7 +287,8 @@ def create_account_with_params(request, params):
 def is_new_user(request, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
+        is_internal_user = user.email.split('@')[1] == 'edx.org'
+        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), is_internal_user)
 
 
 def _link_user_to_third_party_provider(
