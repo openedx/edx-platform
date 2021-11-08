@@ -4,9 +4,10 @@ Tests for Discussion API views
 
 
 import json
+import random
 from datetime import datetime
 from unittest import mock
-from urllib.parse import urlparse, urlencode
+from urllib.parse import parse_qs, urlparse, urlencode
 
 import ddt
 import httpretty
@@ -26,7 +27,11 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    SuperuserFactory,
+    UserFactory,
+)
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -2664,3 +2669,90 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         content = json.loads(response.content.decode('utf-8'))
         assertion = self.assertTrue if action == 'allow' else self.assertFalse
         assertion(any(user.username in x['username'] for x in content['results']))
+
+
+@ddt.ddt
+@httpretty.activate
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+    """
+    Tests for the course stats endpoint
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self) -> None:
+        super().setUp()
+        self.course_key = 'course-v1:test+test+test'
+        seed_permissions_roles(self.course_key)
+        self.user = UserFactory(username='user')
+        self.moderator = UserFactory(username='moderator')
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role.users.add(self.moderator)
+        self.stats = [
+            {
+                "active_flags": random.randint(0, 3),
+                "inactive_flags": random.randint(0, 2),
+                "replies": random.randint(0, 30),
+                "responses": random.randint(0, 100),
+                "threads": random.randint(0, 10),
+                "username": f"user-{idx}"
+            }
+            for idx in range(10)
+        ]
+        self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
+        self.register_course_stats_response(self.course_key, self.stats, 1, 3)
+        self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_regular_user(self):
+        """
+        Tests that for a regular user stats are returned without flag counts
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats_without_flags
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_moderator_user(self):
+        """
+        Tests that for a moderator user stats are returned with flag counts
+        """
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats
+
+    @ddt.data(
+        ("moderator", "flagged", "flagged"),
+        ("moderator", "activity", "activity"),
+        ("moderator", None, "flagged"),
+        ("user", None, "activity"),
+        ("user", "activity", "activity"),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting(self, username, ordering_requested, ordering_performed):
+        """
+        Test valid sorting options and defaults
+        """
+        self.client.login(username=username, password='test')
+        params = {}
+        if ordering_requested:
+            params = {"order_by": ordering_requested}
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f"/api/v1/users/{self.course_key}/stats"
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get("sort_key", None) == [ordering_performed]
+
+    @ddt.data("flagged", "xyz")
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting_error_regular_user(self, order_by):
+        """
+        Test for invalid sorting options for regular users.
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url, {"order_by": order_by})
+        assert "order_by" in response.json()["field_errors"]

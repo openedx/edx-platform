@@ -4,6 +4,7 @@ Discussion API forms
 import urllib.parse
 
 from django.core.exceptions import ValidationError
+from django.db.models import TextChoices
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -15,9 +16,14 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
-    Role
+    Role,
 )
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
+
+
+class UserOrdering(TextChoices):
+    BY_ACTIVITY = 'activity'
+    BY_FLAGS = 'flagged'
 
 
 class _PaginationForm(Form):
@@ -201,8 +207,8 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
         if course_id and rolename:
             try:
                 role = Role.objects.get(name=rolename, course_id=course_id)
-            except Role.DoesNotExist:
-                raise ValidationError(f"Role '{rolename}' does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
+            except Role.DoesNotExist as err:
+                raise ValidationError(f"Role '{rolename}' does not exist") from err
 
             self.cleaned_data['role'] = role
             return rolename
@@ -218,3 +224,8 @@ class TopicListGetForm(Form):
     def clean_topic_id(self):
         topic_ids = self.cleaned_data.get("topic_id", None)
         return set(topic_ids.strip(',').split(',')) if topic_ids else None
+
+
+class CourseActivityStatsForm(_PaginationForm):
+    """Form for validating course activity stats API query parameters"""
+    order_by = ChoiceField(choices=UserOrdering.choices, required=False)

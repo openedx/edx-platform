@@ -42,6 +42,7 @@ from ..rest_api.api import (
     delete_thread,
     get_comment_list,
     get_course,
+    get_course_discussion_user_stats,
     get_course_topics,
     get_course_topics_v2,
     get_response_comments,
@@ -54,11 +55,13 @@ from ..rest_api.api import (
 from ..rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
+    CourseActivityStatsForm,
     CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
     TopicListGetForm,
     UserCommentListGetForm,
+    UserOrdering,
 )
 from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 from ..rest_api.serializers import (
@@ -103,6 +106,79 @@ class CourseView(DeveloperErrorViewMixin, APIView):
         # Record user activity for tracking progress towards a user's course goals (for mobile app)
         UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(get_course(request, course_key))
+
+
+@view_auth_classes()
+class CourseActivityStatsView(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Fetch statistics about a user's activity in a course.
+
+    **Example Requests**:
+
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/activity_stats?order_by=activity
+
+    **Response Values**:
+
+
+    **Example Response**
+    ```json
+    {
+        "pagination": {
+            "count": 3,
+            "next": null,
+            "num_pages": 1,
+            "previous": null
+        },
+        "results": [
+            {
+                "active_flags": 3,
+                "inactive_flags": 0,
+                "replies": 13,
+                "responses": 21,
+                "threads": 32,
+                "username": "edx"
+            },
+            {
+                "active_flags": 1,
+                "inactive_flags": 0,
+                "replies": 6,
+                "responses": 8,
+                "threads": 13,
+                "username": "honor"
+            },
+            ...
+        ]
+    }
+    ```
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
+    )
+
+    def get(self, request, course_key_string):
+        """Implements the GET method as described in the class docstring."""
+        form_query_string = CourseActivityStatsForm(request.query_params)
+        if not form_query_string.is_valid():
+            raise ValidationError(form_query_string.errors)
+        order_by = form_query_string.cleaned_data.get('order_by', None)
+        order_by = UserOrdering(order_by) if order_by else None
+        data = get_course_discussion_user_stats(
+            request,
+            course_key_string,
+            form_query_string.cleaned_data['page'],
+            form_query_string.cleaned_data['page_size'],
+            order_by,
+        )
+        return data
 
 
 @view_auth_classes()
