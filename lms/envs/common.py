@@ -635,6 +635,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
+    # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, CCX ID will be included in the generated filename for CCX courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-16
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: None
+    # .. toggle_warnings: Turning this feature ON will affect all generated filenames which are related to CCX courses.
+    'ENABLE_COURSE_FILENAME_CCX_SUFFIX': False,
+
     # Setting for overriding default filtering facets for Course discovery
     # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 
