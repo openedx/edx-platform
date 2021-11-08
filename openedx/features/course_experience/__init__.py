@@ -7,7 +7,9 @@ from django.utils.translation import ugettext as _
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import (
+    CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+)
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
@@ -85,6 +87,11 @@ RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_date
 # Waffle flag to enable user calendar syncing
 CALENDAR_SYNC_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'calendar_sync')
 
+# Namespace for course experience waffle switch.
+WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_experience')
+
+# Waffle switch to enable the separate course outline page and full width content.
+COURSE_OUTLINE_PAGE_SWITCH = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'course_outline_page')
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

@@ -285,6 +285,7 @@
 
                 this.sr_container.focus();
             }
+            document.getElementById('seq-position').innerHTML = newPosition;
         };
 
         Sequence.prototype.goto = function(event) {
@@ -335,6 +336,7 @@
                 }, true);
                 alert(alertText);  // eslint-disable-line no-alert
             }
+            document.getElementById('seq-position').innerHTML = newPosition;
         };
 
         Sequence.prototype.selectNext = function(event) {
@@ -411,6 +413,7 @@
                 .removeClass('active')
                 .removeClass('focused')
                 .addClass('visited');
+            this.$('#seq-item-active_tab_'+position).addClass('seq-inactive');
         };
 
         Sequence.prototype.update_completion = function(position) {
@@ -438,6 +441,7 @@
                 .removeClass('focused')
                 .addClass('active');
             this.$('.sequence-list-wrapper').focus();
+            this.$('#seq-item-active_tab_'+position).removeClass('seq-inactive');
         };
 
         Sequence.prototype.addBookmarkIconToActiveNavItem = function(event) {
