@@ -8,7 +8,7 @@
         return Backbone.Collection.extend({
 
             model: CourseCard,
-            pageSize: 20,
+            pageSize: 40,  // Tahoe: RED-2571 hack: use 40 instead of 20 to hide a bug in course results with Course Access Groups.
             totalCount: 0,
             latestModelsCount: 0,
             searchTerm: '',
