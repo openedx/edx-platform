@@ -17,5 +17,5 @@ urlpatterns = [
         views.DiscussionBoardFragmentView.as_view(),
         name='discussion_board_fragment_view'
     ),
-    path('', views.forum_form_discussion, name='forum_form_discussion'),
+    re_path('', views.forum_form_discussion, name='forum_form_discussion'),
 ]
