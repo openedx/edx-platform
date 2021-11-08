@@ -4841,3 +4841,9 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+
+################# Bulk Course Email Settings #################
+# If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
+# The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
+# a value of `3` would include learners who have logged in within the past 3 months.
+BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
