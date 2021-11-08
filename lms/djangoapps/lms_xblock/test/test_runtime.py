@@ -66,6 +66,7 @@ class TestHandlerUrl(TestCase):
             render_template=Mock(),
             replace_urls=str,
             course_id=self.course_key,
+            user=Mock(),
             descriptor_runtime=Mock(),
         )
 
@@ -125,18 +126,14 @@ class TestUserServiceAPI(TestCase):
         self.course_id = CourseLocator("org", "course", "run")
         self.user = UserFactory.create()
 
-        def mock_get_real_user(_anon_id):
-            """Just returns the test user"""
-            return self.user
-
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             render_template=Mock(),
             replace_urls=str,
+            user=self.user,
             course_id=self.course_id,
-            get_real_user=mock_get_real_user,
             descriptor_runtime=Mock(),
         )
         self.scope = 'course'
@@ -192,6 +189,7 @@ class TestBadgingService(ModuleStoreTestCase):
             render_template=Mock(),
             replace_urls=str,
             course_id=self.course_id,
+            user=self.user,
             get_real_user=mock_get_real_user,
             descriptor_runtime=Mock(),
         )
@@ -247,6 +245,7 @@ class TestI18nService(ModuleStoreTestCase):
             render_template=Mock(),
             replace_urls=str,
             course_id=self.course.id,
+            user=Mock(),
             descriptor_runtime=Mock(),
         )
 
