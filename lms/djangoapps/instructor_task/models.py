@@ -25,7 +25,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.files.base import ContentFile
 from django.db import models, transaction
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.storage import get_storage
