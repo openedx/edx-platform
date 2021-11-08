@@ -23,7 +23,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db import models
 from django.db.models.signals import post_save
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
