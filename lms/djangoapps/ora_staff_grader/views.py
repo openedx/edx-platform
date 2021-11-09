@@ -91,7 +91,7 @@ class SubmissionFetchView(RetrieveAPIView):
     GET submission contents and assessment info, if any
 
     Response: {
-        
+
     }
 
     Returns:
@@ -112,7 +112,7 @@ class SubmissionFetchView(RetrieveAPIView):
         ora_location = request.query_params.get('ora_location')
         if not ora_location:
             return HttpResponseBadRequest(_("Query must contain an ora_location param."))
-        
+
         submission_uuid = request.query_params.get('submission_uuid')
         if not submission_uuid:
             return HttpResponseBadRequest(_("Query must contain a submission_uuid param."))

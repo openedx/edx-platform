@@ -41,7 +41,6 @@ class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=self.staff.username, password=self.password)
 
 
-
 class TestInitializeView(BaseViewTest):
     """
     Tests for the /initialize view, creating setup data for ESG
@@ -168,7 +167,7 @@ class TestFetchSubmissionView(BaseViewTest):
                 },
             ]
         }
-        mock_get_submission_and_assessment_info.return_value =  {
+        mock_get_submission_and_assessment_info.return_value = {
             'submission': mock_submission,
             'assessment': mock_assessment,
         }
@@ -179,5 +178,5 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.status_code == 200
         assert response.data.keys() == set(['gradeData', 'response'])
         assert response.data['response'].keys() == set(['files', 'text'])
-        expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()          
+        expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()
         assert response.data['gradeData'].keys() == expected_assessment_keys

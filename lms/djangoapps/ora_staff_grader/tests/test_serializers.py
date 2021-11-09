@@ -269,8 +269,8 @@ class TestInitializeSerializer(TestCase):
 class TestScoreFieldAndSerializer(TestCase):
 
     def test_field_no_values(self):
-        assert ScoreField().to_representation({}) == None
-    
+        assert ScoreField().to_representation({}) is None
+
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_field_missing(self, missing_field):
         value = {'pointsEarned': 30, 'pointsPossible': 50}
@@ -292,15 +292,13 @@ class TestScoreFieldAndSerializer(TestCase):
 
     def test_serializer_no_values(self):
         data = ScoreSerializer({}).data
-        
         assert data ==  {'pointsEarned': 0, 'pointsPossible': 0}
-    
+
     def test_serialier(self):
         input = {'pointsEarned': 10, 'pointsPossible': 200}
         data = ScoreSerializer(input).data
-
         assert data == input
-    
+
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_serializer_missing_field(self, missing_field):
         value = {'pointsEarned': 30, 'pointsPossible': 50}
@@ -318,7 +316,7 @@ class TestUploadedFileSerializer(TestCase):
     def test_uploaded_file_serializer(self):
         input = MagicMock()
         data = UploadedFileSerializer(input).data
-        
+
         expected_value = {
             'downloadURL': str(input.download_url),
             'description': str(input.description),
@@ -333,7 +331,7 @@ class TestResponseSerializer(TestCase):
     def test_response_serializer__empty(self):
         input = {'files': [], 'text': []}
         assert ResponseSerializer(input).data == input
-    
+
     @ddt.unpack
     @ddt.data((True, True), (True, False), (False, True), (False, False))
     def test_response_serializer(self, has_text, has_files):
@@ -342,13 +340,13 @@ class TestResponseSerializer(TestCase):
             input.files = [Mock(), Mock(), Mock()]
         if has_text:
             input.text = [Mock(), Mock(), Mock()]
-        
+
         data = ResponseSerializer(input).data
         expected_value = {
             'files': [UploadedFileSerializer(mock_file).data for mock_file in input.files] if has_files else [],
             'text': [str(mock_text) for mock_text in input.text] if has_text else [],
         }
-        assert data == expected_value    
+        assert data == expected_value
 
 
 class TestAssessmentCriteriaSerializer(TestCase):
@@ -378,11 +376,12 @@ class TestAssessmentCriteriaSerializer(TestCase):
 
         assert data == expected_value
 
+
 @ddt.ddt
 class TestGradeDataSerializer(TestCase):
 
     def test_grade_data_serializer__no_assessment(self):
-        assert GradeDataSerializer({}).data == {} 
+        assert GradeDataSerializer({}).data == {}
 
     @ddt.data(True, False)
     def test_grade_data_serializer__assessment(self, has_criteria):
