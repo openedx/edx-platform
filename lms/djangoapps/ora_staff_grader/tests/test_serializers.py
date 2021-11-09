@@ -428,12 +428,8 @@ class TestSubmissionDetailResponseSerializer(TestCase):
 
 class TestLockStatusSerializer(SharedModuleStoreTestCase):
     """
-    Tests for CourseMetadataSerializer
+    Tests for LockStatusSerializer
     """
-    lock_contested = {
-        "error": "Submission already locked"
-    }
-
     lock_in_progress = {
         "submission_uuid": "e34ef789-a4b1-48cf-b1bc-b3edacfd4eb2",
         "owner_id": "10ab03f1b75b4f9d9ab13a1fd1dccca1",
