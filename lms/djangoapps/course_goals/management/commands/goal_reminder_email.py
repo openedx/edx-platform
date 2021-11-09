@@ -7,7 +7,6 @@ import logging
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from django.urls import reverse
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
@@ -53,10 +52,7 @@ def send_ace_message(goal):
 
     course_home_url = get_learning_mfe_home_url(course_key=goal.course_key, view_name='home')
 
-    goals_unsubscribe_url = settings.LEARNING_MICROFRONTEND_URL + reverse(
-        'course-home:unsubscribe-from-course-goal',
-        kwargs={'token': goal.unsubscribe_token}
-    )
+    goals_unsubscribe_url = f'{settings.LEARNING_MICROFRONTEND_URL}/goal-unsubscribe/{goal.unsubscribe_token}'
 
     language = get_user_preference(user, LANGUAGE_KEY)
 
