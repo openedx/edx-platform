@@ -6,7 +6,7 @@ jobs:
     name: 'master'
     uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
     with:
-      local_base_branch: 'prod'
+      local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
       upstream_branch: 'master'
     secrets:
@@ -16,7 +16,7 @@ jobs:
     name: 'koa'
     uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
     with:
-      local_base_branch: 'prod'
+      local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
       upstream_branch: 'open-release/koa.master'
     secrets:
