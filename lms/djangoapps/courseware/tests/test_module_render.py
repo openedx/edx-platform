@@ -2687,3 +2687,17 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert runtime.seed == 0
         assert runtime.user_id is None
         assert not runtime.user_is_staff
+
+    def test_render_template(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        rendered = runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
+        assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'

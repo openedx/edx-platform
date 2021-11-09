@@ -32,6 +32,7 @@ from xblock.fields import Scope
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
@@ -309,6 +310,8 @@ class StudioEditModuleRuntime:
                 return DjangoXBlockUserService(self._user)
             if service_name == "studio_user_permissions":
                 return StudioPermissionsService(self._user)
+            if service_name == "mako":
+                return MakoService()
             if service_name == "settings":
                 return SettingsService()
             if service_name == "lti-configuration":
