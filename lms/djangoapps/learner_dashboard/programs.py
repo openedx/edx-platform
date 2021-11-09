@@ -75,7 +75,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    DEFAULT_ROLE = 'student'
+    DEFAULT_ROLE = 'Student'
     ADMIN_ROLE = 'Administrator'
 
     @staticmethod
