@@ -33,6 +33,16 @@ def handle_course_discussion_config_update(sender, configuration: CourseDiscussi
 def update_course_discussion_config(configuration: CourseDiscussionConfigurationData):
     """
     Update the database version of the configuration if it changes in the course structure.
+
+    This function accepts a discussion configuration object that represents the current
+    configuration and applies that state to the database. It will go over the list of topic
+    links in the configuration, find the corresponding topic link in the database and apply
+    any changes if needed. If a new topic link has been introduced it will create an entry.
+    If a topic has been removed, it will deactivate the entry.
+
+    When this runs on a new course it will create a new DiscussionConfiguration entry for
+    the course.
+
     Args:
         configuration (CourseDiscussionConfigurationData): configuration data for the course
     """
@@ -43,8 +53,6 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
         for topic_context in configuration.contexts
     }
     with transaction.atomic():
-        # Go over existing topics in the database and update them if they have been changed.
-        # i.e. in case a unit display name has changed, or a unit has been removed, or otherwise made inaccessible
         log.info(f"Updating existing discussion topic links for {course_key}")
         for topic_link in DiscussionTopicLink.objects.filter(
             context_key=course_key, provider_id=provider_id,
@@ -54,8 +62,6 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
             # TODO: handle deleting topics that are no longer in use
             # currently this will simply not work for course-wide topics since deleting the link will
             # remove access to all posts in the topic.
-            # If the topic exists in the db, but not in the new configuration, it has been removed or otherwise
-            # made inaccessible.
             if topic_context is None:
                 topic_link.enabled_in_context = False
             else:
@@ -63,7 +69,7 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 topic_link.title = topic_context.title
             topic_link.save()
         log.info(f"Creating new discussion topic links for {course_key}")
-        # If there are any topic contexts left here, they are new or not present in DiscussionTopicLink
+
         DiscussionTopicLink.objects.bulk_create([
             DiscussionTopicLink(
                 context_key=course_key,
@@ -76,7 +82,6 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
             for topic_context in new_topic_map.values()
         ])
 
-        # If this is a new course save changes to the model.
         if not DiscussionsConfiguration.objects.filter(context_key=course_key).exists():
             log.info(f"Course {course_key} doesn't have discussion configuration model yet. Creating a new one.")
             DiscussionsConfiguration(
@@ -87,7 +92,6 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 enable_graded_units=configuration.enable_graded_units,
                 unit_level_visibility=configuration.unit_level_visibility,
             ).save()
-        # If the model already exists, then it's already up-to-date.
 
 
 COURSE_DISCUSSIONS_UPDATED.connect(handle_course_discussion_config_update)

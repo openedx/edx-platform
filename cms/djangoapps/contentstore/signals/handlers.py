@@ -3,10 +3,10 @@
 
 import logging
 from datetime import datetime
+from functools import wraps
 
 from django.core.cache import cache
 from django.dispatch import receiver
-from functools import wraps
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
