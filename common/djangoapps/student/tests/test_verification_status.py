@@ -346,6 +346,29 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.save()
         self._assert_course_verification_status(None)
 
+    @ddt.data(True, False)
+    def test_integrity_disables_sidebar(self, integrity_flag):
+        self._setup_mode_and_enrollment(None, "verified")
+
+        #no sidebar when no IDV yet
+        response = self.client.get(self.dashboard_url)
+        self.assertNotContains(response, "profile-sidebar")
+
+        # The student has an approved verification
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+
+        # sidebar only appears after IDV if integrity is not on
+        with patch('common.djangoapps.student.views.dashboard.is_integrity_signature_enabled',
+                   return_value=integrity_flag):
+            response = self.client.get(self.dashboard_url)
+            if integrity_flag:
+                self.assertNotContains(response, "profile-sidebar")
+            else:
+                self.assertContains(response, "profile-sidebar")
+
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
 
