@@ -559,8 +559,7 @@ def login_user(request, api_version='v1'):
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
-                is_internal_user = user.email.split('@')[1] == 'edx.org'
-                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), is_internal_user)
+                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
             _handle_failed_authentication(user, possibly_authenticated_user)
