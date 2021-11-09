@@ -95,7 +95,7 @@ class FormDescriptionTest(TestCase):
             placeholder="placeholder",
             instructions="instructions",
             required=True,
-            toggled=False,
+            exposed=True,
             restrictions={
                 "min_length": 2,
                 "max_length": 10
@@ -111,7 +111,7 @@ class FormDescriptionTest(TestCase):
                json.dumps({'method': 'post',
                            'submit_url': '/submit',
                            'fields': [{'name': 'name', 'label': 'label', 'type': 'text', 'defaultValue': 'default',
-                                       'placeholder': 'placeholder', 'instructions': 'instructions', 'toggled': False,
+                                       'placeholder': 'placeholder', 'instructions': 'instructions', 'exposed': True,
                                        'required': True, 'restrictions': {'min_length': 2, 'max_length': 10},
                                        'errorMessages': {'required': 'You must provide a value!'},
                                        'supplementalLink': '', 'supplementalText': '',

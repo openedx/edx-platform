@@ -102,7 +102,7 @@
                         len = data.length,
                         requiredFields = [],
                         optionalFields = [],
-                        notToggledOptionalFields = [];
+                        exposedOptionalFields = [];
 
                     this.fields = data;
 
@@ -125,17 +125,17 @@
                                 this.hasOptionalFields = true;
                             }
 
-                            if (field.toggled) {
-                                optionalFields.push(field);
+                            if (field.exposed) {
+                                exposedOptionalFields.push(field);
                             } else {
-                                notToggledOptionalFields.push(field);
+                                optionalFields.push(field);
                             }
                         }
                     }
 
                     html = this.renderFields(requiredFields, 'required-fields');
 
-                    html.push.apply(html, this.renderFields(notToggledOptionalFields, 'not-toggled-optional-fields'));
+                    html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
                     html.push.apply(html, this.renderFields(
                       optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
                     ));
@@ -262,7 +262,7 @@
                     // to insert the not toggled optional fields before .honor_tos_combined's parent
                     // that is the container for the honor TOS text and checkbox.
                     // xss-lint: disable=javascript-jquery-insert-into-target
-                    $('.not-toggled-optional-fields').insertBefore(
+                    $('.exposed-optional-fields').insertBefore(
                         $('.honor_tos_combined').parent()
                     );
 

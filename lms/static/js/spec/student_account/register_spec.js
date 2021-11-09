@@ -88,7 +88,7 @@
                                 defaultValue: '',
                                 type: 'email',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: 'Enter your email.',
                                 restrictions: {}
                             },
@@ -99,7 +99,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: 'Enter your email.',
                                 restrictions: {}
                             },
@@ -110,7 +110,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: 'Enter your username.',
                                 restrictions: {}
                             },
@@ -121,7 +121,7 @@
                                 defaultValue: '',
                                 type: 'text',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: 'Enter your username.',
                                 restrictions: {}
                             },
@@ -132,7 +132,7 @@
                                 defaultValue: '',
                                 type: 'password',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: 'Enter your password.',
                                 restrictions: {}
                             },
@@ -149,7 +149,7 @@
                                     {value: 'b', name: "Bachelor's degree"}
                                 ],
                                 required: false,
-                                toggled: true,
+                                exposed: false,
                                 instructions: 'Select your education level.',
                                 restrictions: {}
                             },
@@ -166,7 +166,7 @@
                                     {value: 'o', name: 'Other'}
                                 ],
                                 required: false,
-                                toggled: true,
+                                exposed: false,
                                 instructions: 'Select your gender.',
                                 restrictions: {}
                             },
@@ -183,7 +183,7 @@
                                     {value: 2014, name: '2014'}
                                 ],
                                 required: false,
-                                toggled: true,
+                                exposed: false,
                                 instructions: 'Select your year of birth.',
                                 restrictions: {}
                             },
@@ -194,7 +194,7 @@
                                 defaultValue: '',
                                 type: 'textarea',
                                 required: false,
-                                toggled: true,
+                                exposed: false,
                                 instructions: 'Enter your mailing address.',
                                 restrictions: {}
                             },
@@ -205,7 +205,7 @@
                                 defaultValue: '',
                                 type: 'textarea',
                                 required: false,
-                                toggled: true,
+                                exposed: false,
                                 instructions: "If you'd like, tell us why you're interested in edX.",
                                 restrictions: {}
                             },
@@ -216,7 +216,7 @@
                                 defaultValue: '',
                                 type: 'checkbox',
                                 required: true,
-                                toggled: false,
+                                exposed: true,
                                 instructions: '',
                                 restrictions: {},
                                 supplementalLink: '/honor',
@@ -513,25 +513,27 @@
                     expect(view.$submitButton).toHaveAttr('disabled');
                 });
 
-                it('shows optional not toggled fields', function() {
+                it('shows optional exposed fields', function() {
                     var formFields = FORM_DESCRIPTION.fields
                     formFields.push({
                         placeholder: '',
-                        name: 'not_toggled_custom_optional_field',
-                        label: 'Not toggled custom optional field.',
+                        name: 'exposed_custom_optional_field',
+                        label: 'Exposed custom optional field.',
                         defaultValue: '',
                         type: 'checkbox',
                         required: false,
-                        toggled: false,
+                        exposed: true,
                         instructions: 'Check this field if you would like to.',
                         restrictions: {}
                     })
 
                     createRegisterView(this, formFields);
-                    var elementClasses = view.$('.not-toggled-optional-fields').attr('class');
-                    // Expect the toggled optional fields container does not have other
+                    var elementClasses = view.$('.exposed-optional-fields').attr('class');
+                    var elementChildren = view.$('.exposed-optional-fields .form-field')
+                    // Expect the exposed optional fields container does not have other
                     // classes assigned, like .hidden
-                    expect(elementClasses).toEqual('not-toggled-optional-fields');
+                    expect(elementClasses).toEqual('exposed-optional-fields');
+                    expect(elementChildren.length).toEqual(1)
                 });
 
                 it('hides optional fields by default', function() {
