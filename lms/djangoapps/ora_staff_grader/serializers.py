@@ -8,13 +8,16 @@ from rest_framework import serializers
 
 
 class GradeStatusField(serializers.ChoiceField):
-  def __init__(self):
-    super().__init__(choices=['graded', 'ungraded'])
+    """ Field that can have the values ['graded' 'ungraded'] """
+    def __init__(self):
+        super().__init__(choices=['graded', 'ungraded'])
 
 
 class LockStatusField(serializers.ChoiceField):
-  def __init__(self):
-    super().__init__(choices=['not-locked', 'locked', 'in-progress'])
+    """ Field that can have the values ['not-locked', 'locked', 'in-progress'] """
+    def __init__(self):
+        super().__init__(choices=['not-locked', 'locked', 'in-progress'])
+
 
 class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """

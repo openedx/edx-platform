@@ -267,12 +267,15 @@ class TestInitializeSerializer(TestCase):
 
 @ddt.ddt
 class TestScoreFieldAndSerializer(TestCase):
+    """ Tests for ScoreField and ScoreSerializer """
 
     def test_field_no_values(self):
+        """ An empty dict passed to the field should return None """
         assert ScoreField().to_representation({}) is None
 
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_field_missing(self, missing_field):
+        """ One missing field should result in the field defaulting to 0 """
         value = {'pointsEarned': 30, 'pointsPossible': 50}
         del value[missing_field]
 
@@ -283,6 +286,7 @@ class TestScoreFieldAndSerializer(TestCase):
         assert expectedValue == actualValue
 
     def test_field(self):
+        """ Base serialization behavior for ScoreField """
         data = {
             'pointsEarned': 20,
             'pointsPossible': 40
@@ -291,16 +295,19 @@ class TestScoreFieldAndSerializer(TestCase):
         assert representation == data
 
     def test_serializer_no_values(self):
+        """ Passing the ScoreSerializer an empty dict should result in two zeroes for the field """
         data = ScoreSerializer({}).data
         assert data ==  {'pointsEarned': 0, 'pointsPossible': 0}
 
     def test_serialier(self):
+        """ Base serialization behavior for ScoreSerializer """
         input = {'pointsEarned': 10, 'pointsPossible': 200}
         data = ScoreSerializer(input).data
         assert data == input
 
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_serializer_missing_field(self, missing_field):
+        """ One missing field should result in the field defaulting to 0 """
         value = {'pointsEarned': 30, 'pointsPossible': 50}
         del value[missing_field]
 
@@ -312,8 +319,10 @@ class TestScoreFieldAndSerializer(TestCase):
 
 
 class TestUploadedFileSerializer(TestCase):
+    """ Tests for UploadedFileSerializer """
 
     def test_uploaded_file_serializer(self):
+        """ Base serialization behavior """
         input = MagicMock()
         data = UploadedFileSerializer(input).data
 
@@ -327,14 +336,17 @@ class TestUploadedFileSerializer(TestCase):
 
 @ddt.ddt
 class TestResponseSerializer(TestCase):
+    """ Tests for ResponseSerializer """
 
     def test_response_serializer__empty(self):
+        """ Empty fields should be allowed """
         input = {'files': [], 'text': []}
         assert ResponseSerializer(input).data == input
 
     @ddt.unpack
     @ddt.data((True, True), (True, False), (False, True), (False, False))
     def test_response_serializer(self, has_text, has_files):
+        """ Base serialization behavior """
         input = MagicMock()
         if has_files:
             input.files = [Mock(), Mock(), Mock()]
@@ -350,8 +362,10 @@ class TestResponseSerializer(TestCase):
 
 
 class TestAssessmentCriteriaSerializer(TestCase):
+    """ Tests for AssessmentCriteriaSerializer """
 
     def test_assessment_criteria_serializer(self):
+        """ Base serialization behavior """
         input = Mock()
         data = AssessmentCriteriaSerializer(input).data
 
@@ -363,6 +377,7 @@ class TestAssessmentCriteriaSerializer(TestCase):
         assert data == expected_value
 
     def test_assessment_criteria_serializer__feedback_only(self):
+        """ Test for serialization behavior of a feedback-only criterion """
         input = {
             'name': 'SomeCriterioOn',
             'feedback': 'Pathetic Effort',
@@ -379,12 +394,15 @@ class TestAssessmentCriteriaSerializer(TestCase):
 
 @ddt.ddt
 class TestGradeDataSerializer(TestCase):
+    """ Tests for GradeDataSerializer """
 
     def test_grade_data_serializer__no_assessment(self):
+        """ Passing an empty dict should result in an empty dict """
         assert GradeDataSerializer({}).data == {}
 
     @ddt.data(True, False)
     def test_grade_data_serializer__assessment(self, has_criteria):
+        """ Base serialization behavior, with and without criteria """
         input = MagicMock()
         if has_criteria:
             input.criteria = [Mock(), Mock(), Mock()]
@@ -402,8 +420,10 @@ class TestGradeDataSerializer(TestCase):
 
 
 class TestSubmissionDetailResponseSerializer(TestCase):
+    """ Tests for SubmissionDetailResponseSerializer """
 
     def test_submission_detail_response_serializer(self):
+        """ Base serialization behavior """
         input = MagicMock()
         data = SubmissionDetailResponseSerializer(input).data
 

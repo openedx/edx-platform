@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.factories import ItemFactory
 
 
 class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
-
+    """ Base class for shared test utils and setup """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod

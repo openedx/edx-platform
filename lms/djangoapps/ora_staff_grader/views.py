@@ -91,15 +91,27 @@ class SubmissionFetchView(RetrieveAPIView):
     GET submission contents and assessment info, if any
 
     Response: {
-
+        gradeData: {
+            score: (dict or None) {
+                pointsEarned: (int) earned points
+                pointsPossible: (int) possible points
+            }
+            overallFeedback: (string) overall feedback
+            criteria: (list of dict) [{
+                name: (str) name of criterion
+                feedback: (str) feedback for criterion
+                selectedOption: (str) name of selected option or None if feedback-only criterion
+            }]
+        }
+        response: {
+            text: (list of string), [the html content of text responses]
+            files: (list of dict) [{
+                downloadURL: (string) file download url
+                description: (string) file description
+                name: (string) filename
+            }]
+        }
     }
-
-    Returns:
-        200
-        400
-        403
-        404
-        405
     """
     authentication_classes = (
         JwtAuthentication,
