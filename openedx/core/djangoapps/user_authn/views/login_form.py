@@ -272,6 +272,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
+        'edx_user_info_cookie_name': settings.EDXMKTG_USER_INFO_COOKIE_NAME,
     }
 
     update_logistration_context_for_enterprise(request, context, enterprise_customer)
