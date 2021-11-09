@@ -95,7 +95,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
 
     def get_user_roles(self, user):
         """
-        Returns the Administrator role if the user is Global staff else returns the Student role
+        Returns the given user's roles
         """
         if GlobalStaff().has_user(user):
             return self.ADMIN_ROLE
