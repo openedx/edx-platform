@@ -11,7 +11,6 @@ Run like this:
 import inspect
 import json
 import os
-import pprint
 import sys
 import traceback
 import unittest
@@ -34,7 +33,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.tests.helpers import mock_render_template, StubMakoService, StubUserService
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
+
 
 MODULE_DIR = path(__file__).dirname()
 # Location of common test DATA directory
@@ -90,21 +91,24 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 def get_test_system(
     course_id=CourseKey.from_string('/'.join(['org', 'course', 'run'])),
     user=None,
+    user_is_staff=False,
+    render_template=None,
 ):
     """
     Construct a test ModuleSystem instance.
 
-    By default, the render_template() method simply returns the repr of the
-    context it is passed.  You can override this behavior by monkey patching::
-
-        system = get_test_system()
-        system.render_template = my_render_func
-
-    where `my_render_func` is a function of the form my_render_func(template, context).
-
+    By default, the descriptor system's render_template() method simply returns the repr of the
+    context it is passed.  You can override this by passing in a different render_template argument.
     """
     if not user:
         user = Mock(name='get_test_system.user', is_staff=False)
+    user_service = StubUserService(
+        user=user,
+        anonymous_user_id='student',
+        user_is_staff=user_is_staff,
+    )
+
+    mako_service = StubMakoService(render_template=render_template)
 
     descriptor_system = get_test_descriptor_system()
 
@@ -128,13 +132,15 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
-        render_template=mock_render_template,
         replace_urls=str,
-        user=user,
         get_real_user=lambda __: user,
         filestore=Mock(name='get_test_system.filestore', root_path='.'),
         debug=True,
         hostname="edx.org",
+        services={
+            'user': user_service,
+            'mako': mako_service,
+        },
         xqueue={
             'interface': None,
             'callback_url': '/',
@@ -143,7 +149,6 @@ def get_test_system(
             'construct_callback': Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-        anonymous_student_id='student',
         course_id=course_id,
         error_descriptor_class=ErrorBlock,
         get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),
@@ -152,7 +157,7 @@ def get_test_system(
     )
 
 
-def get_test_descriptor_system():
+def get_test_descriptor_system(render_template=None):
     """
     Construct a test DescriptorSystem instance.
     """
@@ -162,23 +167,13 @@ def get_test_descriptor_system():
         load_item=Mock(name='get_test_descriptor_system.load_item'),
         resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
-        render_template=mock_render_template,
+        render_template=render_template or mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         field_data=field_data,
         services={'field-data': field_data},
     )
     descriptor_system.get_asides = lambda block: []
     return descriptor_system
-
-
-def mock_render_template(*args, **kwargs):
-    """
-    Pretty-print the args and kwargs.
-
-    Allows us to not depend on any actual template rendering mechanism,
-    while still returning a unicode object
-    """
-    return pprint.pformat((args, kwargs)).encode().decode()
 
 
 class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

@@ -238,6 +238,7 @@ class OutlineTabView(RetrieveAPIView):
         is_enrolled = enrollment and enrollment.is_active
         is_staff = bool(has_access(request.user, 'staff', course_key))
         show_enrolled = is_enrolled or is_staff
+        enable_proctored_exams = False
         if show_enrolled:
             course_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
             date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
@@ -249,6 +250,8 @@ class OutlineTabView(RetrieveAPIView):
             offer_data = generate_offer_data(request.user, course_overview)
             access_expiration = get_access_expiration_data(request.user, course_overview)
             cert_data = get_cert_data(request.user, course, enrollment.mode) if is_enrolled else None
+
+            enable_proctored_exams = course_overview.enable_proctored_exams
 
             if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
                 if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
@@ -350,6 +353,7 @@ class OutlineTabView(RetrieveAPIView):
             'course_goals': course_goals,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
+            'enable_proctored_exams': enable_proctored_exams,
             'enroll_alert': enroll_alert,
             'enrollment_mode': enrollment_mode,
             'handouts_html': handouts_html,

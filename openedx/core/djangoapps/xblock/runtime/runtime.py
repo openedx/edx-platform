@@ -19,8 +19,10 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
@@ -226,6 +228,16 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == "completion":
             context_key = block.scope_ids.usage_id.context_key
             return CompletionService(user=self.user, context_key=context_key)
+        elif service_name == "user":
+            return DjangoXBlockUserService(
+                self.user,
+                # The value should be updated to whether the user is staff in the context when Blockstore runtime adds
+                # support for courses.
+                user_is_staff=self.user.is_staff,
+                anonymous_user_id=self.anonymous_student_id,
+            )
+        elif service_name == "mako":
+            return MakoService()
         elif service_name == "i18n":
             return ModuleI18nService(block=block)
         # Check if the XBlockRuntimeSystem wants to handle this:

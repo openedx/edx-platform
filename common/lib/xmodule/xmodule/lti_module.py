@@ -78,6 +78,7 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_module import EditingMixin
 
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
 from xmodule.raw_module import EmptyDataRawMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -269,6 +270,8 @@ class LTIFields:
 
 
 @XBlock.needs("i18n")
+@XBlock.needs("mako")
+@XBlock.needs("user")
 class LTIBlock(
     LTIFields,
     LTI20BlockMixin,
@@ -399,7 +402,7 @@ class LTIBlock(
         # Add our specific template information (the raw data body)
         context.update({'data': self.data})
         fragment = Fragment(
-            self.system.render_template(self.mako_template, context)
+            self.runtime.service(self, 'mako').render_template(self.mako_template, context)
         )
         add_webpack_to_fragment(fragment, 'LTIBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
@@ -515,7 +518,7 @@ class LTIBlock(
         Return the student view.
         """
         fragment = Fragment()
-        fragment.add_content(self.system.render_template('lti.html', self.get_context()))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('lti.html', self.get_context()))
         add_webpack_to_fragment(fragment, 'LTIBlockPreview')
         shim_xmodule_js(fragment, 'LTI')
         return fragment
@@ -525,11 +528,14 @@ class LTIBlock(
         """
         This is called to get context with new oauth params to iframe.
         """
-        template = self.system.render_template('lti_form.html', self.get_context())
+        template = self.runtime.service(self, 'mako').render_template('lti_form.html', self.get_context())
         return Response(template, content_type='text/html')
 
     def get_user_id(self):
-        user_id = self.runtime.anonymous_student_id
+        """
+        Returns the current user ID, URL-escaped so it is safe to use as a URL component.
+        """
+        user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         assert user_id is not None
         return str(parse.quote(user_id))
 
@@ -671,7 +677,8 @@ class LTIBlock(
         # To test functionality test in LMS
 
         if callable(self.runtime.get_real_user):
-            real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+            real_user_object = self.runtime.get_real_user(user_id)
             try:
                 self.user_email = real_user_object.email  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             except AttributeError:

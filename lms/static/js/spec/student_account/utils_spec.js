@@ -21,5 +21,19 @@ define(['jquery', 'js/student_account/utils'],
                 expect(user).toEqual(userInfo);
             });
         });
+
+        describe('userFromEdxUserCookie', function() {
+            var user;
+
+            beforeEach(function() {
+                $.cookie('edx-user-info', null);
+            });
+
+            it('returns empty user information when cookie is absent', function() {
+                spyOn($, 'cookie').and.returnValue(null);
+                user = Utils.userFromEdxUserCookie();
+                expect(user).toEqual({});
+            });
+        });
     }
 );

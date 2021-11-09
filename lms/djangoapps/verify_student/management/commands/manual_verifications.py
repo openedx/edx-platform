@@ -41,8 +41,8 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--batch-size',
-            default=None,
-            help='(Optional) Maximum records to write in one transaction.',
+            default=10000,
+            help='Maximum records to write in one query.',
             type=int,
         )
 
@@ -91,6 +91,22 @@ class Command(BaseCommand):
             total_emails = len(email_ids)
 
         log.info(f'Creating manual verification for {total_emails} emails.')
+        failed_emails = []
+        for n in range(0, total_emails, batch_size):
+            failed_emails.extend(self._add_users_to_manual_verification(email_ids[n:n + batch_size]))
+
+        return total_emails, failed_emails
+
+    def _add_users_to_manual_verification(self, email_ids):
+        """
+        Generates a verification for a list of user emails.
+
+        Arguments:
+            email_ids (list): emails of the users to be verified
+
+        Returns:
+            failed_emails: list of emails for which a verification was not created
+        """
         verifications_to_create = []
         users = User.objects.filter(email__in=email_ids)
         user_existing_verification = {v.user.id for v in ManualVerification.objects.filter(
@@ -107,9 +123,9 @@ class Command(BaseCommand):
                 ))
             else:
                 log.info(f'Skipping email {user.email}, existing verification found.')
-        ManualVerification.objects.bulk_create(verifications_to_create, batch_size)
+        ManualVerification.objects.bulk_create(verifications_to_create)
         failed_emails = set(email_ids) - set(users.values_list('email', flat=True))
-        return total_emails, list(failed_emails)
+        return list(failed_emails)
 
     def _add_user_to_manual_verification(self, email_id):
         """

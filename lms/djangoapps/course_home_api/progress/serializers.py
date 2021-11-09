@@ -124,6 +124,7 @@ class ProgressTabSerializer(VerifiedModeSerializer):
     certificate_data = CertificateDataSerializer()
     completion_summary = serializers.DictField()
     course_grade = CourseGradeSerializer()
+    credit_course_requirements = serializers.DictField()
     end = serializers.DateTimeField()
     enrollment_mode = serializers.CharField()
     grading_policy = GradingPolicySerializer()

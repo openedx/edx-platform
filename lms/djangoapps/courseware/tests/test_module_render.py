@@ -45,6 +45,7 @@ from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, py
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -1923,7 +1924,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         if hasattr(xblock_class, 'module_class'):
             descriptor.module_class = xblock_class.module_class
 
-        return render.get_module_for_descriptor_internal(
+        module = render.get_module_for_descriptor_internal(
             user=self.user,
             descriptor=descriptor,
             student_data=Mock(spec=FieldData, name='student_data'),
@@ -1932,7 +1933,9 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             xqueue_callback_url_prefix=Mock(name='xqueue_callback_url_prefix'),  # XQueue Callback Url Prefix
             request_token='request_token',
             course=self.course,
-        ).xmodule_runtime.anonymous_student_id
+        )
+        current_user = module.xmodule_runtime.service(module, 'user').get_current_user()
+        return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
     def test_per_student_anonymized_id(self, descriptor_class):
@@ -2557,3 +2560,144 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         item = self.store.get_item(item_id)
         assert item.__class__.__name__ == descriptor
         return item_id
+
+
+@ddt.ddt
+class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
+    """
+    Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the course and descriptor used to instantiate the runtime.
+        """
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+        cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
+        cls.problem_descriptor = ItemFactory(category="problem", parent=cls.course)
+
+    def setUp(self):
+        """
+        Set up the user and other fields that will be used to instantiate the runtime.
+        """
+        super().setUp()
+        self.user = UserFactory(id=232)
+        self.student_data = Mock()
+        self.track_function = Mock()
+        self.xqueue_callback_url_prefix = Mock()
+        self.request_token = Mock()
+
+    @ddt.data(
+        ('seed', 232),
+        ('user_id', 232),
+        ('user_is_staff', False),
+    )
+    @ddt.unpack
+    def test_user_service_attributes(self, attribute, expected_value):
+        """
+        Tests that the deprecated attributes provided by the user service match expected values.
+        """
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert getattr(runtime, attribute) == expected_value
+
+    @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+    def test_user_is_staff(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.user_is_staff
+
+    def test_anonymous_student_id(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+
+    def test_anonymous_student_id_bug(self):
+        """
+        Verifies that subsequent calls to get_module_system_for_user have no effect on each block runtime's
+        anonymous_student_id value.
+        """
+        problem_runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.problem_descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        # Ensure the problem block returns a per-user anonymous id
+        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+
+        vertical_runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        # Ensure the vertical block returns a per-course+user anonymous id
+        assert vertical_runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+
+        # Ensure the problem runtime's anonymous student ID is unchanged after the above call.
+        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+
+    def test_user_service_with_anonymous_user(self):
+        runtime, _ = render.get_module_system_for_user(
+            AnonymousUser(),
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.anonymous_student_id is None
+        assert runtime.seed == 0
+        assert runtime.user_id is None
+        assert not runtime.user_is_staff
+
+    def test_render_template(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        rendered = runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
+        assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'

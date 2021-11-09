@@ -358,6 +358,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         response = self.client.get(self.url)
         assert response.status_code == 200
         courseware_data = response.json()
+        assert 'is_integrity_signature_enabled' in courseware_data
+        assert courseware_data['is_integrity_signature_enabled'] is True
         assert 'user_needs_integrity_signature' in courseware_data
         assert courseware_data['user_needs_integrity_signature'] == needs_integrity_signature
 

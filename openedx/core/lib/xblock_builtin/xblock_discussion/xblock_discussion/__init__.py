@@ -32,6 +32,7 @@ def _(text):
 
 @XBlock.needs('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Provides a discussion forum that is inline with other content in the courseware.
@@ -202,7 +203,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
             'login_msg': login_msg,
         }
 
-        fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html',
+                                                                                context))
         fragment.initialize_js('DiscussionInlineBlock')
 
         return fragment
@@ -212,7 +214,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders author view for Studio.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.render_template(
+        fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
             {'discussion_id': self.discussion_id}
         ))
