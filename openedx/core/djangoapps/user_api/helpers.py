@@ -159,9 +159,8 @@ class FormDescription:
             instructions (unicode): Short instructions for using the field
                 (e.g. "This is the email address you used when you registered.")
 
-            exposed (boolean): Whether the field is optional and conditionally shown.
-                In case the field is not set, the field will be treated as toggled
-                if not set to required.
+            exposed (boolean): Whether the field is shown if not required.
+                If the field is not set, the field will be visible if it's required.
 
             required (boolean): Whether the field is required or optional.
 
@@ -198,6 +197,9 @@ class FormDescription:
                 allowed=", ".join(self.ALLOWED_TYPES)
             )
             raise InvalidFieldError(msg)
+
+        if exposed is None:
+            exposed = required
 
         field_dict = {
             "name": name,

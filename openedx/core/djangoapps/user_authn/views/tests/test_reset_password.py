@@ -710,7 +710,7 @@ class PasswordResetViewTest(UserAPITestCase):
         assert form_desc['method'] == 'post'
         assert form_desc['submit_url'] == reverse('password_change_request')
         assert form_desc['fields'] ==\
-               [{'name': 'email', 'defaultValue': '', 'type': 'email', 'toggled': False,
+               [{'name': 'email', 'defaultValue': '', 'type': 'email', 'exposed': True,
                  'required': True, 'label': 'Email', 'placeholder': 'username@domain.com',
                  'instructions': 'The email address you used to register with {platform_name}'
                 .format(platform_name=settings.PLATFORM_NAME),
