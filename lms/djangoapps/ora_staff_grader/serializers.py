@@ -59,10 +59,10 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
 
 
 class ScoreField(serializers.Field):
-  def to_representation(self, value):
-    if ('pointsEarned' not in value) and ('pointsPossible' not in value):
-      return None
-    return ScoreSerializer(value).data
+    def to_representation(self, value):
+        if ('pointsEarned' not in value) and ('pointsPossible' not in value):
+            return None
+        return ScoreSerializer(value).data
 
 
 class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -71,6 +71,7 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     """
     pointsEarned = serializers.IntegerField(default=0)
     pointsPossible = serializers.IntegerField(default=0)
+
 
 class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
@@ -116,6 +117,7 @@ class InitializeSerializer(serializers.Serializer):
             'submissions',
             'rubricConfig',
         ]
+
 
 class UploadedFileSerializer(serializers.Serializer):
     """ Serializer for a file uploaded as a part of a response """

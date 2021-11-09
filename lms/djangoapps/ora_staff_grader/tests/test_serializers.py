@@ -297,7 +297,7 @@ class TestScoreFieldAndSerializer(TestCase):
     def test_serializer_no_values(self):
         """ Passing the ScoreSerializer an empty dict should result in two zeroes for the field """
         data = ScoreSerializer({}).data
-        assert data ==  {'pointsEarned': 0, 'pointsPossible': 0}
+        assert data == {'pointsEarned': 0, 'pointsPossible': 0}
 
     def test_serialier(self):
         """ Base serialization behavior for ScoreSerializer """
