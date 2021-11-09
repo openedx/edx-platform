@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-coverage==6.0.2
+coverage==6.1.1
     # via -r requirements/edx/coverage.in
 diff-cover==4.0.0
     # via
