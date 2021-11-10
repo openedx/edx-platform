@@ -177,7 +177,10 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+LANGUAGE_MAP = {
+    'terms': dict(ALL_LANGUAGES),
+    'name': 'Language',
+}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
         'name': 'Organization',

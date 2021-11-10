@@ -255,10 +255,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 len(cls._get_children(block)) == 0
             )
 
-        return [
-            block for block in  # lint-amnesty, pylint: disable=unnecessary-comprehension
-            traverse_pre_order(unit, cls._get_visible_children, leaf_filter)
-        ]
+        return list(traverse_pre_order(unit, cls._get_visible_children, leaf_filter))
 
     def _stats_dict(self, data):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not data:

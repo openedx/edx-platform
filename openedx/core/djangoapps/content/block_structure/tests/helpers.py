@@ -223,7 +223,7 @@ def mock_registered_transformers(transformers):
         'openedx.core.djangoapps.content.block_structure.transformer_registry.'
         'TransformerRegistry.get_registered_transformers'
     ) as mock_available_transforms:
-        mock_available_transforms.return_value = {transformer for transformer in transformers}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        mock_available_transforms.return_value = set(transformers)
         yield
 
 
