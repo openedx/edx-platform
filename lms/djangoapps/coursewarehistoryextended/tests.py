@@ -24,7 +24,7 @@ from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def setUp(self):
         super().setUp()

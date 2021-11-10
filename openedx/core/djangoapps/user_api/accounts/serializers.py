@@ -309,7 +309,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce all languages are unique.
         """
-        language_proficiencies = [language for language in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        language_proficiencies = list(value)
         unique_language_proficiencies = {language["code"] for language in language_proficiencies}
         if len(language_proficiencies) != len(unique_language_proficiencies):
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages.")
@@ -319,7 +319,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce only one entry for a particular social platform.
         """
-        social_links = [social_link for social_link in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        social_links = list(value)
         unique_social_links = {social_link["platform"] for social_link in social_links}
         if len(social_links) != len(unique_social_links):
             raise serializers.ValidationError("The social_links field must consist of unique social platforms.")

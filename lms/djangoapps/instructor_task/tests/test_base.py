@@ -354,7 +354,7 @@ class TestReportMixin:
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+            csv_rows = list(unicodecsv.DictReader(csv_file, encoding='utf-8-sig'))
 
             if ignore_other_columns:
                 csv_rows = [
