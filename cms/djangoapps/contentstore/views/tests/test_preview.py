@@ -236,3 +236,13 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         descriptor = ItemFactory(category="pure", parent=self.course)
         html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
         assert '<div id="142" ns="main">Testing the MakoService</div>' in html
+
+    def test_xqueue_is_not_available_in_studio(self):
+        descriptor = ItemFactory(category="problem", parent=self.course)
+        runtime = _preview_module_system(
+            self.request,
+            descriptor=descriptor,
+            field_data=mock.Mock(),
+        )
+        assert runtime.xqueue is None
+        assert runtime.service(descriptor, 'xqueue') is None

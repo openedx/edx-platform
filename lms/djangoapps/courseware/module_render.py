@@ -31,7 +31,6 @@ from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from web_fragments.fragment import Fragment
@@ -42,7 +41,7 @@ from xblock.runtime import KvsFieldData
 
 from common.djangoapps import static_replace
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
-from capa.xqueue_interface import XQueueInterface  # lint-amnesty, pylint: disable=wrong-import-order
+from capa.xqueue_interface import XQueueService
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -99,17 +98,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
-
-if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
-    REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
-else:
-    REQUESTS_AUTH = None
-
-XQUEUE_INTERFACE = XQueueInterface(
-    settings.XQUEUE_INTERFACE['url'],
-    settings.XQUEUE_INTERFACE['django_auth'],
-    REQUESTS_AUTH,
-)
 
 # TODO: course_id and course_key are used interchangeably in this file, which is wrong.
 # Some brave person should make the variable names consistently someday, but the code's
@@ -490,12 +478,14 @@ def get_module_system_for_user(
     # TODO: Queuename should be derived from 'course_settings.json' of each course
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
-    xqueue = {
-        'interface': XQUEUE_INTERFACE,
-        'construct_callback': make_xqueue_callback,
-        'default_queuename': xqueue_default_queuename.replace(' ', '_'),
-        'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
-    }
+    xqueue_service = XQueueService(
+        construct_callback=make_xqueue_callback,
+        default_queuename=xqueue_default_queuename,
+        url=settings.XQUEUE_INTERFACE['url'],
+        django_auth=settings.XQUEUE_INTERFACE['django_auth'],
+        basic_auth=settings.XQUEUE_INTERFACE.get('basic_auth'),
+        waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
+    )
 
     def inner_get_module(descriptor):
         """
@@ -772,7 +762,6 @@ def get_module_system_for_user(
     system = LmsModuleSystem(
         track_function=track_function,
         static_url=settings.STATIC_URL,
-        xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
         filestore=descriptor.runtime.resources_fs,
         get_module=inner_get_module,
@@ -821,6 +810,7 @@ def get_module_system_for_user(
             'grade_utils': GradesUtilService(course_id=course_id),
             'user_state': UserStateService(),
             'content_type_gating': ContentTypeGatingService(),
+            'xqueue': xqueue_service,
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
