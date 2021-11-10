@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);
-    if (typeof(v) == 'boolean') {
+    const v = (n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     " ${price} {currency} )": " ${price} {currency} )",
     " and ": "i",
     "${listPrice}": "${listPrice}",
@@ -893,7 +894,6 @@
     "Processing Re-run Request": "Przetwarzanie \u017c\u0105dania wznowienia",
     "Proctored": "Nadzorowany",
     "Proctored Exam": "Egzamin nadzorowany",
-    "Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.": "Egzaminy nadzorowane s\u0105 egzaminami z limitem czasu i obejmuj\u0105 nagrywanie filmowe ka\u017cdego studenta w trakcie przebiegu jego egzaminu. Filmy mo\u017cna nast\u0119pnie sprawdzi\u0107 i upewni\u0107 si\u0119, \u017ce studenci stosowali si\u0119 do zasad egzaminacyjnych.",
     "Product Name": "Nazwa produktu",
     "Professional Certificate for {courseName}": "Certyfikat Edukacji Specjalistycznej kursu {courseName}",
     "Professional Education": "Edukacja Specjalistyczna",
@@ -1505,8 +1505,8 @@
     "You have not created any certificates yet.": "Nie stworzy\u0142e\u015b jeszcze \u017cadnych certyfikat\u00f3w.",
     "You have not created any content groups yet.": "Nie stworzy\u0142e\u015b jeszcze \u017cadnej grupy tre\u015bci.",
     "You have not created any group configurations yet.": "Nie stworzy\u0142e\u015b jeszcze \u017cadnych konfiguracji grupy.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Wybrano akcj\u0119, lecz nie dokonano \u017cadnych zmian w polach. Prawdopodobnie szukasz przycisku \u201eWykonaj\u201d, a nie \u201eZapisz\u201d.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Wybrano akcj\u0119, lecz cz\u0119\u015b\u0107 zmian w polach nie zosta\u0142a zachowana. Kliknij OK, aby zapisa\u0107. Aby wykona\u0107 akcj\u0119, nale\u017cy j\u0105 ponownie uruchomi\u0107.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Wybrano akcj\u0119, lecz nie dokonano \u017cadnych zmian w polach. Prawdopodobnie szukasz przycisku \u201eWykonaj\u201d, a nie \u201eZapisz\u201d.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Wybrano akcj\u0119, lecz cz\u0119\u015b\u0107 zmian w polach nie zosta\u0142a zachowana. Kliknij OK, aby zapisa\u0107. Aby wykona\u0107 akcj\u0119, nale\u017cy j\u0105 ponownie uruchomi\u0107.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Pomy\u015blnie zalogowa\u0142e\u015b si\u0119 do %(currentProvider)s, ale twoje konto %(currentProvider)s nie jest po\u0142\u0105czone z kontem w %(platformName)s. Aby po\u0142\u0105czy\u0107 konta, zaloguj si\u0119 u\u017cywaj\u0105c swojego has\u0142a w %(platformName)s.",
     "You have successfully updated your goal.": "Pomy\u015blnie zaktualizowano cel nauki.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Zmiany w niekt\u00f3rych polach nie zosta\u0142y zachowane. Po wykonaniu akcji, zmiany te zostan\u0105 utracone.",
@@ -1570,6 +1570,18 @@
     "Zoom In": "Powi\u0119ksz",
     "Zoom Out": "Pomniejsz",
     "[no tags]": "[brak tag\u00f3w]",
+    "abbrev. month April\u0004Apr": "Kwi",
+    "abbrev. month August\u0004Aug": "Sie",
+    "abbrev. month December\u0004Dec": "Gru",
+    "abbrev. month February\u0004Feb": "Lut",
+    "abbrev. month January\u0004Jan": "Sty",
+    "abbrev. month July\u0004Jul": "Lip",
+    "abbrev. month June\u0004Jun": "Cze",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "Maj",
+    "abbrev. month November\u0004Nov": "Lis",
+    "abbrev. month October\u0004Oct": "Pa\u017a",
+    "abbrev. month September\u0004Sep": "Wrz",
     "and others": "i inni",
     "anonymous": "anonimowy",
     "bytes": "bajt\u00f3w",
@@ -1700,24 +1712,24 @@
     "{type} Progress": "{type} - post\u0119p",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1727,16 +1739,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1759,7 +1771,6 @@
       "%d.%m.%Y %H:%M:%S",
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -1789,8 +1800,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1809,6 +1820,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 
