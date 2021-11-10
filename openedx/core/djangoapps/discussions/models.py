@@ -151,7 +151,7 @@ AVAILABLE_PROVIDER_MAP = {
             accessibility='',
             contact_email='',
         )._asdict(),
-        'messages': [],
+        'messages': [pii_sharing_required_message('Ed Discussion')],
         'has_full_support': False
     },
     'inscribe': {
