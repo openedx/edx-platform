@@ -1,1 +1,18 @@
 {% extends 'ace_common/edx_ace/common/base_head.html' %}
+{% block additional_styles %}
+<style type="text/css">
+    @media only screen and (max-width: 456px) {
+        .goals-banner-div {
+            background-image: url('{{image_url}}goalreminder-mobile-hero.png') !important;
+            height: 200px !important;
+            padding-top: 0 !important;
+        }
+        .goal-reminder-body-wrapper {
+            margin: 0 .8rem 0 .3rem !important;
+        }
+        h3 {
+            margin-top: 0;
+        }
+    }
+</style>
+{% endblock %}
