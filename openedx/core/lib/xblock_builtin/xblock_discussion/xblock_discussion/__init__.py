@@ -9,10 +9,10 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
-from web_fragments.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -171,7 +171,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         fragment = Fragment()
         if ENABLE_DISCUSSIONS_MFE.is_enabled(self.course_key) and settings.DISCUSSION_MICROFRONTEND_URL:
             url = f"{settings.DISCUSSION_MICROFRONTEND_URL}/discussions/{self.course_key}/topics/{self.discussion_id}"
-            fragment.add_content(HTML("<iframe id='discussions-mfe-tab-embed' src='{src}'></iframe>").format(src=url))
+            fragment.add_content(HTML(
+                "<iframe id='discussions-mfe-tab-embed' src='{src}' title='{title}'></iframe>"
+            ).format(src=url, title=_("Discussions")))
             fragment.add_css(
                 """
                 #discussions-mfe-tab-embed {
