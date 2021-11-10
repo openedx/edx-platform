@@ -20,30 +20,17 @@
 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
 {# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
 
-<table style="width: 100%;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table style="width: 100%; min-width: 325px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
             {% include "goal_reminder_banner.html" %}
-            <style>
-                .goal-reminder-body-wrapper {
-                    margin: 2.25rem 1.25rem 0 1.0625rem;
-                }
-                @media only screen and (max-width: 600px) {
-                    .goal-reminder-body-wrapper {
-                        margin-left: 0 !important;
-                    }
-                }
-                @media only screen and (max-width: 425px) {
-                    .goal-reminder-body-wrapper {
-                        margin-top: 0 !important;
-                    }
-                }
-            </style>
-            <div class="goal-reminder-body-wrapper" style="width:inherit; font-size: 0.875rem; padding: 0 20px 0 20px;">
+            <div class="goal-reminder-body-wrapper" style="width:inherit; font-size: 14px; font-size: 0.875rem; padding: 0 20px 0 5%; margin: 36px 20px 0 17px; margin: 2.25rem 1.25rem 0 1.0625rem;">
                 <h3 style="
+                    font-size: 22px;
                     font-size: 1.38rem;
                     font-style: normal;
                     font-weight: 700;
+                    line-height: 28px;
                     line-height: 1.75rem;
                     text-align: left;
                     ">
@@ -66,7 +53,12 @@
 
                 <a style="color: white; text-decoration: none; display: inline-block;"
                     href="{{course_url}}" target="_blank">
-                    <div style="padding: 0.5rem 0.75rem; background: #D23228; margin-bottom: 1rem;">
+                    <div style="
+                        padding: 8px 0 12px;
+                        padding: 0.5rem 0.75rem;
+                        background: #D23228;
+                        margin-bottom: 16px;
+                        margin-bottom: 1rem;">
                         {% filter force_escape %}{% blocktrans %}
                             Jump back in
                         {% endblocktrans %}{% endfilter %}
@@ -82,26 +74,33 @@
 
                 <a style="color: #D23228; text-decoration: none; display: inline-block; border: 0.0625rem solid #F2F0EF;"
                    href="{{course_url}}" target="_blank">
-                    <div style="padding: 0.5rem 0.75rem; background: white;">
+                    <div style="
+                        padding: 8px 0 12px;
+                        padding: 0.5rem 0.75rem;
+                        background: white;">
                         {% filter force_escape %}{% blocktrans %}
                             Adjust my goal
                         {% endblocktrans %}{% endfilter %}
                     </div>                
                 </a>
 
-                <a style="
+                <center>
+                    <a style="
                         color: #00688D;
                         display: block;
+                        margin: 15px auto 0 auto;
                         margin: 0.9375rem auto 0 auto;
                         text-align: center;
                         text-decoration: none;
+                        width: 208px;
                         width: 13rem;
                     "
                     href="{{goals_unsubscribe_url}}" target="_blank">
-                    {% filter force_escape %}{% blocktrans %}
-                        Unsubscribe from goal reminder emails for this course
-                    {% endblocktrans %}{% endfilter %}
-                </a>
+                        {% filter force_escape %}{% blocktrans %}
+                            Unsubscribe from goal reminder emails for this course
+                        {% endblocktrans %}{% endfilter %}
+                    </a>
+                </center>
             </div>
         </td>
     </tr>
