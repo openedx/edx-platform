@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       "%(cnt)s \u0915\u094b %(sel)s \u091a\u092f\u0928 \u0917\u0930\u093f\u092f\u094b",
       "%(cnt)s \u0915\u094b %(sel)s \u091a\u092f\u0928 \u0917\u0930\u093f\u092f\u094b"
@@ -62,24 +63,24 @@
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u0924\u092a\u093e\u0907\u0932\u0947 \u0915\u093e\u0930\u094d\u092f \u091b\u093e\u0928\u0947 \u092a\u0928\u093f \u092b\u0947\u0930\u092c\u0926\u0932\u0939\u0930\u0941 \u092c\u091a\u0924 \u0917\u0930\u094d\u0928\u0941 \u092d\u090f\u0915\u094b \u091b\u0948\u0928 \u0964 \u0915\u0943\u092a\u092f\u093e \u092c\u091a\u0924 \u0917\u0930\u094d\u0928 \u0939\u0941\u0928\u094d\u091b \u0925\u093f\u091a\u094d\u0928\u0941\u0939\u094b\u0938 \u0964 \u0915\u093e\u0930\u094d\u092f \u092a\u0941\u0928: \u0938\u091e\u094d\u091a\u093e\u0932\u0928 \u0917\u0930\u094d\u0928\u0941\u092a\u0930\u094d\u0928\u0947\u091b \u0964",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u0924\u092a\u093e\u0907\u0915\u094b \u092b\u0947\u0930\u092c\u0926\u0932 \u092c\u091a\u0924 \u092d\u090f\u0915\u094b \u091b\u0948\u0928 \u0964 \u0915\u093e\u0930\u094d\u092f \u092d\u090f\u092e\u093e \u092c\u091a\u0924 \u0928\u092d\u090f\u0915\u093e \u092b\u0947\u0930\u092c\u0926\u0932 \u0939\u0930\u093e\u0909\u0928\u0947 \u091b\u0928\u094d \u0964"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -89,16 +90,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -121,15 +122,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "N j, Y",
     "DATE_INPUT_FORMATS": [
@@ -162,8 +160,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -182,6 +180,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 
