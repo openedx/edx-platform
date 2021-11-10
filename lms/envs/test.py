@@ -579,6 +579,7 @@ ACCOUNT_MICROFRONTEND_URL = "http://account-mfe"
 AUTHN_MICROFRONTEND_URL = "http://authn-mfe"
 AUTHN_MICROFRONTEND_DOMAIN = "authn-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
+DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 
 ########################## limiting dashboard courses ######################
 

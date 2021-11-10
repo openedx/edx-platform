@@ -4698,7 +4698,7 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend-based dicussions page.
+# .. setting_description: Base URL of the micro-frontend-based discussions page.
 # .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
 DISCUSSIONS_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
