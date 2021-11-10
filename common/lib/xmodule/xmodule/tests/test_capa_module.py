@@ -817,7 +817,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert module.attempts == 1
 
-    def test_submit_problem_with_files(self):
+    @patch.object(XQueueInterface, '_http_post')
+    def test_submit_problem_with_files(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the submit_problem API.
         # pylint: disable=protected-access
 
@@ -830,10 +831,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         module = CapaFactoryWithFiles.create()
 
-        # Mock the XQueueInterface.
-        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
-        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
-        module.system.xqueue['interface'] = xqueue_interface
+        # Mock the XQueueInterface post method
+        mock_xqueue_post.return_value = (0, "ok")
 
         # Create a request dictionary for submit_problem.
         get_request_dict = {
@@ -862,13 +861,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         #   )
         # pylint: enable=line-too-long
 
-        assert xqueue_interface._http_post.call_count == 1
-        _, kwargs = xqueue_interface._http_post.call_args
+        assert mock_xqueue_post.call_count == 1
+        _, kwargs = mock_xqueue_post.call_args
         self.assertCountEqual(fpaths, list(kwargs['files'].keys()))
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
-    def test_submit_problem_with_files_as_xblock(self):
+    @patch.object(XQueueInterface, '_http_post')
+    def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
         # pylint: disable=protected-access
 
@@ -881,10 +881,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         module = CapaFactoryWithFiles.create()
 
-        # Mock the XQueueInterface.
-        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
-        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
-        module.system.xqueue['interface'] = xqueue_interface
+        # Mock the XQueueInterface post method
+        mock_xqueue_post.return_value = (0, "ok")
 
         # Create a webob Request with the files uploaded.
         post_data = []
@@ -895,8 +893,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         module.handle('xmodule_handler', request, 'problem_check')
 
-        assert xqueue_interface._http_post.call_count == 1
-        _, kwargs = xqueue_interface._http_post.call_args
+        assert mock_xqueue_post.call_count == 1
+        _, kwargs = mock_xqueue_post.call_args
         self.assertCountEqual(fnames, list(kwargs['files'].keys()))
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
@@ -3101,7 +3099,8 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': module.seed}}
 
-    def test_file_inputs(self):
+    @patch.object(XQueueInterface, '_http_post')
+    def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
         fileobjs = [open(fpath) for fpath in fpaths]
@@ -3111,10 +3110,8 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         factory = CapaFactoryWithFiles
         module = factory.create()
 
-        # Mock the XQueueInterface.
-        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
-        xqueue_interface._http_post = Mock(return_value=(0, "ok"))  # pylint: disable=protected-access
-        module.system.xqueue['interface'] = xqueue_interface
+        # Mock the XQueueInterface post method
+        mock_xqueue_post.return_value = (0, "ok")
 
         answer_input_dict = {
             CapaFactoryWithFiles.input_key(response_num=2): fileobjs,

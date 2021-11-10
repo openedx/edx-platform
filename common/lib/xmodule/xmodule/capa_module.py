@@ -121,6 +121,8 @@ class Randomization(String):
 @XBlock.needs('user')
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
+# Studio doesn't provide XQueueService, but the LMS does.
+@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,

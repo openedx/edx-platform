@@ -1881,6 +1881,31 @@ class ModuleSystemShim:
             return render_service.render_template
         return None
 
+    @property
+    def xqueue(self):
+        """
+        Returns a dict containing the XQueueInterface object, as well as parameters for the specific StudentModule:
+        * interface: XQueueInterface object
+        * construct_callback: function to construct the fully-qualified LMS callback URL.
+        * default_queuename: default queue name for the course in XQueue
+        * waittime: number of seconds to wait in between calls to XQueue
+
+        Deprecated in favor of the xqueue service.
+        """
+        warnings.warn(
+            'runtime.xqueue is deprecated. Please use the xqueue service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        xqueue_service = self._services.get('xqueue')
+        if xqueue_service:
+            return {
+                'interface': xqueue_service.interface,
+                'construct_callback': xqueue_service.construct_callback,
+                'default_queuename': xqueue_service.default_queuename,
+                'waittime': xqueue_service.waittime,
+            }
+        return None
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1898,7 +1923,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     def __init__(
             self, static_url, track_function, get_module,
             replace_urls, descriptor_runtime, filestore=None,
-            debug=False, hostname="", xqueue=None, publish=None, node_path="",
+            debug=False, hostname="", publish=None, node_path="",
             course_id=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None,
@@ -1920,12 +1945,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
-
-        xqueue - Dict containing XqueueInterface object, as well as parameters
-                    for the specific StudentModule:
-                    xqueue = {'interface': XQueueInterface object,
-                              'callback_url': Callback into the LMS,
-                              'queue_name': Target queuename in Xqueue}
 
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
@@ -1963,7 +1982,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         super().__init__(field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
-        self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module

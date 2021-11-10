@@ -41,6 +41,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime  # lint-amne
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
+from capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
@@ -2567,6 +2568,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     """
     Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
     """
+    COURSE_ID = 'edX/LmsModuleShimTest/2021_Fall'
 
     @classmethod
     def setUpClass(cls):
@@ -2574,7 +2576,8 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         Set up the course and descriptor used to instantiate the runtime.
         """
         super().setUpClass()
-        cls.course = CourseFactory.create()
+        org, number, run = cls.COURSE_ID.split('/')
+        cls.course = CourseFactory.create(org=org, number=number, run=run)
         cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
         cls.problem_descriptor = ItemFactory(category="problem", parent=cls.course)
 
@@ -2586,7 +2589,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.user = UserFactory(id=232)
         self.student_data = Mock()
         self.track_function = Mock()
-        self.xqueue_callback_url_prefix = Mock()
+        self.xqueue_callback_url_prefix = 'https://lms.url'
         self.request_token = Mock()
 
     @ddt.data(
@@ -2737,3 +2740,22 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         )
         rendered = runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
+
+    def test_xqueue(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        xqueue = runtime.xqueue
+        assert isinstance(xqueue['interface'], XQueueInterface)
+        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
+        assert xqueue['waittime'] == 5
+        callback_url = f'https://lms.url/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/{self.descriptor.location}'
+        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
+        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'

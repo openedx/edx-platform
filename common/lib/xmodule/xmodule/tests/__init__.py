@@ -26,6 +26,7 @@ from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 
+from capa.xqueue_interface import XQueueService
 from xmodule.assetstore import AssetMetadata
 from xmodule.error_module import ErrorBlock
 from xmodule.mako_module import MakoDescriptorSystem
@@ -144,13 +145,14 @@ def get_test_system(
         services={
             'user': user_service,
             'mako': mako_service,
-        },
-        xqueue={
-            'interface': None,
-            'callback_url': '/',
-            'default_queuename': 'testqueue',
-            'waittime': 10,
-            'construct_callback': Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
+            'xqueue': XQueueService(
+                url='http://xqueue.url',
+                django_auth={},
+                basic_auth=[],
+                default_queuename='testqueue',
+                waittime=10,
+                construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
+            ),
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,

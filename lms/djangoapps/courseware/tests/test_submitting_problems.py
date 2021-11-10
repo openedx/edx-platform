@@ -26,6 +26,7 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory,
     SchematicResponseXMLFactory
 )
+from capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -776,7 +777,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         # re-fetch the course from the database so the object is up to date
         self.refresh_course()
 
-    def test_three_files(self):
+    @patch.object(XQueueInterface, '_http_post')
+    def test_three_files(self, mock_xqueue_post):
         # Open the test files, and arrange to close them later.
         filenames = "prog1.py prog2.py prog3.py"
         fileobjs = [
@@ -787,20 +789,19 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
-            resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
+        mock_xqueue_post.return_value = (0, "ok")
+        resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         assert resp.status_code == 200
         json_resp = json.loads(resp.content.decode('utf-8'))
         assert json_resp['success'] == 'incorrect'
 
         # See how post got called.
-        name, args, kwargs = mock_session.mock_calls[0]
-        assert name == 'post'
-        assert len(args) == 1
+        assert mock_xqueue_post.call_count == 1
+        args, kwargs = mock_xqueue_post.call_args
+        assert len(args) == 2
         assert args[0].endswith('/submit/')
-        self.assertCountEqual(list(kwargs.keys()), ["files", "data", "timeout"])
-        self.assertCountEqual(list(kwargs['files'].keys()), filenames.split())
+        self.assertEqual(list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
