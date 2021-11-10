@@ -15,7 +15,7 @@ jobs:
         django-version: ["3.2"]
         test_module: [
             "lms/djangoapps/badges/ lms/djangoapps/branding/ lms/djangoapps/bulk_email/ lms/djangoapps/bulk_enroll/ lms/djangoapps/bulk_user_retirement/ lms/djangoapps/ccx/ lms/djangoapps/certificates/ lms/djangoapps/commerce/",
-            "lms/djangoapps/course_api/ lms/djangoapps/course_blocks/ lms/djangoapps/course_goals/ lms/djangoapps/course_home_api/ lms/djangoapps/course_wiki/ lms/djangoapps/coursewarehistoryextended/ lms/djangoapps/dashboard/ lms/djangoapps/debug/",
+            "lms/djangoapps/course_api/ lms/djangoapps/course_blocks/ lms/djangoapps/course_goals/ lms/djangoapps/course_home_api/ lms/djangoapps/user_tours/ lms/djangoapps/course_wiki/ lms/djangoapps/coursewarehistoryextended/ lms/djangoapps/dashboard/ lms/djangoapps/debug/",
             "lms/djangoapps/courseware/",
             "lms/djangoapps/discussion/ lms/djangoapps/edxnotes/ lms/djangoapps/email_marketing/ lms/djangoapps/experiments/",
             "lms/djangoapps/gating/ lms/djangoapps/grades/ lms/djangoapps/instructor/ lms/djangoapps/instructor_analytics/",
