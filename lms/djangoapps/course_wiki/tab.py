@@ -5,7 +5,7 @@ a user has on an article.
 
 
 from django.conf import settings
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 
 from lms.djangoapps.courseware.tabs import EnrolledTab
 
@@ -16,7 +16,7 @@ class WikiTab(EnrolledTab):
     """
 
     type = "wiki"
-    title = ugettext_noop('Wiki')
+    title = gettext_noop('Wiki')
     view_name = "course_wiki"
     is_hideable = True
     is_default = False

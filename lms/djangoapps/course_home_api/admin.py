@@ -3,7 +3,7 @@ Django Admin for DisableProgressPageStackedConfig.
 """
 
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openedx.core.djangoapps.config_model_utils.admin import StackedConfigModelAdmin
 

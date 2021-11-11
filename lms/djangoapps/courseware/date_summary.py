@@ -14,8 +14,8 @@ from django.urls import reverse
 from django.utils.formats import date_format
 from django.utils.functional import cached_property
 from django.utils.translation import get_language, to_locale
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from lazy import lazy
 from pytz import utc
 
@@ -277,8 +277,8 @@ class CourseStartDate(DateSummary):
     def title(self):
         enrollment = CourseEnrollment.get_enrollment(self.user, self.course_id)
         if enrollment and self.course.end and enrollment.created > self.course.end:
-            return ugettext_lazy('Enrollment Date')
-        return ugettext_lazy('Course starts')
+            return gettext_lazy('Enrollment Date')
+        return gettext_lazy('Course starts')
 
     def register_alerts(self, request, course):
         """
@@ -315,7 +315,7 @@ class CourseEndDate(DateSummary):
     Displays the end date of the course.
     """
     css_class = 'end-date'
-    title = ugettext_lazy('Course ends')
+    title = gettext_lazy('Course ends')
     is_enabled = True
 
     @property
@@ -482,7 +482,7 @@ class CertificateAvailableDate(DateSummary):
     Displays the certificate available date of the course.
     """
     css_class = 'certificate-available-date'
-    title = ugettext_lazy('Certificate Available')
+    title = gettext_lazy('Certificate Available')
 
     @lazy
     def is_allowed(self):
@@ -544,7 +544,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     Verified track.
     """
     css_class = 'verified-upgrade-deadline'
-    link_text = ugettext_lazy('Upgrade to Verified Certificate')
+    link_text = gettext_lazy('Upgrade to Verified Certificate')
 
     @property
     def link(self):

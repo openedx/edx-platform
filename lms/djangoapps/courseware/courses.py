@@ -13,7 +13,7 @@ from dateutil.parser import parse as parse_date
 from django.conf import settings
 from django.http import Http404, QueryDict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import function_trace
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
