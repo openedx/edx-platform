@@ -8,7 +8,6 @@ consist primarily of authentication, request validation, and serialization.
 import json
 import logging
 
-from course_modes.models import CourseMode
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ObjectDoesNotExist,
     ValidationError
@@ -35,7 +34,6 @@ from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangofromcourseware.models import BaseStudentModuleHistory, StudentModule
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name

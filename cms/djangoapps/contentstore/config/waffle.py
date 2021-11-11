@@ -74,7 +74,7 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
 # .. toggle_description: Prevents staff from deleting course structures
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-06-25
-PREVENT_STAFF_STRUCTURE_DELETION = WaffleFlag(
+PREVENT_STAFF_STRUCTURE_DELETION = LegacyWaffleFlag(
     waffle_flags(),
     'prevent_staff_structure_deletion',
     module_name=__name__,

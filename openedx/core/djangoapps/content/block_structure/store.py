@@ -230,13 +230,13 @@ class BlockStructureStore:
         Returns the cache key to use for the given
         BlockStructureModel or StubModel.
         """
-        if _is_storage_backing_enabled():
-            return six.text_type(bs_model)
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
+            return str(bs_model)
 
         else:
-            return u"v{version}.root.key.{root_usage_key}".format(
-                version=six.text_type(BlockStructureBlockData.VERSION),
-                root_usage_key=six.text_type(bs_model.data_usage_key),
+            return "v{version}.root.key.{root_usage_key}".format(
+                version=str(BlockStructureBlockData.VERSION),
+                root_usage_key=str(bs_model.data_usage_key),
             )
 
     @staticmethod
