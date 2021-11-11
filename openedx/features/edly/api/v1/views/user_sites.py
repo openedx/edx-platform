@@ -53,14 +53,13 @@ class UserSitesViewSet(viewsets.ViewSet):
         user_sites = []
         for edly_sub_org_of_user in edly_sub_orgs_of_user.all():
             context['edly_sub_org_of_user'] = edly_sub_org_of_user
-            site_configuration = SiteConfiguration.get_configuration_for_org(
-                edly_sub_org_of_user.get_edx_organizations
-            )
-            site_configuration = site_configuration.__dict__.get('site_values', {}) if site_configuration else {}
-            context['site_configuration'] = site_configuration
-            serializer = self.serializer({}, context=context)
-            user_sites.append(
-                serializer.data
-            )
+            edx_organizations = edly_sub_org_of_user.get_edx_organizations
+
+            for edx_organization in edx_organizations:
+                site_configuration = SiteConfiguration.get_configuration_for_org(edx_organization)
+                site_configuration = site_configuration.__dict__.get('site_values', {}) if site_configuration else {}
+                context['site_configuration'] = site_configuration
+                serializer = self.serializer({}, context=context)
+                user_sites.append(serializer.data)
 
         return Response(user_sites)

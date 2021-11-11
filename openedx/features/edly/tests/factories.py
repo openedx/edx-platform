@@ -39,6 +39,7 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
     slug = Sequence('edly-sub-organization-{}'.format)
     edly_organization = SubFactory(EdlyOrganizationFactory)
     edx_organization = SubFactory(OrganizationFactory)
+    edx_organizations = SubFactory(OrganizationFactory)
     lms_site = SubFactory(SiteFactory)
     studio_site = SubFactory(SiteFactory)
 
@@ -56,6 +57,8 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
             edx_orgs.extend(extracted if isinstance(extracted, list) else [extracted])
             for edx_org in edx_orgs:
                 self.edx_organizations.add(edx_org)
+        else:
+            self.edx_organizations.add(self.edx_organization)
 
 
 
