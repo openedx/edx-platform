@@ -117,9 +117,12 @@ LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 #   the response (the status quo behavior). If True, check for user mismatches regardless of
 #   response cookie status (the desired future behavior). Once this has been enabled for a week or
 #   so, the toggle can be removed in favor of the True setting.
-#   (This is intended to *restore* an older behavior. It seems that all requests used to set a new
+#   
+#   This is intended to *restore* an older behavior. It seems that all requests used to set a new
 #   session cookie, and for some reason no longer do, so this is really just an attempt to return
-#   to that previous behavior no matter whether a new session cookie will be set.)
+#   to that previous behavior no matter whether a new session cookie will be set. The only difference
+#   should be that now logout responses will also be checked, but those now use a call that declares
+#   them safe, so that part should be a no-op
 # .. toggle_warnings: This will expose some analysis code to a greater volume of requests and
 #   possibly different request configurations, which may expose some latent bugs that could cause
 #   request failure. Watch error rates and be ready to toggle off again.
