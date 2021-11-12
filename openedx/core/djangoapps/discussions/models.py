@@ -16,12 +16,13 @@ from enum import Enum
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.django.models import LearningContextKeyField
+from opaque_keys.edx.django.models import LearningContextKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -118,6 +119,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
         ],
+        'supports_lti': False,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -127,6 +129,33 @@ AVAILABLE_PROVIDER_MAP = {
         )._asdict(),
         'messages': [],
         'has_full_support': True
+    },
+    'openedx': {
+        'features': [
+            Features.BASIC_CONFIGURATION.value,
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.COURSE_COHORT_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+        ],
+        'supports_lti': False,
+        'external_links': ProviderExternalLinks(
+            learn_more='',
+            configuration='',
+            general='',
+            accessibility='',
+            contact_email='',
+        )._asdict(),
+        'messages': [],
+        'has_full_support': True,
+        'supports_in_context_discussions': True,
     },
     'ed-discuss': {
         'features': [
@@ -144,6 +173,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.IN_PLATFORM_NOTIFICATIONS.value,
             Features.USER_MENTIONS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -171,6 +201,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.IN_PLATFORM_NOTIFICATIONS.value,
             Features.DISCUSSION_CONTENT_PROMPTS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='',
             configuration='',
@@ -194,6 +225,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.WCAG_2_0_SUPPORT.value,
             Features.BLACKOUT_DISCUSSION_DATES.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='https://piazza.com/product/overview',
             configuration='https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',  # pylint: disable=line-too-long
@@ -219,6 +251,7 @@ AVAILABLE_PROVIDER_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
+        'supports_lti': True,
         'external_links': ProviderExternalLinks(
             learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
             configuration='',
@@ -402,6 +435,12 @@ class DiscussionsConfiguration(TimeStampedModel):
             enabled=self.enabled,
         )
 
+    def supports_in_context_discussions(self):
+        """
+        Returns is the provider supports in-context discussions
+        """
+        return AVAILABLE_PROVIDER_MAP.get(self.provider_type, {}).get('supports_in_context_discussions', False)
+
     def supports(self, feature: str) -> bool:
         """
         Check if the provider supports some feature
@@ -412,7 +451,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     def supports_lti(self) -> bool:
         """Returns a boolean indicating if the provider supports lti discussion view."""
-        return self.provider_type != DEFAULT_PROVIDER_TYPE
+        return AVAILABLE_PROVIDER_MAP.get(self.provider_type, {}).get('supports_lti', False)
 
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
@@ -510,3 +549,58 @@ class ProgramDiscussionsConfiguration(TimeStampedModel):
             return configuration.enabled
         except cls.DoesNotExist:
             return False
+
+
+class DiscussionTopicLink(models.Model):
+    """
+    A model linking discussion topics ids to the part of a course they are linked to.
+    """
+    context_key = LearningContextKeyField(
+        db_index=True,
+        max_length=255,
+        # Translators: A key specifying a course, library, program,
+        # website, or some other collection of content where learning
+        # happens.
+        verbose_name=_("Learning Context Key"),
+        help_text=_("Context key for context in which this discussion topic exists.")
+    )
+    usage_key = UsageKeyField(
+        db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_("Usage key for in-context discussion topic. Set to null for course-level topics.")
+    )
+    title = models.CharField(
+        max_length=255,
+        help_text=_("Title for discussion topic.")
+    )
+    group = models.ForeignKey(
+        CourseUserGroup,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("Group for divided discussions.")
+    )
+    provider_id = models.CharField(
+        max_length=32,
+        help_text=_("Provider id for discussion provider.")
+    )
+    external_id = models.CharField(
+        db_index=True,
+        max_length=255,
+        help_text=_("Discussion context ID in external forum provider. e.g. commentable_id for cs_comments_service.")
+    )
+    enabled_in_context = models.BooleanField(
+        default=True,
+        help_text=_("Whether this topic should be shown in-context in the course.")
+    )
+
+    def __str__(self):
+        return (
+            f'DiscussionTopicLink('
+            f'context_key="{self.context_key}", usage_key="{self.usage_key}", title="{self.title}", '
+            f'group={self.group}, provider_id="{self.provider_id}", external_id="{self.external_id}", '
+            f'enabled_in_context={self.enabled_in_context}'
+            f')'
+        )

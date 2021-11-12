@@ -30,3 +30,6 @@ class DiscussionsConfig(AppConfig):
         PluginSettings.CONFIG: {
         },
     }
+
+    def ready(self):
+        from . import handlers  # pylint: disable=unused-import

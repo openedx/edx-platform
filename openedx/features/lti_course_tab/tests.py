@@ -22,7 +22,8 @@ class DiscussionLtiCourseTabTestCase(TabTestCase):
         self.discussion_config = DiscussionsConfiguration.objects.create(
             context_key=self.course.id,
             enabled=False,
-            provider_type="lti_provider",
+            # Pick a provider that supports LTI
+            provider_type="yellowdig",
         )
         self.discussion_config.lti_configuration = LtiConfiguration.objects.create(
             config_store=LtiConfiguration.CONFIG_ON_DB,
