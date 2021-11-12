@@ -16,6 +16,8 @@
         box-shadow: 0 1px 5px rgba(0,0,0,0.25);
     "
 {% endblock %}
+<!-- Remove header because it duplicates the logo that's in the banner -->
+{% block header %}{% endblock %}
 {% block content %}
 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
 {# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
