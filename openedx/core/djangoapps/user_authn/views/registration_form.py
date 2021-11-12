@@ -432,6 +432,7 @@ class RegistrationFormFactory:
                                     FormDescription.FIELD_TYPE_MAP.get(field.__class__)),
                                 placeholder=field.initial,
                                 instructions=field.help_text,
+                                exposed=self._is_field_exposed(field_name),
                                 required=(self._is_field_required(field_name) or field.required),
                                 restrictions=restrictions,
                                 options=getattr(field, 'choices', None), error_messages=field.error_messages,
