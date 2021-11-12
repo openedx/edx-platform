@@ -108,7 +108,7 @@ class TabsAPITests(CourseTestCase):
         # make sure we have enough tabs to play around with
         assert num_orig_tabs >= 5
 
-        # Randomise the order of static tabs, leave the rest intact
+        # Randomize the order of static tabs, leaving the rest intact
         course_tabs.sort(key=lambda tab: (100 + random.random()) if tab.type == 'static_tab' else tab.priority)
 
         tabs_data = [
@@ -123,7 +123,7 @@ class TabsAPITests(CourseTestCase):
         resp = self.make_reorder_tabs_request(tabs_data)
         assert resp.status_code == 204
 
-        # reload the course and verify the new tab order
+        # Reload the course and verify the new tab order
         self.reload_course()
         reordered_tab_ids = [tab.tab_id for tab in course_tabs]
         new_tab_ids = [tab.tab_id for tab in self.course.tabs]
