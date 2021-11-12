@@ -328,11 +328,15 @@ class RegistrationFormFactory:
 
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
-        return self._extra_fields_setting.get(field_name) in ["required", "optional"]
+        return self._extra_fields_setting.get(field_name) in ["required", "optional", "optional-exposed"]
 
     def _is_field_required(self, field_name):
         """Check whether a field is required based on Django settings. """
         return self._extra_fields_setting.get(field_name) == "required"
+
+    def _is_field_exposed(self, field_name):
+        """Check whether a field is optional and should be toggled. """
+        return self._extra_fields_setting.get(field_name) in ["required", "optional-exposed"]
 
     def __init__(self):
 
@@ -441,6 +445,7 @@ class RegistrationFormFactory:
                                     FormDescription.FIELD_TYPE_MAP.get(field.__class__)),
                                 placeholder=field.initial,
                                 instructions=field.help_text,
+                                exposed=self._is_field_exposed(field_name),
                                 required=(self._is_field_required(field_name) or field.required),
                                 restrictions=restrictions,
                                 options=getattr(field, 'choices', None), error_messages=field.error_messages,
