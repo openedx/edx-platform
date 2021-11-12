@@ -1,11 +1,10 @@
 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
 {% if image_url %}
-<div class="goals-banner-div" style="
-    width: 100%;
-    height: 0;
-    padding-top: 42%;
-    background-image: url('{{image_url}}goalreminder-desktop-hero.png');
-    background-size: contain;
-    background-repeat: no-repeat;">
-</div>
+<table cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" valign="top">
+      <img src="{{image_url}}goalreminder-desktop-hero.png" width="600" border="0" style="display:block;height:auto" class="mobile_img" />
+    </td>
+  </tr>
+</table>
 {% endif %}

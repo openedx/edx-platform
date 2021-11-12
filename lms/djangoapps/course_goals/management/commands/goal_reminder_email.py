@@ -78,6 +78,8 @@ def send_ace_message(goal):
         'image_url': image_url,
         'unsubscribe_url': None,  # We don't want to include the default unsubscribe link
         'omit_unsubscribe_link': True,
+        'courses_url': getattr(settings, 'ACE_EMAIL_COURSES_URL', None),
+        'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
     })
 
     msg = Message(
