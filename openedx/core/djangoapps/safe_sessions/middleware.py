@@ -131,7 +131,7 @@ LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 # .. toggle_target_removal_date: 2022-01-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1952
 VERIFY_USER_CHANGE_UNCONDITIONAL = SettingToggle('VERIFY_USER_CHANGE_UNCONDITIONAL', default=False,
-                                                 module_name='openedx.core.djangoapps.safe_sessions.middleware')
+                                                 module_name=__name__)
 
 log = getLogger(__name__)
 
