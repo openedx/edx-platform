@@ -122,11 +122,10 @@ def reorder_tabs_handler(course_item, tabs_data, user):
     Helper function for handling reorder of static tabs request
     """
 
-    # Tabs are identified by tab_id or locators.
-    # The locators are used to identify static tabs since they are xmodules.
+    # Static tabs are identified by locators (a UsageKey) instead of a tab id like
+    # other tabs. These can be used to identify static tabs since they are xmodules.
     # Although all tabs have tab_ids, newly created static tabs do not know
     # their tab_ids since the xmodule editor uses only locators to identify new objects.
-    # get original tab list of only static tabs with their original index(position) in the full course tabs list
     new_tab_list = create_new_list(tabs_data, course_item.tabs)
 
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
@@ -137,14 +136,16 @@ def reorder_tabs_handler(course_item, tabs_data, user):
 
     course_item.tabs = new_tab_list
 
-    # persist the new order of the tabs
     modulestore().update_item(course_item, user.id)
 
 
 def create_new_list(tab_locators, old_tab_list):
     """
-    Helper function for creating a new course tab list in the new order
-    of reordered tabs
+    Helper function for creating a new course tab list in the new order of
+    reordered tabs.
+
+    It will take tab_locators for static tabs and resolve them to actual tab
+    instances.
     """
     new_tab_list = []
     for tab_locator in tab_locators:

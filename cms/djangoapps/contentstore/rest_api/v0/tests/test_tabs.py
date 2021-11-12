@@ -96,9 +96,9 @@ class TabsAPITests(CourseTestCase):
             content_type="application/json",
         )
 
-    def test_reorder_tabs(self):
+    def test_reorder_static_tabs(self):
         """
-        Test re-ordering of tabs
+        Test re-ordering of static tabs in a course.
         """
 
         # get the original tabs
