@@ -2,30 +2,15 @@
     'use strict';
     define(['jquery'], function($) {
         var edxUserCookieUtils = {
-            getHostname: function() {
-                return window.location.hostname;
-            },
+            userFromEdxUserCookie: function(edxUserInfoCookieName) {
+                var cookie, user, userCookie;
 
-            userFromEdxUserCookie: function() {
-                var hostname = this.getHostname();
-                var isLocalhost = hostname.indexOf('localhost') >= 0;
-                var isSandbox = hostname.indexOf('sandbox') >=0;
-                var isStage = hostname.indexOf('stage') >= 0;
-                var isEdge = hostname.indexOf('edge') >= 0;
-                var cookie, edxUserCookie, prefix, user, userCookie;
+                cookie = document.cookie.match('(^|;)\\s*' + edxUserInfoCookieName + '\\s*=\\s*([^;]+)');
+                userCookie = cookie ? cookie.pop() : $.cookie(edxUserInfoCookieName);
 
-                if (isLocalhost || isSandbox) {
-                    // localhost doesn't have prefixes
-                    edxUserCookie = 'edx-user-info';
-                } else {
-                    // does not take sandboxes into account
-                    prefix = isStage ? 'stage' : 'prod';
-                    prefix = isEdge ? 'edge' : prefix;
-                    edxUserCookie = prefix + '-edx-user-info';
+                if (!userCookie) {
+                    return {};
                 }
-
-                cookie = document.cookie.match('(^|;)\\s*' + edxUserCookie + '\\s*=\\s*([^;]+)');
-                userCookie = cookie ? cookie.pop() : $.cookie(edxUserCookie);
 
                 // returns the user object from cookie. Replaces '054' with ',' and removes '\'
                 user = userCookie.replace(/\\/g, '').replace(/054/g, ',');

@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;
-    if (typeof(v) == 'boolean') {
+    const v = (n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n\u05dc\u05e4\u05e0\u05d9 \u05e9\u05ea\u05ea\u05d7\u05d9\u05dc\n\u05d5\u05d5\u05d3\u05d0 \u05e9\u05dc\u05de\u05d7\u05e9\u05d1\u05da \u05d9\u05e9 \u05de\u05e6\u05dc\u05de\u05ea \u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8 \u05d5\u05d9\u05e9 \u05dc\u05da \u05ea\u05de\u05d5\u05e0\u05ea \u05d6\u05d9\u05d4\u05d5\u05d9 \u05de\u05e2\u05d5\u05d3\u05db\u05e0\u05ea\n\u05db\u05d2\u05d5\u05df \u05e8\u05d9\u05e9\u05d9\u05d5\u05df \u05e0\u05d4\u05d9\u05d2\u05d4 \u05d0\u05d5 \u05d3\u05e8\u05db\u05d5\u05df.",
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n\u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05d4\u05d0\u05d9\u05de\u05d5\u05ea \u05e9\u05dc\u05da \u05e0\u05db\u05e9\u05dc. \u05e7\u05e8\u05d0 \u05d1\u05d1\u05e7\u05e9\u05d4 \u05d0\u05ea \u05d4\u05d5\u05e8\u05d0\u05d5\u05ea\u05d9\u05e0\u05d5 \u05e2\u05dc \u05de\u05e0\u05ea \u05dc\u05d4\u05d1\u05d8\u05d9\u05d7 \n\u05e9\u05d4\u05d1\u05e0\u05ea \u05d0\u05ea \u05d4\u05d3\u05e8\u05d9\u05e9\u05d5\u05ea \u05dc\u05e6\u05d5\u05e8\u05da \u05d4\u05e9\u05dc\u05de\u05ea \u05d4\u05d0\u05d9\u05de\u05d5\u05ea \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4,\n\u05d5\u05d0\u05d6 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea.",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n\u05e4\u05d2 \u05ea\u05d5\u05e7\u05e4\u05d5 \u05e9\u05dc \u05d4\u05d0\u05d9\u05de\u05d5\u05ea. \u05e2\u05dc\u05d9\u05da \u05dc\u05d4\u05e9\u05dc\u05d9\u05dd \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4 \u05d0\u05d9\u05de\u05d5\u05ea \u05d6\u05d4\u05d5\u05ea \u05d7\u05d3\u05e9\u05d4\n\u05dc\u05e4\u05e0\u05d9 \u05e9\u05ea\u05d5\u05db\u05dc \u05dc\u05d4\u05ea\u05d7\u05d9\u05dc \u05d0\u05ea \u05d4\u05de\u05d1\u05d7\u05df \u05ea\u05d7\u05ea \u05e4\u05d9\u05e7\u05d5\u05d7.",
@@ -1347,8 +1348,8 @@
     "You have not created any certificates yet.": "\u05dc\u05d0 \u05d9\u05e6\u05e8\u05ea \u05d0\u05e3 \u05ea\u05e2\u05d5\u05d3\u05d4 \u05e2\u05d3\u05d9\u05d9\u05df.",
     "You have not created any content groups yet.": " \u05dc\u05d0 \u05d9\u05e6\u05e8\u05ea \u05e2\u05d3\u05d9\u05d9\u05df \u05e7\u05d1\u05d5\u05e6\u05d5\u05ea \u05ea\u05d5\u05db\u05df \u05db\u05dc\u05e9\u05d4\u05df.",
     "You have not created any group configurations yet.": "\u05dc\u05d0 \u05d9\u05e6\u05e8\u05ea \u05e2\u05d3\u05d9\u05d9\u05df \u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05e7\u05d1\u05d5\u05e6\u05d4.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\u05d1\u05d7\u05e8\u05ea \u05e4\u05e2\u05d5\u05dc\u05d4, \u05d5\u05dc\u05d0 \u05e2\u05e9\u05d9\u05ea\u05d4 \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05de \u05e2\u05dc \u05e9\u05d3\u05d5\u05ea. \u05d0\u05ea\u05d4 \u05db\u05e0\u05e8\u05d0\u05d4 \u05de\u05d7\u05e4\u05e9 \u05d0\u05ea \u05d4\u05db\u05e4\u05ea\u05d5\u05e8 \u05dc\u05dc\u05db\u05ea \u05d1\u05de\u05e7\u05d5\u05dd \u05d4\u05db\u05e4\u05ea\u05d5\u05e8 \u05dc\u05e9\u05de\u05d5\u05e8.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u05d1\u05d7\u05e8\u05ea \u05e4\u05e2\u05d5\u05dc\u05d4, \u05d0\u05d1\u05dc \u05e2\u05d5\u05d3 \u05dc\u05d0 \u05e9\u05de\u05e8\u05ea \u05d0\u05ea \u05d4\u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd \u05dc\u05e9\u05d3\u05d5\u05ea \u05d1\u05d5\u05d3\u05d3\u05d9\u05dd. \u05d0\u05e0\u05d0 \u05dc\u05d7\u05e5 \u05e2\u05dc \u05d0\u05d9\u05e9\u05d5\u05e8 \u05db\u05d3\u05d9 \u05dc\u05e9\u05de\u05d5\u05e8. \u05d9\u05d4\u05d9\u05d4 \u05e2\u05dc\u05d9\u05da \u05dc\u05d4\u05e4\u05e2\u05d9\u05dc \u05d0\u05ea \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4 \u05e2\u05d5\u05d3 \u05e4\u05e2\u05dd.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "\u05d1\u05d7\u05e8\u05ea \u05e4\u05e2\u05d5\u05dc\u05d4, \u05d0\u05da \u05dc\u05d0 \u05d1\u05d9\u05e6\u05e2\u05ea \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd \u05d1\u05e9\u05d3\u05d5\u05ea. \u05db\u05e0\u05e8\u05d0\u05d4 \u05d7\u05d9\u05e4\u05e9\u05ea \u05d0\u05ea \u05db\u05e4\u05ea\u05d5\u05e8 \u05d1\u05e6\u05e2 \u05d1\u05de\u05e7\u05d5\u05dd \u05db\u05e4\u05ea\u05d5\u05e8 \u05e9\u05de\u05d9\u05e8\u05d4.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "\u05d1\u05d7\u05e8\u05ea \u05e4\u05e2\u05d5\u05dc\u05d4, \u05d0\u05da \u05dc\u05d0 \u05e9\u05de\u05e8\u05ea \u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05ea \u05d4\u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd \u05dc\u05e9\u05d3\u05d5\u05ea \u05d1\u05d5\u05d3\u05d3\u05d9\u05dd. \u05e0\u05d0 \u05dc\u05dc\u05d7\u05d5\u05e5 \u05e2\u05dc \u05d0\u05d9\u05e9\u05d5\u05e8 \u05db\u05d3\u05d9 \u05dc\u05e9\u05de\u05d5\u05e8. \u05d9\u05d4\u05d9\u05d4 \u05e2\u05dc\u05d9\u05da \u05dc\u05d4\u05e4\u05e2\u05d9\u05dc \u05d0\u05ea \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4 \u05e2\u05d5\u05d3 \u05e4\u05e2\u05dd.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "\u05e0\u05db\u05e0\u05e1\u05ea \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4 \u05d1\u05d0\u05de\u05e6\u05e2\u05d5\u05ea \u05d7\u05e9\u05d1\u05d5\u05df  \u05d4%(currentProvider)s \u05e9\u05dc\u05da, \u05d0\u05da \u05e0\u05e8\u05d0\u05d4 \u05e9\u05d7\u05e9\u05d1\u05d5\u05df \u05d4%(currentProvider)s \u05e9\u05dc\u05da \u05d0\u05d9\u05e0\u05d5 \u05de\u05e7\u05d5\u05e9\u05e8 \u05dc\u05d7\u05e9\u05d1\u05d5\u05df \u05d1%(platformName)s. \u05d1\u05db\u05d3\u05d9 \u05dc\u05e7\u05e9\u05e8 \u05d1\u05d9\u05df \u05e9\u05e0\u05d9 \u05d4\u05d7\u05e9\u05d1\u05d5\u05e0\u05d5\u05ea, \u05e0\u05d0 \u05dc\u05d4\u05d9\u05db\u05e0\u05e1 \u05d1\u05d0\u05de\u05e6\u05e2\u05d5\u05ea \u05d4\u05e1\u05d9\u05e1\u05de\u05d4 \u05e9\u05dc\u05da \u05d1%(platformName)s.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u05d9\u05e9 \u05dc\u05da \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd \u05e9\u05dc\u05d0 \u05e0\u05e9\u05de\u05e8\u05d5 \u05e2\u05dc \u05e9\u05d3\u05d5\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea.  \u05d0\u05dd \u05d0\u05ea\u05d4 \u05de\u05e4\u05e2\u05d9\u05dc \u05e4\u05e2\u05d5\u05dc\u05d4, \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd \u05e9\u05dc\u05d0 \u05e0\u05e9\u05de\u05e8\u05d5 \u05d9\u05d0\u05d1\u05d3\u05d5.",
     "You haven't added any assets to this course yet.": "\u05e2\u05d3\u05d9\u05d9\u05df \u05dc\u05d0 \u05d4\u05d5\u05e1\u05e4\u05ea \u05e0\u05db\u05e1\u05d9\u05dd \u05dc\u05e7\u05d5\u05e8\u05e1 \u05d6\u05d4.",
@@ -1498,24 +1499,24 @@
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}\u05d0\u05d6\u05d4\u05e8\u05d4:{screen_reader_end} \u05e7\u05d1\u05d5\u05e6\u05ea \u05d4\u05ea\u05d5\u05db\u05df \u05e9\u05e0\u05d1\u05d7\u05e8\u05d4 \u05d1\u05e2\u05d1\u05e8, \u05e0\u05de\u05d7\u05e7\u05d4. \u05d1\u05d7\u05e8 \u05e7\u05d1\u05d5\u05e6\u05ea \u05ea\u05d5\u05db\u05df \u05d0\u05d7\u05e8\u05ea.",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1525,16 +1526,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1557,15 +1558,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "j \u05d1F Y",
     "DATE_INPUT_FORMATS": [
@@ -1598,8 +1596,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1618,6 +1616,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

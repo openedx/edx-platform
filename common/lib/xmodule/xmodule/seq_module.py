@@ -34,6 +34,7 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
 )
 
+from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
 from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 from .exceptions import NotFoundError
@@ -244,6 +245,7 @@ class ProctoringFields:
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 @XBlock.wants('content_type_gating')
 class SequenceBlock(
     SequenceMixin,
@@ -379,7 +381,7 @@ class SequenceBlock(
         is_hidden_after_due = False
 
         if self._required_prereq():
-            if self.runtime.user_is_staff:
+            if self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
                 banner_text = _(
                     'This subsection is unlocked for learners when they meet the prerequisite requirements.'
                 )
@@ -460,7 +462,7 @@ class SequenceBlock(
         prereq_met = True
         prereq_meta_info = {}
         if self._required_prereq():
-            if self.runtime.user_is_staff:
+            if self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
                 banner_text = _(
                     'This subsection is unlocked for learners when they meet the prerequisite requirements.'
                 )
@@ -537,7 +539,7 @@ class SequenceBlock(
         if not self._can_user_view_content(course):
             banner_text = self._hidden_content_banner_text(course)
 
-            hidden_content_html = self.system.render_template(
+            hidden_content_html = self.runtime.service(self, 'mako').render_template(
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
@@ -554,7 +556,7 @@ class SequenceBlock(
         """
         hidden_date = course.end if course.self_paced else self.due
         return (
-            self.runtime.user_is_staff or
+            self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF) or
             self.verify_current_content_visibility(hidden_date, self.hide_after_due)
         )
 
@@ -609,7 +611,7 @@ class SequenceBlock(
         if settings.FEATURES.get('SHOW_PROGRESS_BAR', False) and getattr(settings, 'COMPLETION_AGGREGATOR_URL', ''):
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
             params['chapter_completion_aggregator_url'] = '/'.join([settings.COMPLETION_AGGREGATOR_URL, str(self.course_id), parent_block_id]) + '/'
-        fragment.add_content(self.system.render_template("seq_module.html", params))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)
@@ -647,8 +649,9 @@ class SequenceBlock(
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
             fulfilled = gating_service.is_gate_fulfilled(
-                self.course_id, self.location, self.runtime.user_id
+                self.course_id, self.location, user_id
             )
             return fulfilled
 
@@ -696,7 +699,8 @@ class SequenceBlock(
             comes to determining whether a student is allowed to access this,
             with other checks being done in has_access calls.
         """
-        if self.runtime.user_is_staff or context.get('specific_masquerade', False):
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        if user_is_staff or context.get('specific_masquerade', False):
             return False
 
         # We're not allowed to see it because of pre-reqs that haven't been
@@ -727,7 +731,8 @@ class SequenceBlock(
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
-            return gating_service.compute_is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+            return gating_service.compute_is_prereq_met(self.location, user_id, recalc_on_unmet)
 
         return True, {}
 
@@ -919,8 +924,10 @@ class SequenceBlock(
             self.is_time_limited
         )
         if feature_enabled:
-            user_id = self.runtime.user_id
-            user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
+            current_user = self.runtime.service(self, 'user').get_current_user()
+            user_id = current_user.opt_attrs.get(ATTR_KEY_USER_ID)
+            user_is_staff = current_user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            user_role_in_course = 'staff' if user_is_staff else 'student'
             course_id = self.runtime.course_id
             content_id = self.location
 

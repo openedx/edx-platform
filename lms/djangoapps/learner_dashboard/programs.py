@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
 from web_fragments.fragment import Fragment
 
+from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id, program_discussions_is_enabled
 from lti_consumer.lti_1p1.contrib.django import lti_embed
@@ -74,7 +75,8 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    DEFAULT_ROLE = 'student'
+    DEFAULT_ROLE = 'Student'
+    ADMIN_ROLE = 'Administrator'
 
     @staticmethod
     def get_program_discussion_configuration(program_uuid):
@@ -91,6 +93,14 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     def _get_result_sourcedid(context_id, resource_link_id, user_id) -> str:
         return f'{context_id}:{resource_link_id}:{user_id}'
 
+    def get_user_roles(self, user):
+        """
+        Returns the given user's roles
+        """
+        if GlobalStaff().has_user(user):
+            return self.ADMIN_ROLE
+        return self.DEFAULT_ROLE
+
     def _get_lti_embed_code(self, program_discussions_configuration, request) -> str:
         """
         Returns the LTI embed code for embedding in the program discussions tab
@@ -105,8 +115,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         user_id = str(request.user.id)
         context_id = program_uuid
         resource_link_id = self._get_resource_link_id(program_uuid, request)
-        # TODO: Add support for multiple roles
-        roles = self.DEFAULT_ROLE
+        roles = self.get_user_roles(request.user)
         context_title = program_uuid
         result_sourcedid = self._get_result_sourcedid(context_id, resource_link_id, user_id)
 

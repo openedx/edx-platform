@@ -55,7 +55,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     """
     __test__ = False
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None

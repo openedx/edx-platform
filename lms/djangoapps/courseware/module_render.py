@@ -35,13 +35,13 @@ from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
 from common.djangoapps import static_replace
+from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -52,7 +52,6 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
@@ -90,6 +89,7 @@ from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.track import contexts
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
@@ -97,7 +97,6 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.x_module import XModuleDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -539,6 +538,24 @@ def get_module_system_for_user(
             })
         return handlers.get(event_type)
 
+    # These modules store data using the anonymous_student_id as a key.
+    # To prevent loss of data, we will continue to provide old modules with
+    # the per-student anonymized id (as we have in the past),
+    # while giving selected modules a per-course anonymized id.
+    # As we have the time to manually test more modules, we can add to the list
+    # of modules that get the per-course anonymized id.
+    if getattr(descriptor, 'requires_per_student_anonymous_id', False):
+        anonymous_student_id = anonymous_id_for_user(user, None)
+    else:
+        anonymous_student_id = anonymous_id_for_user(user, course_id)
+
+    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
+    user_service = DjangoXBlockUserService(
+        user,
+        user_is_staff=user_is_staff,
+        anonymous_user_id=anonymous_student_id,
+    )
+
     def publish(block, event_type, event):
         """
         A function that allows XModules to publish events.
@@ -548,8 +565,10 @@ def get_module_system_for_user(
             handle_event(block, event)
         else:
             context = contexts.course_context_from_course_id(course_id)
-            if block.runtime.user_id:
-                context['user_id'] = block.runtime.user_id
+            user_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+            if user_id:
+                context['user_id'] = user_id
+
             context['asides'] = {}
             for aside in block.runtime.get_asides(block):
                 if hasattr(aside, 'get_event_context'):
@@ -684,8 +703,9 @@ def get_module_system_for_user(
     if is_masquerading_as_specific_student(user, course_id):
         block_wrappers.append(filter_displayed_blocks)
 
+    mako_service = MakoService()
     if settings.FEATURES.get("LICENSING", False):
-        block_wrappers.append(wrap_with_license)
+        block_wrappers.append(partial(wrap_with_license, mako_service=mako_service))
 
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
@@ -746,26 +766,11 @@ def get_module_system_for_user(
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
-    # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide old modules with
-    # the per-student anonymized id (as we have in the past),
-    # while giving selected modules a per-course anonymized id.
-    # As we have the time to manually test more modules, we can add to the list
-    # of modules that get the per-course anonymized id.
-    is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
-    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)):
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, None)
-
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
-    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
-
     system = LmsModuleSystem(
         track_function=track_function,
-        render_template=render_to_string,
         static_url=settings.STATIC_URL,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
@@ -794,7 +799,6 @@ def get_module_system_for_user(
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=anonymous_student_id,
         course_id=course_id,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
@@ -806,7 +810,8 @@ def get_module_system_for_user(
         services={
             'fs': FSService(),
             'field-data': field_data,
-            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+            'mako': mako_service,
+            'user': user_service,
             'verification': XBlockVerificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),

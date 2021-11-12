@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+import warnings
 from collections import namedtuple
 from functools import partial
 
@@ -40,6 +41,13 @@ from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
+
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -1732,7 +1740,94 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                     setattr(xblock, field.name, field_value)
 
 
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
+class ModuleSystemShim:
+    """
+    This shim provides the properties formerly available from ModuleSystem which are now being provided by services.
+
+    This shim will be removed, so all properties raise a deprecation warning.
+    """
+
+    @property
+    def anonymous_student_id(self):
+        """
+        Returns the anonymous user ID for the current user and course.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.anonymous_student_id is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        return None
+
+    @property
+    def seed(self):
+        """
+        Returns the numeric current user id, for use as a random seed.
+        Returns 0 if there is no current user.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.seed is deprecated. Please use the user service `user_id` instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.user_id or 0
+
+    @property
+    def user_id(self):
+        """
+        Returns the current user id, or None if there is no current user.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_id is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+        return None
+
+    @property
+    def user_is_staff(self):
+        """
+        Returns whether the current user has staff access to the course.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_staff is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        return None
+
+    @property
+    def render_template(self):
+        """
+        Returns a function that takes (template_file, context), and returns rendered html.
+
+        Deprecated in favor of the mako service.
+        """
+        warnings.warn(
+            'Use of runtime.render_template is deprecated. '
+            'Use MakoService.render_template or a JavaScript-based template instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        render_service = self._services.get('mako')
+        if render_service:
+            return render_service.render_template
+        return None
+
+
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -1746,10 +1841,10 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
 
     def __init__(
-            self, static_url, track_function, get_module, render_template,
-            replace_urls, descriptor_runtime, user=None, filestore=None,
+            self, static_url, track_function, get_module,
+            replace_urls, descriptor_runtime, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
-            anonymous_student_id='', course_id=None,
+            course_id=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
@@ -1768,12 +1863,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 
-        render_template - a function that takes (template_file, context), and
-                         returns rendered html.
-
-        user - The user to base the random number generator seed off of for this
-                         request
-
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
 
@@ -1788,8 +1877,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
                          ajax results.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
-
-        anonymous_student_id - Used for tracking modules with student id
 
         course_id - the course_id containing this module
 
@@ -1831,15 +1918,11 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
-        self.render_template = render_template
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
-        self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
-        self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
-        self.user_is_staff = user is not None and user.is_staff
 
         if publish:
             self.publish = publish
@@ -1858,9 +1941,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
-
-        if user:
-            self.user_id = user.id
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""

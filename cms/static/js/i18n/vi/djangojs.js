@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     " and ": "v\u00e0",
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)",
     "%(errorCount)s error found in form.": [
@@ -975,7 +976,6 @@
     "Processing Re-run Request": "\u0110ang x\u1eed l\u00ed Y\u00eau c\u1ea7u Re-run ",
     "Proctored": "C\u00f3 gi\u00e1m s\u00e1t",
     "Proctored Exam": "Thi c\u00f3 gi\u00e1m s\u00e1t",
-    "Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.": "B\u00e0i thi c\u00f3 gi\u00e1m s\u00e1t \u0111\u01b0\u1ee3c t\u00ednh gi\u1edd v\u00e0 ghi l\u1ea1i video m\u1ed7i h\u1ecdc vi\u00ean tham d\u1ef1 b\u00e0i thi. C\u00e1c video n\u00e0y sau \u0111\u00f3 \u0111\u01b0\u1ee3c xem x\u00e9t \u0111\u1ec3 \u0111\u1ea3m b\u1ea3o r\u1eb1ng c\u00e1c h\u1ecdc vi\u00ean tu\u00e2n th\u1ee7 t\u1ea5t c\u1ea3 c\u00e1c quy t\u1eafc ki\u1ec3m tra.",
     "Professional Education": "Gi\u00e1o D\u1ee5c Chuy\u00ean Nghi\u1ec7p",
     "Professional Education Verified Certificate": "Gi\u1ea5y ch\u1ee9ng nh\u1eadn x\u00e1c th\u1ef1c cho gi\u00e1o d\u1ee5c chuy\u00ean nghi\u1ec7p",
     "Profile": "H\u1ed3 s\u01a1",
@@ -1770,24 +1770,24 @@
     "{type} Progress": "{type} Ti\u1ebfn \u0111\u1ed9",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1797,16 +1797,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1829,15 +1829,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "\\N\\g\u00e0\\y d \\t\\h\u00e1\\n\\g n \\n\u0103\\m Y",
     "DATE_INPUT_FORMATS": [
@@ -1870,8 +1867,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1890,6 +1887,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 
