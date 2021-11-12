@@ -133,11 +133,12 @@ class SubmissionFetchView(RetrieveAPIView):
 
 class SubmissionLockView(RetrieveAPIView):
     """
-    POST lock a submission for grading course metadata
+    POST claim a submission lock for grading
+    DELETE release a submission lock
 
     Params:
-    - submissionId (UUID): A submission to lock/unlock
-    - value (bool): Whether to add (True, default) or remove (False) a lock from this submission
+    - ora_location (str/UsageID): ORA location for XBlock handling
+    - submissionUUID (UUID): A submission to lock/unlock
 
     Response: {
         lockStatus
@@ -154,22 +155,35 @@ class SubmissionLockView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['ora_location', 'submissionId', 'value'])
-    def post(self, request, ora_location, submission_uuid, value, *args, **kwargs):
+    @require_params(['ora_location', 'submissionId'])
+    def post(self, request, ora_location, submission_uuid, *args, **kwargs):
+        """ Claim a submission lock """
         # Validate ORA location
         try:
             UsageKey.from_string(ora_location)
         except (InvalidKeyError, ItemNotFoundError):
             return HttpResponseBadRequest("Invalid ora_location.")
 
-        # Bool-ify the value param
-        value = True if value.lower() == 'true' else False
+        response = self.claim_submission_lock(request, ora_location, submission_uuid)
 
-        # Determine if we want to claim a submission lock (value=True) or delete it (value=False)
-        if value:
-            response = self.claim_submission_lock(request, ora_location, submission_uuid)
-        else:
-            response = self.delete_submission_lock(request, ora_location, submission_uuid)
+        # In the case of an error, pass through the error response code directly
+        if response.status_code != 200:
+            return response
+
+        # Success should return serialized lock info
+        response_data = json.loads(response.content)
+        return Response(LockStatusSerializer(response_data).data)
+
+    @require_params(['ora_location', 'submissionId'])
+    def delete(self, request, ora_location, submission_uuid, *args, **kwargs):
+        """ Clear a submission lock """
+        # Validate ORA location
+        try:
+            UsageKey.from_string(ora_location)
+        except (InvalidKeyError, ItemNotFoundError):
+            return HttpResponseBadRequest("Invalid ora_location.")
+
+        response = self.delete_submission_lock(request, ora_location, submission_uuid)
 
         # In the case of an error, pass through the error response code directly
         if response.status_code != 200:

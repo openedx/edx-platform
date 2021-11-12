@@ -210,20 +210,15 @@ class TestSubmissionLockView(APITestCase):
     def setUp(self):
         super().setUp()
 
-        # Request to claim a lock must include ora_location, submissionID, and value=True
-        self.test_claim_lock_params = {
+        # Lock requests must include ora_location and submissionID
+        self.test_lock_params = {
             "ora_location": self.test_ora_location,
-            "submissionId": self.test_submission_uuid,
-            "value": True
+            "submissionId": self.test_submission_uuid
         }
-
-        # Request to claim a lock must include ora_location, submissionID, and value=False
-        self.test_delete_lock_params = self.test_claim_lock_params.copy()
-        self.test_delete_lock_params['value'] = False
 
         self.client.login(username=self.staff.username, password=self.password)
 
-    def url_with_params(self, params):
+    def _url_with_params(self, params):
         """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
         query_dictionary = QueryDict('', mutable=True)
         query_dictionary.update(params)
@@ -233,11 +228,21 @@ class TestSubmissionLockView(APITestCase):
             querystring=query_dictionary.urlencode()
         )
 
-    def test_invalid_ora(self):
-        """ An invalid ORA returns a 404 """
-        self.test_claim_lock_params['ora_location'] = 'not_a_real_location'
+    def claim_lock(self, params):
+        """ Wrapper for easier calling of 'claim_submission_lock' """
+        return self.client.post(self._url_with_params(params))
 
-        response = self.client.post(self.url_with_params(self.test_claim_lock_params))
+    def delete_lock(self, params):
+        """ Wrapper for easier calling of 'delete_submission_lock' """
+        return self.client.delete(self._url_with_params(params))
+
+    # Tests for claiming a lock (POST)
+
+    def test_claim_lock_invalid_ora(self):
+        """ An invalid ORA returns a 404 """
+        self.test_lock_params['ora_location'] = 'not_a_real_location'
+
+        response = self.claim_lock(self.test_lock_params)
 
         assert response.status_code == 400
         assert response.content.decode() == "Invalid ora_location."
@@ -253,7 +258,7 @@ class TestSubmissionLockView(APITestCase):
         }
         mock_xblock_handler.return_value = HttpResponse(json.dumps(mock_return_data), content_type="application/json")
 
-        response = self.client.post(self.url_with_params(self.test_claim_lock_params))
+        response = self.claim_lock(self.test_lock_params)
 
         expected_value = {"lockStatus": "in-progress"}
         assert response.status_code == 200
@@ -267,11 +272,13 @@ class TestSubmissionLockView(APITestCase):
         }
         mock_xblock_handler.return_value = HttpResponseForbidden(json.dumps(mock_return_data), content_type="application/json")
 
-        response = self.client.post(self.url_with_params(self.test_claim_lock_params))
+        response = self.claim_lock(self.test_lock_params)
 
         expected_value = mock_return_data
         assert response.status_code == 403
         assert json.loads(response.content) == expected_value
+
+    # Tests for deleting a lock (DELETE)
 
     @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_delete_lock(self, mock_xblock_handler):
@@ -284,7 +291,7 @@ class TestSubmissionLockView(APITestCase):
         }
         mock_xblock_handler.return_value = HttpResponse(json.dumps(mock_return_data), content_type="application/json")
 
-        response = self.client.post(self.url_with_params(self.test_delete_lock_params))
+        response = self.delete_lock(self.test_lock_params)
 
         expected_value = {"lockStatus": "unlocked"}
         assert response.status_code == 200
@@ -298,7 +305,7 @@ class TestSubmissionLockView(APITestCase):
         }
         mock_xblock_handler.return_value = HttpResponseForbidden(json.dumps(mock_return_data), content_type="application/json")
 
-        response = self.client.post(self.url_with_params(self.test_delete_lock_params))
+        response = self.delete_lock(self.test_lock_params)
 
         expected_value = mock_return_data
         assert response.status_code == 403
