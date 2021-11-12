@@ -13,6 +13,7 @@ from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_MISSING_PARAM
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -59,7 +60,7 @@ class TestInitializeView(BaseViewTest):
         response = self.client.get(self.api_url)
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query requires the following query params: ora_location"
+        assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_bad_ora_location(self):
         """ Bad ORA location should return a 400 and error message """
@@ -67,7 +68,7 @@ class TestInitializeView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': 'not_a_real_location'})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Invalid ora_location."
+        assert response.content.decode() == ERR_BAD_ORA_LOCATION
 
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
@@ -239,13 +240,13 @@ class TestSubmissionLockView(APITestCase):
     # Tests for claiming a lock (POST)
 
     def test_claim_lock_invalid_ora(self):
-        """ An invalid ORA returns a 404 """
+        """ An invalid ORA returns a 400 """
         self.test_lock_params['ora_location'] = 'not_a_real_location'
 
         response = self.claim_lock(self.test_lock_params)
 
         assert response.status_code == 400
-        assert response.content.decode() == "Invalid ora_location."
+        assert response.content.decode() == ERR_BAD_ORA_LOCATION
 
     @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_claim_lock(self, mock_xblock_handler):

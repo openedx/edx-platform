@@ -5,6 +5,7 @@ from functools import wraps
 import json
 
 from django.http.response import HttpResponseBadRequest
+from lms.djangoapps.ora_staff_grader.errors import ERR_MISSING_PARAM
 
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.request import clone_request
@@ -31,7 +32,7 @@ def require_params(param_names):
                 param = request.query_params.get(param_name)
 
                 if not param:
-                    return HttpResponseBadRequest(f"Query requires the following query params: {', '.join(param_names)}")
+                    return HttpResponseBadRequest(ERR_MISSING_PARAM)
 
                 passed_parameters.append(param)
             return function(self, request, *passed_parameters, *args, **kwargs)

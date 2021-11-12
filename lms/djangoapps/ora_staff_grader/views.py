@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
 from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer, LockStatusSerializer, SubmissionDetailResponseSerializer
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
@@ -52,7 +53,7 @@ class InitializeView(RetrieveAPIView):
             ora_usage_key = UsageKey.from_string(ora_location)
             response_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest(_("Invalid ora_location."))
+            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
 
         # Get course metadata
         course_id = str(ora_usage_key.course_key)
@@ -162,7 +163,7 @@ class SubmissionLockView(RetrieveAPIView):
         try:
             UsageKey.from_string(ora_location)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest("Invalid ora_location.")
+            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
 
         response = self.claim_submission_lock(request, ora_location, submission_uuid)
 
@@ -181,7 +182,7 @@ class SubmissionLockView(RetrieveAPIView):
         try:
             UsageKey.from_string(ora_location)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest("Invalid ora_location.")
+            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
 
         response = self.delete_submission_lock(request, ora_location, submission_uuid)
 
