@@ -156,6 +156,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True,
         'supports_in_context_discussions': True,
+        'visible': False,
     },
     'ed-discuss': {
         'features': [

@@ -238,7 +238,11 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             'plugin_configuration': plugin_configuration,
             'providers': {
                 'active': provider_type or DEFAULT_PROVIDER_TYPE,
-                'available': AVAILABLE_PROVIDER_MAP,
+                'available': {
+                    key: value
+                    for key, value in AVAILABLE_PROVIDER_MAP.items()
+                    if value.get('visible', True)
+                },
             },
         })
         return payload
