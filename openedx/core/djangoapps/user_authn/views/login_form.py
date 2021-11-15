@@ -263,6 +263,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'is_enterprise_enable': enterprise_enabled(),
             'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),
             'enable_coppa_compliance': settings.ENABLE_COPPA_COMPLIANCE,
+            'edx_user_info_cookie_name': settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,

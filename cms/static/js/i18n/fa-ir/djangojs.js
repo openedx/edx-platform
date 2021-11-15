@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n > 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n > 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       " %(sel)s \u0627\u0632 %(cnt)s \u0627\u0646\u062a\u062e\u0627\u0628 \u0634\u062f\u0647\u200c\u0627\u0646\u062f",
       " %(sel)s \u0627\u0632 %(cnt)s \u0627\u0646\u062a\u062e\u0627\u0628 \u0634\u062f\u0647\u200c\u0627\u0646\u062f"
@@ -70,9 +71,21 @@
     "Tomorrow": "\u0641\u0631\u062f\u0627",
     "Type into this box to filter down the list of available %s.": "\u0628\u0631\u0627\u06cc \u063a\u0631\u0628\u0627\u0644 \u0641\u0647\u0631\u0633\u062a %s\u06cc \u0645\u0648\u062c\u0648\u062f \u062f\u0631\u0648\u0646 \u0627\u06cc\u0646 \u062c\u0639\u0628\u0647 \u062a\u0627\u06cc\u067e \u06a9\u0646\u06cc\u062f.",
     "Yesterday": "\u062f\u06cc\u0631\u0648\u0632",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\u0634\u0645\u0627 \u0639\u0645\u0644\u06cc \u0631\u0627 \u0627\u0646\u062c\u0627\u0645 \u062f\u0627\u062f\u0647 \u0627\u06cc\u062f\u060c \u0648\u0644\u06cc \u062a\u063a\u06cc\u06cc\u0631\u06cc \u0627\u0646\u062c\u0627\u0645 \u0646\u062f\u0627\u062f\u0647 \u0627\u06cc\u062f. \u0627\u062d\u062a\u0645\u0627\u0644\u0627 \u062f\u0646\u0628\u0627\u0644 \u06a9\u0644\u06cc\u062f Go \u0628\u0647 \u062c\u0627\u06cc Save \u0645\u06cc\u06af\u0631\u062f\u06cc\u062f.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u0634\u0645\u0627 \u06a9\u0627\u0631\u06cc \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0631\u062f\u0647 \u0627\u06cc\u062f\u060c \u0648\u0644\u06cc \u0647\u0646\u0648\u0632 \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a \u0628\u0639\u0636\u06cc \u0641\u06cc\u0644\u062f \u0647\u0627 \u0631\u0627 \u0630\u062e\u06cc\u0631\u0647 \u0646\u06a9\u0631\u062f\u0647 \u0627\u06cc\u062f. \u0644\u0637\u0641\u0627 OK \u0631\u0627 \u0641\u0634\u0627\u0631 \u062f\u0647\u06cc\u062f \u062a\u0627 \u0630\u062e\u06cc\u0631\u0647 \u0634\u0648\u062f.\n\u0634\u0645\u0627 \u0628\u0627\u06cc\u062f \u0639\u0645\u0644\u06cc\u0627\u062a \u0631\u0627 \u062f\u0648\u0628\u0627\u0631\u0647 \u0627\u0646\u062c\u0627\u0645 \u062f\u0647\u06cc\u062f.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "\u0634\u0645\u0627 \u06cc\u06a9 \u0627\u0642\u062f\u0627\u0645 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0631\u062f\u0647\u200c\u0627\u06cc\u062f\u060c \u0648\u0644\u06cc \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a\u06cc \u062f\u0631 \u0641\u06cc\u0644\u062f\u0647\u0627\u06cc \u0634\u062e\u0635\u06cc \u0648\u0627\u0631\u062f \u0646\u06a9\u0631\u062f\u0647\u200c\u0627\u06cc\u062f. \u0627\u062d\u062a\u0645\u0627\u0644\u0627\u064b \u0628\u0647 \u062c\u0627\u06cc \u06a9\u0644\u06cc\u062f Save \u0628\u0647 \u062f\u0646\u0628\u0627\u0644 \u06a9\u0644\u06cc\u062f Go \u0645\u06cc\u200c\u06af\u0631\u062f\u06cc\u062f.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "\u0634\u0645\u0627 \u06cc\u06a9 \u0627\u0642\u062f\u0627\u0645 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0631\u062f\u0647\u200c\u0627\u06cc\u062f\u060c \u0648\u0644\u06cc \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a\u06cc \u06a9\u0647 \u062f\u0631 \u0641\u06cc\u0644\u062f\u0647\u0627\u06cc \u0634\u062e\u0635\u06cc \u0648\u0627\u0631\u062f \u06a9\u0631\u062f\u0647\u200c\u0627\u06cc\u062f \u0647\u0646\u0648\u0632 \u0630\u062e\u06cc\u0631\u0647 \u0646\u0634\u062f\u0647\u200c\u0627\u0646\u062f. \u0644\u0637\u0641\u0627\u064b \u06a9\u0644\u06cc\u062f OK \u0631\u0627 \u0628\u0631\u0627\u06cc \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0631\u062f\u0646 \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a \u0628\u0632\u0646\u06cc\u062f. \u0644\u0627\u0632\u0645 \u0627\u0633\u062a \u06a9\u0647 \u0627\u0642\u062f\u0627\u0645 \u0631\u0627 \u062f\u0648\u0628\u0627\u0631\u0647 \u0627\u062c\u0631\u0627 \u06a9\u0646\u06cc\u062f.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u0634\u0645\u0627 \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a\u06cc \u062f\u0631 \u0628\u0639\u0636\u06cc \u0641\u06cc\u0644\u062f\u0647\u0627\u06cc \u0642\u0627\u0628\u0644 \u062a\u063a\u06cc\u06cc\u0631 \u0627\u0646\u062c\u0627\u0645 \u062f\u0627\u062f\u0647 \u0627\u06cc\u062f. \u0627\u06af\u0631 \u06a9\u0627\u0631\u06cc \u0627\u0646\u062c\u0627\u0645 \u062f\u0647\u06cc\u062f\u060c  \u062a\u063a\u06cc\u06cc\u0631\u0627\u062a \u0627\u0632 \u062f\u0633\u062a \u062e\u0648\u0627\u0647\u0646\u062f \u0631\u0641\u062a",
+    "abbrev. month April\u0004Apr": "\u0622\u0648\u0631\u06cc\u0644",
+    "abbrev. month August\u0004Aug": "\u0627\u0648\u062a",
+    "abbrev. month December\u0004Dec": "\u062f\u0633\u0627\u0645\u0628\u0631",
+    "abbrev. month February\u0004Feb": "\u0641\u0648\u0631\u06cc\u0647",
+    "abbrev. month January\u0004Jan": "\u0698\u0627\u0646\u0648\u06cc\u0647",
+    "abbrev. month July\u0004Jul": "\u0698\u0648\u0626\u06cc\u0647",
+    "abbrev. month June\u0004Jun": "\u0698\u0648\u0626\u0646",
+    "abbrev. month March\u0004Mar": "\u0645\u0627\u0631\u0633",
+    "abbrev. month May\u0004May": "\u0645\u06cc",
+    "abbrev. month November\u0004Nov": "\u0646\u0648\u0627\u0645\u0628\u0631",
+    "abbrev. month October\u0004Oct": "\u0627\u06a9\u062a\u0628\u0631",
+    "abbrev. month September\u0004Sep": "\u0633\u067e\u062a\u0627\u0645\u0628\u0631",
     "one letter Friday\u0004F": "\u062c",
     "one letter Monday\u0004M": "\u062f",
     "one letter Saturday\u0004S": "\u0634",
@@ -81,24 +94,24 @@
     "one letter Tuesday\u0004T": "\u0633",
     "one letter Wednesday\u0004W": "\u0686"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -108,16 +121,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -140,15 +153,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "j F Y",
     "DATE_INPUT_FORMATS": [
@@ -181,8 +191,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -201,6 +211,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

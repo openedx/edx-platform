@@ -28,6 +28,7 @@
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # faisal wazir <alwazir95business@gmail.com>, 2020
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021
 # Hassan Husseini <hassan@constructeducation.com>, 2020
 # br1ng <ibnalawam@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
@@ -45,6 +46,7 @@
 # Ned Batchelder <ned@edx.org>, 2015-2016
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020-2021
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
@@ -89,6 +91,7 @@
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # RaghadG <raghad_g@yahoo.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Shadi Naif <shadinaif@gmail.com>, 2019
@@ -137,6 +140,7 @@
 # Ned Batchelder <ned@edx.org>, 2016
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Rama Alshebel, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
@@ -169,6 +173,8 @@
 # Ned Batchelder <ned@edx.org>, 2016-2017
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Rama Alshebel, 2021
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
@@ -181,8 +187,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
+"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
@@ -11279,11 +11285,9 @@ msgstr "مُراقب"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"الامتحانات المراقبة محدّدة التوقيت، وسيُسجّل مقطع فيديو لكل متعلّم يُجري "
-"امتحانًا لتُراجع مقاطع الفيديو هذه بعد ذلك بهدف ضمان التزام المتعلّمين بجميع"
-" القواعد الامتحانية."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

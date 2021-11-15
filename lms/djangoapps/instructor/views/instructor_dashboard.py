@@ -129,10 +129,6 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
-    is_white_label = CourseMode.is_white_label(course_key)  # lint-amnesty, pylint: disable=unused-variable
-
-    reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)  # lint-amnesty, pylint: disable=unused-variable
-
     sections = []
     if access['staff']:
         sections_content = [

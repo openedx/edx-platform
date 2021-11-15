@@ -137,7 +137,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     """
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -339,7 +339,7 @@ class TestCourseGrader(TestSubmittingProblems):
     Suite of tests for the course grader.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
@@ -752,7 +752,7 @@ class TestCourseGrader(TestSubmittingProblems):
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def setUp(self):
         super().setUp()
@@ -808,7 +808,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     Check that we can submit a schematic and custom response, and it answers properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation

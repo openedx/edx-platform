@@ -34,10 +34,14 @@
     # via -r requirements/edx/testing.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/testing.txt
-aiohttp==3.7.4.post0
+aiohttp==3.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   geoip2
+aiosignal==1.2.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   aiohttp
 alabaster==0.7.12
     # via sphinx
 amqp==2.6.1
@@ -68,7 +72,7 @@ astroid==2.8.4
     #   -r requirements/edx/testing.txt
     #   pylint
     #   pylint-celery
-async-timeout==3.0.1
+async-timeout==4.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -90,7 +94,7 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-backports.entry-points-selectable==1.1.0
+backports.entry-points-selectable==1.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
@@ -152,11 +156,11 @@ cffi==1.15.0
 chardet==4.0.0
     # via
     #   -r requirements/edx/testing.txt
-    #   aiohttp
     #   pysrt
 charset-normalizer==2.0.7
     # via
     #   -r requirements/edx/testing.txt
+    #   aiohttp
     #   requests
 chem==1.2.0
     # via -r requirements/edx/testing.txt
@@ -195,7 +199,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.0.2
+coverage[toml]==6.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -243,7 +247,7 @@ distlib==0.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.8
+django==3.2.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -426,7 +430,7 @@ django-simple-history==3.0.0
     #   ora2
 django-splash==1.1.0
     # via -r requirements/edx/testing.txt
-django-statici18n==2.0.1
+django-statici18n==2.1.1
     # via -r requirements/edx/testing.txt
 django-storages==1.8
     # via
@@ -475,6 +479,7 @@ docopt==0.6.2
     #   xmodule
 docutils==0.17.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
     #   m2r
@@ -493,7 +498,7 @@ edx-ace==1.4.0
     # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.5.0
     # via -r requirements/edx/testing.txt
-edx-auth-backends==4.0.0
+edx-auth-backends==4.0.1
     # via -r requirements/edx/testing.txt
 edx-bulk-grades==0.9.2
     # via
@@ -525,7 +530,7 @@ edx-django-utils==4.4.0
     #   event-tracking
     #   ora2
     #   super-csv
-edx-drf-extensions==8.0.0
+edx-drf-extensions==8.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -536,7 +541,7 @@ edx-drf-extensions==8.0.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.33.9
+edx-enterprise==3.33.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -544,7 +549,7 @@ edx-i18n-tools==0.8.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-edx-lint==5.2.0
+edx-lint==5.2.1
     # via -r requirements/edx/testing.txt
 edx-milestones==0.3.3
     # via -r requirements/edx/testing.txt
@@ -575,7 +580,7 @@ edx-proctoring==4.7.0
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-rbac==1.5.0
+edx-rbac==1.5.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -635,9 +640,9 @@ execnet==1.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-xdist
-factory-boy==3.2.0
+factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==9.6.0
+faker==9.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -645,7 +650,7 @@ fastapi==0.70.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-filelock==3.3.1
+filelock==3.3.2
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -654,6 +659,11 @@ freezegun==0.3.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
+frozenlist==1.2.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   aiohttp
+    #   aiosignal
 fs==2.0.18
     # via
     #   -r requirements/edx/testing.txt
@@ -709,10 +719,12 @@ idna==3.3
     #   yarl
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.8.1
+importlib-metadata==4.8.2
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-randomly
+importlib-resources==5.4.0
+    # via jsonschema
 inflect==5.3.0
     # via
     #   -r requirements/edx/testing.txt
@@ -735,7 +747,7 @@ isodate==0.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   python3-saml
-isort==5.9.3
+isort==5.10.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -777,7 +789,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.1.2
+jsonschema==4.2.1
     # via sphinxcontrib-openapi
 jwcrypto==1.0
     # via
@@ -889,7 +901,7 @@ mypy-extensions==0.4.3
     # via mypy
 mysqlclient==2.0.3
     # via -r requirements/edx/testing.txt
-newrelic==7.2.2.169
+newrelic==7.2.3.170
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -899,7 +911,7 @@ nltk==3.6.5
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/testing.txt
-numpy==1.21.3
+numpy==1.21.4
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -919,7 +931,7 @@ openedx-events==0.6.0
     # via -r requirements/edx/testing.txt
 ora2==3.7.4
     # via -r requirements/edx/testing.txt
-packaging==21.0
+packaging==21.2
     # via
     #   -r requirements/edx/testing.txt
     #   bleach
@@ -948,7 +960,7 @@ path.py==12.5.0
     #   xmodule
 paver==1.3.4
     # via -r requirements/edx/testing.txt
-pbr==5.6.0
+pbr==5.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   stevedore
@@ -986,7 +998,7 @@ psutil==5.8.0
     #   edx-django-utils
     #   pact-python
     #   pytest-xdist
-py==1.10.0
+py==1.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest
@@ -1000,7 +1012,7 @@ pycodestyle==2.8.0
     # via -r requirements/edx/testing.txt
 pycountry==20.7.3
     # via -r requirements/edx/testing.txt
-pycparser==2.20
+pycparser==2.21
     # via
     #   -r requirements/edx/testing.txt
     #   cffi
@@ -1074,7 +1086,7 @@ pymongo==3.10.1
     #   mongoengine
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
-pyparsing==3.0.1
+pyparsing==2.4.7
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1195,7 +1207,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
 redis==3.5.3
     # via -r requirements/edx/testing.txt
-regex==2021.10.23
+regex==2021.11.2
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1226,7 +1238,7 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-ruamel.yaml==0.17.16
+ruamel.yaml==0.17.17
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
@@ -1247,7 +1259,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-ace
-scipy==1.7.1
+scipy==1.7.2
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1343,7 +1355,7 @@ sorl-thumbnail==12.7.0
     #   django-wiki
 sortedcontainers==2.4.0
     # via -r requirements/edx/testing.txt
-soupsieve==2.2.1
+soupsieve==2.3
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
@@ -1437,8 +1449,8 @@ transifex-client==0.14.3
 typing-extensions==3.10.0.2
     # via
     #   -r requirements/edx/testing.txt
-    #   aiohttp
     #   astroid
+    #   async-timeout
     #   gitpython
     #   mypy
     #   pydantic
@@ -1475,7 +1487,7 @@ vine==1.3.0
     #   -r requirements/edx/testing.txt
     #   amqp
     #   celery
-virtualenv==20.9.0
+virtualenv==20.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -1552,7 +1564,7 @@ xmlsec==1.3.12
     #   python3-saml
 xss-utils==0.3.0
     # via -r requirements/edx/testing.txt
-yarl==1.7.0
+yarl==1.7.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -1560,6 +1572,7 @@ zipp==3.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

@@ -55,6 +55,7 @@
                     };
 
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
+                    this.edxUserInfoCookieName = options.edx_user_info_cookie_name || 'edx-user-info';
 
                     // Account activation messages
                     this.accountActivationMessages = options.account_activation_messages || [];
@@ -320,10 +321,13 @@
              */
                 loginComplete: function() {
                     if (this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl) {
-                        multipleEnterpriseInterface.check(this.thirdPartyAuth.finishAuthUrl);
+                        multipleEnterpriseInterface.check(
+                            this.thirdPartyAuth.finishAuthUrl,
+                            this.edxUserInfoCookieName
+                        );
                     // Note: the third party auth URL likely contains another redirect URL embedded inside
                     } else {
-                        multipleEnterpriseInterface.check(this.nextUrl);
+                        multipleEnterpriseInterface.check(this.nextUrl, this.edxUserInfoCookieName);
                     }
                 },
 

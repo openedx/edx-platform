@@ -61,7 +61,7 @@ class ConfigModelFixture:
         Log in as a staff user, then return the cookies for the session (as a dict)
         Raises a `ConfigModelFixtureError` if the login fails.
         """
-        return {key: val for key, val in self.session.cookies.items()}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        return dict(self.session.cookies.items())
 
     @lazy
     def headers(self):
