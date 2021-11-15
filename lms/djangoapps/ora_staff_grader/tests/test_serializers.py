@@ -275,15 +275,11 @@ class TestScoreFieldAndSerializer(TestCase):
 
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_field_missing(self, missing_field):
-        """ One missing field should result in the field defaulting to 0 """
+        """ Missing fields should just be ignored """
         value = {'pointsEarned': 30, 'pointsPossible': 50}
         del value[missing_field]
 
-        expectedValue = dict(value)
-        expectedValue[missing_field] = 0
-
-        actualValue = ScoreField().to_representation(value)
-        assert expectedValue == actualValue
+        assert ScoreField().to_representation(value) == value
 
     def test_field(self):
         """ Base serialization behavior for ScoreField """
@@ -295,9 +291,8 @@ class TestScoreFieldAndSerializer(TestCase):
         assert representation == data
 
     def test_serializer_no_values(self):
-        """ Passing the ScoreSerializer an empty dict should result in two zeroes for the field """
-        data = ScoreSerializer({}).data
-        assert data == {'pointsEarned': 0, 'pointsPossible': 0}
+        """ Passing the ScoreSerializer an empty dict should result in an empty serializer """
+        assert ScoreSerializer({}).data == {}
 
     def test_serialier(self):
         """ Base serialization behavior for ScoreSerializer """
@@ -307,15 +302,11 @@ class TestScoreFieldAndSerializer(TestCase):
 
     @ddt.data('pointsEarned', 'pointsPossible')
     def test_serializer_missing_field(self, missing_field):
-        """ One missing field should result in the field defaulting to 0 """
+        """ Missing fields should just be ignored """
         value = {'pointsEarned': 30, 'pointsPossible': 50}
         del value[missing_field]
 
-        expectedValue = dict(value)
-        expectedValue[missing_field] = 0
-
-        actualValue = ScoreSerializer(value).data
-        assert expectedValue == actualValue
+        assert ScoreSerializer(value).data == value
 
 
 class TestUploadedFileSerializer(TestCase):

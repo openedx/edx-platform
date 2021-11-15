@@ -69,8 +69,8 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
-    pointsEarned = serializers.IntegerField(default=0)
-    pointsPossible = serializers.IntegerField(default=0)
+    pointsEarned = serializers.IntegerField(required=False)
+    pointsPossible = serializers.IntegerField(required=False)
 
 
 class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
