@@ -91,6 +91,7 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import SettingToggle
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -108,6 +109,28 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
 LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
+
+# .. toggle_name: VERIFY_USER_CHANGE_UNCONDITIONAL
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: If False, only check for user mismatch if a session cookie is being set in
+#   the response (the status quo behavior). If True, check for user mismatches regardless of
+#   response cookie status (the desired future behavior). Once this has been enabled for a week or
+#   so, the toggle can be removed in favor of the True setting.
+#   (This is intended to *restore* an older behavior. It seems that all requests used to set a new
+#   session cookie, and for some reason no longer do, so this is really just an attempt to return
+#   to that previous behavior no matter whether a new session cookie will be set. The only difference
+#   should be that now logout responses will also be checked, but those now use a call that declares
+#   them safe, so that part should be a no-op.)
+# .. toggle_warnings: This will expose some analysis code to a greater volume of requests and
+#   possibly different request configurations, which may expose some latent bugs that could cause
+#   request failure. Watch error rates and be ready to toggle off again.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-11-12
+# .. toggle_target_removal_date: 2022-01-01
+# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1952
+VERIFY_USER_CHANGE_UNCONDITIONAL = SettingToggle('VERIFY_USER_CHANGE_UNCONDITIONAL', default=False,
+                                                 module_name=__name__)
 
 log = getLogger(__name__)
 
@@ -398,16 +421,24 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         except:  # pylint: disable=bare-except
             pass
 
+        verify_all = VERIFY_USER_CHANGE_UNCONDITIONAL.is_enabled()
+
+        # One of the two places this can be called from (desired future location).
+        if verify_all:
+            user_id_in_session = self.get_user_id_from_session(request)
+            self._verify_user(request, response, user_id_in_session)  # Step 2
+
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
-                user_id_in_session = self.get_user_id_from_session(request)
-                self._verify_user(request, response, user_id_in_session)  # Step 2
+                # The other, older place this can be called from.
+                if not verify_all:
+                    user_id_in_session = self.get_user_id_from_session(request)
+                    self._verify_user(request, response, user_id_in_session)  # Step 2
 
                 # Use the user_id marked in the session instead of the
                 # one in the request in case the user is not set in the
                 # request, for example during Anonymous API access.
                 self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
-
             except SafeCookieError:
                 _mark_cookie_for_deletion(request)
 
