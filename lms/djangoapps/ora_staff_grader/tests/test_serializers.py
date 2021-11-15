@@ -359,12 +359,13 @@ class TestAssessmentCriteriaSerializer(TestCase):
 
     def test_assessment_criteria_serializer(self):
         """ Base serialization behavior """
-        input = Mock()
+        input = Mock(points=595)
         data = AssessmentCriteriaSerializer(input).data
 
         expected_value = {
             'name': str(input.name),
             'feedback': str(input.feedback),
+            'points': input.points,
             'selectedOption': str(input.option),
         }
         assert data == expected_value
@@ -374,6 +375,7 @@ class TestAssessmentCriteriaSerializer(TestCase):
         input = {
             'name': 'SomeCriterioOn',
             'feedback': 'Pathetic Effort',
+            'points': None,
             'option': None,
         }
         data = AssessmentCriteriaSerializer(input).data
@@ -398,7 +400,7 @@ class TestGradeDataSerializer(TestCase):
         """ Base serialization behavior, with and without criteria """
         input = MagicMock()
         if has_criteria:
-            input.criteria = [Mock(), Mock(), Mock()]
+            input.criteria = [Mock(points=123), Mock(points=11), Mock(points=22)]
         data = GradeDataSerializer(input).data
 
         expected_value = {

@@ -141,8 +141,7 @@ class AssessmentCriteriaSerializer(serializers.Serializer):
     """ Serializer for information about a criterion, in the context of a completed assessment """
     name = serializers.CharField()
     feedback = serializers.CharField()
-    # to be completed in AU-410
-    # score = serializers.IntegerField()
+    points = serializers.IntegerField()
     selectedOption = serializers.CharField(source='option')
 
 
