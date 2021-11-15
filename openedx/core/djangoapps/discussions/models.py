@@ -130,33 +130,6 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True
     },
-    'openedx': {
-        'features': [
-            Features.BASIC_CONFIGURATION.value,
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
-            Features.COMMUNITY_TA_SUPPORT.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
-            Features.ANONYMOUS_POSTING.value,
-            Features.INTERNATIONALIZATION_SUPPORT.value,
-            Features.WCAG_2_0_SUPPORT.value,
-            Features.BLACKOUT_DISCUSSION_DATES.value,
-            Features.COURSE_COHORT_SUPPORT.value,
-            Features.RESEARCH_DATA_EVENTS.value,
-        ],
-        'supports_lti': False,
-        'external_links': ProviderExternalLinks(
-            learn_more='',
-            configuration='',
-            general='',
-            accessibility='',
-            contact_email='',
-        )._asdict(),
-        'messages': [],
-        'has_full_support': True,
-        'supports_in_context_discussions': True,
-    },
     'ed-discuss': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
