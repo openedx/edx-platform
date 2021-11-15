@@ -57,28 +57,34 @@ class FetchSubmissionStatusView(RetrieveAPIView):
 class LockView(APIView):
     """ Lock a submission for grading """
 
-    def lock_submission(self, submission, value):
-        """
-        Change lock status on a submission.
-        For now, that means updating to "in-progress" when requested
-        or to "unlocked" when a lock is released
-        """
-        submission['lockStatus'] = 'in-progress' if value else 'unlocked'
-        return submission
-
-
     def post(self, request):
-        value = request.query_params['value'] == "true"  # Bool, whether to lock (True) or unlock (False) submission
-        submission_id = request.query_params['submissionId']
+        """ Claim a submission lock, updating lock status """
+        ora_location = request.query_params['ora_location']
+        submission_id = request.query_params['submissionUUID']
 
-        submission = fetch_submission(submission_id)
+        submission = fetch_submission(ora_location, submission_id)
+        submission['lockStatus'] = 'in-progress'
 
-        self.lock_submission(submission, value)
-        save_submission_update(submission)
+        save_submission_update(ora_location, submission)
 
         return Response({
             "lockStatus": submission['lockStatus']
         })
+
+    def delete(self, request):
+        """ Delete a submission lock, updating lock status """
+        ora_location = request.query_params['ora_location']
+        submission_id = request.query_params['submissionUUID']
+
+        submission = fetch_submission(ora_location, submission_id)
+        submission['lockStatus'] = 'unlocked'
+
+        save_submission_update(ora_location, submission)
+
+        return Response({
+            "lockStatus": submission['lockStatus']
+        })
+
 
 class UpdateGradeView(RetrieveAPIView):
     """ Submit a grade """

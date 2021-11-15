@@ -13,10 +13,26 @@ def read_data_file(file_name):
     with open(path.join(DATA_ROOT, file_name), "r") as data_file:
         return json.load(data_file)
 
-def update_data_file(file_name, update_key, update_value):
-    """ Update a single key/value within a JSON file """
+def update_data_file(file_name, update_key_path, update_value):
+    """
+    Update a single key/value within a JSON file
+
+    params:
+    - file_name: string path of file relative to DATA_ROOT
+    - update_key_path: array-like list of keys to traverse, necessary for editing multiple levels down in hierarchy
+    """
     update_data = read_data_file(file_name)
-    update_data[update_key] = update_value
+
+    # Adapted from https://ipindersinghsuri.medium.com/updating-dynamic-nested-dictionary-in-python-92f5afbd1755
+    def get_updated_dict(dict_to_update, key_list, value):
+        obj = dict_to_update
+
+        for k in key_list[:-1]:
+            obj = obj[k]
+
+        obj[key_list[-1]] = value
+
+    get_updated_dict(update_data, update_key_path, update_value)
 
     with open(path.join(DATA_ROOT, file_name), "w") as update_data_file:
         json.dump(update_data, update_data_file, indent=4)
@@ -41,6 +57,6 @@ def fetch_default_response(submission_id):  # pylint: disable=unused-argument
     """ Return a default response, the same for all submissions """
     return read_data_file("responses.json").get("default")
 
-def save_submission_update(submission):
+def save_submission_update(ora_location, submission):
     """ Update a submission key with new data """
-    update_data_file("submissions.json", submission['submissionId'], submission)
+    update_data_file("submissions.json", [ora_location, submission['submissionId']], submission)
