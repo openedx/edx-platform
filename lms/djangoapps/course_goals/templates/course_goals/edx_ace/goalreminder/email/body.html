@@ -26,20 +26,21 @@
             {% include "goal_reminder_banner.html" %}
             <div class="goal-reminder-body-wrapper" style="width:inherit; font-size: 14px; font-size: 0.875rem; padding: 0 20px 0 5%; margin: 36px 20px 0 17px; margin: 2.25rem 1.25rem 0 1.0625rem;">
                 <h3 style="
-                    font-size: 22px;
-                    font-size: 1.38rem;
+                    font-size: 25px;
+                    font-size: 1.563rem;
                     font-style: normal;
                     font-weight: 700;
                     line-height: 28px;
                     line-height: 1.75rem;
                     text-align: left;
+                    color: black;
                     ">
                     {% filter force_escape %}{% blocktrans %}
                         There's still time to reach your goal
                     {% endblocktrans %}{% endfilter %}
                 </h3>
 
-                <p style="color: rgba(0,0,0,.75);">
+                <p style="color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem;">
                     {% filter force_escape %}
                         {% blocktrans count count=days_per_week asvar goal_text %}
                             You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!"
@@ -54,18 +55,21 @@
                 <a style="color: white; text-decoration: none; display: inline-block;"
                     href="{{course_url}}" target="_blank">
                     <div style="
-                        padding: 8px 0 12px;
+                        padding: 8px 12px;
                         padding: 0.5rem 0.75rem;
                         background: #D23228;
                         margin-bottom: 16px;
-                        margin-bottom: 1rem;">
+                        margin-bottom: 1rem;
+                        font-size: 16px;
+                        font-size: 1rem;
+                        ">
                         {% filter force_escape %}{% blocktrans %}
                             Jump back in
                         {% endblocktrans %}{% endfilter %}
                     </div>                
                 </a>
 
-                <p style="color: rgba(0,0,0,.75);">
+                <p style="color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem;">
                     {% filter force_escape %}{% blocktrans %}
                         Remember, you can always change your learning goal. The best goal is one that you can stick to.
                     {% endblocktrans %}{% endfilter %}
@@ -75,9 +79,12 @@
                 <a style="color: #D23228; text-decoration: none; display: inline-block; border: 0.0625rem solid #F2F0EF;"
                    href="{{course_url}}" target="_blank">
                     <div style="
-                        padding: 8px 0 12px;
+                        padding: 8px 12px;
                         padding: 0.5rem 0.75rem;
-                        background: white;">
+                        background: white;
+                        font-size: 16px;
+                        font-size: 1rem;
+                        ">
                         {% filter force_escape %}{% blocktrans %}
                             Adjust my goal
                         {% endblocktrans %}{% endfilter %}
@@ -88,12 +95,14 @@
                     <a style="
                         color: #00688D;
                         display: block;
-                        margin: 15px auto 0 auto;
-                        margin: 0.9375rem auto 0 auto;
+                        margin: 20px auto 0 auto;
+                        margin: 1.25rem auto 0 auto;
                         text-align: center;
                         text-decoration: none;
-                        width: 208px;
-                        width: 13rem;
+                        width: 250px;
+                        width: 15.625rem;
+                        font-size: 16px;
+                        font-size: 1rem;
                     "
                     href="{{goals_unsubscribe_url}}" target="_blank">
                         {% filter force_escape %}{% blocktrans %}
