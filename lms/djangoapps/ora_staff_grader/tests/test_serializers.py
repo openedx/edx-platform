@@ -1,14 +1,22 @@
 """
 Tests for ESG Serializers
 """
+import ddt
 from django.test import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 
 from lms.djangoapps.ora_staff_grader.serializers import (
+    AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
+    GradeDataSerializer,
     InitializeSerializer,
     OpenResponseMetadataSerializer,
+    ResponseSerializer,
+    ScoreField,
+    ScoreSerializer,
+    SubmissionDetailResponseSerializer,
     SubmissionMetadataSerializer,
+    UploadedFileSerializer,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -255,3 +263,163 @@ class TestInitializeSerializer(TestCase):
         assert output_data['oraMetadata'] == OpenResponseMetadataSerializer(self.mock_ora_instance).data
         assert output_data['submissions'] == self.mock_submissions_data
         assert output_data['rubricConfig'] == self.mock_rubric_data
+
+
+@ddt.ddt
+class TestScoreFieldAndSerializer(TestCase):
+    """ Tests for ScoreField and ScoreSerializer """
+
+    def test_field_no_values(self):
+        """ An empty dict passed to the field should return None """
+        assert ScoreField().to_representation({}) is None
+
+    @ddt.data('pointsEarned', 'pointsPossible')
+    def test_field_missing(self, missing_field):
+        """ Missing fields should just be ignored """
+        value = {'pointsEarned': 30, 'pointsPossible': 50}
+        del value[missing_field]
+
+        assert ScoreField().to_representation(value) == value
+
+    def test_field(self):
+        """ Base serialization behavior for ScoreField """
+        data = {
+            'pointsEarned': 20,
+            'pointsPossible': 40
+        }
+        representation = ScoreField().to_representation(data)
+        assert representation == data
+
+    def test_serializer_no_values(self):
+        """ Passing the ScoreSerializer an empty dict should result in an empty serializer """
+        assert ScoreSerializer({}).data == {}
+
+    def test_serialier(self):
+        """ Base serialization behavior for ScoreSerializer """
+        input = {'pointsEarned': 10, 'pointsPossible': 200}
+        data = ScoreSerializer(input).data
+        assert data == input
+
+    @ddt.data('pointsEarned', 'pointsPossible')
+    def test_serializer_missing_field(self, missing_field):
+        """ Missing fields should just be ignored """
+        value = {'pointsEarned': 30, 'pointsPossible': 50}
+        del value[missing_field]
+
+        assert ScoreSerializer(value).data == value
+
+
+class TestUploadedFileSerializer(TestCase):
+    """ Tests for UploadedFileSerializer """
+
+    def test_uploaded_file_serializer(self):
+        """ Base serialization behavior """
+        input = MagicMock()
+        data = UploadedFileSerializer(input).data
+
+        expected_value = {
+            'downloadUrl': str(input.download_url),
+            'description': str(input.description),
+            'name': str(input.name),
+        }
+        assert data == expected_value
+
+
+@ddt.ddt
+class TestResponseSerializer(TestCase):
+    """ Tests for ResponseSerializer """
+
+    def test_response_serializer__empty(self):
+        """ Empty fields should be allowed """
+        input = {'files': [], 'text': []}
+        assert ResponseSerializer(input).data == input
+
+    @ddt.unpack
+    @ddt.data((True, True), (True, False), (False, True), (False, False))
+    def test_response_serializer(self, has_text, has_files):
+        """ Base serialization behavior """
+        input = MagicMock()
+        if has_files:
+            input.files = [Mock(), Mock(), Mock()]
+        if has_text:
+            input.text = [Mock(), Mock(), Mock()]
+
+        data = ResponseSerializer(input).data
+        expected_value = {
+            'files': [UploadedFileSerializer(mock_file).data for mock_file in input.files] if has_files else [],
+            'text': [str(mock_text) for mock_text in input.text] if has_text else [],
+        }
+        assert data == expected_value
+
+
+class TestAssessmentCriteriaSerializer(TestCase):
+    """ Tests for AssessmentCriteriaSerializer """
+
+    def test_assessment_criteria_serializer(self):
+        """ Base serialization behavior """
+        input = Mock()
+        data = AssessmentCriteriaSerializer(input).data
+
+        expected_value = {
+            'name': str(input.name),
+            'feedback': str(input.feedback),
+            'selectedOption': str(input.option),
+        }
+        assert data == expected_value
+
+    def test_assessment_criteria_serializer__feedback_only(self):
+        """ Test for serialization behavior of a feedback-only criterion """
+        input = {
+            'name': 'SomeCriterioOn',
+            'feedback': 'Pathetic Effort',
+            'option': None,
+        }
+        data = AssessmentCriteriaSerializer(input).data
+
+        expected_value = dict(input)
+        expected_value['selectedOption'] = expected_value['option']
+        del expected_value['option']
+
+        assert data == expected_value
+
+
+@ddt.ddt
+class TestGradeDataSerializer(TestCase):
+    """ Tests for GradeDataSerializer """
+
+    def test_grade_data_serializer__no_assessment(self):
+        """ Passing an empty dict should result in an empty dict """
+        assert GradeDataSerializer({}).data == {}
+
+    @ddt.data(True, False)
+    def test_grade_data_serializer__assessment(self, has_criteria):
+        """ Base serialization behavior, with and without criteria """
+        input = MagicMock()
+        if has_criteria:
+            input.criteria = [Mock(), Mock(), Mock()]
+        data = GradeDataSerializer(input).data
+
+        expected_value = {
+            'score': ScoreField().to_representation(input.score),
+            'overallFeedback': str(input.feedback)
+        }
+        if has_criteria:
+            expected_value['criteria'] = [AssessmentCriteriaSerializer(criterion).data for criterion in input.criteria]
+        else:
+            expected_value['criteria'] = []
+        assert data == expected_value
+
+
+class TestSubmissionDetailResponseSerializer(TestCase):
+    """ Tests for SubmissionDetailResponseSerializer """
+
+    def test_submission_detail_response_serializer(self):
+        """ Base serialization behavior """
+        input = MagicMock()
+        data = SubmissionDetailResponseSerializer(input).data
+
+        expected_value = {
+            'gradeData': GradeDataSerializer(input.assessment).data,
+            'response': ResponseSerializer(input.submission).data
+        }
+        assert data == expected_value

@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer
+from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer, SubmissionDetailResponseSerializer
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -84,3 +84,59 @@ class InitializeView(RetrieveAPIView):
             'target_rubric_block_id': usage_id
         }
         return call_xblock_json_handler(request, usage_id, 'get_rubric', data)
+
+
+class SubmissionFetchView(RetrieveAPIView):
+    """
+    GET submission contents and assessment info, if any
+
+    Response: {
+        gradeData: {
+            score: (dict or None) {
+                pointsEarned: (int) earned points
+                pointsPossible: (int) possible points
+            }
+            overallFeedback: (string) overall feedback
+            criteria: (list of dict) [{
+                name: (str) name of criterion
+                feedback: (str) feedback for criterion
+                selectedOption: (str) name of selected option or None if feedback-only criterion
+            }]
+        }
+        response: {
+            text: (list of string), [the html content of text responses]
+            files: (list of dict) [{
+                downloadUrl: (string) file download url
+                description: (string) file description
+                name: (string) filename
+            }]
+        }
+    }
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        ora_location = request.query_params.get('ora_location')
+        if not ora_location:
+            return HttpResponseBadRequest(_("Query must contain an ora_location param."))
+
+        submission_uuid = request.query_params.get('submission_uuid')
+        if not submission_uuid:
+            return HttpResponseBadRequest(_("Query must contain a submission_uuid param."))
+
+        submission_and_assessment_info = self.get_submission_and_assessment_info(ora_location, submission_uuid)
+        return Response(SubmissionDetailResponseSerializer(submission_and_assessment_info).data)
+
+    def get_submission_and_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get submission content and assessment data from the ORA's 'get_submission_and_assessment_info' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'get_submission_and_assessment_info', data)
