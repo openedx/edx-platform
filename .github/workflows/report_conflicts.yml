@@ -9,6 +9,7 @@ jobs:
       local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
       upstream_branch: 'master'
+      exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
       github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -19,5 +20,6 @@ jobs:
       local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
       upstream_branch: 'open-release/koa.master'
+      exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
       github_token: ${{ secrets.GITHUB_TOKEN }}
