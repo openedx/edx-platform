@@ -21,14 +21,17 @@ def update_data_file(file_name, update_key, update_value):
     with open(path.join(DATA_ROOT, file_name), "w") as update_data_file:
         json.dump(update_data, update_data_file, indent=4)
 
-def get_course_metadata(course_id):
-    return read_data_file("course_metadata.json")[course_id]
+def get_course_metadata(ora_location):
+    """ Get course metadata, indexed by ORA block location """
+    return read_data_file("course_metadata.json")[ora_location]
 
 def get_ora_metadata(ora_location):
+    """ Get ORA metadata, indexed by ORA block location """
     return read_data_file("ora_metadata.json")[ora_location]
 
 def get_submissions(ora_location):  # pylint: disable=unused-argument
-    return read_data_file("submissions.json")
+    """ Get Submission list, scoped by ORA block location """
+    return read_data_file("submissions.json")[ora_location]
 
 def fetch_submission(submission_id):
     return read_data_file("submissions.json").get(submission_id)
