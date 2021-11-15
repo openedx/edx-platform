@@ -318,11 +318,15 @@ class RegistrationFormFactory:
 
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
-        return self._extra_fields_setting.get(field_name) in ["required", "optional"]
+        return self._extra_fields_setting.get(field_name) in ["required", "optional", "optional-exposed"]
 
     def _is_field_required(self, field_name):
         """Check whether a field is required based on Django settings. """
         return self._extra_fields_setting.get(field_name) == "required"
+
+    def _is_field_exposed(self, field_name):
+        """Check whether a field is optional and should be toggled. """
+        return self._extra_fields_setting.get(field_name) in ["required", "optional-exposed"]
 
     def __init__(self):
 
@@ -346,6 +350,11 @@ class RegistrationFormFactory:
             handler = getattr(self, f"_add_{field_name}_field")
             self.field_handlers[field_name] = handler
 
+        custom_form = get_registration_extension_form()
+        if custom_form:
+            custom_form_field_names = [field_name for field_name, field in custom_form.fields.items()]
+            valid_fields.extend(custom_form_field_names)
+
         field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
         if not field_order:
             field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
@@ -353,7 +362,8 @@ class RegistrationFormFactory:
         # if not append missing fields at end of field order
         if set(valid_fields) != set(field_order):
             difference = set(valid_fields).difference(set(field_order))
-            field_order.extend(difference)
+            # sort the additional fields so we have could have a deterministic result when presenting them
+            field_order.extend(sorted(difference))
 
         self.field_order = field_order
 
@@ -377,57 +387,57 @@ class RegistrationFormFactory:
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
         custom_form = get_registration_extension_form()
-
         if custom_form:
-            # Default fields are always required
-            for field_name in self.DEFAULT_FIELDS:
-                self.field_handlers[field_name](form_desc, required=True)
-
-            for field_name, field in custom_form.fields.items():
-                restrictions = {}
-                if getattr(field, 'max_length', None):
-                    restrictions['max_length'] = field.max_length
-                if getattr(field, 'min_length', None):
-                    restrictions['min_length'] = field.min_length
-                field_options = getattr(
-                    getattr(custom_form, 'Meta', None), 'serialization_options', {}
-                ).get(field_name, {})
-                field_type = field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__))
-                if not field_type:
-                    raise ImproperlyConfigured(
-                        "Field type '{}' not recognized for registration extension field '{}'.".format(
-                            field_type,
-                            field_name
-                        )
-                    )
-                form_desc.add_field(
-                    field_name, label=field.label,
-                    default=field_options.get('default'),
-                    field_type=field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__)),
-                    placeholder=field.initial, instructions=field.help_text, required=field.required,
-                    restrictions=restrictions,
-                    options=getattr(field, 'choices', None), error_messages=field.error_messages,
-                    include_default_option=field_options.get('include_default_option'),
-                )
-
-            # Extra fields configured in Django settings
-            # may be required, optional, or hidden
-            for field_name in self.EXTRA_FIELDS:
-                if self._is_field_visible(field_name):
-                    self.field_handlers[field_name](
-                        form_desc,
-                        required=self._is_field_required(field_name)
-                    )
+            custom_form_field_names = [field_name for field_name, field in custom_form.fields.items()]
         else:
-            # Go through the fields in the fields order and add them if they are required or visible
-            for field_name in self.field_order:
-                if field_name in self.DEFAULT_FIELDS:
-                    self.field_handlers[field_name](form_desc, required=True)
-                elif self._is_field_visible(field_name):
-                    self.field_handlers[field_name](
-                        form_desc,
-                        required=self._is_field_required(field_name)
-                    )
+            custom_form_field_names = []
+
+        # Go through the fields in the fields order and add them if they are required or visible
+        for field_name in self.field_order:
+            if field_name in self.DEFAULT_FIELDS:
+                self.field_handlers[field_name](form_desc, required=True)
+            elif self._is_field_visible(field_name) and self.field_handlers.get(field_name):
+                self.field_handlers[field_name](
+                    form_desc,
+                    required=self._is_field_required(field_name)
+                )
+            elif field_name in custom_form_field_names:
+                for custom_field_name, field in custom_form.fields.items():
+                    if field_name == custom_field_name:
+                        restrictions = {}
+                        if getattr(field, 'max_length', None):
+                            restrictions['max_length'] = field.max_length
+                        if getattr(field, 'min_length', None):
+                            restrictions['min_length'] = field.min_length
+                        field_options = getattr(
+                            getattr(custom_form, 'Meta', None), 'serialization_options', {}
+                        ).get(field_name, {})
+                        field_type = field_options.get(
+                            'field_type',
+                            FormDescription.FIELD_TYPE_MAP.get(field.__class__))
+                        if not field_type:
+                            raise ImproperlyConfigured(
+                                u"Field type '{}' not recognized for registration extension field '{}'.".format(
+                                    field_type,
+                                    field_name
+                                )
+                            )
+                        if self._is_field_visible(field_name) or field.required:
+                            form_desc.add_field(
+                                field_name,
+                                label=field.label,
+                                default=field_options.get('default'),
+                                field_type=field_options.get(
+                                    'field_type',
+                                    FormDescription.FIELD_TYPE_MAP.get(field.__class__)),
+                                placeholder=field.initial,
+                                instructions=field.help_text,
+                                required=(self._is_field_required(field_name) or field.required),
+                                restrictions=restrictions,
+                                options=getattr(field, 'choices', None), error_messages=field.error_messages,
+                                include_default_option=field_options.get('include_default_option'),
+                            )
+
         # remove confirm_email form v1 registration form
         if is_api_v1(request):
             for index, field in enumerate(form_desc.fields):
