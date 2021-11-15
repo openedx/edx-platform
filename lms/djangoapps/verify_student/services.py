@@ -116,15 +116,17 @@ class IDVerificationService:
             'status__in': statuses,
         }
 
-        photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs)
-        sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs)
-        manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs)
+        sort_by = 'updated_at'
+
+        photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).order_by('-' + sort_by)
+        sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs).order_by('-' + sort_by)
+        manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs).order_by('-' + sort_by)
 
         attempt = most_recent_verification(
             photo_id_verifications,
             sso_id_verifications,
             manual_id_verifications,
-            'updated_at'
+            sort_by
         )
         return attempt and attempt.expiration_datetime
 
