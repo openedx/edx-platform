@@ -96,14 +96,17 @@ class UpdateGradeView(RetrieveAPIView):
         submission['lockStatus'] = 'unlocked'
 
     def post(self, request):
-        submission_id = request.query_params['submissionId']
+        ora_location = request.query_params['ora_location']
+        submission_id = request.query_params['submissionUUID']
         grade_data = request.data
 
-        submission = fetch_submission(submission_id)
+        submission = fetch_submission(ora_location, submission_id)
 
         self.update_grade_data(submission, grade_data)
-        save_submission_update(submission)
+        save_submission_update(ora_location, submission)
 
         return Response({
-            'gradeData': submission['gradeData']
+            'gradeStatus': submission['gradeStatus'],
+            'lockStatus': submission['lockStatus'],
+            'gradeData': submission['gradeData'],
         })
