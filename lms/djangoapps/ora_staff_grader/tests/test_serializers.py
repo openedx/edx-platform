@@ -327,7 +327,7 @@ class TestUploadedFileSerializer(TestCase):
         data = UploadedFileSerializer(input).data
 
         expected_value = {
-            'downloadURL': str(input.download_url),
+            'downloadUrl': str(input.download_url),
             'description': str(input.description),
             'name': str(input.name),
         }

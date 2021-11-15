@@ -106,7 +106,7 @@ class SubmissionFetchView(RetrieveAPIView):
         response: {
             text: (list of string), [the html content of text responses]
             files: (list of dict) [{
-                downloadURL: (string) file download url
+                downloadUrl: (string) file download url
                 description: (string) file description
                 name: (string) filename
             }]

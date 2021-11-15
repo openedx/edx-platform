@@ -14,6 +14,6 @@ urlpatterns += [
         'initialize', InitializeView.as_view(), name='initialize'
     ),
     path(
-        'fetch-submission', SubmissionFetchView.as_view(), name='fetch-submission'
+        'submission', SubmissionFetchView.as_view(), name='fetch-submission'
     )
 ]
