@@ -11,25 +11,30 @@
             "feedback": "optional",
             "feedbackPrompt": "How would you grade this response?",
             "feedbackDefaultText": "I believe this response...",
-            "criteria": [{
-                "name": "Grammar",
-                "orderNum": 0,
-                "prompt": "How correct is the submitter's grammar?",
-                "feedback": "optional",
-                "options": [{
+            "criteria": [
+                {
+                    "name": "Grammar",
                     "orderNum": 0,
-                    "name": "poor",
-                    "label": "Poor",
-                    "explanation": "Absolute rubbish",
-                    "points": 0
-                }, {
-                    "orderNum": 1,
-                    "name": "excellent",
-                    "label": "Excelent",
-                    "explanation": "Not absolute rubbish",
-                    "points": 5
-                }]
-            }]
+                    "prompt": "How correct is the submitter's grammar?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "orderNum": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "orderNum": 1,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
         },
         "fileUploadResponseConfig": "optional"
     },
@@ -45,25 +50,30 @@
             "feedback": "required",
             "feedbackPrompt": "How would you grade this response?",
             "feedbackDefaultText": "I believe this response...",
-            "criteria": [{
-                "name": "Correctness",
-                "orderNum": 0,
-                "prompt": "How correct is the team's answer?",
-                "feedback": "optional",
-                "options": [{
+            "criteria": [
+                {
+                    "name": "Correctness",
                     "orderNum": 0,
-                    "name": "poor",
-                    "label": "Poor",
-                    "explanation": "Absolute rubbish",
-                    "points": 0
-                }, {
-                    "orderNum": 1,
-                    "name": "excellent",
-                    "label": "Excelent",
-                    "explanation": "Not absolute rubbish",
-                    "points": 5
-                }]
-            }]
+                    "prompt": "How correct is the team's answer?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "orderNum": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "orderNum": 1,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
         },
         "fileUploadResponseConfig": "required"
     }
