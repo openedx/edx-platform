@@ -39,12 +39,13 @@ class FetchSubmissionView(RetrieveAPIView):
 
 
 class FetchSubmissionStatusView(RetrieveAPIView):
-    """ Get a submission status """
+    """ Get a submission status, leaving out the response """
 
     def get(self, request):
-        submission_id = request.query_params['submissionId']
+        ora_location = request.query_params['ora_location']
+        submission_id = request.query_params['submissionUUID']
 
-        submission = fetch_submission(submission_id)
+        submission = fetch_submission(ora_location, submission_id)
 
         return Response({
             'gradeStatus': submission['gradeStatus'],
