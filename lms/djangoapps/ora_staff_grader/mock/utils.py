@@ -33,11 +33,12 @@ def get_submissions(ora_location):  # pylint: disable=unused-argument
     """ Get Submission list, scoped by ORA block location """
     return read_data_file("submissions.json")[ora_location]
 
-def fetch_submission(submission_id):
-    return read_data_file("submissions.json").get(submission_id)
+def fetch_submission(ora_location, submission_id):
+    """ Fetch an individual submission, indexed first by ORA block location then Submission ID """
+    return read_data_file("submissions.json")[ora_location].get(submission_id)
 
-def fetch_response(submission_id):  # pylint: disable=unused-argument
-    # Right now, we use a single reponse
+def fetch_default_response(submission_id):  # pylint: disable=unused-argument
+    """ Return a default response, the same for all submissions """
     return read_data_file("responses.json").get("default")
 
 def save_submission_update(submission):
