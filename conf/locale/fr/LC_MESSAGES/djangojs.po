@@ -65,7 +65,7 @@
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2014-2015
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015-2016
 # Serge Bibauw <sbibauw@gmail.com>, 2016
@@ -121,7 +121,7 @@
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
@@ -215,7 +215,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-14 20:43+0000\n"
 "PO-Revision-Date: 2021-11-08 15:37+0000\n"
 "Last-Translator: iderr <ibrahim@derraz.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"

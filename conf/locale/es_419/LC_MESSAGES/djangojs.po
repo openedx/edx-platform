@@ -46,7 +46,7 @@
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
-# Sarina Canelake <sarina@edx.org>, 2015
+# Sarina Canelake <sarina@tcril.org>, 2015
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
@@ -174,9 +174,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
-"PO-Revision-Date: 2021-11-07 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-11-14 20:43+0000\n"
+"PO-Revision-Date: 2021-11-12 16:08+0000\n"
+"Last-Translator: Carolina De Mares <carolina.demares@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -11171,25 +11171,32 @@ msgstr "Vence en: "
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "weeks from learner enrollment date"
-msgstr ""
+msgstr "Semanas para la fecha de inscripción del estudiante "
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
 msgstr ""
+"Si un estudiante empieza en {startDate}, esta subsección será vencida en "
+"{projectedDueIn}."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The maximum number of weeks this subsection can be due in is 18 weeks from "
 "the learner enrollment date."
 msgstr ""
+"El número máximo de semanas para esta subsección puede tener fecha de "
+"vencimiento en 18 semanas a partir de la fecha de inscripción del "
+"estudiante."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The minimum number of weeks this subsection can be due in is 1 week from the"
 " learner enrollment date."
 msgstr ""
+"El mínimo número de semanas para esta subsección puede tener vencimiento en "
+"1 semana a partir de la fecha de inscripción del estudiante."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"
@@ -11412,6 +11419,10 @@ msgid ""
 " back to a basic exam. You may not configure it as a special exam now. "
 "Contact edX Support for assistance."
 msgstr ""
+"Esta subsección fue lanzada para los estudiantes como un examen especial, "
+"pero fue revertida a un examen básico. Ahora no puede configurarlo como un "
+"examen especial. Ponte en contacto con el servicio de asistencia de edX para"
+" obtener ayuda."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11420,6 +11431,11 @@ msgid ""
 " basic exam by selecting 'None', but you will NOT be able to configure it as"
 " a special exam in the future."
 msgstr ""
+"Este examen especial ha sido lanzado a los estudiantes. Ahora no puede "
+"configurarlo como otro tipo de examen especial. Puedes revertir esta "
+"subsección para que vuelva a hacer un examen básico seleccionado la opción "
+"''Ninguno'', pero NO podrás configurar nuevamente este examen como especial "
+"en el futuro. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
@@ -11448,6 +11464,11 @@ msgid ""
 "examination rules. Please note that setting this exam as proctored will "
 "change the visibility settings to \"Hide content after due date.\""
 msgstr ""
+"Los exámenes supervisados son cronometrados y se graba en vídeo a cada "
+"estudiante que realiza el examen. Los vídeos se revisan para garantizar que "
+"los estudiantes siguen todas las reglas del examen. Tenga en cuenta que al "
+"configurar este examen como supervisado cambiará la configuración de "
+"visibilidad a \"Ocultar contenido después de la fecha de vencimiento\"."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

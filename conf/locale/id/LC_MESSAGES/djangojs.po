@@ -24,7 +24,7 @@
 # Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2016
 # Nanang Riyadi, 2015
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2015
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2018
 # Sony Wiliyanto <sonywiliyanto@hotmail.com>, 2015
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-14 20:43+0000\n"
 "PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
