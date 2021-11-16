@@ -17,8 +17,6 @@ class LtiSerializer(serializers.ModelSerializer):
     """
     Serialize LtiConfiguration responses
     """
-    # pii_share_username = serializers.BooleanField(read_only=False,)
-    # pii_share_email = serializers.BooleanField(read_only=False,)
 
     class Meta:
         model = LtiConfiguration
@@ -73,6 +71,7 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
     """
     Serialize legacy discussions settings
     """
+
     class Meta:
         fields = [
             'allow_anonymous',
@@ -181,8 +180,8 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             'unit_level_visibility',
         ]
         fields = [
-            'enabled',
-        ] + course_fields
+                     'enabled',
+                 ] + course_fields
 
     def _get_course(self):
         """
@@ -215,20 +214,15 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         course_key = instance.context_key
         payload = super().to_representation(instance)
-        # breakpoint()
-        # lti_configuration_data = {}
-        # if instance.supports_lti():
-        # pi = DiscussionsConfiguration.objects.all()[0]
         lti_configuration = LtiSerializer(
             instance.lti_configuration,
             context={'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key)}
         )
         lti_configuration_data = lti_configuration.data
 
-        # lti_configuration_data = lti_configuration.data
         provider_type = instance.provider_type
         plugin_configuration = instance.plugin_configuration
-        # if provider_type == 'legacy':
+
         course = get_course_by_id(course_key)
         legacy_settings = LegacySettingsSerializer(
             course,
