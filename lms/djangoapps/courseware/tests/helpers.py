@@ -7,7 +7,6 @@ import ast
 import json
 from collections import OrderedDict
 from datetime import timedelta
-from unittest.mock import Mock
 
 from django.contrib import messages
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -64,11 +63,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
     METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def new_module_runtime(self, render_template=None):
+    def new_module_runtime(self):
         """
         Generate a new ModuleSystem that is minimally set up for testing
         """
-        return get_test_system(course_id=self.course.id, render_template=render_template)
+        return get_test_system(course_id=self.course.id)
 
     def new_descriptor_runtime(self):
         runtime = get_test_descriptor_system()
@@ -144,14 +143,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
 class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    def new_module_runtime(self, render_template=None):
+    def new_module_runtime(self):
         """
         Create a runtime that actually does html rendering
         """
-        if not render_template:
-            render_template = render_to_string
-        runtime = super().new_module_runtime(render_template=render_template)
-        runtime.modulestore = Mock()
+        runtime = super().new_module_runtime()
+        runtime.render_template = render_to_string
         return runtime
 
 
