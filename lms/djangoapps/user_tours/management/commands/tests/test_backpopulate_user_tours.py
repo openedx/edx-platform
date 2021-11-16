@@ -1,16 +1,29 @@
 """ Tests for backpopulate user tours Command. """
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
+from django.db.models.signals import post_save
 from django.test import TestCase
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.user_tours.models import UserTour
+from lms.djangoapps.user_tours.handlers import init_user_tour
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+
+User = get_user_model()
 
 
 @skip_unless_lms
 class TestBackpopulateUserTourCommand(TestCase):
     """ Tests for the backpopulate user tours Command. """
+    @classmethod
+    def setUpClass(cls):
+        """ Init required for the class to properly run. """
+        super().setUpClass()
+        # We need to disable the UserTour handler for the backpopulate command since it is assuming
+        # users without UserTours to run.
+        post_save.disconnect(init_user_tour, sender=User)
+
     def test_happy_path(self):
         """ Tests happy path of command with one user. """
         user = UserFactory()
