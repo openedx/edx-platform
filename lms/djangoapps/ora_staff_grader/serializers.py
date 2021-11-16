@@ -14,12 +14,12 @@ class GradeStatusField(serializers.ChoiceField):
 
 
 class LockStatusField(serializers.ChoiceField):
-    """ Field that can have the values ['not-locked', 'locked', 'in-progress'] """
-    def __init__(self):
-        super().__init__(choices=['not-locked', 'locked', 'in-progress'])
+    """ Field that can have the values ['unlocked', 'locked', 'in-progress'] """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, choices=['unlocked', 'locked', 'in-progress'])
 
 
-class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class CourseMetadataSerializer(serializers.Serializer):
     """
     Serialize top-level info about a course, used for creating header in ESG
     """
@@ -37,9 +37,10 @@ class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstr
             'number',
             'courseId',
         ]
+        read_only_fields = fields
 
 
-class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class OpenResponseMetadataSerializer(serializers.Serializer):
     """
     Serialize ORA metadata, used for setting up views in ESG
     """
@@ -56,6 +57,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable
             'prompts',
             'type',
         ]
+        read_only_fields = fields
 
 
 class ScoreField(serializers.Field):
@@ -65,7 +67,7 @@ class ScoreField(serializers.Field):
         return ScoreSerializer(value).data
 
 
-class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class ScoreSerializer(serializers.Serializer):
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
@@ -73,7 +75,7 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     pointsPossible = serializers.IntegerField(required=False)
 
 
-class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class SubmissionMetadataSerializer(serializers.Serializer):
     """
     Submission metadata for displaying submissions table in ESG
     """
@@ -99,6 +101,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=a
             'lockStatus',
             'score'
         ]
+        read_only_fields = fields
 
 
 class InitializeSerializer(serializers.Serializer):
@@ -117,6 +120,7 @@ class InitializeSerializer(serializers.Serializer):
             'submissions',
             'rubricConfig',
         ]
+        read_only_fields = fields
 
 
 class UploadedFileSerializer(serializers.Serializer):
@@ -155,3 +159,16 @@ class SubmissionDetailResponseSerializer(serializers.Serializer):
     #  to be completed in AU-387
     #  gradeStatus = GradeStatusField()
     #  lockStatus = LockStatusField()
+
+
+class LockStatusSerializer(serializers.Serializer):
+    """
+    Info about the status of a submission lock, with extra metadata stripped out.
+    """
+    lockStatus = LockStatusField(source='lock_status')
+
+    class Meta:
+        fields = [
+            'lockStatus'
+        ]
+        read_only_fields = fields

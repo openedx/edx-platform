@@ -1,0 +1,4 @@
+""" Error codes and exceptions for ESG """
+
+ERR_MISSING_PARAM = "ERR_MISSING_PARAM"
+ERR_BAD_ORA_LOCATION = "ERR_BAD_ORA_LOCATION"

@@ -10,6 +10,7 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     CourseMetadataSerializer,
     GradeDataSerializer,
     InitializeSerializer,
+    LockStatusSerializer,
     OpenResponseMetadataSerializer,
     ResponseSerializer,
     ScoreField,
@@ -100,7 +101,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         "dateGraded": "<yyyy-mm-dd HH:MM:SS/None>",
         "gradedBy": "<username/empty>",
         "gradingStatus": "<ungraded/graded>",
-        "lockStatus": "<locked/unlocked/in-progress",
+        "lockStatus": "<locked/unlocked/in-progress>",
         "score": {
             "pointsEarned": <num>,
             "pointsPossible": <num>
@@ -423,3 +424,43 @@ class TestSubmissionDetailResponseSerializer(TestCase):
             'response': ResponseSerializer(input.submission).data
         }
         assert data == expected_value
+
+
+class TestLockStatusSerializer(SharedModuleStoreTestCase):
+    """
+    Tests for LockStatusSerializer
+    """
+    lock_in_progress = {
+        "submission_uuid": "e34ef789-a4b1-48cf-b1bc-b3edacfd4eb2",
+        "owner_id": "10ab03f1b75b4f9d9ab13a1fd1dccca1",
+        "created_at": "2021-09-21T21:54:09.901221Z",
+        "lock_status": "in-progress",
+    }
+
+    lock_in_progress_expected = {
+        "lockStatus": "in-progress"
+    }
+
+    lock_owned_by_other_user = {
+        "submission_uuid": "e34ef789-a4b1-48cf-b1bc-b3edacfd4eb2",
+        "owner_id": "10ab03f1b75b4f9d9ab13a1fd1dccca1",
+        "created_at": "2021-09-21T21:54:09.901221Z",
+        "lock_status": "locked",
+    }
+
+    lock_owned_by_other_user_expected = {
+        "lockStatus": "locked"
+    }
+
+    course_id = "course-v1:Oxford+TT101+2054"
+
+    def setUp(self):
+        super().setUp()
+
+    def test_happy_path(self):
+        """ For simple cases, lock status is passed through directly """
+        data = LockStatusSerializer(self.lock_in_progress).data
+        assert data == self.lock_in_progress_expected
+
+        data = LockStatusSerializer(self.lock_owned_by_other_user).data
+        assert data == self.lock_owned_by_other_user_expected
