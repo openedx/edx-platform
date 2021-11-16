@@ -433,7 +433,7 @@ class TestSubmissionDetailResponseSerializer(TestCase):
         }
         mock_get_grade_status.assert_called_once_with(input)
         assert data == expected_value
-        
+
     @ddt.data(True, False)
     def test_get__gradeStatus(self, has_assessment):
         """ Unit test for get_gradeStatus """

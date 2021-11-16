@@ -196,7 +196,7 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.data['response'].keys() == set(['files', 'text'])
         expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()
         assert response.data['gradeData'].keys() == expected_assessment_keys
-        
+
         mock_get_submission_and_assessment_info.assert_called_once()
         mock_get_submission_and_assessment_info_args = mock_get_submission_and_assessment_info.call_args[0]
         assert len(mock_get_submission_and_assessment_info_args) == 3

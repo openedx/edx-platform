@@ -121,7 +121,7 @@ class SubmissionFetchView(RetrieveAPIView):
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_and_assessment_info = self.get_submission_and_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
-        
+
         serializer = SubmissionDetailResponseSerializer({
             'submission_and_assessment_info': submission_and_assessment_info,
             'lock_info': lock_info,
