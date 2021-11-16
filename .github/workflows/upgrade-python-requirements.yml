@@ -2,70 +2,23 @@ name: Upgrade Requirements
 
 on:
   schedule:
-    # will start the job at 2 every tuesday (UTC)
-    - cron: "0 2 * * 2"
+     - cron: "0 2 * * 2"
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Target branch to create requirements PR against"
-        required: true
-        default: 'master'
-
+     inputs:
+       branch:
+         description: 'Target branch to create requirements PR against'
+         required: true
+         default: $default-branch
 jobs:
-  upgrade_requirements:
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        python-version: ["3.8"]
-
-    steps:
-      - name: setup target branch
-        run: echo "target_branch=$(if ['${{ github.event.inputs.branch }}' = '']; then echo 'master'; else echo '${{ github.event.inputs.branch }}'; fi)" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v1
-        with:
-          ref: ${{ env.target_branch }}
-
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install pip
-        run: pip install -r requirements/pip.txt
-
-      - name: make upgrade
-        run: |
-          cd $GITHUB_WORKSPACE
-          make upgrade
-
-      - name: setup testeng-ci
-        run: |
-          git clone https://github.com/edx/testeng-ci.git
-          cd $GITHUB_WORKSPACE/testeng-ci
-          pip install -r requirements/base.txt
-      - name: create pull request
-        env:
-          GITHUB_TOKEN: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
-          GITHUB_USER_EMAIL: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
-        run: |
-          cd $GITHUB_WORKSPACE/testeng-ci
-          python -m jenkins.pull_request_creator --repo-root=$GITHUB_WORKSPACE \
-          --target-branch="${{ env.target_branch }}" --base-branch-name="upgrade-python-requirements" \
-          --commit-message="chore: Updating Python Requirements" --pr-title="Python Requirements Update" \
-          --pr-body="Python requirements update.Please review the [changelogs](https://openedx.atlassian.net/wiki/spaces/TE/pages/1001521320/Python+Package+Changelogs) for the upgraded packages." \
-          --user-reviewers="" --team-reviewers="arbi-bom" --delete-old-pull-requests
-
-      - name: Send failure notification
-        if: ${{ failure() }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: email-smtp.us-east-1.amazonaws.com
-          server_port: 465
-          username: ${{secrets.EDX_SMTP_USERNAME}}
-          password: ${{secrets.EDX_SMTP_PASSWORD}}
-          subject: Upgrade python requirements workflow failed in ${{github.repository}}
-          to: arbi-bom@edx.org
-          from: github-actions <github-actions@edx.org>
-          body: Upgrade python requirements workflow in ${{github.repository}} failed! For details see "github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+   call-upgrade-python-requirements-workflow:
+    with:
+       branch: ${{ github.event.inputs.branch }}
+       team_reviewers: "arbi-bom"
+       email_address: arbi-bom@edx.org
+       send_success_notification: false
+    secrets:
+       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
+       requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
+       edx_smtp_username: ${{ secrets.EDX_SMTP_USERNAME }}
+       edx_smtp_password: ${{ secrets.EDX_SMTP_PASSWORD }}
+    uses: edx/.github/.github/workflows/upgrade-python-requirements.yml@master
