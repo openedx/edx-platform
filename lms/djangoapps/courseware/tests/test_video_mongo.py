@@ -130,9 +130,9 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'poster': 'null',
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+               get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                 expected_context))
 
 
 class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
@@ -211,9 +211,8 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'poster': 'null',
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         expected_result = get_context_dict_from_string(
-            mako_service.render_template('video.html', expected_context)
+            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
         )
         assert get_context_dict_from_string(context) == expected_result
         assert expected_result['download_video_link'] == 'example.mp4'
@@ -384,9 +383,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(metadata)
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+                   get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                     expected_context))
 
     def test_get_html_source(self):
         # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
@@ -492,9 +491,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+                   get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                     expected_context))
 
     def test_get_html_with_non_existent_edx_video_id(self):
         """
@@ -632,9 +631,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'metadata': json.dumps(expected_context['metadata'])
         })
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+               get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                 expected_context))
 
     def test_get_html_with_existing_edx_video_id(self):
         """
@@ -660,9 +659,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # context returned by get_html when provided with above data
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+               get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                 expected_context))
 
     def test_get_html_with_existing_unstripped_edx_video_id(self):
         """
@@ -691,9 +690,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+               get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                 expected_context))
 
     def encode_and_create_video(self, edx_video_id):
         """
@@ -900,9 +899,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+                   get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                     expected_context))
 
     # pylint: disable=invalid-name
     def test_get_html_cdn_source_external_video(self):
@@ -1002,9 +1001,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
+                   get_context_dict_from_string(self.item_descriptor.xmodule_runtime.render_template('video.html',
+                                                                                                     expected_context))
 
     @ddt.data(
         (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
@@ -2235,8 +2234,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             }))
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
-        expected_content = mako_service.render_template('video.html', expected_context)
+        expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
         assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
 
 
@@ -2327,9 +2325,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
             autoadvance_flag=autoadvance_must_be,
         )
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
         with override_settings(FEATURES=self.FEATURES):
-            expected_content = mako_service.render_template('video.html', expected_context)
+            expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
 
         assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
 

@@ -42,6 +42,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         self.patchers = []
         self.course_id = "test_course"
         self.runtime = self.new_module_runtime()
+        self.runtime.modulestore = mock.Mock()
 
         self.discussion_id = str(uuid.uuid4())
         self.data = DictFieldData({
@@ -130,8 +131,7 @@ class TestViews(TestDiscussionXBlock):
         self.template_canary = 'canary'
         self.render_template = mock.Mock()
         self.render_template.return_value = self.template_canary
-        self.runtime = self.new_module_runtime(render_template=self.render_template)
-        self.block.runtime = self.runtime
+        self.block.runtime.render_template = self.render_template
         self.has_permission_mock = mock.Mock()
         self.has_permission_mock.return_value = False
         self.block.has_permission = self.has_permission_mock

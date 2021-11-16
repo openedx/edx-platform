@@ -22,7 +22,8 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        system = get_test_descriptor_system(render_template=Mock())
+        system = get_test_descriptor_system()
+        system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         self.tabs = [
             {
                 'name': "Test_css",
