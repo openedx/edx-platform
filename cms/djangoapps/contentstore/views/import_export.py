@@ -274,6 +274,7 @@ def import_status_handler(request, course_key_string, filename=None):
     else:
         status = min(task_status.completed_steps + 1, 3)
 
+    logging.info(f'Import Name : {name} task uuid:  {task_status.uuid} task status : {task_status.state}')
     return JsonResponse({"ImportStatus": status, "Message": message})
 
 
