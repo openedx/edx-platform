@@ -119,7 +119,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url)
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
+        assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_ora_location(self):
         """ Missing ora_location param should return 400 and error message """
@@ -127,7 +127,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': ''})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
+        assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_missing_submission_uuid(self):
         """ Missing submission_uuid param should return 400 and error message """
@@ -135,7 +135,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': Mock()})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
+        assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_submission_uuid(self):
         """ Blank submission_uuid param should return 400 and error message """
@@ -143,7 +143,7 @@ class TestFetchSubmissionView(BaseViewTest):
         response = self.client.get(self.api_url, {'ora_location': Mock(), 'submission_uuid': ''})
 
         assert response.status_code == 400
-        assert response.content.decode() == "Query requires the following query params: ora_location, submission_uuid"
+        assert response.content.decode() == ERR_MISSING_PARAM
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_and_assessment_info')
