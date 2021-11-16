@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from lms.djangoapps.ora_staff_grader.mock.utils import *
 
+
 class InitializeView(RetrieveAPIView):
     """ Returns initial app state """
 
