@@ -6,7 +6,7 @@ Implementation of "Instructor" service
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
