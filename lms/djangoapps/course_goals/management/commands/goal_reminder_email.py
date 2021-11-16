@@ -82,6 +82,10 @@ def send_ace_message(goal):
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
     })
 
+    message_context['email'] = 'mpiatetsky@edx.org'
+    message_context['image_url'] = 'https://courses.edx.org/static/images/'
+    message_context['logo_url'] = 'http://email-media.s3.amazonaws.com/edX/2021/edX_logo.png'
+
     msg = Message(
         name="goalreminder",
         app_label="course_goals",
@@ -109,6 +113,7 @@ class Command(BaseCommand):
         Helpful notes for the function:
             weekday() returns an int 0-6 with Monday being 0 and Sunday being 6
         """
+        send_ace_message(CourseGoal.objects.first()); return
         today = date.today()
         sunday_date = today + timedelta(days=SUNDAY_WEEKDAY - today.weekday())
         monday_date = today - timedelta(days=today.weekday())

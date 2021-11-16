@@ -20,3 +20,5 @@ def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function
     settings.ACE_ROUTING_KEY = 'edx.core.low'
 
     settings.FEATURES['test_django_plugin'] = True
+    settings.ACE_EMAIL_COURSES_URL = 'test'
+    settings.ACE_EMAIL_PROGRAMS_URL = 'test'

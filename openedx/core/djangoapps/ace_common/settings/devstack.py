@@ -13,8 +13,8 @@ def plugin_settings(settings):
     common.plugin_settings(settings)
 
     settings.ACE_ENABLED_CHANNELS = [
-        'file_email'
+        'braze_email'
     ]
 
-    settings.ACE_CHANNEL_DEFAULT_EMAIL = 'file_email'
-    settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'file_email'
+    settings.ACE_CHANNEL_DEFAULT_EMAIL = 'braze_email'
+    settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'braze_email'
