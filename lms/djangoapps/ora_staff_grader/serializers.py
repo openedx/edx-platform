@@ -19,7 +19,7 @@ class LockStatusField(serializers.ChoiceField):
         super().__init__(*args, **kwargs, choices=['unlocked', 'locked', 'in-progress'])
 
 
-class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class CourseMetadataSerializer(serializers.Serializer):
     """
     Serialize top-level info about a course, used for creating header in ESG
     """
@@ -40,7 +40,7 @@ class CourseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstr
         read_only_fields = fields
 
 
-class OpenResponseMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class OpenResponseMetadataSerializer(serializers.Serializer):
     """
     Serialize ORA metadata, used for setting up views in ESG
     """
@@ -67,7 +67,7 @@ class ScoreField(serializers.Field):
         return ScoreSerializer(value).data
 
 
-class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class ScoreSerializer(serializers.Serializer):
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
@@ -75,7 +75,7 @@ class ScoreSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     pointsPossible = serializers.IntegerField(required=False)
 
 
-class SubmissionMetadataSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class SubmissionMetadataSerializer(serializers.Serializer):
     """
     Submission metadata for displaying submissions table in ESG
     """
