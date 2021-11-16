@@ -74,18 +74,14 @@ class TestLibraryContentExportImport(LibraryContentTest):
     """
     Export and import tests for LibraryContentBlock
     """
+    def setUp(self):
+        super().setUp()
 
-    maxDiff = None
-
-    def test_xml_export_import_cycle(self):
-        """
-        Test the export-import cycle.
-        """
         # Children will only set after calling this.
         self.lc_block.refresh_children()
-        lc_block = self.store.get_item(self.lc_block.location)
+        self.lc_block = self.store.get_item(self.lc_block.location)
 
-        expected_olx = (
+        self.expected_olx = (
             '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
             ' source_library_id="{block.source_library_id}" source_library_version="{block.source_library_version}">\n'
             '  <html url_name="{block.children[0].block_id}"/>\n'
@@ -94,44 +90,78 @@ class TestLibraryContentExportImport(LibraryContentTest):
             '  <html url_name="{block.children[3].block_id}"/>\n'
             '</library_content>\n'
         ).format(
-            block=lc_block,
+            block=self.lc_block,
         )
 
-        export_fs = MemoryFS()
         # Set the virtual FS to export the olx to.
-        lc_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
+        self.export_fs = MemoryFS()
+        self.lc_block.runtime._descriptor_system.export_fs = self.export_fs  # pylint: disable=protected-access
+
+        # Prepare runtime for the import.
+        self.runtime = TestImportSystem(load_error_modules=True, course_id=self.lc_block.location.course_key)
+        self.runtime.resources_fs = self.export_fs
+        self.id_generator = Mock()
 
         # Export the olx.
         node = etree.Element("unknown_root")
-        lc_block.add_xml_to_node(node)
+        self.lc_block.add_xml_to_node(node)
 
-        # Read it back
-        with export_fs.open('{dir}/{file_name}.xml'.format(
-            dir=lc_block.scope_ids.usage_id.block_type,
-            file_name=lc_block.scope_ids.usage_id.block_id
+    def _verify_xblock_properties(self, imported_lc_block):
+        """
+        Check the new XBlock has the same properties as the old one.
+        """
+        assert imported_lc_block.display_name == self.lc_block.display_name
+        assert imported_lc_block.source_library_id == self.lc_block.source_library_id
+        assert imported_lc_block.source_library_version == self.lc_block.source_library_version
+        assert imported_lc_block.mode == self.lc_block.mode
+        assert imported_lc_block.max_count == self.lc_block.max_count
+        assert imported_lc_block.capa_type == self.lc_block.capa_type
+        assert len(imported_lc_block.children) == len(self.lc_block.children)
+        assert imported_lc_block.children == self.lc_block.children
+
+    def test_xml_export_import_cycle(self):
+        """
+        Test the export-import cycle.
+        """
+        # Read back the olx.
+        with self.export_fs.open('{dir}/{file_name}.xml'.format(
+            dir=self.lc_block.scope_ids.usage_id.block_type,
+            file_name=self.lc_block.scope_ids.usage_id.block_id
         )) as f:
             exported_olx = f.read()
 
         # And compare.
-        assert exported_olx == expected_olx
-
-        runtime = TestImportSystem(load_error_modules=True, course_id=lc_block.location.course_key)
-        runtime.resources_fs = export_fs
+        assert exported_olx == self.expected_olx
 
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, runtime, None, id_generator)
+        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None, self.id_generator)
 
-        # Check the new XBlock has the same properties as the old one.
-        assert imported_lc_block.display_name == lc_block.display_name
-        assert imported_lc_block.source_library_id == lc_block.source_library_id
-        assert imported_lc_block.source_library_version == lc_block.source_library_version
-        assert imported_lc_block.mode == lc_block.mode
-        assert imported_lc_block.max_count == lc_block.max_count
-        assert imported_lc_block.capa_type == lc_block.capa_type
-        assert len(imported_lc_block.children) == 4
-        assert imported_lc_block.children == lc_block.children
+        self._verify_xblock_properties(imported_lc_block)
+
+    def test_xml_import_with_comments(self):
+        """
+        Test that XML comments within LibraryContentBlock are ignored during the import.
+        """
+        olx_with_comments = (
+            '<!-- Comment -->\n'
+            '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
+            ' source_library_id="{block.source_library_id}" source_library_version="{block.source_library_version}">\n'
+            '<!-- Comment -->\n'
+            '  <html url_name="{block.children[0].block_id}"/>\n'
+            '  <html url_name="{block.children[1].block_id}"/>\n'
+            '  <html url_name="{block.children[2].block_id}"/>\n'
+            '  <html url_name="{block.children[3].block_id}"/>\n'
+            '</library_content>\n'
+        ).format(
+            block=self.lc_block,
+        )
+
+        # Import the olx.
+        olx_element = etree.fromstring(olx_with_comments)
+        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None, self.id_generator)
+
+        self._verify_xblock_properties(imported_lc_block)
 
 
 class LibraryContentBlockTestMixin:
