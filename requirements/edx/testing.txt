@@ -34,7 +34,7 @@
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
-aiohttp==3.8.0
+aiohttp==3.8.1
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -63,11 +63,11 @@ asgiref==3.4.1
     #   -r requirements/edx/base.txt
     #   django
     #   uvicorn
-astroid==2.8.4
+astroid==2.8.5
     # via
     #   pylint
     #   pylint-celery
-async-timeout==4.0.0
+async-timeout==4.0.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -188,7 +188,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.1.1
+coverage[toml]==6.1.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -229,6 +229,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
+    #   redis
 diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -236,6 +237,7 @@ diff-cover==4.0.0
 distlib==0.3.3
     # via virtualenv
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -621,7 +623,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==9.8.0
+faker==9.8.2
     # via factory-boy
 fastapi==0.70.0
     # via pact-python
@@ -715,7 +717,7 @@ itypes==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   coreapi
-jinja2==3.0.2
+jinja2==3.0.3
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
@@ -848,7 +850,7 @@ multidict==5.2.0
     #   yarl
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==7.2.3.170
+newrelic==7.2.4.171
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1055,7 +1057,7 @@ pytest-metadata==1.8.0
     # via
     #   -r requirements/edx/testing.in
     #   pytest-json-report
-pytest-randomly==3.10.1
+pytest-randomly==3.10.2
     # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.in
@@ -1129,9 +1131,9 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==3.5.3
+redis==4.0.0
     # via -r requirements/edx/base.txt
-regex==2021.11.2
+regex==2021.11.10
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1270,7 +1272,7 @@ sorl-thumbnail==12.7.0
     #   django-wiki
 sortedcontainers==2.4.0
     # via -r requirements/edx/base.txt
-soupsieve==2.3
+soupsieve==2.3.1
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
@@ -1332,7 +1334,7 @@ tqdm==4.62.3
     #   nltk
 transifex-client==0.14.3
     # via -r requirements/edx/testing.in
-typing-extensions==3.10.0.2
+typing-extensions==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   astroid
