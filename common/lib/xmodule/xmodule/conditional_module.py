@@ -11,7 +11,6 @@ from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
 from xblock.fields import ReferenceList, Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
@@ -39,7 +38,6 @@ log = logging.getLogger('edx.' + __name__)
 _ = lambda text: text
 
 
-@XBlock.needs('mako')
 class ConditionalBlock(
     SequenceMixin,
     MakoTemplateBlockBase,
@@ -247,7 +245,7 @@ class ConditionalBlock(
 
     def get_html(self):
         required_html_ids = [descriptor.location.html_id() for descriptor in self.get_required_blocks]
-        return self.runtime.service(self, 'mako').render_template('conditional_ajax.html', {
+        return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'ajax_url': self.ajax_url,
             'depends': ';'.join(required_html_ids)
@@ -273,7 +271,7 @@ class ConditionalBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.system.render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'ConditionalBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
@@ -286,7 +284,8 @@ class ConditionalBlock(
         if not self.is_condition_satisfied():
             context = {'module': self,
                        'message': self.conditional_message}
-            html = self.runtime.service(self, 'mako').render_template('conditional_module.html', context)
+            html = self.system.render_template('conditional_module.html',
+                                               context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
         fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]

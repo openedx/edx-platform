@@ -6,7 +6,6 @@ import textwrap
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
 from xblock.fields import Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
@@ -30,7 +29,6 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-@XBlock.needs('mako')
 class AnnotatableBlock(
     RawMixin,
     XmlMixin,
@@ -203,7 +201,7 @@ class AnnotatableBlock(
             'content_html': self._render_content()
         }
 
-        return self.runtime.service(self, 'mako').render_template('annotatable.html', context)
+        return self.system.render_template('annotatable.html', context)
 
     def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -221,7 +219,7 @@ class AnnotatableBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.system.render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'AnnotatableBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
