@@ -3,7 +3,7 @@ URLs for the student support app.
 """
 
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from .views.certificate import CertificatesSupportView
 from .views.contact_us import ContactUsView
@@ -19,37 +19,38 @@ COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 
 app_name = 'support'
 urlpatterns = [
-    url(r'^$', index, name="index"),
-    url(r'^certificates/?$', CertificatesSupportView.as_view(), name="certificates"),
-    url(r'^enrollment/?$', EnrollmentSupportView.as_view(), name="enrollment"),
-    url(r'^course_entitlement/?$', COURSE_ENTITLEMENTS_VIEW, name="course_entitlement"),
-    url(r'^contact_us/?$', ContactUsView.as_view(), name="contact_us"),
-    url(
+    path('', index, name="index"),
+    re_path(r'^certificates/?$', CertificatesSupportView.as_view(), name="certificates"),
+    re_path(r'^enrollment/?$', EnrollmentSupportView.as_view(), name="enrollment"),
+    re_path(r'^course_entitlement/?$', COURSE_ENTITLEMENTS_VIEW, name="course_entitlement"),
+    re_path(r'^contact_us/?$', ContactUsView.as_view(), name="contact_us"),
+    re_path(
         r'^enrollment/(?P<username_or_email>[\w.@+-]+)?$',
         EnrollmentSupportListView.as_view(),
         name="enrollment_list"
     ),
-    url(r'^manage_user/?$', ManageUserSupportView.as_view(), name="manage_user"),
-    url(
+    re_path(r'^manage_user/?$', ManageUserSupportView.as_view(), name="manage_user"),
+    re_path(
         r'^manage_user/(?P<username_or_email>[\w.@+-]+)?$',
         ManageUserDetailView.as_view(),
         name="manage_user_detail"
     ),
-    url(
+    re_path(
         r'^feature_based_enrollments/?$',
         FeatureBasedEnrollmentsSupportView.as_view(),
         name="feature_based_enrollments"
     ),
-    url(
+    re_path(
         fr'^feature_based_enrollment_details/{settings.COURSE_ID_PATTERN}$',
         FeatureBasedEnrollmentSupportAPIView.as_view(),
         name="feature_based_enrollment_details"
     ),
-    url(r'link_program_enrollments/?$', LinkProgramEnrollmentSupportView.as_view(), name='link_program_enrollments'),
-    url(
+    re_path(r'link_program_enrollments/?$', LinkProgramEnrollmentSupportView.as_view(),
+            name='link_program_enrollments'),
+    re_path(
         r'program_enrollments_inspector/?$',
         ProgramEnrollmentsInspectorView.as_view(),
         name='program_enrollments_inspector'
     ),
-    url(r'sso_records/(?P<username_or_email>[\w.@+-]+)?$', SsoView.as_view(), name='sso_records'),
+    re_path(r'sso_records/(?P<username_or_email>[\w.@+-]+)?$', SsoView.as_view(), name='sso_records'),
 ]
