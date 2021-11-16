@@ -27,7 +27,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 log = logging.getLogger(__name__)
 
-DEFAULT_PROVIDER_TYPE = 'legacy'
+EDX_PROVIDER = 'legacy'
+DEFAULT_PROVIDER_TYPE = EDX_PROVIDER
 DEFAULT_CONFIG_ENABLED = True
 
 ProviderExternalLinks = namedtuple(

@@ -17,6 +17,9 @@ class LtiSerializer(serializers.ModelSerializer):
     """
     Serialize LtiConfiguration responses
     """
+    # pii_share_username = serializers.BooleanField(read_only=False,)
+    # pii_share_email = serializers.BooleanField(read_only=False,)
+
     class Meta:
         model = LtiConfiguration
         fields = [
@@ -212,22 +215,27 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         course_key = instance.context_key
         payload = super().to_representation(instance)
-        lti_configuration_data = {}
-        if instance.supports_lti():
-            lti_configuration = LtiSerializer(instance.lti_configuration, context={
-                'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
-            })
-            lti_configuration_data = lti_configuration.data
-        provider_type = instance.provider_type or DEFAULT_PROVIDER_TYPE
+        # breakpoint()
+        # lti_configuration_data = {}
+        # if instance.supports_lti():
+        # pi = DiscussionsConfiguration.objects.all()[0]
+        lti_configuration = LtiSerializer(
+            instance.lti_configuration,
+            context={'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key)}
+        )
+        lti_configuration_data = lti_configuration.data
+
+        # lti_configuration_data = lti_configuration.data
+        provider_type = instance.provider_type
         plugin_configuration = instance.plugin_configuration
-        if provider_type == 'legacy':
-            course = get_course_by_id(course_key)
-            legacy_settings = LegacySettingsSerializer(
-                course,
-                data=plugin_configuration,
-            )
-            if legacy_settings.is_valid(raise_exception=True):
-                plugin_configuration = legacy_settings.data
+        # if provider_type == 'legacy':
+        course = get_course_by_id(course_key)
+        legacy_settings = LegacySettingsSerializer(
+            course,
+            data=plugin_configuration,
+        )
+        if legacy_settings.is_valid(raise_exception=True):
+            plugin_configuration = legacy_settings.data
         features_list = [
             {'id': feature.value, 'feature_support_type': feature.feature_support_type}
             for feature in Features
