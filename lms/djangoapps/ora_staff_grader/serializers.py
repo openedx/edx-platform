@@ -48,6 +48,8 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
     name = serializers.CharField(source='display_name')
     prompts = serializers.ListField()
     type = serializers.SerializerMethodField()
+    textResponseConfig = serializers.CharField(source='text_response')
+    fileUploadResponseConfig = serializers.CharField(source='file_upload_response')
 
     def get_type(self, instance):
         return 'team' if instance.teams_enabled else 'individual'
@@ -57,6 +59,8 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
             'name',
             'prompts',
             'type',
+            'textResponseConfig',
+            'fileUploadResponseConfig',
         ]
         read_only_fields = fields
 
