@@ -676,7 +676,7 @@ class ImportTestCase(CourseTestCase):
         self.assertImportStatusResponse(status_response, self.UpdatingError, import_error.UNKNOWN_ERROR_IN_IMPORT)
 
     def test_import_status_response_is_not_cached(self):
-        """Helper method to get course import status."""
+        """To test import_status endpoint response is not cached"""
         resp = self.client.get(
             reverse_course_url(
                 'import_status_handler',
