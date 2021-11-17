@@ -1173,35 +1173,39 @@
       padding: $baseline/2;
       margin-bottom: 0;
 
-      .related-programs-preface {
+      .related-programs-preface  {
         @include float(left);
 
         margin: 0 $baseline/2;
         font-weight: bold;
       }
 
-      ul {
+      .related-program-container {
         display: inline;
         padding: 0;
         margin: 0;
       }
 
-      li {
-        @include float(left);
+      .related-program-element {
+        &.buffered-element {
+          &.important-element {
+            @include float(left);
 
-        display: inline;
-        padding: 0 0.5em;
-        border-right: 1px solid;
+            display: inline;
+            padding: 0 0.5em !important;
+            border-right: 1px solid;
 
-        .category-icon {
-          @include float(left);
-          @include margin-right($baseline/4);
+            .category-icon {
+              @include float(left);
+              @include margin-right($baseline/4);
 
-          margin-top: ($baseline/10);
-          background-color: transparent;
-          background-size: 100%;
-          width: ($baseline*0.7);
-          height: ($baseline*0.7);
+              margin-top: ($baseline/10);
+              background-color: transparent;
+              background-size: 100%;
+              width: ($baseline*0.7);
+              height: ($baseline*0.7);
+            }
+          }
         }
       }
 
