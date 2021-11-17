@@ -20,6 +20,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.utils.translation import gettext as _
+from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
@@ -232,6 +233,7 @@ def _write_chunk(request, courselike_key):  # lint-amnesty, pylint: disable=too-
 @require_GET
 @ensure_csrf_cookie
 @login_required
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
 def import_status_handler(request, course_key_string, filename=None):
     """
