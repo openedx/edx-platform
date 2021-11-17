@@ -4,6 +4,8 @@ Unit tests for course rating api views.
 from unittest import TestCase
 import pytest
 
+from django.conf import settings
+from django.contrib.auth.models import Group
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -110,6 +112,19 @@ class CourseRatingViewSet(TestCase):
         response = client.put(api_url, params, content_type='application/json')
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['rating'] == params['rating']
+
+        params['is_approved'] = True
+        edly_user = EdlyUserFactory(password=USER_PASSWORD)
+        request = RequestFactory()
+        request.site = self.site
+        request.user = edly_user
+        edly_wp_admin_user_group, __ = Group.objects.get_or_create(name=settings.EDLY_WP_ADMIN_USERS_GROUP)
+        request.user.groups.add(edly_wp_admin_user_group)
+        client = Client(SERVER_NAME=request.site.domain)
+        client.login(username=edly_user.username, password=USER_PASSWORD)
+        response = client.put(api_url, params, content_type='application/json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['is_approved'] == params['is_approved']
 
 
 class CourseAverageRatingAPIView(TestCase):
