@@ -2,9 +2,7 @@
     "block-a": {
         "name": "Individual ORA",
         "prompts": [
-            {
-                "description": "<p>Enter a text/files response.</p>"
-            }
+            "<p>Enter a text/files response.</p>"
         ],
         "type": "individual",
         "rubricConfig": {
@@ -13,8 +11,9 @@
             "feedbackDefaultText": "I believe this response...",
             "criteria": [
                 {
-                    "name": "Grammar",
                     "orderNum": 0,
+                    "name": "grammar",
+                    "label": "Grammar",
                     "prompt": "How correct is the submitter's grammar?",
                     "feedback": "optional",
                     "options": [
@@ -41,9 +40,7 @@
     "block-b": {
         "name": "Team ORA",
         "prompts": [
-            {
-                "description": "<p>Enter a text/files response.</p>"
-            }
+            "<p>Enter a text/files response.</p>"
         ],
         "type": "team",
         "rubricConfig": {
@@ -52,8 +49,9 @@
             "feedbackDefaultText": "I believe this response...",
             "criteria": [
                 {
-                    "name": "Correctness",
                     "orderNum": 0,
+                    "name": "correctness",
+                    "label": "Correctness",
                     "prompt": "How correct is the team's answer?",
                     "feedback": "optional",
                     "options": [
