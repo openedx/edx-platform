@@ -675,6 +675,17 @@ class ImportTestCase(CourseTestCase):
         status_response = self.get_import_status(self.course.id, self.good_tar)
         self.assertImportStatusResponse(status_response, self.UpdatingError, import_error.UNKNOWN_ERROR_IN_IMPORT)
 
+    def test_import_status_response_is_not_cached(self):
+        """Helper method to get course import status."""
+        resp = self.client.get(
+            reverse_course_url(
+                'import_status_handler',
+                self.course.id,
+                kwargs={'filename': os.path.split(self.good_tar)[1]}
+            )
+        )
+        self.assertEqual(resp.headers['Cache-Control'], 'no-cache, no-store, must-revalidate')
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 @ddt.ddt
