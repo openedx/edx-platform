@@ -146,13 +146,15 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.content.decode() == ERR_MISSING_PARAM
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_and_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_assessment_info')
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.check_submission_lock')
     def test_fetch_submission(
         self,
         has_assessment,
         mock_check_submission_lock,
-        mock_get_submission_and_assessment_info
+        mock_get_assessment_info,
+        mock_get_submission_info,
     ):
         """ """
         mock_submission = {
@@ -181,10 +183,9 @@ class TestFetchSubmissionView(BaseViewTest):
                 },
             ]
         }
-        mock_get_submission_and_assessment_info.return_value = {
-            'submission': mock_submission,
-            'assessment': mock_assessment,
-        }
+
+        mock_get_submission_info.return_value = mock_submission
+        mock_get_assessment_info.return_value = mock_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
 
         self.log_in()
@@ -196,16 +197,6 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.data['response'].keys() == set(['files', 'text'])
         expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()
         assert response.data['gradeData'].keys() == expected_assessment_keys
-
-        mock_get_submission_and_assessment_info.assert_called_once()
-        mock_get_submission_and_assessment_info_args = mock_get_submission_and_assessment_info.call_args[0]
-        assert len(mock_get_submission_and_assessment_info_args) == 3
-        assert mock_get_submission_and_assessment_info_args[1:] == (str(ora_location), str(submission_uuid))
-
-        mock_check_submission_lock.assert_called_once()
-        mock_check_submission_lock_args = mock_check_submission_lock.call_args[0]
-        assert len(mock_check_submission_lock_args) == 3
-        assert mock_check_submission_lock_args[1:] == (str(ora_location), str(submission_uuid))
 
 
 class TestSubmissionLockView(APITestCase):

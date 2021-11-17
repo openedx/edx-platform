@@ -426,8 +426,8 @@ class TestSubmissionDetailResponseSerializer(TestCase):
             data = serializer.data
 
         expected_value = {
-            'gradeData': GradeDataSerializer(input.submission_and_assessment_info.assessment).data,
-            'response': ResponseSerializer(input.submission_and_assessment_info.submission).data,
+            'gradeData': GradeDataSerializer(input.assessment_info).data,
+            'response': ResponseSerializer(input.submission_info).data,
             'gradeStatus': mock_get_grade_status.return_value,
             'lockStatus': LockStatusField().to_representation(input.lock_info.lock_status)
         }
@@ -438,7 +438,7 @@ class TestSubmissionDetailResponseSerializer(TestCase):
     def test_get__gradeStatus(self, has_assessment):
         """ Unit test for get_gradeStatus """
         assessment = {'somekey': 'somevalue'} if has_assessment else {}
-        input = {'submission_and_assessment_info': {'assessment': assessment}}
+        input = {'assessment_info': {'assessment': assessment}}
         value = SubmissionDetailResponseSerializer().get_gradeStatus(input)
         expected = 'graded' if has_assessment else 'ungraded'
         assert value == expected

@@ -154,13 +154,13 @@ class GradeDataSerializer(serializers.Serializer):
 
 class SubmissionDetailResponseSerializer(serializers.Serializer):
     """ Serializer for the response from the submission """
-    gradeData = GradeDataSerializer(source='submission_and_assessment_info.assessment')
-    response = ResponseSerializer(source='submission_and_assessment_info.submission')
+    gradeData = GradeDataSerializer(source='assessment_info')
+    response = ResponseSerializer(source='submission_info')
     gradeStatus = serializers.SerializerMethodField()
     lockStatus = LockStatusField(source='lock_info.lock_status')
 
     def get_gradeStatus(self, obj):
-        if obj.get('submission_and_assessment_info', {}).get('assessment'):
+        if obj.get('assessment_info', {}).get('assessment'):
             return 'graded'
         else:
             return 'ungraded'

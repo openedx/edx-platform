@@ -97,6 +97,7 @@ class SubmissionFetchView(RetrieveAPIView):
             criteria: (list of dict) [{
                 name: (str) name of criterion
                 feedback: (str) feedback for criterion
+                points: (int) points of selected option or None if feedback-only criterion
                 selectedOption: (str) name of selected option or None if feedback-only criterion
             }]
         }
@@ -119,24 +120,35 @@ class SubmissionFetchView(RetrieveAPIView):
 
     @require_params(['ora_location', 'submission_uuid'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        submission_and_assessment_info = self.get_submission_and_assessment_info(request, ora_location, submission_uuid)
+        submission_info = self.get_submission_info(request, ora_location, submission_uuid)
+        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
 
         serializer = SubmissionDetailResponseSerializer({
-            'submission_and_assessment_info': submission_and_assessment_info,
+            'submission_info': submission_info,
+            'assessment_info': assessment_info,
             'lock_info': lock_info,
         })
 
         return Response(serializer.data)
 
-    def get_submission_and_assessment_info(self, request, usage_id, submission_uuid):
+    def get_submission_info(self, request, usage_id, submission_uuid):
         """
-        Get submission content and assessment data from ORA 'get_submission_and_assessment_info' XBlock.json_handler
+        Get submission content from ORA 'get_submission_info' XBlock.json_handler
         """
         data = {
             'submission_uuid': submission_uuid
         }
-        return call_xblock_json_handler(request, usage_id, 'get_submission_and_assessment_info', data)
+        return call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+
+    def get_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
 
     def check_submission_lock(self, request, usage_id, submission_uuid):
         """
