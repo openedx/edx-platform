@@ -5,7 +5,7 @@ import logging
 
 from celery.states import FAILURE, READY_STATES, REVOKED
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from lms.djangoapps.instructor_task.api_helper import get_status_from_instructor_task, get_updated_instructor_task
 from lms.djangoapps.instructor_task.models import PROGRESS
@@ -13,7 +13,7 @@ from lms.djangoapps.instructor_task.models import PROGRESS
 log = logging.getLogger(__name__)
 
 # return status for completed tasks and tasks in progress
-STATES_WITH_STATUS = [state for state in READY_STATES] + [PROGRESS]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+STATES_WITH_STATUS = list(READY_STATES) + [PROGRESS]
 
 
 def _get_instructor_task_status(task_id):

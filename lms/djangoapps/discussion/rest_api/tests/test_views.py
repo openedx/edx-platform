@@ -11,10 +11,12 @@ from urllib.parse import urlparse
 import ddt
 import httpretty
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -23,6 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
@@ -131,6 +134,153 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
     def test_inactive(self):
         self.user.is_active = False
         self.test_basic()
+
+
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Tests for UploadFileView.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+        self.valid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.jpg",
+                b"test content",
+                content_type="image/jpeg",
+            ),
+        }
+        self.user = UserFactory.create(password="password")
+        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
+        self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
+
+    def user_login(self):
+        """
+        Authenticates the test client with the example user.
+        """
+        self.client.login(username=self.user.username, password="password")
+
+    def enroll_user_in_course(self):
+        """
+        Makes the example user enrolled to the course.
+        """
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def assert_upload_success(self, response):
+        """
+        Asserts that the upload response was successful and returned the
+        expected contents.
+        """
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content_type == "application/json"
+        response_data = json.loads(response.content)
+        assert "location" in response_data
+
+    def test_file_upload_by_unauthenticated_user(self):
+        """
+        Should fail if an unauthenticated user tries to upload a file.
+        """
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_file_upload_by_unauthorized_user(self):
+        """
+        Should fail if the user is not either staff or a student
+        enrolled in the course.
+        """
+        self.user_login()
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_by_enrolled_user(self):
+        """
+        Should succeed when a valid file is uploaded by an authenticated
+        user who's enrolled in the course.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_global_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a global staff
+        member.
+        """
+        self.user_login()
+        GlobalStaff().add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_instructor(self):
+        """
+        Should succeed when a valid file is uploaded by a course instructor.
+        """
+        self.user_login()
+        CourseInstructorRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_course_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a course staff
+        member.
+        """
+        self.user_login()
+        CourseStaffRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_with_thread_key(self):
+        """
+        Should contain the given thread_key in the uploaded file name.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, {
+            **self.valid_file,
+            "thread_key": "somethread",
+        })
+        response_data = json.loads(response.content)
+        assert "/somethread/" in response_data["location"]
+
+    def test_file_upload_with_invalid_file(self):
+        """
+        Should fail if the uploaded file format is not allowed.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        invalid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.txt",
+                b"test content",
+                content_type="text/plain",
+            ),
+        }
+        response = self.client.post(self.url, invalid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_invalid_course_id(self):
+        """
+        Should fail if the course does not exist.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        url = reverse("upload_file", kwargs={"course_id": "d/e/f"})
+        response = self.client.post(url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_no_data(self):
+        """
+        Should fail when the user sends a request missing an
+        `uploaded_file` field.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, data={})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})

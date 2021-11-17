@@ -3188,6 +3188,9 @@ INSTALLED_APPS = [
 
     # Content Library LTI 1.3 Support.
     'pylti1p3.contrib.django.lti1p3_tool_config',
+
+    # For edx ace template tags
+    'edx_ace',
 ]
 
 ######################### CSRF #########################################
@@ -3434,7 +3437,8 @@ LOGIN_REDIRECT_WHITELIST = []
 #   'terms_of_service': 'hidden', 'city': 'hidden', 'country': 'hidden'}
 # .. setting_description: The signup form may contain extra fields that are presented to every user. For every field, we
 #   can specifiy whether it should be "required": to display the field, and make it mandatory; "optional": to display
-#   the field, and make it non-mandatory; "hidden": to not display the field.
+#   the optional field as part of a toggled input field list; "optional-exposed": to display the optional fields among
+#   the required fields, and make it non-mandatory; "hidden": to not display the field.
 #   When the terms of service are not visible and agreement to the honor code is required (the default), the signup page
 #   includes a paragraph that links to the honor code page (defined my MKTG_URLS["HONOR"]). This page might not be
 #   available for all Open edX platforms. In such cases, the "honor_code" registration field should be "hidden".
@@ -4841,3 +4845,9 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+
+################# Bulk Course Email Settings #################
+# If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
+# The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
+# a value of `3` would include learners who have logged in within the past 3 months.
+BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None

@@ -6,7 +6,7 @@ Support for using the CodeMirror code editor as a wiki content editor.
 from django import forms
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from wiki.editors.base import BaseEditor
@@ -41,7 +41,7 @@ class CodeMirrorWidget(forms.Widget):
 
         return render_to_string('wiki/includes/editor_widget.html',
                                 {'attrs': mark_safe(flatatt(final_attrs)),
-                                 'content': conditional_escape(force_text(value)),
+                                 'content': conditional_escape(force_str(value)),
                                  })
 
 

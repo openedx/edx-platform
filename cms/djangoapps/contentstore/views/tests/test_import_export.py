@@ -1256,7 +1256,25 @@ class TestCourseExportImportProblem(CourseTestCase):
 
             '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  '
             '<multiplechoiceresponse/>\n</problem>\n'
-        ]
+        ],
+        [
+            '<!-- Comment outside of the root (will be deleted). -->'
+            '<problem>'
+            '<!-- Valid comment -->'
+            '<p>'
+            '"<!-- String with non-XML structure: >< -->"'
+            'Text'
+            '</p>'
+            '</problem>',
+
+            '<problem>\n  '
+            '<!-- Valid comment -->\n  '
+            '<p>'
+            '"<!-- String with non-XML structure: >< -->"'
+            'Text'
+            '</p>\n'
+            '</problem>\n'
+        ],
     )
     @ddt.unpack
     def test_problem_content_on_course_export_import(self, problem_data, expected_problem_content):

@@ -11,11 +11,16 @@ from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email
 
-ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
-ATTR_KEY_USER_ID = 'edx-platform.user_id'
-ATTR_KEY_USERNAME = 'edx-platform.username'
-ATTR_KEY_USER_IS_STAFF = 'edx-platform.user_is_staff'
-ATTR_KEY_USER_PREFERENCES = 'edx-platform.user_preferences'
+from .constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_IS_AUTHENTICATED,
+    ATTR_KEY_USER_ID,
+    ATTR_KEY_USERNAME,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_PREFERENCES,
+)
+
+
 USER_PREFERENCES_WHITE_LIST = ['pref-lang', 'time_zone']
 
 
@@ -24,10 +29,17 @@ class DjangoXBlockUserService(UserService):
     A user service that converts Django users to XBlockUser
     """
     def __init__(self, django_user, **kwargs):
+        """
+        Constructs a DjangoXBlockUserService object.
+
+        Args:
+            user_is_staff(bool): optional - whether the user is staff in the course
+            anonymous_user_id(str): optional - anonymous_user_id for the user in the course
+        """
         super().__init__(**kwargs)
         self._django_user = django_user
-        if self._django_user:
-            self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
+        self._user_is_staff = kwargs.get('user_is_staff', False)
+        self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
 
     def get_current_user(self):
         """
@@ -82,10 +94,11 @@ class DjangoXBlockUserService(UserService):
                 full_name = None
             xblock_user.full_name = full_name
             xblock_user.emails = [django_user.email]
+            xblock_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] = self._anonymous_user_id
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
             xblock_user.opt_attrs[ATTR_KEY_USERNAME] = django_user.username
-            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = django_user.user_is_staff
+            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = self._user_is_staff
             user_preferences = get_user_preferences(django_user)
             xblock_user.opt_attrs[ATTR_KEY_USER_PREFERENCES] = {
                 pref: user_preferences.get(pref)

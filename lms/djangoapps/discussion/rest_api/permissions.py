@@ -3,6 +3,18 @@ Discussion API permission logic
 """
 from typing import Dict, Set, Union
 
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions
+
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+)
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    has_discussion_privileges,
+)
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 
@@ -118,3 +130,21 @@ def can_delete(cc_content, context):
     Return True if the requester can delete the given content, False otherwise
     """
     return _is_author_or_privileged(cc_content, context)
+
+
+class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
+    """
+    Permission that checks to see if the user is allowed to post or
+    comment in the course.
+    """
+
+    def has_permission(self, request, view):
+        """Returns true if the user is enrolled or is staff."""
+        course_key = CourseKey.from_string(view.kwargs.get('course_id'))
+        return (
+            GlobalStaff().has_user(request.user) or
+            CourseStaffRole(course_key).has_user(request.user) or
+            CourseInstructorRole(course_key).has_user(request.user) or
+            CourseEnrollment.is_enrolled(request.user, course_key) or
+            has_discussion_privileges(request.user, course_key)
+        )

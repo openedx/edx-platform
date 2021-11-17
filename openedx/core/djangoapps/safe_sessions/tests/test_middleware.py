@@ -5,7 +5,6 @@ Unit tests for SafeSessionMiddleware
 from unittest.mock import patch
 
 import ddt
-
 from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -17,7 +16,13 @@ from django.test.utils import override_settings
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..middleware import SafeCookieData, SafeSessionMiddleware, track_request_user_changes, mark_user_change_as_expected
+from ..middleware import (
+    SafeCookieData,
+    SafeSessionMiddleware,
+    mark_user_change_as_expected,
+    obscure_token,
+    track_request_user_changes
+)
 from .test_utils import TestSafeSessionsLogMixin
 
 
@@ -286,7 +291,17 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
 
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=False)
     def test_success(self):
+        self.verify_success()
+
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=True)
+    def test_success_with_verify_all(self):
+        """
+        Test with verify-all feature enabled (non-default case). Remove this
+        test when feature toggle is permanently enabled, and remove override
+        from the pre-existing test_success.
+        """
         self.verify_success()
 
     def test_success_from_mobile_web_view(self):
@@ -303,6 +318,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         Verifies error path.
         """
         self.request.COOKIES[settings.SESSION_COOKIE_NAME] = 'not-a-safe-cookie'
+        self.request.session = self.client.session
 
         with self.assert_parse_error():
             request_response = SafeSessionMiddleware().process_request(self.request)
@@ -315,7 +331,18 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             SafeSessionMiddleware().process_response(self.request, self.client.response)
             assert mock_delete_cookie.called
 
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=False)
     def test_error(self):
+        self.request.META['HTTP_ACCEPT'] = 'text/html'
+        self.verify_error(302)
+
+    @override_settings(VERIFY_USER_CHANGE_UNCONDITIONAL=True)
+    def test_error_with_verify_all(self):
+        """
+        Test with verify-all feature enabled (non-default case). Remove this
+        test when feature toggle is permanently enabled, and remove override
+        from the pre-existing test_error.
+        """
         self.request.META['HTTP_ACCEPT'] = 'text/html'
         self.verify_error(302)
 
@@ -410,6 +437,37 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
         assert 'safe_sessions.user_mismatch' not in [call.args[0] for call in mock_attr.call_args_list]
+
+
+class TestTokenObscuring(TestCase):
+    """
+    Test the ability to obscure session IDs.
+    """
+
+    def test_obscure_none(self):
+        """Doesn't break on None input."""
+        assert obscure_token(None) is None
+
+    def test_obscure_vary(self):
+        """
+        Verifies that input and SECRET_KEY both change output.
+
+        The "expected" values here are computed and arbitrary; if the
+        algorithm is updated, the expected values should also be
+        updated. (Changing the algorithm will invalidate any stored
+        data, but the docstring explicitly warns not to store these
+        outputs anyhow.)
+        """
+        with override_settings(SECRET_KEY="FIRST SECRET"):
+            # Same input twice, same output twice
+            assert obscure_token('abcdef-123456') == '2d4260b0'
+            assert obscure_token('abcdef-123456') == '2d4260b0'
+            # Different input, different output
+            assert obscure_token('zxcvbnm-000111') == '87978f29'
+
+        # Different key, different output
+        with override_settings(SECRET_KEY="SECOND SECRET"):
+            assert obscure_token('abcdef-123456') == '7325d529'
 
 
 @ddt.ddt

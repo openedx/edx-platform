@@ -1020,8 +1020,8 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         form_desc = json.loads(response.content.decode('utf-8'))
         assert form_desc['method'] == 'post'
         assert form_desc['submit_url'] == reverse('user_api_login_session', kwargs={'api_version': 'v1'})
-        assert form_desc['fields'] == [{'name': 'email', 'defaultValue': '', 'type': 'email', 'required': True,
-                                        'label': 'Email', 'placeholder': '',
+        assert form_desc['fields'] == [{'name': 'email', 'defaultValue': '', 'type': 'email', 'exposed': True,
+                                        'required': True, 'label': 'Email', 'placeholder': '',
                                         'instructions': 'The email address you used to register with {platform_name}'
                                         .format(platform_name=settings.PLATFORM_NAME),
                                         'restrictions': {'min_length': EMAIL_MIN_LENGTH,
@@ -1033,6 +1033,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
                                        {'name': 'password',
                                         'defaultValue': '',
                                         'type': 'password',
+                                        'exposed': True,
                                         'required': True,
                                         'label': 'Password',
                                         'placeholder': '',

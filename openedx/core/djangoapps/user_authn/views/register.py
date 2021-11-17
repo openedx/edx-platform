@@ -292,8 +292,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 def is_new_user(request, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        is_internal_user = user.email.split('@')[1] == 'edx.org'
-        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), is_internal_user)
+        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
 
 def _link_user_to_third_party_provider(
@@ -354,27 +353,26 @@ def _link_user_to_third_party_provider(
 def _track_user_registration(user, profile, params, third_party_provider, registration):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        identity_args = [
-            user.id,
-            {
-                'email': user.email,
-                'username': user.username,
-                'name': profile.name,
-                # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
-                'age': profile.age or -1,
-                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
-                'education': profile.level_of_education_display,
-                'address': profile.mailing_address,
-                'gender': profile.gender_display,
-                'country': str(profile.country),
-                'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
-                                   params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
-            }
-        ]
+        traits = {
+            'email': user.email,
+            'username': user.username,
+            'name': profile.name,
+            # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
+            'age': profile.age or -1,
+            'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
+            'education': profile.level_of_education_display,
+            'address': profile.mailing_address,
+            'gender': profile.gender_display,
+            'country': str(profile.country)
+        }
+        if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
+            email_subscribe = 'subscribed' if params.get('marketing_emails_opt_in') == 'true' else 'unsubscribed'
+            traits['email_subscribe'] = email_subscribe
+
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
-        segment.identify(*identity_args)
+        segment.identify(user.id, traits)
         properties = {
             'category': 'conversion',
             # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.

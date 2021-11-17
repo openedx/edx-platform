@@ -17,7 +17,7 @@ from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -974,15 +974,15 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             "certificate template."
         )
     )
-    include_hours_of_effort = models.NullBooleanField(
+    include_hours_of_effort = models.BooleanField(
         default=None,
         help_text=(
             "Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
             "times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
             "attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its "
             "certificate template includes Hours of Effort."
-        )
-    )
+        ),
+        null=True)
 
     class Meta:
         get_latest_by = 'created'

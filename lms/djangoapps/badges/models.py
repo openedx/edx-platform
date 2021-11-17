@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
 from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
 from model_utils.models import TimeStampedModel

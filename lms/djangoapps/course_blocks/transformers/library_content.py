@@ -225,7 +225,7 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
             if library_children:
                 state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
                 current_children_blocks = {block.block_id for block in library_children}
-                current_selected_blocks = {item[1] for item in state_dict['selected']}
+                current_selected_blocks = {item[1] for item in state_dict.get('selected', [])}
 
                 # As the selections should have already been made by the ContentLibraryTransformer,
                 # the current children of the library_content block should be the same as the stored
