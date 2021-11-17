@@ -648,7 +648,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('lms.djangoapps.support.views.program_enrollments.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -1189,3 +1189,183 @@ class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):
         )
         data = json.loads(response.content.decode('utf-8'))
         assert data == {}
+
+
+@ddt.ddt
+class LinkProgramEnrollmentSupportAPIViewTests(SupportViewTestCase):
+    """
+    Tests for the link_program_enrollments support view.
+    """
+    _url = reverse("support:link_program_enrollments_details")
+
+    def setUp(self):
+        """
+        Make the user support staff.
+        """
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.username_pair_text = '0001,user-0001\n0002,user-02'
+
+    def _setup_user_from_username(self, username):
+        """
+        Setup a user from the passed in username.
+        If username passed in is falsy, return None
+        """
+        created_user = None
+        if username:
+            created_user = UserFactory(username=username, password=self.PASSWORD)
+        return created_user
+
+    def _setup_enrollments(self, external_user_key, linked_user=None):
+        """
+        Create enrollments for testing linking.
+        The enrollments can be created with already linked edX user.
+        """
+        program_enrollment = ProgramEnrollmentFactory.create(
+            external_user_key=external_user_key,
+            program_uuid=self.program_uuid,
+            user=linked_user
+        )
+        course_enrollment = None
+        if linked_user:
+            course_enrollment = CourseEnrollmentFactory.create(
+                course_id=self.course.id,
+                user=linked_user,
+                mode=CourseMode.MASTERS,
+                is_active=True
+            )
+        program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+            program_enrollment=program_enrollment,
+            course_key=self.course.id,
+            course_enrollment=course_enrollment,
+            status='active'
+        )
+        return program_enrollment, program_course_enrollment
+
+    def test_invalid_uuid(self):
+        """
+        Tests if enrollment linkages are refused for an invalid uuid
+        """
+        response = self.client.post(self._url, data={
+            'program_uuid': 'notauuid',
+            'username_pair_text': self.username_pair_text,
+        })
+        msg = "Supplied program UUID 'notauuid' is not a valid UUID."
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['errors'] == [msg]
+
+    @ddt.data(
+        ('program_uuid', ''),
+        ('', 'username_pair_text'),
+        ('', '')
+    )
+    @ddt.unpack
+    def test_missing_parameter(self, program_uuid, username_pair_text):
+        """
+        Tests if enrollment linkages are refused for missing parameters
+        """
+        error = (
+            "You must provide both a program uuid "
+            "and a series of lines with the format "
+            "'external_user_key,lms_username'."
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': program_uuid,
+            'username_pair_text': username_pair_text
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['errors'] == [error]
+
+    @ddt.data(
+        '0001,learner-01\n0002,learner-02',                                 # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
+        '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
+    )
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
+    def test_username_pair_text(self, username_pair_text, mocked_link):
+        """
+        Tests if enrollment linkages are created for different types of
+        username_pair_text format
+        """
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': username_pair_text,
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        mocked_link.assert_called_once()
+        mocked_link.assert_called_with(
+            UUID(self.program_uuid),
+            {
+                '0001': 'learner-01',
+                '0002': 'learner-02',
+            }
+        )
+        success = ["('0001', 'learner-01')", "('0002', 'learner-02')"]
+        assert response_data['successes'] == success
+        mocked_link.reset_mock()
+
+    def test_invalid_username_pair_text(self):
+        """
+        Tests if enrollment linkages are refused for invalid types of
+        username_pair_text format
+        """
+        username_pair_text = 'garbage_text'
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': username_pair_text,
+        })
+        msg = "All linking lines must be in the format 'external_user_key,lms_username'"
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['errors'] == [msg]
+
+    @ddt.data(
+        ('linked_user', None),
+        ('linked_user', 'original_user')
+    )
+    @ddt.unpack
+    def test_linking_program_enrollment_with_username(self, username, original_username):
+        """
+        Tests if enrollment linkages are created for valid usernames
+        """
+        external_user_key = '0001'
+        linked_user = self._setup_user_from_username(username)
+        original_user = self._setup_user_from_username(original_username)
+        program_enrollment, program_course_enrollment = self._setup_enrollments(
+            external_user_key,
+            original_user
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': external_user_key + ',' + username
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_success = f"('{external_user_key}', '{username}')"
+        assert response_data['successes'] == [expected_success]
+        program_enrollment.refresh_from_db()
+        assert program_enrollment.user == linked_user
+        program_course_enrollment.refresh_from_db()
+        assert program_course_enrollment.course_enrollment.user == linked_user
+
+    @ddt.data(
+        ('', None),
+    )
+    @ddt.unpack
+    def test_linking_program_enrollment_without_username(self, username, original_username):
+        """
+        Tests if enrollment linkages are refused for invalid usernames
+        """
+        external_user_key = '0001'
+        linked_user = self._setup_user_from_username(username)
+        original_user = self._setup_user_from_username(original_username)
+        program_enrollment, program_course_enrollment = self._setup_enrollments(
+            external_user_key,
+            original_user
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': external_user_key + ',' + username
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        error = "All linking lines must be in the format 'external_user_key,lms_username'"
+        assert response_data['errors'] == [error]
