@@ -15,7 +15,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
-from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer, LockStatusSerializer, SubmissionDetailResponseSerializer
+from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer, LockStatusSerializer, SubmissionFetchSerializer
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -124,7 +124,7 @@ class SubmissionFetchView(RetrieveAPIView):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
 
-        serializer = SubmissionDetailResponseSerializer({
+        serializer = SubmissionFetchSerializer({
             'submission_info': submission_info,
             'assessment_info': assessment_info,
             'lock_info': lock_info,
