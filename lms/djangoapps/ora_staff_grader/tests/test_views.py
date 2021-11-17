@@ -199,6 +199,99 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.data['gradeData'].keys() == expected_assessment_keys
 
 
+@ddt.ddt
+class TestFetchSubmissionStatusView(BaseViewTest):
+    """
+    Tests for the submission fetch view
+    """
+    view_name = 'ora-staff-grader:fetch-submission-status'
+
+    def test_missing_ora_location(self):
+        """ Missing ora_location param should return 400 and error message """
+        self.log_in()
+        response = self.client.get(self.api_url)
+
+        assert response.status_code == 400
+        assert response.content.decode() == ERR_MISSING_PARAM
+
+    def test_blank_ora_location(self):
+        """ Missing ora_location param should return 400 and error message """
+        self.log_in()
+        response = self.client.get(self.api_url, {'ora_location': ''})
+
+        assert response.status_code == 400
+        assert response.content.decode() == ERR_MISSING_PARAM
+
+    def test_missing_submission_uuid(self):
+        """ Missing submission_uuid param should return 400 and error message """
+        self.log_in()
+        response = self.client.get(self.api_url, {'ora_location': Mock()})
+
+        assert response.status_code == 400
+        assert response.content.decode() == ERR_MISSING_PARAM
+
+    def test_blank_submission_uuid(self):
+        """ Blank submission_uuid param should return 400 and error message """
+        self.log_in()
+        response = self.client.get(self.api_url, {'ora_location': Mock(), 'submission_uuid': ''})
+
+        assert response.status_code == 400
+        assert response.content.decode() == ERR_MISSING_PARAM
+
+    @ddt.data(True, False)
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.check_submission_lock')
+    def test_fetch_submission_status(
+        self,
+        has_assessment,
+        mock_check_submission_lock,
+        mock_get_assessment_info,
+    ):
+
+        mock_assessment = {} if not has_assessment else {
+            'feedback': "Base Assessment Feedback",
+            'score': {
+                'pointsEarned': 5,
+                'pointsPossible': 6,
+            },
+            'criteria': [
+                {
+                    'name': "Criterion 1",
+                    'option': "Three",
+                    'points': 3,
+                    'feedback': "Feedback 1"
+                },
+            ]
+        }
+        mock_get_assessment_info.return_value = mock_assessment
+
+        mock_check_submission_lock.return_value = {'lock_status': 'in-progress'}
+
+        self.log_in()
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(self.api_url, {'ora_location': ora_location, 'submission_uuid': submission_uuid})
+
+        assert response.status_code == 200
+        actual = response.json()
+        expected = {
+            'gradeStatus': 'graded' if has_assessment else 'ungraded',
+            'lockStatus': mock_check_submission_lock.return_value['lock_status'],
+            'gradeData': {} if not has_assessment else {
+                'score': mock_assessment['score'],
+                'overallFeedback': mock_assessment['feedback'],
+                'criteria': [
+                    {
+                        'name': "Criterion 1",
+                        'selectedOption': "Three",
+                        'points': 3,
+                        'feedback': "Feedback 1"
+                    },
+                ]
+            }
+        }
+        assert actual == expected
+
+
 class TestSubmissionLockView(APITestCase):
     """
     Tests for the /lock view, locking or unlocking a submission for grading

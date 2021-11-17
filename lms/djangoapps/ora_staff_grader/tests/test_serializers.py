@@ -438,13 +438,15 @@ class TestSubmissionStatusFetchSerializer(TestCase):
     def test_get__gradeStatus(self, has_assessment):
         """ Unit test for get_gradeStatus """
         assessment = {'somekey': 'somevalue'} if has_assessment else {}
-        input = {'assessment_info': {'assessment': assessment}}
+        input = {'assessment_info': assessment}
         value = SubmissionStatusFetchSerializer().get_gradeStatus(input)
         expected = 'graded' if has_assessment else 'ungraded'
         assert value == expected
 
 
 class TestSubmissionFetchSerializer(TestCase):
+    """ Tests for the SubmissionFetchSerializer """
+
     def test_submission_fetch_serializer(self):
         """ Base serialization behavior """
         input = MagicMock()

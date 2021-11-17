@@ -151,6 +151,7 @@ class GradeDataSerializer(serializers.Serializer):
     overallFeedback = serializers.CharField(source='feedback', required=False)
     criteria = serializers.ListField(child=AssessmentCriteriaSerializer(), allow_empty=True, required=False)
 
+
 class SubmissionStatusFetchSerializer(serializers.Serializer):
     """ Serializer for the response from the submission status fetch endpoint"""
     gradeData = GradeDataSerializer(source='assessment_info')
@@ -158,10 +159,11 @@ class SubmissionStatusFetchSerializer(serializers.Serializer):
     lockStatus = LockStatusField(source='lock_info.lock_status')
 
     def get_gradeStatus(self, obj):
-        if obj.get('assessment_info', {}).get('assessment'):
+        if not obj.get('assessment_info', {}) == {}:
             return 'graded'
         else:
             return 'ungraded'
+
 
 class SubmissionFetchSerializer(SubmissionStatusFetchSerializer):
     """
