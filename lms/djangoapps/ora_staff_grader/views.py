@@ -120,16 +120,32 @@ class SubmissionFetchView(RetrieveAPIView):
     @require_params(['ora_location', 'submission_uuid'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_and_assessment_info = self.get_submission_and_assessment_info(request, ora_location, submission_uuid)
-        return Response(SubmissionDetailResponseSerializer(submission_and_assessment_info).data)
+        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+
+        serializer = SubmissionDetailResponseSerializer({
+            'submission_and_assessment_info': submission_and_assessment_info,
+            'lock_info': lock_info,
+        })
+
+        return Response(serializer.data)
 
     def get_submission_and_assessment_info(self, request, usage_id, submission_uuid):
         """
-        Get submission content and assessment data from the ORA's 'get_submission_and_assessment_info' XBlock.json_handler
+        Get submission content and assessment data from ORA 'get_submission_and_assessment_info' XBlock.json_handler
         """
         data = {
             'submission_uuid': submission_uuid
         }
         return call_xblock_json_handler(request, usage_id, 'get_submission_and_assessment_info', data)
+
+    def check_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
 
 
 class SubmissionLockView(RetrieveAPIView):

@@ -9,8 +9,9 @@ from rest_framework import serializers
 
 class GradeStatusField(serializers.ChoiceField):
     """ Field that can have the values ['graded' 'ungraded'] """
-    def __init__(self):
-        super().__init__(choices=['graded', 'ungraded'])
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = ['graded', 'ungraded']
+        super().__init__(*args, **kwargs)
 
 
 class LockStatusField(serializers.ChoiceField):
@@ -140,8 +141,7 @@ class AssessmentCriteriaSerializer(serializers.Serializer):
     """ Serializer for information about a criterion, in the context of a completed assessment """
     name = serializers.CharField()
     feedback = serializers.CharField()
-    # to be completed in AU-410
-    # score = serializers.IntegerField()
+    points = serializers.IntegerField()
     selectedOption = serializers.CharField(source='option')
 
 
@@ -154,11 +154,16 @@ class GradeDataSerializer(serializers.Serializer):
 
 class SubmissionDetailResponseSerializer(serializers.Serializer):
     """ Serializer for the response from the submission """
-    gradeData = GradeDataSerializer(source='assessment')
-    response = ResponseSerializer(source='submission')
-    #  to be completed in AU-387
-    #  gradeStatus = GradeStatusField()
-    #  lockStatus = LockStatusField()
+    gradeData = GradeDataSerializer(source='submission_and_assessment_info.assessment')
+    response = ResponseSerializer(source='submission_and_assessment_info.submission')
+    gradeStatus = serializers.SerializerMethodField()
+    lockStatus = LockStatusField(source='lock_info.lock_status')
+
+    def get_gradeStatus(self, obj):
+        if obj.get('submission_and_assessment_info', {}).get('assessment'):
+            return 'graded'
+        else:
+            return 'ungraded'
 
 
 class LockStatusSerializer(serializers.Serializer):
