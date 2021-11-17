@@ -9,7 +9,7 @@ from rest_framework import serializers
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
-from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features
+from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features, Provider
 from .utils import available_division_schemes, get_divided_discussions
 
 
@@ -304,10 +304,8 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         plugin_configuration = validated_data.pop('plugin_configuration', {})
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
-        will_support_legacy = bool(
-            updated_provider_type == 'legacy'
-        )
-        if will_support_legacy:
+
+        if updated_provider_type == Provider.LEGACY:
             legacy_settings = LegacySettingsSerializer(
                 self._get_course(),
                 context={
