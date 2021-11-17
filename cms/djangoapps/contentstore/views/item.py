@@ -1331,8 +1331,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 xblock_info['staff_only_message'] = False
 
             xblock_info['show_delete_button'] = True
-            if user is not None and PREVENT_STAFF_STRUCTURE_DELETION.is_enabled():
-                xblock_info['show_delete_button'] = user.has_perm(DELETE_COURSE_CONTENT, xblock)
+            if PREVENT_STAFF_STRUCTURE_DELETION.is_enabled():
+                xblock_info['show_delete_button'] = user.has_perm(DELETE_COURSE_CONTENT, xblock) if user is not None else False
 
             xblock_info['has_partition_group_components'] = has_children_visible_to_specific_partition_groups(
                 xblock
