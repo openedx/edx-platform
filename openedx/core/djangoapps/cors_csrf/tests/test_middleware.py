@@ -70,7 +70,8 @@ class TestCorsMiddlewareProcessRequest(TestCase):
     )
     @ddt.data(
         'https://foo.com/bar/', 'https://foo.com/bar/baz/', 'https://www.foo.com/bar/baz/',
-        'https://learning.edge.foo.bar', 'https://learning.edge.foo.bar/foo'
+        'https://learning.edge.foo.bar', 'https://learning.edge.foo.bar/foo',
+        'https://foo.com/'
     )
     def test_enabled(self, http_referer):
         request = self.get_request(is_secure=True, http_referer=http_referer)
