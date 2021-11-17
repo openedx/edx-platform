@@ -50,7 +50,7 @@ def is_cross_domain_request_allowed(request):
 
     scheme_with_host = referer
     # if url is like `https://www.foo.bar/baz/` following check will return `https://www.foo.bar`
-    if referer and referer_parts.scheme and referer_parts.path:
+    if referer and referer_parts.scheme and referer_parts.path and referer_parts.path != '/':
         scheme_with_host = referer.replace(referer_parts.path, '')
 
     if scheme_with_host is not None:
