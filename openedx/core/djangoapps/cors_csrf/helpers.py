@@ -58,7 +58,7 @@ def is_cross_domain_request_allowed(request):
 
     domain_is_whitelisted = (
         getattr(settings, 'CORS_ORIGIN_ALLOW_ALL', False) or
-        scheme_with_host in getattr(settings, 'CORS_ORIGIN_WHITELIST', ['https://authn.stage.edx.org/'])
+        scheme_with_host in getattr(settings, 'CORS_ORIGIN_WHITELIST', [])
     )
     if not domain_is_whitelisted:
         if referer_hostname is None:
