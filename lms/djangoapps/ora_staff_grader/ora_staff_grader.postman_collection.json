@@ -126,7 +126,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"courseMetadata\": {\n        \"title\": \"Defense against the dark arts\",\n        \"org\": \"Hogwarts\",\n        \"number\": \"DADA101\",\n        \"courseId\": \"course-v1:Hogwarts+DADA101+2021_Winter\"\n    },\n    \"oraMetadata\": {\n        \"name\": \"Individual ORA\",\n        \"prompts\": [\n            {\n                \"description\": \"<p>Enter a text/files response.</p>\"\n            }\n        ],\n        \"type\": \"individual\",\n        \"rubricConfig\": {\n            \"feedback\": \"optional\",\n            \"feedbackPrompt\": \"How would you grade this response?\",\n            \"feedbackDefaultText\": \"I believe this response...\",\n            \"criteria\": [\n                {\n                    \"name\": \"Grammar\",\n                    \"orderNum\": 0,\n                    \"prompt\": \"How correct is the submitter's grammar?\",\n                    \"feedback\": \"optional\",\n                    \"options\": [\n                        {\n                            \"orderNum\": 0,\n                            \"name\": \"poor\",\n                            \"label\": \"Poor\",\n                            \"explanation\": \"Absolute rubbish\",\n                            \"points\": 0\n                        },\n                        {\n                            \"orderNum\": 1,\n                            \"name\": \"excellent\",\n                            \"label\": \"Excelent\",\n                            \"explanation\": \"Not absolute rubbish\",\n                            \"points\": 5\n                        }\n                    ]\n                }\n            ]\n        },\n        \"fileUploadResponseConfig\": \"optional\"\n    },\n    \"submissions\": {\n        \"SUBMISSION_ID-0\": {\n            \"submissionId\": \"SUBMISSION_ID-0\",\n            \"username\": \"USERNAME-0\",\n            \"dateSubmitted\": 1631215154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-1\": {\n            \"submissionId\": \"SUBMISSION_ID-1\",\n            \"username\": \"USERNAME-1\",\n            \"dateSubmitted\": 1631301554955,\n            \"score\": {\n                \"pointsEarned\": 70,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 70,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-2\": {\n            \"submissionId\": \"SUBMISSION_ID-2\",\n            \"username\": \"USERNAME-2\",\n            \"dateSubmitted\": 1631387954955,\n            \"score\": {\n                \"pointsEarned\": 80,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 80,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-3\": {\n            \"submissionId\": \"SUBMISSION_ID-3\",\n            \"username\": \"USERNAME-3\",\n            \"dateSubmitted\": 1631474354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-4\": {\n            \"submissionId\": \"SUBMISSION_ID-4\",\n            \"username\": \"USERNAME-4\",\n            \"dateSubmitted\": 1631560754955,\n            \"score\": {\n                \"pointsEarned\": 90,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 90,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-5\": {\n            \"submissionId\": \"SUBMISSION_ID-5\",\n            \"username\": \"USERNAME-5\",\n            \"dateSubmitted\": 1631647154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-6\": {\n            \"submissionId\": \"SUBMISSION_ID-6\",\n            \"username\": \"USERNAME-6\",\n            \"dateSubmitted\": 1631733554955,\n            \"score\": {\n                \"pointsEarned\": 71,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 71,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-7\": {\n            \"submissionId\": \"SUBMISSION_ID-7\",\n            \"username\": \"USERNAME-7\",\n            \"dateSubmitted\": 1631819954955,\n            \"score\": {\n                \"pointsEarned\": 81,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 81,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-8\": {\n            \"submissionId\": \"SUBMISSION_ID-8\",\n            \"username\": \"USERNAME-8\",\n            \"dateSubmitted\": 1631906354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-9\": {\n            \"submissionId\": \"SUBMISSION_ID-9\",\n            \"username\": \"USERNAME-9\",\n            \"dateSubmitted\": 1631992754955,\n            \"score\": {\n                \"pointsEarned\": 91,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 91,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-10\": {\n            \"submissionId\": \"SUBMISSION_ID-10\",\n            \"username\": \"USERNAME-10\",\n            \"dateSubmitted\": 1632079154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-11\": {\n            \"submissionId\": \"SUBMISSION_ID-11\",\n            \"username\": \"USERNAME-11\",\n            \"dateSubmitted\": 1632165554955,\n            \"score\": {\n                \"pointsEarned\": 72,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 72,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-12\": {\n            \"submissionId\": \"SUBMISSION_ID-12\",\n            \"username\": \"USERNAME-12\",\n            \"dateSubmitted\": 1632251954955,\n            \"score\": {\n                \"pointsEarned\": 82,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 82,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-13\": {\n            \"submissionId\": \"SUBMISSION_ID-13\",\n            \"username\": \"USERNAME-13\",\n            \"dateSubmitted\": 1632338354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-14\": {\n            \"submissionId\": \"SUBMISSION_ID-14\",\n            \"username\": \"USERNAME-14\",\n            \"dateSubmitted\": 1632424754955,\n            \"score\": {\n                \"pointsEarned\": 92,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 92,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-15\": {\n            \"submissionId\": \"SUBMISSION_ID-15\",\n            \"username\": \"USERNAME-15\",\n            \"dateSubmitted\": 1632511154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-16\": {\n            \"submissionId\": \"SUBMISSION_ID-16\",\n            \"username\": \"USERNAME-16\",\n            \"dateSubmitted\": 1632597554955,\n            \"score\": {\n                \"pointsEarned\": 73,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 73,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-17\": {\n            \"submissionId\": \"SUBMISSION_ID-17\",\n            \"username\": \"USERNAME-17\",\n            \"dateSubmitted\": 1632683954955,\n            \"score\": {\n                \"pointsEarned\": 83,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 83,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-18\": {\n            \"submissionId\": \"SUBMISSION_ID-18\",\n            \"username\": \"USERNAME-18\",\n            \"dateSubmitted\": 1632770354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-19\": {\n            \"submissionId\": \"SUBMISSION_ID-19\",\n            \"username\": \"USERNAME-19\",\n            \"dateSubmitted\": 1632856754955,\n            \"score\": {\n                \"pointsEarned\": 93,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 93,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-20\": {\n            \"submissionId\": \"SUBMISSION_ID-20\",\n            \"username\": \"USERNAME-20\",\n            \"dateSubmitted\": 1632943154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-21\": {\n            \"submissionId\": \"SUBMISSION_ID-21\",\n            \"username\": \"USERNAME-21\",\n            \"dateSubmitted\": 1633029554955,\n            \"score\": {\n                \"pointsEarned\": 74,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 74,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-22\": {\n            \"submissionId\": \"SUBMISSION_ID-22\",\n            \"username\": \"USERNAME-22\",\n            \"dateSubmitted\": 1633115954955,\n            \"score\": {\n                \"pointsEarned\": 84,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 84,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-23\": {\n            \"submissionId\": \"SUBMISSION_ID-23\",\n            \"username\": \"USERNAME-23\",\n            \"dateSubmitted\": 1633202354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-24\": {\n            \"submissionId\": \"SUBMISSION_ID-24\",\n            \"username\": \"USERNAME-24\",\n            \"dateSubmitted\": 1633288754955,\n            \"score\": {\n                \"pointsEarned\": 94,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 94,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-25\": {\n            \"submissionId\": \"SUBMISSION_ID-25\",\n            \"username\": \"USERNAME-25\",\n            \"dateSubmitted\": 1633375154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-26\": {\n            \"submissionId\": \"SUBMISSION_ID-26\",\n            \"username\": \"USERNAME-26\",\n            \"dateSubmitted\": 1633461554955,\n            \"score\": {\n                \"pointsEarned\": 75,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 75,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-27\": {\n            \"submissionId\": \"SUBMISSION_ID-27\",\n            \"username\": \"USERNAME-27\",\n            \"dateSubmitted\": 1633547954955,\n            \"score\": {\n                \"pointsEarned\": 85,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 85,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-28\": {\n            \"submissionId\": \"SUBMISSION_ID-28\",\n            \"username\": \"USERNAME-28\",\n            \"dateSubmitted\": 1633634354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-29\": {\n            \"submissionId\": \"SUBMISSION_ID-29\",\n            \"username\": \"USERNAME-29\",\n            \"dateSubmitted\": 1633720754955,\n            \"score\": {\n                \"pointsEarned\": 95,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 95,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-30\": {\n            \"submissionId\": \"SUBMISSION_ID-30\",\n            \"username\": \"USERNAME-30\",\n            \"dateSubmitted\": 1633807154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-31\": {\n            \"submissionId\": \"SUBMISSION_ID-31\",\n            \"username\": \"USERNAME-31\",\n            \"dateSubmitted\": 1633893554955,\n            \"score\": {\n                \"pointsEarned\": 76,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 76,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-32\": {\n            \"submissionId\": \"SUBMISSION_ID-32\",\n            \"username\": \"USERNAME-32\",\n            \"dateSubmitted\": 1633979954955,\n            \"score\": {\n                \"pointsEarned\": 86,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 86,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-33\": {\n            \"submissionId\": \"SUBMISSION_ID-33\",\n            \"username\": \"USERNAME-33\",\n            \"dateSubmitted\": 1634066354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-34\": {\n            \"submissionId\": \"SUBMISSION_ID-34\",\n            \"username\": \"USERNAME-34\",\n            \"dateSubmitted\": 1634152754955,\n            \"score\": {\n                \"pointsEarned\": 96,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 96,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-35\": {\n            \"submissionId\": \"SUBMISSION_ID-35\",\n            \"username\": \"USERNAME-35\",\n            \"dateSubmitted\": 1634239154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-36\": {\n            \"submissionId\": \"SUBMISSION_ID-36\",\n            \"username\": \"USERNAME-36\",\n            \"dateSubmitted\": 1634325554955,\n            \"score\": {\n                \"pointsEarned\": 77,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 77,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-37\": {\n            \"submissionId\": \"SUBMISSION_ID-37\",\n            \"username\": \"USERNAME-37\",\n            \"dateSubmitted\": 1634411954955,\n            \"score\": {\n                \"pointsEarned\": 87,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 87,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-38\": {\n            \"submissionId\": \"SUBMISSION_ID-38\",\n            \"username\": \"USERNAME-38\",\n            \"dateSubmitted\": 1634498354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-39\": {\n            \"submissionId\": \"SUBMISSION_ID-39\",\n            \"username\": \"USERNAME-39\",\n            \"dateSubmitted\": 1634584754955,\n            \"score\": {\n                \"pointsEarned\": 97,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 97,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-40\": {\n            \"submissionId\": \"SUBMISSION_ID-40\",\n            \"username\": \"USERNAME-40\",\n            \"dateSubmitted\": 1634671154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-41\": {\n            \"submissionId\": \"SUBMISSION_ID-41\",\n            \"username\": \"USERNAME-41\",\n            \"dateSubmitted\": 1634757554955,\n            \"score\": {\n                \"pointsEarned\": 78,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 78,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-42\": {\n            \"submissionId\": \"SUBMISSION_ID-42\",\n            \"username\": \"USERNAME-42\",\n            \"dateSubmitted\": 1634843954955,\n            \"score\": {\n                \"pointsEarned\": 88,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 88,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-43\": {\n            \"submissionId\": \"SUBMISSION_ID-43\",\n            \"username\": \"USERNAME-43\",\n            \"dateSubmitted\": 1634930354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-44\": {\n            \"submissionId\": \"SUBMISSION_ID-44\",\n            \"username\": \"USERNAME-44\",\n            \"dateSubmitted\": 1635016754955,\n            \"score\": {\n                \"pointsEarned\": 98,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 98,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-45\": {\n            \"submissionId\": \"SUBMISSION_ID-45\",\n            \"username\": \"USERNAME-45\",\n            \"dateSubmitted\": 1635103154955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-46\": {\n            \"submissionId\": \"SUBMISSION_ID-46\",\n            \"username\": \"USERNAME-46\",\n            \"dateSubmitted\": 1635189554955,\n            \"score\": {\n                \"pointsEarned\": 79,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 79,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-47\": {\n            \"submissionId\": \"SUBMISSION_ID-47\",\n            \"username\": \"USERNAME-47\",\n            \"dateSubmitted\": 1635275954955,\n            \"score\": {\n                \"pointsEarned\": 89,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 89,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-48\": {\n            \"submissionId\": \"SUBMISSION_ID-48\",\n            \"username\": \"USERNAME-48\",\n            \"dateSubmitted\": 1635362354955,\n            \"score\": null,\n            \"gradeData\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        },\n        \"SUBMISSION_ID-49\": {\n            \"submissionId\": \"SUBMISSION_ID-49\",\n            \"username\": \"USERNAME-49\",\n            \"dateSubmitted\": 1635448754955,\n            \"score\": {\n                \"pointsEarned\": 99,\n                \"pointsPossible\": 100\n            },\n            \"gradeData\": {\n                \"score\": {\n                    \"pointsEarned\": 99,\n                    \"pointsPossible\": 100\n                },\n                \"overallFeedback\": \"was okay\",\n                \"criteria\": [\n                    {\n                        \"name\": \"firstCriterion\",\n                        \"feedback\": \"did alright\",\n                        \"selectedOption\": \"good\"\n                    }\n                ]\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"in-progress\"\n        }\n    }\n}"
+							"body": "{\n    \"courseMetadata\": {\n        \"title\": \"Defense against the dark arts\",\n        \"org\": \"Hogwarts\",\n        \"number\": \"DADA101\",\n        \"courseId\": \"course-v1:Hogwarts+DADA101+2021_Winter\"\n    },\n    \"oraMetadata\": {\n        \"name\": \"Individual ORA\",\n        \"prompts\": [\n            \"<p>Enter a text/files response.</p>\"\n        ],\n        \"type\": \"individual\",\n        \"rubricConfig\": {\n            \"feedback_prompt\": \"How would you grade this response?\",\n            \"feedback_default_text\": \"I believe this response...\",\n            \"criteria\": [\n                {\n                    \"order_num\": 0,\n                    \"name\": \"grammar\",\n                    \"label\": \"Grammar\",\n                    \"prompt\": \"How correct is the submitter's grammar?\",\n                    \"feedback\": \"optional\",\n                    \"options\": [\n                        {\n                            \"order_num\": 0,\n                            \"name\": \"poor\",\n                            \"label\": \"Poor\",\n                            \"explanation\": \"Absolute rubbish\",\n                            \"points\": 0\n                        },\n                        {\n                            \"order_num\": 1,\n                            \"name\": \"excellent\",\n                            \"label\": \"Excelent\",\n                            \"explanation\": \"Not absolute rubbish\",\n                            \"points\": 5\n                        }\n                    ]\n                }\n            ]\n        },\n        \"fileUploadResponseConfig\": \"optional\"\n    },\n    \"submissions\": {\n        \"SUBMISSION_ID-0\": {\n            \"submissionUuid\": \"SUBMISSION_ID-0\",\n            \"username\": \"USERNAME-0\",\n            \"dateSubmitted\": 1631215154955,\n            \"score\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-1\": {\n            \"submissionUuid\": \"SUBMISSION_ID-1\",\n            \"username\": \"USERNAME-1\",\n            \"dateSubmitted\": 1631301554955,\n            \"score\": {\n                \"pointsEarned\": 70,\n                \"pointsPossible\": 100\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-2\": {\n            \"submissionUuid\": \"SUBMISSION_ID-2\",\n            \"username\": \"USERNAME-2\",\n            \"dateSubmitted\": 1631387954955,\n            \"score\": {\n                \"pointsEarned\": 80,\n                \"pointsPossible\": 100\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-3\": {\n            \"submissionUuid\": \"SUBMISSION_ID-3\",\n            \"username\": \"USERNAME-3\",\n            \"dateSubmitted\": 1631474354955,\n            \"score\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        }\n    }\n}"
 						},
 						{
 							"name": "ORA location missing",
@@ -310,7 +310,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?submissionId={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -322,7 +322,11 @@
 							],
 							"query": [
 								{
-									"key": "submissionId",
+									"key": "ora_location",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUuid",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -341,7 +345,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -357,7 +361,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUUID",
+											"key": "submissionUuid",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -409,7 +413,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 70,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was okay\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    },\n    \"response\": {\n        \"text\": \"<div><h1>Title (${submissionId})</h1>Phasellus tempor eros aliquam ipsum molestie, vitae varius lectus tempus. Morbi iaculis, libero euismod vehicula rutrum, nisi leo volutpat diam, quis commodo ex nunc ut odio. Pellentesque condimentum feugiat erat ac vulputate. Pellentesque porta rutrum sagittis. Curabitur vulputate tempus accumsan. Fusce bibendum gravida metus a scelerisque. Mauris fringilla orci non lobortis commodo. Quisque iaculis, quam a tincidunt vehicula, erat nisi accumsan quam, eu cursus ligula magna id odio. Nulla porttitor, lorem gravida vehicula tristique, sapien metus tristique ex, id tincidunt sapien justo nec sapien. Maecenas luctus, nisl vestibulum scelerisque pharetra, ligula orci vulputate turpis, in ultrices mauris dolor eu enim. Suspendisse quis nibh nec augue semper maximus. Morbi maximus eleifend magna. Phasellus porttitor vel magna et auctor. Nulla porttitor convallis aliquam. Donec cursus, ipsum ut egestas bibendum, purus metus dignissim est, ac condimentum leo felis eget diam. In magna mi, tincidunt id sapien id, fermentum vestibulum quam. Quisque et dui sed urna convallis rutrum pellentesque quis sapien. Cras non lectus velit. Praesent semper eros id risus mollis, quis interdum quam imperdiet. Sed nec vulputate tortor, at tristique tortor.</div>\",\n        \"files\": []\n    },\n    \"gradeStatus\": \"graded\",\n    \"lockStatus\": \"locked\"\n}"
+							"body": "{\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 90,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was pretty good\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    },\n    \"response\": {\n        \"text\": [\n            \"<div><h1>Response Title</h1>Phasellus tempor eros aliquam ipsum molestie, vitae varius lectus tempus. Morbi iaculis, libero euismod vehicula rutrum, nisi leo volutpat diam, quis commodo ex nunc ut odio. Pellentesque condimentum feugiat erat ac vulputate. Pellentesque porta rutrum sagittis. Curabitur vulputate tempus accumsan. Fusce bibendum gravida metus a scelerisque. Mauris fringilla orci non lobortis commodo. Quisque iaculis, quam a tincidunt vehicula, erat nisi accumsan quam, eu cursus ligula magna id odio. Nulla porttitor, lorem gravida vehicula tristique, sapien metus tristique ex, id tincidunt sapien justo nec sapien. Maecenas luctus, nisl vestibulum scelerisque pharetra, ligula orci vulputate turpis, in ultrices mauris dolor eu enim. Suspendisse quis nibh nec augue semper maximus. Morbi maximus eleifend magna. Phasellus porttitor vel magna et auctor. Nulla porttitor convallis aliquam. Donec cursus, ipsum ut egestas bibendum, purus metus dignissim est, ac condimentum leo felis eget diam. In magna mi, tincidunt id sapien id, fermentum vestibulum quam. Quisque et dui sed urna convallis rutrum pellentesque quis sapien. Cras non lectus velit. Praesent semper eros id risus mollis, quis interdum quam imperdiet. Sed nec vulputate tortor, at tristique tortor.</div>\"\n        ],\n        \"files\": []\n    },\n    \"gradeStatus\": \"graded\",\n    \"lockStatus\": \"unlocked\"\n}"
 						}
 					]
 				},
@@ -436,7 +440,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?submissionId={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/status?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -444,11 +448,16 @@
 							"path": [
 								"api",
 								"ora_staff_grader{{mock}}",
-								"submissionStatus"
+								"submission",
+								"status"
 							],
 							"query": [
 								{
-									"key": "submissionId",
+									"key": "ora_location",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUuid",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -467,7 +476,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-0",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-0",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -483,7 +492,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUUID",
+											"key": "submissionUuid",
 											"value": "SUBMISSION_ID-0"
 										}
 									]
@@ -549,7 +558,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionId=SUBMISSION_ID-1",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-1",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -565,7 +574,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionId",
+											"key": "submissionUuid",
 											"value": "SUBMISSION_ID-1"
 										}
 									]
@@ -631,7 +640,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionId=SUBMISSION_ID-2",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-2",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -647,7 +656,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionId",
+											"key": "submissionUuid",
 											"value": "SUBMISSION_ID-2"
 										}
 									]
@@ -713,7 +722,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionId=SUBMISSION_ID-3",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-3",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -729,7 +738,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionId",
+											"key": "submissionUuid",
 											"value": "SUBMISSION_ID-3"
 										}
 									]
@@ -808,7 +817,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -825,7 +834,7 @@
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUUID",
+									"key": "submissionUuid",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -844,7 +853,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -861,7 +870,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUUID",
+											"key": "submissionUuid",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -940,7 +949,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -957,7 +966,7 @@
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUUID",
+									"key": "submissionUuid",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -976,7 +985,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -993,7 +1002,7 @@
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUUID",
+											"key": "submissionUuid",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -1071,17 +1080,8 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"score\": {\n        \"pointsEarned\": 90,\n        \"pointsPossible\": 100\n    },\n    \"overallFeedback\": \"was pretty good\",\n    \"criteria\": [\n        {\n            \"name\": \"firstCriterion\",\n            \"feedback\": \"did alright\",\n            \"selectedOption\": \"good\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?ora_location={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/grade?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -1089,7 +1089,8 @@
 							"path": [
 								"api",
 								"ora_staff_grader{{mock}}",
-								"updateGrade"
+								"submission",
+								"grade"
 							],
 							"query": [
 								{
@@ -1097,7 +1098,7 @@
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUUID",
+									"key": "submissionUuid",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -1125,7 +1126,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?submissionId={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?submissionUuid={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -1137,7 +1138,7 @@
 									],
 									"query": [
 										{
-											"key": "submissionId",
+											"key": "submissionUuid",
 											"value": "{{submission_id}}"
 										}
 									]
