@@ -73,4 +73,4 @@ def fetch_default_response(submission_id):  # pylint: disable=unused-argument
 
 def save_submission_update(ora_location, submission):
     """ Update a submission key with new data """
-    update_data_file("submissions.json", [ora_location, submission['submissionId']], submission)
+    update_data_file("submissions.json", [ora_location, submission['submissionUuid']], submission)

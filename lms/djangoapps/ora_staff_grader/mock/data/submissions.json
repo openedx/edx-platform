@@ -1,7 +1,7 @@
 {
     "block-a": {
         "SUBMISSION_ID-0": {
-            "submissionId": "SUBMISSION_ID-0",
+            "submissionUuid": "SUBMISSION_ID-0",
             "username": "USERNAME-0",
             "dateSubmitted": 1631215154955,
             "score": null,
@@ -10,7 +10,7 @@
             "lockStatus": "unlocked"
         },
         "SUBMISSION_ID-1": {
-            "submissionId": "SUBMISSION_ID-1",
+            "submissionUuid": "SUBMISSION_ID-1",
             "username": "USERNAME-1",
             "dateSubmitted": 1631301554955,
             "score": {
@@ -35,7 +35,7 @@
             "lockStatus": "locked"
         },
         "SUBMISSION_ID-2": {
-            "submissionId": "SUBMISSION_ID-2",
+            "submissionUuid": "SUBMISSION_ID-2",
             "username": "USERNAME-2",
             "dateSubmitted": 1631387954955,
             "score": {
@@ -60,7 +60,7 @@
             "lockStatus": "unlocked"
         },
         "SUBMISSION_ID-3": {
-            "submissionId": "SUBMISSION_ID-3",
+            "submissionUuid": "SUBMISSION_ID-3",
             "username": "USERNAME-3",
             "dateSubmitted": 1631474354955,
             "score": null,
