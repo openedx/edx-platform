@@ -10,6 +10,9 @@ jobs:
   collect-and-verify:
     runs-on: [ self-hosted ]
     steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+
       - uses: actions/checkout@v2
       - name: install requirements
         run: |
