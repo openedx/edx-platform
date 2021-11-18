@@ -79,8 +79,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "name": self.ora_data['display_name'],
             "prompts": self.ora_data['prompts'],
             "type": "individual",
-            "textResponseConfig": "None",
-            "fileUploadResponseConfig": "None",
+            "textResponseConfig": "none",
+            "fileUploadResponseConfig": "none",
         }
 
     def test_team_ora(self):
@@ -92,8 +92,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "name": self.ora_data['display_name'],
             "prompts": self.ora_data['prompts'],
             "type": "team",
-            "textResponseConfig": "None",
-            "fileUploadResponseConfig": "None",
+            "textResponseConfig": "none",
+            "fileUploadResponseConfig": "none",
         }
 
     @ddt.unpack
@@ -104,8 +104,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
 
         data = OpenResponseMetadataSerializer(self.mock_ora_instance).data
 
-        assert data['textResponseConfig'] == text_response if text_response else 'None'
-        assert data['fileUploadResponseConfig'] == file_upload_response if file_upload_response else 'None'
+        assert data['textResponseConfig'] == text_response if text_response else "none"
+        assert data['fileUploadResponseConfig'] == file_upload_response if file_upload_response else "none"
 
 
 class TestSubmissionMetadataSerializer(TestCase):
@@ -134,7 +134,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "username": "foo",
             "teamName": "",
             "dateSubmitted": "1969-07-16 13:32:00",
-            "dateGraded": "None",
+            "dateGraded": "none",
             "gradedBy": "",
             "gradingStatus": "ungraded",
             "lockStatus": "unlocked",
@@ -148,7 +148,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "username": "",
             "teamName": "bar",
             "dateSubmitted": "1969-07-20 20:17:40",
-            "dateGraded": "None",
+            "dateGraded": "none",
             "gradedBy": "",
             "gradingStatus": "ungraded",
             "lockStatus": "in-progress",
