@@ -13,18 +13,18 @@ urlpatterns = []
 
 urlpatterns += [
     url(
-        'initialize', InitializeView.as_view(), name='initialize'
+        'initialize/', InitializeView.as_view(), name='initialize'
     ),
     url(
-        'submissionStatus', FetchSubmissionStatusView.as_view(), name='fetch-submission-status'
+        'submission/status/', FetchSubmissionStatusView.as_view(), name='fetch-submission-status'
     ),
     url(
-        'submission/lock', LockView.as_view(), name='lock-submission'
+        'submission/lock/', LockView.as_view(), name='lock-submission'
     ),
     url(
-        'submission', FetchSubmissionView.as_view(), name='fetch-submission'
+        'submission/grade/', UpdateGradeView.as_view(), name='update-grade'
     ),
     url(
-        'updateGrade', UpdateGradeView.as_view(), name='update-grade'
-    )
+        'submission/', FetchSubmissionView.as_view(), name='fetch-submission'
+    ),
 ]

@@ -12,14 +12,14 @@ urlpatterns = []
 app_name = "ora-staff-grader"
 
 urlpatterns += [
-    url('mock', include('lms.djangoapps.ora_staff_grader.mock.urls')),
+    url('mock/', include('lms.djangoapps.ora_staff_grader.mock.urls')),
     path(
-        'initialize', InitializeView.as_view(), name='initialize'
-    ),
-    path(
-        'submission', SubmissionFetchView.as_view(), name='fetch-submission'
+        'initialize/', InitializeView.as_view(), name='initialize'
     ),
     path(
         'submission/lock', SubmissionLockView.as_view(), name='lock'
     ),
+    path(
+        'submission/', SubmissionFetchView.as_view(), name='fetch-submission'
+    )
 ]
