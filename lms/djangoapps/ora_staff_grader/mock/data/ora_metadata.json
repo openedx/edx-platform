@@ -6,26 +6,25 @@
         ],
         "type": "individual",
         "rubricConfig": {
-            "feedback": "optional",
-            "feedbackPrompt": "How would you grade this response?",
-            "feedbackDefaultText": "I believe this response...",
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
             "criteria": [
                 {
-                    "orderNum": 0,
+                    "order_num": 0,
                     "name": "grammar",
                     "label": "Grammar",
                     "prompt": "How correct is the submitter's grammar?",
                     "feedback": "optional",
                     "options": [
                         {
-                            "orderNum": 0,
+                            "order_num": 0,
                             "name": "poor",
                             "label": "Poor",
                             "explanation": "Absolute rubbish",
                             "points": 0
                         },
                         {
-                            "orderNum": 1,
+                            "order_num": 1,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
@@ -44,26 +43,25 @@
         ],
         "type": "team",
         "rubricConfig": {
-            "feedback": "required",
-            "feedbackPrompt": "How would you grade this response?",
-            "feedbackDefaultText": "I believe this response...",
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
             "criteria": [
                 {
-                    "orderNum": 0,
+                    "order_num": 0,
                     "name": "correctness",
                     "label": "Correctness",
                     "prompt": "How correct is the team's answer?",
                     "feedback": "optional",
                     "options": [
                         {
-                            "orderNum": 0,
+                            "order_num": 0,
                             "name": "poor",
                             "label": "Poor",
                             "explanation": "Absolute rubbish",
                             "points": 0
                         },
                         {
-                            "orderNum": 1,
+                            "order_num": 1,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
