@@ -60,7 +60,9 @@ class TestOpenResponseMetadataSerializer(TestCase):
     ora_data = {
         "display_name": "Week 1: Time Travel Paradoxes",
         "prompts": ["<p>In your own words, explain a famous time travel paradox</p>"],
-        "teams_enabled": False
+        "teams_enabled": False,
+        "text_response": "optional",
+        "file_upload_response" : "required",
     }
 
     def setUp(self):
@@ -76,6 +78,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "name": self.ora_data['display_name'],
             "prompts": self.ora_data['prompts'],
             "type": "individual",
+            "textResponseConfig": "optional",
+            "fileUploadResponseConfig" : "required",
         }
 
     def test_team_ora(self):
@@ -87,6 +91,8 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "name": self.ora_data['display_name'],
             "prompts": self.ora_data['prompts'],
             "type": "team",
+            "textResponseConfig": "optional",
+            "fileUploadResponseConfig" : "required",
         }
 
 
