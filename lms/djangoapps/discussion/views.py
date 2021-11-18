@@ -720,11 +720,11 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             Fragment: The fragment representing the discussion board
         """
         course_key = CourseKey.from_string(course_id)
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and settings.DISCUSSION_MICROFRONTEND_URL:
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and settings.DISCUSSIONS_MICROFRONTEND_URL:
             fragment = Fragment(
                 HTML(
                     "<iframe id='discussions-mfe-tab-embed' src='{src}'></iframe>"
-                ).format(src=f"{settings.DISCUSSION_MICROFRONTEND_URL}/discussions/{course_id}/")
+                ).format(src=f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{course_id}/")
             )
             fragment.add_css(
                 """

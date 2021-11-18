@@ -1234,7 +1234,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             assert not self.discussion_tab_present(self.enrolled_user)
 
-    @override_settings(DISCUSSION_MICROFRONTEND_URL="http://test.url")
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @ddt.data(
         (True, 'http://test.url/discussions/{}/'),
         (False, '/courses/{}/discussion/forum/'),

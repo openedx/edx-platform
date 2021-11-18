@@ -163,7 +163,7 @@ LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
-DISCUSSION_MICROFRONTEND_URL = 'http://localhost:2002'
+DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
 ################################# DJANGO-REQUIRE ###############################
 

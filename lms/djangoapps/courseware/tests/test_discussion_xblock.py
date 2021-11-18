@@ -309,7 +309,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         assert 'data-user-create-comment="false"' in html
         assert 'data-user-create-subcomment="false"' in html
 
-    @override_settings(DISCUSSION_MICROFRONTEND_URL="http://test.url")
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
     def test_embed_mfe_in_course(self):
         """

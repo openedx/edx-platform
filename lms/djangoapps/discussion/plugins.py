@@ -35,8 +35,8 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            if ENABLE_DISCUSSIONS_MFE.is_enabled(course.id) and settings.DISCUSSION_MICROFRONTEND_URL:
-                return f"{settings.DISCUSSION_MICROFRONTEND_URL}/discussions/{course.id}/"
+            if ENABLE_DISCUSSIONS_MFE.is_enabled(course.id) and settings.DISCUSSIONS_MICROFRONTEND_URL:
+                return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{course.id}/"
             return _link_func(course, reverse_func)
 
         return link_func
