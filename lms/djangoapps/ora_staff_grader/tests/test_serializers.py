@@ -63,14 +63,13 @@ class TestOpenResponseMetadataSerializer(TestCase):
         "prompts": ["<p>In your own words, explain a famous time travel paradox</p>"],
         "teams_enabled": False,
         "text_response": None,
-        "file_upload_response" : None,
+        "file_upload_response": None,
     }
 
     def setUp(self):
         super().setUp()
 
         self.mock_ora_instance = Mock(name='openassessment-block', **self.ora_data)
-
 
     def test_individual_ora(self):
         # An ORA with teams disabled should have type "individual"
@@ -81,7 +80,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "prompts": self.ora_data['prompts'],
             "type": "individual",
             "textResponseConfig": "None",
-            "fileUploadResponseConfig" : "None",
+            "fileUploadResponseConfig": "None",
         }
 
     def test_team_ora(self):
@@ -94,7 +93,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "prompts": self.ora_data['prompts'],
             "type": "team",
             "textResponseConfig": "None",
-            "fileUploadResponseConfig" : "None",
+            "fileUploadResponseConfig": "None",
         }
 
     @ddt.unpack
@@ -107,6 +106,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
 
         assert data['textResponseConfig'] == text_response if text_response else 'None'
         assert data['fileUploadResponseConfig'] == file_upload_response if file_upload_response else 'None'
+
 
 class TestSubmissionMetadataSerializer(TestCase):
     """
