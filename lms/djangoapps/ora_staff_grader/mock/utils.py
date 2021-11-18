@@ -52,7 +52,13 @@ def get_ora_metadata(ora_location):
 
 def get_submissions(ora_location):  # pylint: disable=unused-argument
     """ Get Submission list, scoped by ORA block location """
-    return read_data_file("submissions.json")[ora_location]
+    submissions = read_data_file("submissions.json")[ora_location]
+
+    # For the list view, we don't return grade data
+    for submission_id, submission in submissions.items():  # pylint: disable=unused-variable
+        submission.pop('gradeData')
+
+    return submissions
 
 
 def fetch_submission(ora_location, submission_id):
