@@ -6,7 +6,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SplitModulestoreCourseIndexTest(TestCase):
