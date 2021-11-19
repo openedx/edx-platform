@@ -35,7 +35,7 @@ ProviderExternalLinks = namedtuple(
 
 class Provider:
     """
-    Discussion providers data.
+    List of Discussion providers.
     """
     LEGACY = 'legacy'
     ED_DISCUSS = 'ed-discuss'

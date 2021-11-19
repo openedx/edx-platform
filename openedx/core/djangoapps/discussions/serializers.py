@@ -180,8 +180,8 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             'unit_level_visibility',
         ]
         fields = [
-                     'enabled',
-                 ] + course_fields
+            'enabled',
+        ] + course_fields
 
     def _get_course(self):
         """
