@@ -9,7 +9,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from freezegun import freeze_time
 from pytz import utc
 

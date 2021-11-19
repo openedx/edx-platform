@@ -7,7 +7,7 @@ import json
 import logging
 from time import time
 
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 from opaque_keys.edx.keys import UsageKey
 from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
@@ -65,7 +65,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     problem_url = task_input.get('problem_url')
     entrance_exam_url = task_input.get('entrance_exam_url')
     student_identifier = task_input.get('student')
-    override_score_task = action_name == ugettext_noop('overridden')
+    override_score_task = action_name == gettext_noop('overridden')
     problems = {}
 
     # if problem_url is present make a usage key from it
