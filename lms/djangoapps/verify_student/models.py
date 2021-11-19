@@ -28,7 +28,7 @@ from django.urls import reverse
 
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -1086,11 +1086,11 @@ class VerificationDeadline(TimeStampedModel):
         max_length=255,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy("The course for which this deadline applies"),
+        help_text=gettext_lazy("The course for which this deadline applies"),
     )
 
     deadline = models.DateTimeField(
-        help_text=ugettext_lazy(
+        help_text=gettext_lazy(
             "The datetime after which users are no longer allowed "
             "to submit photos for verification."
         )
