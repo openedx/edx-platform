@@ -554,7 +554,9 @@ def activate_account(request, key):
             activation_message_type = 'info'
             messages.info(
                 request,
-                HTML(_('{html_start}This {account_or_email} has already been {activated_or_confirmed}.{html_end}')).format(
+                HTML(_(
+                    '{html_start}This {account_or_email} has already been {activated_or_confirmed}.{html_end}'
+                )).format(
                     account_or_email=account_or_email,
                     activated_or_confirmed=activated_or_confirmed,
                     html_start=HTML('<p class="message-title">'),
