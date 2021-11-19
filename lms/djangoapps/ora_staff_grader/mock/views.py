@@ -7,12 +7,14 @@ from rest_framework.views import APIView
 
 from lms.djangoapps.ora_staff_grader.mock.utils import *
 
+PARAM_ORA_LOCATION = 'oraLocation'
+PRAM_SUBMISSION_ID = 'submissionUUID'
 
 class InitializeView(RetrieveAPIView):
     """ Returns initial app state """
 
     def get(self, request):
-        ora_location = request.query_params['ora_location']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
 
         return Response({
             'courseMetadata': get_course_metadata(ora_location),
@@ -25,8 +27,8 @@ class FetchSubmissionView(RetrieveAPIView):
     """ Get a submission """
 
     def get(self, request):
-        ora_location = request.query_params['ora_location']
-        submission_id = request.query_params['submissionUUID']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
+        submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
         response = fetch_default_response(submission_id)
@@ -43,8 +45,8 @@ class FetchSubmissionStatusView(RetrieveAPIView):
     """ Get a submission status, leaving out the response """
 
     def get(self, request):
-        ora_location = request.query_params['ora_location']
-        submission_id = request.query_params['submissionUUID']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
+        submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
 
@@ -60,8 +62,8 @@ class LockView(APIView):
 
     def post(self, request):
         """ Claim a submission lock, updating lock status """
-        ora_location = request.query_params['ora_location']
-        submission_id = request.query_params['submissionUUID']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
+        submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
         submission['lockStatus'] = 'in-progress'
@@ -74,8 +76,8 @@ class LockView(APIView):
 
     def delete(self, request):
         """ Delete a submission lock, updating lock status """
-        ora_location = request.query_params['ora_location']
-        submission_id = request.query_params['submissionUUID']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
+        submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
         submission['lockStatus'] = 'unlocked'
@@ -97,8 +99,8 @@ class UpdateGradeView(RetrieveAPIView):
         submission['lockStatus'] = 'unlocked'
 
     def post(self, request):
-        ora_location = request.query_params['ora_location']
-        submission_id = request.query_params['submissionUUID']
+        ora_location = request.query_params[PARAM_ORA_LOCATION]
+        submission_id = request.query_params[PRAM_SUBMISSION_ID]
         grade_data = request.data
 
         submission = fetch_submission(ora_location, submission_id)
