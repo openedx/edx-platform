@@ -1187,26 +1187,27 @@
       }
 
       .related-program-element {
-        &.buffered-element {
-          &.important-element {
+        &.important-element {
+          @include float(left);
+
+          display: inline;
+          padding: 0 0.5em !important;
+
+          .category-icon {
             @include float(left);
+            @include margin-right($baseline/4);
 
-            display: inline;
-            padding: 0 0.5em !important;
-            border-right: 1px solid;
-
-            .category-icon {
-              @include float(left);
-              @include margin-right($baseline/4);
-
-              margin-top: ($baseline/10);
-              background-color: transparent;
-              background-size: 100%;
-              width: ($baseline*0.7);
-              height: ($baseline*0.7);
-            }
+            margin-top: ($baseline/10);
+            background-color: transparent;
+            background-size: 100%;
+            width: ($baseline*0.7);
+            height: ($baseline*0.7);
           }
         }
+      }
+
+      li {
+        border-right: 1px solid;
       }
 
       // Remove separator from last list item.

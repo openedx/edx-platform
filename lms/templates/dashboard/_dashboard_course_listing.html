@@ -348,7 +348,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           <ul class="related-program-container" >
             % for program in related_programs:
               ## intentionally using multiple classnames here to bump up specificity
-            <li class="related-program-element buffered-element important-element">
+            <li class="related-program-element important-element">
               <span class="category-icon ${program['type'].lower()}-icon" aria-hidden="true"></span>
               <span><a href="${program['detail_url']}">${u'{title} {type}'.format(title=program['title'], type=program['type'])}</a></span>
             </li>
