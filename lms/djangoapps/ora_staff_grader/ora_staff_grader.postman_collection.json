@@ -62,7 +62,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?ora_location={{block_id_encoded}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?oraLocation={{block_id_encoded}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -74,7 +74,7 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										}
 									]
@@ -152,7 +152,7 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}",
 											"disabled": true
 										}
@@ -219,7 +219,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?ora_location={{block_id_encoded}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?oraLocation={{block_id_encoded}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -231,7 +231,7 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										}
 									]
@@ -310,7 +310,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -322,11 +322,11 @@
 							],
 							"query": [
 								{
-									"key": "ora_location",
+									"key": "oraLocation",
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUuid",
+									"key": "submissionUUID",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -345,7 +345,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -357,11 +357,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -440,7 +440,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/status?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/status?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -453,11 +453,11 @@
 							],
 							"query": [
 								{
-									"key": "ora_location",
+									"key": "oraLocation",
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUuid",
+									"key": "submissionUUID",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -476,7 +476,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-0",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-0",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -488,11 +488,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "SUBMISSION_ID-0"
 										}
 									]
@@ -558,7 +558,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-1",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-1",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -570,11 +570,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "SUBMISSION_ID-1"
 										}
 									]
@@ -640,7 +640,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-2",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-2",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -652,11 +652,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "SUBMISSION_ID-2"
 										}
 									]
@@ -722,7 +722,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?ora_location={{block_id_encoded}}&submissionUuid=SUBMISSION_ID-3",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-3",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -734,11 +734,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "SUBMISSION_ID-3"
 										}
 									]
@@ -817,7 +817,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -830,11 +830,11 @@
 							],
 							"query": [
 								{
-									"key": "ora_location",
+									"key": "oraLocation",
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUuid",
+									"key": "submissionUUID",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -853,7 +853,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -866,11 +866,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -949,7 +949,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -962,11 +962,11 @@
 							],
 							"query": [
 								{
-									"key": "ora_location",
+									"key": "oraLocation",
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUuid",
+									"key": "submissionUUID",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -985,7 +985,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -998,11 +998,11 @@
 									],
 									"query": [
 										{
-											"key": "ora_location",
+											"key": "oraLocation",
 											"value": "{{block_id_encoded}}"
 										},
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "{{submission_id}}"
 										}
 									]
@@ -1080,8 +1080,17 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"score\": {\n        \"pointsEarned\": 90,\n        \"pointsPossible\": 100\n    },\n    \"overallFeedback\": \"was pretty good\",\n    \"criteria\": [\n        {\n            \"name\": \"firstCriterion\",\n            \"feedback\": \"did alright\",\n            \"selectedOption\": \"good\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/grade?ora_location={{block_id_encoded}}&submissionUuid={{submission_id}}",
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/grade?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{lms_url}}"
@@ -1094,11 +1103,11 @@
 							],
 							"query": [
 								{
-									"key": "ora_location",
+									"key": "oraLocation",
 									"value": "{{block_id_encoded}}"
 								},
 								{
-									"key": "submissionUuid",
+									"key": "submissionUUID",
 									"value": "{{submission_id}}"
 								}
 							]
@@ -1126,7 +1135,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?submissionUuid={{submission_id}}",
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?submissionUUID={{submission_id}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{lms_url}}"
@@ -1138,7 +1147,7 @@
 									],
 									"query": [
 										{
-											"key": "submissionUuid",
+											"key": "submissionUUID",
 											"value": "{{submission_id}}"
 										}
 									]
