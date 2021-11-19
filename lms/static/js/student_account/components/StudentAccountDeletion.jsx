@@ -57,10 +57,11 @@ export class StudentAccountDeletion extends React.Component {
     );
 
     const activationError = StringUtils.interpolate(
-      gettext('Before proceeding, please {htmlStart}activate your account{htmlEnd}.'),
+      gettext('Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}.'),
       {
         htmlStart: '<a href="https://support.edx.org/hc/en-us/articles/115000940568-How-do-I-activate-my-account-" rel="noopener" target="_blank">',
         htmlEnd: '</a>',
+        emailMsg: this.props.mktgEmailOptIn ? 'confirm your email' : 'activate your account',
       },
     );
 
@@ -173,6 +174,7 @@ StudentAccountDeletion.propTypes = {
   mktgRootLink: PropTypes.string,
   platformName: PropTypes.string,
   siteName: PropTypes.string,
+  mktgEmailOptIn: PropTypes.bool.isRequired,
 };
 
 StudentAccountDeletion.defaultProps = {
