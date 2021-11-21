@@ -5,7 +5,7 @@
 #
 # Translators:
 # ariadna.lawyer.23 <ari2332@hotmail.com>, 2014
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Cristóbal Urbano <urbano@ub.edu>, 2018
 # Elies Martos Robles <eliesmr4@gmail.com>, 2018
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
@@ -18,7 +18,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Xavi Armengol <xarmengol@gmail.com>, 2016
@@ -28,7 +28,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Elies Martos Robles <eliesmr4@gmail.com>, 2018
 # Estefania Garcia, 2016
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
@@ -41,7 +41,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
@@ -49,7 +49,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # mcolomer <mcmlilhity@gmail.com>, 2014
 # Miquel Oliver <miquel.oliver@upf.edu>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#

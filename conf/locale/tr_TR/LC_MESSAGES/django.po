@@ -131,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-14 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -6265,15 +6265,15 @@ msgstr "Emin değilim"
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        There's still time to reach your goal\n"
-"                    "
+"                            There’s still time to reach your goal\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
 msgid ""
 "\n"
-"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
 "                            "
 msgid_plural ""
 "\n"
@@ -6285,15 +6285,15 @@ msgstr[1] ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                            Jump back in\n"
-"                        "
+"                                Jump back in\n"
+"                            "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
-"                    "
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
@@ -8256,6 +8256,7 @@ msgid " (out of {total})"
 msgstr " ({total} içinde)"
 
 #: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -9754,11 +9755,19 @@ msgstr "ACE Common"
 msgid "Go to %(platform_name)s Home Page"
 msgstr "%(platform_name)s Ana Sayfasına Git"
 
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr "Dersler"
+
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Giriş"
+msgid "My Account"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -12469,6 +12478,11 @@ msgstr ""
 "kullandınız."
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr "Giriş"
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "E-posta adresimiz şöyle: "
 
@@ -13481,16 +13495,6 @@ msgstr "Ders Numarası:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
 msgstr "Ders Zamanı:"
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
-msgstr "Dersler"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html

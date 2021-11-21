@@ -11060,34 +11060,40 @@ msgstr "La identificación del proveedor de discusiones"
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Context key for context in which this discussion topic exists."
 msgstr ""
+"Llave de contexto por contexto en el cual esta temática de discusión exista."
+" "
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "Usage key for in-context discussion topic. Set to null for course-level "
 "topics."
 msgstr ""
+"Llave de uso para esta temática de discusión en contexto. Establece a nulo "
+"para temas de nivel de curso."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Title for discussion topic."
-msgstr ""
+msgstr "Título para el tema de discusión "
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Group for divided discussions."
-msgstr ""
+msgstr "Grupo para discusiones divididas."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Provider id for discussion provider."
-msgstr ""
+msgstr "Proveedor de ID para proveedor de discusiones."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "Discussion context ID in external forum provider. e.g. commentable_id for "
 "cs_comments_service."
 msgstr ""
+"ID de contexto de discusión en el proveedor de foro externo. p.ej. "
+"commentable_id para cs_comments_service."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Whether this topic should be shown in-context in the course."
-msgstr ""
+msgstr "Si esta temática debe ser mostrada en el contexto del curso."
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
