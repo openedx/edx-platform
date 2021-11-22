@@ -5,6 +5,8 @@ import logging
 from unittest import mock
 
 import ddt
+from django.conf import settings
+from django.test import override_settings
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -329,6 +331,31 @@ class AllowlistTests(ModuleStoreTestCase):
         )
 
         assert _set_allowlist_cert_status(u, key, self.enrollment_mode, self.grade) is None
+
+    def test_generate_allowlist_honor_cert(self):
+        """
+        Test that verifies we can generate an Honor cert for an Open edX installation configured to support Honor
+        certificates.
+        """
+        course_run = CourseFactory()
+        course_run_key = course_run.id  # pylint: disable=no-member
+        enrollment_mode = CourseMode.HONOR
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_run_key,
+            is_active=True,
+            mode=enrollment_mode,
+        )
+
+        CertificateAllowlistFactory.create(course_id=course_run_key, user=self.user)
+
+        # Enable Honor Certificates and verify we can generate an AllowList certificate
+        with override_settings(FEATURES={**settings.FEATURES, 'DISABLE_HONOR_CERTIFICATES': False}):
+            assert _can_generate_allowlist_certificate(self.user, course_run_key, enrollment_mode)
+
+        # Disable Honor Certificates and verify we cannot generate an AllowList certificate
+        with override_settings(FEATURES={**settings.FEATURES, 'DISABLE_HONOR_CERTIFICATES': True}):
+            assert not _can_generate_allowlist_certificate(self.user, course_run_key, enrollment_mode)
 
 
 @mock.patch(INTEGRITY_ENABLED_METHOD, mock.Mock(return_value=False))
@@ -741,3 +768,31 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         assert _set_regular_cert_status(u, key, self.enrollment_mode, self.grade) is None
+
+    def test_can_generate_honor_cert(self):
+        """
+        Test that verifies we can generate an Honor cert for an Open edX installation configured to support Honor
+        certificates.
+        """
+        course_run = CourseFactory()
+        course_run_key = course_run.id  # pylint: disable=no-member
+        enrollment_mode = CourseMode.HONOR
+        grade = CourseGradeFactory().read(self.user, course_run)
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_run_key,
+            is_active=True,
+            mode=enrollment_mode,
+        )
+
+        # Enable Honor Certificates and verify we can generate a certificate
+        with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
+                mock.patch(PASSING_GRADE_METHOD, return_value=True), \
+                override_settings(FEATURES={**settings.FEATURES, 'DISABLE_HONOR_CERTIFICATES': False}):
+            assert _can_generate_regular_certificate(self.user, course_run_key, enrollment_mode, grade)
+
+        # Disable Honor Certificates and verify we cannot generate a certificate
+        with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
+                mock.patch(PASSING_GRADE_METHOD, return_value=True), \
+                override_settings(FEATURES={**settings.FEATURES, 'DISABLE_HONOR_CERTIFICATES': True}):
+            assert not _can_generate_regular_certificate(self.user, course_run_key, enrollment_mode, grade)
