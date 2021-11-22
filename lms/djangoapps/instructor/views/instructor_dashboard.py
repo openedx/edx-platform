@@ -22,6 +22,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
+from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
@@ -52,6 +53,7 @@ from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
+from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
@@ -254,6 +256,15 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
+
+    # lms.djangoapp is passed to get_plugins_view_context instead of ProjectType.LMS
+    # to avoid cyclic import issue
+    context_from_plugins = get_plugins_view_context(
+        'lms.djangoapp',
+        INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME,
+        context
+    )
+    context.update(context_from_plugins)
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
