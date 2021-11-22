@@ -10,6 +10,7 @@ from lms.djangoapps.bulk_email.forms import CourseAuthorizationAdminForm, Course
 from lms.djangoapps.bulk_email.models import (
     BulkEmailFlag,
     CourseAuthorization,
+    DisabledCourse,
     CourseEmail,
     CourseEmailTemplate,
     Optout
@@ -88,8 +89,14 @@ To enable email for the course, check the "Email enabled" box, then click "Save"
     )
 
 
+class DisabledCourseAdmin(admin.ModelAdmin):
+    """Admin for disabling bulk email on a course-by-course basis"""
+    list_display = ('course_id', )
+
+
 admin.site.register(CourseEmail, CourseEmailAdmin)
 admin.site.register(Optout, OptoutAdmin)
 admin.site.register(CourseEmailTemplate, CourseEmailTemplateAdmin)
 admin.site.register(CourseAuthorization, CourseAuthorizationAdmin)
 admin.site.register(BulkEmailFlag, ConfigurationModelAdmin)
+admin.site.register(DisabledCourse, DisabledCourseAdmin)
