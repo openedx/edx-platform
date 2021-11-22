@@ -42,15 +42,15 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
-from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def intercept_renderer(path, context):
