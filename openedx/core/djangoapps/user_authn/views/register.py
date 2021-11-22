@@ -224,7 +224,7 @@ def create_account_with_params(request, params):
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
-        user, running_pipeline, third_party_provider,
+        user, running_pipeline, third_party_provider, params,
     )
 
     if skip_email:
@@ -364,7 +364,7 @@ def _track_user_registration(user, profile, params, third_party_provider):
         )
 
 
-def _skip_activation_email(user, running_pipeline, third_party_provider):
+def _skip_activation_email(user, running_pipeline, third_party_provider, params):
     """
     Return `True` if activation email should be skipped.
 
@@ -417,7 +417,7 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
     return (
         settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
-        skip_registration_email_for_registration_api(get_current_request()) or
+        skip_registration_email_for_registration_api(get_current_request(), params) or
         is_request_for_amc_admin(get_current_request()) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
     )

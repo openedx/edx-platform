@@ -2,6 +2,7 @@
 Tests for openedx.core.djangoapps.appsembler.api.v2.views.RegistrationViewSet
 
 """
+from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -41,6 +42,42 @@ class RegistrationApiViewTestsV2(TestCase):
         res = self.client.post(self.url, self.sample_user_data)
         self.assertNotContains(res, "user_id ")
         self.assertContains(res, "user_id", status_code=200)
+
+    @ddt.unpack
+    @ddt.data(
+        {'send_activation_email': True, 'should_send': True},
+        {'send_activation_email': False, 'should_send': False},
+        {'send_activation_email': 'True', 'should_send': True},
+        {'send_activation_email': 'False', 'should_send': False},
+        {'send_activation_email': 'true', 'should_send': True},
+        {'send_activation_email': 'false', 'should_send': False},
+    )
+    def test_send_activation_email_with_password(self, send_activation_email, should_send):
+        """
+        This test makes sure when the API endpoint is called with a password,
+        the send_activation_email parameter is being used properly. Also makes
+        sure when the attribute is True the user remains inactive until the
+        activation is performed through the activation email. It also makes
+        sure the user is automatically activate when the parameter is False.
+
+        TODO: Reuse the tests of v1's RegistrationApiViewTests instead of duplicating code
+              as described in https://github.com/appsembler/edx-platform/issues/1047
+        """
+        params = {
+            'username': 'mr_potato_head',
+            'email': 'mr_potato_head@example.com',
+            'name': 'Mr Potato Head',
+            'password': 'some-password',
+            'send_activation_email': send_activation_email,
+        }
+
+        with patch('openedx.core.djangoapps.user_authn.views.register.compose_and_send_activation_email') as fake_send:
+            res = self.client.post(self.url, params)
+            self.assertContains(res, 'user_id', status_code=200)
+            new_user = User.objects.get(username=params['username'])
+
+            assert fake_send.called == should_send, 'activation email should not be called'
+            assert new_user.is_active == (not should_send), 'xor, Either activate or send the email'
 
     def test_duplicate_identifiers(self):
         self.client.post(self.url, self.sample_user_data)
