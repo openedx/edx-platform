@@ -86,6 +86,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor.constants import INVOICE_KEY
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
@@ -94,7 +95,6 @@ from lms.djangoapps.instructor.enrollment import (
     send_mail_to_student,
     unenroll_email,
 )
-from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
