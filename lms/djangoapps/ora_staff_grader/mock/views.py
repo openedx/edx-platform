@@ -10,6 +10,7 @@ from lms.djangoapps.ora_staff_grader.mock.utils import *
 PARAM_ORA_LOCATION = 'oraLocation'
 PRAM_SUBMISSION_ID = 'submissionUUID'
 
+
 class InitializeView(RetrieveAPIView):
     """ Returns initial app state """
 
