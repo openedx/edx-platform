@@ -14,8 +14,8 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
-from xmodule.library_content_module import LibraryContentBlock
-from xmodule.modulestore.django import modulestore
+from xmodule.library_content_module import LibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_student_module_as_dict
 
