@@ -4,9 +4,9 @@ Tests for Progress Tab API in the Course Home API
 
 import dateutil
 import ddt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from pytz import UTC
-from unittest.mock import patch
+from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -23,7 +23,7 @@ from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
