@@ -237,7 +237,8 @@ div.problem {
 
   input[type="radio"],
   input[type="checkbox"] {
-    @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+    @include margin($baseline/4);
+    @include margin-right($baseline/2);
   }
 
   input {
@@ -288,7 +289,7 @@ div.problem {
 
     label {
       @include padding($baseline/2);
-      @include padding-left($baseline*1.9);
+      @include padding-left($baseline*2.3);
 
       position: relative;
       font-size: $base-font-size;
@@ -301,7 +302,7 @@ div.problem {
       @include left(em(9));
 
       position: absolute;
-      top: em(9);
+      top: 0.35em;
       width: $baseline*1.1;
       height: $baseline*1.1;
       z-index: 1;

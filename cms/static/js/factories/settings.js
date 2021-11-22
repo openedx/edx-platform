@@ -26,7 +26,8 @@ define([
                 });
                 editor.render();
             },
-            reset: true
+            reset: true,
+            cache: false
         });
     };
 });

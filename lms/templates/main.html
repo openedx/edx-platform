@@ -171,6 +171,11 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
     </script>
 % endif
 
+  % if course and course is not UNDEFINED and render_course_wide_assets:
+  % for css in course.course_wide_css:
+    <link rel="stylesheet" href="${css}" type="text/css">
+  % endfor
+  % endif
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
@@ -214,6 +219,13 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
   <script type="text/javascript" src="${static.url('js/header/header.js')}"></script>
   <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
   <script type="text/javascript" src="${static.url('js/src/jquery_extend_patch.js')}"></script>
+  <div id="lean_overlay"></div>
+
+  % if course and course is not UNDEFINED and render_course_wide_assets:
+  % for js in course.course_wide_js:
+  <script type="text/javascript" src="${js}"></script>
+  % endfor
+  % endif
 </body>
 </html>
 

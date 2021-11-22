@@ -1709,7 +1709,7 @@ CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
-LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
+LANGUAGES_BIDI = ("he", "ar", "ar-sa", "fa", "ur", "fa-ir", "rtl")
 
 LANGUAGE_COOKIE = "openedx-language-preference"
 
@@ -1719,7 +1719,7 @@ LANGUAGES = [
     ('rtl', 'Right-to-Left Test Language'),
     ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
-
+    ('ar-sa', 'العربية (المملكة العربية السعودية)'),  # Arabic (Saudi Arabia)
     ('am', 'አማርኛ'),  # Amharic
     ('ar', 'العربية'),  # Arabic
     ('az', 'azərbaycanca'),  # Azerbaijani
@@ -2614,6 +2614,15 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = 'celery.beat:PersistentScheduler'
+CELERY_IMPORTS = (
+    # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
+    # by celery workers, its tasks will not get auto-discovered:
+    'poll.tasks',
+)
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
@@ -3146,6 +3155,9 @@ INSTALLED_APPS = [
     # in the LMS process at the moment, so anything that has Django admin access
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
+
+    # GDPR user retirement
+    'lms.djangoapps.gdpr_user_retirement',
 ]
 
 ######################### CSRF #########################################
@@ -3907,6 +3919,21 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
+# .. toggle_name: SEARCH_SKIP_INVITATION_ONLY_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, invitation-only courses will appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = True
+# .. toggle_name: SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, courses with a catalog_visibility set to "none" will still
+#    appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = True
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {

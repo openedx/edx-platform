@@ -40,7 +40,8 @@ describe('CourseOutlinePage', function() {
             user_partitions: [],
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -67,7 +68,8 @@ describe('CourseOutlinePage', function() {
             show_review_rules: true,
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -92,7 +94,8 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             highlights: [],
-            highlights_enabled: true
+            highlights_enabled: true,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -122,7 +125,8 @@ describe('CourseOutlinePage', function() {
             },
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -140,7 +144,8 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            show_delete_button: true
         }, options);
     };
 
@@ -850,6 +855,13 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectNoRequests(requests); // No fetch should be performed
             expect(outlinePage.$('[data-locator="mock-section"]')).not.toExist();
             expect(outlinePage.$('[data-locator="mock-section-2"]')).toExist();
+        });
+
+        it('remains un-visible if show_delete_button is false ', function() {
+            createCourseOutlinePage(this, createMockCourseJSON({show_delete_button: false}, [
+                createMockSectionJSON({show_delete_button: false})
+            ]));
+            expect(getItemHeaders('section').find('.delete-button').first()).not.toExist();
         });
 
         it('can be deleted if it is the only section', function() {

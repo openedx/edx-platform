@@ -1004,3 +1004,8 @@ if settings.FEATURES.get('ENABLE_BULK_USER_RETIREMENT'):
     urlpatterns += [
         url(r'', include('lms.djangoapps.bulk_user_retirement.urls')),
     ]
+
+# GDPR Deletion API urls
+urlpatterns += [
+    url(r'', include('lms.djangoapps.gdpr_user_retirement.urls')),
+]

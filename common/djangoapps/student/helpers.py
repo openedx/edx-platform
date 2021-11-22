@@ -391,6 +391,31 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
     return redirect_to
 
 
+def generate_activation_email_context(user, registration):
+    """
+    Constructs a dictionary for use in activation email contexts
+
+    Arguments:
+        user (User): Currently logged-in user
+        registration (Registration): Registration object for the currently logged-in user
+    """
+    return {
+        'name': user.profile.name,
+        'key': registration.activation_key,
+        'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'contact_mailing_address': configuration_helpers.get_value(
+            'contact_mailing_address',
+            settings.CONTACT_MAILING_ADDRESS
+        ),
+        'support_url': configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+        'site_configuration_values': configuration_helpers.get_current_site_configuration_values(),
+    }
+
+
 def create_or_set_user_attribute_created_on_site(user, site):
     """
     Create or Set UserAttribute indicating the site the user account was created on.

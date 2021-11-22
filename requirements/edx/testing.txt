@@ -20,6 +20,7 @@
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/base.txt
 -e common/lib/xmodule  # via -r requirements/edx/base.txt
+-e git+https://github.com/open-craft/xblock-lti-consumer.git@2.10.1-opencraft#egg=lti-consumer #via -r requirements/edx/base.in
 amqp==2.6.1               # via -r requirements/edx/base.txt, kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.txt
 aniso8601==9.0.1          # via -r requirements/edx/base.txt, edx-tincan-py35, tincan
@@ -170,7 +171,6 @@ lazy-object-proxy==1.6.0  # via astroid
 lazy==1.4                 # via -r requirements/edx/base.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/base.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/base.txt, ora2
-lti-consumer-xblock==2.9.1  # via -r requirements/edx/base.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, capa, edxval, lti-consumer-xblock, olxcleaner, ora2, pyquery, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.txt
 mako==1.1.4               # via -r requirements/edx/base.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils

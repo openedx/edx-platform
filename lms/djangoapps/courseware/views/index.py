@@ -443,6 +443,7 @@ class CoursewareIndex(View):
             'sequence_title': None,
             'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
+            'render_course_wide_assets': True,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

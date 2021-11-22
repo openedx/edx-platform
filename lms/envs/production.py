@@ -105,6 +105,10 @@ EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFOR
 
 ###################################### CELERY  ################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = ENV_TOKENS.get('CELERYBEAT_SCHEDULER', CELERYBEAT_SCHEDULER)
+
 # Don't use a connection pool, since connections are dropped by ELB.
 BROKER_POOL_LIMIT = 0
 BROKER_CONNECTION_TIMEOUT = 1
@@ -506,10 +510,14 @@ BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
                                        CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
-BROKER_TRANSPORT_OPTIONS = {
-    'fanout_patterns': True,
-    'fanout_prefix': True,
-}
+try:
+    BROKER_TRANSPORT_OPTIONS = {
+        'fanout_patterns': True,
+        'fanout_prefix': True,
+        **ENV_TOKENS.get('CELERY_BROKER_TRANSPORT_OPTIONS', {})
+    }
+except TypeError as exc:
+    raise ImproperlyConfigured('CELERY_BROKER_TRANSPORT_OPTIONS must be a dict') from exc
 
 # Block Structures
 
@@ -698,6 +706,15 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
 
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
+
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = ENV_TOKENS.get(
+    'SEARCH_SKIP_INVITATION_ONLY_FILTERING',
+    SEARCH_SKIP_INVITATION_ONLY_FILTERING,
+)
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = ENV_TOKENS.get(
+    'SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING',
+    SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING,
+)
 
 # Facebook app
 FACEBOOK_API_VERSION = AUTH_TOKENS.get("FACEBOOK_API_VERSION")

@@ -391,10 +391,14 @@ BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
                                        CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
-BROKER_TRANSPORT_OPTIONS = {
-    'fanout_patterns': True,
-    'fanout_prefix': True,
-}
+try:
+    BROKER_TRANSPORT_OPTIONS = {
+        'fanout_patterns': True,
+        'fanout_prefix': True,
+        **ENV_TOKENS.get('CELERY_BROKER_TRANSPORT_OPTIONS', {})
+    }
+except TypeError as exc:
+    raise ImproperlyConfigured('CELERY_BROKER_TRANSPORT_OPTIONS must be a dict') from exc
 
 # Message expiry time in seconds
 CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
@@ -558,6 +562,10 @@ LOGO_TRADEMARK_URL = ENV_TOKENS.get('LOGO_TRADEMARK_URL', LOGO_TRADEMARK_URL)
 FAVICON_URL = ENV_TOKENS.get('FAVICON_URL', FAVICON_URL)
 
 ######################## CELERY ROTUING ########################
+
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = ENV_TOKENS.get('CELERYBEAT_SCHEDULER', CELERYBEAT_SCHEDULER)
 
 # Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
 ALTERNATE_ENV_TASKS = {
