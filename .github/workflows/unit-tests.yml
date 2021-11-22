@@ -87,6 +87,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: set pytest randomly option
+        run: |
+          random_shards=(lms-2 lms-4 lms-5 cms-1)
+          echo "pytest_randomly_option=$(if [[ " ${random_shards[@]} " =~ '${{ matrix.shard_name }}' ]]; then echo ''; else echo '-p no:randomly' ; fi)" >> $GITHUB_ENV
+
       - name: install requirements
         run: |
           make test-requirements
@@ -112,7 +117,7 @@ jobs:
       - name: run tests
         shell: bash
         run: |
-          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }} --cov=.
+          python -Wd -m pytest ${{ env.pytest_randomly_option }} --ds=${{ env.settings_path }} ${{ env.unit_test_paths }} --cov=.
 
       - name: rename warnings json file
         if: success()

@@ -316,8 +316,6 @@ class RegistrationFormFactory:
     Construct Registration forms and associated fields.
     """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
-
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
         return self._extra_fields_setting.get(field_name) in ["required", "optional", "optional-exposed"]
@@ -331,6 +329,8 @@ class RegistrationFormFactory:
         return self._extra_fields_setting.get(field_name) in ["required", "optional-exposed"]
 
     def __init__(self):
+
+        self.DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
         self.EXTRA_FIELDS = [
             "confirm_email",
