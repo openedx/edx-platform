@@ -1,0 +1,1904 @@
+{
+	"info": {
+		"_postman_id": "da8b1a76-d44c-4f0a-b546-c20a3116f285",
+		"name": "Enhanced Staff Grader",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BFF",
+			"item": [
+				{
+					"name": "Initialize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?ora_location={{block_id_encoded}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"initialize"
+							],
+							"query": [
+								{
+									"key": "ora_location",
+									"value": "{{block_id_encoded}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?oraLocation={{block_id_encoded}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"initialize"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Nov 2021 18:05:22 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=50.014999999998366;desc=\"User CPU time\", TimerPanel_stime;dur=11.372000000000604;desc=\"System CPU time\", TimerPanel_total;dur=61.38699999999897;desc=\"Total CPU time\", TimerPanel_total_time;dur=109.26604270935059;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "16161"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Mon, 29 Nov 2021 18:05:22 GMT; Max-Age=1209600; Path=/"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"courseMetadata\": {\n        \"title\": \"Defense against the dark arts\",\n        \"org\": \"Hogwarts\",\n        \"number\": \"DADA101\",\n        \"courseId\": \"course-v1:Hogwarts+DADA101+2021_Winter\"\n    },\n    \"oraMetadata\": {\n        \"name\": \"Individual ORA\",\n        \"prompts\": [\n            \"<p>Enter a text/files response.</p>\"\n        ],\n        \"type\": \"individual\",\n        \"rubricConfig\": {\n            \"feedback_prompt\": \"How would you grade this response?\",\n            \"feedback_default_text\": \"I believe this response...\",\n            \"criteria\": [\n                {\n                    \"order_num\": 0,\n                    \"name\": \"grammar\",\n                    \"label\": \"Grammar\",\n                    \"prompt\": \"How correct is the submitter's grammar?\",\n                    \"feedback\": \"optional\",\n                    \"options\": [\n                        {\n                            \"order_num\": 0,\n                            \"name\": \"poor\",\n                            \"label\": \"Poor\",\n                            \"explanation\": \"Absolute rubbish\",\n                            \"points\": 0\n                        },\n                        {\n                            \"order_num\": 1,\n                            \"name\": \"excellent\",\n                            \"label\": \"Excelent\",\n                            \"explanation\": \"Not absolute rubbish\",\n                            \"points\": 5\n                        }\n                    ]\n                }\n            ]\n        },\n        \"fileUploadResponseConfig\": \"optional\"\n    },\n    \"submissions\": {\n        \"SUBMISSION_ID-0\": {\n            \"submissionUuid\": \"SUBMISSION_ID-0\",\n            \"username\": \"USERNAME-0\",\n            \"dateSubmitted\": 1631215154955,\n            \"score\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-1\": {\n            \"submissionUuid\": \"SUBMISSION_ID-1\",\n            \"username\": \"USERNAME-1\",\n            \"dateSubmitted\": 1631301554955,\n            \"score\": {\n                \"pointsEarned\": 70,\n                \"pointsPossible\": 100\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"locked\"\n        },\n        \"SUBMISSION_ID-2\": {\n            \"submissionUuid\": \"SUBMISSION_ID-2\",\n            \"username\": \"USERNAME-2\",\n            \"dateSubmitted\": 1631387954955,\n            \"score\": {\n                \"pointsEarned\": 80,\n                \"pointsPossible\": 100\n            },\n            \"gradeStatus\": \"graded\",\n            \"lockStatus\": \"unlocked\"\n        },\n        \"SUBMISSION_ID-3\": {\n            \"submissionUuid\": \"SUBMISSION_ID-3\",\n            \"username\": \"USERNAME-3\",\n            \"dateSubmitted\": 1631474354955,\n            \"score\": null,\n            \"gradeStatus\": \"ungraded\",\n            \"lockStatus\": \"in-progress\"\n        }\n    }\n}"
+						},
+						{
+							"name": "ORA location missing",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"initialize"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 07 Oct 2021 21:14:20 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=17.853999999999814;desc=\"User CPU time\", TimerPanel_stime;dur=3.001999999999949;desc=\"System CPU time\", TimerPanel_total;dur=20.855999999999764;desc=\"Total CPU time\", TimerPanel_total_time;dur=21.944522857666016;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "41"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Thu, 21 Oct 2021 21:14:20 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "ERR_MISSING_PARAM"
+						},
+						{
+							"name": "Invalid ORA location",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/initialize?oraLocation={{block_id_encoded}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"initialize"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 07 Oct 2021 21:13:33 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=1449.6719999999996;desc=\"User CPU time\", TimerPanel_stime;dur=152.5620000000001;desc=\"System CPU time\", TimerPanel_total;dur=1602.2339999999997;desc=\"Total CPU time\", TimerPanel_total_time;dur=2176.3010025024414;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "21"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Thu, 21 Oct 2021 21:13:33 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "ERR_BAD_ORA_LOCATION"
+						}
+					]
+				},
+				{
+					"name": "Fetch Submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"submission"
+							],
+							"query": [
+								{
+									"key": "oraLocation",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUUID",
+									"value": "{{submission_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Fetch Submission Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submission"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "{{submission_id}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Nov 2021 18:24:04 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=34.623000000001625;desc=\"User CPU time\", TimerPanel_stime;dur=3.391000000000144;desc=\"System CPU time\", TimerPanel_total;dur=38.01400000000177;desc=\"Total CPU time\", TimerPanel_total_time;dur=52.39248275756836;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1553"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Mon, 29 Nov 2021 18:24:04 GMT; Max-Age=1209600; Path=/"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 90,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was pretty good\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    },\n    \"response\": {\n        \"text\": [\n            \"<div><h1>Response Title</h1>Phasellus tempor eros aliquam ipsum molestie, vitae varius lectus tempus. Morbi iaculis, libero euismod vehicula rutrum, nisi leo volutpat diam, quis commodo ex nunc ut odio. Pellentesque condimentum feugiat erat ac vulputate. Pellentesque porta rutrum sagittis. Curabitur vulputate tempus accumsan. Fusce bibendum gravida metus a scelerisque. Mauris fringilla orci non lobortis commodo. Quisque iaculis, quam a tincidunt vehicula, erat nisi accumsan quam, eu cursus ligula magna id odio. Nulla porttitor, lorem gravida vehicula tristique, sapien metus tristique ex, id tincidunt sapien justo nec sapien. Maecenas luctus, nisl vestibulum scelerisque pharetra, ligula orci vulputate turpis, in ultrices mauris dolor eu enim. Suspendisse quis nibh nec augue semper maximus. Morbi maximus eleifend magna. Phasellus porttitor vel magna et auctor. Nulla porttitor convallis aliquam. Donec cursus, ipsum ut egestas bibendum, purus metus dignissim est, ac condimentum leo felis eget diam. In magna mi, tincidunt id sapien id, fermentum vestibulum quam. Quisque et dui sed urna convallis rutrum pellentesque quis sapien. Cras non lectus velit. Praesent semper eros id risus mollis, quis interdum quam imperdiet. Sed nec vulputate tortor, at tristique tortor.</div>\"\n        ],\n        \"files\": []\n    },\n    \"gradeStatus\": \"graded\",\n    \"lockStatus\": \"unlocked\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Fetch Submission Status",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/status?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"submission",
+								"status"
+							],
+							"query": [
+								{
+									"key": "oraLocation",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUUID",
+									"value": "{{submission_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Fetch Submission Status (Ungraded, Unlocked)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-0",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submissionStatus"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "SUBMISSION_ID-0"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 24 Sep 2021 18:57:03 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=28.50000000000108;desc=\"User CPU time\", TimerPanel_stime;dur=5.303000000000058;desc=\"System CPU time\", TimerPanel_total;dur=33.803000000001134;desc=\"Total CPU time\", TimerPanel_total_time;dur=45.25923728942871;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "67"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Fri, 08 Oct 2021 18:57:03 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeStatus\": \"ungraded\",\n    \"lockStatus\": \"unlocked\",\n    \"gradeData\": null\n}"
+						},
+						{
+							"name": "Fetch Submission Status Success (Graded, Locked)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-1",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submissionStatus"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "SUBMISSION_ID-1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 24 Sep 2021 18:55:44 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=28.64000000000111;desc=\"User CPU time\", TimerPanel_stime;dur=5.395999999999734;desc=\"System CPU time\", TimerPanel_total;dur=34.03600000000084;desc=\"Total CPU time\", TimerPanel_total_time;dur=55.06443977355957;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "226"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Fri, 08 Oct 2021 18:55:44 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeStatus\": \"graded\",\n    \"lockStatus\": \"locked\",\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 70,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was okay\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    }\n}"
+						},
+						{
+							"name": "Fetch Submission Status (Graded, Unlocked)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-2",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submissionStatus"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "SUBMISSION_ID-2"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 24 Sep 2021 18:57:56 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=34.06099999999945;desc=\"User CPU time\", TimerPanel_stime;dur=4.2439999999999145;desc=\"System CPU time\", TimerPanel_total;dur=38.30499999999937;desc=\"Total CPU time\", TimerPanel_total_time;dur=60.15753746032715;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "228"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Fri, 08 Oct 2021 18:57:56 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeStatus\": \"graded\",\n    \"lockStatus\": \"unlocked\",\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 80,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was okay\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    }\n}"
+						},
+						{
+							"name": "Fetch Submission Status (Ungraded, Locked)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submissionStatus?oraLocation={{block_id_encoded}}&submissionUUID=SUBMISSION_ID-3",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submissionStatus"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "SUBMISSION_ID-3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 24 Sep 2021 18:58:11 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=41.81600000000074;desc=\"User CPU time\", TimerPanel_stime;dur=3.610000000000113;desc=\"System CPU time\", TimerPanel_total;dur=45.426000000000855;desc=\"Total CPU time\", TimerPanel_total_time;dur=56.12611770629883;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "70"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Fri, 08 Oct 2021 18:58:11 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeStatus\": \"ungraded\",\n    \"lockStatus\": \"in-progress\",\n    \"gradeData\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Lock Submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"submission",
+								"lock"
+							],
+							"query": [
+								{
+									"key": "oraLocation",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUUID",
+									"value": "{{submission_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Lock Submission Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submission",
+										"lock"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "{{submission_id}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Nov 2021 19:31:37 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, DELETE, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=45.421000000001044;desc=\"User CPU time\", TimerPanel_stime;dur=5.9869999999997425;desc=\"System CPU time\", TimerPanel_total;dur=51.40800000000078;desc=\"Total CPU time\", TimerPanel_total_time;dur=103.04784774780273;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "28"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Mon, 29 Nov 2021 19:31:37 GMT; Max-Age=1209600; Path=/"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"lockStatus\": \"in-progress\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Unlock Submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"submission",
+								"lock"
+							],
+							"query": [
+								{
+									"key": "oraLocation",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUUID",
+									"value": "{{submission_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Unlock Submission Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/lock?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"submission",
+										"lock"
+									],
+									"query": [
+										{
+											"key": "oraLocation",
+											"value": "{{block_id_encoded}}"
+										},
+										{
+											"key": "submissionUUID",
+											"value": "{{submission_id}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Nov 2021 19:29:46 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, DELETE, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=62.70800000000065;desc=\"User CPU time\", TimerPanel_stime;dur=8.10999999999984;desc=\"System CPU time\", TimerPanel_total;dur=70.8180000000005;desc=\"Total CPU time\", TimerPanel_total_time;dur=106.28485679626465;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "25"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Mon, 29 Nov 2021 19:29:46 GMT; Max-Age=1209600; Path=/"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"lockStatus\": \"unlocked\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Grade Data",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"score\": {\n        \"pointsEarned\": 90,\n        \"pointsPossible\": 100\n    },\n    \"overallFeedback\": \"was pretty good\",\n    \"criteria\": [\n        {\n            \"name\": \"firstCriterion\",\n            \"feedback\": \"did alright\",\n            \"selectedOption\": \"good\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/submission/grade?oraLocation={{block_id_encoded}}&submissionUUID={{submission_id}}",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"api",
+								"ora_staff_grader{{mock}}",
+								"submission",
+								"grade"
+							],
+							"query": [
+								{
+									"key": "oraLocation",
+									"value": "{{block_id_encoded}}"
+								},
+								{
+									"key": "submissionUUID",
+									"value": "{{submission_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update Grade Data Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"score\": {\n        \"pointsEarned\": 70,\n        \"pointsPossible\": 100\n    },\n    \"overallFeedback\": \"was okay\",\n    \"criteria\": [\n        {\n            \"name\": \"firstCriterion\",\n            \"feedback\": \"did alright\",\n            \"selectedOption\": \"good\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/api/ora_staff_grader{{mock}}/updateGrade?submissionUUID={{submission_id}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"api",
+										"ora_staff_grader{{mock}}",
+										"updateGrade"
+									],
+									"query": [
+										{
+											"key": "submissionUUID",
+											"value": "{{submission_id}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 24 Sep 2021 20:45:55 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.8.10"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Accept-Language, Origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "Server-Timing",
+									"value": "TimerPanel_utime;dur=162.01099999999968;desc=\"User CPU time\", TimerPanel_stime;dur=45.31599999999969;desc=\"System CPU time\", TimerPanel_total;dur=207.32699999999937;desc=\"Total CPU time\", TimerPanel_total_time;dur=2530.384063720703;desc=\"Elapsed time\", SQLPanel_sql_time;dur=0;desc=\"SQL 0 queries\""
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Length",
+									"value": "181"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "openedx-language-preference=en; expires=Fri, 08 Oct 2021 20:45:55 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"gradeData\": {\n        \"score\": {\n            \"pointsEarned\": 70,\n            \"pointsPossible\": 100\n        },\n        \"overallFeedback\": \"was okay\",\n        \"criteria\": [\n            {\n                \"name\": \"firstCriterion\",\n                \"feedback\": \"did alright\",\n                \"selectedOption\": \"good\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.environment.set(\"course_id_encoded\", encodeURIComponent(pm.environment.get(\"course_id\")));",
+							"pm.environment.set(\"block_id_encoded\", encodeURIComponent(pm.environment.get(\"block_id\")));"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "ORA XBlock Handlers",
+			"item": [
+				{
+					"name": "Submission Locking API",
+					"item": [
+						{
+							"name": "check_submission_lock",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/check_submission_lock",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"courses",
+										"{{course_id}}",
+										"xblock",
+										"{{block_id}}",
+										"handler",
+										"check_submission_lock"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Submission not locked",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/check_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"check_submission_lock"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:53:41 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "2"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=957.209000000006;desc=\"User CPU time\", TimerPanel_stime;dur=215.66100000000432;desc=\"System CPU time\", TimerPanel_total;dur=1172.8700000000104;desc=\"Total CPU time\", TimerPanel_total_time;dur=2320.283889770508;desc=\"Elapsed time\", SQLPanel_sql_time;dur=29.979705810546875;desc=\"SQL 14 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:53:41 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{}"
+								},
+								{
+									"name": "Submission locked",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/check_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"check_submission_lock"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:54:36 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "152"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=648.6289999999997;desc=\"User CPU time\", TimerPanel_stime;dur=139.0349999999998;desc=\"System CPU time\", TimerPanel_total;dur=787.6639999999995;desc=\"Total CPU time\", TimerPanel_total_time;dur=1444.2543983459473;desc=\"Elapsed time\", SQLPanel_sql_time;dur=14.47296142578125;desc=\"SQL 11 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:54:36 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"submission_uuid\": \"e34ef789-a4b1-48cf-b1bc-b3edacfd4eb2\",\n    \"owner_id\": \"10ab03f1b75b4f9d9ab13a1fd1dccca1\",\n    \"created_at\": \"2021-09-21T21:54:09.901221Z\"\n}"
+								}
+							]
+						},
+						{
+							"name": "claim_submission_lock",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/claim_submission_lock",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"courses",
+										"{{course_id}}",
+										"xblock",
+										"{{block_id}}",
+										"handler",
+										"claim_submission_lock"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Claimed submission lock",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/claim_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"claim_submission_lock"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:54:10 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "152"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=629.8699999999968;desc=\"User CPU time\", TimerPanel_stime;dur=141.32800000000145;desc=\"System CPU time\", TimerPanel_total;dur=771.1979999999983;desc=\"Total CPU time\", TimerPanel_total_time;dur=1322.0055103302002;desc=\"Elapsed time\", SQLPanel_sql_time;dur=19.69456672668457;desc=\"SQL 15 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:54:10 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"submission_uuid\": \"e34ef789-a4b1-48cf-b1bc-b3edacfd4eb2\",\n    \"owner_id\": \"10ab03f1b75b4f9d9ab13a1fd1dccca1\",\n    \"created_at\": \"2021-09-21T21:54:09.901221Z\"\n}"
+								},
+								{
+									"name": "Submission already locked",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/claim_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"claim_submission_lock"
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:54:52 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "38"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=658.7760000000031;desc=\"User CPU time\", TimerPanel_stime;dur=156.65099999999654;desc=\"System CPU time\", TimerPanel_total;dur=815.4269999999997;desc=\"Total CPU time\", TimerPanel_total_time;dur=1530.5724143981934;desc=\"Elapsed time\", SQLPanel_sql_time;dur=23.58722686767578;desc=\"SQL 11 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:54:52 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Submission already locked\"\n}"
+								}
+							]
+						},
+						{
+							"name": "delete_submission_lock",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-CSRFToken",
+										"value": "{{csrftoken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/delete_submission_lock",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{lms_url}}"
+									],
+									"path": [
+										"courses",
+										"{{course_id}}",
+										"xblock",
+										"{{block_id}}",
+										"handler",
+										"delete_submission_lock"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Deleted submission lock",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/delete_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"delete_submission_lock"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:55:44 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "2"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=1039.5369999999957;desc=\"User CPU time\", TimerPanel_stime;dur=334.534000000005;desc=\"System CPU time\", TimerPanel_total;dur=1374.0710000000008;desc=\"Total CPU time\", TimerPanel_total_time;dur=2091.7656421661377;desc=\"Elapsed time\", SQLPanel_sql_time;dur=87.89372444152832;desc=\"SQL 12 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:55:44 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{}"
+								},
+								{
+									"name": "Can't delete submission lock",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRFToken",
+												"value": "{{csrftoken}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"submission_id\": \"{{submission_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/delete_submission_lock",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{lms_url}}"
+											],
+											"path": [
+												"courses",
+												"{{course_id}}",
+												"xblock",
+												"{{block_id}}",
+												"handler",
+												"delete_submission_lock"
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Tue, 21 Sep 2021 21:54:52 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "WSGIServer/0.2 CPython/3.8.10"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "38"
+										},
+										{
+											"key": "Server-Timing",
+											"value": "TimerPanel_utime;dur=658.7760000000031;desc=\"User CPU time\", TimerPanel_stime;dur=156.65099999999654;desc=\"System CPU time\", TimerPanel_total;dur=815.4269999999997;desc=\"Total CPU time\", TimerPanel_total_time;dur=1530.5724143981934;desc=\"Elapsed time\", SQLPanel_sql_time;dur=23.58722686767578;desc=\"SQL 11 queries\""
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Language, Origin, Cookie"
+										},
+										{
+											"key": "Content-Language",
+											"value": "en"
+										},
+										{
+											"key": "Set-Cookie",
+											"value": "openedx-language-preference=en; expires=Tue, 05 Oct 2021 21:54:52 GMT; Max-Age=1209600; Path=/; SameSite=Lax"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Unable to clear submission lock\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "List Staff Workflows",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRFToken",
+								"value": "{{csrftoken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{lms_url}}/courses/{{course_id}}/xblock/{{block_id}}/handler/list_staff_workflows",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{lms_url}}"
+							],
+							"path": [
+								"courses",
+								"{{course_id}}",
+								"xblock",
+								"{{block_id}}",
+								"handler",
+								"list_staff_workflows"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var xsrfCookie = postman.getResponseCookie(\"csrftoken\");",
+					"postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "course_id_encoded",
+			"value": ""
+		},
+		{
+			"key": "block_id_encoded",
+			"value": ""
+		}
+	]
+}
