@@ -51,9 +51,9 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True

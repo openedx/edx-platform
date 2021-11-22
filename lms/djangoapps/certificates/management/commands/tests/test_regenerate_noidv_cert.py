@@ -12,8 +12,8 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 COMMAND_INTEGRITY_ENABLED = \
     'lms.djangoapps.certificates.management.commands.regenerate_noidv_cert.is_integrity_signature_enabled'

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pytz import UTC
-from unittest import mock
+from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
 import ddt
 from django.core.management import call_command
