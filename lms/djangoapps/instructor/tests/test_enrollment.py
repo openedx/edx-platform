@@ -43,7 +43,7 @@ from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixi
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
 
 
-class TestSettableEnrollmentState(CacheIsolationTestCase):
+class TestSettableEnrollmentState(SharedModuleStoreTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
         super().setUp()
@@ -65,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         assert mes == ees
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase, metaclass=ABCMeta):
+class TestEnrollmentChangeBase(SharedModuleStoreTestCase, metaclass=ABCMeta):
     """
     Test instructor enrollment administration against database effects.
 

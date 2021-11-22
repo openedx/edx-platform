@@ -303,30 +303,6 @@ class RegistrationFormFactory:
     Construct Registration forms and associated fields.
     """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
-
-    EXTRA_FIELDS = [
-        "confirm_email",
-        "first_name",
-        "last_name",
-        "city",
-        "state",
-        "country",
-        "gender",
-        "year_of_birth",
-        "level_of_education",
-        "company",
-        "job_title",
-        "title",
-        "mailing_address",
-        "goals",
-        "honor_code",
-        "terms_of_service",
-        "profession",
-        "specialty",
-        "marketing_emails_opt_in",
-    ]
-
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
         return self._extra_fields_setting.get(field_name) in ["required", "optional", "optional-exposed"]
@@ -340,6 +316,30 @@ class RegistrationFormFactory:
         return self._extra_fields_setting.get(field_name) in ["required", "optional-exposed"]
 
     def __init__(self):
+
+        self.DEFAULT_FIELDS = ["email", "name", "username", "password"]
+
+        self.EXTRA_FIELDS = [
+            "confirm_email",
+            "first_name",
+            "last_name",
+            "city",
+            "state",
+            "country",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "company",
+            "job_title",
+            "title",
+            "mailing_address",
+            "goals",
+            "honor_code",
+            "terms_of_service",
+            "profession",
+            "specialty",
+            "marketing_emails_opt_in",
+        ]
 
         if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
             self.EXTRA_FIELDS.remove('year_of_birth')
