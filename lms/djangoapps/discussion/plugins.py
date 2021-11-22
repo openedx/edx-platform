@@ -19,7 +19,7 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
     type = 'discussion'
     title = gettext_noop('Discussion')
-    priority = None
+    priority = 40
     view_name = 'forum_form_discussion'
     fragment_view_name = 'lms.djangoapps.discussion.views.DiscussionBoardFragmentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)

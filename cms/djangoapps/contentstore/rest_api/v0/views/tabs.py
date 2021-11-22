@@ -177,7 +177,7 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
         return super().handle_exception(exc)
 
     @apidocs.schema(
-        body=[TabIDLocatorSerializer],
+        body=TabIDLocatorSerializer(many=True),
         parameters=[
             apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
         ],
@@ -199,23 +199,11 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
 
             POST /api/contentstore/v0/tabs/{course_id}/reorder [
                 {
-                    "tab_id": "info"
-                },
-                {
-                    "tab_id": "courseware"
-                },
-                {
                     "tab_locator": "block-v1:TstX+DemoX+Demo+type@static_tab+block@d26fcb0e93824fbfa5c9e5f100e2511a"
                 },
                 {
-                    "tab_id": "wiki"
+                    "tab_locator": "block-v1:TstX+DemoX+Demo+type@static_tab+block@a011f1bd05af4578ae397ed8cabccf62"
                 },
-                {
-                    "tab_id": "discussion"
-                },
-                {
-                    "tab_id": "progress"
-                }
             ]
 
 
@@ -233,7 +221,7 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
         tab_id_locators.is_valid(raise_exception=True)
         reorder_tabs_handler(
             course_module,
-            {"tabs": tab_id_locators.validated_data},
+            tab_id_locators.validated_data,
             request.user,
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
