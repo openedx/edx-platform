@@ -432,7 +432,8 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that we treat a sequential with incomplete (but not scored) items (like a video maybe) as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
+        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
+                              start=datetime.datetime.now() - datetime.timedelta(hours=1))
         sequential = ItemFactory(parent=chapter, category='sequential')
         problem = ItemFactory(parent=sequential, category='problem', has_score=True)
         ItemFactory(parent=sequential, category='video', has_score=False)
@@ -453,6 +454,25 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         course = CourseFactory()
         chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
         ItemFactory(parent=chapter, category='sequential')
+
+        assignments = get_course_assignments(course.location.context_key, self.user, None)
+        assert len(assignments) == 1
+        assert not assignments[0].complete
+
+    def test_completion_does_not_treat_unreleased_as_complete(self):
+        """
+        Test that unreleased assignments are not treated as complete.
+        """
+        course = CourseFactory()
+        chapter = ItemFactory(parent=course, category='chapter', graded=True,
+                              due=datetime.datetime.now() + datetime.timedelta(hours=2),
+                              start=datetime.datetime.now() + datetime.timedelta(hours=1))
+        sequential = ItemFactory(parent=chapter, category='sequential')
+        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
+        ItemFactory(parent=sequential, category='video', has_score=False)
+
+        self.override_waffle_switch(True)
+        BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
 
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1
