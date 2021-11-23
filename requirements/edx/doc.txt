@@ -38,13 +38,13 @@ jinja2==3.0.3
     #   sphinx
 markupsafe==2.0.1
     # via jinja2
-packaging==21.2
+packaging==21.3
     # via sphinx
-pbr==5.7.0
+pbr==5.8.0
     # via stevedore
 pygments==2.10.0
     # via sphinx
-pyparsing==2.4.7
+pyparsing==3.0.6
     # via packaging
 python-slugify==4.0.1
     # via
@@ -60,7 +60,7 @@ six==1.16.0
     # via edx-sphinx-theme
 smmap==5.0.0
     # via gitdb
-snowballstemmer==2.1.0
+snowballstemmer==2.2.0
     # via sphinx
 sphinx==4.3.0
     # via
