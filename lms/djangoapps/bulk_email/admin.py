@@ -58,18 +58,10 @@ unsupported tags will cause email sending to fail.
 '''
         }),
     )
-    # Turn off the action bar (we have no bulk actions)
-    actions = None
 
     def has_add_permission(self, request):
         """Enable the ability to add new templates, as we want to be able to define multiple templates."""
         return True
-
-    def has_delete_permission(self, request, obj=None):
-        """
-        Disables the ability to remove existing templates, as we'd like to make sure we don't have dangling references.
-        """
-        return False
 
 
 class CourseAuthorizationAdmin(admin.ModelAdmin):
