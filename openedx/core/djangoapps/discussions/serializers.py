@@ -6,6 +6,7 @@ from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -230,16 +231,34 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         plugin_configuration = instance.plugin_configuration
 
         course = get_course_by_id(course_key)
-        legacy_settings = LegacySettingsSerializer(
-            course,
-            data=plugin_configuration,
-        )
-        if legacy_settings.is_valid(raise_exception=True):
-            plugin_configuration = legacy_settings.data
+        if instance.provider_type in [Provider.LEGACY, Provider.OPEN_EDX]:
+            legacy_settings = LegacySettingsSerializer(
+                course,
+                data=plugin_configuration,
+            )
+            if legacy_settings.is_valid(raise_exception=True):
+                plugin_configuration = legacy_settings.data
+            if provider_type == Provider.OPEN_EDX:
+                plugin_configuration.update({
+                    "group_at_subsection": instance.plugin_configuration.get("group_at_subsection", False)
+                })
         features_list = [
             {'id': feature.value, 'feature_support_type': feature.feature_support_type}
             for feature in Features
         ]
+        hidden_providers = []
+        # If the user is currently using the legacy provider, don't show the new provider
+        # TODO: Allow switching between legacy and new providers
+        if instance.provider_type == Provider.LEGACY:
+            hidden_providers.append(Provider.OPEN_EDX)
+        # If the user is currently using the new provider, don't show the legacy provider
+        elif instance.provider_type == Provider.OPEN_EDX:
+            hidden_providers.append(Provider.LEGACY)
+        else:
+            # If this is a new course, or some other provider is selected, the new provider
+            # should only show up if the MFE is enabled
+            if not ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
+                hidden_providers.append(Provider.OPEN_EDX)
         payload.update({
             'features': features_list,
             'lti_configuration': lti_configuration_data,
@@ -249,7 +268,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                 'available': {
                     key: value
                     for key, value in AVAILABLE_PROVIDER_MAP.items()
-                    if value.get('visible', True)
+                    if key not in hidden_providers
                 },
             },
         })
@@ -311,7 +330,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         plugin_configuration = validated_data.pop('plugin_configuration', {})
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
 
-        if updated_provider_type == Provider.LEGACY:
+        if updated_provider_type in [Provider.LEGACY, Provider.OPEN_EDX]:
             legacy_settings = LegacySettingsSerializer(
                 self._get_course(),
                 context={
@@ -410,7 +429,6 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         """
         Return a serialized representation of the course discussion settings.
         """
-        payload = super().to_representation(instance)
         course = self.context['course']
         instance = self.context['settings']
         course_key = course.id
