@@ -41,7 +41,7 @@ def forwards_func(apps, schema_editor):
                     "\nMongo data: "
                     f"edited_on: {data['edited_on']}, "
                     f"last_update: {data['last_update']}, "
-                    f"published_version: {data['published_version']}"
+                    f"published_version: {data.get('published_version', 'none')}"
                     "\nMySQL data: "
                     f"edited_on: {mysql_entry.edited_on}, "
                     f"last_update: {mysql_entry.last_update}, "
