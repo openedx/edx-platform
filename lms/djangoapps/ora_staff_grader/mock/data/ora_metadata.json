@@ -6,25 +6,25 @@
         ],
         "type": "individual",
         "rubricConfig": {
-            "feedback_prompt": "How would you grade this response?",
-            "feedback_default_text": "I believe this response...",
+            "feedbackPrompt": "How would you grade this response?",
+            "feedback": "optional",
             "criteria": [
                 {
-                    "order_num": 0,
+                    "orderNum": 0,
                     "name": "grammar",
                     "label": "Grammar",
                     "prompt": "How correct is the submitter's grammar?",
                     "feedback": "optional",
                     "options": [
                         {
-                            "order_num": 0,
+                            "orderNum": 0,
                             "name": "poor",
                             "label": "Poor",
                             "explanation": "Absolute rubbish",
                             "points": 0
                         },
                         {
-                            "order_num": 1,
+                            "orderNum": 1,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
@@ -34,6 +34,7 @@
                 }
             ]
         },
+        "textResponseConfig": "optional",
         "fileUploadResponseConfig": "optional"
     },
     "block-b": {
@@ -43,25 +44,25 @@
         ],
         "type": "team",
         "rubricConfig": {
-            "feedback_prompt": "How would you grade this response?",
-            "feedback_default_text": "I believe this response...",
+            "feedbackPrompt": "How would you grade this response?",
+            "feedback": "optional",
             "criteria": [
                 {
-                    "order_num": 0,
+                    "orderNum": 0,
                     "name": "correctness",
                     "label": "Correctness",
                     "prompt": "How correct is the team's answer?",
                     "feedback": "optional",
                     "options": [
                         {
-                            "order_num": 0,
+                            "orderNum": 0,
                             "name": "poor",
                             "label": "Poor",
                             "explanation": "Absolute rubbish",
                             "points": 0
                         },
                         {
-                            "order_num": 1,
+                            "orderNum": 1,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
@@ -71,6 +72,7 @@
                 }
             ]
         },
+        "textResponseConfig": "optional",
         "fileUploadResponseConfig": "required"
     }
 }
