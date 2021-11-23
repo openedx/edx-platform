@@ -465,6 +465,7 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         """
         course = CourseFactory()
         chapter = ItemFactory(parent=course, category='chapter', graded=True,
+                              due=datetime.datetime.now() + datetime.timedelta(hours=2),
                               start=datetime.datetime.now() + datetime.timedelta(hours=1))
         sequential = ItemFactory(parent=chapter, category='sequential')
         problem = ItemFactory(parent=sequential, category='problem', has_score=True)
