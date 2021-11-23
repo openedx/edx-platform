@@ -572,6 +572,9 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                     url = reverse('jump_to', args=[course_key, subsection_key])
 
                 complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                if not assignment_released:
+                    complete = False
+
                 past_due = not complete and due < now
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
