@@ -3,7 +3,6 @@ Views for Enhanced Staff Grader
 """
 import json
 from django.http.response import HttpResponseBadRequest
-from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -15,7 +14,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
-from lms.djangoapps.ora_staff_grader.serializers import InitializeSerializer, LockStatusSerializer, SubmissionDetailResponseSerializer
+from lms.djangoapps.ora_staff_grader.serializers import (
+    InitializeSerializer, LockStatusSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
+)
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -97,6 +98,7 @@ class SubmissionFetchView(RetrieveAPIView):
             criteria: (list of dict) [{
                 name: (str) name of criterion
                 feedback: (str) feedback for criterion
+                points: (int) points of selected option or None if feedback-only criterion
                 selectedOption: (str) name of selected option or None if feedback-only criterion
             }]
         }
@@ -119,24 +121,95 @@ class SubmissionFetchView(RetrieveAPIView):
 
     @require_params(['ora_location', 'submission_uuid'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        submission_and_assessment_info = self.get_submission_and_assessment_info(request, ora_location, submission_uuid)
+        submission_info = self.get_submission_info(request, ora_location, submission_uuid)
+        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
 
-        serializer = SubmissionDetailResponseSerializer({
-            'submission_and_assessment_info': submission_and_assessment_info,
+        serializer = SubmissionFetchSerializer({
+            'submission_info': submission_info,
+            'assessment_info': assessment_info,
             'lock_info': lock_info,
         })
 
         return Response(serializer.data)
 
-    def get_submission_and_assessment_info(self, request, usage_id, submission_uuid):
+    def get_submission_info(self, request, usage_id, submission_uuid):
         """
-        Get submission content and assessment data from ORA 'get_submission_and_assessment_info' XBlock.json_handler
+        Get submission content from ORA 'get_submission_info' XBlock.json_handler
         """
         data = {
             'submission_uuid': submission_uuid
         }
-        return call_xblock_json_handler(request, usage_id, 'get_submission_and_assessment_info', data)
+        return call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+
+    def get_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+
+    def check_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+
+
+class SubmissionStatusFetchView(RetrieveAPIView):
+    """
+    GET submission grade status, lock status, and grade data
+
+    Response: {
+        gradeStatus: (str) one of [graded, ungraded]
+        lockStatus: (str) one of [locked, unlocked, in-progress]
+        gradeData: {
+            score: (dict or None) {
+                pointsEarned: (int) earned points
+                pointsPossible: (int) possible points
+            }
+            overallFeedback: (string) overall feedback
+            criteria: (list of dict) [{
+                name: (str) name of criterion
+                feedback: (str) feedback for criterion
+                points: (int) points of selected option or None if feedback-only criterion
+                selectedOption: (str) name of selected option or None if feedback-only criterion
+            }]
+        }
+    }
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    @require_params(['oraLocation', 'submissionUuid'])
+    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
+        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+
+        serializer = SubmissionStatusFetchSerializer({
+            'assessment_info': assessment_info,
+            'lock_info': lock_info,
+        })
+
+        return Response(serializer.data)
+
+    def get_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
+        return call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
 
     def check_submission_lock(self, request, usage_id, submission_uuid):
         """

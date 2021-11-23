@@ -16,7 +16,8 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     ResponseSerializer,
     ScoreField,
     ScoreSerializer,
-    SubmissionDetailResponseSerializer,
+    SubmissionFetchSerializer,
+    SubmissionStatusFetchSerializer,
     SubmissionMetadataSerializer,
     UploadedFileSerializer,
 )
@@ -442,19 +443,18 @@ class TestGradeDataSerializer(TestCase):
 
 
 @ddt.ddt
-class TestSubmissionDetailResponseSerializer(TestCase):
-    """ Tests for SubmissionDetailResponseSerializer """
+class TestSubmissionStatusFetchSerializer(TestCase):
+    """ Tests for SubmissionStatusFetchSerializer """
 
-    def test_submission_detail_response_serializer(self):
+    def test_submission_status_fetch_serializer(self):
         """ Base serialization behavior """
         input = MagicMock()
-        serializer = SubmissionDetailResponseSerializer(input)
+        serializer = SubmissionStatusFetchSerializer(input)
         with patch.object(serializer, 'get_gradeStatus') as mock_get_grade_status:
             data = serializer.data
 
         expected_value = {
-            'gradeData': GradeDataSerializer(input.submission_and_assessment_info.assessment).data,
-            'response': ResponseSerializer(input.submission_and_assessment_info.submission).data,
+            'gradeData': GradeDataSerializer(input.assessment_info).data,
             'gradeStatus': mock_get_grade_status.return_value,
             'lockStatus': LockStatusField().to_representation(input.lock_info.lock_status)
         }
@@ -465,10 +465,30 @@ class TestSubmissionDetailResponseSerializer(TestCase):
     def test_get__gradeStatus(self, has_assessment):
         """ Unit test for get_gradeStatus """
         assessment = {'somekey': 'somevalue'} if has_assessment else {}
-        input = {'submission_and_assessment_info': {'assessment': assessment}}
-        value = SubmissionDetailResponseSerializer().get_gradeStatus(input)
+        input = {'assessment_info': assessment}
+        value = SubmissionStatusFetchSerializer().get_gradeStatus(input)
         expected = 'graded' if has_assessment else 'ungraded'
         assert value == expected
+
+
+class TestSubmissionFetchSerializer(TestCase):
+    """ Tests for the SubmissionFetchSerializer """
+
+    def test_submission_fetch_serializer(self):
+        """ Base serialization behavior """
+        input = MagicMock()
+        serializer = SubmissionFetchSerializer(input)
+        with patch.object(serializer, 'get_gradeStatus') as mock_get_grade_status:
+            data = serializer.data
+
+        expected_value = {
+            'gradeData': GradeDataSerializer(input.assessment_info).data,
+            'gradeStatus': mock_get_grade_status.return_value,
+            'lockStatus': LockStatusField().to_representation(input.lock_info.lock_status),
+            'response': ResponseSerializer(input.submission_info).data
+        }
+        mock_get_grade_status.assert_called_once_with(input)
+        assert data == expected_value
 
 
 class TestLockStatusSerializer(SharedModuleStoreTestCase):

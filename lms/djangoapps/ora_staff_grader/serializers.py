@@ -162,18 +162,25 @@ class GradeDataSerializer(serializers.Serializer):
     criteria = serializers.ListField(child=AssessmentCriteriaSerializer(), allow_empty=True, required=False)
 
 
-class SubmissionDetailResponseSerializer(serializers.Serializer):
-    """ Serializer for the response from the submission """
-    gradeData = GradeDataSerializer(source='submission_and_assessment_info.assessment')
-    response = ResponseSerializer(source='submission_and_assessment_info.submission')
+class SubmissionStatusFetchSerializer(serializers.Serializer):
+    """ Serializer for the response from the submission status fetch endpoint"""
+    gradeData = GradeDataSerializer(source='assessment_info')
     gradeStatus = serializers.SerializerMethodField()
     lockStatus = LockStatusField(source='lock_info.lock_status')
 
     def get_gradeStatus(self, obj):
-        if obj.get('submission_and_assessment_info', {}).get('assessment'):
+        if not obj.get('assessment_info', {}) == {}:
             return 'graded'
         else:
             return 'ungraded'
+
+
+class SubmissionFetchSerializer(SubmissionStatusFetchSerializer):
+    """
+    Serializer for the response from the submission fetch endpoint
+    Same as the SubmissionStatusFetchSerializer with an added submission_info field
+    """
+    response = ResponseSerializer(source='submission_info')
 
 
 class LockStatusSerializer(serializers.Serializer):
