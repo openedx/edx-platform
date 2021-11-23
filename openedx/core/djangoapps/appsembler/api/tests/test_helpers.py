@@ -63,4 +63,4 @@ class TestAPISendActivationEmail(TestCase):
 
         helper_path = 'openedx.core.djangoapps.user_authn.views.register.skip_registration_email_for_registration_api'
         with patch(helper_path, return_value=True):
-            assert _skip_activation_email(user, {}, None), 'API requested: email can be skipped by AMC admin'
+            assert _skip_activation_email(user, {}, None, {}), 'API requested: email can be skipped by AMC admin'

@@ -24,7 +24,7 @@ def as_course_key(course_id):
 
 
 @beeline.traced(name='appsembler.skip_registration_email_for_registration_api')
-def skip_registration_email_for_registration_api(request):
+def skip_registration_email_for_registration_api(request, params):
     """
     Helper to check if the Registration API caller has requested email to be skipped.
 
@@ -34,7 +34,7 @@ def skip_registration_email_for_registration_api(request):
     skip_email = False
     if request and request.method == 'POST':
         # TODO: RED-1647 add TahoeAuthMixin permission checks
-        skip_email = not request.POST.get('send_activation_email', True)
+        skip_email = not params.get('send_activation_email', True)
         beeline.add_context_field('appsembler__skip_email', skip_email)
 
     return skip_email

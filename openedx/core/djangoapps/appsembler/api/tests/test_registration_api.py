@@ -72,8 +72,16 @@ class RegistrationApiViewTests(TestCase):
             res = self.client.post(self.url, params)
         self.assertContains(res, 'user_id', status_code=status.HTTP_200_OK)
 
-    @ddt.data(True, False, 'True', 'False', 'true', 'false')
-    def test_send_activation_email_with_password(self, send_activation_email):
+    @ddt.unpack
+    @ddt.data(
+        {'send_activation_email': True, 'should_send': True},
+        {'send_activation_email': False, 'should_send': False},
+        {'send_activation_email': 'True', 'should_send': True},
+        {'send_activation_email': 'False', 'should_send': False},
+        {'send_activation_email': 'true', 'should_send': True},
+        {'send_activation_email': 'false', 'should_send': False},
+    )
+    def test_send_activation_email_with_password(self, send_activation_email, should_send):
         """
         This test makes sure when the API endpoint is called with a password,
         the send_activation_email parameter is being used properly. Also makes
@@ -89,17 +97,13 @@ class RegistrationApiViewTests(TestCase):
             'send_activation_email': send_activation_email,
         }
 
-        def fake_send(user, profile, user_registration=None):
-            assert send_activation_email in [True, 'True', 'true'], 'activation email should not be called'
-
-        with patch('student.views.management.compose_and_send_activation_email', fake_send):
+        with patch('openedx.core.djangoapps.user_authn.views.register.compose_and_send_activation_email') as fake_send:
             res = self.client.post(self.url, params)
             self.assertContains(res, 'user_id', status_code=200)
             new_user = User.objects.get(username=params['username'])
-            if send_activation_email in [False, 'False', 'false']:
-                self.assertTrue(new_user.is_active)
-            else:
-                self.assertFalse(new_user.is_active)
+
+            assert fake_send.called == should_send, 'activation email should not be called'
+            assert new_user.is_active == (not should_send), 'xor, Either activate or send the email'
 
     @ddt.data(True, False, 'True', 'False', 'true', 'false')
     def test_send_activation_email_without_password(self, send_activation_email):
@@ -115,16 +119,16 @@ class RegistrationApiViewTests(TestCase):
             'send_activation_email': send_activation_email,
         }
 
-        def fake_send(user, profile, user_registration=None):
-            assert False, 'Should not call fake_send when no password'
-
         with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
                    return_value=self.site):
-            with patch('student.views.management.compose_and_send_activation_email', fake_send):
+
+            email_func_path = 'openedx.core.djangoapps.user_authn.views.register.compose_and_send_activation_email'
+            with patch(email_func_path) as fake_send:
                 res = self.client.post(self.url, params)
                 self.assertContains(res, 'user_id', status_code=200)
                 new_user = User.objects.get(username=params['username'])
                 assert not new_user.is_active
+                assert not fake_send.call_count, 'Should not send email when no password'
 
     @ddt.data('username', 'name')
     def test_missing_field(self, field):
