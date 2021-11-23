@@ -494,6 +494,7 @@ IDA_LOGOUT_URI_LIST = []
 
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
+DISCUSSIONS_MICROFRONTEND_URL = None
 LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 
 ############################# SOCIAL MEDIA SHARING #############################

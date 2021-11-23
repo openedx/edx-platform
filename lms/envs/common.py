@@ -4683,6 +4683,11 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
 # .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
+# .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based dicussions page.
+# .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
+DISCUSSIONS_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
