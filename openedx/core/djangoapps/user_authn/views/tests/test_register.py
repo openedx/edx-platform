@@ -962,6 +962,21 @@ class RegistrationViewTestV1(
             }
         )
 
+    def test_register_form_marketing_emails_opt_in_field(self):
+        self._assert_reg_field(
+            {"marketing_emails_opt_in": "optional"},
+            {
+                "name": "marketing_emails_opt_in",
+                "type": "checkbox",
+                "required": False,
+                "label": 'I agree that {platform_name} may send me marketing messages.'.format(
+                    platform_name=settings.PLATFORM_NAME,
+                ),
+                "exposed": True,
+                "defaultValue": True,
+            }
+        )
+
     def test_register_form_profession_without_profession_options(self):
         self._assert_reg_field(
             {"profession": "required"},
