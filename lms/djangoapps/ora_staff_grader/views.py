@@ -190,7 +190,7 @@ class SubmissionStatusFetchView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['ora_location', 'submission_uuid'])
+    @require_params(['oraLocation', 'submissionUuid'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)

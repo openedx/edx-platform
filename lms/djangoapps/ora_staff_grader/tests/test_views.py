@@ -217,7 +217,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     def test_blank_ora_location(self):
         """ Missing ora_location param should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': ''})
+        response = self.client.get(self.api_url, {'oraLocation': ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
@@ -225,7 +225,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     def test_missing_submission_uuid(self):
         """ Missing submission_uuid param should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': Mock()})
+        response = self.client.get(self.api_url, {'oraLocation': Mock()})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
@@ -233,7 +233,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     def test_blank_submission_uuid(self):
         """ Blank submission_uuid param should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': Mock(), 'submission_uuid': ''})
+        response = self.client.get(self.api_url, {'oraLocation': Mock(), 'submissionUuid': ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
@@ -269,7 +269,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
 
         self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
-        response = self.client.get(self.api_url, {'ora_location': ora_location, 'submission_uuid': submission_uuid})
+        response = self.client.get(self.api_url, {'oraLocation': ora_location, 'submissionUuid': submission_uuid})
 
         assert response.status_code == 200
         actual = response.json()
