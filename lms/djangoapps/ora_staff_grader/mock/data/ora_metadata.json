@@ -25,6 +25,13 @@
                         },
                         {
                             "orderNum": 1,
+                            "name": "good",
+                            "label": "Good",
+                            "explanation": "pretty good",
+                            "points": 3
+                        },
+                        {
+                            "orderNum": 2,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
@@ -63,6 +70,13 @@
                         },
                         {
                             "orderNum": 1,
+                            "name": "good",
+                            "label": "Good",
+                            "explanation": "pretty good",
+                            "points": 3
+                        },
+                        {
+                            "orderNum": 2,
                             "name": "excellent",
                             "label": "Excelent",
                             "explanation": "Not absolute rubbish",
