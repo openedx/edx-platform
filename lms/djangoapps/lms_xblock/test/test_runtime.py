@@ -19,9 +19,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from xmodule.modulestore.django import ModuleI18nService
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class BlockMock(Mock):
