@@ -30,7 +30,7 @@ from path import Path as path
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .common import *
 
