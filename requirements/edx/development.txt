@@ -903,9 +903,7 @@ mypy==0.910
 mypy-extensions==0.4.3
     # via mypy
 mysqlclient==2.1.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+    # via -r requirements/edx/testing.txt
 newrelic==7.2.4.171
     # via
     #   -r requirements/edx/testing.txt
