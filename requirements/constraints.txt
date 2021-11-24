@@ -96,3 +96,6 @@ py2neo<2022
 
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
+
+# mysqlclient==2.1.0 caused NameError in running pylint checks on master
+mysqlclient<2.1.0
