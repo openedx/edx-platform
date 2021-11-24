@@ -345,16 +345,22 @@ class UtilsTests(SharedModuleStoreTestCase):
         response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, cookie_settings(self.request))
         self._copy_cookies_to_request(response, self.request)
         edly_user_info_cookie = self.request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME)
-        edly_sub_org = get_edly_sub_org_from_cookie(edly_user_info_cookie)
+        edx_orgs = get_edx_org_from_cookie(edly_user_info_cookie)
         self.request.user = self.admin_user
+        for edx_org in edx_orgs:
+            GlobalCourseCreatorRole(edx_org).add_users(self.user)
 
         set_global_course_creator_status(self.request, self.user, True)
         assert self._get_course_creator_status(self.user) == 'granted'
-        assert auth.user_has_role(self.user, GlobalCourseCreatorRole(edly_sub_org))
+
+        for edx_org in edx_orgs:
+            assert auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
 
         set_global_course_creator_status(self.request, self.user, False)
         assert self._get_course_creator_status(self.user) == 'unrequested'
-        assert not auth.user_has_role(self.user, GlobalCourseCreatorRole(edly_sub_org))
+
+        for edx_org in edx_orgs:
+            assert not auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
 
         self.admin_user.is_staff = False
         self.admin_user.save()

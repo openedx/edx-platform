@@ -114,17 +114,17 @@ def get_edly_sub_org_from_cookie(encoded_cookie_data):
 
 def get_edx_org_from_cookie(encoded_cookie_data):
     """
-    Returns edx-org short name from the edly-user-info cookie.
+    Returns edx-orgs short name from the edly-user-info cookie.
 
     Arguments:
         encoded_cookie_data (dict): Edly user info cookie JWT encoded string.
 
     Returns:
-        string
+        list
     """
 
     if not encoded_cookie_data:
-        return ''
+        return []
 
     decoded_cookie_data = decode_edly_user_info_cookie(encoded_cookie_data)
     return decoded_cookie_data['edx-orgs']
@@ -210,11 +210,13 @@ def set_global_course_creator_status(request, user, set_global_creator):
     course_creator.admin = request_user
     course_creator.save()
     edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
-    edly_sub_org = get_edly_sub_org_from_cookie(edly_user_info_cookie)
-    if set_global_creator:
-        GlobalCourseCreatorRole(edly_sub_org).add_users(user)
-    else:
-        GlobalCourseCreatorRole(edly_sub_org).remove_users(user)
+    edx_orgs = get_edx_org_from_cookie(edly_user_info_cookie)
+
+    for edx_org in edx_orgs:
+        if set_global_creator:
+            GlobalCourseCreatorRole(edx_org).add_users(user)
+        else:
+            GlobalCourseCreatorRole(edx_org).remove_users(user)
 
 
 def user_belongs_to_edly_sub_organization(request, user):
