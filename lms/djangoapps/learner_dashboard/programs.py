@@ -214,8 +214,8 @@ class ProgramDiscussionLTI:
 
     def _get_context_title(self) -> str:
         return "{} - {}".format(
-            self.program.get('title',''),
-            self.program.get('subtitle',''),
+            self.program.get('title', ''),
+            self.program.get('subtitle', ''),
         )
 
     def _get_lti_embed_code(self) -> str:
@@ -237,8 +237,8 @@ class ProgramDiscussionLTI:
             context_title=self._get_context_title(),
             context_label=self.program_uuid,
             result_sourcedid=quote(result_sourcedid),
-            locale = to_locale(get_language()),
-            additional_params = self._get_additional_lti_parameters()
+            locale=to_locale(get_language()),
+            additional_params=self._get_additional_lti_parameters()
 
         )
 
