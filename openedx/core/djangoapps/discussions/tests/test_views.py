@@ -51,7 +51,9 @@ DEFAULT_LTI_CONFIGURATION = {
     'lti_1p1_client_key': '',
     'lti_1p1_client_secret': '',
     'lti_1p1_launch_url': '',
-    'version': None
+    'version': None,
+    'pii_share_email': False,
+    'pii_share_username': False,
 }
 
 DATA_LTI_CONFIGURATION = {
