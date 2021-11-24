@@ -49,12 +49,12 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 )
-from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
