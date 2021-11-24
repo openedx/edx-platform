@@ -6,8 +6,8 @@ import mock
 
 from openedx.core.djangoapps.discussions.data import DiscussionTopicContext
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
