@@ -667,7 +667,7 @@ multidict==5.2.0
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.1.0
+mysqlclient==2.0.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in

@@ -902,7 +902,7 @@ mypy==0.910
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
-mysqlclient==2.1.0
+mysqlclient==2.0.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
