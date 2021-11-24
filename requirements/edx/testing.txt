@@ -848,7 +848,7 @@ multidict==5.2.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   yarl
-mysqlclient==2.0.3
+mysqlclient==2.1.0
     # via -r requirements/edx/base.txt
 newrelic==7.2.4.171
     # via

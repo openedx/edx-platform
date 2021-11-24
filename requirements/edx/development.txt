@@ -901,7 +901,7 @@ mypy==0.910
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
-mysqlclient==2.0.3
+mysqlclient==2.1.0
     # via -r requirements/edx/testing.txt
 newrelic==7.2.4.171
     # via
