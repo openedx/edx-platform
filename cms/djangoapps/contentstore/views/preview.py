@@ -31,16 +31,16 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import ModuleI18nService, modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
-from xmodule.studio_editable import has_author_view
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.studio_editable import has_author_view  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_visibility_partition_info
 from .access import get_user_role
