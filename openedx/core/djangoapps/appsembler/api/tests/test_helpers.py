@@ -1,8 +1,10 @@
 
+import ddt
 from unittest.mock import patch
 import pytest
 
 from django.test import TestCase
+from rest_framework.exceptions import ValidationError
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -10,7 +12,10 @@ from opaque_keys.edx.locator import CourseLocator
 
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.user_authn.views.register import _skip_activation_email
-from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
+from openedx.core.djangoapps.appsembler.api.helpers import (
+    as_course_key,
+    normalize_bool_param,
+)
 from openedx.core.djangoapps.appsembler.api.tests.factories import COURSE_ID_STR_TEMPLATE
 
 
@@ -64,3 +69,26 @@ class TestAPISendActivationEmail(TestCase):
         helper_path = 'openedx.core.djangoapps.user_authn.views.register.skip_registration_email_for_registration_api'
         with patch(helper_path, return_value=True):
             assert _skip_activation_email(user, {}, None, {}), 'API requested: email can be skipped by AMC admin'
+
+
+@ddt.ddt
+class TestNormalizeBoolParamsHelper(TestCase):
+    """
+    Tests for the `normalize_bool_param` helper.
+    """
+
+    @ddt.data(False, 'False', 'false')
+    def test_normalize_bool_param_falsy(self, unnormalized):
+        normalized = normalize_bool_param(unnormalized)
+        assert not normalized, 'Should consider `{}` as falsy'.format(unnormalized)
+
+    @ddt.data(True, 'True', 'true')
+    def test_normalize_bool_param_truthy(self, unnormalized):
+        normalized = normalize_bool_param(unnormalized)
+        assert normalized, 'Should consider `{}` as truthy'.format(unnormalized)
+
+    @ddt.data(1, '2', '', None)
+    def test_normalize_bool_param_exception(self, unnormalized):
+        """Should raise exception on unexpected values."""
+        with self.assertRaises(ValidationError):
+            normalize_bool_param(unnormalized)

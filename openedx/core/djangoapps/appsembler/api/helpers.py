@@ -1,7 +1,8 @@
 import beeline
 
-from opaque_keys.edx.keys import CourseKey
+from rest_framework.exceptions import ValidationError
 
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.appsembler.api.v1.mixins import TahoeAuthMixin
 
 
@@ -38,3 +39,14 @@ def skip_registration_email_for_registration_api(request, params):
         beeline.add_context_field('appsembler__skip_email', skip_email)
 
     return skip_email
+
+
+def normalize_bool_param(unnormalized):
+    """
+    Allow strings of any case (upper/lower) to be used by the API caller.
+    For example "False", "false", "TRUE"
+    """
+    normalized = str(unnormalized).lower()
+    if normalized not in ['false', 'true']:
+        raise ValidationError('invalid value `{unnormalized}` for boolean type'.format(unnormalized=unnormalized))
+    return True if normalized == 'true' else False

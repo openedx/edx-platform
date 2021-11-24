@@ -42,7 +42,7 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email,
 )
 
-from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
+from openedx.core.djangoapps.appsembler.api.helpers import as_course_key, normalize_bool_param
 from openedx.core.djangoapps.appsembler.api.v1.api import (
     account_exists,
     enroll_learners_in_course,
@@ -165,9 +165,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         if password_provided:
             try:
                 # Default behavior is True - send the email
-
-                data['send_activation_email'] = self._normalize_bool_param(
-                    data.get('send_activation_email', True))
+                data['send_activation_email'] = normalize_bool_param(data.get('send_activation_email', True))
             except ValueError:
                 errors = {
                     'user_message': '{0} is not a valid value for "send_activation_email"'.format(
@@ -229,16 +227,6 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
                 field=err.field)
             return Response(dict(user_message=msg), status=status.HTTP_400_BAD_REQUEST)
         return Response({'user_id ': user_id}, status=status.HTTP_200_OK)
-
-    def _normalize_bool_param(self, unnormalized):
-        """
-        Allow strings of any case (upper/lower) to be used by the API caller.
-        For example "False", "false", "TRUE"
-        """
-        normalized = str(unnormalized).lower()
-        if normalized not in ['false', 'true']:
-            raise ValidationError('invalid value {unnormalized} for boolean type'.format(unnormalized))
-        return True if normalized == 'true' else False
 
 
 class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
