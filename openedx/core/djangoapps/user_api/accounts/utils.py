@@ -17,8 +17,8 @@ from common.djangoapps.student.models import AccountRecovery, Registration, get_
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import UserRetirementStatus
 
