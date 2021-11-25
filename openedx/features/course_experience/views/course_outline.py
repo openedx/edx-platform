@@ -22,8 +22,8 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience.utils import dates_banner_should_display
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import get_course_content_milestones
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
-from xmodule.modulestore.django import modulestore
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_course_outline_block_tree, get_resume_block
 
