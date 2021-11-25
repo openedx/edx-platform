@@ -75,6 +75,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 max_age=COOKIE_DURATION,
                 secure=self.request.is_secure(),
+                samesite="Lax"
             )
         else:
             response.delete_cookie.assert_called_with(
