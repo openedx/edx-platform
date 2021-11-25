@@ -2,10 +2,13 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
 from organizations.models import Organization
+from student.roles import GlobalCourseCreatorRole
 
 EDLY_SLUG_VALIDATOR = RegexValidator(r'^[0-9a-z-]*$', 'Only small case alphanumeric and hyphen characters are allowed.')
 
@@ -52,6 +55,22 @@ class EdlySubOrganization(TimeStampedModel):
             list: List of edx organizations short names
         """
         return list(self.edx_organizations.values_list('short_name', flat=True))
+
+
+@receiver(post_save, sender=EdlySubOrganization, dispatch_uid='update_global_course_creators')
+def update_global_course_creators(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+   Update global course creators.
+   """
+    users = User.objects.filter(
+        edly_profile__edly_sub_organizations=instance.id,
+        courseaccessrole__role='global_course_creator'
+    )
+    edx_orgs = instance.get_edx_organizations
+    for user in users:
+        for edx_org in edx_orgs:
+            if not GlobalCourseCreatorRole(edx_org).has_user(user):
+                GlobalCourseCreatorRole(edx_org).add_users(user)
 
 
 class EdlyUserProfile(models.Model):

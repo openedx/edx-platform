@@ -3,6 +3,7 @@ Tests for Edly django models.
 """
 from django.test import TestCase
 
+from organizations.tests.factories import OrganizationFactory
 from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
 from openedx.features.edly.tests.factories import (
     EdlyOrganizationFactory,
@@ -11,6 +12,8 @@ from openedx.features.edly.tests.factories import (
     EdlyUserProfileFactory,
     SiteFactory,
 )
+from student.tests.factories import UserFactory
+from student.roles import GlobalCourseCreatorRole
 
 
 class EdlyOrganizationTests(TestCase):
@@ -62,9 +65,25 @@ class EdlySubOrganizationTests(TestCase):
         """
         Test EdlySubOrganization model object creation.
         """
-        edly_sub_organization = EdlySubOrganizationFactory(slug='test-edly-sub-organization', lms_site=self.lms_site)
+        edx_org = OrganizationFactory()
+        edly_sub_organization = EdlySubOrganizationFactory(
+            edx_organizations=[edx_org],
+            slug='test-edly-sub-organization',
+            lms_site=self.lms_site
+        )
         edly_sub_organization_data = EdlySubOrganization.objects.filter(lms_site=edly_sub_organization.lms_site)
         assert edly_sub_organization_data.count() == 1
+
+        user = UserFactory.create()
+        edly_user_profile = EdlyUserProfileFactory(user=user)
+        edly_user_profile.edly_sub_organizations.add(edly_sub_organization)  # pylint: disable=E1101
+        GlobalCourseCreatorRole(edx_org.short_name).add_users(user)
+
+        edx_org_2 = OrganizationFactory()
+        edly_sub_organization.edx_organizations.add(edx_org_2)
+        edly_sub_organization.save()
+
+        assert GlobalCourseCreatorRole(edx_org_2.short_name).has_user(user)
 
     def test_edly_sub_organization_post_update_receiver(self):
         """
