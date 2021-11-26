@@ -1,6 +1,8 @@
 # pylint: skip-file
 import json
 import logging
+from typing import Set
+
 import regex
 from collections import defaultdict
 from datetime import datetime
@@ -83,6 +85,26 @@ def get_role_ids(course_id):
     """
     roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
     return {role.name: list(role.users.values_list('id', flat=True)) for role in roles}
+
+
+def get_user_role_names(user: User, course_key: CourseKey) -> Set[str]:
+    """
+    Get a set of discussion roles a user has for the specified course.
+
+    Args:
+        user (User): a user
+        course_key (CourseKey): a course key
+
+    Returns:
+        (Set[str]) a set of role names that the user has.
+
+    """
+    return set(
+        Role.objects.filter(
+            users=user,
+            course_id=course_key,
+        ).values_list('name', flat=True).distinct()
+    )
 
 
 def has_discussion_privileges(user, course_id):
