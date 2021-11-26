@@ -34,7 +34,7 @@ class CoursewareTab(EnrolledTab):
     """
     type = 'courseware'
     title = gettext_noop('Course')
-    priority = 10
+    priority = 11
     view_name = 'courseware'
     is_movable = False
     is_default = False
@@ -69,7 +69,7 @@ class CourseInfoTab(CourseTab):
     """
     type = 'course_info'
     title = gettext_noop('Home')
-    priority = 20
+    priority = 10
     view_name = 'info'
     tab_id = 'info'
     is_movable = False
@@ -86,7 +86,7 @@ class SyllabusTab(EnrolledTab):
     """
     type = 'syllabus'
     title = gettext_noop('Syllabus')
-    priority = 30
+    priority = 80
     view_name = 'syllabus'
     allow_multiple = True
     is_default = False
@@ -104,7 +104,7 @@ class ProgressTab(EnrolledTab):
     """
     type = 'progress'
     title = gettext_noop('Progress')
-    priority = 40
+    priority = 20
     view_name = 'progress'
     is_hideable = True
     is_default = False
@@ -153,7 +153,7 @@ class TextbookTabs(TextbookTabsBase):
     A tab representing the collection of all textbook tabs.
     """
     type = 'textbooks'
-    priority = None
+    priority = 200
     view_name = 'book'
 
     @classmethod
@@ -177,7 +177,7 @@ class PDFTextbookTabs(TextbookTabsBase):
     A tab representing the collection of all PDF textbook tabs.
     """
     type = 'pdf_textbooks'
-    priority = None
+    priority = 201
     view_name = 'pdf_book'
 
     @classmethod
@@ -196,7 +196,7 @@ class HtmlTextbookTabs(TextbookTabsBase):
     A tab representing the collection of all Html textbook tabs.
     """
     type = 'html_textbooks'
-    priority = None
+    priority = 202
     view_name = 'html_book'
 
     @classmethod
@@ -285,7 +285,7 @@ class ExternalLinkCourseTab(LinkTab):
     A course tab containing an external link.
     """
     type = 'external_link'
-    priority = None
+    priority = 110
     is_default = False    # An external link tab is not added to a course by default
     allow_multiple = True
 
@@ -326,9 +326,9 @@ class DatesTab(EnrolledTab):
     A tab representing the relevant dates for a course.
     """
     type = "dates"
-    title = gettext_noop(
-        "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
-    priority = 50
+    # We don't have the user in this context, so we don't want to translate it at this level.
+    title = gettext_noop("Dates")
+    priority = 30
     view_name = "dates"
     is_dynamic = True
 

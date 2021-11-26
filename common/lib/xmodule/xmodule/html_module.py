@@ -43,7 +43,6 @@ _ = lambda text: text
 
 
 @XBlock.needs("i18n")
-@XBlock.needs("mako")
 @XBlock.needs("user")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
@@ -132,7 +131,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.system.render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'HtmlBlockStudio')
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
@@ -485,10 +484,7 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-            return self.runtime.service(self, 'mako').render_template(
-                f"{self.TEMPLATE_DIR}/course_updates.html",
-                context,
-            )
+            return self.system.render_template(f"{self.TEMPLATE_DIR}/course_updates.html", context)
 
     @classmethod
     def order_updates(self, updates):  # lint-amnesty, pylint: disable=bad-classmethod-argument

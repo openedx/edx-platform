@@ -1527,6 +1527,7 @@
     "Read more": "En lire plus",
     "Ready To Start": "Pr\u00eat \u00e0 Commencer",
     "Ready To Submit": "Pr\u00eat \u00e0 Soumettre",
+    "Ready to Resume": "Pr\u00eat \u00e0 reprendre",
     "Reason": "Motif",
     "Reason field should not be left blank.": "Le champ Raison ne doit pas \u00eatre laiss\u00e9 vide.",
     "Reason for change:": "Raison du changement : ",

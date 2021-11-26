@@ -39,8 +39,7 @@ from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
 from .exceptions import ItemNotFoundError
 from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
 
-edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True)
 
 etree.set_default_parser(edx_xml_parser)
 

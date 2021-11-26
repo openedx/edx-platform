@@ -25,7 +25,7 @@
 # MOH CHIN LAM <chinlam91@gmail.com>, 2015
 # 區壬豪 <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Shawn Li <tp9106@gmail.com>, 2017
 # Shung-Hsi Yu <shy.no.reply@gmail.com>, 2017
 # hymnsf <singmoonson@gmail.com>, 2014
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)\n"

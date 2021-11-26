@@ -12,7 +12,7 @@ from uuid import uuid4
 import pytest
 import ddt
 from celery.states import FAILURE, SUCCESS
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 from opaque_keys.edx.keys import i4xEncoder
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -676,7 +676,7 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('generated')
+            action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]
@@ -706,7 +706,7 @@ class TestOra2ExportSubmissionFilesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_submission_files(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('compressed')
+            action_name = gettext_noop('compressed')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]
@@ -736,7 +736,7 @@ class TestOra2SummaryInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_summary(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('generated')
+            action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]

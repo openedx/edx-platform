@@ -19,7 +19,6 @@ from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
@@ -44,6 +43,7 @@ from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSys
 
 from ..utils import get_visibility_partition_info
 from .access import get_user_role
+from .helpers import render_from_lms
 from .session_kv_store import SessionKeyValueStore
 
 __all__ = ['preview_handler']
@@ -185,10 +185,9 @@ def _preview_module_system(request, descriptor, field_data):
         )
     ]
 
-    mako_service = MakoService(namespace_prefix='lms.')
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
-        wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
+        wrappers.insert(0, wrap_with_license)
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -196,6 +195,7 @@ def _preview_module_system(request, descriptor, field_data):
         track_function=lambda event_type, event: None,
         filestore=descriptor.runtime.resources_fs,
         get_module=partial(_load_preview_module, request),
+        render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
@@ -213,7 +213,6 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "field-data": field_data,
             "i18n": ModuleI18nService,
-            'mako': mako_service,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user, anonymous_user_id='student'),
             "partitions": StudioPartitionService(course_id=course_id),

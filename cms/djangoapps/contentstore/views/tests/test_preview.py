@@ -8,7 +8,6 @@ from unittest import mock
 
 import ddt
 from django.test.client import Client, RequestFactory
-from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -169,20 +168,13 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
-@XBlock.needs("mako")
 @XBlock.needs("user")
 @XBlock.needs("teams_configuration")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
     """
-    def student_view(self, context):
-        """
-        Renders the output that a student will see.
-        """
-        fragment = Fragment()
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('edxmako.html', context))
-        return fragment
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -214,25 +206,3 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
-
-
-class CmsModuleSystemShimTest(ModuleStoreTestCase):
-    """
-    Tests that the deprecated attributes in the Module System (XBlock Runtime) return the expected values.
-    """
-    def setUp(self):
-        """
-        Set up the user and other fields that will be used to instantiate the runtime.
-        """
-        super().setUp()
-        self.course = CourseFactory.create()
-        self.user = UserFactory()
-        self.request = RequestFactory().get('/dummy-url')
-        self.request.user = self.user
-        self.request.session = {}
-
-    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    def test_render_template(self):
-        descriptor = ItemFactory(category="pure", parent=self.course)
-        html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
-        assert '<div id="142" ns="main">Testing the MakoService</div>' in html

@@ -143,7 +143,7 @@
 # RenataBarboza, 2013
 # Renata Barboza, 2014-2016
 # Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Siderlan Santos <siderlan.santos@gmail.com>, 2015
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # e05a6f0c527312287ac027cf3d3a35f5_685166c <0e3f187c36e42a887ffaef9a9e407417_190443>, 2014
@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"

@@ -99,6 +99,25 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
     FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
+    @override_settings(MARKETING_EMAILS_OPT_IN=True)
+    def test_login_success_with_opt_in_flag_enabled(self):
+        self.user.is_active = False
+        self.user.save()
+        response, mock_audit_log = self._login_response(
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+        )
+        self._assert_response(response, success=True)
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
+
+    @override_settings(MARKETING_EMAILS_OPT_IN=False)
+    def test_login_failed_with_opt_in_flag_disabled(self):
+        self.user.is_active = False
+        self.user.save()
+        response, mock_audit_log = self._login_response(self.user_email, self.password)
+        self._assert_audit_log(
+            mock_audit_log, 'warning', ['Login failed - Account not active for user.id: 1, resending activation']
+        )
+
     @patch.dict(settings.FEATURES, {
         "ENABLE_THIRD_PARTY_AUTH": True
     })

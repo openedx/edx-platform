@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-10 15:41+0000\n"
-"PO-Revision-Date: 2021-11-10 15:41:51.055243\n"
+"POT-Creation-Date: 2021-11-21 20:52+0000\n"
+"PO-Revision-Date: 2021-11-21 20:52:10.097795\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6144,18 +6144,18 @@ msgstr "Nøʇ snɹǝ ʎǝʇ"
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        There's still time to reach your goal\n"
-"                    "
+"                            There’s still time to reach your goal\n"
+"                        "
 msgstr ""
 "\n"
-"                        Ŧɥǝɹǝ's sʇᴉll ʇᴉɯǝ ʇø ɹǝɐɔɥ ʎønɹ ƃøɐl\n"
-"                    "
+"                            Ŧɥǝɹǝ’s sʇᴉll ʇᴉɯǝ ʇø ɹǝɐɔɥ ʎønɹ ƃøɐl\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
 msgid ""
 "\n"
-"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
 "                            "
 msgid_plural ""
 "\n"
@@ -6163,7 +6163,7 @@ msgid_plural ""
 "                        "
 msgstr[0] ""
 "\n"
-"                            Ɏøn sǝʇ ɐ ƃøɐl øɟ lǝɐɹnᴉnƃ {start_bold}%(days_per_week)s ʇᴉɯǝ ɐ ʍǝǝʞ ᴉn %(course_name)s{end_bold}. Ɏøn'ɹǝ nøʇ bnᴉʇǝ ʇɥǝɹǝ, bnʇ ʇɥǝɹǝ's sʇᴉll ʇᴉɯǝ ʇø ɹǝɐɔɥ ʇɥɐʇ ƃøɐl!\"\n"
+"                            Ɏøn sǝʇ ɐ ƃøɐl øɟ lǝɐɹnᴉnƃ {start_bold}%(days_per_week)s ʇᴉɯǝ ɐ ʍǝǝʞ ᴉn %(course_name)s{end_bold}. Ɏøn’ɹǝ nøʇ bnᴉʇǝ ʇɥǝɹǝ, bnʇ ʇɥǝɹǝ's sʇᴉll ʇᴉɯǝ ʇø ɹǝɐɔɥ ʇɥɐʇ ƃøɐl!\n"
 "                            "
 msgstr[1] ""
 "\n"
@@ -6173,22 +6173,22 @@ msgstr[1] ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                            Jump back in\n"
-"                        "
+"                                Jump back in\n"
+"                            "
 msgstr ""
 "\n"
-"                            Ɉnɯd bɐɔʞ ᴉn\n"
-"                        "
+"                                Ɉnɯd bɐɔʞ ᴉn\n"
+"                            "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
-"                    "
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
 msgstr ""
 "\n"
-"                        Ɍǝɯǝɯbǝɹ, ʎøn ɔɐn ɐlʍɐʎs ɔɥɐnƃǝ ʎønɹ lǝɐɹnᴉnƃ ƃøɐl. Ŧɥǝ bǝsʇ ƃøɐl ᴉs ønǝ ʇɥɐʇ ʎøn ɔɐn sʇᴉɔʞ ʇø.\n"
-"                    "
+"                            Ɍǝɯǝɯbǝɹ, ʎøn ɔɐn ɐlʍɐʎs ɔɥɐnƃǝ ʎønɹ lǝɐɹnᴉnƃ ƃøɐl. Ŧɥǝ bǝsʇ ƃøɐl ᴉs ønǝ ʇɥɐʇ ʎøn ɔɐn sʇᴉɔʞ ʇø.\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -6203,12 +6203,12 @@ msgstr ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Unsubscribe from goal reminder emails for this course\n"
-"                    "
+"                            Unsubscribe from goal reminder emails for this course\n"
+"                        "
 msgstr ""
 "\n"
-"                        Ʉnsnbsɔɹᴉbǝ ɟɹøɯ ƃøɐl ɹǝɯᴉndǝɹ ǝɯɐᴉls ɟøɹ ʇɥᴉs ɔønɹsǝ\n"
-"                    "
+"                            Ʉnsnbsɔɹᴉbǝ ɟɹøɯ ƃøɐl ɹǝɯᴉndǝɹ ǝɯɐᴉls ɟøɹ ʇɥᴉs ɔønɹsǝ\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "You're almost there!"
@@ -8190,6 +8190,7 @@ msgid " (out of {total})"
 msgstr " (ønʇ øɟ {total})"
 
 #: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -9671,10 +9672,19 @@ msgid "Go to %(platform_name)s Home Page"
 msgstr "Ǥø ʇø %(platform_name)s Ħøɯǝ Ᵽɐƃǝ"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Sᴉƃn Ɨn"
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr "Ȼønɹsǝs"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "My Account"
+msgstr "Mʎ Ⱥɔɔønnʇ"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -10526,6 +10536,42 @@ msgstr "Ŧɥǝ ŁŦƗ ɔønɟᴉƃnɹɐʇᴉøn dɐʇɐ ɟøɹ ʇɥᴉs dɹøƃ�
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion provider's id"
 msgstr "Ŧɥǝ dᴉsɔnssᴉøn dɹøʌᴉdǝɹ's ᴉd"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Context key for context in which this discussion topic exists."
+msgstr "Ȼønʇǝxʇ ʞǝʎ ɟøɹ ɔønʇǝxʇ ᴉn ʍɥᴉɔɥ ʇɥᴉs dᴉsɔnssᴉøn ʇødᴉɔ ǝxᴉsʇs."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Usage key for in-context discussion topic. Set to null for course-level "
+"topics."
+msgstr ""
+"Ʉsɐƃǝ ʞǝʎ ɟøɹ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøn ʇødᴉɔ. Sǝʇ ʇø nnll ɟøɹ ɔønɹsǝ-lǝʌǝl "
+"ʇødᴉɔs."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Title for discussion topic."
+msgstr "Ŧᴉʇlǝ ɟøɹ dᴉsɔnssᴉøn ʇødᴉɔ."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Group for divided discussions."
+msgstr "Ǥɹønd ɟøɹ dᴉʌᴉdǝd dᴉsɔnssᴉøns."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Provider id for discussion provider."
+msgstr "Ᵽɹøʌᴉdǝɹ ᴉd ɟøɹ dᴉsɔnssᴉøn dɹøʌᴉdǝɹ."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Discussion context ID in external forum provider. e.g. commentable_id for "
+"cs_comments_service."
+msgstr ""
+"Đᴉsɔnssᴉøn ɔønʇǝxʇ ƗĐ ᴉn ǝxʇǝɹnɐl ɟøɹnɯ dɹøʌᴉdǝɹ. ǝ.ƃ. ɔøɯɯǝnʇɐblǝ_ᴉd ɟøɹ "
+"ɔs_ɔøɯɯǝnʇs_sǝɹʌᴉɔǝ."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Whether this topic should be shown in-context in the course."
+msgstr "Wɥǝʇɥǝɹ ʇɥᴉs ʇødᴉɔ sɥønld bǝ sɥøʍn ᴉn-ɔønʇǝxʇ ᴉn ʇɥǝ ɔønɹsǝ."
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -12360,6 +12406,11 @@ msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr "Ɏøn ɥɐʌǝ nsǝd {attempts} øɟ nnlᴉɯᴉʇǝd ɐʇʇǝɯdʇs ɟøɹ ʇɥᴉs dɹøblǝɯ."
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr "Sᴉƃn Ɨn"
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Ønɹ ɯɐᴉlᴉnƃ ɐddɹǝss ᴉs"
 
@@ -13371,16 +13422,6 @@ msgstr "Ȼønɹsǝ Nnɯbǝɹ:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
 msgstr "Ȼønɹsǝ Ɍnn:"
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
-msgstr "Ȼønɹsǝs"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html

@@ -18,7 +18,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
 
@@ -377,8 +377,8 @@ openid.oidutil.log = lambda message, level=0: None
 
 # Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
+PLATFORM_NAME = gettext_lazy("édX")
+PLATFORM_DESCRIPTION = gettext_lazy("Open édX Platform")
 
 SITE_NAME = "edx.org"
 
@@ -495,20 +495,6 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
-TEMPLATES.append(
-    {
-        # This separate copy of the Mako backend is used to test rendering previews in the 'lms.main' namespace
-        'NAME': 'preview',
-        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
-        'APP_DIRS': False,
-        'DIRS': MAKO_TEMPLATE_DIRS_BASE,
-        'OPTIONS': {
-            'context_processors': CONTEXT_PROCESSORS,
-            'debug': False,
-            'namespace': 'lms.main',
-        }
-    }
-)
 
 ########################## VIDEO TRANSCRIPTS STORAGE ############################
 VIDEO_TRANSCRIPTS_SETTINGS = dict(

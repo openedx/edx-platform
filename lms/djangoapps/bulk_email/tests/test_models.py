@@ -25,8 +25,10 @@ from lms.djangoapps.bulk_email.models import (
     CourseAuthorization,
     CourseEmail,
     CourseEmailTemplate,
+    DisabledCourse,
     Optout
 )
+from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.bulk_email.tests.factories import TargetFactory
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -312,6 +314,27 @@ class CourseAuthorizationTest(TestCase):
 
         # Now, course should STILL be authorized!
         assert is_bulk_email_feature_enabled(course_id)
+
+
+class DisabledCourseTest(TestCase):
+    """
+    Test DisabledCourse model and api
+    """
+    def tearDown(self):
+        super().tearDown()
+        BulkEmailFlag.objects.all().delete()
+
+    def test_is_email_disabled_for_course(self):
+        BulkEmailFlag.objects.create(enabled=True)
+        course_id = CourseKey.from_string('abc/123/doremi')
+        # Test that course is not disabled by default
+        assert not is_bulk_email_disabled_for_course(course_id)
+
+        # Disable the course
+        disabled_course = DisabledCourse(course_id=course_id)
+        disabled_course.save()
+        # Course should be disabled
+        assert is_bulk_email_disabled_for_course(course_id)
 
 
 class TargetFilterTest(ModuleStoreTestCase):

@@ -9,7 +9,7 @@
   from openedx.core.djangolib.js_utils import js_escaped_string
   from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
 %>
-<%block name="title">${_("Pages")}</%block>
+<%block name="title">${_("Custom pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
 
 <%block name="header_extras">
@@ -52,14 +52,14 @@
       </nav>
     </div>
     <h1 class="page-header">
-      <span class="sr">&gt; </span>${_("Custom Pages")}
+      <span class="sr">&gt; </span>${_("Custom pages")}
     </h1>
   % else:
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
       <small class="subtitle">${_("Content")}</small>
       ## Translators: Custom Pages refer to the tabs that appear in the top navigation of each course.
-      <span class="sr"> > </span>${_("Custom Pages")}
+      <span class="sr"> > </span>${_("Custom pages")}
     </h1>
   % endif
 
