@@ -269,7 +269,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-14 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -6554,18 +6554,18 @@ msgstr "No estoy seguro todavía"
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        There's still time to reach your goal\n"
-"                    "
+"                            There’s still time to reach your goal\n"
+"                        "
 msgstr ""
 "\n"
-"                        Aun hay tiempo para alcanzar tu objetivo\n"
-"                    "
+"                            Aún hay tiempo para alcanzar tu objetivo\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
 msgid ""
 "\n"
-"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
 "                            "
 msgid_plural ""
 "\n"
@@ -6573,31 +6573,32 @@ msgid_plural ""
 "                        "
 msgstr[0] ""
 "\n"
-"Definiste un objetivo de estudio de {start_bold}%(days_per_week)s vez a la semana en %(course_name)s{end_bold}. Aún no lo haz alcanzado, pero todavía estas a tiempo de lograrlo!"
+"                            Definiste un objetivo de estudio de {start_bold}%(days_per_week)s veces a la semana en %(course_name)s{end_bold}. ¡Aún no lo ha alcanzado, pero todavía estas a tiempo de lograrlo!\n"
+"                        "
 msgstr[1] ""
 "\n"
-"                            Definiste un objetivo de estudio de {start_bold}%(days_per_week)s veces a la semana en %(course_name)s{end_bold}. Aún no lo haz alcanzado, pero todavía estas a tiempo de lograrlo!\n"
+"                            Definiste un objetivo de estudio de {start_bold}%(days_per_week)s veces a la semana en %(course_name)s{end_bold}. ¡Aún no lo has alcanzado, pero todavía estas a tiempo de lograrlo!\n"
 "                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                            Jump back in\n"
-"                        "
+"                                Jump back in\n"
+"                            "
 msgstr ""
 "\n"
-"                            Volver a ingresar\n"
-"                        "
+"                                Volver a ingresar\n"
+"                            "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
-"                    "
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
 msgstr ""
 "\n"
-"                        Recuerda, siempre puedes cambiar tu objetivo de aprendizaje. El mejor objetivo es aquel que puedas cumplir.\n"
-"                    "
+"                           Recuerda que siempre puedes cambiar tu objetivo de aprendizaje. El mejor objetivo es aquel que sabes que puedes cumplir.\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -8662,6 +8663,7 @@ msgid " (out of {total})"
 msgstr " (de los {total})"
 
 #: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -10174,10 +10176,19 @@ msgid "Go to %(platform_name)s Home Page"
 msgstr "Ve a la página principal de %(platform_name)s "
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Iniciar sesión"
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr "Cursos"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "My Account"
+msgstr "Mi cuenta"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -12984,6 +12995,11 @@ msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr "Has usado {attempts} de intentos ilimitados para este problema."
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr "Iniciar sesión"
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Nuestra dirección de correo es"
 
@@ -14025,16 +14041,6 @@ msgstr "Número de curso:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
 msgstr "Edición del Curso:"
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
-msgstr "Cursos"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html

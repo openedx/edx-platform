@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-21 20:52+0000\n"
-"PO-Revision-Date: 2021-11-21 20:52:10.097795\n"
+"POT-Creation-Date: 2021-11-28 20:51+0000\n"
+"PO-Revision-Date: 2021-11-28 20:51:49.595057\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6712,7 +6712,10 @@ msgid ""
 msgstr ""
 "Mɐᴉnʇɐᴉn ǝxɐɯ ᴉnʇǝƃɹᴉʇʎ bʎ ǝnɐblᴉnƃ ɐ dɹøɔʇøɹᴉnƃ sølnʇᴉøn ɟøɹ ʎønɹ ɔønɹsǝ"
 
-#: lms/djangoapps/courseware/plugins.py
+#. #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
+#. Translators: Custom Pages refer to the tabs that appear in the top
+#. navigation of each course.
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
 msgid "Custom pages"
 msgstr "Ȼnsʇøɯ dɐƃǝs"
 
@@ -7802,6 +7805,7 @@ msgid "Cohorts"
 msgstr "Ȼøɥøɹʇs"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussions"
 msgstr "Đᴉsɔnssᴉøns"
@@ -21872,21 +21876,10 @@ msgstr ""
 msgid "Learn more about content visibility settings"
 msgstr "Łǝɐɹn ɯøɹǝ ɐbønʇ ɔønʇǝnʇ ʌᴉsᴉbᴉlᴉʇʎ sǝʇʇᴉnƃs"
 
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "Ᵽɐƃǝs"
-
 #: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Pages & Resources"
 msgstr "Ᵽɐƃǝs & Ɍǝsønɹɔǝs"
-
-#. Translators: Custom Pages refer to the tabs that appear in the top
-#. navigation of each course.
-#: cms/templates/edit-tabs.html
-msgid "Custom Pages"
-msgstr "Ȼnsʇøɯ Ᵽɐƃǝs"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
@@ -22141,6 +22134,10 @@ msgstr "Ȼønɹsǝ Sʇɹnɔʇnɹǝ"
 #: cms/templates/export.html
 msgid "Individual Problems"
 msgstr "Ɨndᴉʌᴉdnɐl Ᵽɹøblǝɯs"
+
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "Ᵽɐƃǝs"
 
 #: cms/templates/export.html
 msgid "Course Assets"
