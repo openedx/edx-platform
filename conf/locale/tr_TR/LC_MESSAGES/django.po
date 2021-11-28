@@ -131,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-21 20:43+0000\n"
+"POT-Creation-Date: 2021-11-28 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -7867,6 +7867,7 @@ msgid "Cohorts"
 msgstr "Topluluklar"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussions"
 msgstr "Forum"
@@ -21765,21 +21766,10 @@ msgstr ""
 msgid "Learn more about content visibility settings"
 msgstr "İçerik görünürlüğü ayarları hakkında daha fazla bilgi"
 
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "Sayfalar"
-
 #: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Pages & Resources"
 msgstr "Sayfalar & Kaynaklar"
-
-#. Translators: Custom Pages refer to the tabs that appear in the top
-#. navigation of each course.
-#: cms/templates/edit-tabs.html
-msgid "Custom Pages"
-msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
@@ -22028,6 +22018,10 @@ msgstr "Ders Yapısı"
 #: cms/templates/export.html
 msgid "Individual Problems"
 msgstr "Bireysel Problemler"
+
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "Sayfalar"
 
 #: cms/templates/export.html
 msgid "Course Assets"
