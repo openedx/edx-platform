@@ -120,6 +120,7 @@ class Randomization(String):
 
 @XBlock.needs('user')
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -392,7 +393,7 @@ class ProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
@@ -821,7 +822,7 @@ class ProblemBlock(
             filestore=self.runtime.filestore,
             i18n=self.runtime.service(self, "i18n"),
             node_path=self.runtime.node_path,
-            render_template=self.runtime.render_template,
+            render_template=self.runtime.service(self, 'mako').render_template,
             seed=seed,  # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.xqueue,
@@ -915,7 +916,7 @@ class ProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.render_template('problem_ajax.html', {
+        return self.runtime.service(self, 'mako').render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': str(self.location),
             'ajax_url': self.ajax_url,
@@ -1263,7 +1264,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.render_template('problem.html', context)
+        html = self.runtime.service(self, 'mako').render_template('problem.html', context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1573,7 +1574,7 @@ class ProblemBlock(
 
         return {
             'answers': new_answers,
-            'correct_status_html': self.runtime.render_template(
+            'correct_status_html': self.runtime.service(self, 'mako').render_template(
                 'status_span.html',
                 {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
             )

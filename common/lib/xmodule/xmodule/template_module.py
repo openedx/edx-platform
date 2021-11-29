@@ -3,6 +3,7 @@ Template module
 """
 
 from string import Template
+from xblock.core import XBlock
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -40,6 +41,7 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     """
 
 
+@XBlock.needs('mako')
 class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     """
     This module supports tags of the form
@@ -85,7 +87,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'CustomTagBlockStudio')
         shim_xmodule_js(fragment, 'XMLEditingDescriptor')
