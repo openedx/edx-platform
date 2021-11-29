@@ -8,8 +8,6 @@
     # via
     #   -r requirements/edx/base.txt
     #   xmodule
--e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
-    # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/django-wiki.git@1.0.2#egg=django-wiki
     # via -r requirements/edx/base.txt
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
@@ -63,7 +61,7 @@ asgiref==3.4.1
     #   -r requirements/edx/base.txt
     #   django
     #   uvicorn
-astroid==2.8.6
+astroid==2.9.0
     # via
     #   pylint
     #   pylint-celery
@@ -150,7 +148,7 @@ chardet==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pysrt
-charset-normalizer==2.0.7
+charset-normalizer==2.0.8
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -188,7 +186,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.1.2
+coverage[toml]==6.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -495,6 +493,8 @@ edx-celeryutils==1.1.1
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
+edx-codejail==3.1.5
+    # via -r requirements/edx/base.txt
 edx-completion==4.1.0
     # via -r requirements/edx/base.txt
 edx-django-release-util==1.1.0
@@ -995,7 +995,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.11.1
+pylint==2.12.1
     # via
     #   edx-lint
     #   pylint-celery
@@ -1092,7 +1092,7 @@ python-slugify==4.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   transifex-client
-python-swiftclient==3.12.0
+python-swiftclient==3.13.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1189,7 +1189,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.7.2
+scipy==1.7.3
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1219,12 +1219,12 @@ six==1.16.0
     #   bleach
     #   bok-choy
     #   chem
-    #   codejail
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
     #   edx-bulk-grades
     #   edx-ccx-keys
+    #   edx-codejail
     #   edx-django-release-util
     #   edx-drf-extensions
     #   edx-enterprise
