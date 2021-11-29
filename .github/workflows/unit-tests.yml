@@ -29,11 +29,11 @@ jobs:
         ]
 
 
-    name: python ${{ matrix.python-version }},django ${{ matrix.django-version }} ${{ matrix.test_module }}
+    # name: python ${{ matrix.python-version }},django ${{ matrix.django-version }} ${{ matrix.test_module }}
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: start mongodb service
         run: |
           sudo /etc/init.d/mongodb start
