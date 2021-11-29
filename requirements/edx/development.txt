@@ -587,7 +587,7 @@ edx-rest-api-client==5.4.0
     #   edx-proctoring
 edx-search==3.1.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.16.0
+edx-sga==0.17.2
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
