@@ -19,7 +19,6 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
-from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
@@ -236,8 +235,6 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 user_is_staff=self.user.is_staff,
                 anonymous_user_id=self.anonymous_student_id,
             )
-        elif service_name == "mako":
-            return MakoService()
         elif service_name == "i18n":
             return ModuleI18nService(block=block)
         # Check if the XBlockRuntimeSystem wants to handle this:

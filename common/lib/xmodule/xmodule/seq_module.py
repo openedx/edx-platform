@@ -244,7 +244,6 @@ class ProctoringFields:
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
 @XBlock.needs('i18n')
-@XBlock.needs('mako')
 @XBlock.wants('content_type_gating')
 class SequenceBlock(
     SequenceMixin,
@@ -538,7 +537,7 @@ class SequenceBlock(
         if not self._can_user_view_content(course):
             banner_text = self._hidden_content_banner_text(course)
 
-            hidden_content_html = self.runtime.service(self, 'mako').render_template(
+            hidden_content_html = self.system.render_template(
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
@@ -607,7 +606,7 @@ class SequenceBlock(
 
         fragment = Fragment()
         params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
-        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)

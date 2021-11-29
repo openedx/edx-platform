@@ -4,7 +4,7 @@ URL definitions for the verify_student app.
 
 
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from lms.djangoapps.verify_student import views
 
@@ -14,7 +14,7 @@ urlpatterns = [
     # The user is starting the verification / payment process,
     # most likely after enrolling in a course and selecting
     # a "verified" track.
-    url(
+    re_path(
         fr'^start-flow/{settings.COURSE_ID_PATTERN}/$',
         # Pylint seems to dislike the as_view() method because as_view() is
         # decorated with `classonlymethod` instead of `classmethod`.
@@ -26,7 +26,7 @@ urlpatterns = [
     ),
 
     # This is for A/B testing.
-    url(
+    re_path(
         fr'^begin-flow/{settings.COURSE_ID_PATTERN}/$',
         views.PayAndVerifyView.as_view(),
         name="verify_student_begin_flow",
@@ -38,7 +38,7 @@ urlpatterns = [
     # The user is enrolled in a non-paid mode and wants to upgrade.
     # This is the same as the "start verification" flow,
     # except with slight messaging changes.
-    url(
+    re_path(
         fr'^upgrade/{settings.COURSE_ID_PATTERN}/$',
         views.PayAndVerifyView.as_view(),
         name="verify_student_upgrade_and_verify",
@@ -53,7 +53,7 @@ urlpatterns = [
     # from the verification step.
     # Note that if the user has already verified, this will redirect
     # to the dashboard.
-    url(
+    re_path(
         fr'^verify-now/{settings.COURSE_ID_PATTERN}/$',
         views.PayAndVerifyView.as_view(),
         name="verify_student_verify_now",
@@ -64,26 +64,26 @@ urlpatterns = [
         }
     ),
 
-    url(
-        r'^create_order',
+    path(
+        'create_order',
         views.create_order,
         name="verify_student_create_order"
     ),
 
-    url(
-        r'^results_callback$',
+    path(
+        'results_callback',
         views.results_callback,
         name="verify_student_results_callback",
     ),
 
-    url(
-        r'^submit-photos/$',
+    path(
+        'submit-photos/',
         views.SubmitPhotosView.as_view(),
         name="verify_student_submit_photos"
     ),
 
-    url(
-        r'^status/$',
+    path(
+        'status/',
         views.VerificationStatusAPIView.as_view(),
         name="verification_status_api"
     ),
@@ -95,25 +95,25 @@ urlpatterns = [
     # new photos.  This is different than *in-course* reverification,
     # in which a student submits only face photos, which are matched
     # against the ID photo from the user's initial verification attempt.
-    url(
-        r'^reverify$',
+    path(
+        'reverify',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
     ),
 
-    url(
+    re_path(
         fr'^photo-urls/{IDV_RECEIPT_ID_PATTERN}$',
         views.PhotoUrlsView.as_view(),
         name="verification_photo_urls"
     ),
 
-    url(
+    re_path(
         fr'^decrypt-idv-images/face/{IDV_RECEIPT_ID_PATTERN}$',
         views.DecryptFaceImageView.as_view(),
         name="verification_decrypt_face_image"
     ),
 
-    url(
+    re_path(
         fr'^decrypt-idv-images/photo-id/{IDV_RECEIPT_ID_PATTERN}$',
         views.DecryptPhotoIDImageView.as_view(),
         name="verification_decrypt_photo_id_image"
@@ -124,5 +124,5 @@ urlpatterns = [
 if settings.FEATURES.get('ENABLE_SOFTWARE_SECURE_FAKE'):
     from lms.djangoapps.verify_student.tests.fake_software_secure import SoftwareSecureFakeView
     urlpatterns += [
-        url(r'^software-secure-fake-response', SoftwareSecureFakeView.as_view()),
+        path('software-secure-fake-response', SoftwareSecureFakeView.as_view()),
     ]

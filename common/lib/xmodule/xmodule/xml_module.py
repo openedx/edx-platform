@@ -18,9 +18,7 @@ from xmodule.x_module import XModuleDescriptor  # lint-amnesty, pylint: disable=
 log = logging.getLogger(__name__)
 
 # assume all XML files are persisted as utf-8.
-EDX_XML_PARSER = XMLParser(dtd_validation=False, load_dtd=False,
-                           remove_comments=True, remove_blank_text=True,
-                           encoding='utf-8')
+EDX_XML_PARSER = XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True, encoding='utf-8')
 
 
 def name_to_pathname(name):

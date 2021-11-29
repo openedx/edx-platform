@@ -15,7 +15,7 @@ from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException

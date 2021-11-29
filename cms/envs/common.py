@@ -486,12 +486,15 @@ ENABLE_COPPA_COMPLIANCE = False
 
 ENABLE_JASMINE = False
 
+MARKETING_EMAILS_OPT_IN = False
+
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
+DISCUSSIONS_MICROFRONTEND_URL = None
 LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 
 ############################# SOCIAL MEDIA SHARING #############################

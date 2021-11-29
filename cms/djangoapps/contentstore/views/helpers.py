@@ -14,6 +14,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 from openedx.core.toggles import ENTRANCE_EXAMS
@@ -40,6 +41,13 @@ def event(request):
     console logs don't get distracted :-)
     '''
     return HttpResponse(status=204)
+
+
+def render_from_lms(template_name, dictionary, namespace='main'):
+    """
+    Render a template using the LMS Mako templates
+    """
+    return render_to_string(template_name, dictionary, namespace="lms." + namespace)
 
 
 def get_parent_xblock(xblock):

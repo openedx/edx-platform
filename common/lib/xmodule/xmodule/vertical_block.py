@@ -48,7 +48,7 @@ class VerticalFields:
     )
 
 
-@XBlock.needs('user', 'bookmarks', 'mako')
+@XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
 @XBlock.wants('call_to_action')
 class VerticalBlock(
@@ -151,7 +151,7 @@ class VerticalBlock(
                     child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', fragment_context))
+        fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
 
         add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')

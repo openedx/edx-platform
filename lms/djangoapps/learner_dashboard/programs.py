@@ -2,20 +2,20 @@
 Fragments for rendering programs.
 """
 
-
 import json
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from lti_consumer.lti_1p1.contrib.django import lti_embed
 from web_fragments.fragment import Fragment
 
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id, program_discussions_is_enabled
-from lti_consumer.lti_1p1.contrib.django import lti_embed
+from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_view_is_enabled, strip_course_id
+
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
@@ -75,92 +75,11 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    DEFAULT_ROLE = 'Student'
-    ADMIN_ROLE = 'Administrator'
-
-    @staticmethod
-    def get_program_discussion_configuration(program_uuid):
-        return ProgramDiscussionsConfiguration.objects.filter(
-            program_uuid=program_uuid
-        ).first()
 
     @staticmethod
     def _get_resource_link_id(program_uuid, request) -> str:
         site = get_current_site(request)
         return f'{site.domain}-{program_uuid}'
-
-    @staticmethod
-    def _get_result_sourcedid(context_id, resource_link_id, user_id) -> str:
-        return f'{context_id}:{resource_link_id}:{user_id}'
-
-    def get_user_roles(self, user):
-        """
-        Returns the given user's roles
-        """
-        if GlobalStaff().has_user(user):
-            return self.ADMIN_ROLE
-        return self.DEFAULT_ROLE
-
-    def _get_lti_embed_code(self, program_discussions_configuration, request) -> str:
-        """
-        Returns the LTI embed code for embedding in the program discussions tab
-        Args:
-            program_discussions_configuration (ProgramDiscussionsConfiguration): ProgramDiscussionsConfiguration object.
-            request (HttpRequest): Request object for view in which LTI will be embedded.
-        Returns:
-            HTML code to embed LTI in program page.
-        """
-        program_uuid = program_discussions_configuration.program_uuid
-        lti_consumer = program_discussions_configuration.lti_configuration.get_lti_consumer()
-        user_id = str(request.user.id)
-        context_id = program_uuid
-        resource_link_id = self._get_resource_link_id(program_uuid, request)
-        roles = self.get_user_roles(request.user)
-        context_title = program_uuid
-        result_sourcedid = self._get_result_sourcedid(context_id, resource_link_id, user_id)
-
-        return lti_embed(
-            html_element_id='lti-tab-launcher',
-            lti_consumer=lti_consumer,
-            resource_link_id=resource_link_id,
-            user_id=user_id,
-            roles=roles,
-            context_id=context_id,
-            context_title=context_title,
-            context_label=context_id,
-            result_sourcedid=result_sourcedid
-        )
-
-    def render_discussions_fragment(self, program_uuid, request) -> dict:
-        """
-        Returns the program discussion fragment if program discussions configuration exists for a program uuid
-        """
-        if program_discussions_is_enabled():
-            program_discussions_configuration = self.get_program_discussion_configuration(program_uuid)
-            if program_discussions_configuration:
-                lti_embed_html = self._get_lti_embed_code(program_discussions_configuration, request)
-                fragment = Fragment(
-                    HTML(
-                        """
-                        <iframe
-                            id='lti-tab-embed'
-                            style='width: 100%; min-height: 800px; border: none'
-                            srcdoc='{srcdoc}'
-                         >
-                        </iframe>
-                        """
-                    ).format(
-                        srcdoc=lti_embed_html
-                    )
-                )
-                return {
-                    'iframe': fragment.content,
-                    'enabled': True
-                }
-        return {
-            'iframe': '',
-            'enabled': False
-        }
 
     def render_to_fragment(self, request, program_uuid, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """View details about a specific program."""
@@ -219,7 +138,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
             'program_record_url': program_record_url,
         }
-
+        program_discussion_lti = ProgramDiscussionLTI(program_uuid, request)
         context = {
             'urls': urls,
             'user_preferences': get_user_preferences(user),
@@ -228,8 +147,11 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
-            'program_discussions_enabled': program_discussions_is_enabled(),
-            'discussion_fragment': self.render_discussions_fragment(program_uuid, request)
+            'program_discussions_enabled': program_tab_view_is_enabled(),
+            'discussion_fragment': {
+                'enabled': bool(program_discussion_lti.configuration),
+                'iframe': program_discussion_lti.render_iframe()
+            }
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)
@@ -242,3 +164,88 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         Return page title for the standalone page.
         """
         return _('Program Details')
+
+
+class ProgramDiscussionLTI:
+    """
+      Encapsulates methods for program discussion iframe rendering.
+    """
+    DEFAULT_ROLE = 'Student'
+    ADMIN_ROLE = 'Administrator'
+
+    def __init__(self, program_uuid, request):
+        self.program_uuid = program_uuid
+        self.request = request
+        self.configuration = self.get_configuration()
+
+    def get_configuration(self) -> ProgramDiscussionsConfiguration:
+        """
+        Returns ProgramDiscussionsConfiguration object with respect to program_uuid
+        """
+        return ProgramDiscussionsConfiguration.objects.filter(
+            program_uuid=self.program_uuid
+        ).first()
+
+    def _get_resource_link_id(self) -> str:
+        site = get_current_site(self.request)
+        return f'{site.domain}-{self.program_uuid}'
+
+    def _get_result_sourcedid(self, resource_link_id) -> str:
+        return f'{self.program_uuid}:{resource_link_id}:{self.request.user.id}'
+
+    def get_user_roles(self) -> str:
+        """
+        Returns comma-separated roles for the given user
+        """
+        basic_role = self.DEFAULT_ROLE
+
+        if GlobalStaff().has_user(self.request.user):
+            basic_role = self.ADMIN_ROLE
+
+        all_roles = [basic_role]
+        return ','.join(all_roles)
+
+    def _get_lti_embed_code(self) -> str:
+        """
+        Returns the LTI embed code for embedding in the program discussions tab
+        Returns:
+            HTML code to embed LTI in program page.
+        """
+        resource_link_id = self._get_resource_link_id()
+        result_sourcedid = self._get_result_sourcedid(resource_link_id)
+
+        return lti_embed(
+            html_element_id='lti-tab-launcher',
+            lti_consumer=self.configuration.lti_configuration.get_lti_consumer(),
+            resource_link_id=resource_link_id,
+            user_id=str(self.request.user.id),
+            roles=self.get_user_roles(),
+            context_id=self.program_uuid,
+            context_title=self.program_uuid,
+            context_label=self.program_uuid,
+            result_sourcedid=result_sourcedid
+        )
+
+    def render_iframe(self) -> str:
+        """
+        Returns the program discussion fragment if program discussions configuration exists for a program uuid
+        """
+        if not self.configuration:
+            return ''
+
+        lti_embed_html = self._get_lti_embed_code()
+        fragment = Fragment(
+            HTML(
+                """
+                <iframe
+                    id='lti-tab-embed'
+                    style='width: 100%; min-height: 800px; border: none'
+                    srcdoc='{srcdoc}'
+                 >
+                </iframe>
+                """
+            ).format(
+                srcdoc=lti_embed_html
+            )
+        )
+        return fragment.content

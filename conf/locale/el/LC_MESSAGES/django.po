@@ -90,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/open-edx/teams/6205/el/)\n"
@@ -4208,6 +4208,14 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Enable in-context discussions for the Unit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Add discussion for the Unit."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 #, python-brace-format
 msgid ""
@@ -5629,15 +5637,15 @@ msgstr ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        There's still time to reach your goal\n"
-"                    "
+"                            There’s still time to reach your goal\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
 msgid ""
 "\n"
-"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
 "                            "
 msgid_plural ""
 "\n"
@@ -5649,15 +5657,15 @@ msgstr[1] ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                            Jump back in\n"
-"                        "
+"                                Jump back in\n"
+"                            "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
-"                    "
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
@@ -5670,8 +5678,8 @@ msgstr ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Unsubscribe from goal reminder emails to this course\n"
-"                    "
+"                            Unsubscribe from goal reminder emails for this course\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
@@ -7490,6 +7498,7 @@ msgid " (out of {total})"
 msgstr "(από {total} συνολικά)"
 
 #: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -7869,13 +7878,6 @@ msgstr ""
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #, python-format
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
-msgstr ""
-
-#: lms/templates/goal_reminder_banner.html
-msgid ""
-"\n"
-"                You’re almost there!\n"
-"            "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
@@ -8860,9 +8862,20 @@ msgstr ""
 msgid "Go to %(platform_name)s Home Page"
 msgstr "Πηγαίνετε στην Αρχική Σελίδα του %(platform_name)s"
 
-#: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Σύνδεση"
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "My Account"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -9631,6 +9644,38 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion provider's id"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Context key for context in which this discussion topic exists."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Usage key for in-context discussion topic. Set to null for course-level "
+"topics."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Title for discussion topic."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Group for divided discussions."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Provider id for discussion provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Discussion context ID in external forum provider. e.g. commentable_id for "
+"cs_comments_service."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Whether this topic should be shown in-context in the course."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py
@@ -11308,6 +11353,10 @@ msgstr ""
 msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr ""
 
+#: cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr "Σύνδεση"
+
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Η διεύθυνση του ηλεκτρονικού ταχυδρομείου μας είναι"
@@ -12264,16 +12313,6 @@ msgstr "Κωδικός Μαθήματος:"
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
-msgstr ""
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
 msgstr ""
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html

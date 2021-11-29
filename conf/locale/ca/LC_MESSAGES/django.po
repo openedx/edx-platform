@@ -5,12 +5,12 @@
 #
 # Translators:
 # ariadna.lawyer.23 <ari2332@hotmail.com>, 2014
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Cristóbal Urbano <urbano@ub.edu>, 2018
 # Elies Martos Robles <eliesmr4@gmail.com>, 2018
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
 # mcolomer <mcmlilhity@gmail.com>, 2014
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Susanna Pujol, 2021
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
@@ -18,7 +18,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Xavi Armengol <xarmengol@gmail.com>, 2016
@@ -28,7 +28,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Elies Martos Robles <eliesmr4@gmail.com>, 2018
 # Estefania Garcia, 2016
 # Juanjo Bote <juanjo.botev@ub.edu>, 2018
@@ -41,7 +41,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
@@ -49,7 +49,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# claudi <claudix.kernel@gmail.com>, 2014
+# c896ac1a58859742747095a7a9acc41f_ae2eef1 <f3242be5e2827fc993543819c3e74ab4_161414>, 2014
 # mcolomer <mcmlilhity@gmail.com>, 2014
 # Miquel Oliver <miquel.oliver@upf.edu>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
@@ -65,7 +65,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-07 20:43+0000\n"
+"POT-Creation-Date: 2021-11-21 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -4084,6 +4084,14 @@ msgstr ""
 msgid "Cancel"
 msgstr "Cancel·lar"
 
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Enable in-context discussions for the Unit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Add discussion for the Unit."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 #, python-brace-format
 msgid ""
@@ -5481,15 +5489,15 @@ msgstr ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        There's still time to reach your goal\n"
-"                    "
+"                            There’s still time to reach your goal\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
 msgid ""
 "\n"
-"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
 "                            "
 msgid_plural ""
 "\n"
@@ -5501,15 +5509,15 @@ msgstr[1] ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                            Jump back in\n"
-"                        "
+"                                Jump back in\n"
+"                            "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
-"                    "
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
@@ -5522,8 +5530,8 @@ msgstr ""
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
-"                        Unsubscribe from goal reminder emails to this course\n"
-"                    "
+"                            Unsubscribe from goal reminder emails for this course\n"
+"                        "
 msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
@@ -7691,13 +7699,6 @@ msgstr ""
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
 
-#: lms/templates/goal_reminder_banner.html
-msgid ""
-"\n"
-"                You’re almost there!\n"
-"            "
-msgstr ""
-
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -8695,10 +8696,19 @@ msgstr ""
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr "Cursos"
+
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Sign In"
-msgstr "Accedeix"
+msgid "My Account"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -9464,6 +9474,38 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion provider's id"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Context key for context in which this discussion topic exists."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Usage key for in-context discussion topic. Set to null for course-level "
+"topics."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Title for discussion topic."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Group for divided discussions."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Provider id for discussion provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Discussion context ID in external forum provider. e.g. commentable_id for "
+"cs_comments_service."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Whether this topic should be shown in-context in the course."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py
@@ -11068,6 +11110,10 @@ msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr ""
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Sign In"
+msgstr "Accedeix"
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -12073,16 +12119,6 @@ msgstr "Número del curs:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
 msgstr "Curs d'execució:"
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
-msgstr "Cursos"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html

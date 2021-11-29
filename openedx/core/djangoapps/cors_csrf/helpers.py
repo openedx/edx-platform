@@ -27,7 +27,6 @@ def is_cross_domain_request_allowed(request):
     """
     referer = request.META.get('HTTP_REFERER')
     referer_parts = urllib.parse.urlparse(referer) if referer else None
-    referer_hostname = referer_parts.hostname if referer_parts is not None else None
 
     # Use CORS_ALLOW_INSECURE *only* for development and testing environments;
     # it should never be enabled in production.
@@ -48,36 +47,25 @@ def is_cross_domain_request_allowed(request):
             log.debug("Referer '%s' must have the scheme 'https'")
             return False
 
-    scheme_with_host = referer
-    # if url is like `https://www.foo.bar/baz/` following check will return `https://www.foo.bar`
-    if referer and referer_parts.scheme and referer_parts.path:
-        scheme_with_host = referer.replace(referer_parts.path, '')
+    # Reduce the referer URL to just the scheme and authority
+    # components (no path, query, or fragment).
+    if referer_parts:
+        origin_parts = (referer_parts.scheme, referer_parts.netloc, '', '', '', '')
+        referer_origin = urllib.parse.urlunparse(origin_parts)
+    else:
+        referer_origin = None
 
-    domain_is_whitelisted = (
-        getattr(settings, 'CORS_ORIGIN_ALLOW_ALL', False) or
-        scheme_with_host in getattr(settings, 'CORS_ORIGIN_WHITELIST', [])
+    allow_all = getattr(settings, 'CORS_ORIGIN_ALLOW_ALL', False)
+    origin_is_whitelisted = (
+        allow_all or
+        referer_origin in getattr(settings, 'CORS_ORIGIN_WHITELIST', [])
     )
-    if not domain_is_whitelisted:
-        if referer_hostname is None:
-            # If no referer is specified, we can't check if it's a cross-domain
-            # request or not.
-            log.debug("Referrer hostname is `None`, so it is not on the whitelist.")
-        elif referer_hostname != request.get_host():
-            log.info(
-                (
-                    "Domain '%s' is not on the cross domain whitelist.  "
-                    "Add the domain to `CORS_ORIGIN_WHITELIST` or set "
-                    "`CORS_ORIGIN_ALLOW_ALL` to True in the settings."
-                ), referer_hostname
-            )
-            log.info("Request host is '%s' and referer is '%s'", request.get_host(), referer)
-        else:
-            log.debug(
-                (
-                    "Domain '%s' is the same as the hostname in the request, "
-                    "so we are not going to treat it as a cross-domain request."
-                ), referer_hostname
-            )
+    if not origin_is_whitelisted:
+        log.info(
+            f"Origin {referer_origin!r} was not in `CORS_ORIGIN_WHITELIST`; "
+            f"full referer was {referer!r} and requested host was {request.get_host()!r}; "
+            f"CORS_ORIGIN_ALLOW_ALL={allow_all}"
+        )
         return False
 
     return True
