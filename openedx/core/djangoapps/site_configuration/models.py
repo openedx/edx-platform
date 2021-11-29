@@ -55,6 +55,9 @@ class SiteConfiguration(models.Model):
 
     .. no_pii:
     """
+
+    api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
     site_values = JSONField(
@@ -134,7 +137,11 @@ class SiteConfiguration(models.Model):
         """
         if self.enabled:
             try:
-                return self.site_values.get(name, default)
+                if self.api_adapter:
+                    # Tahoe: Use `SiteConfigAdapter` if available.
+                    return self.api_adapter.get_value(name, default)
+                else:
+                    return self.site_values.get(name, default)
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -267,7 +274,13 @@ class SiteConfiguration(models.Model):
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
     def _formatted_sass_variables(self):
-        return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
+        if self.api_adapter:
+            # Tahoe: Use `SiteConfigAdapter` if available.
+            sass_variables = self.api_adapter.get_amc_v1_theme_css_variables()
+        else:
+            sass_variables = self.sass_variables
+
+        return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
 
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
