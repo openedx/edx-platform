@@ -139,6 +139,7 @@ class UploadedFileSerializer(serializers.Serializer):
     downloadUrl = serializers.URLField(source='download_url')
     description = serializers.CharField()
     name = serializers.CharField()
+    size = serializers.IntegerField()
 
 
 class ResponseSerializer(serializers.Serializer):

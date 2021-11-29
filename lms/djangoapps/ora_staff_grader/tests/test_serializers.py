@@ -344,13 +344,14 @@ class TestUploadedFileSerializer(TestCase):
 
     def test_uploaded_file_serializer(self):
         """ Base serialization behavior """
-        input = MagicMock()
+        input = MagicMock(size=89794)
         data = UploadedFileSerializer(input).data
 
         expected_value = {
             'downloadUrl': str(input.download_url),
             'description': str(input.description),
             'name': str(input.name),
+            'size': input.size,
         }
         assert data == expected_value
 
@@ -370,7 +371,7 @@ class TestResponseSerializer(TestCase):
         """ Base serialization behavior """
         input = MagicMock()
         if has_files:
-            input.files = [Mock(), Mock(), Mock()]
+            input.files = [Mock(size=111), Mock(size=222), Mock(size=333)]
         if has_text:
             input.text = [Mock(), Mock(), Mock()]
 

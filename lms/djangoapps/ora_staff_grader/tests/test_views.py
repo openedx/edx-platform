@@ -163,7 +163,8 @@ class TestFetchSubmissionView(BaseViewTest):
                 {
                     'name': 'name_0',
                     'description': 'description_0',
-                    'download_url': 'www.file_url.com/key_0'
+                    'download_url': 'www.file_url.com/key_0',
+                    'size': 123455,
                 }
             ]
         }
