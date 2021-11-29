@@ -79,8 +79,8 @@
         }
     },
     "block-b": {
-        "SUBMISSION_ID-0": {
-            "submissionUUID": "SUBMISSION_ID-0",
+        "TEAM_SUBMISSION_ID-0": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-0",
             "teamName": "TEAMNAME-0",
             "dateSubmitted": 1631215154955,
             "score": null,
@@ -88,8 +88,8 @@
             "gradeStatus": "ungraded",
             "lockStatus": "unlocked"
         },
-        "SUBMISSION_ID-1": {
-            "submissionUUID": "SUBMISSION_ID-1",
+        "TEAM_SUBMISSION_ID-1": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-1",
             "teamName": "TEAMNAME-1",
             "dateSubmitted": 1631301554955,
             "score": {
@@ -113,8 +113,8 @@
             "gradeStatus": "graded",
             "lockStatus": "locked"
         },
-        "SUBMISSION_ID-2": {
-            "submissionUUID": "SUBMISSION_ID-2",
+        "TEAM_SUBMISSION_ID-2": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-2",
             "teamName": "TEAMNAME-2",
             "dateSubmitted": 1631387954955,
             "score": {
@@ -138,8 +138,8 @@
             "gradeStatus": "graded",
             "lockStatus": "unlocked"
         },
-        "SUBMISSION_ID-3": {
-            "submissionUUID": "SUBMISSION_ID-3",
+        "TEAM_SUBMISSION_ID-3": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-3",
             "teamName": "TEAMNAME-3",
             "dateSubmitted": 1631474354955,
             "score": null,
@@ -147,8 +147,8 @@
             "gradeStatus": "ungraded",
             "lockStatus": "in-progress"
         },
-        "SUBMISSION_ID-4": {
-            "submissionUUID": "TEAM-SUBMISSION_ID-4",
+        "TEAM_SUBMISSION_ID-4": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-4",
             "teamName": "TEAMNAME-4",
             "dateSubmitted": 1631474354955,
             "score": null,
