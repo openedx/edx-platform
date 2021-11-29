@@ -4,19 +4,26 @@ Defines URLs for theming views.
 
 
 from django.conf.urls import url
+from django.urls import path
 
-from .helpers import is_comprehensive_theming_enabled
-from .views import ThemingAdministrationFragmentView
+from . import helpers
+from . import views
 
-app_name = 'openedx.core.djangoapps.theming'
+app_name = "openedx.core.djangoapps.theming"
 
-if is_comprehensive_theming_enabled():
-    urlpatterns = [
+urlpatterns = [
+    path(
+        "asset/<path:path>",
+        views.themed_asset,
+        name="openedx.theming.asset",
+    ),
+]
+
+if helpers.is_comprehensive_theming_enabled():
+    urlpatterns += [
         url(
-            r'^admin',
-            ThemingAdministrationFragmentView.as_view(),
-            name='openedx.theming.update_theme_fragment_view',
+            r"^admin",
+            views.ThemingAdministrationFragmentView.as_view(),
+            name="openedx.theming.update_theme_fragment_view",
         ),
     ]
-else:
-    urlpatterns = []
