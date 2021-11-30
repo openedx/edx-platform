@@ -42,6 +42,7 @@ from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
 User = get_user_model()
@@ -338,7 +339,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         ('audit', False, False, False),
         ('verified', False, True, False),
         ('masters', False, True, False),
-        ('verified', True, False, False),
+        ('verified', True, False, True),
+        ('audit', True, False, False),
     )
     @ddt.unpack
     @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
@@ -370,6 +372,31 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         TieredCache.dangerous_clear_all_tiers()
         self.client.get(self.url, {'browser_timezone': 'Asia/Tokyo'})
         assert len(LastSeenCoursewareTimezone.objects.filter()) == 1
+
+    @ddt.data(
+        (1, False),
+        (2, True),
+        (3, True),
+    )
+    @ddt.unpack
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
+    def test_course_staff_masquerade(self, masquerade_group_id, needs_signature):
+        self.user.is_staff = True
+        self.user.save()
+        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
+        masquerade_config = {
+            'role': 'student',
+            'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+            'group_id': masquerade_group_id
+        }
+        self.update_masquerade(**masquerade_config)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        courseware_data = response.json()
+        assert 'is_integrity_signature_enabled' in courseware_data
+        assert courseware_data['is_integrity_signature_enabled'] is True
+        assert 'user_needs_integrity_signature' in courseware_data
+        assert courseware_data['user_needs_integrity_signature'] == needs_signature
 
 
 @ddt.ddt
