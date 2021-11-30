@@ -31,7 +31,7 @@ jobs:
     name: pylint ${{ matrix.module-name }}
     steps:
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Install Required System Packages
       run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
