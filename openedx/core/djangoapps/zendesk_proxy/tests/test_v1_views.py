@@ -17,7 +17,8 @@ from openedx.core.lib.api.test_utils import ApiTestCase
 @ddt.ddt
 @override_settings(
     ZENDESK_URL="https://www.superrealurlsthataredefinitelynotfake.com",
-    ZENDESK_OAUTH_ACCESS_TOKEN="abcdefghijklmnopqrstuvwxyz1234567890"
+    ZENDESK_OAUTH_ACCESS_TOKEN="abcdefghijklmnopqrstuvwxyz1234567890",
+    ZENDESK_CUSTOM_FIELDS={'referrer': '002'}
 )
 class ZendeskProxyTestCase(ApiTestCase):
     """Tests for zendesk_proxy views."""
@@ -40,6 +41,10 @@ class ZendeskProxyTestCase(ApiTestCase):
                 {
                     'id': '001',
                     'value': 'demo-course'
+                },
+                {
+                    'id': '002',
+                    'value': 'https://www.example.com'
                 }
             ],
         }
@@ -74,7 +79,10 @@ class ZendeskProxyTestCase(ApiTestCase):
                     'comment': {
                         'body': "Help! I'm trapped in a unit test factory and I can't get out!", 'uploads': None
                     },
-                    'custom_fields': [{'id': '001', 'value': 'demo-course'}],
+                    'custom_fields': [
+                        {'id': '001', 'value': 'demo-course'},
+                        {'id': '002', 'value': 'https://www.example.com'},
+                    ],
                     'requester': {'email': self.user.email, 'name': self.user.username},
                     'subject': 'Python Unit Test Help Request', 'tags': ['python_unit_test']
                 }
