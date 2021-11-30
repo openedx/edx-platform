@@ -287,7 +287,7 @@ class SubmissionLockView(RetrieveAPIView):
         Returns:
         - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
         """
-        body = {"submission_id": submission_uuid}
+        body = {"submission_uuid": submission_uuid}
 
         # Return the raw response to preserve HTTP status codes for failure states
         return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
@@ -299,7 +299,7 @@ class SubmissionLockView(RetrieveAPIView):
         Returns:
         - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
         """
-        body = {"submission_id": submission_uuid}
+        body = {"submission_uuid": submission_uuid}
 
         # Return raw response to preserve HTTP status codes for failure states
         return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
