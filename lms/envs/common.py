@@ -2950,6 +2950,9 @@ INSTALLED_APPS = [
     # Course home api
     'lms.djangoapps.course_home_api',
 
+    # User tours
+    'lms.djangoapps.user_tours',
+
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
 

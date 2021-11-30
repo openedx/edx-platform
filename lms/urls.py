@@ -994,6 +994,11 @@ urlpatterns += [
     path('api/course_home/v1/', include(('lms.djangoapps.course_home_api.urls', 'course-home-v1'))),
 ]
 
+# User Tour API urls
+urlpatterns += [
+    path('api/user_tours/', include('lms.djangoapps.user_tours.urls')),
+]
+
 # Course Experience API urls
 urlpatterns += [
     path('api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
