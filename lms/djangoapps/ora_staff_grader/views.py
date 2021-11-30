@@ -2,7 +2,7 @@
 Views for Enhanced Staff Grader
 """
 import json
-from django.http.response import HttpResponseBadRequest
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -13,9 +13,9 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_MISSING_BODY
 from lms.djangoapps.ora_staff_grader.serializers import (
-    InitializeSerializer, LockStatusSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
+    InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
@@ -72,7 +72,8 @@ class InitializeView(RetrieveAPIView):
         """
         Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
         """
-        return call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
+        response = call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
+        return json.loads(response.content)
 
     def get_rubric_config(self, request, usage_id):
         """
@@ -81,7 +82,8 @@ class InitializeView(RetrieveAPIView):
         data = {
             'target_rubric_block_id': usage_id
         }
-        return call_xblock_json_handler(request, usage_id, 'get_rubric', data)
+        response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
+        return json.loads(response.content)
 
 
 class SubmissionFetchView(RetrieveAPIView):
@@ -137,28 +139,25 @@ class SubmissionFetchView(RetrieveAPIView):
         """
         Get submission content from ORA 'get_submission_info' XBlock.json_handler
         """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        return call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+        return json.loads(response.content)
 
     def get_assessment_info(self, request, usage_id, submission_uuid):
         """
         Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
         """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        return call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        return json.loads(response.content)
 
     def check_submission_lock(self, request, usage_id, submission_uuid):
         """
         Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
         """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        return call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        return json.loads(response.content)
 
 
 class SubmissionStatusFetchView(RetrieveAPIView):
@@ -206,19 +205,17 @@ class SubmissionStatusFetchView(RetrieveAPIView):
         """
         Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
         """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        return call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        return json.loads(response.content)
 
     def check_submission_lock(self, request, usage_id, submission_uuid):
         """
         Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
         """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        return call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        return json.loads(response.content)
 
 
 class SubmissionLockView(RetrieveAPIView):
@@ -290,12 +287,10 @@ class SubmissionLockView(RetrieveAPIView):
         Returns:
         - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
         """
-        body = {
-            "submission_id": submission_uuid
-        }
+        body = {"submission_id": submission_uuid}
 
-        # running with decode=False to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body, decode=False)
+        # Return the raw response to preserve HTTP status codes for failure states
+        return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
 
     def delete_submission_lock(self, request, usage_id, submission_uuid):
         """
@@ -304,9 +299,7 @@ class SubmissionLockView(RetrieveAPIView):
         Returns:
         - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
         """
-        body = {
-            "submission_id": submission_uuid
-        }
+        body = {"submission_id": submission_uuid}
 
-        # running with decode=False to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body, decode=False)
+        # Return raw response to preserve HTTP status codes for failure states
+        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
