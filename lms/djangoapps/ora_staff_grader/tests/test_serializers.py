@@ -535,10 +535,6 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
 class TestStaffAssessSerializer(TestCase):
     """ Tests for StaffAssessSerializer """
     grade_data = {
-        "score": {
-            "pointsEarned": 90,
-            "pointsPossible": 100
-        },
         # TODO - determine if this is empty or if key is nonexistant for no feedback
         "overallFeedback": "was pretty good",
         "criteria": [
@@ -549,7 +545,6 @@ class TestStaffAssessSerializer(TestCase):
             },
             {
                 "name": "secondCriterion",
-                # TODO - determine if this is empty or if key is nonexistant for no feedback
                 "selectedOption": "fair"
             }
         ]
