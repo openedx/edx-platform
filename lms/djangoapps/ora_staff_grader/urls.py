@@ -6,7 +6,7 @@ from django.urls.conf import path
 
 
 from lms.djangoapps.ora_staff_grader.views import (
-    InitializeView, SubmissionFetchView, SubmissionLockView, SubmissionStatusFetchView,
+    InitializeView, SubmissionFetchView, SubmissionLockView, SubmissionStatusFetchView, UpdateGradeView
 )
 
 
@@ -23,6 +23,9 @@ urlpatterns += [
     ),
     url(
         r'^submission/lock', SubmissionLockView.as_view(), name='lock'
+    ),
+    url(
+        r'^submission/grade', UpdateGradeView.as_view(), name='update-grade'
     ),
     url(
         r'^submission?$', SubmissionFetchView.as_view(), name='fetch-submission'

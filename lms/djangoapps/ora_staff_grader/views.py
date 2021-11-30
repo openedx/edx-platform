@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_MISSING_BODY
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
@@ -214,6 +214,123 @@ class SubmissionStatusFetchView(RetrieveAPIView):
         Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
         """
         data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        return json.loads(response.content)
+
+
+class UpdateGradeView(RetrieveAPIView):
+    """
+    POST submit a grade for a submission
+
+    Body: {
+        overallFeedback: (string) overall feedback
+        criteria: [
+            {
+                name: (string) name of criterion
+                feedback: (string, optional) feedback for criterion
+                selectedOption: (string) name of selected option or None if feedback-only criterion
+            },
+            ... (one per criteria)
+        ]
+    }
+
+    Response: {
+        gradeStatus: (string) - One of ['graded', 'ungraded']
+        lockStatus: (string) - One of ['unlocked', 'locked', 'in-progress']
+        gradeData: {
+            score: (dict or None) {
+                pointsEarned: (int) earned points
+                pointsPossible: (int) possible points
+            }
+            overallFeedback: (string) overall feedback
+            criteria: (list of dict) [{
+                name: (str) name of criterion
+                feedback: (str) feedback for criterion
+                selectedOption: (str) name of selected option or None if feedback-only criterion
+            }]
+        }
+    }
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    @require_params(['oraLocation', 'submissionUUID'])
+    def post(self, request, ora_location, submission_uuid, *args, **kwargs):
+        # Transform data from frontend format to staff assess format
+        context = {'submission_uuid': submission_uuid}
+        grade_data = StaffAssessSerializer(request.data, context=context).data
+
+        # Perform the staff assessment
+        response = self.submit_grade(request, ora_location, grade_data)
+
+        # Failed response returns 'success': False with an error message
+        if not response['success']:
+            return HttpResponseServerError(response['msg'])
+
+        # TODO - Confirm we want to do unlocking here
+        # Remove the lock on the graded submission
+        self.delete_submission_lock(request, ora_location, submission_uuid)
+
+        # Return submission status info to frontend
+        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+
+        serializer = SubmissionStatusFetchSerializer({
+            'assessment_info': assessment_info,
+            'lock_info': lock_info,
+        })
+
+        return Response(serializer.data)
+
+    def submit_grade(self, request, usage_id, grade_data):
+        """
+        Submit a grade for an assessment.
+
+        Returns: {'success': True/False, 'msg': err_msg}
+        """
+        response = call_xblock_json_handler(request, usage_id, 'staff_assess', grade_data)
+        return json.loads(response.content)
+
+    def delete_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Attempt to claim a submission lock for grading.
+
+        Returns:
+        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
+        """
+        body = {"submission_uuid": submission_uuid}
+
+        # Return raw response to preserve HTTP status codes for failure states
+        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
+
+    def get_submission_info(self, request, usage_id, submission_uuid):
+        """
+        Get submission content from ORA 'get_submission_info' XBlock.json_handler
+        """
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+        return json.loads(response.content)
+
+
+    def get_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
+        """
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        return json.loads(response.content)
+
+    def check_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
+        """
+        data = {
+            'submission_uuid': submission_uuid
+        }
         response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
         return json.loads(response.content)
 
