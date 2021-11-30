@@ -16,15 +16,15 @@ urlpatterns += [
         r'^initialize', InitializeView.as_view(), name='initialize'
     ),
     url(
-        r'^submission/status', FetchSubmissionStatusView.as_view(), name='fetch-submission-status'
+        r'^submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'
     ),
     url(
-        r'^submission/lock', LockView.as_view(), name='lock-submission'
+        r'^submission/lock', SubmissionLockView.as_view(), name='lock-submission'
     ),
     url(
         r'^submission/grade', UpdateGradeView.as_view(), name='update-grade'
     ),
     url(
-        r'^submission?$', FetchSubmissionView.as_view(), name='fetch-submission'
+        r'^submission?$', SubmissionFetchView.as_view(), name='fetch-submission'
     ),
 ]
