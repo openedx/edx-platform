@@ -9,6 +9,7 @@ cannot be generated, a message is logged and no further action is taken.
 import logging
 
 from common.djangoapps.course_modes import api as modes_api
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -164,14 +165,20 @@ def _can_generate_certificate_common(user, course_key, enrollment_mode):
         log.info(f'{user.id} : {course_key} does not have an enrollment. Certificate cannot be generated.')
         return False
 
-    if not modes_api.is_eligible_for_certificate(enrollment_mode):
+    is_eligible_for_cert = modes_api.is_eligible_for_certificate(enrollment_mode)
+    if not is_eligible_for_cert:
         log.info(f'{user.id} : {course_key} has an enrollment mode of {enrollment_mode}, which is not eligible for a '
                  f'certificate. Certificate cannot be generated.')
         return False
 
     if _required_verification_missing(course_key, user):
-        log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
-        return False
+        # Honor courses can be eligible for certificates and don't require a valid approved IDV
+        if is_eligible_for_cert and enrollment_mode in CourseMode.NON_VERIFIED_MODES:
+            log.info(f'{user.id} : {course_key} is eligible for a certificate without requiring a verified id. '
+                     'Skipping result of the ID verification check.')
+        else:
+            log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
+            return False
 
     if not _can_generate_certificate_for_status(user, course_key, enrollment_mode):
         return False
