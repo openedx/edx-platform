@@ -817,7 +817,7 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
-    # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
+    # .. toggle_name: FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
