@@ -14,6 +14,7 @@ from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_MISSING_PARAM
+from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -55,7 +56,7 @@ class TestInitializeView(BaseViewTest):
     view_name = 'ora-staff-grader:initialize'
 
     def test_missing_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+        """ Missing ORA location param should return 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url)
 
@@ -65,7 +66,7 @@ class TestInitializeView(BaseViewTest):
     def test_bad_ora_location(self):
         """ Bad ORA location should return a 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
-        response = self.client.get(self.api_url, {'ora_location': 'not_a_real_location'})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: 'not_a_real_location'})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_BAD_ORA_LOCATION
@@ -99,7 +100,7 @@ class TestInitializeView(BaseViewTest):
         mock_get_rubric_config.return_value = {"foo": "bar"}
 
         self.client.login(username=self.staff.username, password=self.password)
-        response = self.client.get(self.api_url, {'ora_location': self.ora_usage_key})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions', 'rubricConfig'])
         assert response.status_code == 200
@@ -122,25 +123,25 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+        """ Blank ORA location should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': ''})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_missing_submission_uuid(self):
-        """ Missing submission_uuid param should return 400 and error message """
+        """ Missing submission UUID should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': Mock()})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_submission_uuid(self):
-        """ Blank submission_uuid param should return 400 and error message """
+        """ Blank submission UUID should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'ora_location': Mock(), 'submission_uuid': ''})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
@@ -190,7 +191,7 @@ class TestFetchSubmissionView(BaseViewTest):
 
         self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
-        response = self.client.get(self.api_url, {'ora_location': ora_location, 'submission_uuid': submission_uuid})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
         assert response.status_code == 200
         assert response.data.keys() == set(['gradeData', 'response', 'gradeStatus', 'lockStatus'])
@@ -207,7 +208,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     view_name = 'ora-staff-grader:fetch-submission-status'
 
     def test_missing_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+        """ Missing ORA location should return 400 and error message """
         self.log_in()
         response = self.client.get(self.api_url)
 
@@ -215,25 +216,25 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+        """ Empty ORA location should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'oraLocation': ''})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_missing_submission_uuid(self):
-        """ Missing submission_uuid param should return 400 and error message """
+        """ Missing submission UUID should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'oraLocation': Mock()})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
 
     def test_blank_submission_uuid(self):
-        """ Blank submission_uuid param should return 400 and error message """
+        """ Blank submission UUID should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url, {'oraLocation': Mock(), 'submissionUuid': ''})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
 
         assert response.status_code == 400
         assert response.content.decode() == ERR_MISSING_PARAM
@@ -269,7 +270,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
 
         self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
-        response = self.client.get(self.api_url, {'oraLocation': ora_location, 'submissionUuid': submission_uuid})
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
         assert response.status_code == 200
         actual = response.json()
@@ -314,10 +315,10 @@ class TestSubmissionLockView(APITestCase):
     def setUp(self):
         super().setUp()
 
-        # Lock requests must include ora_location and submissionID
+        # Lock requests must include ORA location and submission UUID
         self.test_lock_params = {
-            "ora_location": self.test_ora_location,
-            "submissionId": self.test_submission_uuid
+            PARAM_ORA_LOCATION: self.test_ora_location,
+            PARAM_SUBMISSION_ID: self.test_submission_uuid
         }
 
         self.client.login(username=self.staff.username, password=self.password)
@@ -344,7 +345,7 @@ class TestSubmissionLockView(APITestCase):
 
     def test_claim_lock_invalid_ora(self):
         """ An invalid ORA returns a 400 """
-        self.test_lock_params['ora_location'] = 'not_a_real_location'
+        self.test_lock_params[PARAM_ORA_LOCATION] = 'not_a_real_location'
 
         response = self.claim_lock(self.test_lock_params)
 

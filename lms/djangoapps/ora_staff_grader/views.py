@@ -21,6 +21,9 @@ from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, requ
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+PARAM_ORA_LOCATION = 'oraLocation'
+PARAM_SUBMISSION_ID = 'submissionUUID'
+
 
 class InitializeView(RetrieveAPIView):
     """
@@ -35,7 +38,7 @@ class InitializeView(RetrieveAPIView):
 
     Returns:
     - 200 on success
-    - 400 for invalid/missing ora_location
+    - 400 for invalid/missing ORA location
     - 403 for invalid access/credentials
     """
     authentication_classes = (
@@ -45,7 +48,7 @@ class InitializeView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation'])
+    @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
         response_data = {}
 
@@ -121,7 +124,7 @@ class SubmissionFetchView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation', 'submissionUUID'])
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_info = self.get_submission_info(request, ora_location, submission_uuid)
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
@@ -189,7 +192,7 @@ class SubmissionStatusFetchView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation', 'submissionUUID'])
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
@@ -258,7 +261,7 @@ class UpdateGradeView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation', 'submissionUUID'])
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         # Transform data from frontend format to staff assess format
         context = {'submission_uuid': submission_uuid}
@@ -359,7 +362,7 @@ class SubmissionLockView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation', 'submissionUUID'])
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Claim a submission lock """
         # Validate ORA location
@@ -378,7 +381,7 @@ class SubmissionLockView(RetrieveAPIView):
         response_data = json.loads(response.content)
         return Response(LockStatusSerializer(response_data).data)
 
-    @require_params(['oraLocation', 'submissionUUID'])
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def delete(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Clear a submission lock """
         # Validate ORA location
