@@ -16,6 +16,7 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     ResponseSerializer,
     ScoreField,
     ScoreSerializer,
+    StaffAssessSerializer,
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
     SubmissionMetadataSerializer,
@@ -529,3 +530,49 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
 
         data = LockStatusSerializer(self.lock_owned_by_other_user).data
         assert data == self.lock_owned_by_other_user_expected
+
+
+class TestStaffAssessSerializer(TestCase):
+    """ Tests for StaffAssessSerializer """
+    grade_data = {
+        "score": {
+            "pointsEarned": 90,
+            "pointsPossible": 100
+        },
+        # TODO - determine if this is empty or if key is nonexistant for no feedback
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {
+                "name": "firstCriterion",
+                "feedback": "did alright",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                # TODO - determine if this is empty or if key is nonexistant for no feedback
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    submission_uuid = "foo"
+
+    def test_staff_assess_serializer(self):
+        """ Base serialization behavior """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {
+                "firstCriterion": "did alright",
+            },
+            "overall_feedback": "was pretty good",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value
