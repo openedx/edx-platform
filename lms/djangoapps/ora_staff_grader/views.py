@@ -45,7 +45,7 @@ class InitializeView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['ora_location'])
+    @require_params(['oraLocation'])
     def get(self, request, ora_location, *args, **kwargs):
         response_data = {}
 
@@ -121,7 +121,7 @@ class SubmissionFetchView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['ora_location', 'submission_uuid'])
+    @require_params(['oraLocation', 'submissionUUID'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_info = self.get_submission_info(request, ora_location, submission_uuid)
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
@@ -189,7 +189,7 @@ class SubmissionStatusFetchView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['oraLocation', 'submissionUuid'])
+    @require_params(['oraLocation', 'submissionUUID'])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
@@ -242,7 +242,7 @@ class SubmissionLockView(RetrieveAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    @require_params(['ora_location', 'submissionId'])
+    @require_params(['oraLocation', 'submissionUUID'])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Claim a submission lock """
         # Validate ORA location
@@ -261,7 +261,7 @@ class SubmissionLockView(RetrieveAPIView):
         response_data = json.loads(response.content)
         return Response(LockStatusSerializer(response_data).data)
 
-    @require_params(['ora_location', 'submissionId'])
+    @require_params(['oraLocation', 'submissionUUID'])
     def delete(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Clear a submission lock """
         # Validate ORA location
