@@ -21,7 +21,7 @@ from six.moves import map
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
-from openedx.features.edly.utils import get_edly_sub_org_from_cookie
+from openedx.features.edly.utils import get_edx_org_from_cookie
 
 import track.views
 from edxmako.shortcuts import render_to_response
@@ -75,8 +75,9 @@ def require_global_staff(func):
     @wraps(func)
     def wrapped(request, *args, **kwargs):
         edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None) if request else None
-        edly_sub_org = get_edly_sub_org_from_cookie(edly_user_info_cookie)
-        if GlobalStaff().has_user(request.user) or GlobalCourseCreatorRole(edly_sub_org).has_user(request.user):
+        edx_orgs = get_edx_org_from_cookie(edly_user_info_cookie)
+        edx_org = edx_orgs[0] if len(edx_orgs) > 0 else None
+        if GlobalStaff().has_user(request.user) or GlobalCourseCreatorRole(edx_org).has_user(request.user):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden(

@@ -8,10 +8,8 @@ to decide whether to check course creator role, and other such functions.
 
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
-
-from organizations.models import Organization
 
 from student.roles import (
     CourseBetaTesterRole,
@@ -81,12 +79,6 @@ def get_user_permissions(user, course_key, org=None):
     """
     if org is None:
         org = course_key.org
-        organization = Organization.objects.get(short_name=org)
-        try:
-            edly_sub_org = organization.edx_organizations.first().slug
-        except ObjectDoesNotExist:
-            edly_sub_org = None
-
         course_key = course_key.for_branch(None)
     else:
         assert course_key is None
@@ -99,7 +91,7 @@ def get_user_permissions(user, course_key, org=None):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
-    if course_key and user_has_role(user, GlobalCourseCreatorRole(edly_sub_org)):
+    if course_key and user_has_role(user, GlobalCourseCreatorRole(org)):
         return all_perms
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
