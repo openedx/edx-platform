@@ -267,11 +267,14 @@ class UpdateGradeView(RetrieveAPIView):
         context = {'submission_uuid': submission_uuid}
         grade_data = StaffAssessSerializer(request.data, context=context).data
 
+        # TODO - Reassert that we have ownership of the submission lock
+
         # Perform the staff assessment
         response = self.submit_grade(request, ora_location, grade_data)
 
         # Failed response returns 'success': False with an error message
         if not response['success']:
+            # TODO - This should be updated to an error object with our error overhaul story
             return HttpResponseServerError(response['msg'])
 
         # Remove the lock on the graded submission

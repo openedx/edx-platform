@@ -520,3 +520,11 @@ class TestUpdateGradeView(BaseViewTest):
 
         # Verify that clear lock was called
         mock_delete_lock.assert_called_once()
+
+    def test_submit_lock_contested(self):
+        """ TODO - Submitting a grade should be blocked if someone else has obtained the lock """
+        pass
+
+    def test_parital_success(self):
+        """ TODO - For success in updating a grade but failure to clear lock or get submission meta... ? """
+        pass
