@@ -493,7 +493,7 @@ edx-celeryutils==1.1.1
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.1.5
+edx-codejail==3.2.0
     # via -r requirements/edx/base.txt
 edx-completion==4.1.0
     # via -r requirements/edx/base.txt
@@ -623,7 +623,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==9.8.3
+faker==9.9.0
     # via factory-boy
 fastapi==0.70.0
     # via pact-python
@@ -1062,7 +1062,7 @@ pytest-metadata==1.8.0
     # via
     #   -r requirements/edx/testing.in
     #   pytest-json-report
-pytest-randomly==3.10.2
+pytest-randomly==3.10.3
     # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.4.0
     # via -r requirements/edx/testing.in
@@ -1339,7 +1339,7 @@ tqdm==4.62.3
     #   nltk
 transifex-client==0.14.3
     # via -r requirements/edx/testing.in
-typing-extensions==4.0.0
+typing-extensions==4.0.1
     # via
     #   -r requirements/edx/base.txt
     #   astroid
