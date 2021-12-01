@@ -72,7 +72,7 @@ from .. import permissions
 from ..toggles import data_download_v2_is_enabled
 from .tools import get_units_with_due_date, title_or_url
 
-# this import has been done here, at the last, to avoid failing a test: TestCourseTabApi  
+# this import has been done here, at the last, to avoid failing a test: TestCourseTabApi
 from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
 log = logging.getLogger(__name__)
