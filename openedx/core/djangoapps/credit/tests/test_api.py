@@ -747,7 +747,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Since the requirement hasn't been published yet, it won't show
         # up in the list of requirements.
         req_status = api.get_credit_requirement_status(self.course_key, username, namespace="grade", name="grade")
-        assert req_status == []
+        assert not req_status
 
         # Now add the requirements, simulating what happens when a course is published.
         requirements = [
