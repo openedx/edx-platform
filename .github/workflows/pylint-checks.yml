@@ -1,4 +1,4 @@
-name: Pylint checks
+name: quality
 
 on:
   pull_request:
@@ -28,9 +28,8 @@ jobs:
             path: "cms"
 
 
-    name: pylint ${{ matrix.module-name }}
+    name: pylint-${{ matrix.module-name }}
     steps:
-
     - uses: actions/checkout@v1
 
     - name: Install Required System Packages

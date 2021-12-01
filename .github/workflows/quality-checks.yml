@@ -1,4 +1,4 @@
-name: Quality checks
+name: quality
 
 on:
   pull_request:
@@ -9,7 +9,6 @@ on:
 
 jobs:
   run_tests:
-    name: Quality Others
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,8 +16,8 @@ jobs:
         python-version: [ 3.8 ]
         node-version: [ 12 ]
 
+    name: others
     steps:
-
     - uses: actions/checkout@v1
       with:
         fetch-depth: 2
