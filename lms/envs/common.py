@@ -1001,6 +1001,9 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
 ENABLE_COPPA_COMPLIANCE = False
 
+# VAN-741 - save for later api put behind a flag to make it only available for edX
+ENABLE_SAVE_FOR_LATER = False
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -3194,6 +3197,9 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
+
+    # For save for later
+    'lms.djangoapps.save_for_later'
 ]
 
 ######################### CSRF #########################################
@@ -4560,6 +4566,10 @@ RESET_PASSWORD_API_RATELIMIT = '30/7d'
 ##### PASSWORD RESET RATE LIMIT SETTINGS #####
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
+
+#### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
+SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX

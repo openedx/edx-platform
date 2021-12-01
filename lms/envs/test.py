@@ -613,3 +613,10 @@ RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
 RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 CORS_ORIGIN_WHITELIST = ['https://sandbox.edx.org']
+
+# enable /api/v1/save/course/ api for testing
+ENABLE_SAVE_FOR_LATER = True
+
+# rate limit for /api/v1/save/course/ api
+SAVE_FOR_LATER_IP_RATE_LIMIT = '5/d'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
