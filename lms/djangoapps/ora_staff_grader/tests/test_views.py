@@ -415,3 +415,108 @@ class TestSubmissionLockView(APITestCase):
         expected_value = mock_return_data
         assert response.status_code == 403
         assert json.loads(response.content) == expected_value
+
+
+class TestUpdateGradeView(BaseViewTest):
+    """
+    Tests for updating a grade for a submission
+    """
+    view_name = 'ora-staff-grader:update-grade'
+
+    submission_uuid = str(uuid4())
+    ora_location = Mock()
+    test_anon_user_id = 'anon-user-id'
+    test_timestamp = '2020-08-29T02:14:00-04:00'
+
+    test_grade_data = {
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {
+                "name": "Ideas",
+                "feedback": "did alright",
+                "selectedOption": "Fair"
+            },
+            {
+                "name": "Content",
+                "selectedOption": "Excellent"
+            }
+        ]
+    }
+
+    def _url_with_params(self, params):
+        """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
+        query_dictionary = QueryDict('', mutable=True)
+        query_dictionary.update(params)
+
+        return '{base_url}?{querystring}'.format(
+            base_url=reverse(self.view_name),
+            querystring=query_dictionary.urlencode()
+        )
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.staff.username, password=self.password)
+
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    def test_submit_grade_failure(self, mock_submit_grade): 
+        """ An ORA failure to submit a grade returns a server error """
+        mock_submit_grade.return_value = {'success': False, 'msg': 'Danger, Will Robinson!'}
+        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        data = self.test_grade_data
+
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 500
+        assert response.content.decode() == mock_submit_grade.return_value['msg']
+
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock): 
+        """ A grade update success should clear the submission lock and return submission meta """
+        mock_submit_grade.return_value = {'success': True, 'msg': ''}
+        mock_assessment = {
+            'feedback': "Base Assessment Feedback",
+            'score': {
+                'pointsEarned': 5,
+                'pointsPossible': 6,
+            },
+            'criteria': [
+                {
+                    'name': "Criterion 1",
+                    'option': "Three",
+                    'points': 3,
+                    'feedback': "Feedback 1"
+                },
+            ]
+        }
+        mock_get_info.return_value = mock_assessment
+        mock_check_lock.return_value = {'lock_status': 'unlocked'}
+
+        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        data = self.test_grade_data
+
+        response = self.client.post(url, data, format='json')
+
+        expected_response = {
+            'gradeStatus': 'graded',
+            'lockStatus': 'unlocked',
+            'gradeData': {
+                'score': mock_assessment['score'],
+                'overallFeedback': mock_assessment['feedback'],
+                'criteria': [
+                    {
+                        'name': "Criterion 1",
+                        'selectedOption': "Three",
+                        'points': 3,
+                        'feedback': "Feedback 1"
+                    },
+                ]
+            }
+        }
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == expected_response
+
+        # Verify that clear lock was called
+        mock_delete_lock.assert_called_once()
