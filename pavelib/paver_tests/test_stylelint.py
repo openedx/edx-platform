@@ -25,12 +25,12 @@ class TestPaverStylelint(PaverTestCase):
         """
         Verify that the quality task fails with Stylelint violations.
         """
-            if should_pass:
-                _mock_stylelint_violations = MagicMock(return_value=0)
-                with patch('pavelib.quality._get_stylelint_violations', _mock_stylelint_violations):
+        if should_pass:
+            _mock_stylelint_violations = MagicMock(return_value=0)
+            with patch('pavelib.quality._get_stylelint_violations', _mock_stylelint_violations):
+                call_task('pavelib.quality.run_stylelint')
+        else:
+            _mock_stylelint_violations = MagicMock(return_value=100)
+            with patch('pavelib.quality._get_stylelint_violations', _mock_stylelint_violations):
+                with pytest.raises(SystemExit):
                     call_task('pavelib.quality.run_stylelint')
-            else:
-                _mock_stylelint_violations = MagicMock(return_value=100)
-                with patch('pavelib.quality._get_stylelint_violations', _mock_stylelint_violations):
-                    with pytest.raises(SystemExit):
-                        call_task('pavelib.quality.run_stylelint')
