@@ -6,7 +6,8 @@
         ],
         "type": "individual",
         "rubricConfig": {
-            "feedbackPrompt": "How would you grade this response?",
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
             "feedback": "optional",
             "criteria": [
                 {
