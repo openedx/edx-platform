@@ -76,7 +76,6 @@ Custom Attributes:
 """
 
 import inspect
-from base64 import b64encode
 from hashlib import sha1, sha256
 from logging import getLogger
 from typing import Union
@@ -640,14 +639,6 @@ def _delete_cookie(request, response):
         domain=settings.SESSION_COOKIE_DOMAIN,
         secure=settings.SESSION_COOKIE_SECURE or None,
         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
-    )
-
-    # Log the cookie, but cap the length and base64 encode to make sure nothing
-    # malicious gets directly dumped into the log.
-    cookie_header = request.META.get('HTTP_COOKIE', '')[:4096]
-    log.warning(
-        "Malformed Cookie Header? First 4K, in Base64: %s",
-        b64encode(str(cookie_header).encode())
     )
 
     # Note, there is no request.user attribute at this point.
