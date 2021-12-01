@@ -57,6 +57,7 @@ from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, g
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text
@@ -70,6 +71,9 @@ from xmodule.tabs import CourseTab
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled
 from .tools import get_units_with_due_date, title_or_url
+
+# this import has been done here, at the last to avoid an error/exception
+from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
 log = logging.getLogger(__name__)
 
@@ -256,12 +260,8 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
 
-    from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
-
-    # lms.djangoapp is passed to get_plugins_view_context instead of ProjectType.LMS
-    # to avoid cyclic import issue
     context_from_plugins = get_plugins_view_context(
-        'lms.djangoapp',
+        ProjectType.LMS,
         INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME,
         context
     )
