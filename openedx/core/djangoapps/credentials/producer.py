@@ -15,7 +15,7 @@ grade_change_schema_string = """
             {"name":"course_run", "type": "string"},
             {"name":"letter_grade", "type": ["string", "null"], "default": "null"},
             {"name":"percent_grade", "type": ["float", "null"], "default": "null"},
-            {"name":"verified", "type": "boolean"},
+            {"name":"verified", "type": "boolean"}
         ]
     }
 """
@@ -50,7 +50,7 @@ GRADE_CHANGE_EVENT_SERIALIZER = AvroSerializer(schema_str=grade_change_schema_st
                                                to_dict = GradeChangeEvent.to_dict)
 
 producer_settings = dict(settings.KAFKA_PRODUCER_CONF_BASE)
-producer_settings.update({'key.serializer': StringSerializer,
+producer_settings.update({'key.serializer': StringSerializer('utf-8'),
                           'value.serializer': GRADE_CHANGE_EVENT_SERIALIZER})
 GRADE_CHANGE_EVENT_PRODUCER = SerializingProducer(producer_settings)
 

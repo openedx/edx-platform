@@ -281,7 +281,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
                 verbose=verbose
             )
         logger.info(msg)
-    GRADE_CHANGE_EVENT_PRODUCER.produce(topic="grade_change", key=str(uuid4()),
+    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
                                         value=GradeChangeEvent(
                                             username=getattr(user, 'username', None),
                                             course_run=str(course_run_key),
