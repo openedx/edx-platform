@@ -274,7 +274,6 @@ class UpdateGradeView(RetrieveAPIView):
         if not response['success']:
             return HttpResponseServerError(response['msg'])
 
-        # TODO - Confirm we want to do unlocking here
         # Remove the lock on the graded submission
         self.delete_submission_lock(request, ora_location, submission_uuid)
 
