@@ -10,6 +10,19 @@ try:
 except ImportError:
     CONFIG_CLIENT_INSTALLED = False
 
+    def is_feature_enabled_for_site(site_uuid):
+        """
+        Dummy helper.
+        """
+        return False
+
+    class SiteConfigAdapter:
+        """
+        Dummy SiteConfigAdapter.
+        """
+        def __init__(self, site_uuid):
+            self.site_uuid = site_uuid
+
 
 def is_enabled_for_current_organization():
     """
@@ -18,8 +31,8 @@ def is_enabled_for_current_organization():
     if not CONFIG_CLIENT_INSTALLED:
         return False
 
-    from .utils import get_current_organization  # Local import to avoid AppRegistryNotReady error
-    organization = get_current_organization()
+    from . import utils as site_utils  # Local import to avoid AppRegistryNotReady error
+    organization = site_utils.get_current_organization()
     return is_feature_enabled_for_site(organization.edx_uuid)
 
 
@@ -27,6 +40,6 @@ def get_current_configuration_adapter():
     if not CONFIG_CLIENT_INSTALLED:
         return None
 
-    from .utils import get_current_organization  # Local import to avoid AppRegistryNotReady error
-    organization = get_current_organization()
+    from . import utils as site_utils  # Local import to avoid AppRegistryNotReady error
+    organization = site_utils.get_current_organization()
     return SiteConfigAdapter(organization.edx_uuid)
