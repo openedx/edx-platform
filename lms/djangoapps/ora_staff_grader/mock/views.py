@@ -32,7 +32,7 @@ class FetchSubmissionView(RetrieveAPIView):
         submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
-        response = fetch_default_response(submission_id)
+        response = fetch_response(submission_id)
 
         return Response({
             'gradeData': submission['gradeData'],
