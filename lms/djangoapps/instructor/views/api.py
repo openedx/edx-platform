@@ -140,6 +140,8 @@ TASK_SUBMISSION_OK = 'created'
 SUCCESS_MESSAGE_TEMPLATE = _("The {report_type} report is being created. "
                              "To view the status of the report, see Pending Tasks below.")
 
+# Please avoid changing value of this constant
+# as this is also being used inside external plugins
 INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME = "instructor"
 
 

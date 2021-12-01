@@ -72,9 +72,6 @@ from .. import permissions
 from ..toggles import data_download_v2_is_enabled
 from .tools import get_units_with_due_date, title_or_url
 
-# this import has been done here, at the last, to avoid failing a test: TestCourseTabApi
-from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
-
 log = logging.getLogger(__name__)
 
 
@@ -259,6 +256,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
+
+    # this import has been done inline to avoid failing a test: TestCourseTabApi
+    from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
     context_from_plugins = get_plugins_view_context(
         ProjectType.LMS,
