@@ -40,6 +40,10 @@ class ZendeskProxyTestCase(ApiTestCase):
                 {
                     'id': '001',
                     'value': 'demo-course'
+                },
+                {
+                    'id': '002',
+                    'value': 'https://www.example.com'
                 }
             ],
         }
@@ -74,7 +78,10 @@ class ZendeskProxyTestCase(ApiTestCase):
                     'comment': {
                         'body': "Help! I'm trapped in a unit test factory and I can't get out!", 'uploads': None
                     },
-                    'custom_fields': [{'id': '001', 'value': 'demo-course'}],
+                    'custom_fields': [
+                        {'id': '001', 'value': 'demo-course'},
+                        {'id': '002', 'value': 'https://www.example.com'},
+                    ],
                     'requester': {'email': self.user.email, 'name': self.user.username},
                     'subject': 'Python Unit Test Help Request', 'tags': ['python_unit_test']
                 }
