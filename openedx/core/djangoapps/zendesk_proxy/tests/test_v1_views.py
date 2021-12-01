@@ -17,8 +17,7 @@ from openedx.core.lib.api.test_utils import ApiTestCase
 @ddt.ddt
 @override_settings(
     ZENDESK_URL="https://www.superrealurlsthataredefinitelynotfake.com",
-    ZENDESK_OAUTH_ACCESS_TOKEN="abcdefghijklmnopqrstuvwxyz1234567890",
-    ZENDESK_CUSTOM_FIELDS={'referrer': '002'}
+    ZENDESK_OAUTH_ACCESS_TOKEN="abcdefghijklmnopqrstuvwxyz1234567890"
 )
 class ZendeskProxyTestCase(ApiTestCase):
     """Tests for zendesk_proxy views."""
