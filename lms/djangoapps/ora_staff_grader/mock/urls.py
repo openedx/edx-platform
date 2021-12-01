@@ -3,28 +3,30 @@ URLs for Enhanced Staff Grader (ESG) backend-for-frontend (BFF)
 
 NOTE - This should be the same as ../urls.py
 """
+from django.urls import path
 
-from django.conf.urls import url
-
-from lms.djangoapps.ora_staff_grader.mock.views import *
+from lms.djangoapps.ora_staff_grader.mock.views import (
+    InitializeView, SubmissionStatusFetchView, SubmissionLockView, UpdateGradeView, SubmissionFetchView
+)
 
 
 urlpatterns = []
+app_name = "mock-ora-staff-grader"
 
 urlpatterns += [
-    url(
-        r'^initialize', InitializeView.as_view(), name='initialize'
+    path(
+        'initialize', InitializeView.as_view(), name='initialize'
     ),
-    url(
-        r'^submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'
+    path(
+        'submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'
     ),
-    url(
-        r'^submission/lock', SubmissionLockView.as_view(), name='lock-submission'
+    path(
+        'submission/lock', SubmissionLockView.as_view(), name='lock-submission'
     ),
-    url(
-        r'^submission/grade', UpdateGradeView.as_view(), name='update-grade'
+    path(
+        'submission/grade', UpdateGradeView.as_view(), name='update-grade'
     ),
-    url(
-        r'^submission?$', SubmissionFetchView.as_view(), name='fetch-submission'
+    path(
+        'submission', SubmissionFetchView.as_view(), name='fetch-submission'
     ),
 ]
