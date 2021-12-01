@@ -438,6 +438,15 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 
+#################### Kafka Related Settings ##############################
+KAFKA_PRODUCER_CONF_BASE = {'bootstrap.servers': "edx.devstack.kafka:29092",
+                 'client.id': 'edx.devstack.lms' }
+
+KAFKA_CONSUMER_CONF_BASE = {'bootstrap.servers': "edx.devstack.kafka:29092",
+                       'group.id': 'lms'}
+
+SCHEMA_REGISTRY_URL = "http://edx.devstack.schema-registry:8081"
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.

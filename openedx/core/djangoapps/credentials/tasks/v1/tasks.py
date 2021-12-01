@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from edx_django_utils.monitoring import set_code_owner_attribute
 from MySQLdb import OperationalError
 from opaque_keys.edx.keys import CourseKey
+from uuid import uuid4
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
@@ -25,6 +26,7 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.producer import GRADE_CHANGE_EVENT_PRODUCER, GradeChangeEvent
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -279,6 +281,15 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
                 verbose=verbose
             )
         logger.info(msg)
+    GRADE_CHANGE_EVENT_PRODUCER.produce(topic="grade_change", key=str(uuid4()),
+                                        value=GradeChangeEvent(
+                                            username=getattr(user, 'username', None),
+                                            course_run=str(course_run_key),
+                                            letter_grade=letter_grade,
+                                            percent_grade=percent_grade,
+                                            verified=True
+                                            ))
+    GRADE_CHANGE_EVENT_PRODUCER.poll()
     # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         if verbose:
