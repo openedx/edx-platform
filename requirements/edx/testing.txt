@@ -881,7 +881,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.6.0
     # via -r requirements/edx/base.txt
-ora2==3.7.4
+ora2==3.7.5
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
