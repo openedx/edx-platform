@@ -201,10 +201,6 @@ class StaffAssessSerializer(serializers.Serializer):
     Converts grade data to the format used for doing staff assessments
 
     From: {
-        "score": {
-            "pointsEarned": 90,
-            "pointsPossible": 100
-        },
         "overallFeedback": "was pretty good",
         "criteria": [
             {
