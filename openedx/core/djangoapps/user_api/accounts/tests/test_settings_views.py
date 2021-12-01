@@ -197,7 +197,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         with mock_get_orders(exception=exceptions.HttpNotFoundError):
             order_detail = get_user_orders(self.user)
 
-        assert not order_detail 
+        assert not order_detail
 
     def test_incomplete_order_detail(self):
         response = {

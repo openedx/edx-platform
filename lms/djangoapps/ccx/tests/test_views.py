@@ -687,7 +687,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course_key)
         student = enrollment.user
         outbox = self.get_outbox()
-        assert not outbox 
+        assert not outbox
 
         url = reverse(
             view_name,
@@ -729,7 +729,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
         course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         outbox = self.get_outbox()
-        assert not outbox 
+        assert not outbox
 
         url = reverse(
             view_name,
@@ -777,7 +777,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_key = CCXLocator.from_course_locator(course.id, ccx.id)
         outbox = self.get_outbox()
         CourseEnrollmentAllowed(course_id=course_key, email=identifier)
-        assert not outbox 
+        assert not outbox
 
         url = reverse(
             view_name,
