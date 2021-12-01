@@ -1,16 +1,13 @@
-name: Javascript tests
+name: js-tests
 
 on:
   pull_request:
-    branches:
-      - master
   push:
     branches:
       - master
 
 jobs:
   run_tests:
-    name: JS
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -18,8 +15,8 @@ jobs:
         node-version: [ 12 ]
         python-version: [ 3.8 ]
 
+    name: ${{ matrix.os }},node-${{ matrix.node-version }}
     steps:
-
     - uses: actions/checkout@v2
     - name: Fetch master to compare coverage
       run: git fetch --depth=1 origin master
@@ -70,7 +67,7 @@ jobs:
         SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
       run: |
         npm install -g jest
-        xvfb-run --auto-servernum ./scripts/all-tests.sh
+        xvfb-run --auto-servernum paver test_js --coverage; paver diff_coverage;
 
     - name: Save Job Artifacts
       uses: actions/upload-artifact@v2
