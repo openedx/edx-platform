@@ -178,7 +178,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if ( 
+    if (
         is_bulk_email_feature_enabled(course_key) and not
         is_bulk_email_disabled_for_course(course_key) and
         (access['staff'] or access['instructor'])
