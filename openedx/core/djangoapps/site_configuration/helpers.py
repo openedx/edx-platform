@@ -27,12 +27,10 @@ def get_current_site_configuration():
         configuration = getattr(site, "configuration", None)
 
         if configuration:
-            # Tahoe: Import is placed here to avoid model import at project startup
-            from openedx.core.djangoapps.appsembler.sites import (
-                site_config_client_helpers as site_helpers,
-            )
-            if site_helpers.is_enabled_for_current_organization():
-                configuration.api_adapter = site_helpers.get_current_configuration_adapter()
+            # Tahoe: This might be the worst place to put the initialization logic, but it works for Open edX
+            #        so we're keeping it here to reduce performance impact of `is_enabled_for_current_organization()`
+            # TODO: Consider moving this init into SiteConfiguration.__init__() method
+            configuration.init_api_client_adapter()
 
         return configuration
     except SiteConfiguration.DoesNotExist:

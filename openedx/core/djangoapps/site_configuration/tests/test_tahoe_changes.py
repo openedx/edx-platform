@@ -95,7 +95,6 @@ class SiteConfigurationTests(TestCase):
         )
 
 
-
 @override_settings(
     ENABLE_COMPREHENSIVE_THEMING=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
