@@ -488,7 +488,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         config_course_cohorts(course, is_cohorted=True)
-        assert not cohorts.get_course_cohorts(course)
+        assert [] == cohorts.get_course_cohorts(course)
 
     def test_get_course_cohorts(self):
         """
