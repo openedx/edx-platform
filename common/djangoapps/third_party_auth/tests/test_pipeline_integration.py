@@ -82,7 +82,7 @@ class GetProviderUserStatesTestCase(TestCase):
 
     def test_returns_empty_list_if_no_enabled_providers(self):
         assert not provider.Registry.enabled()
-        assert not pipeline.get_provider_user_states(self.user)
+        assert [] == pipeline.get_provider_user_states(self.user)
 
     def test_state_not_returned_for_disabled_provider(self):
         disabled_provider = self.configure_google_provider(enabled=False)
@@ -130,7 +130,7 @@ class GetProviderUserStatesTestCase(TestCase):
 
         states = pipeline.get_provider_user_states(self.user)
 
-        assert not list(social_models.DjangoStorage.user.objects.all())
+        assert [] == list(social_models.DjangoStorage.user.objects.all())
         assert 2 == len(states)
 
         google_state = [state for state in states if state.provider.provider_id == google_provider.provider_id][0]

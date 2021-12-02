@@ -409,7 +409,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         # Block does not exist
         usage_key = UsageKey.from_string('i4x://edX/apis/html/interactive')
         usage_key.replace(course_key=self.course.id)
-        assert not Bookmark.get_path(usage_key)
+        assert Bookmark.get_path(usage_key) == []
 
         # Block is an orphan
         self.other_sequential_1.children = []

@@ -70,8 +70,8 @@ class TestAnalyticsFormatDictlist(TestCase):
 
     def test_format_dictlist_empty(self):
         header, datarows = format_dictlist([], [])
-        assert not header
-        assert not datarows
+        assert header == []
+        assert datarows == []
 
     def test_create_csv_response(self):
         header = ['Name', 'Email']

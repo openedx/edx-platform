@@ -126,7 +126,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         assert self.course_key_1 in self.received_1
         assert self.course_key_2 in self.received_1
         assert self.course_key_3 in self.received_1
-        assert not self.received_2
+        assert self.received_2 == []
 
     def test_course_overviews(self):
         """Integration test with CourseOverviews."""
@@ -140,8 +140,8 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
             )
         )
         assert CourseOverview.objects.all().count() == 3
-        assert not self.received_1
-        assert not self.received_2
+        assert self.received_1 == []
+        assert self.received_2 == []
 
     def sample_receiver_1(self, sender, course_key, **kwargs):  # pylint: disable=unused-argument
         """Custom receiver for testing."""
