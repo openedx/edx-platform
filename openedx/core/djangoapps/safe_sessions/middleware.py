@@ -306,8 +306,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         # does not appear to cause user mismatches. (There was a theory
         # that multiple cookies might sometimes be sent in a varying
         # order.) We may still want to have the ability to monitor this
-        # oddity, but as far as I can tell, it is not essential to the
-        # core safe-sessions monitoring. -- timmc
+        # oddity, but as far as we can tell, it is not essential to the
+        # core safe-sessions monitoring.
         try:
             set_custom_attribute(
                 'safe_sessions.session_cookie_count',
