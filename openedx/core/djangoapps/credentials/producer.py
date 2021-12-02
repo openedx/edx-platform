@@ -2,6 +2,7 @@ from confluent_kafka.schema_registry.avro import AvroSerializer, AvroDeserialize
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka import SerializingProducer
 from confluent_kafka.serialization import StringSerializer
+from uuid import uuid4
 from django.conf import settings
 
 
@@ -25,7 +26,7 @@ class GradeChangeEvent:
         self.course_run = kwargs['course_run']
         self.username = kwargs['username']
         self.letter_grade = kwargs['letter_grade']
-        self.percent_grade = kwargs['letter_grade']
+        self.percent_grade = kwargs['percent_grade']
         self.verified = kwargs['verified']
 
     @staticmethod
@@ -53,4 +54,15 @@ producer_settings = dict(settings.KAFKA_PRODUCER_CONF_BASE)
 producer_settings.update({'key.serializer': StringSerializer('utf-8'),
                           'value.serializer': GRADE_CHANGE_EVENT_SERIALIZER})
 GRADE_CHANGE_EVENT_PRODUCER = SerializingProducer(producer_settings)
+
+def produce_grade_change_event(user, course_run_key, letter_grade, percent_grade, verified):
+    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
+                                        value=GradeChangeEvent(
+                                            username=getattr(user, 'username', None),
+                                            course_run=str(course_run_key),
+                                            letter_grade=letter_grade,
+                                            percent_grade=percent_grade,
+                                            verified=verified
+                                        ))
+    GRADE_CHANGE_EVENT_PRODUCER.poll()
 

@@ -281,15 +281,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
                 verbose=verbose
             )
         logger.info(msg)
-    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
-                                        value=GradeChangeEvent(
-                                            username=getattr(user, 'username', None),
-                                            course_run=str(course_run_key),
-                                            letter_grade=letter_grade,
-                                            percent_grade=percent_grade,
-                                            verified=True
-                                            ))
-    GRADE_CHANGE_EVENT_PRODUCER.poll()
+
     # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         if verbose:
@@ -360,6 +352,15 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
 
+    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
+                                        value=GradeChangeEvent(
+                                            username=getattr(user, 'username', None),
+                                            course_run=str(course_run_key),
+                                            letter_grade=letter_grade,
+                                            percent_grade=percent_grade,
+                                            verified=True
+                                            ))
+    GRADE_CHANGE_EVENT_PRODUCER.poll()
     send_grade_to_credentials.delay(user.username, str(course_run_key), True, letter_grade, percent_grade)
 
 
