@@ -7,9 +7,6 @@ from django.conf import settings
 from openedx.core.lib.cache_utils import request_cached
 
 
-from openedx.core.djangoapps.appsembler.sites import site_config_client_helpers
-
-
 @request_cached("site_config")
 def get_current_site_configuration():
     """
@@ -29,8 +26,10 @@ def get_current_site_configuration():
     try:
         configuration = getattr(site, "configuration", None)
 
-        if site_config_client_helpers.is_enabled_for_current_organization():
-            configuration.api_adapter = site_config_client_helpers.get_current_configuration_adapter()
+        # # Tahoe: Import is placed here to avoid model import at project startup
+        # from openedx.core.djangoapps.appsembler.sites import site_config_client_helpers
+        # if site_config_client_helpers.is_enabled_for_current_organization():
+        #     configuration.api_adapter = site_config_client_helpers.get_current_configuration_adapter()
 
         return configuration
     except SiteConfiguration.DoesNotExist:
