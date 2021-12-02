@@ -1931,7 +1931,6 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             student_data=Mock(spec=FieldData, name='student_data'),
             course_id=course_id,
             track_function=Mock(name='track_function'),  # Track Function
-            xqueue_callback_url_prefix=Mock(name='xqueue_callback_url_prefix'),  # XQueue Callback Url Prefix
             request_token='request_token',
             course=self.course,
         )
@@ -2291,7 +2290,6 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
         self.user = UserFactory()
         self.student_data = Mock()
         self.track_function = Mock()
-        self.xqueue_callback_url_prefix = Mock()
         self.request_token = Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
@@ -2307,7 +2305,6 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
             descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course
         )
@@ -2326,7 +2323,6 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
             descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course
         )
@@ -2589,7 +2585,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.user = UserFactory(id=232)
         self.student_data = Mock()
         self.track_function = Mock()
-        self.xqueue_callback_url_prefix = 'https://lms.url'
         self.request_token = Mock()
 
     @ddt.data(
@@ -2608,7 +2603,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2622,7 +2616,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2635,7 +2628,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2652,7 +2644,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.problem_descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2665,7 +2656,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2682,7 +2672,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2698,7 +2687,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2712,14 +2700,46 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
         xqueue = runtime.xqueue
         assert isinstance(xqueue['interface'], XQueueInterface)
+        assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
         assert xqueue['waittime'] == 5
-        callback_url = f'https://lms.url/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/{self.descriptor.location}'
+        callback_url = ('http://localhost:8000/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/'
+                        + str(self.descriptor.location))
+        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
+        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
+
+    @override_settings(
+        XQUEUE_INTERFACE={
+            'callback_url': 'http://alt.url',
+            'url': 'http://xqueue.url',
+            'django_auth': {
+                'username': 'user',
+                'password': 'password',
+            },
+            'basic_auth': ('basic', 'auth'),
+        },
+        XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
+    )
+    def test_xqueue_settings(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        xqueue = runtime.xqueue
+        assert isinstance(xqueue['interface'], XQueueInterface)
+        assert xqueue['interface'].url == 'http://xqueue.url'
+        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
+        assert xqueue['waittime'] == 15
+        callback_url = f'http://alt.url/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/{self.descriptor.location}'
         assert xqueue['construct_callback']() == f'{callback_url}/score_update'
         assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'

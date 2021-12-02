@@ -364,21 +364,6 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
     return msg_fragment
 
 
-def get_xqueue_callback_url_prefix(request):
-    """
-    Calculates default prefix based on request, but allows override via settings
-
-    This is separated from get_module_for_descriptor so that it can be called
-    by the LMS before submitting background tasks to run.  The xqueue callbacks
-    should go back to the LMS, not to the worker.
-    """
-    prefix = '{proto}://{host}'.format(
-        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
-        host=request.get_host()
-    )
-    return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
-
-
 # pylint: disable=too-many-statements
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
@@ -392,7 +377,6 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
     track_function = make_track_function(request)
-    xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
     user_location = getattr(request, 'session', {}).get('country_code')
 
@@ -407,7 +391,6 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         student_data=student_data,
         course_id=course_key,
         track_function=track_function,
-        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         position=position,
         wrap_xmodule_display=wrap_xmodule_display,
         grade_bucket_type=grade_bucket_type,
@@ -427,7 +410,6 @@ def get_module_system_for_user(
         descriptor,
         course_id,
         track_function,
-        xqueue_callback_url_prefix,
         request_token,
         position=None,
         wrap_xmodule_display=True,
@@ -471,6 +453,7 @@ def get_module_system_for_user(
                 dispatch=dispatch
             ),
         )
+        xqueue_callback_url_prefix = settings.XQUEUE_INTERFACE.get('callback_url', settings.LMS_ROOT_URL)
         return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
@@ -501,7 +484,6 @@ def get_module_system_for_user(
             student_data=student_data,
             course_id=course_id,
             track_function=track_function,
-            xqueue_callback_url_prefix=xqueue_callback_url_prefix,
             position=position,
             wrap_xmodule_display=wrap_xmodule_display,
             grade_bucket_type=grade_bucket_type,
@@ -658,7 +640,6 @@ def get_module_system_for_user(
             descriptor=module,
             course_id=course_id,
             track_function=track_function,
-            xqueue_callback_url_prefix=xqueue_callback_url_prefix,
             position=position,
             wrap_xmodule_display=wrap_xmodule_display,
             grade_bucket_type=grade_bucket_type,
@@ -846,7 +827,7 @@ def get_module_system_for_user(
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
 def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,
-                                       track_function, xqueue_callback_url_prefix, request_token,
+                                       track_function, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,
                                        course=None, will_recheck_access=False):
@@ -865,7 +846,6 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         descriptor=descriptor,
         course_id=course_id,
         track_function=track_function,
-        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         position=position,
         wrap_xmodule_display=wrap_xmodule_display,
         grade_bucket_type=grade_bucket_type,
