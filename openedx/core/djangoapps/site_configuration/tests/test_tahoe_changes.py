@@ -137,8 +137,8 @@ class SiteConfigAPIClientTests(TestCase):
         """
         assert False
 
-    def get_current_site_configuration_with_adapter(self):
+    def test_get_current_site_configuration_with_adapter(self):
         """
-        Ensure get_current_site_configuration() uses the `adapter`.
+        Ensure get_current_site_configuration() initializes the `api_adapter`.
         """
         assert False
