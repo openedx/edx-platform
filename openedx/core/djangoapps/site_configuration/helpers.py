@@ -26,10 +26,13 @@ def get_current_site_configuration():
     try:
         configuration = getattr(site, "configuration", None)
 
-        # # Tahoe: Import is placed here to avoid model import at project startup
-        # from openedx.core.djangoapps.appsembler.sites import site_config_client_helpers
-        # if site_config_client_helpers.is_enabled_for_current_organization():
-        #     configuration.api_adapter = site_config_client_helpers.get_current_configuration_adapter()
+        if site:
+            # Tahoe: Import is placed here to avoid model import at project startup
+            from openedx.core.djangoapps.appsembler.sites import (
+                site_config_client_helpers as site_helpers,
+            )
+            if site_helpers.is_enabled_for_current_organization():
+                configuration.api_adapter = site_helpers.get_current_configuration_adapter()
 
         return configuration
     except SiteConfiguration.DoesNotExist:
