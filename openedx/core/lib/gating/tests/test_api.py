@@ -20,8 +20,8 @@ from lms.djangoapps.grades.tests.base import GradeTestBase
 from lms.djangoapps.grades.tests.utils import mock_get_score
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt
