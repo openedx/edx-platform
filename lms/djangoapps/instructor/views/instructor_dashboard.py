@@ -259,13 +259,14 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     # this import has been done inline to avoid circular import
     # due to which a test fails: TestCourseTabApi
-    from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
+    from lms.djangoapps.instructor.views.api import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
     context_from_plugins = get_plugins_view_context(
         ProjectType.LMS,
-        INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME,
+        INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME,
         context
     )
+
     context.update(context_from_plugins)
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
