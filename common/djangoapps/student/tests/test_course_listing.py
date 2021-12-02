@@ -117,7 +117,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
             CourseOverview.objects.filter(id=course_key).delete()
 
             courses_list = list(get_course_enrollments(self.student, None, []))
-            assert courses_list == []
+            assert not courses_list
 
     def test_course_listing_errored_deleted_courses(self):
         """
