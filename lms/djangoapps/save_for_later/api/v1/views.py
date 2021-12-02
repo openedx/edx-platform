@@ -15,8 +15,8 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from eventtracking import tracker
 
-from common.djangoapps.track import segment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -29,6 +29,7 @@ log = logging.getLogger(__name__)
 
 POST_EMAIL_KEY = 'post:email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
+USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.save.for.later.email.sent'
 
 
 class SaveForLaterApiView(APIView):
@@ -104,10 +105,10 @@ class SaveForLaterApiView(APIView):
         )
         try:
             ace.send(msg)
-            segment.track(
-                user.id,
-                'edx.bi.user.sent.email.save.for.later',
+            tracker.emit(
+                USER_SENT_EMAIL_SAVE_FOR_LATER,
                 {
+                    'user_id': user.id,
                     'category': 'save-for-later',
                     'type': 'course' if course_id else 'program'
                 }
