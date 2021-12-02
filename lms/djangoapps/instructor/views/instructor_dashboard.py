@@ -257,7 +257,8 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
 
-    # this import has been done inline to avoid failing a test: TestCourseTabApi
+    # this import has been done inline to avoid circular import 
+    # due to which a test fails: TestCourseTabApi
     from lms.djangoapps.instructor.views.api import INCTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
     context_from_plugins = get_plugins_view_context(
