@@ -93,3 +93,53 @@ class SiteConfigurationTests(TestCase):
                 self.test_config['course_org_filter'], 'LMS_ROOT_URL'),
             self.expected_site_root_url
         )
+
+
+
+@override_settings(
+    ENABLE_COMPREHENSIVE_THEMING=True,
+    DEFAULT_SITE_THEME='edx-theme-codebase',
+)
+class SiteConfigAPIClientTests(TestCase):
+    """
+    Tests for SiteConfiguration and its signals/receivers.
+    """
+    domain = 'example-site.tahoe.appsembler.com'
+    name = 'Example Tahoe Site'
+
+    test_config = {
+        "university": "Tahoe University",
+        "platform_name": name,
+        "SITE_NAME": domain,
+        "course_org_filter": "TahoeX",
+        "css_overrides_file": "test/css/{domain}.css".format(domain=domain),
+        "ENABLE_MKTG_SITE": False,
+        "ENABLE_THIRD_PARTY_AUTH": False,
+        "course_about_show_social_links": False,
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        super(SiteConfigAPIClientTests, cls).setUpClass()
+        cls.site, _ = Site.objects.get_or_create(
+            domain=cls.test_config['SITE_NAME'],
+            name=cls.test_config['SITE_NAME'],
+        )
+
+    def test_get_value_with_adapter(self):
+        """
+        Ensure api_adapter is used for `get_value()`.
+        """
+        assert False
+
+    def test_formatted_sass_variables_with_adapter(self):
+        """
+        Ensure api_adapter is used for `_formatted_sass_variables()`.
+        """
+        assert False
+
+    def get_current_site_configuration_with_adapter(self):
+        """
+        Ensure get_current_site_configuration() uses the `adapter`.
+        """
+        assert False

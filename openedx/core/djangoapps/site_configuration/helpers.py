@@ -26,7 +26,7 @@ def get_current_site_configuration():
     try:
         configuration = getattr(site, "configuration", None)
 
-        if site:
+        if configuration:
             # Tahoe: Import is placed here to avoid model import at project startup
             from openedx.core.djangoapps.appsembler.sites import (
                 site_config_client_helpers as site_helpers,
