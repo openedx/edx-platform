@@ -16,7 +16,7 @@ app_name = "ora-staff-grader"
 urlpatterns += [
     url('mock/', include('lms.djangoapps.ora_staff_grader.mock.urls')),
     url(
-         r'^initialize', InitializeView.as_view(), name='initialize'
+        r'^initialize', InitializeView.as_view(), name='initialize'
     ),
     url(
         r'^submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'

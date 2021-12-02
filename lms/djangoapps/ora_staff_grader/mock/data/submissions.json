@@ -4,9 +4,27 @@
             "submissionUUID": "SUBMISSION_ID-0",
             "username": "USERNAME-0",
             "dateSubmitted": 1631215154955,
-            "score": null,
-            "gradeData": null,
-            "gradeStatus": "ungraded",
+            "score": {
+                "pointsEarned": 70,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "showValidation": false,
+                "overallFeedback": "",
+                "criteria": [
+                    {
+                        "orderNum": 0,
+                        "name": "grammar",
+                        "selectedOption": "excellent",
+                        "feedback": "test3"
+                    }
+                ],
+                "score": {
+                    "pointsEarned": 0,
+                    "pointsPossible": 100
+                }
+            },
+            "gradeStatus": "graded",
             "lockStatus": "unlocked"
         },
         "SUBMISSION_ID-1": {
@@ -86,7 +104,7 @@
             "score": null,
             "gradeData": null,
             "gradeStatus": "ungraded",
-            "lockStatus": "unlocked"
+            "lockStatus": "in-progress"
         },
         "TEAM_SUBMISSION_ID-1": {
             "submissionUUID": "TEAM_SUBMISSION_ID-1",
