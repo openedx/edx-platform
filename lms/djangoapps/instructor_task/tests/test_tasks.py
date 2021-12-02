@@ -83,7 +83,6 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
         return {
-            'xqueue_callback_url_prefix': 'dummy_value',
             'request_info': {
                 'username': 'dummy_username',
                 'user_id': 'dummy_id',

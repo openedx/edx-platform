@@ -300,7 +300,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -321,7 +320,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -375,7 +373,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=self.course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
 
@@ -447,7 +444,6 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
             with self.assertNumQueries(num_queries):
