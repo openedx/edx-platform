@@ -42,7 +42,7 @@ from xblock.runtime import KvsFieldData
 
 from common.djangoapps import static_replace
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
-from capa.xqueue_interface import XQueueInterface
+from capa.xqueue_interface import XQueueInterface  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -91,12 +91,12 @@ from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
