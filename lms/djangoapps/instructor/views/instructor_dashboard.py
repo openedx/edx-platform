@@ -53,6 +53,7 @@ from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
+from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
@@ -256,10 +257,6 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
-
-    # this import has been done inline to avoid circular import
-    # due to which a test fails: TestCourseTabApi
-    from lms.djangoapps.instructor.views.api import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 
     context_from_plugins = get_plugins_view_context(
         ProjectType.LMS,

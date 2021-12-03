@@ -87,6 +87,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor.constants import INVOICE_KEY
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
@@ -95,7 +96,6 @@ from lms.djangoapps.instructor.enrollment import (
     send_mail_to_student,
     unenroll_email,
 )
-from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
@@ -139,10 +139,6 @@ TASK_SUBMISSION_OK = 'created'
 
 SUCCESS_MESSAGE_TEMPLATE = _("The {report_type} report is being created. "
                              "To view the status of the report, see Pending Tasks below.")
-
-# Please avoid changing value of this constant
-# as this is also being used inside external plugins
-INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME = "instructor_dashboard"
 
 
 def common_exceptions_400(func):
