@@ -43,20 +43,20 @@ class GradeChangeEvent:
             "verified": grade_change_event.verified,
         }
 
-if settings.KAFKA_ENABLED:
-    SCHEMA_REGISTRY_CLIENT = SchemaRegistryClient({
-    'url': settings.SCHEMA_REGISTRY_URL,
+
+def produce_grade_change_event(user, course_run_key, letter_grade, percent_grade, verified):
+    schema_registry_client = SchemaRegistryClient({
+        'url': settings.SCHEMA_REGISTRY_URL,
     })
-    GRADE_CHANGE_EVENT_SERIALIZER = AvroSerializer(schema_str=grade_change_schema_string, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
-                                               to_dict = GradeChangeEvent.to_dict)
+    grade_change_event_serializer = AvroSerializer(schema_str=grade_change_schema_string,
+                                                   schema_registry_client=schema_registry_client,
+                                                   to_dict=GradeChangeEvent.to_dict)
 
     producer_settings = dict(settings.KAFKA_PRODUCER_CONF_BASE)
     producer_settings.update({'key.serializer': StringSerializer('utf-8'),
-                          'value.serializer': GRADE_CHANGE_EVENT_SERIALIZER})
-    GRADE_CHANGE_EVENT_PRODUCER = SerializingProducer(producer_settings)
-
-def produce_grade_change_event(user, course_run_key, letter_grade, percent_grade, verified):
-    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
+                              'value.serializer': grade_change_event_serializer})
+    grade_change_event_producer = SerializingProducer(producer_settings)
+    grade_change_event_producer.produce("credentials_grade_change", key=str(uuid4()),
                                         value=GradeChangeEvent(
                                             username=getattr(user, 'username', None),
                                             course_run=str(course_run_key),
@@ -64,5 +64,5 @@ def produce_grade_change_event(user, course_run_key, letter_grade, percent_grade
                                             percent_grade=percent_grade,
                                             verified=verified
                                         ))
-    GRADE_CHANGE_EVENT_PRODUCER.poll()
+    grade_change_event_producer.poll()
 

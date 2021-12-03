@@ -566,17 +566,6 @@ AUTHN_MICROFRONTEND_URL = "http://authn-mfe"
 AUTHN_MICROFRONTEND_DOMAIN = "authn-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
-#################### Kafka Related Settings ##############################
-"""KAFKA_PRODUCER_CONF_BASE = {'bootstrap.servers': "kafka.example.com",
-                 'client.id': 'edx.lms' }
-
-KAFKA_CONSUMER_CONF_BASE = {'bootstrap.servers': "kafka.example.com",
-                       'group.id': 'lms_test'}
-
-SCHEMA_REGISTRY_URL = "http://example.com/schema-registry"
-"""
-KAFKA_ENABLED = False
-
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
