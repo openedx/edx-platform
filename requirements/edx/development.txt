@@ -597,7 +597,7 @@ edx-sga==0.17.2
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
-edx-submissions==3.4.1
+edx-submissions==3.4.2
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
