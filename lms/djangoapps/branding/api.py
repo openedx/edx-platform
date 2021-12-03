@@ -651,4 +651,6 @@ def get_logo_url_for_email():
     Returns the url for the branded logo image for embedding in email templates.
     """
     default_logo_url = getattr(settings, 'DEFAULT_EMAIL_LOGO_URL', None)
-    return getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url
+    # The LOGO_URL_PNG might be reused in the future for other things, so including an email specific png logo
+    return (getattr(settings, 'LOGO_URL_PNG_FOR_EMAIL', None) or
+            getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url)
