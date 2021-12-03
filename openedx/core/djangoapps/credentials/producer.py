@@ -43,17 +43,17 @@ class GradeChangeEvent:
             "verified": grade_change_event.verified,
         }
 
-
-SCHEMA_REGISTRY_CLIENT = SchemaRegistryClient({
+if settings.KAFKA_ENABLED:
+    SCHEMA_REGISTRY_CLIENT = SchemaRegistryClient({
     'url': settings.SCHEMA_REGISTRY_URL,
-})
-GRADE_CHANGE_EVENT_SERIALIZER = AvroSerializer(schema_str=grade_change_schema_string, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
+    })
+    GRADE_CHANGE_EVENT_SERIALIZER = AvroSerializer(schema_str=grade_change_schema_string, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
                                                to_dict = GradeChangeEvent.to_dict)
 
-producer_settings = dict(settings.KAFKA_PRODUCER_CONF_BASE)
-producer_settings.update({'key.serializer': StringSerializer('utf-8'),
+    producer_settings = dict(settings.KAFKA_PRODUCER_CONF_BASE)
+    producer_settings.update({'key.serializer': StringSerializer('utf-8'),
                           'value.serializer': GRADE_CHANGE_EVENT_SERIALIZER})
-GRADE_CHANGE_EVENT_PRODUCER = SerializingProducer(producer_settings)
+    GRADE_CHANGE_EVENT_PRODUCER = SerializingProducer(producer_settings)
 
 def produce_grade_change_event(user, course_run_key, letter_grade, percent_grade, verified):
     GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),

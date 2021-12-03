@@ -26,10 +26,12 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.credentials.producer import GRADE_CHANGE_EVENT_PRODUCER, GradeChangeEvent
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+if settings.KAFKA_ENABLED:
+    from openedx.core.djangoapps.credentials.producer import GRADE_CHANGE_EVENT_PRODUCER, GradeChangeEvent
 
 logger = get_task_logger(__name__)
 
@@ -352,7 +354,8 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
 
-    GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
+    if settings.KAFKA_ENABLED:
+        GRADE_CHANGE_EVENT_PRODUCER.produce("credentials_grade_change", key=str(uuid4()),
                                         value=GradeChangeEvent(
                                             username=getattr(user, 'username', None),
                                             course_run=str(course_run_key),
@@ -360,7 +363,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
                                             percent_grade=percent_grade,
                                             verified=True
                                             ))
-    GRADE_CHANGE_EVENT_PRODUCER.poll()
+        GRADE_CHANGE_EVENT_PRODUCER.poll()
     send_grade_to_credentials.delay(user.username, str(course_run_key), True, letter_grade, percent_grade)
 
 

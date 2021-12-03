@@ -444,8 +444,11 @@ KAFKA_PRODUCER_CONF_BASE = {'bootstrap.servers': "edx.devstack.kafka:29092",
 
 KAFKA_CONSUMER_CONF_BASE = {'bootstrap.servers': "edx.devstack.kafka:29092",
                        'group.id': 'lms'}
+                       
 
 SCHEMA_REGISTRY_URL = "http://edx.devstack.schema-registry:8081"
+
+KAFKA_ENABLED = True
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
