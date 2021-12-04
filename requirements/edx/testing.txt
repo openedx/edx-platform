@@ -578,7 +578,7 @@ edx-search==3.1.0
     # via -r requirements/edx/base.txt
 edx-sga==0.17.2
     # via -r requirements/edx/base.txt
-edx-submissions==3.4.1
+edx-submissions==3.4.2
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -881,7 +881,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.6.0
     # via -r requirements/edx/base.txt
-ora2==3.7.5
+ora2==3.7.6
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
