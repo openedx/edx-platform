@@ -174,7 +174,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-21 20:43+0000\n"
+"POT-Creation-Date: 2021-11-28 20:43+0000\n"
 "PO-Revision-Date: 2021-11-12 16:08+0000\n"
 "Last-Translator: Carolina De Mares <carolina.demares@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5085,8 +5085,8 @@ msgstr ""
 "redes sociales{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "Antes de continuar, por favor {htmlStart} active su cuenta {htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
+msgstr " Antes de proceder, por favor {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""

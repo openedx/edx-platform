@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-21 20:43+0000\n"
+"POT-Creation-Date: 2021-11-28 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)\n"
@@ -6035,7 +6035,10 @@ msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
-#: lms/djangoapps/courseware/plugins.py
+#. #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: Custom Pages refer to the tabs that appear in the top
+#. navigation of each course.
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
 msgid "Custom pages"
 msgstr ""
 
@@ -19584,20 +19587,9 @@ msgstr ""
 msgid "Learn more about content visibility settings"
 msgstr "Контентийн харагдацын тохиргооны талаар дэлгэрэнгүй"
 
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "Хуудсууд"
-
 #: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Pages & Resources"
-msgstr ""
-
-#. Translators: Custom Pages refer to the tabs that appear in the top
-#. navigation of each course.
-#: cms/templates/edit-tabs.html
-msgid "Custom Pages"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -19827,6 +19819,10 @@ msgstr "Хичээлийн бүтэц"
 #: cms/templates/export.html
 msgid "Individual Problems"
 msgstr "Бие даасан даалгаварууд"
+
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "Хуудсууд"
 
 #: cms/templates/export.html
 msgid "Course Assets"

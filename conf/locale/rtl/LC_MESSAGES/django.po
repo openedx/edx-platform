@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-11-28 20:51+0000\n"
-"PO-Revision-Date: 2021-11-28 20:51:49.595057\n"
+"POT-Creation-Date: 2021-12-05 20:51+0000\n"
+"PO-Revision-Date: 2021-12-05 20:51:59.636121\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -314,6 +314,7 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Fɹǝǝ"
@@ -8508,6 +8509,18 @@ msgstr ""
 msgid "You can't leave an instructor managed team."
 msgstr "Ɏøn ɔɐn'ʇ lǝɐʌǝ ɐn ᴉnsʇɹnɔʇøɹ ɯɐnɐƃǝd ʇǝɐɯ."
 
+#: lms/djangoapps/user_tours/models.py
+msgid "Show existing user tour"
+msgstr "Sɥøʍ ǝxᴉsʇᴉnƃ nsǝɹ ʇønɹ"
+
+#: lms/djangoapps/user_tours/models.py
+msgid "Show new user tour"
+msgstr "Sɥøʍ nǝʍ nsǝɹ ʇønɹ"
+
+#: lms/djangoapps/user_tours/models.py
+msgid "Do not show user tour"
+msgstr "Đø nøʇ sɥøʍ nsǝɹ ʇønɹ"
+
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "Ŧɥǝ ɔønɹsǝ ɟøɹ ʍɥᴉɔɥ ʇɥᴉs dǝɐdlᴉnǝ ɐddlᴉǝs"
@@ -9063,6 +9076,56 @@ msgstr "Ⱥlløʍ"
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Check out this course on edx"
+msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn ǝdx"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Enroll now"
+msgstr "Ɇnɹøll nøʍ"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Vᴉǝʍ Ȼønɹsǝ"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Estimated 6 weeks"
+msgstr "Ɇsʇᴉɯɐʇǝd 6 ʍǝǝʞs"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "4-6 hours per week"
+msgstr "4-6 ɥønɹs dǝɹ ʍǝǝʞ"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Self-paced"
+msgstr "Sǝlɟ-dɐɔǝd"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Progress at your own speed"
+msgstr "Ᵽɹøƃɹǝss ɐʇ ʎønɹ øʍn sdǝǝd"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Optional upgrade available"
+msgstr "Ødʇᴉønɐl ndƃɹɐdǝ ɐʌɐᴉlɐblǝ"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
+#, python-format
+msgid "Check out this course on %(platform_name)s."
+msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn %(platform_name)s."
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
+#, python-format
+msgid "This email message was automatically sent by %(lms_url)s "
+msgstr "Ŧɥᴉs ǝɯɐᴉl ɯǝssɐƃǝ ʍɐs ɐnʇøɯɐʇᴉɔɐllʎ sǝnʇ bʎ %(lms_url)s "
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
+#, python-format
+msgid "%(display_name)s"
+msgstr "%(display_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
@@ -11165,6 +11228,14 @@ msgid ""
 "This email is already associated with an existing or previous edX account"
 msgstr ""
 "Ŧɥᴉs ǝɯɐᴉl ᴉs ɐlɹǝɐdʎ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐn ǝxᴉsʇᴉnƃ øɹ dɹǝʌᴉøns ǝdX ɐɔɔønnʇ"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"The password you entered is on a list of known compromised passwords. Please"
+" choose a different one."
+msgstr ""
+"Ŧɥǝ dɐssʍøɹd ʎøn ǝnʇǝɹǝd ᴉs øn ɐ lᴉsʇ øɟ ʞnøʍn ɔøɯdɹøɯᴉsǝd dɐssʍøɹds. Ᵽlǝɐsǝ"
+" ɔɥøøsǝ ɐ dᴉɟɟǝɹǝnʇ ønǝ."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -16514,12 +16585,6 @@ msgstr "Ⱥn ǝɹɹøɹ øɔɔnɹɹǝd. Ᵽlǝɐsǝ ʇɹʎ ɐƃɐᴉn lɐʇǝɹ."
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ"
-
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Vᴉǝʍ Ȼønɹsǝ"
 
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
