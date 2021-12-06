@@ -458,7 +458,7 @@ class TestUpdateGradeView(BaseViewTest):
         self.client.login(username=self.staff.username, password=self.password)
 
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
-    def test_submit_grade_failure(self, mock_submit_grade): 
+    def test_submit_grade_failure(self, mock_submit_grade):
         """ An ORA failure to submit a grade returns a server error """
         mock_submit_grade.return_value = {'success': False, 'msg': 'Danger, Will Robinson!'}
         url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
@@ -472,7 +472,7 @@ class TestUpdateGradeView(BaseViewTest):
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.delete_submission_lock')
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
-    def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock): 
+    def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock):
         """ A grade update success should clear the submission lock and return submission meta """
         mock_submit_grade.return_value = {'success': True, 'msg': ''}
         mock_assessment = {
