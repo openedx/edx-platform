@@ -62,5 +62,10 @@ jobs:
         pip install --no-binary mysqlclient mysqlclient
 
     - name: Run Quality Tests
+      id: 'pylint'
       run: |
-        pylint  ${{ matrix.path }}
+        echo "::set-output name=result::$(pylint  ${{ matrix.path }})"
+
+    - name: check failures
+      run: echo ${{ steps.pylint.outputs.result.linter.stats['error'] }}
+          
