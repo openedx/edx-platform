@@ -702,6 +702,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                     url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
                     response = self.client.get(url)
                     # Check that only the verified option is rendered
+                    self.assertNotContains(response, "Choose a path for your course in")
                     self.assertContains(response, "Earn a certificate")
                     self.assertNotContains(response, "Access this course")
                     self.assertContains(response, '<div class="grid-single">')

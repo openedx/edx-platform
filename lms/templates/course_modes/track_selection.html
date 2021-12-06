@@ -86,7 +86,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                 <article class="register-choose content-main">
                     <header class="page-header">
                         <h3 class="py-md-3">
-                            ${_("Choose a path for your course in")} ${_(course_name)}
+                            % if is_single_mode:
+                                ${_(course_name)}
+                            % else:
+                                ${_("Choose a path for your course in")} ${_(course_name)}
+                            % endif
                         </h3>
                     </header>
 
