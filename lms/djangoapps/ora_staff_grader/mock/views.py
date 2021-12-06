@@ -1,9 +1,11 @@
 """
 Mock views for ESG
 """
+from django.http.response import HttpResponseBadRequest
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
+from lms.djangoapps.ora_staff_grader.errors import ERR_MISSING_PARAM
 
 from lms.djangoapps.ora_staff_grader.mock.utils import *
 
@@ -95,22 +97,39 @@ class UpdateGradeView(RetrieveAPIView):
 
     def update_grade_data(self, submission, grade_data):
         submission['gradeData'] = grade_data
-        submission['score'] = grade_data['score']
         submission['gradeStatus'] = 'graded'
         submission['lockStatus'] = 'unlocked'
+        submission['score'] = {
+            'pointsEarned': 70,
+            'pointsPossible': 100,
+        }
 
     def post(self, request):
         ora_location = request.query_params[PARAM_ORA_LOCATION]
         submission_id = request.query_params[PRAM_SUBMISSION_ID]
         grade_data = request.data
 
-        submission = fetch_submission(ora_location, submission_id)
+        # this is static test data
+        grade_data['score'] = {
+            "pointsEarned": 70,
+            "pointsPossible": 100
+        }
 
+        submission = fetch_submission(ora_location, submission_id)
         self.update_grade_data(submission, grade_data)
         save_submission_update(ora_location, submission)
-
         return Response({
             'gradeStatus': submission['gradeStatus'],
             'lockStatus': submission['lockStatus'],
-            'gradeData': submission['gradeData'],
+            'gradeData': grade_data,
         })
+        '''
+        return Response({
+            'errorCode': ERR_MISSING_PARAM,
+            'submissionStatus': {
+                'gradeStatus': 'ungraded',
+                'lockStatus': 'locked',
+                'gradeData': submission['gradeData'],
+            },
+        }, 409)
+        '''
