@@ -437,7 +437,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.35.3
+edx-enterprise==3.36.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
