@@ -586,7 +586,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         assert 200 == response.status_code
 
     def test_plugin_context(self):
-       
+        """
+        Tests that whether context from plugins is being returned
+        """
         context_from_plugins = get_plugins_view_context(
             ProjectType.LMS,
             INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
