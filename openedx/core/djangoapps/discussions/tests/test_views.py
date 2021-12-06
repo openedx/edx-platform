@@ -9,6 +9,8 @@ from datetime import datetime, timedelta, timezone
 import ddt
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -358,6 +360,33 @@ class DataTest(AuthorizedApiTest):
         # Only configuration fields not stored in the course, or
         # directly in the model should be stored here.
         assert course.discussions_settings['piazza'] == {'custom_field': 'custom_value'}
+
+    @ddt.data(
+        # If the legacy provider is selected show the legacy provider only
+        # and hide the new provider even if the mfe is enabled
+        (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, True),
+        # If the new provider is selected show the new provider only
+        # and hide the legacy provider even if the mfe is disabled
+        (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, False),
+        (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, True),
+        # If some other provider is selected show the new provider
+        # if the mfe is enabled
+        (Provider.PIAZZA, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.PIAZZA, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', True),
+    )
+    @ddt.unpack
+    def test_available_providers_legacy(self, current_provider, visible_providers, hidden_provider, mfe_enabled):
+        """
+        Tests that providers available depending on the course.
+        """
+        self._configure_lti_discussion_provider(provider=current_provider)
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, mfe_enabled):
+            response = self._get()
+            data = response.json()
+            for visible_provider in visible_providers:
+                assert visible_provider in data['providers']['available'].keys()
+            assert hidden_provider not in data['providers']['available'].keys()
 
     @ddt.data(
         {'enabled': 3},
