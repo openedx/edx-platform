@@ -1,9 +1,12 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+import sys
 from datetime import timedelta
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
-from edx_toggles.toggles.testutils import override_waffle_flag
+from django.test.utils import TestContextDecorator
+# from edx_toggles.toggles.testutils import override_waffle_flag
+from waffle.testutils import override_flag
 from openedx.core.djangoapps.course_date_signals.handlers import (
     _gather_graded_items,
     _get_custom_pacing_children,
@@ -14,7 +17,6 @@ from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelative
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from . import utils
-
 
 class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
@@ -195,18 +197,85 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
             sequence = self.store.get_item(sequence.location)
             self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
 
+## BELOW IS CREATING A NEW CLASS
+class override_waffle_flag_class(TestContextDecorator):
+    def __init__(self, flag, active):
+        super().__init__()
+        self.decorator = override_waffle_flag(flag, active)
 
+    def enable(self):
+        self.decorator.__enter__()
+
+    def disable(self):
+        self.decorator.__exit__(*sys.exc_info())
+
+## BELOW IS REWRITING override_waffle_flag
+class override_waffle_flag(TestContextDecorator):
+    """
+    override_waffle_flag is a contextmanager for easier testing of flags.
+    It accepts two parameters, the flag itself and its intended state. Example
+    usage::
+        with override_waffle_flag(SOME_COURSE_FLAG, active=True):
+            ...
+    If the flag already exists, its value will be changed inside the context
+    block, then restored to the original value. If the flag does not exist
+    before entering the context, it is created, then removed at the end of the
+    block.
+    It can also act as a decorator::
+        @override_waffle_flag(SOME_COURSE_FLAG, active=True)
+        def test_happy_mode_enabled():
+            ...
+    """
+
+    def __init__(self, flag, active):
+        """
+        Args:
+             flag (WaffleFlag): The namespaced cached waffle flag.
+             active (Boolean): The value to which the flag will be set.
+        """
+        super().__init__()
+        self.flag = flag
+        self.active = active
+        self._cached_value = None
+        self.decorator = override_flag(self.flag.name, self.active)
+
+    def __enter__(self):
+        self.decorator.__enter__()
+
+        # Store values that have been cached on the flag
+        self._cached_value = self.flag.cached_flags().get(self.flag.name)
+        self.flag.cached_flags()[self.flag.name] = self.active
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.decorator.__exit__(exc_type, exc_val, exc_tb)
+
+        # Restore the cached values
+        self.flag.cached_flags().pop(self.flag.name, None)
+
+        if self._cached_value is not None:
+            self.flag.cached_flags()[self.flag.name] = self._cached_value
+
+    def enable(self):
+        self.__enter__()
+
+    def disable(self):
+        self.__exit__(*sys.exc_info())
+
+# @override_waffle_flag_class(CUSTOM_RELATIVE_DATES, active=True)
+@override_waffle_flag(CUSTOM_RELATIVE_DATES, active = True)
 class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
     """
     Tests the custom Personalized Learner Schedule (PLS) dates in self paced courses
     """
+
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def setUp(self):
         super().setUp()
         SelfPacedRelativeDatesConfig.objects.create(enabled=True)
         self.course = CourseFactory.create(self_paced=True)
         self.chapter = ItemFactory.create(category='chapter', parent=self.course)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_inheritance(self):
         """
         extract_dates_from_course should return a list of (block item location, field metadata dictionary)
@@ -227,7 +296,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_one_subsection(self):
         """
         relative_weeks_due in one of the subsections. Only one of them should have a set due date.
@@ -248,7 +317,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_one_subsection_graded(self):
         """
         A section with a subsection that has relative_weeks_due and
@@ -282,7 +351,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=6)):
             self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_custom_and_default_pls_multiple_subsections_graded(self):
         """
         A section with a subsection that has relative_weeks_due and multiple sections without
@@ -320,7 +389,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=8)):
             self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_all_subsections(self):
         """
         With relative_weeks_due on all subsections. All subsections should
@@ -340,7 +409,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
 
-    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    #@override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_no_subsections(self):
         """
         Without relative_weeks_due on all subsections. None of the subsections should
