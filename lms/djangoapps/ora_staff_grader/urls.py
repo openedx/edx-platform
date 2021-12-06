@@ -18,11 +18,11 @@ urlpatterns += [
     path(
         'initialize', InitializeView.as_view(), name='initialize'
     ),
-    url(
-        r'^submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'
+    path(
+        'submission/status', SubmissionStatusFetchView.as_view(), name='fetch-submission-status'
     ),
-    url(
-        r'^submission/lock', SubmissionLockView.as_view(), name='lock'
+    path(
+        'submission/lock', SubmissionLockView.as_view(), name='lock'
     ),
     path(
         'submission/grade', UpdateGradeView.as_view(), name='update-grade'
