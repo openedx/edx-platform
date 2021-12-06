@@ -33,7 +33,10 @@ class PwnedPasswordsAPI:
     @staticmethod
     def range(password):
         """
-        Returns a dict containing hashed password signatures along with their count
+        Returns a dict containing hashed password signatures along with their count.
+        API URL takes first 5 characters of a SHA-1 password hash (not case-sensitive).
+        API response contains suffix of every hash beginning with the specified prefix,
+        followed by a count of how many times it appears in their data set.
 
         **Argument(s):
             password: a sha-1-hashed string against which pwnedservice is invoked

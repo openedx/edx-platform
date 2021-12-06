@@ -37,7 +37,7 @@ from xblock.fields import Scope, UserScope
 from xblock.runtime import KeyValueStore
 
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField
 

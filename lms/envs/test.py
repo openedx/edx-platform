@@ -495,6 +495,20 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
+TEMPLATES.append(
+    {
+        # This separate copy of the Mako backend is used to test rendering previews in the 'lms.main' namespace
+        'NAME': 'preview',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
+        'APP_DIRS': False,
+        'DIRS': MAKO_TEMPLATE_DIRS_BASE,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            'debug': False,
+            'namespace': 'lms.main',
+        }
+    }
+)
 
 ########################## VIDEO TRANSCRIPTS STORAGE ############################
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
@@ -599,3 +613,10 @@ RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
 RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 CORS_ORIGIN_WHITELIST = ['https://sandbox.edx.org']
+
+# enable /api/v1/save/course/ api for testing
+ENABLE_SAVE_FOR_LATER = True
+
+# rate limit for /api/v1/save/course/ api
+SAVE_FOR_LATER_IP_RATE_LIMIT = '5/d'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'

@@ -1809,6 +1809,23 @@ class ModuleSystemShim:
             return self._services['user'].get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return None
 
+    @property
+    def render_template(self):
+        """
+        Returns a function that takes (template_file, context), and returns rendered html.
+
+        Deprecated in favor of the mako service.
+        """
+        warnings.warn(
+            'Use of runtime.render_template is deprecated. '
+            'Use MakoService.render_template or a JavaScript-based template instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        render_service = self._services.get('mako')
+        if render_service:
+            return render_service.render_template
+        return None
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1824,7 +1841,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     """
 
     def __init__(
-            self, static_url, track_function, get_module, render_template,
+            self, static_url, track_function, get_module,
             replace_urls, descriptor_runtime, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             course_id=None,
@@ -1845,9 +1862,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
-
-        render_template - a function that takes (template_file, context), and
-                         returns rendered html.
 
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
@@ -1904,7 +1918,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
-        self.render_template = render_template
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
         self.replace_urls = replace_urls

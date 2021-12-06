@@ -13,7 +13,7 @@ jobs:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt

@@ -17,6 +17,8 @@ class LtiSerializer(serializers.ModelSerializer):
     """
     Serialize LtiConfiguration responses
     """
+    pii_share_email = serializers.BooleanField(required=False)
+    pii_share_username = serializers.BooleanField(required=False)
 
     class Meta:
         model = LtiConfiguration
@@ -42,6 +44,9 @@ class LtiSerializer(serializers.ModelSerializer):
         return payload
 
     def to_representation(self, instance):
+        """
+        Serialize object into a primitive data types.
+        """
         representation = super().to_representation(instance)
         if not self.context.get('pii_sharing_allowed'):
             representation.pop('pii_share_username')
@@ -214,6 +219,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         course_key = instance.context_key
         payload = super().to_representation(instance)
+
         lti_configuration = LtiSerializer(
             instance.lti_configuration,
             context={'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key)}

@@ -215,7 +215,6 @@
     "Basic Account Information": "Th\u00f4ng tin t\u00e0i kho\u1ea3n c\u01a1 b\u1ea3n",
     "Be sure your entire face is inside the frame": "H\u00e3y ch\u1eafc ch\u1eafn to\u00e0n b\u1ed9 khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n trong khung",
     "Before proceeding, please confirm that your details match": "Tr\u01b0\u1edbc khi ti\u1ebfp t\u1ee5c, h\u00e3y ki\u1ec3m tra l\u1ea1i th\u00f4ng tin c\u1ee7a b\u1ea1n",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "Tr\u01b0\u1edbc khi ti\u1ebfp t\u1ee5c, vui l\u00f2ng {htmlStart}k\u00edch ho\u1ea1t t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Tr\u01b0\u1edbc khi ti\u1ebfp t\u1ee5c, vui l\u00f2ng {htmlStart}h\u1ee7y li\u00ean k\u1ebft t\u1ea5t c\u1ea3 c\u00e1c t\u00e0i kho\u1ea3n m\u1ea1ng x\u00e3 h\u1ed9i{htmlEnd}.",
     "Biography": "Ti\u1ec3u s\u1eed",
     "Blockquote": "\u0110o\u1ea1n tr\u00edch d\u1eabn",

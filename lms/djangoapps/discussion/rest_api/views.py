@@ -6,9 +6,9 @@ Discussion API views
 import logging
 import uuid
 
-from django.core.exceptions import BadRequest
+import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import BadRequest, ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
@@ -21,8 +21,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
 from common.djangoapps.util.file import store_uploaded_file
-from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -54,11 +54,12 @@ from ..rest_api.forms import (
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
 )
+from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 from ..rest_api.serializers import (
+    CourseMetadataSerailizer,
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
 )
-from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 
 log = logging.getLogger(__name__)
 
@@ -68,41 +69,28 @@ User = get_user_model()
 @view_auth_classes()
 class CourseView(DeveloperErrorViewMixin, APIView):
     """
-    **Use Cases**
-
-        Retrieve general discussion metadata for a course.
-
-    **Example Requests**:
-
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
-
-    **Response Values**:
-
-        * id: The identifier of the course
-
-        * blackouts: A list of objects representing blackout periods (during
-            which discussions are read-only except for privileged users). Each
-            item in the list includes:
-
-            * start: The ISO 8601 timestamp for the start of the blackout period
-
-            * end: The ISO 8601 timestamp for the end of the blackout period
-
-        * thread_list_url: The URL of the list of all threads in the course.
-
-        * following_thread_list_url: thread_list_url with parameter following=True
-
-        * topics_url: The URL of the topic listing for the course.
-
-        * allow_anonymous: A boolean which indicating whether anonymous posts
-            are allowed or not.
-
-        * allow_anonymous_to_peers: A boolean which indicating whether posts
-            anonymous to peers are allowed or not.
+    General discussion metadata API.
     """
 
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID")
+        ],
+        responses={
+            200: CourseMetadataSerailizer(read_only=True, required=False),
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        }
+    )
     def get(self, request, course_id):
-        """Implements the GET method as described in the class docstring."""
+        """
+        Retrieve general discussion metadata for a course.
+
+        **Example Requests**:
+
+            GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
+        """
         course_key = CourseKey.from_string(course_id)  # TODO: which class is right?
         # Record user activity for tracking progress towards a user's course goals (for mobile app)
         UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)

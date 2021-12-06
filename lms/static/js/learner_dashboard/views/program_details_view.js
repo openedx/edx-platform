@@ -27,7 +27,7 @@ class ProgramDetailsView extends Backbone.View {
 
   initialize(options) {
     this.options = options;
-    if (this.options.programDiscussionEnabled) {
+    if (this.options.programTabViewEnabled) {
       this.tpl = HtmlUtils.template(tabPageTpl);
     } else {
       this.tpl = HtmlUtils.template(pageTpl);
@@ -79,7 +79,7 @@ class ProgramDetailsView extends Backbone.View {
       remainingCount,
       completedCount,
       completeProgramURL: buyButtonUrl,
-      programDiscussionEnabled: this.options.programDiscussionEnabled,
+      programTabViewEnabled: this.options.programTabViewEnabled,
       industryPathways: this.options.industryPathways,
       creditPathways: this.options.creditPathways,
       discussionFragment: this.options.discussionFragment,
@@ -132,7 +132,7 @@ class ProgramDetailsView extends Backbone.View {
       programRecordUrl: this.options.urls.program_record_url,
       industryPathways: this.options.industryPathways,
       creditPathways: this.options.creditPathways,
-      programDiscussionEnabled: this.options.programDiscussionEnabled,
+      programTabViewEnabled: this.options.programTabViewEnabled,
     });
   }
 
