@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_django_utils.plugins import get_plugins_view_context
 from pyquery import PyQuery as pq
 from pytz import UTC
 
@@ -27,6 +28,7 @@ from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -34,6 +36,7 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
+from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
@@ -581,6 +584,15 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         # assert we don't get a 500 error
         assert 200 == response.status_code
+
+    def test_plugin_context(self):
+       
+        context_from_plugins = get_plugins_view_context(
+            ProjectType.LMS,
+            INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
+        )
+
+        assert 'plugins' in context_from_plugins
 
 
 @ddt.ddt
