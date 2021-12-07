@@ -564,6 +564,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertContains(response, '<span class="award-icon">')
         self.assertContains(response, '<span class="popover-icon">')
         self.assertContains(response, '<span class="note-icon">')
+        self.assertContains(response, '<div class="grid-options">')
 
         # Check for upgrade button ID
         self.assertContains(response, 'track_selection_upgrade')
@@ -608,6 +609,9 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Check min_price was correctly passed in.
         self.assertContains(response, min_price)
 
+        # Check for the HTML element for courses with more than one mode
+        self.assertContains(response, '<div class="grid-options">')
+
     def _assert_legacy_page(self, response, **_):
         """
         Assert choose.html was rendered.
@@ -650,7 +654,11 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         This test checks that the right template is rendered.
 
         """
-        # The active course mode already exists. Create verified course mode:
+        # Create audit/honor course modes
+        for mode in ('audit', 'honor'):
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course_that_started.id)
+
+        # Create verified course mode:
         verified_mode = CourseModeFactory.create(
             mode_slug='verified',
             course_id=self.course_that_started.id,
@@ -673,6 +681,32 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                     url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
                     response = self.client.get(url)
                     expected_page_assertion_function(self, response, min_price=verified_mode.min_price)
+
+    def test_verified_mode_only(self):
+        # Create only the verified mode and enroll the user
+        CourseModeFactory.create(
+            mode_slug='verified',
+            course_id=self.course_that_started.id,
+            min_price=149,
+        )
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course_that_started.id,
+            user=self.user
+        )
+
+        # Value Prop TODO (REV-2378): remove waffle flag from tests once the new Track Selection template is rolled out.
+        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
+            with patch(GATING_METHOD_NAME, return_value=True):
+                with patch(CDL_METHOD_NAME, return_value=True):
+                    url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
+                    response = self.client.get(url)
+                    # Check that only the verified option is rendered
+                    self.assertNotContains(response, "Choose a path for your course in")
+                    self.assertContains(response, "Earn a certificate")
+                    self.assertNotContains(response, "Access this course")
+                    self.assertContains(response, '<div class="grid-single">')
+                    self.assertNotContains(response, '<div class="grid-options">')
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
