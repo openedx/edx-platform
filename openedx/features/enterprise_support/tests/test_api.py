@@ -395,7 +395,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert request_mock.session['enterprise_customer']['uuid'] == str(enterprise_customer_uuid)
 
     def test_get_enterprise_learner_data_from_db_no_data(self):
-        assert [] == get_enterprise_learner_data_from_db(self.user)
+        assert not get_enterprise_learner_data_from_db(self.user)
 
     def test_get_enterprise_learner_data_from_db(self):
         enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)  # lint-amnesty, pylint: disable=unused-variable
