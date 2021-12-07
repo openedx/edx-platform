@@ -72,13 +72,13 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         )
 
     @ddt.data(
-        ('S', 'S9fe2', False),
-        ('S', 'S9fe2', True),
+        ('S', 'S-9fe2', False),
+        ('S', 'S-9fe2', True),
         ('S.K', 'S_K', False),
         ('S.K.', 'S_K', False),
-        ('S.K.', 'S_K_9fe2', True),
+        ('S.K.', 'S_K_-9fe2', True),
         ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengthofm', False),
-        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengt9fe2', True),
+        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengt-9fe', True),
     )
     @ddt.unpack
     @mock.patch('common.djangoapps.third_party_auth.pipeline.user_exists')
