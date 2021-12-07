@@ -16,6 +16,7 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     ResponseSerializer,
     ScoreField,
     ScoreSerializer,
+    StaffAssessSerializer,
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
     SubmissionMetadataSerializer,
@@ -529,3 +530,75 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
 
         data = LockStatusSerializer(self.lock_owned_by_other_user).data
         assert data == self.lock_owned_by_other_user_expected
+
+
+class TestStaffAssessSerializer(TestCase):
+    """ Tests for StaffAssessSerializer """
+    grade_data = {
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {
+                "name": "firstCriterion",
+                "feedback": "did alright",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    grade_data_no_feedback = {
+        "overallFeedback": "",
+        "criteria": [
+            {
+                "name": "firstCriterion",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    submission_uuid = "foo"
+
+    def test_staff_assess_serializer(self):
+        """ Base serialization behavior """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {
+                "firstCriterion": "did alright",
+            },
+            "overall_feedback": "was pretty good",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value
+
+    def test_staff_assess_no_feedback(self):
+        """ Verify that empty feedback returns a reasonable shape """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data_no_feedback, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {},
+            "overall_feedback": "",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value

@@ -26,7 +26,7 @@ class InitializeView(RetrieveAPIView):
         })
 
 
-class FetchSubmissionView(RetrieveAPIView):
+class SubmissionFetchView(RetrieveAPIView):
     """ Get a submission """
 
     def get(self, request):
@@ -44,7 +44,7 @@ class FetchSubmissionView(RetrieveAPIView):
         })
 
 
-class FetchSubmissionStatusView(RetrieveAPIView):
+class SubmissionStatusFetchView(RetrieveAPIView):
     """ Get a submission status, leaving out the response """
 
     def get(self, request):
@@ -60,7 +60,7 @@ class FetchSubmissionStatusView(RetrieveAPIView):
         })
 
 
-class LockView(APIView):
+class SubmissionLockView(APIView):
     """ Lock a submission for grading """
 
     def post(self, request):
