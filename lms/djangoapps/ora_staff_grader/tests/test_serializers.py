@@ -535,12 +535,25 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
 class TestStaffAssessSerializer(TestCase):
     """ Tests for StaffAssessSerializer """
     grade_data = {
-        # TODO - determine if this is empty or if key is nonexistant for no feedback
         "overallFeedback": "was pretty good",
         "criteria": [
             {
                 "name": "firstCriterion",
                 "feedback": "did alright",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    grade_data_no_feedback = {
+        "overallFeedback": "",
+        "criteria": [
+            {
+                "name": "firstCriterion",
                 "selectedOption": "good"
             },
             {
@@ -566,6 +579,24 @@ class TestStaffAssessSerializer(TestCase):
                 "firstCriterion": "did alright",
             },
             "overall_feedback": "was pretty good",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value
+
+    def test_staff_assess_no_feedback(self):
+        """ Verify that empty feedback returns a reasonable shape """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data_no_feedback, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {},
+            "overall_feedback": "",
             "submission_uuid": self.submission_uuid,
             "assess_type": "full-grade"
         }
