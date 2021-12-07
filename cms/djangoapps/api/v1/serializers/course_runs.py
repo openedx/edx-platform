@@ -82,7 +82,7 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):  # lint-amnesty, pyl
 
 def image_is_jpeg_or_png(value):
     content_type = value.content_type
-    if content_type not in list(IMAGE_TYPES.keys()):
+    if content_type not in list(IMAGE_TYPES.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
         raise serializers.ValidationError(
             f'Only JPEG and PNG image types are supported. {content_type} is not valid')
 
