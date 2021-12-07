@@ -606,6 +606,10 @@ class DiscussionTopicLink(models.Model):
         default=True,
         help_text=_("Whether this topic should be shown in-context in the course.")
     )
+    ordering = models.PositiveIntegerField(
+        null=True,
+        help_text=_("Ordering of this topic in its learning context"),
+    )
 
     def __str__(self):
         return (

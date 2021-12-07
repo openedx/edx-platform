@@ -2,6 +2,7 @@
 Discussion API forms
 """
 import urllib.parse
+
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
@@ -9,6 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
@@ -204,3 +206,15 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
 
             self.cleaned_data['role'] = role
             return rolename
+
+
+class TopicListGetForm(Form):
+    """
+    Form for the topics API get query parameters.
+    """
+    topic_id = CharField(required=False)
+    order_by = ChoiceField(choices=TopicOrdering.choices, required=False)
+
+    def clean_topic_id(self):
+        topic_ids = self.cleaned_data.get("topic_id", None)
+        return set(topic_ids.strip(',').split(',')) if topic_ids else None

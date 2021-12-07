@@ -3247,6 +3247,7 @@ REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
+    'DEEP_LINKING': True,
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.

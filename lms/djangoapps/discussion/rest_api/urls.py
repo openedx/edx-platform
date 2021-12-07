@@ -13,6 +13,7 @@ from lms.djangoapps.discussion.rest_api.views import (
     CourseDiscussionRolesAPIView,
     CourseDiscussionSettingsAPIView,
     CourseTopicsView,
+    CourseTopicsViewV2,
     CourseView,
     ReplaceUsernamesView,
     RetireUserView,
@@ -55,6 +56,11 @@ urlpatterns = [
         fr"^v1/course_topics/{settings.COURSE_ID_PATTERN}",
         CourseTopicsView.as_view(),
         name="course_topics"
+    ),
+    re_path(
+        fr"^v2/course_topics/{settings.COURSE_ID_PATTERN}",
+        CourseTopicsViewV2.as_view(),
+        name="course_topics_v2"
     ),
     path('v1/', include(ROUTER.urls)),
 ]
