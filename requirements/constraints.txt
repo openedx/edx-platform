@@ -30,7 +30,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.36.0
+edx-enterprise==3.36.3
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -96,4 +96,3 @@ py2neo<2022
 
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
-
