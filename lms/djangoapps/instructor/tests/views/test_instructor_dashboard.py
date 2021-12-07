@@ -12,7 +12,6 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from edx_django_utils.plugins import get_plugins_view_context
 from pyquery import PyQuery as pq
 from pytz import UTC
 
@@ -24,11 +23,11 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseAccess
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import XssTestMixin
+from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
-from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -36,7 +35,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
-from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
@@ -585,16 +583,20 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # assert we don't get a 500 error
         assert 200 == response.status_code
 
-    def test_plugin_context(self):
+    @patch("lms.djangoapps.instructor.views.instructor_dashboard.get_plugins_view_context")
+    def test_external_plugin_integration(self, mock_get_plugins_view_context):
         """
-        Tests that whether context from plugins is being returned
+        Tests that whether context from plugins is being reflected/added in instructor dashboard.
         """
-        context_from_plugins = get_plugins_view_context(
-            ProjectType.LMS,
-            INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
-        )
+        test_studio_url = get_studio_url(self.course, 'course')
 
-        assert 'plugins' in context_from_plugins
+        context = {
+            'studio_url': test_studio_url
+        }
+        mock_get_plugins_view_context.return_value = context
+
+        response = self.client.get(self.url)
+        self.assertContains(response, test_studio_url)
 
 
 @ddt.ddt
