@@ -13,7 +13,7 @@ from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_MISSING_PARAM
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM
 from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -457,9 +457,11 @@ class TestUpdateGradeView(BaseViewTest):
         super().setUp()
         self.client.login(username=self.staff.username, password=self.password)
 
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
-    def test_submit_grade_failure(self, mock_submit_grade):
+    def test_submit_grade_failure(self, mock_submit_grade, mock_check_lock):
         """ An ORA failure to submit a grade returns a server error """
+        mock_check_lock.return_value = {'lock_status': 'in-progress'}
         mock_submit_grade.return_value = {'success': False, 'msg': 'Danger, Will Robinson!'}
         url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
@@ -474,6 +476,10 @@ class TestUpdateGradeView(BaseViewTest):
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
     def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock):
         """ A grade update success should clear the submission lock and return submission meta """
+        mock_check_lock.side_effect = [
+            {'lock_status': 'in-progress'},
+            {'lock_status': 'unlocked'}
+        ]
         mock_submit_grade.return_value = {'success': True, 'msg': ''}
         mock_assessment = {
             'feedback': "Base Assessment Feedback",
@@ -491,7 +497,6 @@ class TestUpdateGradeView(BaseViewTest):
             ]
         }
         mock_get_info.return_value = mock_assessment
-        mock_check_lock.return_value = {'lock_status': 'unlocked'}
 
         url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
@@ -521,9 +526,21 @@ class TestUpdateGradeView(BaseViewTest):
         # Verify that clear lock was called
         mock_delete_lock.assert_called_once()
 
-    def test_submit_lock_contested(self):
-        """ TODO - Submitting a grade should be blocked if someone else has obtained the lock """
-        pass
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    def test_submit_lock_contested(self, mock_submit_grade, mock_check_lock):
+        """ Submitting a grade should be blocked if someone else has obtained the lock """
+        mock_check_lock.side_effect = [{'lock_status': 'locked'}]
+        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        data = self.test_grade_data
+
+        response = self.client.post(url, data, format='json')
+
+        assert response.status_code == 403
+        assert response.content.decode() == ERR_LOCK_CONTESTED
+
+        # Verify that submit grade was not called
+        mock_submit_grade.assert_not_called()
 
     def test_parital_success(self):
         """ TODO - For success in updating a grade but failure to clear lock or get submission meta... ? """
