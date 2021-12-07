@@ -68,10 +68,10 @@ class SaveForLaterApiView(APIView):
         course_key = CourseKey.from_string(course_id)
 
         if getattr(request, 'limited', False):
-            return Response({'result': 'failure'}, status=403)
+            return Response({'error_code': 'rate-limited'}, status=403)
 
         if get_email_validation_error(email):
-            return Response({'result': 'failure'}, status=400)
+            return Response({'error_code': 'incorrect-email'}, status=400)
 
         try:
             course_overview = CourseOverview.get_from_id(course_key)
@@ -81,7 +81,7 @@ class SaveForLaterApiView(APIView):
                 course_id=course_id,
             )
         except CourseOverview.DoesNotExist:
-            return Response({'result': 'failure'}, status=404)
+            return Response({'error-code': 'course-not-found'}, status=404)
 
         site = Site.objects.get_current()
         message_context = get_base_template_context(site)
@@ -115,6 +115,6 @@ class SaveForLaterApiView(APIView):
             )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send save for later email ', exc_info=True)
-            return Response({'result': 'failure'}, status=400)
+            return Response({'error-code': 'email-not-send'}, status=400)
         else:
             return Response({'result': 'success'}, status=200)
