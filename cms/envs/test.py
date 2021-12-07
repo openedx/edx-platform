@@ -138,6 +138,7 @@ LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
+DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
