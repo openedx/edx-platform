@@ -2443,6 +2443,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
+    'marketing_emails_opt_in': 'hidden',
 }
 EDXAPP_PARSE_KEYS = {}
 
