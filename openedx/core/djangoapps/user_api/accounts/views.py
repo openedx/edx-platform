@@ -1314,12 +1314,17 @@ class UsernameReplacementView(APIView):
         If the desired username is available, that will be returned.
         Otherwise it will generate unique suffixes to the desired username until it is an available username.
         """
+        # https://openedx.atlassian.net/browse/ENT-2824
+        suffix_block_list = ['420', '69', '666']
         new_username = desired_username
         # Keep checking usernames in case desired_username + random suffix is already taken
         while True:
             if User.objects.filter(username=new_username).exists():
                 unique_suffix = uuid.uuid4().hex[:suffix_length]
-                new_username = desired_username + unique_suffix
+                while any(substring in unique_suffix for substring in suffix_block_list):
+                    unique_suffix = uuid.uuid4().hex[:suffix_length]
+                # adding a dash between user-supplied and system-generated values to avoid weird combinations
+                new_username = desired_username + '-' + unique_suffix
             else:
                 break
         return new_username
