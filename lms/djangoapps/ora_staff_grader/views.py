@@ -2,7 +2,7 @@
 Views for Enhanced Staff Grader
 """
 import json
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_LOCK_CONTESTED
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
@@ -263,11 +263,15 @@ class UpdateGradeView(RetrieveAPIView):
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
+        # Reassert that we have ownership of the submission lock
+        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+        if not lock_info.get('lock_status') == 'in-progress':
+            # TODO - This should be updated to an error object with our error overhaul story
+            return HttpResponseForbidden(ERR_LOCK_CONTESTED)
+
         # Transform data from frontend format to staff assess format
         context = {'submission_uuid': submission_uuid}
         grade_data = StaffAssessSerializer(request.data, context=context).data
-
-        # TODO - Reassert that we have ownership of the submission lock
 
         # Perform the staff assessment
         response = self.submit_grade(request, ora_location, grade_data)
