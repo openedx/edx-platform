@@ -60,10 +60,11 @@ class SaveForLaterApiView(APIView):
             }
         """
         user = request.user
-        course_id = request.POST.get('course_id')
-        email = request.POST.get('email')
-        marketing_url = request.POST.get('marketing_url')
-        org_img_url = request.POST.get('org_img_url')
+        data = request.data
+        course_id = data.get('course_id')
+        email = data.get('email')
+        marketing_url = data.get('marketing_url')
+        org_img_url = data.get('org_img_url')
 
         course_key = CourseKey.from_string(course_id)
 
@@ -81,7 +82,7 @@ class SaveForLaterApiView(APIView):
                 course_id=course_id,
             )
         except CourseOverview.DoesNotExist:
-            return Response({'error-code': 'course-not-found'}, status=404)
+            return Response({'error_code': 'course-not-found'}, status=404)
 
         site = Site.objects.get_current()
         message_context = get_base_template_context(site)
@@ -115,6 +116,6 @@ class SaveForLaterApiView(APIView):
             )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send save for later email ', exc_info=True)
-            return Response({'error-code': 'email-not-send'}, status=400)
+            return Response({'error_code': 'email-not-send'}, status=400)
         else:
             return Response({'result': 'success'}, status=200)
