@@ -58,8 +58,4 @@ jobs:
 
       - name: run tests
         run: |
-          python -m pytest -W ignore::django.utils.deprecation.RemovedInDjango40Warning -W ignore::django.utils.deprecation.RemovedInDjango41Warning -p no:randomly --ds=${{ env.settings_path }} -k q ${{ matrix.test_module }}
-
-      - name: what is left
-        run: |
-          ls -al
+          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} -k q ${{ matrix.test_module }}
