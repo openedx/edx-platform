@@ -186,10 +186,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     modal = new EditXBlockModal(options);
                 event.preventDefault();
 
-                //now check if we want to launch in a modal
-                if(true){
+                  // WIP: now check if we want to launch in a modal for the new editors (behind waffle flag)
+                var useNewEditor = this.$('.edit-button').attr("use-new-editors-set")
+                if( useNewEditor === "true") {
+                    console.log(useNewEditor);
                     console.log("Here we want to pull in the waffle flag from the html");
-                    console.log(this.something.options.useNewTextEditor);
+                    console.log(this.options.model.id);
                     return;
                 }
                 modal.edit(xblockElement, this.model, {

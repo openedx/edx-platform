@@ -78,7 +78,13 @@ block_is_unit = is_unit(xblock)
                     % if can_edit:
                         % if not show_inline:
                             <li class="action-item action-edit">
-                                <button class="btn-default edit-button action-button">
+                                <button class="btn-default edit-button action-button"
+                                % if use_new_editor:
+                                    use-new-editors-set="true"
+                                %else:
+                                    use-new-editors-set="false"
+                                % endif
+                                >
                                     <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>
