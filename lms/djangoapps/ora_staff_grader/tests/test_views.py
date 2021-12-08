@@ -352,7 +352,7 @@ class TestSubmissionLockView(APITestCase):
         assert response.status_code == 400
         assert response.content.decode() == ERR_BAD_ORA_LOCATION
 
-    @patch('lms.djangoapps.ora_staff_grader.xblock_handlers_mixin.call_xblock_json_handler')
+    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_claim_lock(self, mock_xblock_handler):
         """ Passing value=True indicates to claim a submission lock. Success returns lock status 'in-progress'. """
         mock_return_data = {
@@ -369,7 +369,7 @@ class TestSubmissionLockView(APITestCase):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.xblock_handlers_mixin.call_xblock_json_handler')
+    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_claim_lock_contested(self, mock_xblock_handler):
         """ Attempting to claim a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_return_data = {
@@ -385,7 +385,7 @@ class TestSubmissionLockView(APITestCase):
 
     # Tests for deleting a lock (DELETE)
 
-    @patch('lms.djangoapps.ora_staff_grader.xblock_handlers_mixin.call_xblock_json_handler')
+    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_delete_lock(self, mock_xblock_handler):
         """ Passing value=False indicates to delete a submission lock. Success returns lock status 'unlocked'. """
         mock_return_data = {
@@ -402,7 +402,7 @@ class TestSubmissionLockView(APITestCase):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.xblock_handlers_mixin.call_xblock_json_handler')
+    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_delete_lock_contested(self, mock_xblock_handler):
         """ Attempting to delete a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_return_data = {
