@@ -1060,8 +1060,9 @@ def dates(request, course_id):
 
     course_key = CourseKey.from_string(course_id)
     if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
-        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
-        raise Redirect(microfrontend_url)
+        raise Redirect(get_learning_mfe_home_url(
+            course_key=course_key, view_name=COURSE_DATES_NAME, params=request.GET,
+        ))
 
     # Enable NR tracing for this view based on course
     monitoring_utils.set_custom_attribute('course_id', str(course_key))
@@ -1137,8 +1138,9 @@ def progress(request, course_id, student_id=None):
     course_key = CourseKey.from_string(course_id)
 
     if course_home_mfe_progress_tab_is_active(course_key) and not request.user.is_staff:
-        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_PROGRESS_NAME)
-        raise Redirect(microfrontend_url)
+        raise Redirect(get_learning_mfe_home_url(
+            course_key=course_key, view_name=COURSE_PROGRESS_NAME, params=request.GET,
+        ))
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
