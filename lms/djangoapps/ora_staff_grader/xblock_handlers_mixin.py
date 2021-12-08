@@ -2,6 +2,7 @@
 import json
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler
 
+
 class XblockHandlersMixin():
     """ XBlock handler functions for ESG. Provides a light interface and data transforms for reuse and ease-of-use. """
 
