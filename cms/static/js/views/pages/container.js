@@ -13,7 +13,6 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
-
             events: {
                 'click .edit-button': 'editXBlock',
                 'click .access-button': 'editVisibilitySettings',
@@ -25,7 +24,8 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             options: {
                 collapsedClass: 'is-collapsed',
-                canEdit: true // If not specified, assume user has permission to make changes
+                canEdit: true,// If not specified, assume user has permission to make changes
+                useNewTextEditor: true
             },
 
             view: 'container_preview',
@@ -186,6 +186,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     modal = new EditXBlockModal(options);
                 event.preventDefault();
 
+                //now check if we want to launch in a modal
+                if(true){
+                    console.log("Here we want to pull in the waffle flag from the html");
+                    console.log(this.something.options.useNewTextEditor);
+                    return;
+                }
                 modal.edit(xblockElement, this.model, {
                     readOnlyView: !this.options.canEdit,
                     refresh: function() {
