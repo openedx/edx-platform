@@ -285,7 +285,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
     # validate transcription providers
     transcription_plans = get_3rd_party_transcription_plans()
-    if provider in list(transcription_plans.keys()):
+    if provider in list(transcription_plans.keys()):   # lint-amnesty, pylint: disable=consider-iterating-dictionary
 
         # Further validations for providers
         if provider == TranscriptProvider.CIELO24:

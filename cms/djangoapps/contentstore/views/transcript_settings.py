@@ -72,7 +72,7 @@ def validate_transcript_credentials(provider, **credentials):
             must_have_props = ['api_key', 'username']
 
         missing = [
-            must_have_prop for must_have_prop in must_have_props if must_have_prop not in list(credentials.keys())
+            must_have_prop for must_have_prop in must_have_props if must_have_prop not in list(credentials.keys())   # lint-amnesty, pylint: disable=consider-iterating-dictionary
         ]
         if missing:
             error_message = '{missing} must be specified.'.format(missing=' and '.join(missing))

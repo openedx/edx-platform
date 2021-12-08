@@ -139,7 +139,7 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
-            assert list(no_courses) == []
+            assert not list(no_courses)
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
