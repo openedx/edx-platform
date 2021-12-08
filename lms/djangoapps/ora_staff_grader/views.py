@@ -26,7 +26,18 @@ PARAM_ORA_LOCATION = 'oraLocation'
 PARAM_SUBMISSION_ID = 'submissionUUID'
 
 
-class InitializeView(XblockHandlersMixin, RetrieveAPIView):
+class StaffGraderBaseView(XblockHandlersMixin, RetrieveAPIView):
+    """ Base view for common setup between ESG views """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (IsAuthenticated,)
+
+
+class InitializeView(StaffGraderBaseView):
     """
     GET course metadata
 
@@ -42,13 +53,6 @@ class InitializeView(XblockHandlersMixin, RetrieveAPIView):
     - 400 for invalid/missing ORA location
     - 403 for invalid access/credentials
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
         response_data = {}
@@ -73,7 +77,7 @@ class InitializeView(XblockHandlersMixin, RetrieveAPIView):
         return Response(InitializeSerializer(response_data).data)
 
 
-class SubmissionFetchView(XblockHandlersMixin, RetrieveAPIView):
+class SubmissionFetchView(StaffGraderBaseView):
     """
     GET submission contents and assessment info, if any
 
@@ -101,13 +105,6 @@ class SubmissionFetchView(XblockHandlersMixin, RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_info = self.get_submission_info(request, ora_location, submission_uuid)
@@ -123,7 +120,7 @@ class SubmissionFetchView(XblockHandlersMixin, RetrieveAPIView):
         return Response(serializer.data)
 
 
-class SubmissionStatusFetchView(XblockHandlersMixin, RetrieveAPIView):
+class SubmissionStatusFetchView(StaffGraderBaseView):
     """
     GET submission grade status, lock status, and grade data
 
@@ -145,13 +142,6 @@ class SubmissionStatusFetchView(XblockHandlersMixin, RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
@@ -165,7 +155,7 @@ class SubmissionStatusFetchView(XblockHandlersMixin, RetrieveAPIView):
         return Response(serializer.data)
 
 
-class UpdateGradeView(XblockHandlersMixin, RetrieveAPIView):
+class UpdateGradeView(StaffGraderBaseView):
     """
     POST submit a grade for a submission
 
@@ -198,13 +188,6 @@ class UpdateGradeView(XblockHandlersMixin, RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         # Reassert that we have ownership of the submission lock
@@ -240,7 +223,7 @@ class UpdateGradeView(XblockHandlersMixin, RetrieveAPIView):
         return Response(serializer.data)
 
 
-class SubmissionLockView(XblockHandlersMixin, RetrieveAPIView):
+class SubmissionLockView(StaffGraderBaseView):
     """
     POST claim a submission lock for grading
     DELETE release a submission lock
@@ -257,13 +240,6 @@ class SubmissionLockView(XblockHandlersMixin, RetrieveAPIView):
     - 400 for bad request or missing query params
     - 403 for bad auth or contested lock with payload { 'error': '<error-code>'}
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Claim a submission lock """
