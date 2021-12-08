@@ -46,7 +46,7 @@ from openedx.features.course_experience.views.welcome_message import WelcomeMess
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
 
 EMPTY_HANDOUTS_HTML = '<ol></ol>'
 

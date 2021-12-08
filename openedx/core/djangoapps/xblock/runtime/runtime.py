@@ -11,7 +11,7 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from functools import lru_cache
+from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
 from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError
@@ -19,6 +19,7 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
@@ -31,8 +32,8 @@ from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
 from common.djangoapps.static_replace import process_static_urls
-from xmodule.errortracker import make_error_tracker
-from xmodule.modulestore.django import ModuleI18nService
+from xmodule.errortracker import make_error_tracker  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -235,6 +236,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 user_is_staff=self.user.is_staff,
                 anonymous_user_id=self.anonymous_student_id,
             )
+        elif service_name == "mako":
+            return MakoService()
         elif service_name == "i18n":
             return ModuleI18nService(block=block)
         # Check if the XBlockRuntimeSystem wants to handle this:

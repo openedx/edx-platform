@@ -285,14 +285,14 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
-    is_new_user(request, new_user)
+    is_new_user(form.cleaned_data['password'], new_user)
     return new_user
 
 
-def is_new_user(request, user):
+def is_new_user(password, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
+        check_pwned_password_and_send_track_event.delay(user.id, password, user.is_staff, True)
 
 
 def _link_user_to_third_party_provider(
@@ -581,7 +581,7 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
-        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and 'marketing_emails_opt_in' not in data:
+        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
                 settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
                 True,
@@ -820,7 +820,8 @@ class RegistrationValidationView(APIView):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
-        return get_password_validation_error(password, username, email)
+        reset_password_page = request.data.get('reset_password_page', 'false') == 'true'
+        return get_password_validation_error(password, username, email, reset_password_page)
 
     def country_handler(self, request):
         """ Country validator """

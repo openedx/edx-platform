@@ -315,6 +315,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
+                'user_is_privileged': False,
+                'user_roles': ['Student'],
             }
         )
 

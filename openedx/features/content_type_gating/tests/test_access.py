@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock  # lint-amnesty, pylint: disable=wrong-import-order
 from pyquery import PyQuery as pq
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
@@ -42,9 +42,9 @@ from openedx.features.content_type_gating.services import ContentTypeGatingServi
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 
 METADATA = {
     'group_access': {

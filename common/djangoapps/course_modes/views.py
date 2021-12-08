@@ -176,12 +176,15 @@ class ChooseModeView(View):
             user=request.user,
             course_key=course_key
         )
+        is_single_mode = len(modes) == 1
+
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
                 kwargs={'course_id': course_id}
             ),
             "modes": modes,
+            "is_single_mode": is_single_mode,
             "has_credit_upsell": has_credit_upsell,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,

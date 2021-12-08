@@ -315,7 +315,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
         template_name = f"{info_module.TEMPLATE_DIR}/course_updates.html"
         info_module.get_html()
         # Assertion to validate that render function is called with the expected context
-        info_module.system.render_template.assert_called_once_with(
+        info_module.runtime.service(info_module, 'mako').render_template.assert_called_once_with(
             template_name,
             expected_context
         )

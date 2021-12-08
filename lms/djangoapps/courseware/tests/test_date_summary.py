@@ -37,6 +37,7 @@ from lms.djangoapps.courseware.models import (
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -654,6 +655,14 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course = create_course_run(days_till_start=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        block = VerificationDeadlineDate(course, user)
+        assert not block.is_allowed
+
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
+    def test_verification_deadline_with_integrity_signature(self):
+        course = create_course_run(days_till_start=-1)
+        user = create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = VerificationDeadlineDate(course, user)
         assert not block.is_allowed
 

@@ -545,15 +545,15 @@ SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
 
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)
+
 ####################### Plugin Settings ##########################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
-
-########################## Derive Any Derived Settings  #######################
-
-derive_settings(__name__)
 
 ############# CORS headers for cross-domain requests #################
 if FEATURES.get('ENABLE_CORS_HEADERS'):

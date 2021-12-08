@@ -19,7 +19,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_module import XmlParserMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 log = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ def _(text):
 
 @XBlock.needs('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Provides a discussion forum that is inline with other content in the courseware.
@@ -220,7 +221,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
             'login_msg': login_msg,
         }
 
-        fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html',
+                                                                                context))
         fragment.initialize_js('DiscussionInlineBlock')
 
         return fragment
@@ -230,7 +232,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders author view for Studio.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.render_template(
+        fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
             {'discussion_id': self.discussion_id}
         ))

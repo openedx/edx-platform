@@ -48,6 +48,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -720,11 +721,12 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             Fragment: The fragment representing the discussion board
         """
         course_key = CourseKey.from_string(course_id)
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and settings.DISCUSSIONS_MICROFRONTEND_URL:
+        mfe_url = get_discussions_mfe_url(course_key)
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and mfe_url:
             fragment = Fragment(
                 HTML(
                     "<iframe id='discussions-mfe-tab-embed' src='{src}'></iframe>"
-                ).format(src=f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{course_id}/")
+                ).format(src=mfe_url)
             )
             fragment.add_css(
                 """

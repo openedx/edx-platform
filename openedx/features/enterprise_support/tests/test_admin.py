@@ -14,7 +14,7 @@ from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.features.enterprise_support.admin.forms import CSVImportForm
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):

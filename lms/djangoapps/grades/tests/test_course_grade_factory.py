@@ -279,7 +279,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         iterator, but it shouldn't error.
         """
         grade_results = list(CourseGradeFactory().iter([], self.course))
-        assert grade_results == []
+        assert not grade_results
 
     def test_all_empty_grades(self):
         """

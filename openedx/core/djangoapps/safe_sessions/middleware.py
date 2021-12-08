@@ -76,7 +76,6 @@ Custom Attributes:
 """
 
 import inspect
-from base64 import b64encode
 from hashlib import sha1, sha256
 from logging import getLogger
 from typing import Union
@@ -91,7 +90,6 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import SettingToggle
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -109,28 +107,6 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
 LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
-
-# .. toggle_name: VERIFY_USER_CHANGE_UNCONDITIONAL
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: If False, only check for user mismatch if a session cookie is being set in
-#   the response (the status quo behavior). If True, check for user mismatches regardless of
-#   response cookie status (the desired future behavior). Once this has been enabled for a week or
-#   so, the toggle can be removed in favor of the True setting.
-#   (This is intended to *restore* an older behavior. It seems that all requests used to set a new
-#   session cookie, and for some reason no longer do, so this is really just an attempt to return
-#   to that previous behavior no matter whether a new session cookie will be set. The only difference
-#   should be that now logout responses will also be checked, but those now use a call that declares
-#   them safe, so that part should be a no-op.)
-# .. toggle_warnings: This will expose some analysis code to a greater volume of requests and
-#   possibly different request configurations, which may expose some latent bugs that could cause
-#   request failure. Watch error rates and be ready to toggle off again.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-11-12
-# .. toggle_target_removal_date: 2022-01-01
-# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1952
-VERIFY_USER_CHANGE_UNCONDITIONAL = SettingToggle('VERIFY_USER_CHANGE_UNCONDITIONAL', default=False,
-                                                 module_name=__name__)
 
 log = getLogger(__name__)
 
@@ -324,12 +300,14 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         final verification before sending the response (in
         process_response).
         """
-        # 2021-10-29: Temporary debugging attr to answer the question
+        # 2021-12-01: Temporary debugging attr to answer the question
         # "are browsers sometimes sending in multiple session
-        # cookies?" We've observed behavior that might be consistent
-        # with this, perhaps due to an additional cookie set on the
-        # wrong domain, and assuming that the cookies *occasionally*
-        # are sent in a different order. -- timmc
+        # cookies?" Answer: Yes, this sometimes happens, although it
+        # does not appear to cause user mismatches. (There was a theory
+        # that multiple cookies might sometimes be sent in a varying
+        # order.) We may still want to have the ability to monitor this
+        # oddity, but as far as we can tell, it is not essential to the
+        # core safe-sessions monitoring.
         try:
             set_custom_attribute(
                 'safe_sessions.session_cookie_count',
@@ -381,12 +359,11 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         cookie.
 
         Also, the session cookie is deleted if prior verification failed
-        or the designated user in the request has changed since the
-        original request.
+        or the new cookie can't be created for some reason.
 
         Processing the response is a multi-step process, as follows:
 
-        Step 1. Call the parent's method to generate the basic cookie.
+        Step 1. Call the parent's method to (maybe) generate the basic cookie.
 
         Step 2. Verify that the user marked at the time of
         process_request matches the user at this time when processing
@@ -401,40 +378,11 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         response = super().process_response(request, response)  # Step 1
 
-        # 2021-10-29: Temporary debugging attrs, to answer the
-        # question "are we calling _verify_user on too few responses?"
-        # We should probably be calling it on every response, and it
-        # looks like we might be missing most responses -- some
-        # testing shows that most of my LMS responses do *not* get a
-        # newly coined session cookie, but I seem to recall that that
-        # used to happen. If so, we may have at some point stopped
-        # calling _verify_user as often as we should. -- timmc
-        try:
-            set_custom_attribute(
-                'safe_sessions.request_had_valid_session',
-                hasattr(request, 'safe_cookie_verified_session_id')
-            )
-            set_custom_attribute(
-                'safe_sessions.response_has_session_cookie',
-                _is_cookie_present(response)
-            )
-        except:  # pylint: disable=bare-except
-            pass
-
-        verify_all = VERIFY_USER_CHANGE_UNCONDITIONAL.is_enabled()
-
-        # One of the two places this can be called from (desired future location).
-        if verify_all:
-            user_id_in_session = self.get_user_id_from_session(request)
-            self._verify_user(request, response, user_id_in_session)  # Step 2
+        user_id_in_session = self.get_user_id_from_session(request)
+        self._verify_user(request, response, user_id_in_session)  # Step 2
 
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
-                # The other, older place this can be called from.
-                if not verify_all:
-                    user_id_in_session = self.get_user_id_from_session(request)
-                    self._verify_user(request, response, user_id_in_session)  # Step 2
-
                 # Use the user_id marked in the session instead of the
                 # one in the request in case the user is not set in the
                 # request, for example during Anonymous API access.
@@ -691,14 +639,6 @@ def _delete_cookie(request, response):
         domain=settings.SESSION_COOKIE_DOMAIN,
         secure=settings.SESSION_COOKIE_SECURE or None,
         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
-    )
-
-    # Log the cookie, but cap the length and base64 encode to make sure nothing
-    # malicious gets directly dumped into the log.
-    cookie_header = request.META.get('HTTP_COOKIE', '')[:4096]
-    log.warning(
-        "Malformed Cookie Header? First 4K, in Base64: %s",
-        b64encode(str(cookie_header).encode())
     )
 
     # Note, there is no request.user attribute at this point.

@@ -112,7 +112,7 @@ cffi==1.15.0
     # via cryptography
 chardet==4.0.0
     # via pysrt
-charset-normalizer==2.0.7
+charset-normalizer==2.0.9
     # via
     #   -r requirements/edx/paver.txt
     #   aiohttp
@@ -246,7 +246,7 @@ django-config-models==2.2.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.10.0
+django-cors-headers==3.10.1
     # via -r requirements/edx/base.in
 django-countries==7.2.1
     # via
@@ -390,7 +390,7 @@ drf-jwt==1.19.1
     # via edx-drf-extensions
 drf-yasg==1.20.0
     # via edx-api-doc-tools
-edx-ace==1.4.0
+edx-ace==1.4.1
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.5.0
     # via -r requirements/edx/base.in
@@ -437,7 +437,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.34.1
+edx-enterprise==3.36.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -466,7 +466,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.0
     # via -r requirements/edx/base.in
-edx-proctoring==4.7.2
+edx-proctoring==4.7.3
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -483,7 +483,7 @@ edx-search==3.1.0
     # via -r requirements/edx/base.in
 edx-sga==0.17.2
     # via -r requirements/edx/base.in
-edx-submissions==3.4.1
+edx-submissions==3.4.2
     # via
     #   -r requirements/edx/base.in
     #   ora2
@@ -667,10 +667,8 @@ multidict==5.2.0
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.0.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+mysqlclient==2.1.0
+    # via -r requirements/edx/base.in
 newrelic==7.2.4.171
     # via
     #   -r requirements/edx/base.in
@@ -698,7 +696,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.6.0
     # via -r requirements/edx/base.in
-ora2==3.7.4
+ora2==3.7.6
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
@@ -745,7 +743,7 @@ pycountry==20.7.3
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
-pycryptodomex==3.11.0
+pycryptodomex==3.12.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -772,7 +770,7 @@ pyjwt[crypto]==2.3.0
     #   social-auth-core
 pylatexenc==2.10
     # via olxcleaner
-pylti1p3==1.9.1
+pylti1p3==1.10.0
     # via -r requirements/edx/base.in
 pymongo==3.10.1
     # via
@@ -816,7 +814,7 @@ python-slugify==4.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-python-swiftclient==3.12.0
+python-swiftclient==3.13.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
     # via
@@ -899,7 +897,7 @@ s3transfer==0.1.13
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.7.2
+scipy==1.7.3
     # via
     #   chem
     #   openedx-calc
@@ -998,7 +996,7 @@ text-unidecode==1.3
     # via python-slugify
 tqdm==4.62.3
     # via nltk
-typing-extensions==4.0.0
+typing-extensions==4.0.1
     # via async-timeout
 unicodecsv==0.14.1
     # via

@@ -906,7 +906,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             # ensure the mock api call was made.  NOTE: the following line
             # approximates the check - if the headers were empty it means
             # there was no last request.
-            assert httpretty.last_request().headers != {}
+            assert httpretty.last_request().headers
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):

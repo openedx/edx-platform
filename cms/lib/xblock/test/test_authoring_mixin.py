@@ -5,8 +5,10 @@ Tests for the Studio authoring XBlock mixin.
 
 from django.conf import settings
 from django.test.utils import override_settings
+from xblock.core import XBlock
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.lib.xmodule.xmodule.tests.test_export import PureXBlock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import (
@@ -32,6 +34,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     FEATURES_WITH_ENROLLMENT_TRACK_DISABLED = settings.FEATURES.copy()
     FEATURES_WITH_ENROLLMENT_TRACK_DISABLED['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = False
 
+    @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def setUp(self):
         """
         Create a simple course with a video component.
@@ -58,8 +61,14 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             parent_location=vertical.location,
             display_name='Test Vertical'
         )
+        pure = ItemFactory.create(
+            category='pure',
+            parent_location=vertical.location,
+            display_name='Test Pure'
+        )
         self.vertical_location = vertical.location
         self.video_location = video.location
+        self.pure_location = pure.location
         self.pet_groups = [Group(1, 'Cat Lovers'), Group(2, 'Dog Lovers')]
 
     def create_content_groups(self, content_groups):
@@ -257,4 +266,16 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_contains(
             self.video_location,
             [self.ENROLLMENT_GROUPS_TITLE, 'audit course', 'verified course', self.GROUP_NO_LONGER_EXISTS]
+        )
+
+    def test_pure_xblock_visibility(self):
+        self.create_content_groups(self.pet_groups)
+        self.verify_visibility_view_contains(
+            self.pure_location,
+            [self.CONTENT_GROUPS_TITLE, 'Cat Lovers', 'Dog Lovers']
+        )
+
+        self.verify_visibility_view_does_not_contain(
+            self.pure_location,
+            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.ENROLLMENT_GROUPS_TITLE]
         )

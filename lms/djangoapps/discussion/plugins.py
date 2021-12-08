@@ -9,6 +9,7 @@ from django.utils.translation import gettext_noop
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.features.lti_course_tab.tab import DiscussionLtiCourseTab
 from xmodule.tabs import TabFragmentViewMixin
 
@@ -35,8 +36,9 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            if ENABLE_DISCUSSIONS_MFE.is_enabled(course.id) and settings.DISCUSSIONS_MICROFRONTEND_URL:
-                return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{course.id}/"
+            mfe_url = get_discussions_mfe_url(course.id)
+            if ENABLE_DISCUSSIONS_MFE.is_enabled(course.id) and mfe_url:
+                return mfe_url
             return _link_func(course, reverse_func)
 
         return link_func
