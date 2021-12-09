@@ -64,10 +64,10 @@ from common.djangoapps.student.models import (
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .serializers import CourseInfoSerializer
 from .utils import serialize_upgrade_info

@@ -41,8 +41,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import from_timestamp
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 TEST_CREDIT_PROVIDER_SECRET_KEY_TWO = "abcf433d583c8baebae1784bad3232e6"
