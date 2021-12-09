@@ -19,8 +19,8 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.lib.cache_utils import request_cached
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 FORUM_ROLE_ADMINISTRATOR = gettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = gettext_noop('Moderator')

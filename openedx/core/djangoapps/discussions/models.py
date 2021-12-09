@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
-from enum import Enum
+from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel

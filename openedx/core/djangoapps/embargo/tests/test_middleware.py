@@ -13,8 +13,8 @@ from django.urls import reverse
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
