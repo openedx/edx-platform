@@ -351,7 +351,29 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
-        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-mismatch")
+        set_attr_call_args = [call.args for call in mock_attr.call_args_list]
+        assert ("safe_sessions.user_mismatch", "request-response-mismatch") in set_attr_call_args
+
+    @override_settings(ENFORCE_SAFE_SESSIONS=True)
+    def test_enforce_on_user_change_before_response(self):
+        """
+        Copy of test_warn_on_user_change_before_response but with enforcement enabled.
+        The differences should be the status code and the session deletion.
+        """
+        self.set_up_for_success()
+
+        assert SafeSessionMiddleware.get_user_id_from_session(self.request) is not None
+
+        # But then user changes unexpectedly
+        self.request.user = UserFactory.create()
+
+        with self.assert_logged_for_request_user_mismatch(self.user.id, self.request.user.id, 'warning', '/', False):
+            with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
+                response = SafeSessionMiddleware().process_response(self.request, self.client.response)
+        assert response.status_code == 401
+        assert SafeSessionMiddleware.get_user_id_from_session(self.request) is None  # session cleared
+        set_attr_call_args = [call.args for call in mock_attr.call_args_list]
+        assert ("safe_sessions.user_mismatch", "request-response-mismatch") in set_attr_call_args
 
     def test_warn_on_user_change_from_session(self):
         """
@@ -366,7 +388,8 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
-        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-session-mismatch")
+        set_attr_call_args = [call.args for call in mock_attr.call_args_list]
+        assert ("safe_sessions.user_mismatch", "request-session-mismatch") in set_attr_call_args
 
     def test_warn_on_user_change_in_both(self):
         """
@@ -382,7 +405,8 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:
                 response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         assert response.status_code == 200
-        mock_attr.assert_called_with("safe_sessions.user_mismatch", "request-response-and-session-mismatch")
+        set_attr_call_args = [call.args for call in mock_attr.call_args_list]
+        assert ("safe_sessions.user_mismatch", "request-response-and-session-mismatch") in set_attr_call_args
 
     @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
     def test_warn_with_verbose_logging(self):
