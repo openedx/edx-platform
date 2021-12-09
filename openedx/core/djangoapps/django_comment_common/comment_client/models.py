@@ -102,6 +102,15 @@ class Model:
 
     @classmethod
     def retrieve_all(cls, params=None):
+        """
+        Performs a GET request against the resource's listing endpoint.
+
+        Arguments:
+            params: A dictionary of parameters to be passed as the request's query string.
+
+        Returns:
+            The parsed JSON response from the backend.
+        """
         return perform_request(
             'get',
             cls.url(action='get_all'),
