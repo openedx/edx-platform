@@ -14,6 +14,7 @@ from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -25,7 +26,6 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)
