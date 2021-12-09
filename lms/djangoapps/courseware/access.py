@@ -13,13 +13,11 @@ Note: The access control logic in this file does NOT check for enrollment in
 
 
 import logging
-from datetime import datetime
 
 from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from pytz import UTC
 from xblock.core import XBlock
 
 from lms.djangoapps.courseware.access_response import (
@@ -250,22 +248,35 @@ def _can_enroll_courselike(user, courselike):
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
 
+    course_enrollment_open = courselike.is_enrollment_open()
+
+    user_has_staff_access = _has_staff_access_to_descriptor(user, courselike, course_key)
+
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
     # they may enroll, except if the CEA has already been used by a different user.
     # Note that as dictated by the legacy database schema, the filter call includes
     # a `course_id` kwarg which requires a CourseKey.
     if user is not None and user.is_authenticated:
         cea = CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key).first()
-        if cea and cea.valid_for_user(user):
-            return ACCESS_GRANTED
-        elif cea:
-            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
-                cea.user.id,
-                user.id,
-            ))
-            return ACCESS_DENIED
+        if cea:
+            # DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED flag is used to disable enrollment for user invited
+            # to a course if user is registering when the course enrollment is closed
+            if (
+                settings.FEATURES.get('DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED') and
+                not course_enrollment_open and
+                not user_has_staff_access
+            ):
+                return ACCESS_DENIED
+            elif cea.valid_for_user(user):
+                return ACCESS_GRANTED
+            else:
+                debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+                    cea.user.id,
+                    user.id,
+                ))
+                return ACCESS_DENIED
 
-    if _has_staff_access_to_descriptor(user, courselike, course_key):
+    if user_has_staff_access:
         return ACCESS_GRANTED
 
     # Access denied when the course requires an invitation
@@ -273,10 +284,7 @@ def _can_enroll_courselike(user, courselike):
         debug("Deny: invitation only")
         return ACCESS_DENIED
 
-    now = datetime.now(UTC)
-    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=UTC)
-    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=UTC)
-    if enrollment_start < now < enrollment_end:
+    if course_enrollment_open:
         debug("Allow: in enrollment period")
         return ACCESS_GRANTED
 

@@ -1206,6 +1206,12 @@ class CourseBlock(
     def has_started(self):
         return course_metadata_utils.has_course_started(self.start)
 
+    def is_enrollment_open(self):
+        """
+        Returns True if course enrollment is open
+        """
+        return course_metadata_utils.is_enrollment_open(self.enrollment_start, self.enrollment_end)
+
     @property
     def grader(self):
         return grader_from_conf(self.raw_grader)
