@@ -229,6 +229,8 @@ class ProgramDiscussionLTI:
         Returns:
             Dictionary with LTI parameters containing PII.
         """
+        if configuration.version != configuration.LTI_1P1:
+            return {}
         pii_config = {}
         if configuration.pii_share_username:
             pii_config['person_sourcedid'] = request.user.username

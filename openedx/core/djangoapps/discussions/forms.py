@@ -23,9 +23,10 @@ class ProgramDiscussionsConfigurationForm(forms.ModelForm):
         pii_share_username = self.cleaned_data.get('pii_share_username', False)
         pii_share_email = self.cleaned_data.get('pii_share_email', False)
         lti_configuration = self.cleaned_data.get('lti_configuration', None)
-        lti_configuration.pii_share_username = pii_share_username
-        lti_configuration.pii_share_email = pii_share_email
-        lti_configuration.save()
+        if lti_configuration:
+            lti_configuration.pii_share_username = pii_share_username
+            lti_configuration.pii_share_email = pii_share_email
+            lti_configuration.save()
         return super().save(commit=commit)
 
     class Meta:
