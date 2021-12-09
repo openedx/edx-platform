@@ -2,7 +2,7 @@
 Views for Enhanced Staff Grader
 """
 import json
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.http.response import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -25,7 +25,90 @@ PARAM_ORA_LOCATION = 'oraLocation'
 PARAM_SUBMISSION_ID = 'submissionUUID'
 
 
-class InitializeView(RetrieveAPIView):
+class StaffGraderBaseView(RetrieveAPIView):
+    """ Base view for common auth/permission setup and XBlock handlers used across ESG views """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (IsAuthenticated,)
+
+    def get_submissions(self, request, usage_id):
+        """
+        Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
+        """
+        response = call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
+        return json.loads(response.content)
+
+    def get_rubric_config(self, request, usage_id):
+        """
+        Get rubric data from the ORA's 'get_rubric' XBlock.json_handler
+        """
+        data = {'target_rubric_block_id': usage_id}
+        response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
+        return json.loads(response.content)
+
+    def get_submission_info(self, request, usage_id, submission_uuid):
+        """
+        Get submission content from ORA 'get_submission_info' XBlock.json_handler
+        """
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+        return json.loads(response.content)
+
+    def get_assessment_info(self, request, usage_id, submission_uuid):
+        """
+        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
+        """
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+        return json.loads(response.content)
+
+    def submit_grade(self, request, usage_id, grade_data):
+        """
+        Submit a grade for an assessment.
+
+        Returns: {'success': True/False, 'msg': err_msg}
+        """
+        response = call_xblock_json_handler(request, usage_id, 'staff_assess', grade_data)
+        return json.loads(response.content)
+
+    def check_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
+        """
+        data = {'submission_uuid': submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+        return json.loads(response.content)
+
+    def claim_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Attempt to claim a submission lock for grading.
+
+        Returns:
+        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
+        """
+        body = {"submission_uuid": submission_uuid}
+
+        # Return the raw response to preserve HTTP status codes for failure states
+        return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
+
+    def delete_submission_lock(self, request, usage_id, submission_uuid):
+        """
+        Attempt to claim a submission lock for grading.
+
+        Returns:
+        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
+        """
+        body = {"submission_uuid": submission_uuid}
+
+        # Return raw response to preserve HTTP status codes for failure states
+        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
+
+
+class InitializeView(StaffGraderBaseView):
     """
     GET course metadata
 
@@ -41,13 +124,6 @@ class InitializeView(RetrieveAPIView):
     - 400 for invalid/missing ORA location
     - 403 for invalid access/credentials
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
         response_data = {}
@@ -71,25 +147,8 @@ class InitializeView(RetrieveAPIView):
 
         return Response(InitializeSerializer(response_data).data)
 
-    def get_submissions(self, request, usage_id):
-        """
-        Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
-        """
-        response = call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
-        return json.loads(response.content)
 
-    def get_rubric_config(self, request, usage_id):
-        """
-        Get rubric data from the ORA's 'get_rubric' XBlock.json_handler
-        """
-        data = {
-            'target_rubric_block_id': usage_id
-        }
-        response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
-        return json.loads(response.content)
-
-
-class SubmissionFetchView(RetrieveAPIView):
+class SubmissionFetchView(StaffGraderBaseView):
     """
     GET submission contents and assessment info, if any
 
@@ -117,13 +176,6 @@ class SubmissionFetchView(RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         submission_info = self.get_submission_info(request, ora_location, submission_uuid)
@@ -138,32 +190,8 @@ class SubmissionFetchView(RetrieveAPIView):
 
         return Response(serializer.data)
 
-    def get_submission_info(self, request, usage_id, submission_uuid):
-        """
-        Get submission content from ORA 'get_submission_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
-        return json.loads(response.content)
 
-    def get_assessment_info(self, request, usage_id, submission_uuid):
-        """
-        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
-        return json.loads(response.content)
-
-    def check_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
-        return json.loads(response.content)
-
-
-class SubmissionStatusFetchView(RetrieveAPIView):
+class SubmissionStatusFetchView(StaffGraderBaseView):
     """
     GET submission grade status, lock status, and grade data
 
@@ -185,13 +213,6 @@ class SubmissionStatusFetchView(RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
@@ -204,24 +225,8 @@ class SubmissionStatusFetchView(RetrieveAPIView):
 
         return Response(serializer.data)
 
-    def get_assessment_info(self, request, usage_id, submission_uuid):
-        """
-        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
-        return json.loads(response.content)
 
-    def check_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
-        return json.loads(response.content)
-
-
-class UpdateGradeView(RetrieveAPIView):
+class UpdateGradeView(StaffGraderBaseView):
     """
     POST submit a grade for a submission
 
@@ -254,13 +259,6 @@ class UpdateGradeView(RetrieveAPIView):
         }
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         # Reassert that we have ownership of the submission lock
@@ -295,55 +293,8 @@ class UpdateGradeView(RetrieveAPIView):
 
         return Response(serializer.data)
 
-    def submit_grade(self, request, usage_id, grade_data):
-        """
-        Submit a grade for an assessment.
 
-        Returns: {'success': True/False, 'msg': err_msg}
-        """
-        response = call_xblock_json_handler(request, usage_id, 'staff_assess', grade_data)
-        return json.loads(response.content)
-
-    def delete_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Attempt to claim a submission lock for grading.
-
-        Returns:
-        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
-        """
-        body = {"submission_uuid": submission_uuid}
-
-        # Return raw response to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
-
-    def get_submission_info(self, request, usage_id, submission_uuid):
-        """
-        Get submission content from ORA 'get_submission_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
-        return json.loads(response.content)
-
-    def get_assessment_info(self, request, usage_id, submission_uuid):
-        """
-        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
-        return json.loads(response.content)
-
-    def check_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
-        """
-        data = {
-            'submission_uuid': submission_uuid
-        }
-        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
-        return json.loads(response.content)
-
-
-class SubmissionLockView(RetrieveAPIView):
+class SubmissionLockView(StaffGraderBaseView):
     """
     POST claim a submission lock for grading
     DELETE release a submission lock
@@ -360,13 +311,6 @@ class SubmissionLockView(RetrieveAPIView):
     - 400 for bad request or missing query params
     - 403 for bad auth or contested lock with payload { 'error': '<error-code>'}
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated,)
-
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Claim a submission lock """
@@ -404,27 +348,3 @@ class SubmissionLockView(RetrieveAPIView):
         # Success should return serialized lock info
         response_data = json.loads(response.content)
         return Response(LockStatusSerializer(response_data).data)
-
-    def claim_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Attempt to claim a submission lock for grading.
-
-        Returns:
-        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
-        """
-        body = {"submission_uuid": submission_uuid}
-
-        # Return the raw response to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
-
-    def delete_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Attempt to claim a submission lock for grading.
-
-        Returns:
-        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
-        """
-        body = {"submission_uuid": submission_uuid}
-
-        # Return raw response to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
