@@ -141,6 +141,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             ('clean_id', ('#',)),
             ('has_ended', ()),
             ('has_started', ()),
+            ('is_enrollment_open', ()),
         ]
         for method_name, method_args in methods_to_test:
             course_value = getattr(course, method_name)(*method_args)

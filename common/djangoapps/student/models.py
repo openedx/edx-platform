@@ -839,6 +839,13 @@ def user_post_save_callback(sender, **kwargs):
                         cea.save()
                     continue
 
+                # Skip auto enrollment of user if enrollment is not open for the course
+                # We are checking this here instead of passing check_access=True to CourseEnrollment.enroll()
+                # as we want to skip course full check.
+                if CourseEnrollment.is_enrollment_closed(user, CourseOverview.get_from_id(cea.course_id)):
+                    log.info(f'Skipping auto enrollment of user as enrollment for course {cea.course_id} has ended')
+                    continue
+
                 enrollment = CourseEnrollment.enroll(user, cea.course_id)
 
                 manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)

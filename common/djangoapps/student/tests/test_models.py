@@ -8,9 +8,10 @@ import pytz
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
+from django.conf import settings
 from django.db.models import signals  # pylint: disable=unused-import
 from django.db.models.functions import Lower
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
@@ -37,6 +38,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -712,6 +714,42 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
         assert actual_course_enrollment.mode == 'audit'
         assert actual_student.is_active is True
         assert actual_cea.user == student
+
+    @ddt.data(False, True)
+    def test_auto_enrollment_if_course_enrollment_closed(self, feature_enabled):
+        """
+        Test the following scenarios
+
+        1. Invited students who register when enrollment is closed are not enrolled if
+        DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is True
+
+        2. Invited students who register when enrollment is closed are enrolled if
+        DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is False
+        """
+
+        def register_and_enroll_student():
+            student = self._set_up_invited_student(
+                course=self.course,
+                active=False,
+                enrolled=False
+            )
+            student.is_active = True
+            # trigger the post_save callback
+            student.save()
+            return CourseEnrollment.get_enrollment(student, self.course.id)
+
+        # Set enrollment end date to a past date so that enrollment is ended
+        enrollment_end = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=2)
+        course_overview = CourseOverviewFactory.create(id=self.course.id, enrollment_end=enrollment_end)
+        course_overview.save()
+
+        if feature_enabled:
+            with override_settings(
+                FEATURES={**settings.FEATURES, 'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': True}
+            ):
+                assert register_and_enroll_student() is None
+        else:
+            assert register_and_enroll_student() is not None
 
     def test_verified_student_not_downgraded_when_changing_email(self):
         """
