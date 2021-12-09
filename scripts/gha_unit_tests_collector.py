@@ -2,25 +2,24 @@ import sys
 import os
 import yaml
 import argparse
-import json
 
 
-def get_all_unit_test_shards():
-    unit_tests_json = f'{os.getcwd()}/.github/workflows/unit-test-shards.json'
-    with open(unit_tests_json) as file:
-        unit_test_workflow_shards = json.loads(file.read())
+def get_all_unit_test_modules():
+    unit_tests_yml = f'{os.getcwd()}/.github/workflows/unit-tests.yml'
+    with open(unit_tests_yml) as file:
+        unit_test_workflow_yaml = yaml.safe_load(file)
 
-    return unit_test_workflow_shards
+    return unit_test_workflow_yaml['jobs']['run-tests']['strategy']['matrix']['test_module']
 
 
 def get_modules_except_cms():
-    all_unit_test_shards = get_all_unit_test_shards()
-    return [paths for shard_name, paths in all_unit_test_shards.items() if not paths.startswith('cms')]
+    all_unit_test_modules = get_all_unit_test_modules()
+    return [module for module in all_unit_test_modules if not module.startswith('cms')]
 
 
 def get_cms_modules():
-    all_unit_test_shards = get_all_unit_test_shards()
-    return [paths for shard_name, paths in all_unit_test_shards.items() if paths.startswith('cms')]
+    all_unit_test_modules = get_all_unit_test_modules()
+    return [module for module in all_unit_test_modules if module.startswith('cms')]
 
 
 if __name__ == "__main__":
