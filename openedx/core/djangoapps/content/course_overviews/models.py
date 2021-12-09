@@ -534,6 +534,12 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def is_enrollment_open(self):
+        """
+        Returns True if course enrollment is open
+        """
+        return course_metadata_utils.is_enrollment_open(self.enrollment_start, self.enrollment_end)
+
     def has_marketing_url(self):
         """
         Returns whether the course has marketing url.

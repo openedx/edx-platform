@@ -1018,6 +1018,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
     'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
+
+    # .. toggle_name: FEATURES['DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable enrollment for user invited to a course
+    # .. if user is registering before enrollment start date or after enrollment end date
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-06-06
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
+    'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
