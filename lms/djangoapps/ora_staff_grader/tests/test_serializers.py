@@ -8,6 +8,7 @@ from unittest.mock import Mock, MagicMock, patch
 from lms.djangoapps.ora_staff_grader.serializers import (
     AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
+    ErrorSerializer,
     GradeDataSerializer,
     InitializeSerializer,
     LockStatusSerializer,
@@ -24,6 +25,41 @@ from lms.djangoapps.ora_staff_grader.serializers import (
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN
+
+
+class TestErrorSerializer(TestCase):
+    """ Tests for error serialization """
+
+    def test_no_error_code(self):
+        # If no error code is provided, fall back to an unknown code
+        input_data = {}
+        data = ErrorSerializer(input_data).data
+
+        assert data == {"error": ERR_UNKNOWN}
+
+    def test_no_context(self):
+        # The serializer may return just the error info
+        input_data = {"error": "ERR_CODE"}
+        data = ErrorSerializer(input_data).data
+
+        assert data == {"error": "ERR_CODE"}
+
+    def test_added_context(self):
+        # The serializer may also add context which gets unpacked into the output
+        input_data = {"error": "ERR_CODE"}
+        added_context = {"a":"b", "c": {"d": ["e", "f"]}}
+        data = ErrorSerializer(input_data, context=added_context).data
+
+        # Extra context should be added to the output
+        assert data == {
+            "error": "ERR_CODE",
+            "a": "b",
+            "c": {
+                "d": ["e", "f"]
+            }
+        }
 
 
 class TestCourseMetadataSerializer(SharedModuleStoreTestCase):

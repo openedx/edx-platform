@@ -1,5 +1,8 @@
 """ Error codes and exceptions for ESG """
 
+# Catch-all error if we don't supply anything
+ERR_UNKNOWN = "ERR_UNKNOWN"
+
 # A request is missing a required query param
 ERR_MISSING_PARAM = "ERR_MISSING_PARAM"
 
