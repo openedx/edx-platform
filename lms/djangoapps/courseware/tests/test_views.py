@@ -606,7 +606,7 @@ class ViewsTestCase(BaseViewsTestCase):
                 'course_id': str(course.id),
             }
         )
-        mfe_url = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+        mfe_url = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
 
         with _set_course_home_mfe_flag(activate_mfe):
             response = self.client.get(reverse('about_course', args=[str(course.id)]))
