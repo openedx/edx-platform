@@ -92,7 +92,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         }
         mock_user_exists.side_effect = [already_exists, False]
         __, strategy = self.get_request_and_strategy()
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.username_suffix_generator') as mock_username_suffix_generator:
-            mock_username_suffix_generator.return_value = '9fe2'
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.username_suffix_generator') as mock_suffix:
+            mock_suffix.return_value = '9fe2'
             final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
             assert expected_username == final_username['username']

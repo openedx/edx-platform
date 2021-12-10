@@ -8,7 +8,6 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 
 import datetime
 import logging
-import uuid
 from functools import wraps
 
 import pytz
