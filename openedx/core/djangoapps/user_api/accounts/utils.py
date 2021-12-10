@@ -217,6 +217,7 @@ def create_retirement_request_and_deactivate_account(user):
     retire_dot_oauth2_models(user)
     AccountRecovery.retire_recovery_email(user.id)
 
+
 def username_suffix_generator(suffix_length=4):
     """
     Generates a random, alternating number and letter string for the purpose of
