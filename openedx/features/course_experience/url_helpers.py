@@ -195,7 +195,7 @@ def make_learning_mfe_courseware_url(
 
 def get_learning_mfe_home_url(
         course_key: CourseKey,
-        view_name: Optional[str] = None,
+        url_fragment: Optional[str] = None,
         params: Optional[QueryDict] = None,
 ) -> str:
     """
@@ -206,13 +206,13 @@ def get_learning_mfe_home_url(
     http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
 
     `course_key` can be either an OpaqueKey or a string.
-    `view_name` is an optional string.
+    `url_fragment` is an optional string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
 
-    if view_name:
-        mfe_link += f'/{view_name}'
+    if url_fragment:
+        mfe_link += f'/{url_fragment}'
 
     if params:
         mfe_link += f'?{params.urlencode()}'
