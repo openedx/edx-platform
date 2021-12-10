@@ -3,6 +3,8 @@ Django models for site configurations.
 """
 
 
+import beeline
+
 import collections
 from logging import getLogger
 import os
@@ -55,6 +57,9 @@ class SiteConfiguration(models.Model):
 
     .. no_pii:
     """
+
+    api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
     site_values = JSONField(
@@ -119,6 +124,20 @@ class SiteConfiguration(models.Model):
         self.compile_microsite_sass()
         return self
 
+    @beeline.traced('site_config.init_api_client_adapter')
+    def init_api_client_adapter(self):
+        """
+        Initialize `api_adapter`, this method is managed externally by `get_current_site_configuration()`.
+        """
+        # Tahoe: Import is placed here to avoid model import at project startup
+        from openedx.core.djangoapps.appsembler.sites import (
+            site_config_client_helpers as site_helpers,
+        )
+        if site_helpers.is_enabled_for_current_organization():
+            # TODO: Refactor to avoid using `get_current_organization()` and query the organization directly
+            self.api_adapter = site_helpers.get_current_configuration_adapter()
+
+    @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
         """
         Return Configuration value for the key specified as name argument.
@@ -132,9 +151,16 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key or returns `None` if configuration is not enabled.
         """
+        beeline.add_context_field('value_name', name)
         if self.enabled:
             try:
-                return self.site_values.get(name, default)
+                if self.api_adapter:
+                    # Tahoe: Use `SiteConfigAdapter` if available.
+                    beeline.add_context_field('value_source', 'site_config_service')
+                    return self.api_adapter.get_value(name, default)
+                else:
+                    beeline.add_context_field('value_source', 'django_model')
+                    return self.site_values.get(name, default)
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -266,8 +292,22 @@ class SiteConfiguration(models.Model):
             except Exception:  # pylint: disable=broad-except  # noqa
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
+    @beeline.traced('site_config._formatted_sass_variables')
     def _formatted_sass_variables(self):
-        return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
+        if self.api_adapter:
+            # Tahoe: Use `SiteConfigAdapter` if available.
+            beeline.add_context_field('value_source', 'site_config_service')
+            sass_variables = self.api_adapter.get_amc_v1_theme_css_variables()
+            # Note: css variables from adapter is in dict format
+            formatted_sass_variables = ""
+            for key, val in sass_variables.items():
+                formatted_sass_variables += "{}: {};".format(key, val)
+            return formatted_sass_variables
+        else:
+            beeline.add_context_field('value_source', 'django_model')
+            # Note: sass variables in list format
+            sass_variables = self.sass_variables
+            return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
 
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
