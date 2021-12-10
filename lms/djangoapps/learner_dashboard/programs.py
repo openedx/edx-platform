@@ -151,7 +151,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'credit_pathways': credit_pathways,
             'program_tab_view_enabled': program_tab_view_is_enabled(),
             'discussion_fragment': {
-                'configured': bool(program_discussion_lti.configuration),
+                'configured': program_discussion_lti.is_configured,
                 'iframe': program_discussion_lti.render_iframe()
             }
         }
@@ -179,15 +179,14 @@ class ProgramDiscussionLTI:
         self.program_uuid = program_uuid
         self.program = get_programs(uuid=self.program_uuid)
         self.request = request
-        self.configuration = self.get_configuration()
+        self.configuration = ProgramDiscussionsConfiguration.get(self.program_uuid)
 
-    def get_configuration(self) -> ProgramDiscussionsConfiguration:
+    @property
+    def is_configured(self):
         """
-        Returns ProgramDiscussionsConfiguration object with respect to program_uuid
+        Returns a boolean indicating if the program configuration is enabled or not.
         """
-        return ProgramDiscussionsConfiguration.objects.filter(
-            program_uuid=self.program_uuid
-        ).first()
+        return bool(self.configuration and self.configuration.enabled)
 
     def _get_resource_link_id(self) -> str:
         site = get_current_site(self.request)
@@ -268,7 +267,7 @@ class ProgramDiscussionLTI:
         """
         Returns the program discussion fragment if program discussions configuration exists for a program uuid
         """
-        if not self.configuration:
+        if not self.is_configured:
             return ''
 
         lti_embed_html = self._get_lti_embed_code()

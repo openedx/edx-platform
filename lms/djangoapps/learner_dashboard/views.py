@@ -86,7 +86,7 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
     **Example**
 
         {
-            'enabled_for_masters': True,
+            'tab_view_enabled': True,
             'discussion': {
                 "iframe": "
                             <iframe
@@ -96,10 +96,9 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
                              >
                             </iframe>
                             ",
-                "enabled": false
+                "configured": false
             }
         }
-
 
     """
     authentication_classes = (BearerAuthentication, SessionAuthentication)
@@ -108,14 +107,11 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
     def get(self, request, program_uuid):
         """ GET handler """
         program_discussion_lti = ProgramDiscussionLTI(program_uuid, request)
-        return Response(
-
-            {
-                'enabled': masters_program_tab_view_is_enabled(),
-                'discussion': {
-                    'iframe': program_discussion_lti.render_iframe(),
-                    'configured': bool(program_discussion_lti.configuration),
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+        response_data = {
+            'tab_view_enabled': masters_program_tab_view_is_enabled(),
+            'discussion': {
+                'iframe': program_discussion_lti.render_iframe(),
+                'configured': program_discussion_lti.is_configured,
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
