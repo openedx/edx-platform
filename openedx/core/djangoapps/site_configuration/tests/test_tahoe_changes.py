@@ -1,22 +1,16 @@
 """
 Tests for site configuration's Tahoe customizations.
 """
-from unittest.mock import patch, Mock
-
 from urllib.parse import urlsplit
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock
-import pytest
-from _pytest.monkeypatch import MonkeyPatch #esther test
+from pytest.monkeypatch import MonkeyPatch
 
 
 from organizations.models import Organization
-
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 from openedx.core.djangoapps.appsembler.sites import (
     site_config_client_helpers as client_helpers,
@@ -24,6 +18,8 @@ from openedx.core.djangoapps.appsembler.sites import (
 from openedx.core.djangoapps.appsembler.sites import (
     utils as site_utils,
 )
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 
 @override_settings(
@@ -149,7 +145,6 @@ class SiteConfigAPIClientTests(TestCase):
         self.api_adapter = client_helpers.get_current_configuration_adapter()
         return self.api_adapter
 
-
     def test_get_value_with_adapter(self):
         """
         Ensure api_adapter is used for `get_value()`.
@@ -162,7 +157,6 @@ class SiteConfigAPIClientTests(TestCase):
         site_configuration.save()
 
         assert True
-
 
     def test_formatted_sass_variables_with_adapter(self):
         """
