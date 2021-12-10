@@ -275,7 +275,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
 
     component_display_names = {
         'discussion': _("Discussion"),
-        'html': _("HTML"),
+        'html': _("Text"),
         'problem': _("Problem"),
         'video': _("Video"),
         'openassessment': _("Open Response")
