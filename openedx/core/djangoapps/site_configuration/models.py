@@ -298,11 +298,14 @@ class SiteConfiguration(models.Model):
             # Tahoe: Use `SiteConfigAdapter` if available.
             beeline.add_context_field('value_source', 'site_config_service')
             sass_variables = self.api_adapter.get_amc_v1_theme_css_variables()
+            formatted_sass_variables = ""
+            for key, val in sass_variables.items():
+                formatted_sass_variables += "{}: {};".format(k, v)
+            return formatted_sass_variables
         else:
             beeline.add_context_field('value_source', 'django_model')
             sass_variables = self.sass_variables
-
-        return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
+            return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
 
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
