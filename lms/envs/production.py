@@ -750,7 +750,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
 ##### Show Answer Override for Self-Paced Courses #####
