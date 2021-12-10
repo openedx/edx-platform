@@ -27,8 +27,8 @@ from xblock.field_data import FieldData
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
-ENABLED_OVERRIDE_PROVIDERS_KEY = 'courseware.field_overrides.enabled_providers.{course_id}'
-ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = 'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
+ENABLED_OVERRIDE_PROVIDERS_KEY = 'lms.djangoapps.courseware.field_overrides.enabled_providers.{course_id}'
+ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = 'lms.djangoapps.courseware.modulestore_field_overrides.enabled_providers.{course_id}'
 
 
 def resolve_dotted(name):
