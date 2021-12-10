@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock
-from pytest.monkeypatch import MonkeyPatch
+from _pytest.monkeypatch import MonkeyPatch
 
 
 from organizations.models import Organization
