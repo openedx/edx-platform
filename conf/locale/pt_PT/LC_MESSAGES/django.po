@@ -24,6 +24,7 @@
 # Mariana Vieira <maglianamatilde@gmail.com>, 2015
 # Miguel Gomes Cardoso <miguelcardoso1994@hotmail.com>, 2014
 # MS, 2016,2018
+# Nika Shahidian, 2021
 # Developer QUEO <developer@queo.pt>, 2017
 # Ricardo Jorge Basílio de Almeida <ricardo.j.basilio@gmail.com>, 2014
 # Rui Ribeiro <info@nau.edu.pt>, 2020
@@ -72,6 +73,7 @@
 # Manuela Silva <mmsrs@sky.com>, 2016
 # Manuela Silva <mmsrs@sky.com>, 2016
 # MS, 2016,2018
+# Nika Shahidian, 2021
 # Developer QUEO <developer@queo.pt>, 2017
 # Ricardo Cardante <ricardocardante@gmail.com>, 2015
 # Ricardo Simões <xmcorporation@gmail.com>, 2015
@@ -137,7 +139,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-05 20:43+0000\n"
+"POT-Creation-Date: 2021-12-12 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
@@ -831,34 +833,32 @@ msgstr "Status da conta inesperado"
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Your account could not be activated{html_end}Something went "
-"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
-"issue."
+"{html_start}Your {account_or_email} could not be "
+"{activated_or_confirmed}{html_end}Something went wrong, please <a "
+"href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
-"{html_start}A sua conta não pode ser ativada{html_end}Ocorreu um erro, por "
-"favor <a href=\"{support_url}\"> contacte o suporte</a> para resolver este "
-"problema."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
-msgstr "{html_start}Esta conta já foi ativada.{html_end}"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}Success{html_end} You have activated your account."
-msgstr "{html_start}Sucesso{html_end} A sua conta foi ativada."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Success! You have activated your account.{html_end}You will now "
-"receive email updates and alerts from us related to the courses you are "
-"enrolled in. Sign In to continue."
+"{html_start}This {account_or_email} has already been "
+"{activated_or_confirmed}.{html_end}"
 msgstr ""
-"{html_start}Sucesso! Activou a sua conta. {html_end}A partir de agora, "
-"receberá emails com atualizações e alertas relativos aos cursos em que está "
-"inscrito. Inicie sessão para continuar."
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success{html_end} You have {activated_or_confirmed} your "
+"{account_or_email}."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have {activated_or_confirmed} your "
+"{account_or_email}.{html_end}You will now receive email updates and alerts "
+"from us related to the courses you are enrolled in. Sign In to continue."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -12164,6 +12164,11 @@ msgstr "Nível de educação concluído"
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "Ano de Nascimento"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "I agree that {platform_name} may send me marketing messages."
+msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
