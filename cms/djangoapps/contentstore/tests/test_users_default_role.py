@@ -8,7 +8,7 @@ from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course, reverse_url
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestUsersDefaultRole(ModuleStoreTestCase):

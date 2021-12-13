@@ -11,9 +11,9 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestOrphanBase(CourseTestCase):
