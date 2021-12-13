@@ -91,7 +91,7 @@ class AppVersionUpgrade(MiddlewareMixin):
         Returns:
             dict: Containing app version info
         """
-        user_agent = request.META.get('HTTP_USER_AGENT')
+        user_agent = request.headers.get('User-Agent')
         if user_agent:
             platform = self._get_platform(request, user_agent)
             if platform:

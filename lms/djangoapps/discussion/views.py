@@ -45,8 +45,10 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none,
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -56,6 +58,7 @@ from openedx.core.djangoapps.discussions.utils import (
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from xmodule.modulestore.django import modulestore
 
@@ -717,8 +720,25 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         Returns:
             Fragment: The fragment representing the discussion board
         """
+        course_key = CourseKey.from_string(course_id)
+        mfe_url = get_discussions_mfe_url(course_key)
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and mfe_url:
+            fragment = Fragment(
+                HTML(
+                    "<iframe id='discussions-mfe-tab-embed' src='{src}'></iframe>"
+                ).format(src=mfe_url)
+            )
+            fragment.add_css(
+                """
+                #discussions-mfe-tab-embed {
+                    width: 100%;
+                    min-height: 800px;
+                    border: none;
+                }
+                """
+            )
+            return fragment
         try:
-            course_key = CourseKey.from_string(course_id)
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:
             #   After the thread is rendered in this fragment, an AJAX

@@ -320,6 +320,12 @@ ul.fa-ul{
       width: calc(50% - 10px);
     }
 
+    &.checkbox-marketing_emails_opt_in {
+      .label-text {
+        font-size: small !important;
+      }
+    }
+
     .label-text-small {
       font-size: small;
     }

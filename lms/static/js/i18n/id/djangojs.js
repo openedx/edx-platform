@@ -215,7 +215,6 @@
     "Basic Account Information": "Informasi Akun Dasar",
     "Be sure your entire face is inside the frame": "Pastikan seluruh wajah anda berada didalam frame",
     "Before proceeding, please confirm that your details match": "Sebelum proses, silakan konfirmasi bahwa detailnya sesuai",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "Sebelum melanjutkan, mohon {htmlStart}aktivasi akun Anda{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Sebelum melanjutkan, mohon {htmlStart}putuskan kaitan semua akun media sosial{htmlEnd}.",
     "Billing/Payment Options": "Pilihan Pembayaran",
     "Biography": "Riwayat hidup",

@@ -7,8 +7,8 @@ tasks.
 import json
 import logging
 
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from common.djangoapps.util.date_utils import get_default_time_display
 from lms.djangoapps.bulk_email.models import CourseEmail
@@ -80,7 +80,7 @@ def extract_email_features(email_task):
         else:
             if 'succeeded' in task_output and task_output['succeeded'] > 0:
                 num_emails = task_output['succeeded']
-                number_sent = ungettext(
+                number_sent = ngettext(
                     "{num_emails} sent",
                     "{num_emails} sent",
                     num_emails
@@ -89,7 +89,7 @@ def extract_email_features(email_task):
             if 'failed' in task_output and task_output['failed'] > 0:
                 num_emails = task_output['failed']
                 number_sent += ", "
-                number_sent += ungettext(
+                number_sent += ngettext(
                     "{num_emails} failed",
                     "{num_emails} failed",
                     num_emails

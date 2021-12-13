@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
-from enum import Enum
+from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
@@ -27,13 +27,26 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 log = logging.getLogger(__name__)
 
-DEFAULT_PROVIDER_TYPE = 'legacy'
-DEFAULT_CONFIG_ENABLED = True
-
 ProviderExternalLinks = namedtuple(
     'ProviderExternalLinks',
     ['learn_more', 'configuration', 'general', 'accessibility', 'contact_email']
 )
+
+
+class Provider:
+    """
+    List of Discussion providers.
+    """
+    LEGACY = 'legacy'
+    ED_DISCUSS = 'ed-discuss'
+    INSCRIBE = 'inscribe'
+    PIAZZA = 'piazza'
+    YELLOWDIG = 'yellowdig'
+    OPEN_EDX = 'openedx'
+
+
+DEFAULT_PROVIDER_TYPE = Provider.LEGACY
+DEFAULT_CONFIG_ENABLED = True
 
 
 class Features(Enum):
@@ -104,7 +117,7 @@ def pii_sharing_required_message(provider_name):
 
 
 AVAILABLE_PROVIDER_MAP = {
-    'legacy': {
+    Provider.LEGACY: {
         'features': [
             Features.BASIC_CONFIGURATION.value,
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
@@ -130,7 +143,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True
     },
-    'openedx': {
+    Provider.OPEN_EDX: {
         'features': [
             Features.BASIC_CONFIGURATION.value,
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
@@ -158,7 +171,7 @@ AVAILABLE_PROVIDER_MAP = {
         'supports_in_context_discussions': True,
         'visible': False,
     },
-    'ed-discuss': {
+    Provider.ED_DISCUSS: {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.BASIC_CONFIGURATION.value,
@@ -185,7 +198,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [pii_sharing_required_message('Ed Discussion')],
         'has_full_support': False
     },
-    'inscribe': {
+    Provider.INSCRIBE: {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.BASIC_CONFIGURATION.value,
@@ -213,7 +226,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [pii_sharing_required_message('InScribe')],
         'has_full_support': False
     },
-    'piazza': {
+    Provider.PIAZZA: {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.BASIC_CONFIGURATION.value,
@@ -237,7 +250,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': False
     },
-    'yellowdig': {
+    Provider.YELLOWDIG: {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.BASIC_CONFIGURATION.value,
@@ -539,17 +552,13 @@ class ProgramDiscussionsConfiguration(TimeStampedModel):
         return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
 
     @classmethod
-    def is_enabled(cls, program_uuid) -> bool:
+    def get(cls, program_uuid):
         """
-        Check if there is an active configuration for a given program uuid
-
-        Default to False, if no configuration exists
+        Lookup a program discussion configuration by program uuid.
         """
-        try:
-            configuration = cls.objects.get(program_uuid=program_uuid)
-            return configuration.enabled
-        except cls.DoesNotExist:
-            return False
+        return ProgramDiscussionsConfiguration.objects.filter(
+            program_uuid=program_uuid
+        ).first()
 
 
 class DiscussionTopicLink(models.Model):

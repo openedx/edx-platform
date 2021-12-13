@@ -379,7 +379,6 @@
     "Basic Account Information": "Informa\u00e7\u00e3o b\u00e1sica da conta",
     "Be sure your entire face is inside the frame": "Certifique-se que o seu rosto inteiro est\u00e1 dentro dos limites",
     "Before proceeding, please confirm that your details match": "Antes de continuar, confirme por favor que as informa\u00e7\u00f5es correspondem",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "Antes de avan\u00e7ar, por favor {htmlStart}active a sua conta{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Antes de avan\u00e7ar, por favor {htmlStart}remova todas as liga\u00e7\u00f5es a contas nas redes sociais{htmlEnd}.",
     "Before you upgrade to a certificate track, you must activate your account.": "Antes de atualizar para um modo certificado, deve ativar a sua conta.",
     "Billing/Payment Options": "Op\u00e7\u00f5es de Fatura\u00e7\u00e3o/Pagamento",

@@ -12,7 +12,7 @@ from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
 from common.djangoapps.student.models import CourseAccessRole
 from openedx.core.lib.courses import course_image_url
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 IMAGE_TYPES = {
     'image/jpeg': 'jpg',
@@ -82,7 +82,7 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):  # lint-amnesty, pyl
 
 def image_is_jpeg_or_png(value):
     content_type = value.content_type
-    if content_type not in list(IMAGE_TYPES.keys()):
+    if content_type not in list(IMAGE_TYPES.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
         raise serializers.ValidationError(
             f'Only JPEG and PNG image types are supported. {content_type} is not valid')
 

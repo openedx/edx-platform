@@ -43,8 +43,8 @@ from common.djangoapps.student.auth import has_studio_write_access
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.util.json_request import JsonResponse
-from xmodule.modulestore import EdxJSONEncoder
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..exceptions import AssetNotFoundException
 from ..utils import (

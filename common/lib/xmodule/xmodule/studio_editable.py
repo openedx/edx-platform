@@ -1,20 +1,17 @@
 """
 Mixin to support editing in Studio.
 """
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockMixin
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW, module_attr
 
 
 @XBlock.needs('mako')
-class StudioEditableBlock:
+class StudioEditableBlock(XBlockMixin):
     """
     Helper methods for supporting Studio editing of XBlocks.
 
     This class is only intended to be used with an XBlock!
     """
-    # Avoids AttributeError caused by the @XBlock.needs decorator.
-    _services_requested = {}
-
     has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):

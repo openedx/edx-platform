@@ -1,7 +1,7 @@
 """Common environment variables unique to the instructor plugin."""
 
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 def plugin_settings(settings):

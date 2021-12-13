@@ -28,6 +28,7 @@ class TeamsTab(EnrolledTab):
     type = "teams"
     title = _("Teams")
     view_name = "teams_dashboard"
+    priority = 60
 
     @classmethod
     def is_enabled(cls, course, user=None):

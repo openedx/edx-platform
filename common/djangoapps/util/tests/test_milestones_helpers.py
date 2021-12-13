@@ -142,7 +142,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         course = CourseFactory()
 
         required_content = milestones_helpers.get_required_content(course.id, AnonymousUser())
-        assert required_content == []
+        assert not required_content
 
         # NOTE (CCB): The initial version of anonymous courseware access is very simple. We avoid accidentally
         # exposing locked content by simply avoiding anonymous access altogether for courses runs with milestones.

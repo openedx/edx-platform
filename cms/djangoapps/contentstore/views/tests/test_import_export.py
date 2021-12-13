@@ -39,14 +39,14 @@ from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.util import milestones_helpers
 from openedx.core.lib.extract_tar import safetar_extractall
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder
-from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import (
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import (  # lint-amnesty, pylint: disable=wrong-import-order
     CourseImportManager,
     ErrorReadingFileException,
     import_course_from_xml,
@@ -675,6 +675,17 @@ class ImportTestCase(CourseTestCase):
         status_response = self.get_import_status(self.course.id, self.good_tar)
         self.assertImportStatusResponse(status_response, self.UpdatingError, import_error.UNKNOWN_ERROR_IN_IMPORT)
 
+    def test_import_status_response_is_not_cached(self):
+        """To test import_status endpoint response is not cached"""
+        resp = self.client.get(
+            reverse_course_url(
+                'import_status_handler',
+                self.course.id,
+                kwargs={'filename': os.path.split(self.good_tar)[1]}
+            )
+        )
+        self.assertEqual(resp.headers['Cache-Control'], 'no-cache, no-store, must-revalidate')
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 @ddt.ddt
@@ -1256,7 +1267,25 @@ class TestCourseExportImportProblem(CourseTestCase):
 
             '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  '
             '<multiplechoiceresponse/>\n</problem>\n'
-        ]
+        ],
+        [
+            '<!-- Comment outside of the root (will be deleted). -->'
+            '<problem>'
+            '<!-- Valid comment -->'
+            '<p>'
+            '"<!-- String with non-XML structure: >< -->"'
+            'Text'
+            '</p>'
+            '</problem>',
+
+            '<problem>\n  '
+            '<!-- Valid comment -->\n  '
+            '<p>'
+            '"<!-- String with non-XML structure: >< -->"'
+            'Text'
+            '</p>\n'
+            '</problem>\n'
+        ],
     )
     @ddt.unpack
     def test_problem_content_on_course_export_import(self, problem_data, expected_problem_content):

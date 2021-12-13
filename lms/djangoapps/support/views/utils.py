@@ -1,6 +1,9 @@
 """
 Various utility methods used by support app views.
 """
+import csv
+from uuid import UUID
+
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -8,6 +11,9 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from lms.djangoapps.program_enrollments.api import (
+    link_program_enrollments
+)
 
 
 def get_course_duration_info(course_key):
@@ -42,3 +48,46 @@ def get_course_duration_info(course_key):
 
     except (ObjectDoesNotExist, InvalidKeyError):
         return {}
+
+
+def validate_and_link_program_enrollments(program_uuid_string, linkage_text):
+    """
+    Validate arguments, and if valid, call `link_program_enrollments`.
+
+    Returns: (successes, errors)
+        where successes and errors are both list[str]
+    """
+    if not (program_uuid_string and linkage_text):
+        error = (
+            "You must provide both a program uuid "
+            "and a series of lines with the format "
+            "'external_user_key,lms_username'."
+        )
+        return [], [error]
+    try:
+        program_uuid = UUID(program_uuid_string)
+    except ValueError:
+        return [], [
+            f"Supplied program UUID '{program_uuid_string}' is not a valid UUID."
+        ]
+    reader = csv.DictReader(
+        linkage_text.splitlines(), fieldnames=('external_key', 'username')
+    )
+    ext_key_to_username = {
+        (item.get('external_key') or '').strip(): (item['username'] or '').strip()
+        for item in reader
+    }
+    if not (all(ext_key_to_username.keys()) and all(ext_key_to_username.values())):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        return [], [
+            "All linking lines must be in the format 'external_user_key,lms_username'"
+        ]
+    link_errors = link_program_enrollments(
+        program_uuid, ext_key_to_username
+    )
+    successes = [
+        str(item)
+        for item in ext_key_to_username.items()
+        if item[0] not in link_errors.keys()  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+    ]
+    errors = [message for message in link_errors.values()]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    return successes, errors

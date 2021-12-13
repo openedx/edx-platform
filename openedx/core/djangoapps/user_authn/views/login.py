@@ -561,7 +561,9 @@ def login_user(request, api_version='v1'):
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
                 check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
-        if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
+        if possibly_authenticated_user is None or not (
+            possibly_authenticated_user.is_active or settings.MARKETING_EMAILS_OPT_IN
+        ):
             _handle_failed_authentication(user, possibly_authenticated_user)
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)

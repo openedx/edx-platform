@@ -290,7 +290,6 @@
     "Basic Account Information": "\u57fa\u672c\u8d26\u53f7\u4fe1\u606f",
     "Be sure your entire face is inside the frame": "\u8bf7\u786e\u4fdd\u60a8\u7684\u6574\u5f20\u8138\u90fd\u5728\u6846\u5185",
     "Before proceeding, please confirm that your details match": "\u5728\u8fdb\u884c\u4e0b\u4e00\u6b65\u4e4b\u524d\uff0c\u8bf7\u786e\u8ba4\u60a8\u63d0\u4f9b\u7684\u4fe1\u606f\u4e4b\u95f4\u76f8\u7b26",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "\u7ee7\u7eed\u64cd\u4f5c\u524d\uff0c\u8bf7\u5148{htmlStart}\u6fc0\u6d3b\u60a8\u7684\u8d26\u53f7{htmlEnd}\u3002",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "\u7ee7\u7eed\u64cd\u4f5c\u524d\uff0c\u8bf7\u5148{htmlStart}\u89e3\u7ed1\u6240\u6709\u793e\u4ea4\u8f6f\u4ef6\u8d26\u53f7{htmlEnd}\u3002",
     "Before you upgrade to a certificate track, you must activate your account.": "\u5728\u60a8\u5347\u7ea7\u81f3\u8bc1\u4e66\u8def\u5f84\u4e4b\u524d\uff0c\u60a8\u5fc5\u987b\u6fc0\u6d3b\u60a8\u7684\u8d26\u53f7\u3002",
     "Biography": "\u7b80\u4ecb",

@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Check out this course on {{ platform_name }}.{% endblocktrans %}
+
+{% blocktrans %}This email message was automatically sent by {{ lms_url }} {% endblocktrans %}
+
+{{ confirm_link }}
+
+{% endautoescape %}

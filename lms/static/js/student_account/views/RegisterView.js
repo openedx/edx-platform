@@ -86,7 +86,7 @@
                         html.push(HtmlUtils.template(fieldTpl)($.extend(fields[i], {
                             form: this.formType,
                             requiredStr: this.requiredStr,
-                            optionalStr: this.optionalStr,
+                            optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                             supplementalText: fields[i].supplementalText || '',
                             supplementalLink: fields[i].supplementalLink || ''
                         })));
