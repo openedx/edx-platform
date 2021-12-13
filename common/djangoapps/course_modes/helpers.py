@@ -4,7 +4,7 @@
 import logging
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from urllib.parse import urljoin
+from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
 
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from slumber.exceptions import SlumberBaseException

@@ -22,8 +22,8 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import get_time_display
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 # We can only test this in the LMS because the course modes admin relies
