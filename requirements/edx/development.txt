@@ -244,11 +244,11 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-distlib==0.3.3
+distlib==0.3.4
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.9
+django==3.2.10
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -348,7 +348,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==3.2.2
+django-debug-toolbar==3.2.3
     # via -r requirements/edx/development.in
 django-fernet-fields==0.6
     # via
@@ -397,7 +397,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-mysql==4.2.0
+django-mysql==4.3.0
     # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -644,11 +644,11 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==9.9.0
+faker==10.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.70.0
+fastapi==0.70.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1119,9 +1119,9 @@ pytest-attrib==0.1.3
     # via -r requirements/edx/testing.txt
 pytest-cov==3.0.0
     # via -r requirements/edx/testing.txt
-pytest-django==4.5.1
+pytest-django==4.5.2
     # via -r requirements/edx/testing.txt
-pytest-forked==1.3.0
+pytest-forked==1.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-xdist
@@ -1133,7 +1133,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.3
     # via -r requirements/edx/testing.txt
-pytest-xdist[psutil]==2.4.0
+pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.txt
 python-dateutil==2.4.0
     # via
@@ -1481,7 +1481,7 @@ urllib3==1.26.7
     #   transifex-client
 user-util==1.0.0
     # via -r requirements/edx/testing.txt
-uvicorn==0.15.0
+uvicorn==0.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1502,7 +1502,7 @@ vulture==2.3
     # via -r requirements/edx/development.in
 watchdog==2.1.6
     # via -r requirements/edx/testing.txt
-web-fragments==1.1.0
+web-fragments==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   crowdsourcehinter-xblock
