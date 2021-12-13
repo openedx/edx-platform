@@ -5,7 +5,6 @@ URLs for the Enrollment API
 
 
 from django.conf import settings
-from django.conf.urls import url
 
 from .views import (
     CourseEnrollmentsApiListView,
@@ -15,18 +14,19 @@ from .views import (
     EnrollmentView,
     UnenrollmentView
 )
+from django.urls import path, re_path
 
 urlpatterns = [
-    url(r'^enrollment/{username},{course_key}$'.format(
+    re_path(r'^enrollment/{username},{course_key}$'.format(
         username=settings.USERNAME_PATTERN,
         course_key=settings.COURSE_ID_PATTERN),
         EnrollmentView.as_view(), name='courseenrollment'),
-    url(fr'^enrollment/{settings.COURSE_ID_PATTERN}$',
+    re_path(fr'^enrollment/{settings.COURSE_ID_PATTERN}$',
         EnrollmentView.as_view(), name='courseenrollment'),
-    url(r'^enrollment$', EnrollmentListView.as_view(), name='courseenrollments'),
-    url(r'^enrollments/?$', CourseEnrollmentsApiListView.as_view(), name='courseenrollmentsapilist'),
-    url(fr'^course/{settings.COURSE_ID_PATTERN}$',
+    path('enrollment', EnrollmentListView.as_view(), name='courseenrollments'),
+    re_path(r'^enrollments/?$', CourseEnrollmentsApiListView.as_view(), name='courseenrollmentsapilist'),
+    re_path(fr'^course/{settings.COURSE_ID_PATTERN}$',
         EnrollmentCourseDetailView.as_view(), name='courseenrollmentdetails'),
-    url(r'^unenroll/$', UnenrollmentView.as_view(), name='unenrollment'),
-    url(r'^roles/$', EnrollmentUserRolesView.as_view(), name='roles'),
+    path('unenroll/', UnenrollmentView.as_view(), name='unenrollment'),
+    path('roles/', EnrollmentUserRolesView.as_view(), name='roles'),
 ]

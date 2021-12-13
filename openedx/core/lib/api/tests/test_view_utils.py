@@ -1,7 +1,6 @@
 """
 Tests for (some of) the view utilities.
 """
-from django.conf.urls import url
 from django.test.utils import override_settings
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
@@ -13,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # 
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..view_utils import DeveloperErrorViewMixin, verify_course_exists
+from django.urls import re_path
 
 
 class MockAPIView(DeveloperErrorViewMixin, APIView):
@@ -28,7 +28,7 @@ class MockAPIView(DeveloperErrorViewMixin, APIView):
         return Response(f"Success {course_id}")
 
 urlpatterns = [
-    url(r'^mock/(?P<course_id>.*)/$', MockAPIView.as_view()),  # Only works with new-style course keys
+    re_path(r'^mock/(?P<course_id>.*)/$', MockAPIView.as_view()),  # Only works with new-style course keys
 ]
 
 
