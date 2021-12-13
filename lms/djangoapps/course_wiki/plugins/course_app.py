@@ -2,7 +2,6 @@
 from typing import Dict, Optional, TYPE_CHECKING
 
 from django.conf import settings
-from django.utils.translation import ugettext_noop as _
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, CourseOverviewTab
@@ -10,6 +9,7 @@ from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList
+from django.utils.translation import gettext_noop as _
 
 # Import the User model only for type checking since importing it at runtime
 # will prevent the app from starting since the model is imported before
