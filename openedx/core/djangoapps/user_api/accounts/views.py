@@ -7,7 +7,6 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 
 import datetime
 import logging
-import uuid
 from functools import wraps
 
 import pytz
@@ -82,7 +81,7 @@ from .serializers import (
     UserSearchEmailSerializer
 )
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
-from .utils import create_retirement_request_and_deactivate_account
+from .utils import create_retirement_request_and_deactivate_account, username_suffix_generator
 
 try:
     from coaching.api import has_ever_consented_to_coaching
@@ -1325,8 +1324,8 @@ class UsernameReplacementView(APIView):
         # Keep checking usernames in case desired_username + random suffix is already taken
         while True:
             if User.objects.filter(username=new_username).exists():
-                unique_suffix = uuid.uuid4().hex[:suffix_length]
-                new_username = desired_username + unique_suffix
+                # adding a dash between user-supplied and system-generated values to avoid weird combinations
+                new_username = desired_username + '-' + username_suffix_generator(suffix_length)
             else:
                 break
         return new_username

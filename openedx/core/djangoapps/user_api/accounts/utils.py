@@ -2,8 +2,9 @@
 Utility methods for the account settings.
 """
 
-
+import random
 import re
+import string
 from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
@@ -215,3 +216,18 @@ def create_retirement_request_and_deactivate_account(user):
     # Delete OAuth tokens associated with the user.
     retire_dot_oauth2_models(user)
     AccountRecovery.retire_recovery_email(user.id)
+
+
+def username_suffix_generator(suffix_length=4):
+    """
+    Generates a random, alternating number and letter string for the purpose of
+    appending to non-unique usernames. Alternating is less likey to produce
+    a significant/meaningful substring like an offensive word.
+    """
+    output = ''
+    for i in range(suffix_length):
+        if (i % 2) == 0:
+            output += random.choice(string.ascii_lowercase)
+        else:
+            output += random.choice(string.digits)
+    return output
