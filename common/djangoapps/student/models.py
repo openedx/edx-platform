@@ -66,6 +66,7 @@ from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
 )
+from openedx_filters.learning.enrollment import PreUnenrollmentFilter
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
@@ -1117,6 +1118,10 @@ class AlreadyEnrolledError(CourseEnrollmentException):
     pass
 
 
+class UnenrollmentNotAllowed(CourseEnrollmentException):
+    pass
+
+
 class CourseEnrollmentManager(models.Manager):
     """
     Custom manager for CourseEnrollment with Table-level filter methods.
@@ -1755,6 +1760,12 @@ class CourseEnrollment(models.Model):
 
         try:
             record = cls.objects.get(user=user, course_id=course_id)
+
+            try:
+                record = PreUnenrollmentFilter.run(enrollment=record)
+            except PreUnenrollmentFilter.PreventUnenrollment as exc:
+                raise UnenrollmentNotAllowed(str(exc)) from exc
+
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
 
         except cls.DoesNotExist:
