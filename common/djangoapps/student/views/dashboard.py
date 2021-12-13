@@ -60,6 +60,8 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
+from openedx_filters.learning.dashboard import PreDashboardRenderFilter
+
 log = logging.getLogger("edx.student")
 
 experiments_namespace = LegacyWaffleFlagNamespace(name='student.experiments')
@@ -862,6 +864,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     context.update({
         'resume_button_urls': resume_button_urls
     })
+
+    try:
+        context = PreDashboardRenderFilter.run(context=context)
+    except PreDashboardRenderFilter.PreventDashboardRender as exc:
+        raise exc
 
     response = render_to_response('dashboard.html', context)
     if show_account_activation_popup:
