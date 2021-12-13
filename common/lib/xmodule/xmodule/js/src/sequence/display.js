@@ -426,6 +426,8 @@
                     }
                 });
             }
+            // Reload progress bar
+            this.$('#progress-frame').attr('src', this.$('#progress-frame').attr('src'));
         };
 
         Sequence.prototype.mark_active = function(position) {
