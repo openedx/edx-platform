@@ -29,6 +29,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libxmlsec1-dev
+        sudo apt-get install -y pkg-config
 
     - name: Get pip cache dir
       id: pip-cache-dir
