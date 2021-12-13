@@ -20,7 +20,7 @@ from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.lib.gating import api as gating_api
-from xmodule.modulestore.django import SignalHandler, modulestore
+from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from .signals import GRADING_POLICY_CHANGED
 
 log = logging.getLogger(__name__)
