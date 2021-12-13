@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 % if detail_url:
 
 ${_("Your {task_name} task has completed with the status '{task_status}'. Use this URL to view task details or download any files created: {detail_url}").format(task_name=task_name, task_status=task_status, detail_url=detail_url)}
