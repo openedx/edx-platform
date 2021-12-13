@@ -8,7 +8,6 @@ from unittest.mock import Mock, MagicMock, patch
 from lms.djangoapps.ora_staff_grader.serializers import (
     AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
-    ErrorSerializer,
     GradeDataSerializer,
     InitializeSerializer,
     LockStatusSerializer,
@@ -26,7 +25,8 @@ from lms.djangoapps.ora_staff_grader.serializers import (
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN
+from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
+
 
 
 class TestErrorSerializer(TestCase):

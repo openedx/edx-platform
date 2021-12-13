@@ -6,21 +6,6 @@ Serializers for Enhanced Staff Grader (ESG)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework import serializers
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN
-
-
-class ErrorSerializer(serializers.Serializer):
-    """ Returns error code and unpacks additional context """
-    error = serializers.CharField(default=ERR_UNKNOWN)
-
-    def to_representation(self, instance):
-        """ Override to unpack context alongside error code """
-        output = super().to_representation(instance)
-        for key, value in self.context.items():
-            output[key] = value
-
-        return output
-
 
 class GradeStatusField(serializers.ChoiceField):
     """ Field that can have the values ['graded' 'ungraded'] """
