@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - open-release/*.master
 
 jobs:
   run-tests:
