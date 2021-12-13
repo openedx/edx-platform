@@ -57,6 +57,8 @@ from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.data import CertificatesDisplayBehaviors
 
+from openedx_filters.learning.certificates import PreCertificateRenderFilter
+
 log = logging.getLogger(__name__)
 _ = translation.gettext
 
@@ -635,6 +637,11 @@ def render_html_view(request, course_id, certificate=None):
 
         # Track certificate view events
         _track_certificate_events(request, course, user, user_certificate)
+
+        try:
+            context = PreCertificateRenderFilter.run(context=context)
+        except PreCertificateRenderFilter.PreventCertificateRender:
+            return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
         # Render the certificate
         return _render_valid_certificate(request, context, custom_template)
