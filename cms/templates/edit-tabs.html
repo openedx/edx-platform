@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "pages" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from django.utils.translation import gettext as _
   from django.urls import reverse
   from xmodule.tabs import StaticTab
   from openedx.core.djangolib.js_utils import js_escaped_string
