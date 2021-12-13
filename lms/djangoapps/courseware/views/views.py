@@ -38,6 +38,7 @@ from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_filters.learning.filters import CourseAboutRenderStarted
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -1024,6 +1025,11 @@ def course_about(request, course_id):
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
         }
+
+        try:
+            context = CourseAboutRenderStarted.run_filter(context=context)
+        except CourseAboutRenderStarted.PreventCourseAboutRender as exc:
+            raise CourseAccessRedirect(reverse(exc.redirect_to or 'dashboard')) from exc
 
         return render_to_response('courseware/course_about.html', context)
 

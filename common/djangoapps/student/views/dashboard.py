@@ -18,6 +18,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from opaque_keys.edx.keys import CourseKey
+from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
@@ -63,6 +64,19 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 log = logging.getLogger("edx.student")
 
 experiments_namespace = LegacyWaffleFlagNamespace(name='student.experiments')
+
+
+class DashboardException(Exception):
+    """
+    Exception class that requires redirecting to a URL.
+    """
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+
+
+class DashboardRenderNotAllowed(DashboardException):
+    pass
 
 
 def get_org_black_and_whitelist_for_site():
@@ -862,6 +876,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     context.update({
         'resume_button_urls': resume_button_urls
     })
+
+    try:
+        context = DashboardRenderStarted.run_filter(context=context)
+    except DashboardRenderStarted.PreventDashboardRender as exc:
+        raise DashboardRenderNotAllowed(reverse(exc.redirect_to or 'account_settings')) from exc
 
     response = render_to_response('dashboard.html', context)
     if show_account_activation_popup:

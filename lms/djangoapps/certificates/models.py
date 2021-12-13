@@ -16,12 +16,12 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
-
 from django.utils.translation import gettext_lazy as _
 from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from openedx_filters.learning.filters import CertificateCreationRequested
 from simple_history.models import HistoricalRecords
 
 from common.djangoapps.student import models_api as student_api
@@ -48,6 +48,14 @@ class CertificateSocialNetworks:
     linkedin = 'LinkedIn'
     facebook = 'Facebook'
     twitter = 'Twitter'
+
+
+class GeneratedCertificateException(Exception):
+    pass
+
+
+class CertificateGenerationNotAllowed(GeneratedCertificateException):
+    pass
 
 
 class CertificateAllowlist(TimeStampedModel):
@@ -463,6 +471,13 @@ class GeneratedCertificate(models.Model):
         The COURSE_CERT_AWARDED signal helps determine if a Program Certificate can be awarded to a learner in the
         Credentials IDA.
         """
+        try:
+            self.user, self.course_id, self.mode, self.status = CertificateCreationRequested.run_filter(
+                user=self.user, course_id=self.course_id, mode=self.mode, status=self.status,
+            )
+        except CertificateCreationRequested.PreventCertificateCreation as exc:
+            raise CertificateGenerationNotAllowed(str(exc)) from exc
+
         super().save(*args, **kwargs)
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,

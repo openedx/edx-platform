@@ -18,6 +18,7 @@ from django.utils.encoding import smart_str
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx_filters.learning.filters import CertificateRenderStarted
 from organizations import api as organizations_api
 from edx_django_utils.plugins import pluggable_override
 
@@ -642,6 +643,11 @@ def render_html_view(request, course_id, certificate=None):
 
         # Track certificate view events
         _track_certificate_events(request, course, user, user_certificate)
+
+        try:
+            context = CertificateRenderStarted.run_filter(context=context)
+        except CertificateRenderStarted.PreventCertificateRender:
+            return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
         # Render the certificate
         return _render_valid_certificate(request, context, custom_template)
