@@ -48,6 +48,8 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx_filters.learning.courses import PreCourseHomeRenderFilter
+
 EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
 
@@ -240,5 +242,11 @@ class CourseHomeFragmentView(EdxFragmentView):
             'has_discount': has_discount,
             'show_search': show_search,
         }
+
+        try:
+            context = PreCourseHomeRenderFilter.run(context=context)
+        except PreCourseHomeRenderFilter.PreventCourseHomeRender as exc:
+            raise exc
+
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

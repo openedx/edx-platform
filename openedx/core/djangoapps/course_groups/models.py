@@ -18,6 +18,7 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 from openedx_events.learning.data import CohortData, CourseData, UserData, UserPersonalData  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx_events.learning.signals import COHORT_MEMBERSHIP_CHANGED  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx_filters.learning.certificates import PreCohortChangeFilter
 
 log = logging.getLogger(__name__)
 
@@ -126,6 +127,12 @@ class CohortMembership(models.Model):
 
                 membership.course_user_group = cohort
                 membership.course_user_group.users.add(user)
+
+                try:
+                    membership = PreCohortChangeFilter.run(cohort_membership=membership)
+                except PreCohortChangeFilter.PreventCohortChange as exc:
+                    raise exc
+
                 membership.save()
         return membership, previous_cohort
 

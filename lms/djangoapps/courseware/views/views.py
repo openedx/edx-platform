@@ -135,6 +135,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # li
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx_filters.learning.courses import PreCourseAboutRenderFilter
+
 from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
@@ -1018,6 +1020,11 @@ def course_about(request, course_id):
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
         }
+
+        try:
+            context = PreCourseAboutRenderFilter.run(context=context)
+        except PreCourseAboutRenderFilter.PreventCourseAboutRender as exc:
+            raise exc
 
         return render_to_response('courseware/course_about.html', context)
 
