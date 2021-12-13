@@ -69,7 +69,7 @@ class TestInitializeView(BaseViewTest):
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: 'not_a_real_location'})
 
         assert response.status_code == 400
-        assert response.content.decode() == ERR_BAD_ORA_LOCATION
+        assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
@@ -351,7 +351,7 @@ class TestSubmissionLockView(APITestCase):
         response = self.claim_lock(self.test_lock_params)
 
         assert response.status_code == 400
-        assert response.content.decode() == ERR_BAD_ORA_LOCATION
+        assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
     @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
     def test_claim_lock(self, mock_xblock_handler):

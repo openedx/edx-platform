@@ -2,7 +2,7 @@
 Views for Enhanced Staff Grader
 """
 import json
-from django.http.response import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.http.response import HttpResponseForbidden, HttpResponseServerError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_LOCK_CONTESTED
+from lms.djangoapps.ora_staff_grader.errors import ERR_LOCK_CONTESTED, BadOraLocationResponse
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
@@ -133,7 +133,7 @@ class InitializeView(StaffGraderBaseView):
             ora_usage_key = UsageKey.from_string(ora_location)
             response_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
+            return BadOraLocationResponse()
 
         # Get course metadata
         course_id = str(ora_usage_key.course_key)
@@ -318,7 +318,7 @@ class SubmissionLockView(StaffGraderBaseView):
         try:
             UsageKey.from_string(ora_location)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
+            return BadOraLocationResponse()
 
         response = self.claim_submission_lock(request, ora_location, submission_uuid)
 
@@ -337,7 +337,7 @@ class SubmissionLockView(StaffGraderBaseView):
         try:
             UsageKey.from_string(ora_location)
         except (InvalidKeyError, ItemNotFoundError):
-            return HttpResponseBadRequest(ERR_BAD_ORA_LOCATION)
+            return BadOraLocationResponse()
 
         response = self.delete_submission_lock(request, ora_location, submission_uuid)
 

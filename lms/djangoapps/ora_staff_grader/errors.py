@@ -1,4 +1,7 @@
 """ Error codes and exceptions for ESG """
+from rest_framework import serializers
+from rest_framework.response import Response
+
 
 # Catch-all error if we don't supply anything
 ERR_UNKNOWN = "ERR_UNKNOWN"
@@ -25,3 +28,19 @@ class ErrorSerializer(serializers.Serializer):
 
         return output
 
+
+class StaffGraderErrorResponse(Response):
+    """ An HTTP error response that returns serialized error data with additional provided context """
+    status = 500
+    err_code = ERR_UNKNOWN
+
+    def __init__(self, context={}):
+        # Unpack provided content into error structure
+        content = ErrorSerializer({"error": self.err_code}, context=context).data
+        super().__init__(content, status=self.status)
+
+
+class BadOraLocationResponse(StaffGraderErrorResponse):
+    """ An HTTP 400 that returns serialized error data with additional provided context """
+    status = 400
+    err_code = ERR_BAD_ORA_LOCATION
