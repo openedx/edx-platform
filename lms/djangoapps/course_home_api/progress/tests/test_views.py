@@ -215,7 +215,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
                 "course_version": self.course.course_version,
                 "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
                 "earned_all": 6.0,
-                "earned_all": 6.0,
                 "possible_all": 12.0,
                 "earned_graded": 6.0,
                 "possible_graded": 8.0,
