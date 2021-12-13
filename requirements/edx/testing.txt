@@ -234,7 +234,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.txt
-distlib==0.3.3
+distlib==0.3.4
     # via virtualenv
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -381,7 +381,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.2.0
+django-mysql==4.3.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -623,9 +623,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==9.9.0
+faker==10.0.0
     # via factory-boy
-fastapi==0.70.0
+fastapi==0.70.1
     # via pact-python
 filelock==3.4.0
     # via
@@ -1050,9 +1050,9 @@ pytest-attrib==0.1.3
     # via -r requirements/edx/testing.in
 pytest-cov==3.0.0
     # via -r requirements/edx/testing.in
-pytest-django==4.5.1
+pytest-django==4.5.2
     # via -r requirements/edx/testing.in
-pytest-forked==1.3.0
+pytest-forked==1.4.0
     # via pytest-xdist
 pytest-json-report==1.4.1
     # via -r requirements/edx/testing.in
@@ -1062,7 +1062,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.10.3
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==2.4.0
+pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.4.0
     # via
@@ -1368,7 +1368,7 @@ urllib3==1.26.7
     #   transifex-client
 user-util==1.0.0
     # via -r requirements/edx/base.txt
-uvicorn==0.15.0
+uvicorn==0.16.0
     # via pact-python
 vine==1.3.0
     # via
@@ -1383,7 +1383,7 @@ voluptuous==0.12.2
     #   ora2
 watchdog==2.1.6
     # via -r requirements/edx/base.txt
-web-fragments==1.1.0
+web-fragments==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   crowdsourcehinter-xblock
