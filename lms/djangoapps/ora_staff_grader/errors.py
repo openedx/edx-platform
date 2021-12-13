@@ -44,3 +44,9 @@ class BadOraLocationResponse(StaffGraderErrorResponse):
     """ An HTTP 400 that returns serialized error data with additional provided context """
     status = 400
     err_code = ERR_BAD_ORA_LOCATION
+
+
+class MissingParamResponse(StaffGraderErrorResponse):
+    """ An HTTP 400 that returns serialized error data with additional provided context """
+    status = 400
+    err_code = ERR_MISSING_PARAM
