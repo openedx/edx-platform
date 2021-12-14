@@ -197,6 +197,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
                 proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
     return proctored_exam_settings_url
 
+
 def get_editor_page_base_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for links to the new base editors
@@ -208,6 +209,8 @@ def get_editor_page_base_url(course_locator) -> str:
         if mfe_base_url:
             editor_url = course_mfe_url
     return editor_url
+
+
 def course_import_olx_validation_is_enabled():
     """
     Check if course olx validation is enabled on course import.

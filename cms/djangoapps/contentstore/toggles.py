@@ -97,7 +97,7 @@ ENABLE_NEW_TEXT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_text_editor',
 
 def use_new_text_editor():
     """
-    Returns a boolean if new text editor is enabled
+    Returns a boolean = true if new text editor is enabled
     """
     return ENABLE_NEW_TEXT_EDITOR_FLAG.is_enabled()
 
@@ -116,7 +116,7 @@ ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor
 
 def use_new_video_editor():
     """
-    Returns a boolean if new video editor is enabled
+    Returns a boolean = true if new video editor is enabled
     """
     return ENABLE_NEW_VIDEO_EDITOR_FLAG.is_enabled()
 
