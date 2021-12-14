@@ -331,14 +331,16 @@ class MasqueradeMixin:
     to pass in the course parameter below.
     """
 
-    def update_masquerade(self, course=None, role='student', group_id=None, username=None, user_partition_id=None):
+    def update_masquerade(self, course=None, course_id=None, role='student', group_id=None, username=None,
+                          user_partition_id=None):
         """
         Installs a masquerade for the specified user and course, to enable
         the user to masquerade as belonging to the specific partition/group
         combination.
 
         Arguments:
-            course (object): a course or None for self.course
+            course (object): a course or None for self.course (or you can pass course_id instead)
+            course_id (str|CourseKey): a course id, useful if you don't happen to have a full course object handy
             user_partition_id (int): the integer partition id, referring to partitions already
                configured in the course.
             group_id (int); the integer group id, within the specified partition.
@@ -347,11 +349,11 @@ class MasqueradeMixin:
 
         Returns: the response object for the AJAX call to update the user's masquerade.
         """
-        course = course or self.course
+        course_id = str(course_id or (course and course.id) or self.course.id)
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': str(course.id),
+                'course_key_string': course_id,
             }
         )
         response = self.client.post(

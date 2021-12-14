@@ -2630,7 +2630,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
@@ -2703,7 +2702,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.descriptor,
             self.course.id,
             self.track_function,
-            self.xqueue_callback_url_prefix,
             self.request_token,
             course=self.course,
         )
