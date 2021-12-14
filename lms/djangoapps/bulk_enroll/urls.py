@@ -3,10 +3,10 @@ URLs for the Bulk Enrollment API
 """
 
 
-from django.conf.urls import url
+from django.urls import path
 
 from .views import BulkEnrollView
 
 urlpatterns = [
-    url(r'^bulk_enroll', BulkEnrollView.as_view(), name='bulk_enroll'),
+    path('bulk_enroll', BulkEnrollView.as_view(), name='bulk_enroll'),
 ]

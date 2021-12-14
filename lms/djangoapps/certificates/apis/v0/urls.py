@@ -4,19 +4,19 @@ Certificates API v0 URLs.
 
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path, re_path
 
 from lms.djangoapps.certificates.apis.v0 import views
 
 CERTIFICATES_URLS = ([
-    url(
+    re_path(
         r'^{username}/courses/{course_id}/$'.format(
             username=settings.USERNAME_PATTERN,
             course_id=settings.COURSE_ID_PATTERN
         ),
         views.CertificatesDetailView.as_view(), name='detail'
     ),
-    url(
+    re_path(
         r'^{username}/$'.format(
             username=settings.USERNAME_PATTERN
         ),
@@ -26,5 +26,5 @@ CERTIFICATES_URLS = ([
 
 app_name = 'v0'
 urlpatterns = [
-    url(r'^certificates/', include(CERTIFICATES_URLS)),
+    path('certificates/', include(CERTIFICATES_URLS)),
 ]
