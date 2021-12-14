@@ -72,6 +72,14 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
         result = self.client.get(outline_url(fake_course_key))
         assert result.status_code == 404
 
+    def test_non_existent_course_401_as_anonymous(self):
+        """
+        We should 401, not 404, when asking for a course that isn't there for an anonymous user.
+        """
+        fake_course_key = self.course_key.replace(run="not_real")
+        result = self.client.get(outline_url(fake_course_key))
+        assert result.status_code == 401
+
     def test_deprecated_course_key(self):
         """
         For now, make sure you need staff access bits to use the API.
