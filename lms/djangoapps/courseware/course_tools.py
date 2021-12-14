@@ -7,7 +7,7 @@ import datetime
 
 import pytz
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience.course_tools import CourseTool
