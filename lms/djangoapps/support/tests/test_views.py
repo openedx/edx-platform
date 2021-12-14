@@ -11,14 +11,25 @@ from unittest.mock import patch
 from uuid import UUID, uuid4
 
 import ddt
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import signals
 from django.http import HttpResponse
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
+from django.utils import timezone
+from edx_proctoring.api import create_exam_attempt, update_attempt_status
+from edx_proctoring.models import ProctoredExam
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.statuses import ProctoredExamStudentAttemptStatus
+from edx_proctoring.tests.test_services import MockLearningSequencesService, MockScheduleItemData
+from edx_proctoring.tests.utils import ProctoredExamTestCase
+from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
 from social_django.models import UserSocialAuth
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -42,8 +53,6 @@ from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SupportViewTestCase(ModuleStoreTestCase):
@@ -1399,3 +1408,211 @@ class SAMLProvidersWithOrgTests(SupportViewTestCase):
         response = self.client.get(self._url)
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.org_key_list
+
+
+class TestOnboardingView(SupportViewTestCase, ProctoredExamTestCase):
+    """
+    Tests for OnboardingView
+    """
+
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+        self.proctored_exam_id = self._create_proctored_exam()
+        self.onboarding_exam_id = self._create_onboarding_exam()
+
+        self.other_user = User.objects.create(username='otheruser', password='test')
+        self.other_course_content = 'block-v1:test+course+2+type@sequential+block@other_onboard'
+
+        self.other_course = CourseFactory.create(
+            org='x',
+            course='y',
+            run='z',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        self.course_scheduled_sections = {
+            BlockUsageLocator.from_string(self.content_id_onboarding): MockScheduleItemData(yesterday),
+            BlockUsageLocator.from_string(self.other_course_content): MockScheduleItemData(yesterday),
+        }
+
+        set_runtime_service('learning_sequences', MockLearningSequencesService(
+            list(self.course_scheduled_sections.keys()),
+            self.course_scheduled_sections,
+        ))
+
+        self.onboarding_exam = ProctoredExam.objects.get(id=self.onboarding_exam_id)
+
+    def tearDown(self):  # lint-amnesty, pylint: disable=super-method-not-called
+        """
+        Override deafult implementation to prevent `default` key deletion from TRACKERS in
+        an inherited tearDown() method of ProctoredExamTestCase
+        """
+        return
+
+    def _url(self, username):
+        return reverse("support:onboarding_status", kwargs={'username_or_email': username})
+
+    def _create_enrollment(self):
+        """ Create enrollment in default course """
+        # default course key = 'a/b/c'
+        self.course = CourseFactory.create(
+            org='a',
+            course='b',
+            run='c',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+        CourseEnrollmentFactory(
+            is_active=True,
+            mode='verified',
+            course_id=self.course.id,
+            user=self.user
+        )
+
+    def test_wrong_username(self):
+        """
+        Test that a request with a username which does not exits returns 404
+        """
+        response = self.client.get(self._url(username='does_not_exist'))
+        self.assertEqual(response.status_code, 404)
+
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(response_data['current_status'], None)
+
+    def test_no_record(self):
+        """
+        Test that a request with a username which do not have any onboarding exam returns empty data
+        """
+        response = self.client.get(self._url(username=self.other_user.username))
+        self.assertEqual(response.status_code, 200)
+
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(response_data['current_status'], None)
+
+    def test_no_verified_attempts(self):
+        """
+        Test that if there are no verified attempts, the most recent status is returned
+        """
+
+        self._create_enrollment()
+
+        # create first attempt
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.submitted)
+
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.submitted
+        )
+
+        # Create second attempt and assert that most recent attempt is returned
+        create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.created
+        )
+
+    def test_get_verified_attempt(self):
+        """
+        Test that if there is at least one verified attempt, the status returned is always verified
+        """
+
+        self._create_enrollment()
+
+        # Create first attempt
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.verified)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(
+            response_data['verified_in']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+
+        # Create second attempt and assert that verified attempt is still returned
+        create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(
+            response_data['verified_in']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+
+    def test_verified_in_another_course(self):
+        """
+        Test that, if there is at least one verified attempt in any course for a given user,
+        the current status will return `other_course_approved`
+        """
+
+        # Create a submitted attempt in the current course
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.submitted)
+
+        # Create an attempt in the other course that has been verified
+        other_course_id = 'x/y/z'
+        other_course_onboarding_exam = ProctoredExam.objects.create(
+            course_id=other_course_id,
+            content_id=self.other_course_content,
+            exam_name='Test Exam',
+            external_id='123aXqe3',
+            time_limit_mins=90,
+            is_active=True,
+            is_proctored=True,
+            is_practice_exam=True,
+            backend='test'
+        )
+
+        self.user_id = self.user.id
+        self._create_exam_attempt(other_course_onboarding_exam.id, ProctoredExamStudentAttemptStatus.verified, True)
+
+        # professional enrollment
+        CourseEnrollmentFactory(
+            is_active=True,
+            mode='professional',
+            course_id=self.other_course.id,
+            user=self.user
+        )
+
+        # default enrollment afterwards with submitted status
+        self._create_enrollment()
+
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        # assert that originally verified enrollment is reflected correctly
+        self.assertEqual(response_data['verified_in']['onboarding_status'], 'verified')
+        self.assertEqual(response_data['verified_in']['course_id'], 'x/y/z')
+
+        # assert that most recent enrollment (current status) has other_course_approved status
+        self.assertEqual(response_data['current_status']['onboarding_status'], 'other_course_approved')
+        self.assertEqual(response_data['current_status']['course_id'], 'a/b/c')
