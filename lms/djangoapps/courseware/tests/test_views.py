@@ -18,6 +18,7 @@ from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponseBadRequest
+from django.http.request import QueryDict
 from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -32,7 +33,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
@@ -102,18 +103,18 @@ from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactor
 from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from common.djangoapps.util.url import reload_django_url_config
 from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.graders import ShowCorrectness
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.graders import ShowCorrectness  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     CourseUserType,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -498,9 +499,9 @@ class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=m
                 'course_id': str(self.course_key),
                 'chapter': str(self.chapter.location.block_id),
                 'section': str(self.section2.location.block_id),
-            }
-        )
-        mfe_url = '{}/course/{}/{}'.format(
+            },
+        ) + '?foo=b$r'
+        mfe_url = '{}/course/{}/{}?foo=b%24r'.format(
             settings.LEARNING_MICROFRONTEND_URL,
             self.course_key,
             self.section2.location
@@ -605,7 +606,7 @@ class ViewsTestCase(BaseViewsTestCase):
                 'course_id': str(course.id),
             }
         )
-        mfe_url = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+        mfe_url = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
 
         with _set_course_home_mfe_flag(activate_mfe):
             response = self.client.get(reverse('about_course', args=[str(course.id)]))
@@ -3395,10 +3396,12 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class DatesTabTestCase(ModuleStoreTestCase):
     """
     Ensure that the dates page renders with the correct data for both a verified and audit learner
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -3533,6 +3536,15 @@ class DatesTabTestCase(ModuleStoreTestCase):
         response = self._get_response(self.course)
         self.assertContains(response, 'div class="banner-cta-text"')
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=False)
+    def test_legacy_redirect(self):
+        """
+        Verify that the legacy dates page redirects to the MFE correctly.
+        """
+        response = self.client.get(reverse('dates', args=[str(self.course.id)]) + '?foo=b$r')
+        assert response.status_code == 302
+        assert response.get('Location') == f'http://learning-mfe/course/{self.course.id}/dates?foo=b%24r'
+
 
 class TestShowCoursewareMFE(TestCase):
     """
@@ -3627,6 +3639,11 @@ class TestShowCoursewareMFE(TestCase):
         assert make_learning_mfe_courseware_url(course_key) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
+        )
+        assert make_learning_mfe_courseware_url(course_key, params=QueryDict('foo=b$r')) == (
+            'https://learningmfe.openedx.org'
+            '/course/course-v1:OpenEdX+MFE+2020'
+            '?foo=b%24r'
         )
         assert make_learning_mfe_courseware_url(course_key, section_key, '') == (
             'https://learningmfe.openedx.org'

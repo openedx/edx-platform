@@ -46,8 +46,8 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise,
     update_third_party_auth_context_for_enterprise
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 

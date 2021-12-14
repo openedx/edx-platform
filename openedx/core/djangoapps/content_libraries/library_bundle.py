@@ -5,7 +5,7 @@ Helper code for working with Blockstore bundles that contain OLX
 import dateutil.parser
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 
-from functools import lru_cache
+from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.plugin import PluginMissingError

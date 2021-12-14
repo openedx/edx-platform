@@ -101,6 +101,7 @@
             <% if ( restrictions.max_length && type !== 'password' ) { %> maxlength="<%- restrictions.max_length %>"<% } %>
             <% if ( restrictions.readonly )   { %> readonly <% } %>
             <% if ( required ) { %> required<% } %>
+            <% if ( defaultValue === true ) { %> checked<% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
                 _.each(errorMessages, function( msg, type ) {%>
                     data-errormsg-<%- type %>="<%- msg %>"

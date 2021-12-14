@@ -2,6 +2,8 @@
 Utility functions used during user authentication.
 """
 
+import hashlib
+import math
 import random
 import re
 from urllib.parse import urlparse  # pylint: disable=import-error
@@ -10,8 +12,10 @@ from uuid import uuid4  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 from django.utils import http
 from oauth2_provider.models import Application
+from rest_framework.status import HTTP_408_REQUEST_TIMEOUT
 
 from common.djangoapps.student.models import username_exists_or_retired
+from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 
 
@@ -105,3 +109,28 @@ def generate_username_suggestions(name):
                     break
 
     return username_suggestions
+
+
+def check_pwned_password(password):
+    """
+        Check the Pwned Databases for vulnerable passwords.
+        check_pwned_password returns password hash suffix and a dictionary containing
+        suffix of every SHA-1 password hash beginning with the specified prefix,
+        followed by a count of how many times it appears in their data set.
+    """
+    properties = {}
+    password = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+
+    pwned_response = PwnedPasswordsAPI.range(password)
+    if pwned_response is not None:
+        if pwned_response == HTTP_408_REQUEST_TIMEOUT:
+            properties['vulnerability'] = 'unknown'
+            pwned_count = 0
+        else:
+            pwned_count = pwned_response.get(password[5:], 0)
+            properties['vulnerability'] = 'yes' if pwned_count > 0 else 'no'
+
+        if pwned_count > 0:
+            properties['frequency'] = math.ceil(math.log10(pwned_count))
+
+    return properties

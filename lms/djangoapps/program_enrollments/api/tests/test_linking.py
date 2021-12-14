@@ -314,7 +314,7 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
             }
         )
 
-        assert errors == {}
+        assert not errors
         self._assert_program_enrollment(self.user_2, self.program, '0001')
         self._assert_no_program_enrollment(self.user_1, self.program)
         # assert that all of user_1's course enrollments as part of the program

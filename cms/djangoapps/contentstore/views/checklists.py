@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 __all__ = ['checklists_handler']
 

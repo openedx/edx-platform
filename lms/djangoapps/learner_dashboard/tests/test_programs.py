@@ -328,8 +328,8 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
 
     def test_discussion_flags_exist(self):
         """
-        Test if programDiscussionEnabled and discussionFragment exist in html.
+        Test if programTabViewEnabled and discussionFragment exist in html.
         """
         response = self.client.get(self.url)
-        self.assertContains(response, 'programDiscussionEnabled: true',)
-        self.assertContains(response, 'discussionFragment: {"enabled": false, "iframe": ""')
+        self.assertContains(response, 'programTabViewEnabled: true',)
+        self.assertContains(response, 'discussionFragment: {"configured": false, "iframe": ""')

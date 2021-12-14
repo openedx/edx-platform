@@ -324,6 +324,7 @@ class RegistrationFormFactory:
         "terms_of_service",
         "profession",
         "specialty",
+        "marketing_emails_opt_in",
     ]
 
     def _is_field_visible(self, field_name):
@@ -349,6 +350,9 @@ class RegistrationFormFactory:
         if not self._extra_fields_setting:
             self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
+
+        if settings.MARKETING_EMAILS_OPT_IN:
+            self._extra_fields_setting['marketing_emails_opt_in'] = 'optional'
 
         # Check that the setting is configured correctly
         for field_name in self.EXTRA_FIELDS:
@@ -658,6 +662,27 @@ class RegistrationFormFactory:
             options=options,
             include_default_option=True,
             required=required
+        )
+
+    def _add_marketing_emails_opt_in_field(self, form_desc, required=False):
+        """Add a marketing email checkbox to form description.
+        Arguments:
+            form_desc: A form description
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        opt_in_label = _(
+            'I agree that {platform_name} may send me marketing messages.').format(
+                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        )
+
+        form_desc.add_field(
+            'marketing_emails_opt_in',
+            label=opt_in_label,
+            field_type="checkbox",
+            exposed=True,
+            default=True,  # the checkbox will automatically be checked; meaning user has opted in
+            required=required,
         )
 
     def _add_field_with_configurable_select_options(self, field_name, field_label, form_desc, required=False):

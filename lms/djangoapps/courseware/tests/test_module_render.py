@@ -68,19 +68,19 @@ from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from common.djangoapps.xblock_django.models import XBlockConfiguration
-from xmodule.capa_module import ProblemBlock
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.lti_module import LTIBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.capa_module import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.lti_module import LTIBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
-from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.video_module import VideoBlock
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT

@@ -13,7 +13,7 @@ jobs:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
@@ -53,5 +53,5 @@ jobs:
       - name: verify unit tests count
         if: ${{ env.root_all_unit_tests_count != env.shards_all_unit_tests_count }}
         run: |
-          echo "::error title='Unit test modules in unit-tests.yml workflow are outdated'::unit tests running in unit-tests workflow don't match the count for unit tests for entire edx-platform suite, please update the test_module under matrix to add any missing apps and match the count"
+          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows to add any missing apps and match the count"
           exit 1

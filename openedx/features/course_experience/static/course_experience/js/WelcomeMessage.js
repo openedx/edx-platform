@@ -1,5 +1,5 @@
 /* globals $ */
-import 'jquery.cookie';
+import 'jquery.cookie'; // eslint-disable-line
 import gettext from 'gettext'; // eslint-disable-line
 import { clampHtmlByWords } from 'common/js/utils/clamp-html'; // eslint-disable-line
 

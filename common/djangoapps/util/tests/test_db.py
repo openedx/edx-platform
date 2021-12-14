@@ -1,6 +1,5 @@
 """Tests for util.db module."""
 
-
 from io import StringIO
 
 import ddt

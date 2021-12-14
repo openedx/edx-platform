@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 from datetime import datetime
 from django.test import RequestFactory
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -11,7 +11,7 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import create_content_gating_partition
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.partitions.partitions import UserPartitionError
+from xmodule.partitions.partitions import UserPartitionError  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestContentTypeGatingPartition(CacheIsolationTestCase):  # pylint: disable=missing-class-docstring

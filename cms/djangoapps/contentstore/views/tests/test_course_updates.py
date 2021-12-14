@@ -9,7 +9,7 @@ from opaque_keys.edx.keys import UsageKey
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from openedx.core.lib.xblock_utils import get_course_update_items
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class CourseUpdateTest(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
