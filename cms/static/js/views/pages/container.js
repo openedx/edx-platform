@@ -187,11 +187,18 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 event.preventDefault();
 
                   // WIP: now check if we want to launch in a modal for the new editors (behind waffle flag)
-                var useNewEditor = this.$('.edit-button').attr("use-new-editors-set")
-                if( useNewEditor === "true") {
-                    console.log(useNewEditor);
-                    console.log("Here we want to pull in the waffle flag from the html");
-                    console.log(this.options.model.id);
+                var useNewTextEditor = this.$('.edit-button').attr("use-new-editor-text"),
+                    useNewVideoEditor = this.$('.edit-button').attr("use-new-editor-video"),
+                    useNewProblemEditor = this.$('.edit-button').attr("use-new-editor-problem"),
+                    blockType = xblockElement.find('.xblock').attr("data-block-type");
+                console.log(useNewTextEditor,useNewVideoEditor,useNewProblemEditor, blockType);
+                if( (useNewTextEditor === "True" && blockType === "html") ||
+                    (useNewVideoEditor === "True" && blockType === "video") ||
+                    (useNewProblemEditor === "True" && blockType === "problem")
+                ) {
+                    var destinationUrl = this.$('.edit-button').attr("authoring_MFE_base_url") + '/' + blockType + '/' + this.$('.studio-xblock-wrapper').attr("data-locator");
+                    console.log(destinationUrl);
+                    window.location.replace(destinationUrl);
                     return;
                 }
                 modal.edit(xblockElement, this.model, {

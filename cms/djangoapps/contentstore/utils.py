@@ -30,6 +30,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from cms.djangoapps.contentstore.toggles import use_new_text_editor
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +197,17 @@ def get_proctored_exam_settings_url(course_locator) -> str:
                 proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
     return proctored_exam_settings_url
 
-
+def get_editor_page_base_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for links to the new base editors
+    """
+    editor_url = None
+    if use_new_text_editor():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if mfe_base_url:
+            editor_url = course_mfe_url
+    return editor_url
 def course_import_olx_validation_is_enabled():
     """
     Check if course olx validation is enabled on course import.
