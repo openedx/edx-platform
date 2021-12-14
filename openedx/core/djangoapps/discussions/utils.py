@@ -13,10 +13,10 @@ from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
 from openedx.core.types import User
-from xmodule.course_module import CourseBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group
-from xmodule.partitions.partitions_service import PartitionService
+from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def get_divided_discussions(
     divided_inline_discussions = []
 
     course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
-    all_discussions = get_discussion_categories_ids(course, None)
+    all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
     for divided_discussion_id in discussion_settings.divided_discussions:
         if divided_discussion_id in course_wide_discussions:
@@ -43,7 +43,7 @@ def get_divided_discussions(
     return divided_course_wide_discussions, divided_inline_discussions
 
 
-def get_discussion_categories_ids(course: CourseBlock, user: Optional[User]) -> List[str]:
+def get_discussion_categories_ids(course: CourseBlock, user: Optional[User], include_all: bool = False) -> List[str]:
     """
     Returns a list of available ids of categories for the course that
     are accessible to the given user.
@@ -51,10 +51,11 @@ def get_discussion_categories_ids(course: CourseBlock, user: Optional[User]) -> 
     Args:
         course: Course for which to get the ids.
         user:  User to check for access.
+        include_all: Whether categories from all blocks should be included.
 
     """
     accessible_discussion_ids = [
-        xblock.discussion_id for xblock in get_accessible_discussion_xblocks(course, user)
+        xblock.discussion_id for xblock in get_accessible_discussion_xblocks(course, user, include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
@@ -62,12 +63,13 @@ def get_discussion_categories_ids(course: CourseBlock, user: Optional[User]) -> 
 def get_accessible_discussion_xblocks(
     course: CourseBlock,
     user: Optional[User],
+    include_all: bool = False,
 ) -> List[DiscussionXBlock]:
     """
     Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
-    include_all = getattr(user, 'is_community_ta', False)
+    include_all = include_all or getattr(user, 'is_community_ta', False)
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
 
 

@@ -21,7 +21,7 @@ from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx_events.tests.utils import OpenEdxEventsTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,

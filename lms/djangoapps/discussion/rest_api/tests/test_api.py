@@ -139,6 +139,7 @@ def _set_course_discussion_blackout(course, user_id):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@ddt.ddt
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
 
@@ -179,7 +180,23 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'topics_url': 'http://testserver/api/discussion/v1/course_topics/x/y/z',
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,
+            'user_is_privileged': False,
+            'user_roles': {'Student'},
         }
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+    )
+    def test_privileged_roles(self, role):
+        """
+        Test that the api returns the correct roles and privileges.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role)
+        course_meta = get_course(self.request, self.course.id)
+        assert course_meta["user_is_privileged"]
+        assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
 
 
 @ddt.ddt

@@ -12,7 +12,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -177,11 +177,17 @@ class CourseOutlineView(APIView):
         if (not force_on) and (not can_call_public_api(course_key)):
             raise PermissionDenied()
 
+        outline_user = self._determine_user(request, course_key)
+
         try:
             # Grab the user's outline and send our response...
-            outline_user = self._determine_user(request, course_key)
             user_course_outline_details = get_user_course_outline_details(course_key, outline_user, at_time)
         except CourseOutlineData.DoesNotExist as does_not_exist_err:
+            if not outline_user.id:
+                # Outline is private or doesn't exist. But don't leak whether a course exists or not to anonymous
+                # users with a 404 - give a 401 instead. This mostly prevents drive-by crawlers from creating a bunch
+                # of 404 errors in your error report dashboard.
+                raise NotAuthenticated() from does_not_exist_err
             raise NotFound() from does_not_exist_err
 
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)

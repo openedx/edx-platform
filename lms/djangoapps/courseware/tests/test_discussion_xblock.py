@@ -24,11 +24,11 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor_in
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xblock_discussion import DiscussionXBlock, loader
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xblock_discussion import DiscussionXBlock, loader  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

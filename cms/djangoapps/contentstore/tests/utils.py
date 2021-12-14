@@ -14,14 +14,14 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 
 from cms.djangoapps.contentstore.utils import reverse_url
 from common.djangoapps.student.models import Registration
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

@@ -75,7 +75,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         % endif
       >
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
-  <% course_target = reverse(course_home_url_name(course_overview.id), args=[str(course_overview.id)]) if course_home_legacy_is_active(course_overview.id) else get_learning_mfe_home_url(course_key=course_overview.id, view_name="home") %>
+  <% course_target = reverse(course_home_url_name(course_overview.id), args=[str(course_overview.id)]) if course_home_legacy_is_active(course_overview.id) else get_learning_mfe_home_url(course_key=course_overview.id, url_fragment="home") %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">

@@ -46,7 +46,7 @@ from common.djangoapps.student.models import (
     UserTestGroup
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()  # pylint:disable=invalid-name
 

@@ -750,7 +750,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
 ##### Show Answer Override for Self-Paced Courses #####
@@ -953,16 +953,16 @@ DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
 
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
-
-########################## Derive Any Derived Settings  #######################
-
-derive_settings(__name__)
 
 ############## Settings for Completion API #########################
 

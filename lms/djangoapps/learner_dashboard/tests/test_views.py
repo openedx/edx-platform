@@ -54,7 +54,7 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         expected_data = {
-            'enabled': True,
+            'tab_view_enabled': True,
             'discussion': {
                 'iframe': "",
                 'configured': False
@@ -69,6 +69,29 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 401)
+
+    def test_program_discussion_disabled(self):
+        """
+        Tests that API does not return discussion iframe when discussion
+        configuration is disabled.
+        """
+        __ = ProgramDiscussionsConfiguration.objects.create(
+            program_uuid=self.program_uuid,
+            enabled=False,
+            provider_type="piazza",
+        )
+        expected_data = {
+            'tab_view_enabled': True,
+            'discussion': {
+                'iframe': "",
+                'configured': False
+            }
+        }
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_data)
 
     def test_api_returns_discussions_iframe(self):
         """

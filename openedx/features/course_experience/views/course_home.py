@@ -46,7 +46,7 @@ from openedx.features.course_experience.views.welcome_message import WelcomeMess
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
 
 EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
@@ -70,7 +70,7 @@ class CourseHomeView(CourseTabView):
         if course_home_legacy_is_active(course.id) or request.user.is_staff:
             home_fragment_view = CourseHomeFragmentView()
             return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
-        microfrontend_url = get_learning_mfe_home_url(course_key=course_id, view_name="home")
+        microfrontend_url = get_learning_mfe_home_url(course_key=course_id, url_fragment='home', params=request.GET)
         raise Redirect(microfrontend_url)
 
 

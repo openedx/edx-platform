@@ -9,10 +9,10 @@ from opaque_keys import InvalidKeyError
 
 from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
 from cms.djangoapps.contentstore.management.commands.reindex_library import Command as ReindexCommand
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

@@ -4,11 +4,12 @@ Fragments for rendering programs.
 
 import json
 
+from urllib.parse import quote
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import get_language, to_locale, gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from web_fragments.fragment import Fragment
 
@@ -17,7 +18,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_view_is_enabled, strip_course_id
 
 from openedx.core.djangoapps.catalog.constants import PathwayType
-from openedx.core.djangoapps.catalog.utils import get_pathways
+from openedx.core.djangoapps.catalog.utils import get_pathways, get_programs
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -30,6 +31,7 @@ from openedx.core.djangoapps.programs.utils import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangolib.markup import HTML
+from common.djangoapps.student.models import anonymous_id_for_user
 
 
 class ProgramsFragmentView(EdxFragmentView):
@@ -147,9 +149,9 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
-            'program_discussions_enabled': program_tab_view_is_enabled(),
+            'program_tab_view_enabled': program_tab_view_is_enabled(),
             'discussion_fragment': {
-                'enabled': bool(program_discussion_lti.configuration),
+                'configured': program_discussion_lti.is_configured,
                 'iframe': program_discussion_lti.render_iframe()
             }
         }
@@ -175,16 +177,16 @@ class ProgramDiscussionLTI:
 
     def __init__(self, program_uuid, request):
         self.program_uuid = program_uuid
+        self.program = get_programs(uuid=self.program_uuid)
         self.request = request
-        self.configuration = self.get_configuration()
+        self.configuration = ProgramDiscussionsConfiguration.get(self.program_uuid)
 
-    def get_configuration(self) -> ProgramDiscussionsConfiguration:
+    @property
+    def is_configured(self):
         """
-        Returns ProgramDiscussionsConfiguration object with respect to program_uuid
+        Returns a boolean indicating if the program configuration is enabled or not.
         """
-        return ProgramDiscussionsConfiguration.objects.filter(
-            program_uuid=self.program_uuid
-        ).first()
+        return bool(self.configuration and self.configuration.enabled)
 
     def _get_resource_link_id(self) -> str:
         site = get_current_site(self.request)
@@ -205,6 +207,36 @@ class ProgramDiscussionLTI:
         all_roles = [basic_role]
         return ','.join(all_roles)
 
+    def _get_additional_lti_parameters(self):
+        lti_config = self.configuration.lti_configuration
+        return lti_config.lti_config.get('additional_parameters', {})
+
+    def _get_context_title(self) -> str:
+        return "{} - {}".format(
+            self.program.get('title', ''),
+            self.program.get('subtitle', ''),
+        )
+
+    def _get_pii_lti_parameters(self, configuration, request):
+        """
+        Get LTI parameters that contain PII.
+
+        Args:
+            configuration (LtiConfiguration): LtiConfiguration object.
+            request (HttpRequest): Request object for view in which LTI will be embedded.
+
+        Returns:
+            Dictionary with LTI parameters containing PII.
+        """
+        if configuration.version != configuration.LTI_1P1:
+            return {}
+        pii_config = {}
+        if configuration.pii_share_username:
+            pii_config['person_sourcedid'] = request.user.username
+        if configuration.pii_share_email:
+            pii_config['person_contact_email_primary'] = request.user.email
+        return pii_config
+
     def _get_lti_embed_code(self) -> str:
         """
         Returns the LTI embed code for embedding in the program discussions tab
@@ -213,24 +245,29 @@ class ProgramDiscussionLTI:
         """
         resource_link_id = self._get_resource_link_id()
         result_sourcedid = self._get_result_sourcedid(resource_link_id)
+        pii_params = self._get_pii_lti_parameters(self.configuration.lti_configuration, self.request)
+        additional_params = self._get_additional_lti_parameters()
 
         return lti_embed(
             html_element_id='lti-tab-launcher',
             lti_consumer=self.configuration.lti_configuration.get_lti_consumer(),
-            resource_link_id=resource_link_id,
-            user_id=str(self.request.user.id),
+            resource_link_id=quote(resource_link_id),
+            user_id=quote(anonymous_id_for_user(self.request.user, None)),
             roles=self.get_user_roles(),
-            context_id=self.program_uuid,
-            context_title=self.program_uuid,
+            context_id=quote(self.program_uuid),
+            context_title=self._get_context_title(),
             context_label=self.program_uuid,
-            result_sourcedid=result_sourcedid
+            result_sourcedid=quote(result_sourcedid),
+            locale=to_locale(get_language()),
+            **pii_params,
+            **additional_params
         )
 
     def render_iframe(self) -> str:
         """
         Returns the program discussion fragment if program discussions configuration exists for a program uuid
         """
-        if not self.configuration:
+        if not self.is_configured:
             return ''
 
         lti_embed_html = self._get_lti_embed_code()

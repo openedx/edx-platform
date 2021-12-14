@@ -18,7 +18,6 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_name,
     is_comment_too_deep,
 )
-from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from lms.djangoapps.discussion.rest_api.permissions import (
     NON_UPDATABLE_COMMENT_FIELDS,
     NON_UPDATABLE_THREAD_FIELDS,
@@ -26,6 +25,7 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
+from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
@@ -37,6 +37,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role,
 )
+from openedx.core.lib.api.serializers import CourseKeyField
 
 User = get_user_model()
 
@@ -631,3 +632,43 @@ class DiscussionRolesListSerializer(serializers.Serializer):
         Overriden update abstract method
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class BlackoutDateSerializer(serializers.Serializer):
+    """
+    Serializer for blackout dates.
+    """
+    start = serializers.DateTimeField(help_text="The ISO 8601 timestamp for the start of the blackout period")
+    end = serializers.DateTimeField(help_text="The ISO 8601 timestamp for the end of the blackout period")
+
+
+class CourseMetadataSerailizer(serializers.Serializer):
+    """
+    Serializer for course metadata.
+    """
+    id = CourseKeyField(help_text="The identifier of the course")
+    blackouts = serializers.ListField(
+        child=BlackoutDateSerializer(),
+        help_text="A list of objects representing blackout periods "
+                  "(during which discussions are read-only except for privileged users)."
+    )
+    thread_list_url = serializers.URLField(
+        help_text="The URL of the list of all threads in the course.",
+    )
+    following_thread_list_url = serializers.URLField(
+        help_text="thread_list_url with parameter following=True",
+    )
+    topics_url = serializers.URLField(help_text="The URL of the topic listing for the course.")
+    allow_anonymous = serializers.BooleanField(
+        help_text="A boolean which indicating whether anonymous posts are allowed or not.",
+    )
+    allow_anonymous_to_peers = serializers.BooleanField(
+        help_text="A boolean which indicating whether posts anonymous to peers are allowed or not.",
+    )
+    user_roles = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="A list of all the roles the requesting user has for this course.",
+    )
+    user_is_privileged = serializers.BooleanField(
+        help_text="A boolean indicating if the current user has a privileged role",
+    )

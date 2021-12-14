@@ -40,21 +40,21 @@ from common.djangoapps.xblock_django.models import (
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-from xmodule.capa_module import ProblemBlock
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.partitions.partitions import (
+from xmodule.capa_module import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_module import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ENROLLMENT_TRACK_PARTITION_ID,
     MINIMUM_STATIC_PARTITION_ID,
     Group,
     UserPartition
 )
-from xmodule.partitions.tests.test_partitions import MockPartitionService
-from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+from xmodule.partitions.tests.test_partitions import MockPartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..component import component_handler, get_component_templates
 from ..item import (

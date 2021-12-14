@@ -9,7 +9,7 @@ from importlib import import_module
 from unittest.mock import patch
 import pytest
 import ddt
-from operator import itemgetter
+from operator import itemgetter  # lint-amnesty, pylint: disable=wrong-import-order
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -35,10 +35,10 @@ from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):

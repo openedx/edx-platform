@@ -37,7 +37,7 @@ class CourseDatesFragmentView(EdxFragmentView):
         if course_home_legacy_is_active(course_key):
             dates_tab_link = reverse('dates', args=[course.id])
         else:
-            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
+            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, url_fragment='dates')
 
         context = {
             'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
