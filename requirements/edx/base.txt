@@ -566,7 +566,7 @@ interchange==2021.0.4
     # via py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.in
-isodate==0.6.0
+isodate==0.6.1
     # via python3-saml
 itypes==1.2.0
     # via coreapi

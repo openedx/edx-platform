@@ -708,7 +708,7 @@ interchange==2021.0.4
     #   py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
-isodate==0.6.0
+isodate==0.6.1
     # via
     #   -r requirements/edx/base.txt
     #   python3-saml
@@ -1323,7 +1323,7 @@ toml==0.10.2
     #   pylint
     #   pytest
     #   tox
-tomli==1.2.2
+tomli==2.0.0
     # via coverage
 tox==3.24.4
     # via
