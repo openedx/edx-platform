@@ -79,7 +79,11 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar']
+INSTALLED_APPS += ['debug_toolbar',
+                   # Arch Experiments,
+                   'lms.djangoapps.arch_experiments.apps.ArchExperimentsConfig',
+                   'lms.djangoapps.arch_experiments.event_bus.apps.EventBusExperimentConfig'
+                   ]
 MIDDLEWARE += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',

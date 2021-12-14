@@ -1,7 +1,7 @@
 
 from django.core.management.base import BaseCommand
 from confluent_kafka import KafkaException, KafkaError
-from lms.djangoapps.arch_experiments.event_bus.consumer import CONSUMER
+from lms.djangoapps.arch_experiments.event_bus.event_consumer import CONSUMER
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
