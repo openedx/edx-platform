@@ -13,6 +13,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
+
             events: {
                 'click .edit-button': 'editXBlock',
                 'click .access-button': 'editVisibilitySettings',
@@ -24,8 +25,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             options: {
                 collapsedClass: 'is-collapsed',
-                canEdit: true,// If not specified, assume user has permission to make changes
-                useNewTextEditor: true
+                canEdit: true// If not specified, assume user has permission to make changes
             },
 
             view: 'container_preview',
