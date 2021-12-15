@@ -12,7 +12,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
 from django.http import HttpRequest
 from django.urls import NoReverseMatch, reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer

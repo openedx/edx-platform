@@ -7,7 +7,7 @@ from urllib.parse import quote
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpRequest
-from django.utils.translation import get_language, to_locale, ugettext_lazy
+from django.utils.translation import get_language, to_locale, gettext_lazy
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from lti_consumer.models import LtiConfiguration
@@ -268,7 +268,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
     type = 'lti_discussion'
     allow_multiple = False
     is_dynamic = True
-    title = ugettext_lazy("Discussion")
+    title = gettext_lazy("Discussion")
 
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
         config = DiscussionsConfiguration.get(course.id)

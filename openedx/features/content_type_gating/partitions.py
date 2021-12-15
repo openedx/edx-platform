@@ -12,7 +12,7 @@ import logging
 import crum
 import pytz
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from common.djangoapps.course_modes.models import CourseMode
