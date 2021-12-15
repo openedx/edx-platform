@@ -13,7 +13,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import NoReverseMatch, reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.verify_student.models import ManualVerification
