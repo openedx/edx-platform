@@ -325,6 +325,8 @@ class AccountViewSet(ViewSet):
                 user = User.objects.get(id=lms_user_id)
             except (UserNotFound, User.DoesNotExist):
                 return Response(status=status.HTTP_404_NOT_FOUND)
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             search_usernames = [user.username]
         try:
             account_settings = get_account_settings(
