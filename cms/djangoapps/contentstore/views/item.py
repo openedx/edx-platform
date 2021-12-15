@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from edx_proctoring.api import (
     does_backend_support_onboarding,

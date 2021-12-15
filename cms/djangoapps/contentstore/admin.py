@@ -7,7 +7,7 @@ import logging
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig

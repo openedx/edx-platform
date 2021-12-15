@@ -18,8 +18,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import FileResponse, HttpResponseNotFound
 from django.urls import reverse
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_toggles.toggles import LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace
 from edxval.api import (
@@ -117,37 +117,37 @@ class StatusDisplayStrings:
     """
 
     # Translators: This is the status of an active video upload
-    _UPLOADING = ugettext_noop("Uploading")
+    _UPLOADING = gettext_noop("Uploading")
     # Translators: This is the status for a video that the servers are currently processing
-    _IN_PROGRESS = ugettext_noop("In Progress")
+    _IN_PROGRESS = gettext_noop("In Progress")
     # Translators: This is the status for a video that the servers have successfully processed
-    _COMPLETE = ugettext_noop("Ready")
+    _COMPLETE = gettext_noop("Ready")
     # Translators: This is the status for a video that is uploaded completely
-    _UPLOAD_COMPLETED = ugettext_noop("Uploaded")
+    _UPLOAD_COMPLETED = gettext_noop("Uploaded")
     # Translators: This is the status for a video that the servers have failed to process
-    _FAILED = ugettext_noop("Failed")
+    _FAILED = gettext_noop("Failed")
     # Translators: This is the status for a video that is cancelled during upload by user
-    _CANCELLED = ugettext_noop("Cancelled")
+    _CANCELLED = gettext_noop("Cancelled")
     # Translators: This is the status for a video which has failed
     # due to being flagged as a duplicate by an external or internal CMS
-    _DUPLICATE = ugettext_noop("Failed Duplicate")
+    _DUPLICATE = gettext_noop("Failed Duplicate")
     # Translators: This is the status for a video which has duplicate token for youtube
-    _YOUTUBE_DUPLICATE = ugettext_noop("YouTube Duplicate")
+    _YOUTUBE_DUPLICATE = gettext_noop("YouTube Duplicate")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
-    _INVALID_TOKEN = ugettext_noop("Invalid Token")
+    _INVALID_TOKEN = gettext_noop("Invalid Token")
     # Translators: This is the status for a video that was included in a course import
-    _IMPORTED = ugettext_noop("Imported")
+    _IMPORTED = gettext_noop("Imported")
     # Translators: This is the status for a video that is in an unknown state
-    _UNKNOWN = ugettext_noop("Unknown")
+    _UNKNOWN = gettext_noop("Unknown")
     # Translators: This is the status for a video that is having its transcription in progress on servers
-    _TRANSCRIPTION_IN_PROGRESS = ugettext_noop("Transcription in Progress")
+    _TRANSCRIPTION_IN_PROGRESS = gettext_noop("Transcription in Progress")
     # Translators: This is the status for a video whose transcription is complete
-    _TRANSCRIPT_READY = ugettext_noop("Transcript Ready")
+    _TRANSCRIPT_READY = gettext_noop("Transcript Ready")
     # Translators: This is the status for a video whose transcription job was failed for some languages
-    _PARTIAL_FAILURE = ugettext_noop("Partial Failure")
+    _PARTIAL_FAILURE = gettext_noop("Partial Failure")
     # Translators: This is the status for a video whose transcription job has failed altogether
-    _TRANSCRIPT_FAILED = ugettext_noop("Transcript Failed")
+    _TRANSCRIPT_FAILED = gettext_noop("Transcript Failed")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,

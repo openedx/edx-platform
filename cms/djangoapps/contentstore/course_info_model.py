@@ -17,7 +17,7 @@ import logging
 import re
 
 from django.http import HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.html_module import CourseInfoBlock
