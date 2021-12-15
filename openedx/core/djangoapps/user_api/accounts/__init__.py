@@ -4,7 +4,7 @@ Account constants
 
 from django.conf import settings
 from django.utils.text import format_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # The maximum length for the bio ("about me") account field
 BIO_MAX_LENGTH = 300
