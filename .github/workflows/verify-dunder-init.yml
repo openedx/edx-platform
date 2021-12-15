@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  verify_dunder_init:
+
+    name: Verify __init__.py Files
+    runs-on: ubuntu-20.04
+
+    steps:
+
+    - name: Check out branch
+      uses: actions/checkout@v2
+
+    - name: Ensure git is installed
+      run: |
+        sudo apt-get update && sudo apt-get install git
+
+    - name: Verify __init__.py files exist
+      run: |
+        scripts/verify-dunder-init.sh
