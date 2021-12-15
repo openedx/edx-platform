@@ -205,7 +205,7 @@ def get_editor_page_base_url(course_locator) -> str:
     editor_url = None
     if use_new_text_editor():
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
         if mfe_base_url:
             editor_url = course_mfe_url
     return editor_url
