@@ -484,6 +484,8 @@ edx-api-doc-tools==1.5.0
     # via -r requirements/edx/base.txt
 edx-auth-backends==4.0.1
     # via -r requirements/edx/base.txt
+edx-braze-client==0.1.0
+    # via -r requirements/edx/base.txt
 edx-bulk-grades==0.9.2
     # via
     #   -r requirements/edx/base.txt
