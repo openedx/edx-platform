@@ -136,6 +136,8 @@ class _ContentSerializer(serializers.Serializer):
     can_delete = serializers.SerializerMethodField()
     anonymous = serializers.BooleanField(default=False)
     anonymous_to_peers = serializers.BooleanField(default=False)
+    last_edit = serializers.SerializerMethodField(required=False)
+    edit_reason_code = serializers.CharField(required=False)
 
     non_updatable_fields = set()
 
@@ -238,6 +240,16 @@ class _ContentSerializer(serializers.Serializer):
         """
         return can_delete(obj, self.context)
 
+    def get_last_edit(self, obj):
+        """
+        Returns information about the last edit for this content for
+        privileged users.
+        """
+        if _validate_privileged_access(self.context):
+            edit_history = obj.get("edit_history")
+            if edit_history:
+                return edit_history[-1]
+
 
 class ThreadSerializer(_ContentSerializer):
     """
@@ -269,6 +281,8 @@ class ThreadSerializer(_ContentSerializer):
     read = serializers.BooleanField(required=False)
     has_endorsed = serializers.BooleanField(source="endorsed", read_only=True)
     response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
+    close_reason_code = serializers.SerializerMethodField(required=False)
+    closed_by = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
@@ -359,6 +373,21 @@ class ThreadSerializer(_ContentSerializer):
         preview capacity.
         """
         return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
+
+    def get_close_reason_code(self, obj):
+        """
+        Returns the reason for which the thread was closed.
+        """
+        if _validate_privileged_access(self.context):
+            return obj.get("close_reason_code")
+
+    def get_closed_by(self, obj):
+        """
+        Returns the username of the moderator who closed this thread,
+        only to other privileged users.
+        """
+        if _validate_privileged_access(self.context):
+            return obj.get("closed_by")
 
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)

@@ -66,7 +66,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
             "abuse_flagged", "course_id", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
         }
         if is_privileged:
-            expected |= {"closed", "pinned"}
+            expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
         if allow_anonymous:
@@ -87,6 +87,8 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         expected = {
             "anonymous", "abuse_flagged", "parent_id", "raw_body", "thread_id", "voted"
         }
+        if is_privileged:
+            expected |= {"edit_reason_code"}
         if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
         assert actual == expected
@@ -116,7 +118,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         actual = get_editable_fields(thread, context)
         expected = {"abuse_flagged", "following", "read", "voted"}
         if is_privileged:
-            expected |= {"closed", "pinned"}
+            expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
         if is_author or is_privileged:
             expected |= {"topic_id", "type", "title", "raw_body"}
         if is_privileged and is_cohorted:
@@ -148,6 +150,8 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_editable_fields(comment, context)
         expected = {"abuse_flagged", "voted"}
+        if is_privileged:
+            expected |= {"edit_reason_code"}
         if is_author or is_privileged:
             expected |= {"raw_body"}
         if (is_thread_author and thread_type == "question") or is_privileged:
