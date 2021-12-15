@@ -128,8 +128,16 @@ def _is_not_subcomment(comment_id):
 
 def _is_first_comment(comment_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread = cc.Thread.find(id=thread_id).retrieve(with_responses=True)
-    if getattr(thread, 'children', None):
-        first_comment = thread.children[0]
+
+    if thread.get('thread_type') == 'question':
+        endorsed_comments = getattr(thread, 'endorsed_responses', [])
+        non_endorsed_comments = getattr(thread, 'non_endorsed_responses', [])
+        comments = endorsed_comments + non_endorsed_comments
+    else:
+        comments = getattr(thread, 'children', [])
+
+    if comments:
+        first_comment = sorted(comments, key=lambda c: c['created_at'])[0]
         return first_comment.get('id') == comment_id
     else:
         return False
