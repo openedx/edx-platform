@@ -139,7 +139,7 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
-cryptography==36.0.0
+cryptography==36.0.1
     # via
     #   -r requirements/edx/base.in
     #   django-fernet-fields
