@@ -73,7 +73,7 @@ from ..models import (
     UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser, CanGetAccountInfoUsingId, CanReplaceUsername, CanRetireUser
+from .permissions import CanDeactivateUser, CanGetAccountInfoUsingIdAndEmail, CanReplaceUsername, CanRetireUser
 from .serializers import (
     PendingNameChangeSerializer,
     UserRetirementPartnerReportSerializer,
@@ -290,7 +290,7 @@ class AccountViewSet(ViewSet):
     authentication_classes = (
         JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
-    permission_classes = (permissions.IsAuthenticated, CanGetAccountInfoUsingId)
+    permission_classes = (permissions.IsAuthenticated, CanGetAccountInfoUsingIdAndEmail)
     parser_classes = (JSONParser, MergePatchParser,)
 
     def get(self, request):
