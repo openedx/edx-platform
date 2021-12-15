@@ -971,7 +971,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
     update that require a separate comments service request.
     """
     for field, form_value in actions_form.cleaned_data.items():
-        if field in request_fields and form_value != api_content[field]:
+        if field in request_fields and field in api_content and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
                 _handle_following_field(form_value, context["cc_requester"], cc_content)
