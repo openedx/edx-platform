@@ -17,7 +17,7 @@ from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from eventtracking import tracker
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
