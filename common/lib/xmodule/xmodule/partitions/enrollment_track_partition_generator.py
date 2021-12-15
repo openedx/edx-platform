@@ -5,7 +5,7 @@ openedx.dynamic_partition plugin.
 import logging
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from xmodule.partitions.partitions import (
     get_partition_from_id,
