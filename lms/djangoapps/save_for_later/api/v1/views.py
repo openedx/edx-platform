@@ -124,7 +124,7 @@ class SaveForLaterApiView(APIView):
                     'user_id': user.id,
                     'category': 'save-for-later',
                     'type': 'course' if course_id else 'program',
-                    'send_to_self': True if not user.is_anonymous and user.email == email else False,
+                    'send_to_self': bool(not user.is_anonymous and user.email == email),
                 }
             )
         except Exception:  # pylint: disable=broad-except
