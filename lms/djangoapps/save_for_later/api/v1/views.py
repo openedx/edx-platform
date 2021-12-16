@@ -88,7 +88,7 @@ class SaveForLaterApiView(APIView):
                 'course_image_url': '{base_url}{image_path}'.format(
                     base_url=lms_url, image_path=course_overview.course_image_url
                 ),
-                'partner_image_url': '{base_url}{image_path}'.format(base_url=lms_url, image_path=org_img_url),
+                'partner_image_url': org_img_url,
                 'enroll_course_url': '{base_url}/register?course_id={course_id}&enrollment_action=enroll&email_opt_in='
                                      'false&save_for_later=true'.format(base_url=lms_url, course_id=course_key),
                 'view_course_url': marketing_url + '?save_for_later=true' if marketing_url else '#',
