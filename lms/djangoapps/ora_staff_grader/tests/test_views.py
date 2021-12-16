@@ -13,7 +13,7 @@ from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM
 from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -469,7 +469,10 @@ class TestUpdateGradeView(BaseViewTest):
 
         response = self.client.post(url, data, format='json')
         assert response.status_code == 500
-        assert response.content.decode() == mock_submit_grade.return_value['msg']
+        assert json.loads(response.content) == {
+            "error": ERR_GRADE_SUBMIT,
+            "msg": mock_submit_grade.return_value['msg']
+        }
 
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')

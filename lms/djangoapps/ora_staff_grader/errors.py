@@ -15,6 +15,9 @@ ERR_BAD_ORA_LOCATION = "ERR_BAD_ORA_LOCATION"
 # User tried to operate on a submission that they do not have a lock for
 ERR_LOCK_CONTESTED = "ERR_LOCK_CONTESTED"
 
+# Error submitting grade
+ERR_GRADE_SUBMIT = "ERR_GRADE_SUBMIT"
+
 
 class ErrorSerializer(serializers.Serializer):
     """ Returns error code and unpacks additional context """
@@ -50,3 +53,9 @@ class MissingParamResponse(StaffGraderErrorResponse):
     """ An HTTP 400 that returns serialized error data with additional provided context """
     status = 400
     err_code = ERR_MISSING_PARAM
+
+
+class SubmitGradeErrorResponse(StaffGraderErrorResponse):
+    """ An HTTP 500 that returns serialized error data with additional provided context """
+    status = 500
+    err_code = ERR_GRADE_SUBMIT

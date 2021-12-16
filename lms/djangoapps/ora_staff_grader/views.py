@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_LOCK_CONTESTED, BadOraLocationResponse
+from lms.djangoapps.ora_staff_grader.errors import ERR_LOCK_CONTESTED, BadOraLocationResponse, SubmitGradeErrorResponse
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
@@ -276,8 +276,7 @@ class UpdateGradeView(StaffGraderBaseView):
 
         # Failed response returns 'success': False with an error message
         if not response['success']:
-            # TODO - This should be updated to an error object with our error overhaul story
-            return HttpResponseServerError(response['msg'])
+            return SubmitGradeErrorResponse(context={"msg": response['msg']})
 
         # Remove the lock on the graded submission
         self.delete_submission_lock(request, ora_location, submission_uuid)
