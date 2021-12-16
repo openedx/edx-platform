@@ -93,14 +93,15 @@ class SaveForLaterApiView(APIView):
                                      'false&save_for_later=true'.format(base_url=lms_url, course_id=course_key),
                 'view_course_url': marketing_url + '?save_for_later=true' if marketing_url else '#',
                 'display_name': course_overview.display_name,
+                'pref_lang': request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, 'en'),
                 'short_description': course_overview.short_description,
             }
         }
 
         braze_client = BrazeClient(
-            api_key=configuration_helpers.get_value('BRAZE_API_KEY'),
-            api_url=configuration_helpers.get_value('BRAZE_API_URL'),
-            app_id=configuration_helpers.get_value('BRAZE_APP_ID'),
+            api_key=configuration_helpers.get_value('EDX_BRAZE_API_KEY'),
+            api_url=configuration_helpers.get_value('EDX_BRAZE_API_SERVER'),
+            app_id='',
         )
 
         try:
@@ -122,7 +123,8 @@ class SaveForLaterApiView(APIView):
                 {
                     'user_id': user.id,
                     'category': 'save-for-later',
-                    'type': 'course' if course_id else 'program'
+                    'type': 'course' if course_id else 'program',
+                    'send_to_self': bool(not user.is_anonymous and user.email == email),
                 }
             )
         except Exception:  # pylint: disable=broad-except

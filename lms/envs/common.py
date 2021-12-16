@@ -4569,7 +4569,7 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 #### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
 SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
