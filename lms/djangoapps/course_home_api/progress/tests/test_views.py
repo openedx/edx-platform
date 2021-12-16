@@ -193,17 +193,9 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert ungated_score['learner_has_access']
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
-    @override_waffle_flag(waffle_flags()[WRITABLE_GRADEBOOK], active=True)
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
-    @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': True})
-    def test_persistent_grade(self):
-        with persistent_grades_feature_flags(
-            global_flag=True,
-            enabled_for_all_courses=True,
-            course_id=self.course.id,
-            enabled_for_course=True
-        ):
-
+    def test_override_is_visible(self):
+        with persistent_grades_feature_flags(global_flag=True):
             chapter = ItemFactory(parent=self.course, category='chapter')
             subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
 
@@ -233,8 +225,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
                 feature=GradeOverrideFeatureEnum.proctoring,
                 comment=proctoring_failure_comment
             )
-
-            assert override.system == GradeOverrideFeatureEnum.proctoring
 
             response = self.client.get(self.url)
             assert response.status_code == 200

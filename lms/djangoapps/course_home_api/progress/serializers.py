@@ -38,6 +38,7 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
     url = serializers.SerializerMethodField()
 
     def get_override(self, subsection):
+        """Proctoring or grading score override"""
         if subsection.override is None:
             return None
         else:
