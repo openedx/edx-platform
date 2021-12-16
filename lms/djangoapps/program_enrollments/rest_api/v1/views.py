@@ -24,7 +24,7 @@ from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments,
     fetch_program_enrollments_by_student,
     get_provider_slug,
-    get_saml_providers_for_organization,
+    get_active_saml_providers_for_organization,
     iter_program_course_grades,
     write_program_course_enrollments,
     write_program_enrollments
@@ -995,7 +995,7 @@ class EnrollmentDataResetView(APIView):
 
         providers = []
         try:
-            providers = get_saml_providers_for_organization(organization)
+            providers = get_active_saml_providers_for_organization(organization)
         except ProviderDoesNotExistException:
             pass
 

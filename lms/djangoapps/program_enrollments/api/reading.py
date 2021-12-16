@@ -386,6 +386,53 @@ def _remove_none_values(dictionary):
     }
 
 
+def get_users_by_external_keys_and_org_key_with_history(external_user_keys, org_key):
+    """
+    TODO: add history to return
+
+    Given an organization_key and a set of external keys,
+    return a dict from external user keys to Users.
+
+    Args:
+        external_user_keys (sequence[str]):
+            external user keys used by the program creator's IdP.
+        org_key (str):
+            The organization short name of which the external_user_key belongs to
+
+    Returns: dict[str: User|None]
+        A dict mapping external user keys to Users.
+        If an external user key is not registered, then None is returned instead
+            of a User for that key.
+
+    Raises:
+        BadOrganizationShortNameException
+        ProviderDoesNotExistsException
+    """
+    saml_providers = get_saml_providers_by_org_key(org_key)
+    found_users_by_external_keys = {}
+    # if the same external id exists in multiple providers (for this organization)
+    # it is expected both providers return the same user
+    for saml_provider in saml_providers:
+        social_auth_uids = {
+            saml_provider.get_social_auth_uid(external_user_key)
+            for external_user_key in external_user_keys
+        }
+        if social_auth_uids:
+            # Filter should be case insensitive
+            query_filter = reduce(or_, [Q(uid__iexact=uid) for uid in social_auth_uids])
+            social_auths = UserSocialAuth.objects.filter(query_filter)
+            found_users_by_external_keys.update({
+                saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
+                for social_auth in social_auths
+            })
+
+    # Default all external keys to None, because external keys
+    # without a User will not appear in `found_users_by_external_keys`.
+    users_by_external_keys = {key: None for key in external_user_keys}
+    users_by_external_keys.update(found_users_by_external_keys)
+    return users_by_external_keys
+
+
 def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
     """
     Given an organization_key and a set of external keys,
@@ -406,7 +453,7 @@ def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
         BadOrganizationShortNameException
         ProviderDoesNotExistsException
     """
-    saml_providers = get_saml_providers_by_org_key(org_key)
+    saml_providers = get_active_saml_providers_by_org_key(org_key)
     found_users_by_external_keys = {}
     # if the same external id exists in multiple providers (for this organization)
     # it is expected both providers return the same user
@@ -484,7 +531,7 @@ def get_external_key_by_user_and_course(user, course_key):
     return relevant_pce.program_enrollment.external_user_key
 
 
-def get_saml_providers_by_org_key(org_key):
+def get_active_saml_providers_by_org_key(org_key):
     """
     Returns a list of SAML providers associated with the provided org_key.
     In most cases an organization will only have one configured provider.
@@ -503,7 +550,7 @@ def get_saml_providers_by_org_key(org_key):
         organization = Organization.objects.get(short_name=org_key)
     except Organization.DoesNotExist:
         raise BadOrganizationShortNameException(org_key)  # lint-amnesty, pylint: disable=raise-missing-from
-    return get_saml_providers_for_organization(organization)
+    return get_active_saml_providers_for_organization(organization)
 
 
 def get_org_key_for_program(program_uuid):
@@ -532,8 +579,27 @@ def get_org_key_for_program(program_uuid):
 
 def get_saml_providers_for_organization(organization):
     """
-    Return currently configured SAML provider(s) for the given Organization.
-    In most cases an organization will only have one configured provider.
+    Return current and past SAML provider(s) for the given Organization.
+
+    Arguments:
+        organization: Organization
+
+    Returns:
+        active_provider_configs (list[SAMLProvider])
+        inactive_provider_configs (list[SamlProvider])
+
+    Raises:
+        ProviderDoesNotExistsException when there are no active
+        (i.e. current SAML providers for the given Organization are inactive)
+    """
+    inactive_provider_configs = organization.samlproviderconfig_set.current_set().filter(enabled=False)
+    return get_active_saml_providers_for_organization(organization), list(inactive_provider_configs)
+
+
+def get_active_saml_providers_for_organization(organization):
+    """
+    Return currently active SAML provider(s) for the given Organization.
+    In most cases an organization will only have one active configured provider.
     However, multiple may be returned during a migration between two active
     providers.
 
