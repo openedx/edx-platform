@@ -99,8 +99,8 @@ class SaveForLaterApiView(APIView):
         }
 
         braze_client = BrazeClient(
-            api_key=configuration_helpers.get_value('EDX_BRAZE_API_KEY'),
-            api_url=configuration_helpers.get_value('EDX_BRAZE_API_SERVER'),
+            api_key=settings.EDX_BRAZE_API_KEY,
+            api_url=settings.EDX_BRAZE_API_SERVER,
             app_id='',
         )
 
