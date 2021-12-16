@@ -14,6 +14,8 @@ from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_name_affirmation.api import create_verified_name
+from edx_name_affirmation.statuses import VerifiedNameStatus
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -42,6 +44,7 @@ class UserAPITestCase(APITestCase):
     """
     The base class for all tests of the User API
     """
+    VERIFIED_NAME = "Verified User"
 
     def setUp(self):
         super().setUp()
@@ -135,6 +138,13 @@ class UserAPITestCase(APITestCase):
         legacy_profile.language_proficiencies.create(code=TEST_LANGUAGE_PROFICIENCY_CODE)
         legacy_profile.phone_number = "+18005555555"
         legacy_profile.save()
+
+    def create_mock_verified_name(self, user):
+        """
+        Helper method to create an approved VerifiedName entry in name affirmation.
+        """
+        legacy_profile = UserProfile.objects.get(id=user.id)
+        create_verified_name(user, self.VERIFIED_NAME, legacy_profile.name, status=VerifiedNameStatus.APPROVED)
 
     def create_user_registration(self, user):
         """
@@ -230,6 +240,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
 
     ENABLED_CACHES = ['default']
+    TOTAL_QUERY_COUNT = 27
+    FULL_RESPONSE_FIELD_COUNT = 30
 
     def setUp(self):
         super().setUp()
@@ -286,7 +298,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        assert 29 == len(data)
+        assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
 
         # public fields (3)
         expected_account_privacy = (
@@ -309,9 +321,10 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         assert data['accomplishments_shared'] is not None
         assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
 
-        # additional admin fields (12)
+        # additional admin fields (13)
         assert self.user.email == data['email']
         assert self.user.id == data['id']
+        assert self.VERIFIED_NAME == data['verified_name']
         assert data['extended_profile'] is not None
         assert 'MA' == data['state']
         assert 'f' == data['gender']
@@ -378,6 +391,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         user = "staff_user"
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
         response = self.send_get(client, query_parameters=f'email={self.user.email}')
@@ -406,6 +420,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         user = "staff_user"
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
         response = self.send_get(client, query_parameters=f'lms_user_id={self.user.id}')
@@ -467,7 +482,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(26):
+        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -482,7 +497,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(26):
+        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -515,6 +530,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Update user account visibility setting.
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, preference_visibility)
         self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
         response = self.send_get(client)
 
         if requesting_username == "different_user":
@@ -537,6 +553,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     @ddt.unpack
     def test_custom_visibility_over_age(self, api_client, requesting_username):
         self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
         # set user's custom visibility preferences
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
         shared_fields = ("bio", "language_proficiencies", "name")
@@ -572,6 +589,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     @ddt.unpack
     def test_custom_visibility_under_age(self, api_client, requesting_username):
         self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
         year_of_birth = self._set_user_age_to_10_years(self.user)
 
         # set user's custom visibility preferences
@@ -607,7 +625,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            assert 29 == len(data)
+            assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -630,12 +648,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(24)
+        verify_get_own_information(25)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(16)
+        verify_get_own_information(17)
 
     def test_get_account_empty_string(self):
         """
@@ -650,7 +668,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(25):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None
@@ -1008,7 +1026,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            assert 29 == len(data)
+            assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             assert self.user.email == data['email']
