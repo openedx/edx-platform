@@ -207,7 +207,6 @@ def _preview_module_system(request, descriptor, field_data):
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorBlock,
-        get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
@@ -215,7 +214,11 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService,
             'mako': mako_service,
             "settings": SettingsService(),
-            "user": DjangoXBlockUserService(request.user, anonymous_user_id='student'),
+            "user": DjangoXBlockUserService(
+                request.user,
+                anonymous_user_id='student',
+                user_role=get_user_role(request.user, course_id),
+            ),
             "partitions": StudioPartitionService(course_id=course_id),
             "teams_configuration": TeamsConfigurationService(),
         },

@@ -44,8 +44,10 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ROLE,
 )
 
 
@@ -1810,6 +1812,59 @@ class ModuleSystemShim:
         return None
 
     @property
+    def user_location(self):
+        """
+        Returns the "country code" associated with the current user's request IP address.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_location is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_current_user().opt_attrs.get(ATTR_KEY_REQUEST_COUNTRY_CODE)
+        return None
+
+    @property
+    def get_real_user(self):
+        """
+        Returns a function that takes `anonymous_student_id` and returns the Django User object
+        associated with `anonymous_student_id`.
+
+        If no `anonymous_student_id` is provided as an argument to this function, then the user service's anonymous user
+        ID is used instead.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.get_real_user is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_user_by_anonymous_id
+        return None
+
+    @property
+    def get_user_role(self):
+        """
+        Returns a function that returns the user's role in the course.
+
+        Implementation is different for LMS and Studio.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.get_user_role is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return partial(self._services['user'].get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
+
+    @property
     def render_template(self):
         """
         Returns a function that takes (template_file, context), and returns rendered html.
@@ -1846,9 +1901,9 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             course_id=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
-            field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            user_location=None, get_python_lib_zip=None, **kwargs):
+            replace_jump_to_id_urls=None, error_descriptor_class=None,
+            field_data=None, rebind_noauth_module_to_user=None,
+            get_python_lib_zip=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1895,12 +1950,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         error_descriptor_class - The class to use to render XModules with errors
 
-        get_real_user - function that takes `anonymous_student_id` and returns real user_id,
-        associated with `anonymous_student_id`.
-
-        get_user_role - A function that returns user role. Implementation is different
-            for LMS and Studio.
-
         field_data - the `FieldData` to use for backing XBlock storage.
 
         rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
@@ -1935,10 +1984,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
-        self.get_real_user = get_real_user
-        self.user_location = user_location
-
-        self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
 
