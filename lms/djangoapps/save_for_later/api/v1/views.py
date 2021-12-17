@@ -93,7 +93,6 @@ class SaveForLaterApiView(APIView):
                                      'false&save_for_later=true'.format(base_url=lms_url, course_id=course_key),
                 'view_course_url': marketing_url + '?save_for_later=true' if marketing_url else '#',
                 'display_name': course_overview.display_name,
-                'pref_lang': request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, 'en'),
                 'short_description': course_overview.short_description,
             }
         }
@@ -105,19 +104,23 @@ class SaveForLaterApiView(APIView):
         )
 
         try:
+            attributes = None
             external_id = braze_client.get_braze_external_id(email)
             if external_id:
                 event_properties.update({'external_id': external_id})
             else:
                 braze_client.create_braze_alias(emails=[email], alias_label='save_for_later')
-                event_properties.update({
-                    'user_alias': {
-                        'alias_label': 'save_for_later',
-                        'alias_name': email,
-                    },
-                })
+                user_alias = {
+                    'alias_label': 'save_for_later',
+                    'alias_name': email,
+                }
+                event_properties.update({'user_alias': user_alias})
+                attributes = [{
+                    'user_alias': user_alias,
+                    'pref-lang': request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, 'en')
+                }]
 
-            braze_client.track_user(events=[event_properties])
+            braze_client.track_user(events=[event_properties], attributes=attributes)
             tracker.emit(
                 USER_SENT_EMAIL_SAVE_FOR_LATER,
                 {
