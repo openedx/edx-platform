@@ -78,7 +78,7 @@ class LTI20BlockMixin:
         except LTIError:
             return Response(status=401)  # Unauthorized in this case.  401 is right
 
-        real_user = self.system.get_real_user(anon_id)
+        real_user = self.system.service(self, 'user').get_user_by_anonymous_id(anon_id)
         if not real_user:  # that means we can't save to database, as we do not have real user id.
             msg = f"[LTI]: Real user not found against anon_id: {anon_id}"
             log.info(msg)

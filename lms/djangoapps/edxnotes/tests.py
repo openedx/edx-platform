@@ -33,6 +33,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests.helpers import StubUserService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from . import helpers
 from .decorators import edxnotes
@@ -81,7 +82,8 @@ class TestProblem:
         self.system = MagicMock(is_author_mode=False)
         self.scope_ids = MagicMock(usage_id="test_usage_id")
         user = user or UserFactory()
-        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda __: user)
+        user_service = StubUserService(user)
+        self.runtime = MagicMock(course_id=course.id, service=lambda _a, _b: user_service)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
