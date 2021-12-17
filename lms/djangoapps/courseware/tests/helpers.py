@@ -64,18 +64,18 @@ class BaseTestXmodule(ModuleStoreTestCase):
     METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def new_module_runtime(self, render_template=None):
+    def new_module_runtime(self, **kwargs):
         """
         Generate a new ModuleSystem that is minimally set up for testing
         """
-        return get_test_system(course_id=self.course.id, render_template=render_template)
+        return get_test_system(course_id=self.course.id, **kwargs)
 
-    def new_descriptor_runtime(self):
-        runtime = get_test_descriptor_system()
+    def new_descriptor_runtime(self, **kwargs):
+        runtime = get_test_descriptor_system(**kwargs)
         runtime.get_block = modulestore().get_item
         return runtime
 
-    def initialize_module(self, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def initialize_module(self, runtime_kwargs=None, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         kwargs.update({
             'parent_location': self.section.location,
             'category': self.CATEGORY
@@ -90,7 +90,9 @@ class BaseTestXmodule(ModuleStoreTestCase):
         student_data = DictFieldData(field_data)
         self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
 
-        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+        if runtime_kwargs is None:
+            runtime_kwargs = {}
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime(**runtime_kwargs)
 
         self.item_url = str(self.item_descriptor.location)
 
@@ -144,13 +146,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
 class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    def new_module_runtime(self, render_template=None):
+    def new_module_runtime(self, **kwargs):
         """
         Create a runtime that actually does html rendering
         """
-        if not render_template:
-            render_template = render_to_string
-        runtime = super().new_module_runtime(render_template=render_template)
+        if 'render_template' not in kwargs:
+            kwargs['render_template'] = render_to_string
+        runtime = super().new_module_runtime(**kwargs)
         runtime.modulestore = Mock()
         return runtime
 

@@ -84,7 +84,7 @@ from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
 from openedx.features.content_type_gating.services import ContentTypeGatingService
-from common.djangoapps.student.models import anonymous_id_for_user, user_by_anonymous_id
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.track import contexts
 from common.djangoapps.util import milestones_helpers
@@ -553,7 +553,9 @@ def get_module_system_for_user(
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
+        user_role=get_user_role(user, course_id),
         anonymous_user_id=anonymous_student_id,
+        request_country_code=user_location,
     )
 
     def publish(block, event_type, event):
@@ -806,7 +808,6 @@ def get_module_system_for_user(
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
-        get_real_user=user_by_anonymous_id,
         services={
             'fs': FSService(),
             'field-data': field_data,
@@ -822,10 +823,8 @@ def get_module_system_for_user(
             'user_state': UserStateService(),
             'content_type_gating': ContentTypeGatingService(),
         },
-        get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
-        user_location=user_location,
         request_token=request_token,
     )
 

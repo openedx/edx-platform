@@ -176,10 +176,6 @@ class TestBadgingService(ModuleStoreTestCase):
         """
         Create the testing runtime.
         """
-        def mock_get_real_user(_anon_id):
-            """Just returns the test user"""
-            return self.user
-
         return LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
@@ -187,7 +183,6 @@ class TestBadgingService(ModuleStoreTestCase):
             replace_urls=str,
             course_id=self.course_id,
             user=self.user,
-            get_real_user=mock_get_real_user,
             descriptor_runtime=Mock(),
         )
 

@@ -2624,6 +2624,21 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         assert runtime.user_is_staff
+        assert runtime.get_user_role() == 'student'
+
+    @patch('lms.djangoapps.courseware.module_render.get_user_role', Mock(return_value='instructor', autospec=True))
+    def test_get_user_role(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        assert runtime.get_user_role() == 'instructor'
 
     def test_anonymous_student_id(self):
         runtime, _ = render.get_module_system_for_user(
@@ -2687,6 +2702,27 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert runtime.seed == 0
         assert runtime.user_id is None
         assert not runtime.user_is_staff
+        assert not runtime.get_user_role()
+
+    def test_get_real_user(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token,
+            course=self.course,
+        )
+        course_anonymous_student_id = anonymous_id_for_user(self.user, self.course.id)
+        assert runtime.get_real_user(course_anonymous_student_id) == self.user  # pylint: disable=not-callable
+
+        no_course_anonymous_student_id = anonymous_id_for_user(self.user, None)
+        assert runtime.get_real_user(no_course_anonymous_student_id) == self.user  # pylint: disable=not-callable
+
+        # Tests that the default is to use the user service's anonymous_student_id
+        assert runtime.get_real_user() == self.user  # pylint: disable=not-callable
 
     def test_render_template(self):
         runtime, _ = render.get_module_system_for_user(

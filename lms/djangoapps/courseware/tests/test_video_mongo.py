@@ -883,8 +883,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 sources=data['sources'],
                 edx_video_id=data['edx_video_id'],
             )
-            self.initialize_block(data=DATA)
-            self.item_descriptor.xmodule_runtime.user_location = 'CN'
+            self.initialize_block(data=DATA, runtime_kwargs={
+                'user_location': 'CN',
+            })
+            assert self.item_descriptor.xmodule_runtime.user_location == 'CN'
             context = self.item_descriptor.render('student_view').content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
