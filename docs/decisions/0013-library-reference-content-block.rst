@@ -10,6 +10,7 @@ Context
 Currently, the courses are being stored in the Modulestore and we want the library content to be stored in the Blockstore.
 To achieve this we need a referencing mechanism to reference the libraries to the courses. This referencing helps in replacing
 v1 libraries (current content libraries stored on Modulestore) with v2 libraries (Blockstore backed) which are:
+
 #. not dependent on edx-platform
 #.simpler to maintain than modulestore
 #. increases re-usability of the content
@@ -24,10 +25,12 @@ Decisions
 =========
 We want to be able to reference single and multiple specific blocks from a library (v2, as well as v1) into a course (that are stored in modulestore)
 The workflow discussed for the interface for library content referencing would be:
+
 #. Author chooses a library.
 #. Author chooses a pool of blocks.
-  * If multiple blocks of the same type are selected, ask for randomization
-    * If no randomization, then ask for ordering
+#. If multiple blocks of the same type are selected, ask for randomization
+#. If no randomization, then ask for ordering
+
 
 Implementation
 ^^^^^^^^^^^^^^
