@@ -29,11 +29,17 @@ class Command(BaseCommand):
         If the user has any prior enrollments, we will treat them as an existing user,
         otherwise they will receive a new user treatment.
         """
+        def get_user_queryset(user_id=1):
+            return User.objects.filter(id__gte=user_id, tour__isnull=True).order_by('id')[:batch_size]
+
         batch_delay = options['batch_delay']
         batch_size = options['batch_size']
-        while User.objects.filter(tour__isnull=True).exists():
+        qset = get_user_queryset()
+        # qset is evaluated here and checks for any results being returned.
+        while qset:
             time.sleep(batch_delay)
-            for user in User.objects.filter(tour__isnull=True)[:batch_size]:
+            # Since qset has already been evaluated, this can just iterate through.
+            for user in qset:
                 if CourseEnrollment.objects.filter(user=user).exists():
                     course_home_tour_status = UserTour.CourseHomeChoices.EXISTING_USER_TOUR
                     show_courseware_tour = False
@@ -48,3 +54,6 @@ class Command(BaseCommand):
                         'show_courseware_tour': show_courseware_tour,
                     },
                 )
+                last_seen_user_id = user.id
+            # Use the last seen user's id to set a lower bound of rows to look at
+            qset = get_user_queryset(last_seen_user_id)

@@ -2,6 +2,7 @@
 Tests for /save/course/ API.
 """
 
+from unittest.mock import patch, MagicMock
 
 import ddt
 from django.conf import settings
@@ -37,6 +38,7 @@ class SaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.course_key = CourseKey.from_string(self.course_id)
         CourseOverviewFactory.create(id=self.course_key)
 
+    @patch('lms.djangoapps.save_for_later.api.v1.views.BrazeClient', MagicMock())
     def test_save_course_using_email(self):
         """
         Test successfully email sent

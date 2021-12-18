@@ -29,6 +29,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from common.djangoapps.student.views.management import activate_secondary_email
 
+from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
@@ -384,15 +385,18 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
         with patch(
             'openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
-            return_value=['mock_certificate']
+            return_value=[{'status': CertificateStatuses.downloadable}]
         ):
             update_account_settings(self.user, {'name': account_settings['name']})
             # The name should not be added to profile metadata
             updated_meta = user_profile.get_meta()
             self.assertEqual(meta, updated_meta)
 
-    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=False))
+    @patch('openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
+           Mock(return_value=[{'status': CertificateStatuses.downloadable}]))
+    @patch('openedx.core.djangoapps.user_api.accounts.api.get_verified_enrollments',
+           Mock(return_value=[{'name': 'Bob'}]))
     def test_name_update_requires_idv(self):
         """
         Test that a name change is blocked through this API if it requires ID verification.
@@ -409,11 +413,26 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
     @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=True))
-    def test_name_update_does_not_require_idv(self):
+    @ddt.data(
+        (True, False),
+        (False, True),
+        (False, False)
+    )
+    @ddt.unpack
+    def test_name_update_does_not_require_idv(self, has_passable_cert, enrolled_in_verified_mode):
         """
         Test that the user can change their name if change does not require IDV.
         """
-        update_account_settings(self.user, {'name': 'New Name'})
+        with patch('openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user') as mock_get_certs,\
+             patch('openedx.core.djangoapps.user_api.accounts.api.get_verified_enrollments') as \
+                mock_get_verified_enrollments:
+            mock_get_certs.return_value = (
+                [{'status': CertificateStatuses.downloadable}] if
+                has_passable_cert else
+                [{'status': CertificateStatuses.unverified}]
+            )
+            mock_get_verified_enrollments.return_value = [{'name': 'Bob'}] if enrolled_in_verified_mode else []
+            update_account_settings(self.user, {'name': 'New Name'})
 
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['name'] == 'New Name'

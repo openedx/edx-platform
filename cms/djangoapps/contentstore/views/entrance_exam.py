@@ -20,8 +20,8 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util import milestones_helpers
 from openedx.core import toggles as core_toggles
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import create_xblock, remove_entrance_exam_graders
 from .item import delete_item

@@ -207,7 +207,7 @@ class OutlineTabView(RetrieveAPIView):
         if course_home_legacy_is_active(course.id):
             dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
         else:
-            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
+            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, url_fragment='dates')
 
         # Set all of the defaults
         access_expiration = None

@@ -16,7 +16,7 @@ click==7.1.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
-cryptography==36.0.0
+cryptography==36.0.1
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib

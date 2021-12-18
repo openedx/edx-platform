@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from cms.djangoapps.contentstore.course_info_model import get_course_updates
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY
-from xmodule.modulestore.django import modulestore
+from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import course_author_access_required, get_bool_param
 

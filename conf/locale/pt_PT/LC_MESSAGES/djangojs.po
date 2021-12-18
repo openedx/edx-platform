@@ -20,6 +20,7 @@
 # Manuela Silva <mmsrs@sky.com>, 2016,2018,2020
 # Manuela Silva <mmsrs@sky.com>, 2018
 # Manuela Silva <mmsrs@sky.com>, 2016
+# Nika Shahidian, 2021
 # Developer QUEO <developer@queo.pt>, 2017
 # Raquelscoelho <Raquelscoelho@gmail.com>, 2014
 # Raquelscoelho <Raquelscoelho@gmail.com>, 2014
@@ -109,7 +110,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-05 20:43+0000\n"
+"POT-Creation-Date: 2021-12-12 20:42+0000\n"
 "PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"

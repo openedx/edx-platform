@@ -1737,7 +1737,7 @@ def get_student_progress_url(request, course_id):
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, 'progress')
+        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
         if user is not None:
             progress_url += '/{}/'.format(user.id)
     else:

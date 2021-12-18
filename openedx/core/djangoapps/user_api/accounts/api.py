@@ -24,7 +24,9 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 from lms.djangoapps.certificates.api import get_certificates_for_user
+from lms.djangoapps.certificates.data import CertificateStatuses
 
+from openedx.core.djangoapps.enrollments.api import get_verified_enrollments
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
@@ -270,18 +272,31 @@ def _validate_name_change(user_profile, data, field_errors):
 
 def _does_name_change_require_verification(user_profile, old_name, new_name):
     """
-    If name change requires verification, do not update it through this API.
+    If name change requires ID verification, do not update it through this API.
     """
-
     profile_meta = user_profile.get_meta()
     old_names_list = profile_meta['old_names'] if 'old_names' in profile_meta else []
 
     user = user_profile.user
-    num_certs = len(get_certificates_for_user(user.username))
 
-    validator = NameChangeValidator(old_names_list, num_certs, old_name, new_name)
+    # We only want to validate on a list of passing certificates for the learner. A learner may have
+    # a certificate in a non-passing status, and we do not have to require ID verification based on certificates
+    # that are not passing.
+    passing_certs = filter(
+        lambda cert: CertificateStatuses.is_passing_status(cert["status"]),
+        get_certificates_for_user(user.username)
+    )
+    num_passing_certs = len(list(passing_certs))
 
-    return not validator.validate()
+    # We check whether the learner has active verified enrollments because we do not want to
+    # require the learner to perform ID verification if the learner is not enrolled in a verified mode
+    # in any courses. The learner will not be able to complete ID verification without being enrolled in
+    # at least one seat.
+    has_verified_enrollments = len(get_verified_enrollments(user.username)) > 0
+
+    validator = NameChangeValidator(old_names_list, num_passing_certs, old_name, new_name)
+
+    return not validator.validate() and has_verified_enrollments
 
 
 def _get_old_language_proficiencies_if_updating(user_profile, data):

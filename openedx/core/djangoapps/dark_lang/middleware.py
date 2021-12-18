@@ -16,7 +16,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.lang_pref import COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref.helpers import set_language_cookie
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 
@@ -110,13 +110,7 @@ class DarkLangMiddleware(MiddlewareMixin):
         language = get_value('LANGUAGE_CODE', None)
         if language:
             request.session[LANGUAGE_SESSION_KEY] = language
-            response.set_cookie(
-                settings.LANGUAGE_COOKIE_NAME,
-                value=language,
-                domain=settings.SHARED_COOKIE_DOMAIN,
-                max_age=COOKIE_DURATION,
-                secure=request.is_secure()
-            )
+            set_language_cookie(request, response, language)
 
     def _fuzzy_match(self, lang_code):
         """Returns a fuzzy match for lang_code"""
@@ -174,10 +168,4 @@ class DarkLangMiddleware(MiddlewareMixin):
 
         # Set the session key to the requested preview lang
         request.session[LANGUAGE_SESSION_KEY] = preview_lang
-        response.set_cookie(
-            settings.LANGUAGE_COOKIE_NAME,
-            value=preview_lang,
-            domain=settings.SHARED_COOKIE_DOMAIN,
-            max_age=COOKIE_DURATION,
-            secure=request.is_secure()
-        )
+        set_language_cookie(request, response, preview_lang)
