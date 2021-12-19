@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:50+0000\n"
-"PO-Revision-Date: 2021-12-12 20:50:12.864119\n"
+"POT-Creation-Date: 2021-12-19 20:50+0000\n"
+"PO-Revision-Date: 2021-12-19 20:50:21.825585\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -61,6 +61,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Ŧǝxʇ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3602,10 +3607,6 @@ msgid ""
 msgstr ""
 "ɆɌɌØɌ: \"{block_type}\" ᴉs ɐn nnʞnøʍn ɔøɯdønǝnʇ ʇʎdǝ. Ŧɥᴉs ɔøɯdønǝnʇ ʍᴉll bǝ"
 " ɥᴉddǝn ᴉn ŁMS."
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Ŧǝxʇ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -12865,10 +12866,6 @@ msgstr "ⱣǝɹɯᴉssᴉønĐǝnᴉǝd: Fɐᴉlǝd ᴉn ɐnʇɥǝnʇᴉɔɐʇ�
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} Snddøɹʇ Łǝʌǝls:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "ĦŦMŁ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
