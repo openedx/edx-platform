@@ -12,8 +12,8 @@ from rest_framework.test import APIClient
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_goals.models import CourseGoal
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 EVENT_NAME_ADDED = 'edx.course.goal.added'
 EVENT_NAME_UPDATED = 'edx.course.goal.updated'
