@@ -599,7 +599,7 @@ edx-sga==0.17.2
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
-edx-submissions==3.4.3
+edx-submissions==3.4.4
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
@@ -934,7 +934,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.6.0
     # via -r requirements/edx/testing.txt
-ora2==3.7.7
+ora2==3.7.8
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
