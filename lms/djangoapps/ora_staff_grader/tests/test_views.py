@@ -48,6 +48,15 @@ class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
         """ Log in as staff """
         self.client.login(username=self.staff.username, password=self.password)
 
+    def url_with_params(self, params):
+        """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
+        query_dictionary = QueryDict('', mutable=True)
+        query_dictionary.update(params)
+
+        return '{base_url}?{querystring}'.format(
+            base_url=reverse(self.view_name),
+            querystring=query_dictionary.urlencode()
+        )
 
 class TestInitializeView(BaseViewTest):
     """
@@ -294,7 +303,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         assert actual == expected
 
 
-class TestSubmissionLockView(APITestCase):
+class TestSubmissionLockView(BaseViewTest):
     """
     Tests for the /lock view, locking or unlocking a submission for grading
     """
@@ -304,14 +313,6 @@ class TestSubmissionLockView(APITestCase):
     test_submission_uuid = str(uuid4())
     test_anon_user_id = 'anon-user-id'
     test_timestamp = '2020-08-29T02:14:00-04:00'
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        cls.test_ora_location = 'block-v1:edX+ToyX+Toy_Course+type@openassessment+block@f00'
-        cls.password = 'password'
-        cls.staff = StaffFactory(course_key=cls.course_key, password=cls.password)
 
     def setUp(self):
         super().setUp()
@@ -324,23 +325,13 @@ class TestSubmissionLockView(APITestCase):
 
         self.client.login(username=self.staff.username, password=self.password)
 
-    def _url_with_params(self, params):
-        """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
-        query_dictionary = QueryDict('', mutable=True)
-        query_dictionary.update(params)
-
-        return '{base_url}?{querystring}'.format(
-            base_url=reverse(self.view_name),
-            querystring=query_dictionary.urlencode()
-        )
-
     def claim_lock(self, params):
         """ Wrapper for easier calling of 'claim_submission_lock' """
-        return self.client.post(self._url_with_params(params))
+        return self.client.post(self.url_with_params(params))
 
     def delete_lock(self, params):
         """ Wrapper for easier calling of 'delete_submission_lock' """
-        return self.client.delete(self._url_with_params(params))
+        return self.client.delete(self.url_with_params(params))
 
     # Tests for claiming a lock (POST)
 
@@ -444,16 +435,6 @@ class TestUpdateGradeView(BaseViewTest):
         ]
     }
 
-    def _url_with_params(self, params):
-        """ For DRF client.posts, you can't add query params easily. This helper adds it to the request URL """
-        query_dictionary = QueryDict('', mutable=True)
-        query_dictionary.update(params)
-
-        return '{base_url}?{querystring}'.format(
-            base_url=reverse(self.view_name),
-            querystring=query_dictionary.urlencode()
-        )
-
     def setUp(self):
         super().setUp()
         self.client.login(username=self.staff.username, password=self.password)
@@ -464,7 +445,7 @@ class TestUpdateGradeView(BaseViewTest):
         """ An ORA failure to submit a grade returns a server error """
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
         mock_submit_grade.return_value = {'success': False, 'msg': 'Danger, Will Robinson!'}
-        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
 
         response = self.client.post(url, data, format='json')
@@ -502,7 +483,7 @@ class TestUpdateGradeView(BaseViewTest):
         }
         mock_get_info.return_value = mock_assessment
 
-        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
 
         response = self.client.post(url, data, format='json')
@@ -535,7 +516,7 @@ class TestUpdateGradeView(BaseViewTest):
     def test_submit_lock_contested(self, mock_submit_grade, mock_check_lock):
         """ Submitting a grade should be blocked if someone else has obtained the lock """
         mock_check_lock.side_effect = [{'lock_status': 'locked'}]
-        url = self._url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
 
         response = self.client.post(url, data, format='json')
