@@ -69,8 +69,8 @@ class SubmitGradeErrorResponse(StaffGraderErrorResponse):
 
 
 class LockContestedResponse(StaffGraderErrorResponse):
-    """ An HTTP 403 that returns serialized error data with additional provided context """
-    status = 403
+    """ An HTTP 409 that returns serialized error data with additional provided context """
+    status = 409
     err_code = ERR_LOCK_CONTESTED
 
 

@@ -381,7 +381,7 @@ class TestSubmissionLockView(BaseViewTest):
         response = self.claim_lock(self.test_lock_params)
 
         expected_value = {"error": ERR_LOCK_CONTESTED, "lockStatus": "locked"}
-        assert response.status_code == 403
+        assert response.status_code == 409
         assert json.loads(response.content) == expected_value
 
     # Tests for deleting a lock (DELETE)
@@ -412,7 +412,7 @@ class TestSubmissionLockView(BaseViewTest):
         response = self.delete_lock(self.test_lock_params)
 
         expected_value = {"error": ERR_LOCK_CONTESTED, "lockStatus": "locked"}
-        assert response.status_code == 403
+        assert response.status_code == 409
         assert json.loads(response.content) == expected_value
 
 
