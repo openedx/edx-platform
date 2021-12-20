@@ -19,7 +19,7 @@ from lms.djangoapps.experiments.utils import (
     get_unenrolled_courses,
     is_enrolled_in_course_run
 )
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
