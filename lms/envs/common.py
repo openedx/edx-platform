@@ -4683,6 +4683,13 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
 # .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_GRADING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based openassessment grading page.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
+#     waffle flag.
+ORA_GRADING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
