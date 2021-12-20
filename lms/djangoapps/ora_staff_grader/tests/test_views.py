@@ -6,14 +6,19 @@ import json
 
 from uuid import uuid4
 from django.http import QueryDict
-from django.http.response import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_CONTESTED, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM, LockContestedError
+from lms.djangoapps.ora_staff_grader.errors import (
+    ERR_BAD_ORA_LOCATION,
+    ERR_GRADE_CONTESTED,
+    ERR_GRADE_SUBMIT,
+    ERR_LOCK_CONTESTED,
+    ERR_MISSING_PARAM,
+    LockContestedError
+)
 from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase

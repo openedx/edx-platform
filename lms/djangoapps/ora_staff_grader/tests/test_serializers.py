@@ -28,7 +28,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
 
 
-
 class TestErrorSerializer(TestCase):
     """ Tests for error serialization """
 

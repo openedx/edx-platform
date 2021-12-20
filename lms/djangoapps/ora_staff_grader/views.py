@@ -137,6 +137,7 @@ class StaffGraderBaseView(RetrieveAPIView):
 
         return response_data
 
+
 class InitializeView(StaffGraderBaseView):
     """
     GET course metadata
