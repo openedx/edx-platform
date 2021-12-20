@@ -1,9 +1,6 @@
 """
 Defines URLs for theming views.
 """
-
-
-from django.conf.urls import url
 from django.urls import path
 
 from . import helpers
@@ -21,9 +18,7 @@ urlpatterns = [
 
 if helpers.is_comprehensive_theming_enabled():
     urlpatterns += [
-        url(
-            r"^admin",
-            views.ThemingAdministrationFragmentView.as_view(),
-            name="openedx.theming.update_theme_fragment_view",
-        ),
+        path('admin', views.ThemingAdministrationFragmentView.as_view(),
+             name="openedx.theming.update_theme_fragment_view",
+             ),
     ]
