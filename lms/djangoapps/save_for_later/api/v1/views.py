@@ -23,7 +23,7 @@ from lms.djangoapps.save_for_later.models import SavedCourse
 
 log = logging.getLogger(__name__)
 
-POST_EMAIL_KEY = 'openedx.core.djangoapps.util.ratelimit.request_post_email'
+POST_EMAIL_KEY = 'openedx.core.djangoapps.util.ratelimit.request_data_email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.save.for.later.email.sent'
 
