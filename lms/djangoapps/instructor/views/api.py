@@ -709,6 +709,7 @@ def create_and_enroll_user(
                 email_params.update({
                     'message_type': 'account_creation_and_enrollment',
                     'email_address': email,
+                    'user_id': user.id,
                     'password': password,
                     'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
                 })
