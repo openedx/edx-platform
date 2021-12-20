@@ -47,7 +47,10 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from openedx.features.edly.utils import get_current_site_invalid_certificate_context
+from openedx.features.edly.utils import (
+    get_current_site_invalid_certificate_context,
+    get_logo_from_current_site_configurations
+)
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
@@ -686,6 +689,7 @@ def _render_invalid_certificate(request, course_id, platform_name, configuration
     # Add certificate header/footer data to current context
     context.update(get_certificate_header_context(is_secure=request.is_secure()))
     context.update(get_certificate_footer_context())
+    context.update(get_logo_from_current_site_configurations())
     return render_to_response(cert_path, context)
 
 

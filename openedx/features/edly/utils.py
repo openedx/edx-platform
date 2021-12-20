@@ -373,6 +373,22 @@ def get_current_site_invalid_certificate_context(default_html_certificate_config
     context['company_tos_url'] = get_tos_and_honor_code_url()
     return context
 
+
+def get_logo_from_current_site_configurations():
+    """
+    Gets the "logo" value in "BRANDING" from current site configurations.
+
+    Returns:
+        dict: Context data.
+    """
+    context = dict()
+    current_site_configuration = get_current_site_configuration()
+    if current_site_configuration:
+        context['logo_src'] = current_site_configuration.get_value('BRANDING', {}).get('logo', '')
+
+    return context
+
+
 def clean_django_settings_override(django_settings_override):
     """
     Enforce only allowed django settings to be overridden.
