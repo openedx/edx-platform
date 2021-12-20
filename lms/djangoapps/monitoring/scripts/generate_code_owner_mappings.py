@@ -36,7 +36,7 @@ EDX_REPO_APPS = {
     'integrated_channels': 'https://github.com/edx/edx-enterprise',
     'lti_consumer': 'https://github.com/edx/xblock-lti-consumer',
     'notices': 'https://github.com/edx/platform-plugin-notices',
-    'organizations': 'https://github.com/edx/edx-organizations',
+    'organizations': 'https://github.com/openedx/edx-organizations',
     'search': 'https://github.com/edx/edx-search',
     'super_csv': 'https://github.com/edx/super-csv',
     'wiki': 'https://github.com/edx/django-wiki',
