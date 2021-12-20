@@ -21,7 +21,7 @@ def require_params(param_names):
     - param_name (string): the query param to unpack
 
     Raises:
-    - 404 if the param was not provided
+    - MissingParamResponse (HTTP 400)
     """
     def decorator(function):
         @wraps(function)

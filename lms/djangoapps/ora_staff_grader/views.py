@@ -149,10 +149,9 @@ class InitializeView(StaffGraderBaseView):
         rubricConfig
     }
 
-    Returns:
-    - 200 on success
-    - 400 for invalid/missing ORA location
-    - 403 for invalid access/credentials
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - BadOraLocationResponse (HTTP 400) for bad ORA location
     """
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
@@ -205,6 +204,9 @@ class SubmissionFetchView(StaffGraderBaseView):
             }]
         }
     }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -242,6 +244,9 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             }]
         }
     }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -288,6 +293,11 @@ class UpdateGradeView(StaffGraderBaseView):
             }]
         }
     }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - GradeContestedResponse (HTTP 409) for trying to submit a grade for a submission you don't have an active lock for
+    - SubmitGradeErrorResponse (HTTP 500) for ORA failures to submit a grade
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -341,9 +351,9 @@ class SubmissionLockView(StaffGraderBaseView):
         lockStatus
     }
 
-    Raises:
-    - 400 for bad request or missing query params
-    - 403 for bad auth or contested lock with payload { 'error': '<error-code>', (lock_info)}
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - LockContestedResponse (HTTP 409) for contested lock
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
