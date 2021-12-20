@@ -18,6 +18,9 @@ ERR_LOCK_CONTESTED = "ERR_LOCK_CONTESTED"
 # Error submitting grade
 ERR_GRADE_SUBMIT = "ERR_GRADE_SUBMIT"
 
+# Contested grade
+ERR_GRADE_CONTESTED = "ERR_GRADE_CONTESTED"
+
 
 class LockContestedError(Exception):
     """ Signal for trying to operate on a lock owned by someone else """
@@ -69,6 +72,12 @@ class LockContestedResponse(StaffGraderErrorResponse):
     """ An HTTP 403 that returns serialized error data with additional provided context """
     status = 403
     err_code = ERR_LOCK_CONTESTED
+
+
+class GradeContestedResponse(StaffGraderErrorResponse):
+    """ An HTTP 409 that returns error data with updated submission status """
+    status = 409
+    err_code = ERR_GRADE_CONTESTED
 
 
 class UnknownErrorResponse(StaffGraderErrorResponse):

@@ -13,7 +13,7 @@ from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM, LockContestedError
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_CONTESTED, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM, LockContestedError
 from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -514,17 +514,51 @@ class TestUpdateGradeView(BaseViewTest):
         mock_delete_lock.assert_called_once()
 
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
     @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
-    def test_submit_lock_contested(self, mock_submit_grade, mock_check_lock):
+    def test_submit_grade_contested(self, mock_submit_grade, mock_get_info, mock_check_lock):
         """ Submitting a grade should be blocked if someone else has obtained the lock """
-        mock_check_lock.side_effect = [{'lock_status': 'locked'}]
+        mock_check_lock.side_effect = [{'lock_status': 'unlocked'}]
+        mock_assessment = {
+            'feedback': "Base Assessment Feedback",
+            'score': {
+                'pointsEarned': 5,
+                'pointsPossible': 6,
+            },
+            'criteria': [
+                {
+                    'name': "Criterion 1",
+                    'option': "Three",
+                    'points': 3,
+                    'feedback': "Feedback 1"
+                },
+            ]
+        }
+        mock_get_info.return_value = mock_assessment
+
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
         data = self.test_grade_data
 
         response = self.client.post(url, data, format='json')
 
-        assert response.status_code == 403
-        assert response.content.decode() == ERR_LOCK_CONTESTED
+        assert response.status_code == 409
+        assert json.loads(response.content) == {
+            "error": ERR_GRADE_CONTESTED,
+            'gradeStatus': 'graded',
+            'lockStatus': 'unlocked',
+            'gradeData': {
+                'score': mock_assessment['score'],
+                'overallFeedback': mock_assessment['feedback'],
+                'criteria': [
+                    {
+                        'name': "Criterion 1",
+                        'selectedOption': "Three",
+                        'points': 3,
+                        'feedback': "Feedback 1"
+                    },
+                ]
+            }
+        }
 
         # Verify that submit grade was not called
         mock_submit_grade.assert_not_called()

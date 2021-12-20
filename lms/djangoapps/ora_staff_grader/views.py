@@ -12,9 +12,20 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import BadOraLocationResponse, LockContestedError, SubmitGradeErrorResponse, LockContestedResponse, UnknownErrorResponse
+from lms.djangoapps.ora_staff_grader.errors import (
+    BadOraLocationResponse,
+    GradeContestedResponse,
+    LockContestedError,
+    SubmitGradeErrorResponse,
+    LockContestedResponse,
+    UnknownErrorResponse,
+)
 from lms.djangoapps.ora_staff_grader.serializers import (
-    InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
+    InitializeSerializer,
+    LockStatusSerializer,
+    StaffAssessSerializer,
+    SubmissionFetchSerializer,
+    SubmissionStatusFetchSerializer,
 )
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
@@ -282,8 +293,13 @@ class UpdateGradeView(StaffGraderBaseView):
         # Reassert that we have ownership of the submission lock
         lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
         if not lock_info.get('lock_status') == 'in-progress':
-            # TODO - This should be updated to an error object with our error overhaul story
-            return HttpResponseForbidden(ERR_LOCK_CONTESTED)
+            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+            submission_status = SubmissionStatusFetchSerializer({
+                'assessment_info': assessment_info,
+                'lock_info': lock_info,
+            }).data
+
+            return GradeContestedResponse(context=submission_status)
 
         # Transform data from frontend format to staff assess format
         context = {'submission_uuid': submission_uuid}
