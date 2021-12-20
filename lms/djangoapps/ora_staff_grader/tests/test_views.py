@@ -13,7 +13,7 @@ from rest_framework.test import APITestCase
 from unittest.mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM
+from lms.djangoapps.ora_staff_grader.errors import ERR_BAD_ORA_LOCATION, ERR_GRADE_SUBMIT, ERR_LOCK_CONTESTED, ERR_MISSING_PARAM, LockContestedError
 from lms.djangoapps.ora_staff_grader.views import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -308,10 +308,10 @@ class TestSubmissionLockView(BaseViewTest):
     Tests for the /lock view, locking or unlocking a submission for grading
     """
     view_name = 'ora-staff-grader:lock'
-    api_url = reverse(view_name)
 
     test_submission_uuid = str(uuid4())
     test_anon_user_id = 'anon-user-id'
+    test_other_anon_user_id = 'anon-user-id-2'
     test_timestamp = '2020-08-29T02:14:00-04:00'
 
     def setUp(self):
@@ -319,7 +319,7 @@ class TestSubmissionLockView(BaseViewTest):
 
         # Lock requests must include ORA location and submission UUID
         self.test_lock_params = {
-            PARAM_ORA_LOCATION: self.test_ora_location,
+            PARAM_ORA_LOCATION: self.ora_usage_key,
             PARAM_SUBMISSION_ID: self.test_submission_uuid
         }
 
@@ -344,16 +344,16 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
-    def test_claim_lock(self, mock_xblock_handler):
-        """ Passing value=True indicates to claim a submission lock. Success returns lock status 'in-progress'. """
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    def test_claim_lock(self, mock_claim_lock):
+        """ POST tries to claim a submission lock. Success returns lock status 'in-progress'. """
         mock_return_data = {
             "submission_uuid": self.test_submission_uuid,
             "owner_id": self.test_anon_user_id,
             "created_at": self.test_timestamp,
             "lock_status": "in-progress"
         }
-        mock_xblock_handler.return_value = HttpResponse(json.dumps(mock_return_data), content_type="application/json")
+        mock_claim_lock.return_value = mock_return_data
 
         response = self.claim_lock(self.test_lock_params)
 
@@ -361,32 +361,30 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
-    def test_claim_lock_contested(self, mock_xblock_handler):
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    def test_claim_lock_contested(self, mock_claim_lock, mock_check_lock):
         """ Attempting to claim a lock owned by another user returns a 403 - forbidden and passes error code. """
-        mock_return_data = {
-            "error": "ERR_LOCK_CONTESTED"
+        mock_claim_lock.side_effect = LockContestedError()
+        mock_check_lock.return_value = {
+            "submission_uuid": self.test_submission_uuid,
+            "owner_id": self.test_other_anon_user_id,
+            "created_at": self.test_timestamp,
+            "lock_status": "locked"
         }
-        mock_xblock_handler.return_value = HttpResponseForbidden(json.dumps(mock_return_data), content_type="application/json")
 
         response = self.claim_lock(self.test_lock_params)
 
-        expected_value = mock_return_data
+        expected_value = {"error": ERR_LOCK_CONTESTED, "lockStatus": "locked"}
         assert response.status_code == 403
         assert json.loads(response.content) == expected_value
 
     # Tests for deleting a lock (DELETE)
 
-    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
-    def test_delete_lock(self, mock_xblock_handler):
-        """ Passing value=False indicates to delete a submission lock. Success returns lock status 'unlocked'. """
-        mock_return_data = {
-            "submission_uuid": "",
-            "owner_id": "",
-            "created_at": "",
-            "lock_status": "unlocked"
-        }
-        mock_xblock_handler.return_value = HttpResponse(json.dumps(mock_return_data), content_type="application/json")
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    def test_delete_lock(self, mock_delete_lock):
+        """ DELETE indicates to clear submission lock. Success returns lock status 'unlocked'. """
+        mock_delete_lock.return_value = {"lock_status": "unlocked"}
 
         response = self.delete_lock(self.test_lock_params)
 
@@ -394,17 +392,21 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.call_xblock_json_handler')
-    def test_delete_lock_contested(self, mock_xblock_handler):
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    def test_delete_lock_contested(self, mock_delete_lock, mock_check_lock):
         """ Attempting to delete a lock owned by another user returns a 403 - forbidden and passes error code. """
-        mock_return_data = {
-            "error": "ERR_LOCK_CONTESTED"
+        mock_delete_lock.side_effect = LockContestedError()
+        mock_check_lock.return_value = {
+            "submission_uuid": self.test_submission_uuid,
+            "owner_id": self.test_other_anon_user_id,
+            "created_at": self.test_timestamp,
+            "lock_status": "locked"
         }
-        mock_xblock_handler.return_value = HttpResponseForbidden(json.dumps(mock_return_data), content_type="application/json")
 
         response = self.delete_lock(self.test_lock_params)
 
-        expected_value = mock_return_data
+        expected_value = {"error": ERR_LOCK_CONTESTED, "lockStatus": "locked"}
         assert response.status_code == 403
         assert json.loads(response.content) == expected_value
 

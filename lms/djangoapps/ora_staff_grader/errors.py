@@ -19,6 +19,10 @@ ERR_LOCK_CONTESTED = "ERR_LOCK_CONTESTED"
 ERR_GRADE_SUBMIT = "ERR_GRADE_SUBMIT"
 
 
+class LockContestedError(Exception):
+    """ Signal for trying to operate on a lock owned by someone else """
+
+
 class ErrorSerializer(serializers.Serializer):
     """ Returns error code and unpacks additional context """
     error = serializers.CharField(default=ERR_UNKNOWN)
@@ -59,3 +63,15 @@ class SubmitGradeErrorResponse(StaffGraderErrorResponse):
     """ An HTTP 500 that returns serialized error data with additional provided context """
     status = 500
     err_code = ERR_GRADE_SUBMIT
+
+
+class LockContestedResponse(StaffGraderErrorResponse):
+    """ An HTTP 403 that returns serialized error data with additional provided context """
+    status = 403
+    err_code = ERR_LOCK_CONTESTED
+
+
+class UnknownErrorResponse(StaffGraderErrorResponse):
+    """ An HTTP 500 for unknown error types """
+    status = 500
+    err_code = ERR_UNKNOWN

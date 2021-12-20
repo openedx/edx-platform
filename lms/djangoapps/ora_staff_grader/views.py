@@ -2,7 +2,6 @@
 Views for Enhanced Staff Grader
 """
 import json
-from django.http.response import HttpResponseForbidden, HttpResponseServerError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -13,7 +12,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.errors import ERR_LOCK_CONTESTED, BadOraLocationResponse, SubmitGradeErrorResponse
+from lms.djangoapps.ora_staff_grader.errors import BadOraLocationResponse, LockContestedError, SubmitGradeErrorResponse, LockContestedResponse, UnknownErrorResponse
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer, LockStatusSerializer, StaffAssessSerializer, SubmissionFetchSerializer, SubmissionStatusFetchSerializer
 )
@@ -91,9 +90,18 @@ class StaffGraderBaseView(RetrieveAPIView):
         - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
         """
         body = {"submission_uuid": submission_uuid}
+        response = call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
+        response_data = json.loads(response.content)
 
-        # Return the raw response to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
+        # Lock contested returns a 403
+        if response.status_code == 403:
+            raise LockContestedError()
+
+        # Other errors should raise a blanket exception
+        elif response.status_code != 200:
+            raise Exception(response_data)
+
+        return response_data
 
     def delete_submission_lock(self, request, usage_id, submission_uuid):
         """
@@ -105,8 +113,18 @@ class StaffGraderBaseView(RetrieveAPIView):
         body = {"submission_uuid": submission_uuid}
 
         # Return raw response to preserve HTTP status codes for failure states
-        return call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
+        response = call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
+        response_data = json.loads(response.content)
 
+        # Lock contested returns a 403
+        if response.status_code == 403:
+            raise LockContestedError()
+
+        # Other errors should raise a blanket exception
+        elif response.status_code != 200:
+            raise Exception(response_data)
+
+        return response_data
 
 class InitializeView(StaffGraderBaseView):
     """
@@ -308,42 +326,50 @@ class SubmissionLockView(StaffGraderBaseView):
 
     Raises:
     - 400 for bad request or missing query params
-    - 403 for bad auth or contested lock with payload { 'error': '<error-code>'}
+    - 403 for bad auth or contested lock with payload { 'error': '<error-code>', (lock_info)}
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Claim a submission lock """
-        # Validate ORA location
         try:
+            # Validate ORA location
             UsageKey.from_string(ora_location)
+            lock_info = self.claim_submission_lock(request, ora_location, submission_uuid)
+            return Response(LockStatusSerializer(lock_info).data)
+
+        # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
             return BadOraLocationResponse()
 
-        response = self.claim_submission_lock(request, ora_location, submission_uuid)
+        # Return updated lock info on error
+        except LockContestedError:
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            lock_status = LockStatusSerializer(lock_info).data
+            return LockContestedResponse(context=lock_status)
 
-        # In the case of an error, pass through the error response code directly
-        if response.status_code != 200:
-            return response
-
-        # Success should return serialized lock info
-        response_data = json.loads(response.content)
-        return Response(LockStatusSerializer(response_data).data)
+        # Blanket exception handling
+        except Exception:
+            return UnknownErrorResponse()
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def delete(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Clear a submission lock """
-        # Validate ORA location
         try:
+            # Validate ORA location
             UsageKey.from_string(ora_location)
+            lock_info = self.delete_submission_lock(request, ora_location, submission_uuid)
+            return Response(LockStatusSerializer(lock_info).data)
+
+        # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
             return BadOraLocationResponse()
 
-        response = self.delete_submission_lock(request, ora_location, submission_uuid)
+        # Return updated lock info on error
+        except LockContestedError:
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            lock_status = LockStatusSerializer(lock_info).data
+            return LockContestedResponse(context=lock_status)
 
-        # In the case of an error, pass through the error response code directly
-        if response.status_code != 200:
-            return response
-
-        # Success should return serialized lock info
-        response_data = json.loads(response.content)
-        return Response(LockStatusSerializer(response_data).data)
+        # Blanket exception handling
+        except Exception:
+            return UnknownErrorResponse()
