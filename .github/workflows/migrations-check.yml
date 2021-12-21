@@ -54,6 +54,7 @@ jobs:
 
     - name: Initiate Services
       run: |
+        mysql -V
         sudo systemctl start mongod
         sudo /etc/init.d/mysql start
 
