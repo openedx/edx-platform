@@ -17,7 +17,7 @@ class LockContestedError(Exception):
 
 
 class ErrorSerializer(serializers.Serializer):
-    """ Returns error code and unpacks additional context """
+    """ Returns error code and unpacks additional context, returns unknown error code if not supplied"""
     error = serializers.CharField(default=ERR_UNKNOWN)
 
     def to_representation(self, instance):
@@ -41,36 +41,54 @@ class StaffGraderErrorResponse(Response):
 
 
 class BadOraLocationResponse(StaffGraderErrorResponse):
-    """ An HTTP 400 that returns serialized error data with additional provided context """
+    """
+    Error response for when the requested ORA_LOCATION could not be found in a course.
+    Returns an HTTP 400 with error code.
+    """
     status = 400
     err_code = ERR_BAD_ORA_LOCATION
 
 
 class MissingParamResponse(StaffGraderErrorResponse):
-    """ An HTTP 400 that returns serialized error data with additional provided context """
+    """
+    Error response for when a request is missing a required param/body.
+    Returns an HTTP 400 with error code.
+    """
     status = 400
     err_code = ERR_MISSING_PARAM
 
 
 class SubmitGradeErrorResponse(StaffGraderErrorResponse):
-    """ An HTTP 500 that returns serialized error data with additional provided context """
+    """
+    Error response for errors encountered during grade submission (except for grade contest).
+    Returns an HTTP 500 with error code and error message from ORA.
+    """
     status = 500
     err_code = ERR_GRADE_SUBMIT
 
 
 class LockContestedResponse(StaffGraderErrorResponse):
-    """ An HTTP 409 that returns serialized error data with additional provided context """
+    """
+    Error response for when a user tries to operate on a submission that they do not have a lock for.
+    Returns an HTTP 409 with error code and updated lock status.
+    """
     status = 409
     err_code = ERR_LOCK_CONTESTED
 
 
 class GradeContestedResponse(StaffGraderErrorResponse):
-    """ An HTTP 409 that returns error data with updated submission status """
+    """
+    Error response for when a user tries to operate on a submission that they do not have a lock for.
+    Returns an HTTP 409 with error code and updated submission status.
+    """
     status = 409
     err_code = ERR_GRADE_CONTESTED
 
 
 class UnknownErrorResponse(StaffGraderErrorResponse):
-    """ An HTTP 500 for unknown error types """
+    """
+    Generic error response for caught but non-standard exception types.
+    Returns an HTTP 500 with generic error code.
+    """
     status = 500
     err_code = ERR_UNKNOWN
