@@ -4,5 +4,5 @@ from django.conf.urls import include
 from django.urls import path
 
 urlpatterns = [
-    path(r'^api/', include(('lms.djangoapps.save_for_later.api.urls', 'api'), namespace='api')),
+    path('api/', include(('lms.djangoapps.save_for_later.api.urls', 'api'), namespace='api')),
 ]
