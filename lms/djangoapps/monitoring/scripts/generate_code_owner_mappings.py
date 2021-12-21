@@ -25,7 +25,7 @@ EDX_REPO_APPS = {
     'completion': 'https://github.com/edx/completion',
     'config_models': 'https://github.com/edx/django-config-models',
     'consent': 'https://github.com/edx/edx-enterprise',
-    'csrf': 'https://github.com/edx/edx-drf-extensions',
+    'csrf': 'https://github.com/openedx/edx-drf-extensions',
     'edx_name_affirmation': 'https://github.com/edx/edx-name-affirmation',
     'edx_proctoring': 'https://github.com/edx/edx-proctoring',
     'edxval': 'https://github.com/edx/edx-val',
