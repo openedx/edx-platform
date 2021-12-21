@@ -1,8 +1,8 @@
 """ Constants used throughout ESG """
 
 # Query params
-PARAM_ORA_LOCATION = 'oraLocation'
-PARAM_SUBMISSION_ID = 'submissionUUID'
+PARAM_ORA_LOCATION = "oraLocation"
+PARAM_SUBMISSION_ID = "submissionUUID"
 
 # Error codes
 ERR_UNKNOWN = "ERR_UNKNOWN"
