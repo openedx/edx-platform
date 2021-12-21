@@ -33,7 +33,6 @@ from openedx.core.djangoapps.content.course_overviews.api import get_course_over
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
-
 class StaffGraderBaseView(RetrieveAPIView):
     """ Base view for common auth/permission setup and XBlock handlers used across ESG views """
     authentication_classes = (
