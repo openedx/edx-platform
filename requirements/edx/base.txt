@@ -239,7 +239,7 @@ django-celery-results==2.0.1
     #   -r requirements/edx/base.in
 django-classy-tags==2.0.0
     # via django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -468,7 +468,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/base.in
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
