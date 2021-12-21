@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from lms.djangoapps.ora_staff_grader.constants import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
     GradeContestedResponse,
@@ -31,8 +32,6 @@ from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, requ
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-PARAM_ORA_LOCATION = 'oraLocation'
-PARAM_SUBMISSION_ID = 'submissionUUID'
 
 
 class StaffGraderBaseView(RetrieveAPIView):

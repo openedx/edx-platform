@@ -2,24 +2,14 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 
-
-# Catch-all error if we don't supply anything
-ERR_UNKNOWN = "ERR_UNKNOWN"
-
-# A request is missing a required query param
-ERR_MISSING_PARAM = "ERR_MISSING_PARAM"
-
-# The requested ORA_LOCATION could not be found in the course
-ERR_BAD_ORA_LOCATION = "ERR_BAD_ORA_LOCATION"
-
-# User tried to operate on a submission that they do not have a lock for
-ERR_LOCK_CONTESTED = "ERR_LOCK_CONTESTED"
-
-# Error submitting grade
-ERR_GRADE_SUBMIT = "ERR_GRADE_SUBMIT"
-
-# Contested grade
-ERR_GRADE_CONTESTED = "ERR_GRADE_CONTESTED"
+from lms.djangoapps.ora_staff_grader.constants import (
+    ERR_BAD_ORA_LOCATION,
+    ERR_GRADE_CONTESTED,
+    ERR_GRADE_SUBMIT,
+    ERR_LOCK_CONTESTED,
+    ERR_MISSING_PARAM,
+    ERR_UNKNOWN
+)
 
 
 class LockContestedError(Exception):
