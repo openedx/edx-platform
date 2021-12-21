@@ -48,7 +48,7 @@ class TestErrorSerializer(TestCase):
     def test_added_context(self):
         # The serializer may also add context which gets unpacked into the output
         input_data = {"error": "ERR_CODE"}
-        added_context = {"a":"b", "c": {"d": ["e", "f"]}}
+        added_context = {"a": "b", "c": {"d": ["e", "f"]}}
         data = ErrorSerializer(input_data, context=added_context).data
 
         # Extra context should be added to the output

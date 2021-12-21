@@ -63,6 +63,7 @@ class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
             querystring=query_dictionary.urlencode()
         )
 
+
 class TestInitializeView(BaseViewTest):
     """
     Tests for the /initialize view, creating setup data for ESG
