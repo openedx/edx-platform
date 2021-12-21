@@ -45,7 +45,7 @@ from lms.djangoapps.instructor_task.tasks import (
     send_bulk_course_email,
     generate_anonymous_ids_for_course
 )
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SpecificStudentIdMissingError(Exception):

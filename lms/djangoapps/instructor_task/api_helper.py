@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import UsageKey
 from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_problems_in_section
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
