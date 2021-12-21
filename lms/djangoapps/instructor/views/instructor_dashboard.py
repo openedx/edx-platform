@@ -65,9 +65,9 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from xmodule.html_module import HtmlBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from xmodule.html_module import HtmlBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled

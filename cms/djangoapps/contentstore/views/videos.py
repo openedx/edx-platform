@@ -53,7 +53,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_module.transcripts_utils import Transcript
+from xmodule.video_module.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import VideoUploadConfig
 from ..utils import reverse_course_url

@@ -24,11 +24,11 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor_in
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xblock_discussion import DiscussionXBlock, loader
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xblock_discussion import DiscussionXBlock, loader  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -300,7 +300,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -321,7 +320,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -375,7 +373,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=self.course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
 
@@ -447,7 +444,6 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
             with self.assertNumQueries(num_queries):

@@ -936,7 +936,7 @@ def course_about(request, course_id):
             if course_home_legacy_is_active(course.id):
                 course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
             else:
-                course_target = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+                course_target = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -1061,7 +1061,7 @@ def dates(request, course_id):
     course_key = CourseKey.from_string(course_id)
     if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
         raise Redirect(get_learning_mfe_home_url(
-            course_key=course_key, view_name=COURSE_DATES_NAME, params=request.GET,
+            course_key=course_key, url_fragment=COURSE_DATES_NAME, params=request.GET,
         ))
 
     # Enable NR tracing for this view based on course
@@ -1133,13 +1133,12 @@ def dates(request, course_id):
 @data_sharing_consent_required
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
-    from lms.urls import COURSE_PROGRESS_NAME
-
     course_key = CourseKey.from_string(course_id)
 
     if course_home_mfe_progress_tab_is_active(course_key) and not request.user.is_staff:
+        end_of_redirect_url = 'progress' if not student_id else f'progress/{student_id}'
         raise Redirect(get_learning_mfe_home_url(
-            course_key=course_key, view_name=COURSE_PROGRESS_NAME, params=request.GET,
+            course_key=course_key, url_fragment=end_of_redirect_url, params=request.GET,
         ))
 
     with modulestore().bulk_operations(course_key):

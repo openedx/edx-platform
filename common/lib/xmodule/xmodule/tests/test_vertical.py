@@ -190,7 +190,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         Test the rendering of the student and public view.
         """
         self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService()
+        self.module_system._services['user'] = StubUserService(user=Mock())
         self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
         now = datetime.now(pytz.UTC)
@@ -212,7 +212,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     def test_render_access_denied_blocks(self, node_has_access_error, child_has_access_error):
         """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
         self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService()
+        self.module_system._services['user'] = StubUserService(user=Mock())
         self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
         self.problem_block.has_access_error = node_has_access_error
         self.nested_problem_block.has_access_error = child_has_access_error

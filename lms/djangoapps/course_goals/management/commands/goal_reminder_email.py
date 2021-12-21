@@ -50,7 +50,7 @@ def send_ace_message(goal):
     site = Site.objects.get_current()
     message_context = get_base_template_context(site)
 
-    course_home_url = get_learning_mfe_home_url(course_key=goal.course_key, view_name='home')
+    course_home_url = get_learning_mfe_home_url(course_key=goal.course_key, url_fragment='home')
 
     goals_unsubscribe_url = f'{settings.LEARNING_MICROFRONTEND_URL}/goal-unsubscribe/{goal.unsubscribe_token}'
 

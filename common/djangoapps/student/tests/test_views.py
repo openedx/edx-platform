@@ -7,10 +7,11 @@ import itertools
 import json
 import re
 import unittest
-from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import patch
 
 import ddt
+import pytz
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.test.utils import override_settings
@@ -22,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
@@ -36,16 +38,17 @@ from common.djangoapps.util.milestones_helpers import (
 from common.djangoapps.util.testing import UrlResetMixin  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 PASSWORD = 'test'
 TOMORROW = now() + timedelta(days=1)
@@ -907,6 +910,55 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
             assert expected_button in dashboard_html
             assert unexpected_button not in dashboard_html
+
+    @ddt.data(
+        # Ecommerce is not enabled
+        (False, True, False, 'abcdef', False),
+        # No verified mode
+        (True, False, False, 'abcdef', False),
+        # User has an entitlement
+        (True, True, True, 'abcdef', False),
+        # No SKU
+        (True, True, False, None, False),
+        (True, True, False, 'abcdef', True)
+    )
+    @ddt.unpack
+    def test_course_upgrade_notification(
+        self, ecommerce_enabled, has_verified_mode, has_entitlement, sku, should_display
+    ):
+        """
+        Upgrade notification for a course should appear if:
+            - Ecommerce service is enabled
+            - The course has a paid/verified mode
+            - The user doesn't have an entitlement for the course
+            - The course has an associated SKU
+        """
+        with patch.object(EcommerceService, 'is_enabled', return_value=ecommerce_enabled):
+            course = CourseFactory.create()
+
+            if has_verified_mode:
+                CourseModeFactory.create(
+                    course_id=course.id,
+                    mode_slug='verified',
+                    mode_display_name='Verified',
+                    expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1),
+                    sku=sku
+                )
+
+            enrollment = CourseEnrollmentFactory(
+                user=self.user,
+                course_id=course.id
+            )
+
+            if has_entitlement:
+                CourseEntitlementFactory(user=self.user, enrollment_course_run=enrollment)
+
+            response = self.client.get(reverse('dashboard'))
+            html_fragment = '<div class="message message-upsell has-actions is-shown">'
+            if should_display:
+                self.assertContains(response, html_fragment)
+            else:
+                self.assertNotContains(response, html_fragment)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid for the LMS')

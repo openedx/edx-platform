@@ -82,6 +82,7 @@ from typing import Union
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
@@ -90,6 +91,7 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import SettingToggle
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -107,6 +109,26 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
 LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
+
+# .. toggle_name: ENFORCE_SAFE_SESSIONS
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Turn this toggle on to enforce safe-sessions policy.
+#   That is, when the `user` attribute of the request object gets changed or
+#   no longer matches the session, the session will be invalidated and the
+#   response cancelled (changed to an error). This is intended as a backup
+#   safety measure in case an attacker (or bug) is able to change the user
+#   on a session in an unexpected way.  The behavior will be available for
+#   the Nutmeg named release and will become permanent in Olive.
+# .. toggle_warnings: Before enabling, confirm that incidences of the string
+#   "SafeCookieData user at request" in the logs only show false positives,
+#   such as people logging in while in possession of an already-valid session
+#   cookie.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-12-01
+# .. toggle_target_removal_date: 2022-08-01
+# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1861
+ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=False)
 
 log = getLogger(__name__)
 
@@ -379,9 +401,18 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         response = super().process_response(request, response)  # Step 1
 
         user_id_in_session = self.get_user_id_from_session(request)
-        self._verify_user(request, response, user_id_in_session)  # Step 2
+        user_matches = self._verify_user(request, response, user_id_in_session)  # Step 2
 
-        if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
+        # If the user changed *unexpectedly* between the beginning and end of
+        # the request (as observed by this middleware) or doesn't match the
+        # user in the session object, then something is likely terribly wrong.
+        # Most likely it's something benign such as a mix of authenticators
+        # (session vs JWT) that have different user IDs, but that could lead
+        # to various kinds of data corruption or arcane vulnerabilities. Forcing
+        # a logout should fix it, at least.
+        destroy_session = ENFORCE_SAFE_SESSIONS.is_enabled() and not user_matches
+
+        if not destroy_session and not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 # Use the user_id marked in the session instead of the
                 # one in the request in case the user is not set in the
@@ -389,6 +420,15 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
             except SafeCookieError:
                 _mark_cookie_for_deletion(request)
+
+        if destroy_session:
+            # Destroy session in DB.
+            request.session.flush()
+            request.user = AnonymousUser()
+            # Will mark cookie for deletion (matching session destruction), but
+            # also prevents the original response from being returned. This could
+            # be helpful if the mismatch is the result of some kind of attack.)
+            response = self._on_user_authentication_failed(request)
 
         if _is_cookie_marked_for_deletion(request):
             _delete_cookie(request, response)  # Step 4
@@ -424,6 +464,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Logs an error if the user marked at the time of process_request
         does not match either the current user in the request or the
         given userid_in_session.
+
+        Returns True if user matches in all places, False otherwise.
         """
         # It's expected that a small number of views may change the
         # user over the course of the request. We have exemptions for
@@ -434,11 +476,11 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         #
         # The relevant views set a flag to indicate the exemption.
         if getattr(response, 'safe_sessions_expected_user_change', None):
-            return
+            return True
 
         if not hasattr(request, 'safe_cookie_verified_user_id'):
             # Skip verification if request didn't come in with a session cookie
-            return
+            return True
 
         if hasattr(request.user, 'real_user'):
             # If a view overrode the request.user with a masqueraded user, this will
@@ -455,7 +497,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         if not (request_user_object_mismatch or session_user_mismatch):
             # Great! No mismatch.
-            return
+            return True
 
         # Log accumulated information stored on request for each change of user
         extra_logs = []
@@ -532,6 +574,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 ),
             )
             set_custom_attribute("safe_sessions.user_mismatch", "request-response-and-session-mismatch")
+
+        return False
 
     @staticmethod
     def get_user_id_from_session(request):

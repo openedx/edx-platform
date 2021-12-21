@@ -34,12 +34,12 @@ from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
-from rest_framework import serializers, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from xmodule.modulestore.django import modulestore
+from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+from submissions import api as sub_api  # installed from the edx-submissions repository  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
@@ -1737,7 +1737,7 @@ def get_student_progress_url(request, course_id):
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, 'progress')
+        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
         if user is not None:
             progress_url += '/{}/'.format(user.id)
     else:

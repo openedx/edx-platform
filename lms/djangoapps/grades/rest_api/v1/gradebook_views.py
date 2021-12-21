@@ -67,8 +67,8 @@ from openedx.core.lib.api.view_utils import (
 )
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from xmodule.util.misc import get_default_short_labeler
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.misc import get_default_short_labeler  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

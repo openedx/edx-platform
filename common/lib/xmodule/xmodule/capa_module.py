@@ -121,6 +121,8 @@ class Randomization(String):
 @XBlock.needs('user')
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
+# Studio doesn't provide XQueueService, but the LMS does.
+@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -825,7 +827,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             seed=seed,  # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
-            xqueue=self.runtime.xqueue,
+            xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -1744,7 +1746,8 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            waittime_between_requests = self.runtime.xqueue['waittime']
+            xqueue_service = self.runtime.service(self, 'xqueue')
+            waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)

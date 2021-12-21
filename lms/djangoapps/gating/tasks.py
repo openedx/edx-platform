@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.gating import api as gating_api
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

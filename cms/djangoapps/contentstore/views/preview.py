@@ -31,16 +31,16 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import ModuleI18nService, modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
-from xmodule.studio_editable import has_author_view
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.studio_editable import has_author_view  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_visibility_partition_info
 from .access import get_user_role
@@ -207,7 +207,6 @@ def _preview_module_system(request, descriptor, field_data):
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorBlock,
-        get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
@@ -215,7 +214,11 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService,
             'mako': mako_service,
             "settings": SettingsService(),
-            "user": DjangoXBlockUserService(request.user, anonymous_user_id='student'),
+            "user": DjangoXBlockUserService(
+                request.user,
+                anonymous_user_id='student',
+                user_role=get_user_role(request.user, course_id),
+            ),
             "partitions": StudioPartitionService(course_id=course_id),
             "teams_configuration": TeamsConfigurationService(),
         },

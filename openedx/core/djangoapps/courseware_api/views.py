@@ -64,10 +64,10 @@ from common.djangoapps.student.models import (
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .serializers import CourseInfoSerializer
 from .utils import serialize_upgrade_info
@@ -498,6 +498,9 @@ class CoursewareInformation(RetrieveAPIView):
         The timezone in the user's account is frequently not set.
         This method sets a user's recent timezone that can be used as a fallback
         """
+        if not user.id:
+            return
+
         cache_key = 'browser_timezone_{}'.format(str(user.id))
         browser_timezone = self.request.query_params.get('browser_timezone', None)
         cached_value = TieredCache.get_cached_response(cache_key)

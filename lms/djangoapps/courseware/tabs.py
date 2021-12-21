@@ -47,7 +47,7 @@ class CoursewareTab(EnrolledTab):
                 url_func = course_reverse_func_from_name_func(reverse_name_func)
                 return url_func(course, reverse_func)
             else:
-                return get_learning_mfe_home_url(course_key=course.id, view_name='home')
+                return get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
 
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)
@@ -112,7 +112,7 @@ class ProgressTab(EnrolledTab):
     def __init__(self, tab_dict):
         def link_func(course, reverse_func):
             if course_home_mfe_progress_tab_is_active(course.id):
-                return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
+                return get_learning_mfe_home_url(course_key=course.id, url_fragment=self.view_name)
             else:
                 return reverse_func(self.view_name, args=[str(course.id)])
 
@@ -337,7 +337,7 @@ class DatesTab(EnrolledTab):
             if course_home_legacy_is_active(course.id):
                 return reverse_func(self.view_name, args=[str(course.id)])
             else:
-                return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
+                return get_learning_mfe_home_url(course_key=course.id, url_fragment=self.view_name)
 
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)

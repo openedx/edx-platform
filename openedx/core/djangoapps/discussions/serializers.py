@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features, Provider
 from .utils import available_division_schemes, get_divided_discussions
 
@@ -42,16 +42,6 @@ class LtiSerializer(serializers.ModelSerializer):
             if key in self.Meta.fields
         }
         return payload
-
-    def to_representation(self, instance):
-        """
-        Serialize object into a primitive data types.
-        """
-        representation = super().to_representation(instance)
-        if not self.context.get('pii_sharing_allowed'):
-            representation.pop('pii_share_username')
-            representation.pop('pii_share_email')
-        return representation
 
     def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
         """
@@ -219,12 +209,13 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         course_key = instance.context_key
         payload = super().to_representation(instance)
+        course_pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_key)
 
-        lti_configuration = LtiSerializer(
-            instance.lti_configuration,
-            context={'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key)}
-        )
+        lti_configuration = LtiSerializer(instance=instance.lti_configuration)
         lti_configuration_data = lti_configuration.data
+        lti_configuration_data.update({
+            'pii_sharing_allowed': course_pii_sharing_allowed
+        })
 
         provider_type = instance.provider_type
         plugin_configuration = instance.plugin_configuration

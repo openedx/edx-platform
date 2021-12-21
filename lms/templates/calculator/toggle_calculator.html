@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -10,13 +10,13 @@ from openedx.core.djangolib.markup import HTML, Text
     <button title="${_('Open Calculator')}" aria-controls="calculator_wrapper" aria-expanded="false" class="calc utility-control-button">
         <span class="icon fa fa-calculator" aria-hidden="true"></span>
     </button>
-    
+
     <div id="calculator_wrapper">
         <form id="calculator">
             <div class="input-wrapper">
                 <label for="calculator_input" class="label-calc-input sr">${_('Enter equation')}</label>
                 <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" />
-                
+
                 <div class="help-wrapper">
                     <button type="button" title="${_('Hints')}" id="calculator_hint" aria-haspopup="true" aria-expanded="false" aria-controls="calculator_input_help"></button>
                     <ul id="calculator_input_help" class="help" aria-hidden="true">

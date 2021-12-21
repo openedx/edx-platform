@@ -14,11 +14,11 @@ from xblock.core import XBlock, XBlockAside
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.xblock_config.models import StudioConfig
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.test_asides import AsideTestType
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..preview import _preview_module_system, get_preview_fragment
 
@@ -230,9 +230,29 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.request = RequestFactory().get('/dummy-url')
         self.request.user = self.user
         self.request.session = {}
+        self.descriptor = ItemFactory(category="video", parent=self.course)
+        self.field_data = mock.Mock()
+        self.runtime = _preview_module_system(
+            self.request,
+            self.descriptor,
+            self.field_data,
+        )
+
+    def test_get_user_role(self):
+        assert self.runtime.get_user_role() == 'staff'
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_render_template(self):
         descriptor = ItemFactory(category="pure", parent=self.course)
         html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
         assert '<div id="142" ns="main">Testing the MakoService</div>' in html
+
+    def test_xqueue_is_not_available_in_studio(self):
+        descriptor = ItemFactory(category="problem", parent=self.course)
+        runtime = _preview_module_system(
+            self.request,
+            descriptor=descriptor,
+            field_data=mock.Mock(),
+        )
+        assert runtime.xqueue is None
+        assert runtime.service(descriptor, 'xqueue') is None

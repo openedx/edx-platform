@@ -19,6 +19,7 @@
 # Phondanai Khanti <phondanai@gmail.com>, 2016
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
+# prakai <prakai.na@gmail.com>, 2021
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -35,6 +36,7 @@
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
 # peemmaruj <peemmaruj@gmail.com>, 2014
 # peemmaruj <peemmaruj@gmail.com>, 2014
+# prakai <prakai.na@gmail.com>, 2021
 # Sanyapong Kridakarn <sanyapong@kelanggreen.com>, 2016
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
@@ -58,6 +60,7 @@
 # Pichai Sivawat <tingtong003tomy@gmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2016
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2016
+# prakai <prakai.na@gmail.com>, 2021
 # Punsarn <translator@punsarn.asia>, 2019
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015,2017
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2014
@@ -79,6 +82,7 @@
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
+# prakai <prakai.na@gmail.com>, 2021
 # Schmitt Dhammachote <hyde.139@gmail.com>, 2015
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
@@ -109,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-05 20:43+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Thai (https://www.transifex.com/open-edx/teams/6205/th/)\n"
@@ -131,6 +135,11 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -718,27 +727,31 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Your account could not be activated{html_end}Something went "
-"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
-"issue."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}Success{html_end} You have activated your account."
+"{html_start}Your {account_or_email} could not be "
+"{activated_or_confirmed}{html_end}Something went wrong, please <a "
+"href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Success! You have activated your account.{html_end}You will now "
-"receive email updates and alerts from us related to the courses you are "
-"enrolled in. Sign In to continue."
+"{html_start}This {account_or_email} has already been "
+"{activated_or_confirmed}.{html_end}"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success{html_end} You have {activated_or_confirmed} your "
+"{account_or_email}."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have {activated_or_confirmed} your "
+"{account_or_email}.{html_end}You will now receive email updates and alerts "
+"from us related to the courses you are enrolled in. Sign In to continue."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -3240,10 +3253,6 @@ msgstr ""
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -10533,6 +10542,11 @@ msgstr ""
 msgid "Year of birth"
 msgstr "ปีที่เกิด"
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "I agree that {platform_name} may send me marketing messages."
+msgstr ""
+
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -11408,10 +11422,6 @@ msgstr "การอนุญาตถูกปฏิเสธ: การตร�
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr ""
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"

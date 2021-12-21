@@ -24,13 +24,13 @@ from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
-from urllib.parse import urljoin
+from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price, get_verified_track_links
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.date_utils import strftime_localized_html
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -43,7 +43,7 @@ from openedx.features.course_duration_limits.access import get_user_course_durat
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.db import outer_atomic
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOG = logging.getLogger(__name__)
 

@@ -1453,12 +1453,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -4569,7 +4567,10 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 #### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
 SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
