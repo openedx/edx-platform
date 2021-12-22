@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests:
-    runs-on: [ self-hosted ]
+    runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
         python-version: ['3.8']
@@ -79,7 +79,7 @@ jobs:
             test_root/log/pytest_warnings*.json
 
   compile-warnings-report:
-    runs-on: [ self-hosted ]
+    runs-on: [ edx-platform-runner ]
     needs: [ run-tests ]
     steps:
       - name: sync directory owner
