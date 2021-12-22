@@ -41,19 +41,19 @@ SCHEMA_REGISTRY_CLIENT = SchemaRegistryClient({
     'url': settings.SCHEMA_REGISTRY_URL,
 })
 
-COURSE_EVENT_KEY_SERIALIZER = key_bridge.serialize_wrapper
+# COURSE_EVENT_KEY_SERIALIZER = key_bridge.serialize_wrapper
 
-# AvroSerializer(schema_str=key_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
-#                                              to_dict = key_bridge.to_dict)
-COURSE_EVENT_VALUE_SERIALIZER = value_bridge.serialize_wrapper
+COURSE_EVENT_KEY_SERIALIZER = AvroSerializer(schema_str=key_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
+                                             to_dict = key_bridge.to_dict)
+# COURSE_EVENT_VALUE_SERIALIZER = value_bridge.serialize_wrapper
 
-# AvroSerializer(schema_str=value_schema, schema_registry_client= SCHEMA_REGISTRY_CLIENT,
-#                                              to_dict = value_bridge.to_dict)
-COURSE_EVENT_KEY_DESERIALIZER = key_bridge.deserialize_wrapper
+COURSE_EVENT_VALUE_SERIALIZER = AvroSerializer(schema_str=value_schema, schema_registry_client= SCHEMA_REGISTRY_CLIENT,
+                                             to_dict = value_bridge.to_dict)
+# COURSE_EVENT_KEY_DESERIALIZER = key_bridge.deserialize_wrapper
 
-# AvroDeserializer(schema_str=key_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
-#                                                  from_dict= key_bridge.dict_to_attrs)
-COURSE_EVENT_VALUE_DESERIALIZER = value_bridge.deserialize_wrapper
+COURSE_EVENT_KEY_DESERIALIZER = AvroDeserializer(schema_str=key_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
+                                                 from_dict= key_bridge.from_dict)
+# COURSE_EVENT_VALUE_DESERIALIZER = value_bridge.deserialize_wrapper
 
-# AvroDeserializer(schema_str=value_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
-#                                                    from_dict = value_bridge.dict_to_attrs)
+COURSE_EVENT_VALUE_DESERIALIZER = AvroDeserializer(schema_str=value_schema, schema_registry_client=SCHEMA_REGISTRY_CLIENT,
+                                                   from_dict = value_bridge.from_dict)
