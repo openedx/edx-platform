@@ -11,7 +11,6 @@ from datetime import timedelta
 
 import ddt
 from django.conf import settings
-from django.conf.urls import url
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -26,6 +25,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
+from django.urls import path
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
@@ -44,14 +44,12 @@ class MockView(APIView):  # pylint: disable=missing-docstring
 
 
 urlpatterns = [
-    url(
-        r'^oauth2-inactive-test/$',
-        MockView.as_view(authentication_classes=[authentication.BearerAuthenticationAllowInactiveUser])
-    ),
-    url(
-        r'^oauth2-test/$',
-        MockView.as_view(authentication_classes=[authentication.BearerAuthentication])
-    )
+    path('oauth2-inactive-test/',
+         MockView.as_view(authentication_classes=[authentication.BearerAuthenticationAllowInactiveUser])
+         ),
+    path('oauth2-test/',
+         MockView.as_view(authentication_classes=[authentication.BearerAuthentication])
+         )
 ]
 
 

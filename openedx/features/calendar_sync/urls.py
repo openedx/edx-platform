@@ -2,15 +2,11 @@
 Defines URLs for Calendar Sync.
 """
 
-
-from django.conf.urls import url
-
 from .views.calendar_sync import CalendarSyncView
+from django.urls import path
 
 urlpatterns = [
-    url(
-        r'^calendar_sync$',
-        CalendarSyncView.as_view(),
-        name='openedx.calendar_sync',
-    ),
+    path('calendar_sync', CalendarSyncView.as_view(),
+         name='openedx.calendar_sync',
+         ),
 ]
