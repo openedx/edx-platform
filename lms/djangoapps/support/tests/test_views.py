@@ -1369,3 +1369,33 @@ class LinkProgramEnrollmentSupportAPIViewTests(SupportViewTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         error = "All linking lines must be in the format 'external_user_key,lms_username'"
         assert response_data['errors'] == [error]
+
+
+class SAMLProvidersWithOrgTests(SupportViewTestCase):
+    """
+    Tests for the get_saml_providers API View
+    """
+    _url = reverse("support:get_saml_providers")
+
+    def setUp(self):
+        """
+        Make the user support staff.
+        """
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+
+    def test_returning_saml_providers(self):
+        response = self.client.get(self._url)
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data == self.org_key_list
