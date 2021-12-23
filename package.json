@@ -24,7 +24,7 @@
     "bootstrap": "4.0.0",
     "camelize": "1.0.0",
     "classnames": "2.2.5",
-    "css-loader": "0.28.8",
+    "css-loader": "1.0.0",
     "datatables": "1.10.18",
     "datatables.net-fixedcolumns": "3.2.6",
     "edx-proctoring-proctortrack": "git+https://git@github.com/anupdhabarde/edx-proctoring-proctortrack.git#9b55ea63a3f670bcfbdb5870241510746252ee41",
