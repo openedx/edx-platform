@@ -1,5 +1,29 @@
 """
-Utilities for logging sensitive information.
+Utilities for logging sensitive debug information such as authentication tokens.
+
+Usage:
+
+1. Read the warning in cli_gen_keys
+2. Generate keys using ``python3 -m common.djangoapps.util.log_sensitive gen-keys``
+   and follow the instructions it prints out
+3. When logging sensitive information, use like so::
+
+     logger.info(
+         "Received invalid auth token %s in Authorization header",
+         encrypt_for_log(token, settings.AUTH_ERRORS_DEBUG_KEYS)
+     )
+
+   This will log a message like::
+
+     Received invalid auth token ZXIzljFT7zTTuXyIB/jy4XTixL34EhI6pY0Gw4mxfFo=|IYS4JDE0S9wypALb5HfoeW9YB/CnSx35/PkspsecZyzTP1Zr8B/W+16Gfe+pRZhjBitQ66XTZk9YHwKfznQ1KA== in Authorization header
+
+4. If you need to decrypt one of these messages, save the encrypted portion
+   to file, retrieve the securely held private key, and run::
+
+     python3 -m common.djangoapps.util.log_sensitive decrypt --message-file ... --private-key-file ...
+
+   If possible, use bash process indirection to keep the private key from
+   touching disk unencrypted, e.g. ``--private-key-file <(gpg2 --decrypt auth-logging-key.enc)``
 """
 
 from base64 import b64decode, b64encode
@@ -93,7 +117,8 @@ def cli_gen_keys():
     private_64 = reader_keys['private']
     print(
         "This is your PUBLIC key, which should be included in the server's "
-        "configuration, and does not need protection:"
+        "configuration. Create a separate setting (and keypair) for each "
+        "distinct project or team. This value does not need special protection:"
         "\n\n"
         f"  \"{public_64}\" (public)"
         "\n\n"
