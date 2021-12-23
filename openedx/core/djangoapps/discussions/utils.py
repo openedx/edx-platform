@@ -9,6 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
@@ -31,14 +32,25 @@ def get_divided_discussions(
     divided_course_wide_discussions = []
     divided_inline_discussions = []
 
-    course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
-    all_discussions = get_discussion_categories_ids(course, None, include_all=True)
+    course_key = str(course.id)
+    provider = DiscussionsConfiguration.get(course_key).provider_type
+    if provider == Provider.LEGACY:
+        course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
+        all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
-    for divided_discussion_id in discussion_settings.divided_discussions:
-        if divided_discussion_id in course_wide_discussions:
-            divided_course_wide_discussions.append(divided_discussion_id)
-        elif divided_discussion_id in all_discussions:
-            divided_inline_discussions.append(divided_discussion_id)
+        for divided_discussion_id in discussion_settings.divided_discussions:
+            if divided_discussion_id in course_wide_discussions:
+                divided_course_wide_discussions.append(divided_discussion_id)
+            elif divided_discussion_id in all_discussions:
+                divided_inline_discussions.append(divided_discussion_id)
+    elif provider == Provider.OPEN_EDX:
+        for topic_link in DiscussionTopicLink.objects.filter(
+            context_key=course_key, provider_id=provider
+        ):
+            if topic_link.usage_key is not None:
+                divided_inline_discussions.append(topic_link.external_id)
+            else:
+                divided_course_wide_discussions.append(topic_link.external_id)
 
     return divided_course_wide_discussions, divided_inline_discussions
 
