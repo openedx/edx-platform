@@ -14,6 +14,7 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     LockStatusField,
     OpenResponseMetadataSerializer,
     ResponseSerializer,
+    RubricConfigSerializer,
     ScoreField,
     ScoreSerializer,
     StaffAssessSerializer,
@@ -276,8 +277,36 @@ class TestInitializeSerializer(TestCase):
             }
         }
 
-        # Rubric data is passed through without transforms, we can create a toy response
-        self.mock_rubric_data = {"foo": "bar"}
+        # Simple rubric example
+        self.mock_rubric_data = {
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
+            "criteria": [
+                {
+                    "order_num": 0,
+                    "name": "grammar",
+                    "label": "Grammar",
+                    "prompt": "How correct is the submitter's grammar?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "order_num": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "order_num": 1,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
+        }
 
     def test_serializer_output(self):
         input_data = {
@@ -293,7 +322,116 @@ class TestInitializeSerializer(TestCase):
         assert output_data['courseMetadata'] == CourseMetadataSerializer(self.mock_course_metadata).data
         assert output_data['oraMetadata'] == OpenResponseMetadataSerializer(self.mock_ora_instance).data
         assert output_data['submissions'] == self.mock_submissions_data
-        assert output_data['rubricConfig'] == self.mock_rubric_data
+        assert output_data['rubricConfig'] == RubricConfigSerializer(self.mock_rubric_data).data
+
+
+class TestRubricConfigSerializer(TestCase):
+    """ Tests for RubricConfigSerializer """
+
+    # Options split for reuse
+    example_options = [
+        {
+            "order_num": 0,
+            "name": "troll",
+            "label": "Troll",
+            "explanation": "Failing grade",
+            "points": 0
+        },
+        {
+            "order_num": 1,
+            "name": "dreadful",
+            "label": "Dreadful",
+            "explanation": "Failing grade",
+            "points": 1
+        },
+        {
+            "order_num": 2,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 2
+        },
+        {
+            "order_num": 3,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 3
+        },
+        {
+            "order_num": 4,
+            "name": "acceptable",
+            "label": "Acceptable",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 4
+        },
+        {
+            "order_num": 5,
+            "name": "exceeds_expectations",
+            "label": "Exceeds Expectations",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 5
+        },
+        {
+            "order_num": 6,
+            "name": "outstanding",
+            "label": "Outstanding",
+            "explanation": "Passing grade (will continue to N.E.W.T)",
+            "points": 6
+        }
+    ]
+
+    example_rubric = {
+        "feedback_prompt": "How did this student do?",
+        "feedback_default_text": "For the O.W.L exams, this student...",
+        "criteria": [
+            {
+                "order_num": 0,
+                "name": "potions",
+                "label": "Potions",
+                "prompt": "How did this student perform in the Potions exam",
+                "feedback": "optional",
+                "options": example_options
+            },
+            {
+                "order_num": 1,
+                "name": "charms",
+                "label": "Charms",
+                "prompt": "How did this student perform in the Charms exam",
+                "feedback": "required",
+                "options": example_options
+            }
+        ]
+    }
+
+    def basic_test_case(self):
+        """ Basic test for complex rubric """
+        # Options have only one naming transform, done here for succinctness
+        expected_options = self.example_options.copy()
+        for option in expected_options:
+            option['orderNum'] = option.pop("order_num")
+
+        assert RubricConfigSerializer(self.example_rubric).data == {
+            "feedbackPrompt": "How did this student do?",
+            "criteria": [
+                {
+                    "orderNum": 0,
+                    "name": "potions",
+                    "label": "Potions",
+                    "prompt": "How did this student perform in the Potions exam",
+                    "feedback": "optional",
+                    "options": expected_options
+                },
+                {
+                    "order_num": 1,
+                    "name": "charms",
+                    "label": "Charms",
+                    "prompt": "How did this student perform in the Charms exam",
+                    "feedback": "required",
+                    "options": expected_options
+                }
+            ]
+        }
 
 
 @ddt.ddt
