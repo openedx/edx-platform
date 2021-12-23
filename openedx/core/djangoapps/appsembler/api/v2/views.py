@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.response import Response
 
+from openedx.core.djangoapps.appsembler.api.helpers import normalize_bool_param
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from student.helpers import AccountValidationError
 
@@ -90,9 +91,7 @@ class RegistrationViewSet(RegistrationViewSetV1):
         if password_provided:
             try:
                 # Default behavior is True - send the email
-
-                data['send_activation_email'] = self._normalize_bool_param(
-                    data.get('send_activation_email', True))
+                data['send_activation_email'] = normalize_bool_param(data.get('send_activation_email', True))
             except ValueError:
                 errors = {
                     'user_message': '{0} is not a valid value for "send_activation_email"'.format(

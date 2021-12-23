@@ -5,6 +5,7 @@ These tests adapted from Appsembler enterprise `appsembler_api` tests
 
 """
 from django.urls import reverse
+from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
@@ -41,8 +42,13 @@ class RegistrationApiViewTests(TestCase):
         }
 
     def test_happy_path(self):
+        assert not mail.outbox, 'Should not have any messages'
         res = self.client.post(self.url, self.sample_user_data)
         self.assertContains(res, 'user_id', status_code=200)
+        assert mail.outbox, 'Should send the activation email'
+        email = mail.outbox[0]
+        assert 'Activate' in email.subject, 'Should have the activation email subject'
+        assert '/activate/' in email.body, 'Should include the activation link in the body'
 
     def test_duplicate_identifiers(self):
         self.client.post(self.url, self.sample_user_data)
@@ -72,16 +78,16 @@ class RegistrationApiViewTests(TestCase):
             res = self.client.post(self.url, params)
         self.assertContains(res, 'user_id', status_code=status.HTTP_200_OK)
 
-    @ddt.unpack
     @ddt.data(
-        {'send_activation_email': True, 'should_send': True},
-        {'send_activation_email': False, 'should_send': False},
-        {'send_activation_email': 'True', 'should_send': True},
-        {'send_activation_email': 'False', 'should_send': False},
-        {'send_activation_email': 'true', 'should_send': True},
-        {'send_activation_email': 'false', 'should_send': False},
+        {'send_activation_email': True, 'expected_subject': 'Activate your', 'email_count': 1},
+        {'send_activation_email': 'True', 'expected_subject': 'Activate your', 'email_count': 1},
+        {'send_activation_email': 'true', 'expected_subject': 'Activate your', 'email_count': 1},
+        {'send_activation_email': False, 'expected_subject': None, 'email_count': 0},
+        {'send_activation_email': 'False', 'expected_subject': None, 'email_count': 0},
+        {'send_activation_email': 'false', 'expected_subject': None, 'email_count': 0},
     )
-    def test_send_activation_email_with_password(self, send_activation_email, should_send):
+    @ddt.unpack
+    def test_send_activation_email_with_password(self, send_activation_email, expected_subject, email_count):
         """
         This test makes sure when the API endpoint is called with a password,
         the send_activation_email parameter is being used properly. Also makes
@@ -97,18 +103,28 @@ class RegistrationApiViewTests(TestCase):
             'send_activation_email': send_activation_email,
         }
 
-        with patch('openedx.core.djangoapps.user_authn.views.register.compose_and_send_activation_email') as fake_send:
-            res = self.client.post(self.url, params)
-            self.assertContains(res, 'user_id', status_code=200)
-            new_user = User.objects.get(username=params['username'])
+        res = self.client.post(self.url, params)
 
-            assert fake_send.called == should_send, 'activation email should not be called'
-            assert new_user.is_active == (not should_send), 'xor, Either activate or send the email'
+        self.assertContains(res, 'user_id', status_code=200)
+        new_user = User.objects.get(username=params['username'])
+        assert new_user.is_active == (not email_count)
+        subject = mail.outbox[0].subject if mail.outbox else ''
+        assert len(mail.outbox) == email_count, 'Incorrect message count: Subject={}'.format(subject)
+        if expected_subject:
+            assert expected_subject in mail.outbox[0].subject
 
-    @ddt.data(True, False, 'True', 'False', 'true', 'false')
-    def test_send_activation_email_without_password(self, send_activation_email):
+    @ddt.data(
+        {'send_activation_email': True},
+        {'send_activation_email': 'True'},
+        {'send_activation_email': 'true'},
+        {'send_activation_email': False},
+        {'send_activation_email': 'False'},
+        {'send_activation_email': 'false'},
+        {},
+    )
+    def test_send_activation_email_without_password(self, activation_email_params):
         """
-        Should not send email. Ignores the `send_activation_email` param. It
+        Should not send the activation email. Ignores the `send_activation_email` param. It
         also makes sure the user remains inactive (is_active=False). The user
         will be activated after the password is reseted.
         """
@@ -116,19 +132,27 @@ class RegistrationApiViewTests(TestCase):
             'username': 'mr_potato_head',
             'email': 'mr_potato_head@example.com',
             'name': 'Mr Potato Head',
-            'send_activation_email': send_activation_email,
         }
+        params.update(activation_email_params)
 
         with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
                    return_value=self.site):
+            res = self.client.post(self.url, params)
 
-            email_func_path = 'openedx.core.djangoapps.user_authn.views.register.compose_and_send_activation_email'
-            with patch(email_func_path) as fake_send:
-                res = self.client.post(self.url, params)
-                self.assertContains(res, 'user_id', status_code=200)
-                new_user = User.objects.get(username=params['username'])
-                assert not new_user.is_active
-                assert not fake_send.call_count, 'Should not send email when no password'
+        self.assertContains(res, 'user_id', status_code=200)
+        new_user = User.objects.get(username=params['username'])
+        assert not new_user.is_active
+        assert mail.outbox, 'Should send the password reset email'
+
+        assert len(mail.outbox) == 1, ('Send NOT password reset email but NOT activation.\n'
+                                       'Subjects={subjects}.\n'
+                                       'params]}').format(
+            subjects=[email.subject for email in mail.outbox],
+            params=params,
+        )
+
+        email = mail.outbox[0]
+        assert 'Password reset on' in email.subject
 
     @ddt.data('username', 'name')
     def test_missing_field(self, field):
