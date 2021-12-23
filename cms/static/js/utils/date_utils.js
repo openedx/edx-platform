@@ -1,5 +1,5 @@
-define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timepicker'],
-    function($, date, TriggerChangeEventOnEnter) {
+define(['jquery', 'date', 'js/utils/change_on_enter', 'moment-timezone', 'jquery.ui', 'jquery.timepicker'],
+    function($, date, TriggerChangeEventOnEnter, moment) {
         'use strict';
 
         function getDate(datepickerInput, timepickerInput) {
@@ -67,15 +67,51 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             return obj;
         }
 
-        function setupDatePicker(fieldName, view, index) {
+        /**
+     * Calculates the utc offset in miliseconds for given
+     * timezone and subtracts it from given localized time
+     * to get time in UTC
+     *
+     * @param {Date} localTime JS Date object in Local Time
+     * @param {string} timezone IANA timezone name ex. "Australia/Brisbane"
+     * @returns JS Date object in UTC
+     */
+    function convertLocalizedDateToUTC(localTime, timezone) {
+        const localTimeMS = localTime.getTime();
+        const utcOffset = moment.tz(localTime, timezone)._offset;
+        return new Date(localTimeMS - (utcOffset * 60 *1000));
+    }
+
+    /**
+     * Returns the timezone abbreviation for given
+     * timezone name
+     *
+     * @param {string} timezone IANA timezone name ex. "Australia/Brisbane"
+     * @returns Timezone abbreviation ex. "AEST"
+     */
+    function getTZAbbreviation(timezone) {
+        return moment(new Date()).tz(timezone).format('z');
+    }
+
+    /**
+     * Converts the given datetime string from UTC to localized time
+     *
+     * @param {string} utcDateTime JS Date object with UTC datetime
+     * @param {string} timezone IANA timezone name ex. "Australia/Brisbane"
+     * @returns Formatted datetime string with localized timezone
+     */
+    function getLocalizedCurrentDate(utcDateTime, timezone) {
+        const localDateTime = moment(utcDateTime).tz(timezone);
+        return localDateTime.format('YYYY-MM-DDTHH[:]mm[:]ss');
+    }function setupDatePicker(fieldName, view, index) {
             var cacheModel;
             var div;
             var datefield;
-            var timefield;
+            var timefield;var tzfield;
             var cacheview;
             var setfield;
             var currentDate;
-            if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
+            var timezone;if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
                 cacheModel = view.collection.models[index];
                 div = view.$el.find('#' + view.collectionSelector(cacheModel.cid));
             } else {
@@ -84,11 +120,16 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             }
             datefield = $(div).find('input.date');
             timefield = $(div).find('input.time');
-            cacheview = view;
+            tzfield = $(div).find('span.timezone');
+        cacheview = view;
+
+        timezone = cacheModel.get('user_timezone');
             setfield = function(event) {
                 var newVal = getDate(datefield, timefield);
 
-                // Setting to null clears the time as well, as date and time are linked.
+                if (timezone) {
+                newVal = convertLocalizedDateToUTC(newVal, timezone);
+            }// Setting to null clears the time as well, as date and time are linked.
                 // Note also that the validation logic prevents us from clearing the start date
                 // (start date is required by the back end).
                 cacheview.clearValidationErrors();
@@ -109,8 +150,13 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             if (cacheModel) {
                 currentDate = cacheModel.get(fieldName);
             }
-            // timepicker doesn't let us set null, so check that we have a time
-            if (currentDate) {
+    if (timezone) {
+            const tz = getTZAbbreviation(timezone);
+            $(tzfield).text("("+tz+")");
+        }        // timepicker doesn't let us set null, so check that we have a time
+            if (currentDate) {if (timezone) {
+                currentDate = getLocalizedCurrentDate(currentDate, timezone);
+            }
                 setDate(datefield, timefield, currentDate);
             } else {
                 // but reset fields either way
