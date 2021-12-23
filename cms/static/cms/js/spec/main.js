@@ -47,6 +47,7 @@
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             moment: 'common/js/vendor/moment-with-locales',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
