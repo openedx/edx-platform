@@ -102,6 +102,12 @@ def cli_gen_keys():
         "such as a password manager:"
         "\n\n"
         f"  \"{private_64}\" (private)"
+        "\n\n"
+        "Before logging anything sensitive, get a legal/compliance review to "
+        "ensure this is acceptable in your organization. Encryption is not "
+        "generally a replacement for retention policies or other privacy "
+        "safeguards; using this utility does not automatically make sensitive "
+        "information safe to handle."
     )
 
 
