@@ -109,10 +109,12 @@ certifi==2021.10.8
     #   py2neo
     #   requests
 cffi==1.15.0
-    # via cryptography
+    # via
+    #   cryptography
+    #   pynacl
 chardet==4.0.0
     # via pysrt
-charset-normalizer==2.0.9
+charset-normalizer==2.0.10
     # via
     #   -r requirements/edx/paver.txt
     #   aiohttp
@@ -166,7 +168,7 @@ deprecated==1.2.13
     # via
     #   jwcrypto
     #   redis
-django==3.2.10
+django==3.2.11
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -784,6 +786,8 @@ pymongo==3.10.1
     #   event-tracking
     #   mongodbproxy
     #   mongoengine
+pynacl==1.4.0
+    # via -r requirements/edx/base.in
 pynliner==0.8.0
     # via -r requirements/edx/base.in
 pyparsing==3.0.6
@@ -943,6 +947,7 @@ six==1.16.0
     #   paver
     #   py2neo
     #   pyjwkest
+    #   pynacl
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
