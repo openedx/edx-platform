@@ -98,7 +98,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.20",
     "karma-webpack": "2.0.9",
-    "plato": "1.2.2",
+    "plato": "1.6.0",
     "react-test-renderer": "16.4.0",
     "selenium-webdriver": "3.4.0",
     "sinon": "2.3.5",
