@@ -47,7 +47,7 @@ def encrypt_for_log(message, reader_public_key_b64):
     Returns a string <sender public key> "|" <ciphertext> which can be
     decrypted with decrypt_log_message.
     """
-    reader_public_key = PublicKey(b64decode(reader_public_key_b64.encode()))
+    reader_public_key = PublicKey(b64decode(reader_public_key_b64))
 
     encrypted = Box(logger_private_key, reader_public_key).encrypt(message.encode())
 
@@ -62,7 +62,7 @@ def decrypt_log_message(encrypted_message, reader_private_key_b64):
     """
     reader_private_key = PrivateKey(b64decode(reader_private_key_b64))
     sender_public_key_data, encrypted_raw = \
-        [b64decode(part.encode()) for part in encrypted_message.split('|', 1)]
+        [b64decode(part) for part in encrypted_message.split('|', 1)]
     return Box(reader_private_key, PublicKey(sender_public_key_data)).decrypt(encrypted_raw).decode()
 
 
