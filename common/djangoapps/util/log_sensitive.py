@@ -83,10 +83,10 @@ def cli():
     pass
 
 
-@click.command('gen-keys')
+@click.command('gen-keys', help="Generate keypair")
 def cli_gen_keys():
     """
-    Generate and print a keypair for reading sensitive logs.
+    Generate and print a keypair for handling sensitive log messages.
     """
     reader_keys = generate_reader_keys()
     public_64 = reader_keys['public']
@@ -111,7 +111,37 @@ def cli_gen_keys():
     )
 
 
+@click.command('decrypt', help="Decrypt a logged message")
+@click.option('--private-key-file', type=click.File('r'), required=True,
+              help="Path to file containing reader's private key in Base64",
+)
+@click.option('--message-file', type=click.File('r'), required=True,
+              help="Path to file containing encrypted message, or - for stdin",
+)
+def cli_decrypt(private_key_file, message_file):
+    """
+    Decrypt a message and print it to stdout.
+    """
+    print(decrypt_log_message(message_file.read(), private_key_file.read()))
+
+
+@click.command('encrypt', help="Encrypt a one-off message")
+@click.option('--public-key', help="Reader's public key, in Base64")
+@click.option('--message-file', type=click.File('r'), required=True,
+              help="Path to file containing message to encrypt, or - for stdin",
+)
+def cli_encrypt(public_key, message_file):
+    """
+    Encrypt a message to the provided public key and print it to stdout.
+
+    This is just intended for use when testing or experimenting with the decrypt command.
+    """
+    print(encrypt_for_log(message_file.read(), public_key))
+
+
 cli.add_command(cli_gen_keys)
+cli.add_command(cli_decrypt)
+cli.add_command(cli_encrypt)
 
 if __name__ == '__main__':
     cli()
