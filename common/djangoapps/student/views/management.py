@@ -28,12 +28,16 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
 from ipware.ip import get_client_ip
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
@@ -53,6 +57,7 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.tasks import send_activation_email
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
@@ -893,18 +898,23 @@ def confirm_email_change(request, key):
         return response
 
 
-@require_POST
-@login_required
-@ensure_csrf_cookie
+@api_view(['POST'])
+@authentication_classes((
+    JwtAuthentication,
+    BearerAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
 def change_email_settings(request):
     """
     Modify logged-in user's setting for receiving emails from a course.
     """
     user = request.user
 
-    course_id = request.POST.get("course_id")
+    course_id = request.data.get("course_id")
+    receive_emails = request.data.get("receive_emails")
     course_key = CourseKey.from_string(course_id)
-    receive_emails = request.POST.get("receive_emails")
+
     if receive_emails:
         optout_object = Optout.objects.filter(user=user, course_id=course_key)
         if optout_object:
