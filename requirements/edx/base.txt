@@ -239,7 +239,7 @@ django-celery-results==2.0.1
     #   -r requirements/edx/base.in
 django-classy-tags==2.0.0
     # via django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -468,7 +468,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/base.in
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -476,7 +476,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
 edx-rbac==1.5.1
     # via edx-enterprise
-edx-rest-api-client==5.4.0
+edx-rest-api-client==5.4.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -890,7 +890,7 @@ ruamel.yaml==0.17.17
     # via drf-yasg
 ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
-rules==3.0
+rules==3.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise

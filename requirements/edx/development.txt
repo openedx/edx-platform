@@ -326,7 +326,7 @@ django-classy-tags==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -578,7 +578,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -588,7 +588,7 @@ edx-rbac==1.5.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-rest-api-client==5.4.0
+edx-rest-api-client==5.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -900,7 +900,7 @@ multidict==5.2.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.920
+mypy==0.930
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -1251,7 +1251,7 @@ ruamel.yaml.clib==0.2.6
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-rules==3.0
+rules==3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1521,7 +1521,7 @@ webob==1.8.7
     #   -r requirements/edx/testing.txt
     #   xblock
     #   xmodule
-wheel==0.37.0
+wheel==0.37.1
     # via
     #   -r requirements/edx/pip-tools.txt
     #   pip-tools
