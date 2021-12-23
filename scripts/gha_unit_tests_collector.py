@@ -15,12 +15,12 @@ def get_all_unit_test_shards():
 
 def get_modules_except_cms():
     all_unit_test_shards = get_all_unit_test_shards()
-    return [paths for shard_name, paths in all_unit_test_shards.items() if not paths.startswith('cms')]
+    return [shard_conf['path'] for shard_name, shard_conf in all_unit_test_shards.items() if not shard_conf['path'].startswith('cms')]
 
 
 def get_cms_modules():
     all_unit_test_shards = get_all_unit_test_shards()
-    return [paths for shard_name, paths in all_unit_test_shards.items() if paths.startswith('cms')]
+    return [shard_conf['path'] for shard_name, shard_conf in all_unit_test_shards.items() if shard_conf['path'].startswith('cms')]
 
 
 if __name__ == "__main__":
@@ -35,7 +35,11 @@ if __name__ == "__main__":
     elif argument.cms_only:
         modules = get_cms_modules()
     else:
-        modules = get_all_unit_test_modules()
+        modules = []
 
-    unit_test_paths = ' '.join(modules)
+    unique_modules = set()
+    for module in modules:
+        unique_modules.update(set(module.split(" ")))
+
+    unit_test_paths = ' '.join(unique_modules)
     sys.stdout.write(unit_test_paths)
