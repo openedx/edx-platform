@@ -401,7 +401,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         try:
             with open(output_path) as output_file:
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
-                rows = [row for row in reader]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                rows = list(reader)
         except OSError:
             self.fail(f"Could not find or open output file at '{output_path}'")
 

@@ -13,7 +13,7 @@ from lms.djangoapps.instructor_task.models import PROGRESS
 log = logging.getLogger(__name__)
 
 # return status for completed tasks and tasks in progress
-STATES_WITH_STATUS = [state for state in READY_STATES] + [PROGRESS]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+STATES_WITH_STATUS = list(READY_STATES) + [PROGRESS]
 
 
 def _get_instructor_task_status(task_id):
