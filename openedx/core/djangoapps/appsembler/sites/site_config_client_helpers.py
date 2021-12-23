@@ -24,22 +24,37 @@ except ImportError:
             self.site_uuid = site_uuid
 
 
-def is_enabled_for_current_organization():
+def get_single_org_for_site(site):
+    """
+    Gets a single organization for a site.
+
+    Raises:
+        Organization.DoesNotExist
+        Organization.MultipleObjectsReturned
+    """
+    return site.organizations.get()
+
+
+def is_enabled_for_site(site):
     """
     Checks if the SiteConfiguration client is enabled for a specific organization.
     """
     if not CONFIG_CLIENT_INSTALLED:
         return False
 
-    from . import utils as site_utils  # Local import to avoid AppRegistryNotReady error
-    organization = site_utils.get_current_organization()
+    from django.conf import settings  # Local import to avoid AppRegistryNotReady error
+
+    if site.id == settings.SITE_ID:
+        # Disable the SiteConfig service on main site.
+        return False
+
+    organization = get_single_org_for_site(site)
     return is_feature_enabled_for_site(organization.edx_uuid)
 
 
-def get_current_configuration_adapter():
+def get_configuration_adapter(site):
     if not CONFIG_CLIENT_INSTALLED:
         return None
 
-    from . import utils as site_utils  # Local import to avoid AppRegistryNotReady error
-    organization = site_utils.get_current_organization()
+    organization = get_single_org_for_site(site)
     return SiteConfigAdapter(organization.edx_uuid)
