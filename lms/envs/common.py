@@ -4695,7 +4695,6 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
