@@ -112,11 +112,13 @@ def cli_gen_keys():
 
 
 @click.command('decrypt', help="Decrypt a logged message")
-@click.option('--private-key-file', type=click.File('r'), required=True,
-              help="Path to file containing reader's private key in Base64",
+@click.option(
+    '--private-key-file', type=click.File('r'), required=True,
+    help="Path to file containing reader's private key in Base64",
 )
-@click.option('--message-file', type=click.File('r'), required=True,
-              help="Path to file containing encrypted message, or - for stdin",
+@click.option(
+    '--message-file', type=click.File('r'), required=True,
+    help="Path to file containing encrypted message, or - for stdin",
 )
 def cli_decrypt(private_key_file, message_file):
     """
@@ -127,8 +129,9 @@ def cli_decrypt(private_key_file, message_file):
 
 @click.command('encrypt', help="Encrypt a one-off message")
 @click.option('--public-key', help="Reader's public key, in Base64")
-@click.option('--message-file', type=click.File('r'), required=True,
-              help="Path to file containing message to encrypt, or - for stdin",
+@click.option(
+    '--message-file', type=click.File('r'), required=True,
+    help="Path to file containing message to encrypt, or - for stdin",
 )
 def cli_encrypt(public_key, message_file):
     """
