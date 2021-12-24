@@ -93,7 +93,7 @@ def decrypt_log_message(encrypted_message, reader_private_key_b64):
 def generate_reader_keys():
     """
     Utility method for generating a public/private keypair for use with these
-    logging functions. Returns a pair of base64
+    logging functions.
     """
     reader_private_key = PrivateKey.generate()
     return {
