@@ -4,7 +4,6 @@ Adds effort estimations for block types it recognizes.
 """
 
 import math
-import re
 
 import crum
 import lxml.html
@@ -14,6 +13,7 @@ from edxval.api import get_videos_for_course
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.effort_estimation.estimate_regex.estimate_time_by_regex import estimate_time_by_regex
 
 from .toggles import EFFORT_ESTIMATION_DISABLED_FLAG
 
@@ -47,7 +47,6 @@ class EffortEstimationTransformer(BlockStructureTransformer):
     TIME_BY_REGEX = 'time_by_regex'
     VIDEO_CLIP_DURATION = 'video_clip_duration'
     VIDEO_DURATION = 'video_duration'
-    TIME_EFFORT_REGEX = r"[0-9]+"
 
     CACHE_VIDEO_DURATIONS = 'video.durations'
     DEFAULT_WPM = 265  # words per minute
@@ -101,15 +100,7 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
         block_structure.set_transformer_block_field(block_key, cls, cls.HTML_WORD_COUNT, len(text.split()))
 
-        lines = text.strip().split("\n")
-        time_by_regex = None
-
-        if len(lines) > 0:
-            last_line = lines[-1]
-            regex_result = re.findall(cls.TIME_EFFORT_REGEX, last_line)
-
-            time_by_regex = int(regex_result[-1]) if len(regex_result) > 0 else None
-
+        time_by_regex = estimate_time_by_regex(text)
         block_structure.set_transformer_block_field(block_key, cls, cls.TIME_BY_REGEX, time_by_regex)
 
     @classmethod
