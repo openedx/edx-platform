@@ -309,7 +309,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:43+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -332,6 +332,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Discussion"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Texte"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3975,10 +3980,6 @@ msgstr ""
 "cachée dans le LMS."
 
 #: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Texte"
-
-#: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
 msgstr "Contenus html à afficher pour ce module"
 
@@ -7193,7 +7194,10 @@ msgstr ""
 "Maintenez l'intégrité de l'examen en activant une solution de surveillance "
 "pour votre cours"
 
-#: lms/djangoapps/courseware/plugins.py
+#. #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: Custom Pages refer to the tabs that appear in the top
+#. navigation of each course.
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
 msgid "Custom pages"
 msgstr "Pages personnalisées"
 
@@ -10315,7 +10319,7 @@ msgstr "Cours"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "My Account"
-msgstr ""
+msgstr "Mon compte"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -13522,10 +13526,6 @@ msgstr "PermissionDenied: Echec de l'authentification pour {user}"
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "Niveaux de support {platform_name} :"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"

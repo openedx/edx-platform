@@ -433,6 +433,7 @@
     "Be sure your entire face is inside the frame": "Assurez-vous que votre visage est enti\u00e8rement dans le cadre",
     "Before proceeding, please confirm that your details match": "Avant de continuer, veuillez v\u00e9rifier que vos informations personnelles correspondent",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Avant de poursuivre, veuillez {htmlStart}annuler le lien avec tous vos comptes de r\u00e9seaux sociaux{htmlEnd}.",
+    "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}.": "Avant de proc\u00e9der, veuillez {htmlStart}{emailMsg}{htmlEnd}.",
     "Before you upgrade to a certificate track, you must activate your account.": "Avant de mettre \u00e0 jour vers un parcours certifiant, vous devez activer votre compte.",
     "Billing/Payment Options": "Options de facturation et de paiement",
     "Biography": "Biographie",

@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -10257,8 +10257,10 @@ msgstr ""
 "anwani ya barua pepe  tofauti."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
 msgid ""
-"This email is already associated with an existing or previous edX account"
+"This email is already associated with an existing or previous "
+"{settings.PLATFORM_NAME} account"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -15176,10 +15178,6 @@ msgstr ""
 
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
-msgstr ""
-
-#: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be locked"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
