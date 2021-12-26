@@ -27,6 +27,7 @@
 # Grégory Petit <petit.gregory.51@gmail.com>, 2020
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # iderr <ibrahim@derraz.fr>, 2021
+# iderr <ibrahim@derraz.fr>, 2021
 # INARES <contact@inares.org>, 2015
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
@@ -215,7 +216,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:42+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
 "PO-Revision-Date: 2021-11-08 15:37+0000\n"
 "Last-Translator: iderr <ibrahim@derraz.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -5155,7 +5156,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
-msgstr ""
+msgstr "Avant de procéder, veuillez {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
