@@ -8,8 +8,8 @@ from wiki.models import URLPath
 
 from common.djangoapps.student.tests.factories import InstructorFactory
 from lms.djangoapps.course_wiki.views import get_or_create_root
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestWikiAccessMiddleware(ModuleStoreTestCase):

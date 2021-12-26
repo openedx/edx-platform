@@ -9,7 +9,6 @@ from django.conf import settings
 from xblock.exceptions import NoSuchServiceError
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 
 
 def edxnotes(cls):
@@ -43,8 +42,7 @@ def edxnotes(cls):
         # - the feature flag or `edxnotes` setting of the course is set to False
         # - the user is not authenticated
         try:
-            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
-            user = self.runtime.get_real_user(user_id)
+            user = self.runtime.service(self, 'user').get_user_by_anonymous_id()
         except NoSuchServiceError:
             user = None
 

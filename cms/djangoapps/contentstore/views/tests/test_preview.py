@@ -230,9 +230,29 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.request = RequestFactory().get('/dummy-url')
         self.request.user = self.user
         self.request.session = {}
+        self.descriptor = ItemFactory(category="video", parent=self.course)
+        self.field_data = mock.Mock()
+        self.runtime = _preview_module_system(
+            self.request,
+            self.descriptor,
+            self.field_data,
+        )
+
+    def test_get_user_role(self):
+        assert self.runtime.get_user_role() == 'staff'
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_render_template(self):
         descriptor = ItemFactory(category="pure", parent=self.course)
         html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
         assert '<div id="142" ns="main">Testing the MakoService</div>' in html
+
+    def test_xqueue_is_not_available_in_studio(self):
+        descriptor = ItemFactory(category="problem", parent=self.course)
+        runtime = _preview_module_system(
+            self.request,
+            descriptor=descriptor,
+            field_data=mock.Mock(),
+        )
+        assert runtime.xqueue is None
+        assert runtime.service(descriptor, 'xqueue') is None

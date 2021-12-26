@@ -1453,12 +1453,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -4697,7 +4695,6 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None

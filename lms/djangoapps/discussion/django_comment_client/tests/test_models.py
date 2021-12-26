@@ -7,8 +7,8 @@ from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 import openedx.core.djangoapps.django_comment_common.models as models
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class RoleClassTestCase(ModuleStoreTestCase):

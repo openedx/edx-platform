@@ -34,6 +34,7 @@ from lxml import etree
 from path import Path as path
 from waffle.testutils import override_flag
 
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
@@ -883,8 +884,12 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 sources=data['sources'],
                 edx_video_id=data['edx_video_id'],
             )
-            self.initialize_block(data=DATA)
-            self.item_descriptor.xmodule_runtime.user_location = 'CN'
+            self.initialize_block(data=DATA, runtime_kwargs={
+                'user_location': 'CN',
+            })
+            user_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'user')
+            user_location = user_service.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+            assert user_location == 'CN'
             context = self.item_descriptor.render('student_view').content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({

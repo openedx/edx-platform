@@ -26,6 +26,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from cms.djangoapps.contentstore.toggles import use_new_text_editor
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -195,6 +196,19 @@ def get_proctored_exam_settings_url(course_locator) -> str:
             else:
                 proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
     return proctored_exam_settings_url
+
+
+def get_editor_page_base_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for links to the new base editors
+    """
+    editor_url = None
+    if use_new_text_editor():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
+        if mfe_base_url:
+            editor_url = course_mfe_url
+    return editor_url
 
 
 def course_import_olx_validation_is_enabled():

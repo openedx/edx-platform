@@ -67,7 +67,7 @@ astroid==2.9.0
     # via
     #   pylint
     #   pylint-celery
-async-timeout==4.0.1
+async-timeout==4.0.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -344,7 +344,7 @@ django-filter==21.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==4.0.0
+django-ipware==4.0.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -387,7 +387,7 @@ django-oauth-toolkit==1.3.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-django-object-actions==3.0.2
+django-object-actions==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -503,7 +503,7 @@ edx-django-release-util==1.1.0
     # via -r requirements/edx/base.txt
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.txt
-edx-django-utils==4.4.0
+edx-django-utils==4.4.1
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -527,7 +527,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.36.7
+edx-enterprise==3.36.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -559,7 +559,7 @@ edx-opaque-keys[django]==2.2.2
     #   openedx-events
     #   ora2
     #   xmodule
-edx-organizations==6.10.0
+edx-organizations==6.10.1
     # via -r requirements/edx/base.txt
 edx-proctoring==4.8.1
     # via
@@ -580,7 +580,7 @@ edx-search==3.1.0
     # via -r requirements/edx/base.txt
 edx-sga==0.17.2
     # via -r requirements/edx/base.txt
-edx-submissions==3.4.3
+edx-submissions==3.4.4
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -689,7 +689,7 @@ idna==3.3
     #   anyio
     #   requests
     #   yarl
-importlib-metadata==4.8.2
+importlib-metadata==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -773,7 +773,7 @@ lazy==1.4
     #   bok-choy
     #   lti-consumer-xblock
     #   ora2
-lazy-object-proxy==1.7.0
+lazy-object-proxy==1.7.1
     # via astroid
 libsass==0.10.0
     # via
@@ -859,13 +859,13 @@ newrelic==7.2.4.171
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-nltk==3.6.5
+nltk==3.6.6
     # via
     #   -r requirements/edx/base.txt
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.txt
-numpy==1.21.4
+numpy==1.21.5
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -883,7 +883,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.6.0
     # via -r requirements/edx/base.txt
-ora2==3.7.7
+ora2==3.7.8
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
@@ -1341,9 +1341,7 @@ transifex-client==0.14.3
     # via -r requirements/edx/testing.in
 typing-extensions==4.0.1
     # via
-    #   -r requirements/edx/base.txt
     #   astroid
-    #   async-timeout
     #   gitpython
     #   pydantic
     #   pylint

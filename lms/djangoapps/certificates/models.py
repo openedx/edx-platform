@@ -34,8 +34,8 @@ from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
-from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData
-from openedx_events.learning.signals import CERTIFICATE_CHANGED, CERTIFICATE_CREATED, CERTIFICATE_REVOKED
+from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx_events.learning.signals import CERTIFICATE_CHANGED, CERTIFICATE_CREATED, CERTIFICATE_REVOKED  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 User = get_user_model()

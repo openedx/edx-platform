@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
-from enum import Enum
+from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
@@ -43,7 +43,8 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from xmodule.course_module import CourseBlock
+
+from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList
 from .exceptions import (
     CommentNotFoundError,

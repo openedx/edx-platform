@@ -139,7 +139,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:43+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
@@ -162,6 +162,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Fórum"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Texto"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3764,10 +3769,6 @@ msgid ""
 msgstr ""
 "ERRO: \"{block_type}\" é um tipo de componente desconhecido. Este componente"
 " estará escondido no LMS."
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Texto"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -13168,10 +13169,6 @@ msgstr "Acesso Negado: Falha na autenticação {user}"
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} Níveis de Suporte:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"

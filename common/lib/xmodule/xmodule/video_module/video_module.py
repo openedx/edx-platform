@@ -29,6 +29,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.lib.cache_utils import request_cached
@@ -108,7 +109,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
-@XBlock.needs('mako')
+@XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         TabsEditingMixin, EmptyDataRawMixin, XmlMixin, EditingMixin,
@@ -281,7 +282,8 @@ class VideoBlock(
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
         default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location, default_cdn_url)
+        user_location = self.runtime.service(self, 'user').get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
@@ -335,7 +337,7 @@ class VideoBlock(
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
+            branding_info = BrandingInfoConfig.get_config().get(user_location)
 
             if self.edx_video_id and edxval_api and video_status != 'external':
                 for index, source_url in enumerate(sources):
