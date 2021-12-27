@@ -25,9 +25,10 @@ def safe_cookie_test_session_patch():
 
     ## session_id --> safe_cookie_data ##
 
-    # Override Client.login method to update cookies with safe
+    # Override Client.login and force_login method to update cookies with safe
     # cookies.
     patched_client_login = Client.login
+    patched_client_force_login = Client.force_login
 
     def login_with_safe_session(self, **credentials):
         """
@@ -45,6 +46,24 @@ def safe_cookie_test_session_patch():
             SafeSessionMiddleware.update_with_safe_session_cookie(self.cookies, self.session[SESSION_KEY])
         return True
     Client.login = login_with_safe_session
+
+    def force_login_with_safe_session(self, user, backend=None):
+        """
+        Call the original Client.force_login method, but update the
+        session cookie with a freshly computed safe_cookie_data
+        before returning.
+        """
+        from django.conf import settings
+        from django.contrib.auth import SESSION_KEY
+        from .middleware import SafeSessionMiddleware
+
+        if not patched_client_force_login(self, user, backend=None):
+            return False
+
+        if using_safe_cookie_data(settings):
+            SafeSessionMiddleware.update_with_safe_session_cookie(self.cookies, self.session[SESSION_KEY])
+        return True
+    Client.force_login = force_login_with_safe_session
 
     ## safe_cookie_data --> session_id ##
 
