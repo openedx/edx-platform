@@ -1661,6 +1661,7 @@ INSTALLED_APPS = [
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
+    'openedx.features.funix_relative_date',
     'lms.djangoapps.experiments',
 
     'openedx.core.djangoapps.external_user_ids',
