@@ -1,5 +1,5 @@
 """
-Badges related signal handlers.
+FunixRelativeDate related signal handlers.
 """
 from django.dispatch import receiver
 
@@ -11,9 +11,6 @@ from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: di
 
 @receiver(ENROLL_STATUS_CHANGE)
 def handle_user_enroll(sender, event=None, user=None, course_id=None,**kwargs):  # pylint: disable=unused-argument
-	"""
-	Awards enrollment badge to the given user on new enrollments.
-	"""
 	if event == EnrollStatusChange.enroll:
 		pass
 
