@@ -921,7 +921,7 @@ def get_course_granded_lesson(course_key, user, include_access=False):
         return []
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
-    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
+    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True, include_effort_estimation=True)
 
     now = datetime.now(pytz.UTC)
     assignments = []
@@ -930,6 +930,9 @@ def get_course_granded_lesson(course_key, user, include_access=False):
             due = block_data.get_xblock_field(subsection_key, 'due', None)
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
             if graded:
+                effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
+                print('--sdsd---')
+                print(effort_time)
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
@@ -965,6 +968,7 @@ def funix_get_assginment_date_blocks(course, user, request, num_return=None, inc
         date_block.complete = assignment.complete
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
+        date_block.block_key = assignment.block_key
         # date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
         date_block.set_title(assignment.title, link=assignment.url)
         date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
