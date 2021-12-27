@@ -40,9 +40,6 @@ def safe_cookie_test_session_patch():
         from django.contrib.auth import SESSION_KEY
         from .middleware import SafeSessionMiddleware
 
-        import pdb;
-        pdb.set_trace()
-
         if not patched_client_login(self, **credentials):
             return False
         if using_safe_cookie_data(settings):
