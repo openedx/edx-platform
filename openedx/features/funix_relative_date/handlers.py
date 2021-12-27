@@ -19,5 +19,4 @@ def handle_user_enroll(sender, event=None, user=None, course_id=None,**kwargs): 
 
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):
-	print('lkj=dddfd')
 	FunixRelativeDate.get_schedule(user_name='edx',course_id='course-v1:FUNiX+DEP302x_01-A_VN+2021_T7')

@@ -915,3 +915,61 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [str(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+
+def get_course_granded_lesson(course_key, user, include_access=False):
+    if not user.id:
+        return []
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
+    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
+
+    now = datetime.now(pytz.UTC)
+    assignments = []
+    for section_key in block_data.get_children(course_usage_key):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        for subsection_key in block_data.get_children(section_key):
+            due = block_data.get_xblock_field(subsection_key, 'due', None)
+            graded = block_data.get_xblock_field(subsection_key, 'graded', False)
+            if graded:
+                first_component_block_id = get_first_component_of_block(subsection_key, block_data)
+                contains_gated_content = include_access and block_data.get_xblock_field(
+                    subsection_key, 'contains_gated_content', False)
+                title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
+
+                assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
+
+                url = None
+                start = block_data.get_xblock_field(subsection_key, 'start')
+                assignment_released = not start or start < now
+                if assignment_released:
+                    # url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
+
+                # past_due = not complete and due < now
+                past_due = False
+                assignments.append(_Assignment(
+                    subsection_key, title, url, due, contains_gated_content,
+                    complete, past_due, assignment_type, None, first_component_block_id
+                ))
+
+    return assignments
+
+def funix_get_assginment_date_blocks(course, user, request, num_return=None, include_past_dates=True):
+    date_blocks = []
+    for assignment in get_course_granded_lesson(course.id, user, include_access=True):
+        date_block = CourseAssignmentDate(course, user)
+        date_block.date = assignment.date
+        date_block.contains_gated_content = assignment.contains_gated_content
+        date_block.first_component_block_id = assignment.first_component_block_id
+        date_block.complete = assignment.complete
+        date_block.assignment_type = assignment.assignment_type
+        date_block.past_due = assignment.past_due
+        # date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
+        date_block.set_title(assignment.title, link=assignment.url)
+        date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
+        date_blocks.append(date_block)
+    date_blocks = sorted((b for b in date_blocks if (b.is_enabled or include_past_dates)), key=date_block_key_fn)
+    if num_return:
+        return date_blocks[:num_return]
+    return date_blocks
