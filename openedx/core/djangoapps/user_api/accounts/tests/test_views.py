@@ -370,21 +370,33 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         assert response.data["activation_key"] is not None
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_get_account_by_email(self, api_client, user):
+    def test_successful_get_account_by_email(self):
         """
-        Test that requesting a user email search works.
+        Test that request using email by a staff user successfully retrieves Account Info.
         """
+        api_client = "staff_client"
+        user = "staff_user"
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
         response = self.send_get(client, query_parameters=f'email={self.user.email}')
         self._verify_full_account_response(response)
+
+    def test_unsuccessful_get_account_by_email(self):
+        """
+        Test that request using email by a normal user fails to retrieve Account Info.
+        """
+        api_client = "client"
+        user = "user"
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(
+            client, query_parameters=f'email={self.user.email}', expected_status=status.HTTP_403_FORBIDDEN
+        )
+        assert response.data.get('detail') == 'You do not have permission to perform this action.'
 
     def test_successful_get_account_by_user_id(self):
         """
@@ -514,7 +526,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
 
-        response = self.send_get(client, query_parameters=f'view=shared&email={self.user.email}')
+        response = self.send_get(client, query_parameters=f'view=shared&username={self.user.username}')
         verify_fields_visible_to_all_users(response)
 
     @ddt.data(
