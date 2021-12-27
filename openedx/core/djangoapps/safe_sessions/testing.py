@@ -40,6 +40,9 @@ def safe_cookie_test_session_patch():
         from django.contrib.auth import SESSION_KEY
         from .middleware import SafeSessionMiddleware
 
+        import pdb;
+        pdb.set_trace()
+
         if not patched_client_login(self, **credentials):
             return False
         if using_safe_cookie_data(settings):
@@ -47,7 +50,7 @@ def safe_cookie_test_session_patch():
         return True
     Client.login = login_with_safe_session
 
-    def force_login_with_safe_session(self, user, backend=None):
+    def force_login_with_safe_session(self, user, backend='openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend'):
         """
         Call the original Client.force_login method, but update the
         session cookie with a freshly computed safe_cookie_data
@@ -57,7 +60,9 @@ def safe_cookie_test_session_patch():
         from django.contrib.auth import SESSION_KEY
         from .middleware import SafeSessionMiddleware
 
-        if not patched_client_force_login(self, user, backend=None):
+        patched_client_force_login(self, user, backend)
+
+        if not hasattr(self.session, '_auth_user_id'):
             return False
 
         if using_safe_cookie_data(settings):
