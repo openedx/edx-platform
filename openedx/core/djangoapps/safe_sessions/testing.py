@@ -59,11 +59,9 @@ def safe_cookie_test_session_patch():
 
         patched_client_force_login(self, user, backend)
 
-        if not hasattr(self.session, '_auth_user_id'):
-            return False
-
         if using_safe_cookie_data(settings):
             SafeSessionMiddleware.update_with_safe_session_cookie(self.cookies, self.session[SESSION_KEY])
+
         return True
     Client.force_login = force_login_with_safe_session
 

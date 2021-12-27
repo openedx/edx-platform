@@ -191,7 +191,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             email=self.OTHER_EMAIL,
             password=self.PASSWORD,
         )
-        # self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
         self.client.force_login(self.user)
 
     @ddt.data(
