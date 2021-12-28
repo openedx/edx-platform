@@ -18,8 +18,6 @@ class FunixRelativeDateLibary():
 
 		last_complete = self._get_last_complete_assignment(assignment_blocks=assignment_blocks)
 
-		last_complete_date = FunixRelativeDateDAO.get_enroll_by_id(user_id=user.id, course_id=course_id)
+		last_complete_date = FunixRelativeDateDAO.get_enroll_by_id(user_id=user.id, course_id=course_id).date
 		if last_complete is not None:
-			last_complete_date = FunixRelativeDateDAO.get_block_by_id(user_id=user.id, course_id=course_id, block_id=last_complete.subsection_key)
-
-		print(last_complete_date)
+			last_complete_date = last_complete.complete_date

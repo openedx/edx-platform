@@ -65,6 +65,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 
 log = logging.getLogger(__name__)
 
@@ -73,6 +74,10 @@ log = logging.getLogger(__name__)
 _Assignment = namedtuple(
     'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due',
                    'assignment_type', 'extra_info', 'first_component_block_id']
+)
+
+_Funix_Assignment = namedtuple(
+    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due', 'assignment_type', 'extra_info', 'first_component_block_id', 'complete_date']
 )
 
 
@@ -931,14 +936,13 @@ def get_course_granded_lesson(course_key, user, include_access=False):
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
             if graded:
                 effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
-                print('--sdsd---')
-                print(effort_time)
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
                 title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
 
                 assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
+                complete_date = block_data.get_xblock_field(subsection_key, BlockCompletionTransformer.COMPLETE_TIME, None)
 
                 url = None
                 start = block_data.get_xblock_field(subsection_key, 'start')
@@ -951,9 +955,9 @@ def get_course_granded_lesson(course_key, user, include_access=False):
 
                 # past_due = not complete and due < now
                 past_due = False
-                assignments.append(_Assignment(
+                assignments.append(_Funix_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
-                    complete, past_due, assignment_type, None, first_component_block_id
+                    complete, past_due, assignment_type, None, first_component_block_id, complete_date
                 ))
 
     return assignments
@@ -969,6 +973,7 @@ def funix_get_assginment_date_blocks(course, user, request, num_return=None, inc
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
         date_block.block_key = assignment.block_key
+        date_block.complete_date = assignment.complete_date
         # date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
         date_block.set_title(assignment.title, link=assignment.url)
         date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access

@@ -410,6 +410,7 @@ class CourseAssignmentDate(DateSummary):
         self.past_due = None
         self._extra_info = None
         self.block_key = None
+        self.complete_date = None
 
     @property
     def date(self):
