@@ -14,44 +14,45 @@ var options = {
     libraryFiles: [],
 
     libraryFilesToInclude: [
-        {pattern: 'common/js/vendor/jquery.js', included: true},
-        {pattern: 'common/js/vendor/jquery-migrate.js', included: true}
+        { pattern: 'common/js/vendor/jquery.js', included: true },
+        { pattern: 'common/js/vendor/jquery-migrate.js', included: true }
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'cms/**/!(*spec|djangojs).js'},
-        {pattern: 'js/**/!(*spec|djangojs).js'},
-        {pattern: 'js/factories/container.js', webpack: true},
-        {pattern: 'js/factories/context_course.js', webpack: true},
+        { pattern: 'cms/**/!(*spec|djangojs).js' },
+        { pattern: 'js/**/!(*spec|djangojs).js' },
     ],
 
     specFiles: [
-        {pattern: 'cms/**/*spec.js'},
-        {pattern: 'js/certificates/spec/**/*spec.js'},
-        {pattern: 'js/spec/**/*spec.js'}
+        { pattern: 'cms/**/*spec.js' },
+        { pattern: 'js/certificates/spec/**/*spec.js' },
+        { pattern: 'js/spec/**/*spec.js' }
     ],
 
     fixtureFiles: [
-        {pattern: '../templates/js/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'}
+        { pattern: '../templates/js/**/*.underscore' },
+        { pattern: 'templates/**/*.underscore' }
     ],
 
     runFiles: [
-        {pattern: 'cms/js/spec/main.js', included: true},
-        {pattern: 'jasmine.cms.conf.js', included: true}
+        { pattern: 'cms/js/spec/main.js', included: true },
+        { pattern: 'jasmine.cms.conf.js', included: true }
     ],
 
-    preprocessors: {}
+    preprocessors: {
+        'cms/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
+        'js/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
+    }
 };
 
 (options.sourceFiles.concat(options.specFiles))
-    .filter(function(file) { return file.webpack; })
-    .forEach(function(file) {
+    .filter(function (file) { return file.webpack; })
+    .forEach(function (file) {
         options.preprocessors[file.pattern] = ['webpack'];
     });
 
-module.exports = function(config) {
+module.exports = function (config) {
     configModule.configure(config, options);
 };
