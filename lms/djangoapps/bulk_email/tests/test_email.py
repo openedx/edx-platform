@@ -86,7 +86,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         """
         Log in self.client as user.
         """
-        self.client.login(username=user.username, password="test")
+        self.client.force_login(user)
 
     def goto_instructor_dash_email_view(self):
         """
