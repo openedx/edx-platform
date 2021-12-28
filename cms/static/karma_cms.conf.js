@@ -22,7 +22,9 @@ var options = {
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'cms/**/!(*spec|djangojs).js'},
-        {pattern: 'js/**/!(*spec|djangojs).js'}
+        {pattern: 'js/**/!(*spec|djangojs).js'},
+        {pattern: 'js/factories/container.js', webpack: true},
+        {pattern: 'js/factories/context_course.js', webpack: true},
     ],
 
     specFiles: [

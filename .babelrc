@@ -2,7 +2,6 @@
   "plugins": [
     "transform-object-assign",
     "transform-object-rest-spread",
-    "syntax-dynamic-import"
   ],
   "presets": [
     [
@@ -24,7 +23,6 @@
     "test": {
       "plugins":[
         "transform-es2015-modules-commonjs",
-        "dynamic-import-node"
       ],
       "presets": [
         [
