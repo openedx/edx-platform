@@ -10,9 +10,6 @@ module.exports = {
     "/**/*.test.jsx",
     "common/static/common/js/components/**/?(*.)+(spec|test).js?(x)",
   ],
-  "testPathIgnorePatterns": [
-    '<rootDir>/node_modules/',
-  ],
   "transform": {
     "^.+\\.jsx$": "babel-jest",
     "^.+\\.js$": "babel-jest",
