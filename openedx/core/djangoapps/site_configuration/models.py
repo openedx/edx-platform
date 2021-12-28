@@ -125,7 +125,7 @@ class SiteConfiguration(models.Model):
         return self
 
     @beeline.traced('site_config.init_api_client_adapter')
-    def init_api_client_adapter(self):
+    def init_api_client_adapter(self, site):
         """
         Initialize `api_adapter`, this method is managed externally by `get_current_site_configuration()`.
         """
@@ -133,9 +133,8 @@ class SiteConfiguration(models.Model):
         from openedx.core.djangoapps.appsembler.sites import (
             site_config_client_helpers as site_helpers,
         )
-        if site_helpers.is_enabled_for_current_organization():
-            # TODO: Refactor to avoid using `get_current_organization()` and query the organization directly
-            self.api_adapter = site_helpers.get_current_configuration_adapter()
+        if site_helpers.is_enabled_for_site(site):
+            self.api_adapter = site_helpers.get_configuration_adapter(site)
 
     @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
