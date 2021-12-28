@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.timezone import now
 
 class FunixRelativeDate(models.Model):
@@ -18,6 +19,13 @@ class FunixRelativeDateDAO():
         return FunixRelativeDate.objects.get(user_id=user_id, course_id=course_id, block_id=block_id)
 
     @classmethod
+    def delete_all_date(self, user_id, course_id):
+        return FunixRelativeDate.objects.filter(
+            ~Q(type='start'),
+            user_id=user_id,
+            course_id=course_id
+        ).delete()
+
+    @classmethod
     def get_enroll_by_id(self, user_id, course_id):
-        print('43-23', user_id, course_id)
         return FunixRelativeDate.objects.get(user_id=user_id, course_id=course_id, type="start")
