@@ -1,7 +1,8 @@
 {
   "plugins": [
     "transform-object-assign",
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "syntax-dynamic-import"
   ],
   "presets": [
     [
@@ -17,11 +18,14 @@
       }
     ],
     "babel-preset-react",
-    "babel-preset-env",
-    ["es2015", { "modules": false }]
+    "babel-preset-env"
   ],
   "env": {
     "test": {
+      "plugins":[
+        "transform-es2015-modules-commonjs",
+        "dynamic-import-node"
+      ],
       "presets": [
         [
           "env",
