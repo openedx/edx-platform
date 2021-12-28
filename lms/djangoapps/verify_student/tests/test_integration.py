@@ -25,7 +25,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
         super().setUp()
 
         self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
+        self.client.force_login(self.user)
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_key = course.id
         CourseModeFactory.create(

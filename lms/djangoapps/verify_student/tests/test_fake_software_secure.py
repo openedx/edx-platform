@@ -26,7 +26,7 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
 
         self.user = UserFactory.create(username="test", password="test")
         self.attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        self.client.login(username="test", password="test")
+        self.client.force_login(self.user)
 
 
 class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):

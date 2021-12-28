@@ -122,8 +122,8 @@ class StartView(TestCase):
         Test the case where the user has no pending `PhotoVerificationAttempts`,
         but is just starting their first.
         """
-        UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
+        user = UserFactory.create(username="rusty", password="test")
+        self.client.force_login(user)
 
     def must_be_logged_in(self):
         self.assertHttpForbidden(self.client.get(self.start_url()))  # lint-amnesty, pylint: disable=no-member
@@ -151,7 +151,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
-        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        result = self.client.force_login(self.user)
         assert result, 'Could not log in'
 
     @ddt.data(
@@ -1056,7 +1056,7 @@ class CheckoutTestMixin:
         self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
-        self.client.login(username="test", password="test")
+        self.client.force_login(self.user)
 
     def _assert_checked_out(
         self,
@@ -1239,7 +1239,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
-        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        result = self.client.force_login(self.user)
         assert result, 'Could not log in'
 
     def test_submit_photos(self):
@@ -1837,7 +1837,7 @@ class TestReverifyView(TestVerificationBase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
-        success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        success = self.client.force_login(self.user)
         assert success, 'Could not log in'
 
     def test_reverify_view_can_do_initial_verification(self):
@@ -1936,7 +1936,7 @@ class TestPhotoURLView(TestVerificationBase):
         super().setUp()
 
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.force_login(self.user)
         assert login_success
         self.attempt = SoftwareSecurePhotoVerification(
             status="submitted",
@@ -1963,7 +1963,7 @@ class TestPhotoURLView(TestVerificationBase):
 
     def test_403_for_non_staff(self):
         self.user = UserFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.force_login(self.user)
         assert login_success
         url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
         response = self.client.get(url)
@@ -2002,7 +2002,7 @@ class TestDecodeImageViews(MockS3BotoMixin, TestVerificationBase):
     def setUp(self):
         super().setUp()
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.force_login(self.user)
         assert login_success
 
     def _mock_submit_images(self):
@@ -2063,7 +2063,7 @@ class TestDecodeImageViews(MockS3BotoMixin, TestVerificationBase):
     @ddt.data("face", "photo_id")
     def test_403_for_non_staff(self, img_type):
         self.user = UserFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.force_login(self.user)
         assert login_success
 
         self._mock_submit_images()
