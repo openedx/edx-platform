@@ -88,7 +88,7 @@
     "jest-enzyme": "6.0.2",
     "karma": "^6.3.9",
     "karma-chrome-launcher": "0.2.3",
-    "karma-coverage": "0.5.5",
+    "karma-coverage": "^2.1.0",
     "karma-firefox-launcher": "0.1.7",
     "karma-jasmine": "0.3.8",
     "karma-jasmine-html-reporter": "0.2.2",
