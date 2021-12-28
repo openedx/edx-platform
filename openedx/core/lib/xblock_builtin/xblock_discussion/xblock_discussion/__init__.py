@@ -5,10 +5,10 @@ Discussion XBlock
 import logging
 import urllib
 
-from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_topic_url
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -170,11 +170,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(self.course_key) and settings.DISCUSSIONS_MICROFRONTEND_URL:
-            url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{self.course_key}/topics/{self.discussion_id}"
+        mfe_url = get_discussions_mfe_topic_url(self.course_key, self.discussion_id)
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(self.course_key) and mfe_url:
             fragment.add_content(HTML(
                 "<iframe id='discussions-mfe-tab-embed' src='{src}' title='{title}'></iframe>"
-            ).format(src=url, title=_("Discussions")))
+            ).format(src=mfe_url, title=_("Discussions")))
             fragment.add_css(
                 """
                 #discussions-mfe-tab-embed {
