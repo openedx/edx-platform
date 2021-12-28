@@ -411,6 +411,7 @@ class CourseAssignmentDate(DateSummary):
         self._extra_info = None
         self.block_key = None
         self.complete_date = None
+        self.effort_time = None
 
     @property
     def date(self):

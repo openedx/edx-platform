@@ -77,7 +77,7 @@ _Assignment = namedtuple(
 )
 
 _Funix_Assignment = namedtuple(
-    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due', 'assignment_type', 'extra_info', 'first_component_block_id', 'complete_date']
+    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due', 'assignment_type', 'extra_info', 'first_component_block_id', 'complete_date', 'effort_time']
 )
 
 
@@ -957,7 +957,7 @@ def get_course_granded_lesson(course_key, user, include_access=False):
                 past_due = False
                 assignments.append(_Funix_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
-                    complete, past_due, assignment_type, None, first_component_block_id, complete_date
+                    complete, past_due, assignment_type, None, first_component_block_id, complete_date, effort_time
                 ))
 
     return assignments
@@ -974,6 +974,7 @@ def funix_get_assginment_date_blocks(course, user, request, num_return=None, inc
         date_block.past_due = assignment.past_due
         date_block.block_key = assignment.block_key
         date_block.complete_date = assignment.complete_date
+        date_block.effort_time = assignment.effort_time // 60
         # date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
         date_block.set_title(assignment.title, link=assignment.url)
         date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access

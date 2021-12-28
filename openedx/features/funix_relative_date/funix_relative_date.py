@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime, time
 import pytz
+import math
 from django.urls import reverse
 
 from lms.djangoapps.courseware.courses import funix_get_assginment_date_blocks, get_course_with_access
@@ -9,6 +10,9 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.date_summary import FunixCourseStartDate, TodaysDate
 
 class FunixRelativeDateLibary():
+	TIME_PER_DAY = 2.5 * 60
+
+
 	@classmethod
 	def _date_to_datetime(self, date):
 		return pytz.utc.localize(datetime.combine(date, time(0, 0)))
@@ -66,8 +70,25 @@ class FunixRelativeDateLibary():
 			last_complete_date = asm.complete_date
 			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 
+		left_time = self.TIME_PER_DAY
+		arr = []
 		for asm in uncompleted_assignments:
-			index += 1
-			last_complete_date += timedelta(days=1)
+			effort_time = asm.effort_time
+			if effort_time <= left_time:
+				arr.append(asm)
+				left_time -= effort_time
+			else:
+				last_complete_date += timedelta(days=1)
+				for el in arr:
+					index += 1
+					FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index, date=last_complete_date).save()
+				left_time = self.TIME_PER_DAY
+				if effort_time > self.TIME_PER_DAY:
+					index += 1
 
-			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
+					day_need = math.ceil(effort_time / self.TIME_PER_DAY)
+					last_complete_date += timedelta(days=day_need)
+					FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
+					arr = []
+				else:
+					arr = [asm]
