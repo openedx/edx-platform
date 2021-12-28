@@ -7,6 +7,7 @@ from django.conf import settings
 from django.urls import re_path
 
 from lms.djangoapps.course_home_api.course_metadata.views import CourseHomeMetadataView
+from openedx.features.funix_relative_date.views import FunixRelativeDatesTabView
 from lms.djangoapps.course_home_api.dates.views import DatesTabView
 from lms.djangoapps.course_home_api.outline.views import (
     OutlineTabView, dismiss_welcome_message, save_course_goal, unsubscribe_from_course_goal_by_token,
@@ -34,6 +35,15 @@ urlpatterns += [
         fr'dates/{settings.COURSE_KEY_PATTERN}',
         DatesTabView.as_view(),
         name='dates-tab'
+    ),
+]
+
+# Funix Dates Tab URLs
+urlpatterns += [
+    re_path(
+        fr'dates-funix/{settings.COURSE_KEY_PATTERN}',
+        FunixRelativeDatesTabView.as_view(),
+        name='funix-dates-tab'
     ),
 ]
 

@@ -1,14 +1,48 @@
-from datetime import timedelta
+from datetime import timedelta, datetime, time
+import pytz
+from django.urls import reverse
 
 from lms.djangoapps.courseware.courses import funix_get_assginment_date_blocks, get_course_with_access
 from common.djangoapps.student.models import get_user_by_username_or_email
 from openedx.features.funix_relative_date.models import FunixRelativeDate, FunixRelativeDateDAO
 from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.courseware.date_summary import FunixCourseStartDate, TodaysDate
 
 class FunixRelativeDateLibary():
 	@classmethod
-	def _get_last_complete_assignment(self, assignment_blocks):
-		return next((asm for asm in assignment_blocks[::-1] if asm.complete), None)
+	def _date_to_datetime(self, date):
+		return pytz.utc.localize(datetime.combine(date, time(0, 0)))
+
+	@classmethod
+	def get_course_date_blocks(self, course, user, request=None):
+		assignment_blocks = funix_get_assginment_date_blocks(course=course, user=user, request=request, include_past_dates=True)
+		date_blocks = FunixRelativeDateDAO.get_all_block_by_id(user_id=user.id, course_id=course.id)
+		date_blocks = list(date_blocks)
+		date_blocks.sort(key=lambda x: x.index)
+
+		# Add start date
+		start_date = date_blocks.pop(0)
+		output = [
+			FunixCourseStartDate(course=course, user=user, date=self._date_to_datetime(start_date.date)),
+			TodaysDate(course=course, user=user)
+		]
+
+		date_dict = {
+			str(asm.block_id): asm.date
+			for asm in date_blocks
+		}
+		for asm in assignment_blocks:
+			block_key = str(asm.block_key)
+			if block_key in date_dict:
+				asm.date = self._date_to_datetime(date_dict[block_key])
+
+				link = reverse('jump_to', args=[str(course.id), block_key])
+				link = request.build_absolute_uri(link) if link else ''
+				asm.link = link
+
+				output.append(asm)
+
+		return sorted(output, key=lambda b: b.date)
 
 	@classmethod
 	def get_schedule(self, user_name, course_id):

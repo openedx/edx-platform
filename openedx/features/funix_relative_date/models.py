@@ -27,5 +27,12 @@ class FunixRelativeDateDAO():
         ).delete()
 
     @classmethod
+    def get_all_block_by_id(self, user_id, course_id):
+        return FunixRelativeDate.objects.filter(
+            user_id=user_id,
+            course_id=course_id
+        )
+
+    @classmethod
     def get_enroll_by_id(self, user_id, course_id):
         return FunixRelativeDate.objects.get(user_id=user_id, course_id=course_id, type="start")
