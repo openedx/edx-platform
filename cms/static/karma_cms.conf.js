@@ -45,6 +45,23 @@ var options = {
         'cms/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
         'js/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
     },
+
+    customPreprocessors:{
+        babelSourceMap:{
+          base: 'babel',
+          options:{
+            presets: ['react', 'es2015'],
+            sourceMap: 'inline'
+          },
+          filename: function(file){
+            return file.originalPath.replace(/\.js$/, '.es5.js');
+          },
+          sourceFileName: function(file){
+            return file.originalPath;
+          }
+        },
+      },
+      
     webpack: { //kind of a copy of your webpack config
         devtool: 'inline-source-map', //just do inline source maps instead of the default
         module: {
