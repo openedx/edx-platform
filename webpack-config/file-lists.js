@@ -3,6 +3,8 @@ var path = require('path');
 
 module.exports = {
     namespacedRequire: [
+        "core-js/modules/es6.promise",
+        "core-js/modules/es6.array.iterator",
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback_notification.js'),
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback_prompt.js'),
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback.js'),
