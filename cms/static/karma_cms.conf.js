@@ -44,6 +44,17 @@ var options = {
     preprocessors: {
         'cms/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
         'js/**/!(*spec|djangojs).js': ['webpack', 'sourcemap'],
+    },
+    webpack: { //kind of a copy of your webpack config
+        devtool: 'inline-source-map', //just do inline source maps instead of the default
+        module: {
+            loaders: [
+                { test: /\.js$/, loader: 'babel-preset-react' }
+            ]
+        }
+    },
+    webpackServer: {
+        noInfo: true //please don't spam the console when running in karma!
     }
 };
 
