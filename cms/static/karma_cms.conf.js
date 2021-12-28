@@ -49,7 +49,7 @@ var options = {
         devtool: 'inline-source-map', //just do inline source maps instead of the default
         module: {
             loaders: [
-                { test: /\.js$/, loader: 'babel-preset-react' }
+                { test: /\.js$/, loader: 'babel-loader' }
             ]
         }
     },
