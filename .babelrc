@@ -1,37 +1,10 @@
 {
-  "plugins": [
-    "transform-object-assign",
-    "transform-object-rest-spread",
-  ],
-  "presets": [
+    "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
-        "targets": {
-          "browsers": [
-            "last 2 versions",
-            "IE >= 11"
-          ]
-        },
-        "modules": false
+        "useBuiltIns": "entry"
       }
-    ],
-    "babel-preset-react",
-    "babel-preset-env"
-  ],
-  "env": {
-    "test": {
-      "plugins":[
-        "transform-es2015-modules-commonjs",
-      ],
-      "presets": [
-        [
-          "env",
-          {
-            "modules": "commonjs"
-          }
-        ]
-      ]
-    }
-  }
+    ]
+  ]
 }
