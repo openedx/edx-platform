@@ -182,6 +182,7 @@ class AccountViewSet(ViewSet):
             * secondary_email: A secondary email address for the user. Unlike
               the email field, GET will reflect the latest update to this field
               even if changes have yet to be confirmed.
+            * verified_name: Approved verified name of the learner present in name affirmation plugin
             * gender: One of the following values:
 
                 * null

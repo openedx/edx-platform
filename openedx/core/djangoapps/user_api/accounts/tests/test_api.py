@@ -606,6 +606,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'email': self.EMAIL,
             'id': user.id,
             'name': self.USERNAME,
+            'verified_name': None,
             'activation_key': user.registration.activation_key,
             'gender': None, 'goals': '',
             'is_active': False,
