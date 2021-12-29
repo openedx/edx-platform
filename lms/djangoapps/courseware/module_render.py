@@ -610,6 +610,7 @@ def get_module_system_for_user(
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
+                FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def rebind_noauth_module_to_user(module, real_user):
         """

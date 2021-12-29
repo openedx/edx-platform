@@ -34,6 +34,7 @@ from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_u
 from common.djangoapps.static_replace import process_static_urls
 from xmodule.errortracker import make_error_tracker  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -189,6 +190,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
+        FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """

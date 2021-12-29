@@ -44,15 +44,27 @@ class FunixRelativeDateLibary():
 				asm.link = link
 
 				output.append(asm)
+		output = sorted(output, key=lambda b: b.date)
 
-		return sorted(output, key=lambda b: b.date)
+		check_complete = True
+		for el in output:
+			if el.css_class == 'assignment':
+				if not el.complete:
+					check_complete = False
+				else:
+					if not check_complete:
+						self.get_schedule(user_name=user.username, course_id=str(course.id), assignment_blocks=assignment_blocks)
+						return self.get_course_date_blocks(course=course, user=user, request=request)
+		return output
 
 	@classmethod
-	def get_schedule(self, user_name, course_id):
+	def get_schedule(self, user_name, course_id, assignment_blocks=None):
 		user = get_user_by_username_or_email(user_name)
 		course_key = CourseKey.from_string(course_id)
 		course = courseware_courses.get_course_with_access(user, 'load', course_key=course_key, check_if_enrolled=False)
-		assignment_blocks = courseware_courses.funix_get_assginment_date_blocks(course=course, user=user, request=None, include_past_dates=True)
+
+		if assignment_blocks is None:
+			assignment_blocks = courseware_courses.funix_get_assginment_date_blocks(course=course, user=user, request=None, include_past_dates=True)
 
 		last_complete_date = FunixRelativeDateDAO.get_enroll_by_id(user_id=user.id, course_id=course_id).date
 
