@@ -70,7 +70,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
-        self.client.login(username=self.student.username, password="test")
+        self.client.force_login(self.student)
         CourseEnrollment.enroll(self.student, self.course.id)
         self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
         self.refresh_course()

@@ -42,7 +42,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         super().setUp()
         password = 'test'
         self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
-        self.client.login(username=self.student.username, password=password)
+        self.client.force_login(self.student)
 
     def _update_course_grading_policy(self, course, grading_policy):
         """
@@ -427,7 +427,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         super().setUp()
         password = 'test'
         self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
-        self.client.login(username=self.student.username, password=password)
+        self.client.force_login(self.student)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3),

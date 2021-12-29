@@ -43,7 +43,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         super().setUp()
         password = 'test'
         self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
-        self.client.login(username=self.student.username, password=password)
+        self.client.force_login(self.student)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.student)
         self.course_structure = get_course_blocks(self.student, self.course.location)
@@ -138,7 +138,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         '''
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
-        self.client.login(username=self.request.user.username, password="test")
+        self.client.force_login(self.request.user)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
     def _get_altered_metadata(self, alterations):
