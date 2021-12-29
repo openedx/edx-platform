@@ -1,4 +1,4 @@
-Anonymous User Id Generation
+Configure Zoom Lti in Programs
 --------------
 
 Status
