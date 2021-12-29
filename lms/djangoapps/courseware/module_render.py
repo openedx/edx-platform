@@ -96,6 +96,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, p
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
 
 log = logging.getLogger(__name__)
 
@@ -564,6 +565,7 @@ def get_module_system_for_user(
                 block_key=block.scope_ids.usage_id,
                 completion=event['completion'],
             )
+            FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def handle_grade_event(block, event):
         """
