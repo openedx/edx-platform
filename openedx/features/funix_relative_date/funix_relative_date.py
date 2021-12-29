@@ -4,14 +4,13 @@ import math
 from django.urls import reverse
 
 import  lms.djangoapps.courseware.courses as courseware_courses
-from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email, get_user_by_id
 from openedx.features.funix_relative_date.models import FunixRelativeDate, FunixRelativeDateDAO
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.date_summary import FunixCourseStartDate, TodaysDate
 
 class FunixRelativeDateLibary():
 	TIME_PER_DAY = 2.5 * 60
-
 
 	@classmethod
 	def _date_to_datetime(self, date):
@@ -93,3 +92,10 @@ class FunixRelativeDateLibary():
 				else:
 					arr = [asm]
 					left_time -= effort_time
+
+	@classmethod
+	def re_schedule_by_course(self, course_id):
+		enroll_list = FunixRelativeDateDAO.get_all_enroll_by_course(course_id=course_id)
+		for user_el in enroll_list:
+			user = get_user_by_id(user_el.user_id)
+			self.get_schedule(user_name=user.username, course_id=str(course_id))
