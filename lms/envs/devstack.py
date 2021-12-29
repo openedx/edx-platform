@@ -147,6 +147,9 @@ CC_PROCESSOR = {
     }
 }
 
+# HOTJAR ANALYTICS
+HOTJAR_TRACKING_ID = None
+
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 FEATURES['ENABLE_MOBILE_REST_API'] = True

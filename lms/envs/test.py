@@ -594,3 +594,6 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
+
+# HOTJAR ANALYTICS
+HOTJAR_TRACKING_ID = None
