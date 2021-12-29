@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
-import * as _ from 'underscore';
+import $ from 'jquery';
+import _ from 'underscore';
 import * as XBlockContainerInfo from 'js/models/xblock_container_info';
 import * as ContainerPage from 'js/views/pages/container';
 import * as ComponentTemplates from 'js/collections/component_template';
