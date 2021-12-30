@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import 'whatwg-fetch';
 
-const COURSE_BLOCKS_API = '/api/courses/v1/blocks/';
+const COURSE_BLOCKS_API = '/api/courses/v1/blocks';
 
 const HEADERS = {
   Accept: 'application/json',
