@@ -281,7 +281,7 @@ FEATURES = {
     'LICENSING': False,
 
     # Enable the courseware search functionality
-    'ENABLE_COURSEWARE_INDEX': False,
+    'ENABLE_COURSEWARE_INDEX': True,
 
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
