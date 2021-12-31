@@ -19,11 +19,11 @@ def handle_user_enroll(sender, event=None, user=None, course_id=None,**kwargs): 
 		enrollment = FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=None, type='start', index=0)
 		enrollment.save()
 
+		FunixRelativeDateLibary.get_schedule(user_name=user.username, course_id=str(course_id))
 
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):
-	FunixRelativeDateLibary.re_schedule_by_course(course_id='course-v1:FUNiX+DEP302x_01-A_VN+2021_T7')
-
+	FunixRelativeDateLibary.re_schedule_by_course(course_id=str(course_key))
 # @receiver(grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED)
 # def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
 # 	user_id = kwargs.get('user_id', None)
