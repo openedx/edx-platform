@@ -13,9 +13,9 @@
 -c common_constraints.txt
 
 # Celery 5.3.0 is not released yet, though planned.
-# As it is not clarified what exact breaking changes will be introduced, ensure
-# that the installed version is within boundaries.
-celery>=5.2.1,<5.3.0
+# As it is not clarified what exact breaking changes will be introduced as per the next major release,
+# ensure that the installed version is within boundaries.
+celery>=5.2.1,<6.0.0
 
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
