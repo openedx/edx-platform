@@ -161,7 +161,7 @@ def container_handler(request, usage_key_string):
             assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
 
             # for the sequence navigator
-            prev_url, next_url = get_sibling_urls(subsection)
+            prev_url, next_url = get_sibling_urls(subsection, unit.location)
             # these are quoted here because they'll end up in a query string on the page,
             # and quoting with mako will trigger the xss linter...
             prev_url = quote_plus(prev_url) if prev_url else None
