@@ -169,7 +169,8 @@ def _parse_metadata_xml(xml, entity_id):
         raise MetadataParseError("This IdP does not support SAML 2.0")
 
     # Now we just need to get the public_key and sso_url
-    public_key = sso_desc.findtext("./{}//{}".format(
+    # We want the use='signing' cert, not the 'encryption' one
+    public_key = sso_desc.findtext("./{}[@use='signing']//{}".format(
         etree.QName(SAML_XML_NS, "KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
     ))
     if not public_key:
