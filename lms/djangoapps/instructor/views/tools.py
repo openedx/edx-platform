@@ -9,7 +9,7 @@ import operator
 import dateutil
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_when import api
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC

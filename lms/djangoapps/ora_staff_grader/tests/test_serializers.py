@@ -14,8 +14,10 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     LockStatusField,
     OpenResponseMetadataSerializer,
     ResponseSerializer,
+    RubricConfigSerializer,
     ScoreField,
     ScoreSerializer,
+    StaffAssessSerializer,
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
     SubmissionMetadataSerializer,
@@ -275,8 +277,36 @@ class TestInitializeSerializer(TestCase):
             }
         }
 
-        # Rubric data is passed through without transforms, we can create a toy response
-        self.mock_rubric_data = {"foo": "bar"}
+        # Simple rubric example
+        self.mock_rubric_data = {
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
+            "criteria": [
+                {
+                    "order_num": 0,
+                    "name": "grammar",
+                    "label": "Grammar",
+                    "prompt": "How correct is the submitter's grammar?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "order_num": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "order_num": 1,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
+        }
 
     def test_serializer_output(self):
         input_data = {
@@ -292,7 +322,116 @@ class TestInitializeSerializer(TestCase):
         assert output_data['courseMetadata'] == CourseMetadataSerializer(self.mock_course_metadata).data
         assert output_data['oraMetadata'] == OpenResponseMetadataSerializer(self.mock_ora_instance).data
         assert output_data['submissions'] == self.mock_submissions_data
-        assert output_data['rubricConfig'] == self.mock_rubric_data
+        assert output_data['rubricConfig'] == RubricConfigSerializer(self.mock_rubric_data).data
+
+
+class TestRubricConfigSerializer(TestCase):
+    """ Tests for RubricConfigSerializer """
+
+    # Options split for reuse
+    example_options = [
+        {
+            "order_num": 0,
+            "name": "troll",
+            "label": "Troll",
+            "explanation": "Failing grade",
+            "points": 0
+        },
+        {
+            "order_num": 1,
+            "name": "dreadful",
+            "label": "Dreadful",
+            "explanation": "Failing grade",
+            "points": 1
+        },
+        {
+            "order_num": 2,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 2
+        },
+        {
+            "order_num": 3,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 3
+        },
+        {
+            "order_num": 4,
+            "name": "acceptable",
+            "label": "Acceptable",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 4
+        },
+        {
+            "order_num": 5,
+            "name": "exceeds_expectations",
+            "label": "Exceeds Expectations",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 5
+        },
+        {
+            "order_num": 6,
+            "name": "outstanding",
+            "label": "Outstanding",
+            "explanation": "Passing grade (will continue to N.E.W.T)",
+            "points": 6
+        }
+    ]
+
+    example_rubric = {
+        "feedback_prompt": "How did this student do?",
+        "feedback_default_text": "For the O.W.L exams, this student...",
+        "criteria": [
+            {
+                "order_num": 0,
+                "name": "potions",
+                "label": "Potions",
+                "prompt": "How did this student perform in the Potions exam",
+                "feedback": "optional",
+                "options": example_options
+            },
+            {
+                "order_num": 1,
+                "name": "charms",
+                "label": "Charms",
+                "prompt": "How did this student perform in the Charms exam",
+                "feedback": "required",
+                "options": example_options
+            }
+        ]
+    }
+
+    def basic_test_case(self):
+        """ Basic test for complex rubric """
+        # Options have only one naming transform, done here for succinctness
+        expected_options = self.example_options.copy()
+        for option in expected_options:
+            option['orderNum'] = option.pop("order_num")
+
+        assert RubricConfigSerializer(self.example_rubric).data == {
+            "feedbackPrompt": "How did this student do?",
+            "criteria": [
+                {
+                    "orderNum": 0,
+                    "name": "potions",
+                    "label": "Potions",
+                    "prompt": "How did this student perform in the Potions exam",
+                    "feedback": "optional",
+                    "options": expected_options
+                },
+                {
+                    "order_num": 1,
+                    "name": "charms",
+                    "label": "Charms",
+                    "prompt": "How did this student perform in the Charms exam",
+                    "feedback": "required",
+                    "options": expected_options
+                }
+            ]
+        }
 
 
 @ddt.ddt
@@ -344,13 +483,14 @@ class TestUploadedFileSerializer(TestCase):
 
     def test_uploaded_file_serializer(self):
         """ Base serialization behavior """
-        input = MagicMock()
+        input = MagicMock(size=89794)
         data = UploadedFileSerializer(input).data
 
         expected_value = {
             'downloadUrl': str(input.download_url),
             'description': str(input.description),
             'name': str(input.name),
+            'size': input.size,
         }
         assert data == expected_value
 
@@ -370,7 +510,7 @@ class TestResponseSerializer(TestCase):
         """ Base serialization behavior """
         input = MagicMock()
         if has_files:
-            input.files = [Mock(), Mock(), Mock()]
+            input.files = [Mock(size=111), Mock(size=222), Mock(size=333)]
         if has_text:
             input.text = [Mock(), Mock(), Mock()]
 
@@ -529,3 +669,75 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
 
         data = LockStatusSerializer(self.lock_owned_by_other_user).data
         assert data == self.lock_owned_by_other_user_expected
+
+
+class TestStaffAssessSerializer(TestCase):
+    """ Tests for StaffAssessSerializer """
+    grade_data = {
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {
+                "name": "firstCriterion",
+                "feedback": "did alright",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    grade_data_no_feedback = {
+        "overallFeedback": "",
+        "criteria": [
+            {
+                "name": "firstCriterion",
+                "selectedOption": "good"
+            },
+            {
+                "name": "secondCriterion",
+                "selectedOption": "fair"
+            }
+        ]
+    }
+
+    submission_uuid = "foo"
+
+    def test_staff_assess_serializer(self):
+        """ Base serialization behavior """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {
+                "firstCriterion": "did alright",
+            },
+            "overall_feedback": "was pretty good",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value
+
+    def test_staff_assess_no_feedback(self):
+        """ Verify that empty feedback returns a reasonable shape """
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data_no_feedback, context=context)
+
+        expected_value = {
+            "options_selected": {
+                "firstCriterion": "good",
+                "secondCriterion": "fair",
+            },
+            "criterion_feedback": {},
+            "overall_feedback": "",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade"
+        }
+
+        assert serializer.data == expected_value

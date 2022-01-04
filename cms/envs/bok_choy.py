@@ -19,7 +19,7 @@ from django.utils.translation import gettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
-from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.modulestore.modulestore_settings import update_module_store_settings  # lint-amnesty, pylint: disable=wrong-import-order
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.

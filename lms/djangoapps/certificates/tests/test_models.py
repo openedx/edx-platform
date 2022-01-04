@@ -39,8 +39,8 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 ENROLLMENT_METHOD = 'common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user'
 PROFILE_METHOD = 'common.djangoapps.student.models_api.get_name'

@@ -16,7 +16,7 @@ from openedx.core.lib.command_utils import (
     parse_course_keys,
     validate_dependent_option
 )
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

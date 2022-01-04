@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, Q, When
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
@@ -67,8 +67,8 @@ from openedx.core.lib.api.view_utils import (
 )
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from xmodule.util.misc import get_default_short_labeler
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.misc import get_default_short_labeler  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

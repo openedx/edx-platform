@@ -62,9 +62,9 @@ from openedx.features.course_experience.utils import is_block_structure_complete
 from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -129,8 +129,16 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     try:
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
+        log.exception(f'Failed to retrieve course from courseoverview."{course_key}"')
         raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+
+    course_under_investigation = str(course_key) == 'course-v1:UQx+ABLE301x+1T2022'
+    if course_under_investigation:
+        log.info('[TNL_9420] Course overview found, Checking course access.')
     check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
+    if course_under_investigation:
+        log.info('[TNL_9420] Course access granted')
+
     return course_overview
 
 
@@ -233,6 +241,9 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
 
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
+        log.exception(
+            f'[TNL_9420] Failed to grant course access for "{course.id}", {access_response.to_json()}'
+        )
         raise CoursewareAccessException(access_response)
 
 
@@ -570,8 +581,10 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                 assignment_released = not start or start < now
                 if assignment_released:
                     url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
 
-                complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 past_due = not complete and due < now
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,

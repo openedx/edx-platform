@@ -417,7 +417,6 @@
     "Basic Account Information": "Informazioni di base",
     "Be sure your entire face is inside the frame": "Assicurati che l'intero volto rientri nell'inquadratura",
     "Before proceeding, please confirm that your details match": "Prima di continuare, confermare che i dettagli corrispondono ",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "Prima di procedere {htmlStart}attivare il tuo account{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Prima di procedere {htmlStart}scollegare tutti gli account social media{htmlEnd}.",
     "Before you upgrade to a certificate track, you must activate your account.": "Prima di eseguire l'aggiornamento ad una traccia del certificato, \u00e8 necessario attivare l'account.",
     "Billing/Payment Options": "Opzioni di pagamento/fatturazione",

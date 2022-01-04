@@ -1,7 +1,6 @@
 """
 Course API Views
 """
-
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.urls import reverse
@@ -32,7 +31,11 @@ from lms.djangoapps.courseware.access_response import (
 )
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
+from lms.djangoapps.courseware.masquerade import (
+    is_masquerading_as_specific_student,
+    setup_masquerade,
+    is_masquerading_as_non_audit_enrollment,
+)
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
@@ -61,10 +64,10 @@ from common.djangoapps.student.models import (
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .serializers import CourseInfoSerializer
 from .utils import serialize_upgrade_info
@@ -325,11 +328,22 @@ class CoursewareMeta:
         """
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
+        enrollment_is_cert_relavant = (
+            self.enrollment_object
+            and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+        )
+
+        if not enrollment_is_cert_relavant:
+            # Check masquerading as a non-audit enrollment
+            enrollment_is_cert_relavant = is_masquerading_as_non_audit_enrollment(
+                self.effective_user,
+                self.course_key,
+                self.course_masquerade
+            )
+
         if (
             integrity_signature_toggle(self.course_key)
-            and not self.is_staff
-            and self.enrollment_object
-            and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+            and enrollment_is_cert_relavant
         ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
@@ -484,6 +498,9 @@ class CoursewareInformation(RetrieveAPIView):
         The timezone in the user's account is frequently not set.
         This method sets a user's recent timezone that can be used as a fallback
         """
+        if not user.id:
+            return
+
         cache_key = 'browser_timezone_{}'.format(str(user.id))
         browser_timezone = self.request.query_params.get('browser_timezone', None)
         cached_value = TieredCache.get_cached_response(cache_key)

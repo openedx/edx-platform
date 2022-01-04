@@ -10,10 +10,10 @@ from django.conf import settings
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.fields import Date
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be

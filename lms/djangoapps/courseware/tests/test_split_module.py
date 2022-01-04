@@ -10,9 +10,9 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SplitTestBase(SharedModuleStoreTestCase):

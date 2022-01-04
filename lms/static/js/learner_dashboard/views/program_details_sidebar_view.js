@@ -29,7 +29,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
     this.industryPathways = options.industryPathways;
     this.creditPathways = options.creditPathways;
     this.programModel = options.model;
-    this.programDiscussionEnabled =  options.programDiscussionEnabled;
+    this.programTabViewEnabled =  options.programTabViewEnabled;
     this.render();
   }
 
@@ -40,7 +40,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
       programRecordUrl: this.programRecordUrl,
       industryPathways: this.industryPathways,
       creditPathways: this.creditPathways,
-      programDiscussionEnabled: this.programDiscussionEnabled
+      programTabViewEnabled: this.programTabViewEnabled
     });
 
     HtmlUtils.setHtml(this.$el, this.tpl(data));

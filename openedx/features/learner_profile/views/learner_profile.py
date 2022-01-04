@@ -45,6 +45,8 @@ def learner_profile(request, username):
     """
     if should_redirect_to_profile_microfrontend():
         profile_microfrontend_url = f"{settings.PROFILE_MICROFRONTEND_URL}{username}"
+        if request.GET:
+            profile_microfrontend_url += f'?{request.GET.urlencode()}'
         return redirect(profile_microfrontend_url)
 
     try:

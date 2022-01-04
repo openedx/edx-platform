@@ -11,7 +11,7 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from functools import lru_cache
+from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
 from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError
@@ -32,8 +32,8 @@ from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
 from common.djangoapps.static_replace import process_static_urls
-from xmodule.errortracker import make_error_tracker
-from xmodule.modulestore.django import ModuleI18nService
+from xmodule.errortracker import make_error_tracker  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim

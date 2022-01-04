@@ -16,8 +16,8 @@ from opaque_keys.edx.locator import CourseLocator
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseDataResearcherRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import deserialize_usage_key
 

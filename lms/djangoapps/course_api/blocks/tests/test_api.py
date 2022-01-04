@@ -13,10 +13,10 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
-from xmodule.modulestore.tests.sample_courses import BlockInfo
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.sample_courses import BlockInfo  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..api import get_blocks
 

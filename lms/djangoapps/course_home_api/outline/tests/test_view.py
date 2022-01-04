@@ -5,13 +5,13 @@ Tests for Outline Tab API in the Course Home API
 import itertools
 from datetime import datetime, timezone
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 
-import ddt
-import json
-from django.conf import settings
-from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
+import ddt  # lint-amnesty, pylint: disable=wrong-import-order
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -33,8 +33,8 @@ from openedx.features.course_experience import (
     ENABLE_COURSE_GOALS
 )
 from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

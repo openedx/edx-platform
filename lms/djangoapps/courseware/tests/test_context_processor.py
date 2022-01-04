@@ -3,7 +3,7 @@ Unit tests for courseware context_processor
 """
 
 from pytz import timezone
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from django.contrib.auth.models import AnonymousUser
 
 from lms.djangoapps.courseware.context_processor import (
@@ -12,8 +12,8 @@ from lms.djangoapps.courseware.context_processor import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):

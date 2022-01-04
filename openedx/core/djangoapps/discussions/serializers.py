@@ -8,8 +8,8 @@ from rest_framework import serializers
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features, Provider
 from .utils import available_division_schemes, get_divided_discussions
 
 
@@ -17,6 +17,9 @@ class LtiSerializer(serializers.ModelSerializer):
     """
     Serialize LtiConfiguration responses
     """
+    pii_share_email = serializers.BooleanField(required=False)
+    pii_share_username = serializers.BooleanField(required=False)
+
     class Meta:
         model = LtiConfiguration
         fields = [
@@ -39,13 +42,6 @@ class LtiSerializer(serializers.ModelSerializer):
             if key in self.Meta.fields
         }
         return payload
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        if not self.context.get('pii_sharing_allowed'):
-            representation.pop('pii_share_username')
-            representation.pop('pii_share_email')
-        return representation
 
     def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
         """
@@ -70,6 +66,7 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
     """
     Serialize legacy discussions settings
     """
+
     class Meta:
         fields = [
             'allow_anonymous',
@@ -212,22 +209,24 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         course_key = instance.context_key
         payload = super().to_representation(instance)
-        lti_configuration_data = {}
-        if instance.supports_lti():
-            lti_configuration = LtiSerializer(instance.lti_configuration, context={
-                'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
-            })
-            lti_configuration_data = lti_configuration.data
-        provider_type = instance.provider_type or DEFAULT_PROVIDER_TYPE
+        course_pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_key)
+
+        lti_configuration = LtiSerializer(instance=instance.lti_configuration)
+        lti_configuration_data = lti_configuration.data
+        lti_configuration_data.update({
+            'pii_sharing_allowed': course_pii_sharing_allowed
+        })
+
+        provider_type = instance.provider_type
         plugin_configuration = instance.plugin_configuration
-        if provider_type == 'legacy':
-            course = get_course_by_id(course_key)
-            legacy_settings = LegacySettingsSerializer(
-                course,
-                data=plugin_configuration,
-            )
-            if legacy_settings.is_valid(raise_exception=True):
-                plugin_configuration = legacy_settings.data
+
+        course = get_course_by_id(course_key)
+        legacy_settings = LegacySettingsSerializer(
+            course,
+            data=plugin_configuration,
+        )
+        if legacy_settings.is_valid(raise_exception=True):
+            plugin_configuration = legacy_settings.data
         features_list = [
             {'id': feature.value, 'feature_support_type': feature.feature_support_type}
             for feature in Features
@@ -302,10 +301,8 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         plugin_configuration = validated_data.pop('plugin_configuration', {})
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
-        will_support_legacy = bool(
-            updated_provider_type == 'legacy'
-        )
-        if will_support_legacy:
+
+        if updated_provider_type == Provider.LEGACY:
             legacy_settings = LegacySettingsSerializer(
                 self._get_course(),
                 context={

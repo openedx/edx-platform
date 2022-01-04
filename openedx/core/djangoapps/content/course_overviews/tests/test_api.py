@@ -16,7 +16,7 @@ from openedx.core.djangoapps.content.course_overviews.api import (
     get_pseudo_course_overview,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestCourseOverviewsApi(ModuleStoreTestCase):

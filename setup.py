@@ -79,6 +79,7 @@ setup(
             "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",  # lint-amnesty, pylint: disable=line-too-long
             "open_assessment_transformer = lms.djangoapps.courseware.transformers:OpenAssessmentDateTransformer",
             'effort_estimation = openedx.features.effort_estimation.api:EffortEstimationTransformer',
+            'discussions_link = openedx.core.djangoapps.discussions.transformers:DiscussionsTopicLinkTransformer',
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"

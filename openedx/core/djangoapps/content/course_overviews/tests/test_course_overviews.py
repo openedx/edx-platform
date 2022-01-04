@@ -24,20 +24,20 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
-from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
-from xmodule.course_module import (
+from xmodule.assetstore.assetmgr import AssetManager  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_metadata_utils import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, CourseOverviewTab
 from .factories import CourseOverviewFactory

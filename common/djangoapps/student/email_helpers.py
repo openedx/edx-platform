@@ -12,7 +12,7 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def generate_activation_email_context(user, registration):

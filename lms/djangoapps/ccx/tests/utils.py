@@ -13,9 +13,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):

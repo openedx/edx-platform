@@ -29,7 +29,7 @@ from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer

@@ -86,13 +86,21 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                 <article class="register-choose content-main">
                     <header class="page-header">
                         <h3 class="py-md-3">
-                            ${_("Choose a path for your course in")} ${_(course_name)}
+                            % if is_single_mode:
+                                ${_(course_name)}
+                            % else:
+                                ${_("Choose a path for your course in")} ${_(course_name)}
+                            % endif
                         </h3>
                     </header>
 
                     <form class="form-register-choose mb-4 mt-0" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         <div class="row">
-                        <div class="track-selection-options">
+                        % if is_single_mode:
+                        <div class="grid-single">
+                        % else:
+                        <div class="grid-options">
+                        % endif
                             % if "verified" in modes:
                             <div class="track-selection-choice track-selection-certificate mr-md-2">
                                 <div class="certificate-container">
@@ -137,6 +145,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                 )}</div>
                             </div>
                             % endif
+                            % if "audit" in modes:
                             <div class="track-selection-choice track-selection-audit ml-md-3">
                                 <p class="float-right text-uppercase price-display">${_("Free")}</p>
                                 <div class="choice-title"><h4>${_("Access this course")}</h4></div>
@@ -149,6 +158,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </li>
                                 </ul>
                             </div>
+                            % endif
                         </div>
                         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                     </form>

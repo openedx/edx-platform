@@ -22,6 +22,7 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from common.djangoapps.student.roles import GlobalStaff
 
 from .helpers import theme_exists
+from .helpers_static import get_static_file_url
 from .models import SiteTheme
 
 PREVIEW_SITE_THEME_PREFERENCE_KEY = 'preview-site-theme'
@@ -135,3 +136,18 @@ class ThemingAdministrationFragmentView(EdxFragmentView):
         Returns the page title for the standalone update page.
         """
         return _('Theming Administration')
+
+
+def themed_asset(request, path):
+    """
+    Redirect to themed asset.
+
+    This view makes it easy to link to theme assets without knowing what is the
+    currently enabled theme. For instance, applications outside of the LMS may
+    want to link to the LMS logo.
+
+    Note that the redirect is not permanent because the theme may change from
+    one run to the next.
+    """
+    themed_url = get_static_file_url(path)
+    return redirect(themed_url, permanent=False)

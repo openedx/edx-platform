@@ -13,7 +13,7 @@ from lms.djangoapps.discussion import tasks
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

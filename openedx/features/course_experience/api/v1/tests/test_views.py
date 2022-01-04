@@ -13,7 +13,7 @@ from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.schedules.models import Schedule
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

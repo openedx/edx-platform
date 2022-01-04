@@ -52,9 +52,9 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import views
 from ..constants import (

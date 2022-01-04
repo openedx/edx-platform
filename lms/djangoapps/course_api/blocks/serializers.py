@@ -2,12 +2,12 @@
 Serializers for Course Blocks related return objects.
 """
 
-
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
+from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
 
 from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.block_counts import BlockCountsTransformer
@@ -21,13 +21,14 @@ class SupportedFieldType:
     """
     Metadata about fields supported by different transformers
     """
+
     def __init__(
-            self,
-            block_field_name,
-            transformer=None,
-            requested_field_name=None,
-            serializer_field_name=None,
-            default_value=None
+        self,
+        block_field_name,
+        transformer=None,
+        requested_field_name=None,
+        serializer_field_name=None,
+        default_value=None
     ):
         self.transformer = transformer
         self.block_field_name = block_field_name
@@ -82,6 +83,8 @@ SUPPORTED_FIELDS = [
     SupportedFieldType(BlockCompletionTransformer.COMPLETION, BlockCompletionTransformer),
     SupportedFieldType(BlockCompletionTransformer.COMPLETE),
     SupportedFieldType(BlockCompletionTransformer.RESUME_BLOCK),
+    SupportedFieldType(DiscussionsTopicLinkTransformer.EXTERNAL_ID),
+    SupportedFieldType(DiscussionsTopicLinkTransformer.EMBED_URL),
 
     *[SupportedFieldType(field_name) for field_name in ExtraFieldsTransformer.get_requested_extra_fields()],
 ]
@@ -111,6 +114,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
     """
     Serializer for single course block
     """
+
     def _get_field(self, block_key, transformer, field_name, default):
         """
         Get the field value requested.  The field may be an XBlock field, a

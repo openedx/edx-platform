@@ -42,10 +42,10 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -906,7 +906,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             # ensure the mock api call was made.  NOTE: the following line
             # approximates the check - if the headers were empty it means
             # there was no last request.
-            assert httpretty.last_request().headers != {}
+            assert httpretty.last_request().headers
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):

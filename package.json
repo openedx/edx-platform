@@ -1,10 +1,11 @@
 {
   "name": "edx",
   "version": "0.1.0",
+  "repository": "https://github.com/edx/edx-platform",
   "dependencies": {
     "@edx/brand-edx.org": "^1.3.3",
     "@edx/edx-bootstrap": "1.0.4",
-    "@edx/edx-proctoring": "^1.5.0",
+    "@edx/edx-proctoring": "^4.8.2",
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^1.17.0",
@@ -26,7 +27,7 @@
     "css-loader": "0.28.8",
     "datatables": "1.10.18",
     "datatables.net-fixedcolumns": "3.2.6",
-    "edx-proctoring-proctortrack": "git+https://git@github.com/anupdhabarde/edx-proctoring-proctortrack.git#d717f3b7e1d5aec6290d7dd08646cba8c6af3499",
+    "edx-proctoring-proctortrack": "git+https://git@github.com/anupdhabarde/edx-proctoring-proctortrack.git#9b55ea63a3f670bcfbdb5870241510746252ee41",
     "edx-ui-toolkit": "1.5.2",
     "exports-loader": "0.6.4",
     "extract-text-webpack-plugin": "2.1.2",

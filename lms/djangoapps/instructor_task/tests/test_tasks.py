@@ -12,7 +12,7 @@ from uuid import uuid4
 import pytest
 import ddt
 from celery.states import FAILURE, SUCCESS
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 from opaque_keys.edx.keys import i4xEncoder
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -32,7 +32,7 @@ from lms.djangoapps.instructor_task.tasks import (
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -83,7 +83,6 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
         return {
-            'xqueue_callback_url_prefix': 'dummy_value',
             'request_info': {
                 'username': 'dummy_username',
                 'user_id': 'dummy_id',
@@ -676,7 +675,7 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('generated')
+            action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]
@@ -706,7 +705,7 @@ class TestOra2ExportSubmissionFilesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_submission_files(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('compressed')
+            action_name = gettext_noop('compressed')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]
@@ -736,7 +735,7 @@ class TestOra2SummaryInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_summary(task_entry.id, task_xmodule_args)
-            action_name = ugettext_noop('generated')
+            action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]

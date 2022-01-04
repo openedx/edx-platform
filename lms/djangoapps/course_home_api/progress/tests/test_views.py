@@ -2,11 +2,13 @@
 Tests for Progress Tab API in the Course Home API
 """
 
+from datetime import datetime, timedelta
 import dateutil
 import ddt
-from datetime import datetime, timedelta
+from django.conf import settings
+
 from pytz import UTC
-from unittest.mock import patch
+from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -17,13 +19,19 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
+from lms.djangoapps.grades.models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride
+)
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -183,6 +191,50 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert ungraded_score['learner_has_access']
         assert not gated_score['learner_has_access']
         assert ungated_score['learner_has_access']
+
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
+    def test_override_is_visible(self):
+        with persistent_grades_feature_flags(global_flag=True):
+            chapter = ItemFactory(parent=self.course, category='chapter')
+            subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
+
+            CourseEnrollment.enroll(self.user, self.course.id)
+
+            params = {
+                "user_id": self.user.id,
+                "usage_key": subsection.location,
+                "course_version": self.course.course_version,
+                "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
+                "earned_all": 6.0,
+                "possible_all": 12.0,
+                "earned_graded": 6.0,
+                "possible_graded": 8.0,
+                "visible_blocks": [],
+                "first_attempted": datetime.now(),
+            }
+
+            created_grade = PersistentSubsectionGrade.update_or_create_grade(**params)
+            proctoring_failure_comment = "Failed Test Proctoring"
+            override = PersistentSubsectionGradeOverride.update_or_create_override(
+                requesting_user=self.staff_user,
+                subsection_grade_model=created_grade,
+                earned_all_override=0.0,
+                earned_graded_override=0.0,
+                system=GradeOverrideFeatureEnum.proctoring,
+                feature=GradeOverrideFeatureEnum.proctoring,
+                comment=proctoring_failure_comment
+            )
+
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+
+            sections = response.data['section_scores']
+            overridden_subsection = sections[1]['subsections'][0]
+            override_entry = overridden_subsection["override"]
+
+            assert override_entry['system'] == GradeOverrideFeatureEnum.proctoring
+            assert override_entry['reason'] == proctoring_failure_comment
 
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
     def test_view_other_students_progress_page(self):
