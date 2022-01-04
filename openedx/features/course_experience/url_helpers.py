@@ -7,17 +7,17 @@ because the Studio course outline may need these utilities.
 from enum import Enum
 from typing import Optional
 
-import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
+from django.http.request import QueryDict
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import navigation_index, path_to_location
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -148,6 +148,7 @@ def make_learning_mfe_courseware_url(
         course_key: CourseKey,
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
+        params: Optional[QueryDict] = None,
 ) -> str:
     """
     Return a str with the URL for the specified courseware content in the Learning MFE.
@@ -176,6 +177,7 @@ def make_learning_mfe_courseware_url(
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
+    `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
 
@@ -185,11 +187,16 @@ def make_learning_mfe_courseware_url(
         if unit_key:
             mfe_link += f'/{unit_key}'
 
+    if params:
+        mfe_link += f'?{params.urlencode()}'
+
     return mfe_link
 
 
 def get_learning_mfe_home_url(
-        course_key: CourseKey, view_name: Optional[str] = None
+        course_key: CourseKey,
+        url_fragment: Optional[str] = None,
+        params: Optional[QueryDict] = None,
 ) -> str:
     """
     Given a course run key and view name, return the appropriate course home (MFE) URL.
@@ -199,12 +206,16 @@ def get_learning_mfe_home_url(
     http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
 
     `course_key` can be either an OpaqueKey or a string.
-    `view_name` is an optional string.
+    `url_fragment` is an optional string.
+    `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
 
-    if view_name:
-        mfe_link += f'/{view_name}'
+    if url_fragment:
+        mfe_link += f'/{url_fragment}'
+
+    if params:
+        mfe_link += f'?{params.urlencode()}'
 
     return mfe_link
 

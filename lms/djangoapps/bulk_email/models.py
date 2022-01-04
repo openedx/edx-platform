@@ -471,6 +471,28 @@ class CourseAuthorization(models.Model):
         return f"Course '{str(self.course_id)}': Instructor Email {not_en}Enabled"
 
 
+class DisabledCourse(models.Model):
+    """
+    Disable the bulk email feature for specific courses.
+
+    .. no_pii:
+    """
+    class Meta:
+        app_label = "bulk_email"
+
+    course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
+
+    @classmethod
+    def instructor_email_disabled_for_course(cls, course_id):
+        """
+        Returns whether or not email is disabled for the given course id.
+        """
+        try:
+            return cls.objects.filter(course_id=course_id).exists()
+        except cls.DoesNotExist:
+            return False
+
+
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.

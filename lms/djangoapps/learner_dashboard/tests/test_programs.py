@@ -13,8 +13,13 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
+from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW
+from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -26,8 +31,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 PROGRAMS_MODULE = 'lms.djangoapps.learner_dashboard.programs'
@@ -298,3 +301,35 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
 
         response = self.client.get(self.url)
         assert response.status_code == 404
+
+
+@override_waffle_flag(ENABLE_PROGRAM_TAB_VIEW, active=True)
+class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixin, ProgramsApiConfigMixin):
+    """Unit tests for the program details page."""
+    program_uuid = str(uuid4())
+    password = 'test'
+    url = reverse_lazy('program_details_fragment_view', kwargs={'program_uuid': program_uuid})
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        modulestore_course = ModuleStoreCourseFactory()
+        course_run = CourseRunFactory(key=str(modulestore_course.id))
+        course = CourseFactory(course_runs=[course_run])
+        cls.program = ProgramFactory(uuid=cls.program_uuid, courses=[course])
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=self.password)
+        self.set_program_in_catalog_cache(self.program_uuid, self.program)
+        self.create_programs_config()
+
+    def test_discussion_flags_exist(self):
+        """
+        Test if programTabViewEnabled and discussionFragment exist in html.
+        """
+        response = self.client.get(self.url)
+        self.assertContains(response, 'programTabViewEnabled: true',)
+        self.assertContains(response, 'discussionFragment: {"configured": false, "iframe": ""')

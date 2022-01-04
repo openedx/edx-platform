@@ -8,8 +8,8 @@ from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from xmodule.capa_module import ProblemBlock
-from xmodule.x_module import AUTHOR_VIEW
+from xmodule.capa_module import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import AUTHOR_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 _ = lambda text: text
 

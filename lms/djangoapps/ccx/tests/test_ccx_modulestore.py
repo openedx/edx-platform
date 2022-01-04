@@ -13,8 +13,8 @@ from six.moves import zip_longest
 
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):

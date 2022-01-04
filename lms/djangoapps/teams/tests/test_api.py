@@ -16,8 +16,8 @@ from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/math/1')

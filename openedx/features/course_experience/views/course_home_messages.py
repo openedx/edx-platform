@@ -31,7 +31,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):

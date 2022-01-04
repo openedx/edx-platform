@@ -42,13 +42,14 @@ from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset, PasswordResetSuccess
+from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.forms import send_account_recovery_email_for_user
 from common.djangoapps.student.models import AccountRecovery, LoginFailures
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password, validate_password
 
-POST_EMAIL_KEY = 'post:email'
+POST_EMAIL_KEY = 'openedx.core.djangoapps.util.ratelimit.request_post_email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
@@ -745,6 +746,17 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                 return Response({'reset_status': reset_status})
 
             validate_password(password, user=user)
+
+            if settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY:
+                # Checks the Pwned Databases for password vulnerability.
+                pwned_response = check_pwned_password(password)
+                if pwned_response.get('vulnerability', 'no') == 'yes':
+                    error_status = {
+                        'reset_status': reset_status,
+                        'err_msg': accounts.AUTHN_PASSWORD_COMPROMISED_MSG
+                    }
+                    return Response(error_status)
+
             form = SetPasswordForm(user, request.data)
             if form.is_valid():
                 form.save()

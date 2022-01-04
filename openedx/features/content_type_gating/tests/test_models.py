@@ -2,14 +2,14 @@
 import pytest
 
 
-import itertools
-from datetime import datetime, timedelta
+import itertools  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 
 import ddt
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
-from unittest.mock import Mock
+from unittest.mock import Mock  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory

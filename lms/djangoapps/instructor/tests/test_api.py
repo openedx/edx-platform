@@ -21,7 +21,7 @@ from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse as django_reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
@@ -88,10 +88,10 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .test_tools import msk_from_problem_urlname
 
@@ -2805,6 +2805,33 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
                 response = self.client.post(url, {})
                 self.assertContains(response, success_status)
+
+    @ddt.data(
+        True,
+        False
+    )
+    @patch('lms.djangoapps.instructor.views.api.is_integrity_signature_enabled')
+    @valid_problem_location
+    def test_idv_retirement_student_features_report(self, toggle_value, mock_toggle):
+        mock_toggle.return_value = toggle_value
+        kwargs = {'course_id': str(self.course.id)}
+        kwargs.update({'csv': '/csv'})
+        url = reverse('get_students_features', kwargs=kwargs)
+        success_status = 'The enrolled learner profile report is being created.'
+        with patch('lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv') as mock_task_endpoint:
+            CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+            response = self.client.post(url, {})
+            self.assertContains(response, success_status)
+
+            # assert that if the integrity signature is enabled, the verification
+            # status is not included as a query feature
+            args = mock_task_endpoint.call_args.args
+            self.assertEqual(len(args), 3)
+            query_features = args[2]
+            if not toggle_value:
+                self.assertIn('verification_status', query_features)
+            else:
+                self.assertNotIn('verification_status', query_features)
 
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': str(self.course.id)})

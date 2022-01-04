@@ -15,10 +15,10 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
@@ -409,7 +409,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         # Block does not exist
         usage_key = UsageKey.from_string('i4x://edX/apis/html/interactive')
         usage_key.replace(course_key=self.course.id)
-        assert Bookmark.get_path(usage_key) == []
+        assert not Bookmark.get_path(usage_key)
 
         # Block is an orphan
         self.other_sequential_1.children = []

@@ -11,10 +11,10 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from xmodule.tests import get_test_system
+from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests import get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

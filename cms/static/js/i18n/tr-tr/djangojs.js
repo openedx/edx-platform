@@ -338,7 +338,6 @@
     "Basic Account Information": "Temel Hesap Bilgileri",
     "Be sure your entire face is inside the frame": "Y\u00fcz\u00fcn\u00fcz\u00fcn tamam\u0131n\u0131n \u00e7er\u00e7eve i\u00e7inde oldu\u011funa emin olun",
     "Before proceeding, please confirm that your details match": "\u0130lerlemeden \u00f6nce, ayr\u0131nt\u0131lar\u0131n\u0131z\u0131n e\u015fle\u015fti\u011fini onaylay\u0131n\u0131z",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "\u0130lerlemeden \u00f6nce, l\u00fctfen {htmlStart}hesab\u0131n\u0131z\u0131 etkinle\u015ftirin{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "Devam etmeden \u00f6nce, l\u00fctfen {htmlStart}t\u00fcm sosyal medya hesaplar\u0131n\u0131z\u0131 kald\u0131r\u0131n{htmlEnd}.",
     "Before you upgrade to a certificate track, you must activate your account.": "Sertifika yoluna y\u00fckseltmeden \u00f6nce, hesab\u0131n\u0131z\u0131 etkinle\u015ftirmelisiniz.",
     "Billing/Payment Options": "Faturaland\u0131rma/\u00d6deme Se\u00e7enekleri",

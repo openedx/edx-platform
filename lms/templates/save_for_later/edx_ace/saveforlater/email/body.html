@@ -1,0 +1,205 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load django_markup %}
+{% load i18n %}
+{% load static %}
+{% block content %}
+<div style="display: flex;">
+    <div style="background-color: #1C8DBE;flex: 50%;">
+        <div style="text-align: center;">
+            <h1 style="color: #fff;
+                line-height: 40px;
+                font-size: 36px;
+                padding-top: 110px;
+                padding-bottom: 24px;
+                padding-left: 32px;
+                padding-right: 32px;
+                min-width: 256px;
+                margin: 0;
+                text-align: left;"
+            >
+                {% filter force_escape %}
+                    {% blocktrans %}Check out this course on edx{% endblocktrans %}
+                {% endfilter %}
+            </h1>
+            <div style="text-align: left;
+                padding-left: 32px;"
+            >
+                <a style="background: #00688D;
+                    width: 94px;
+                    text-decoration: none;
+                    color: #fff;
+                    font-weight: 500;
+                    font-size: 14px;
+                    line-height: 2.25rem;
+                    height: 36px;
+                    padding: 8px 12px;"
+                    href="{{ lms_url|add:enroll_course_url }}"
+                >
+                    {% filter force_escape %}
+                        {% blocktrans %}Enroll now{% endblocktrans %}
+                    {% endfilter %}
+                </a>
+                <a style="background: #03c7e8;
+                    border: 1px solid #fff;
+                    margin-left: 8px;
+                    width: 107px;
+                    text-decoration: none;
+                    color: #fff;
+                    font-weight: 500;
+                    font-size: 14px;
+                    line-height: 2.25rem;
+                    height: 36px;
+                    padding: 8px 12px;"
+                    href="{{ view_course_url }}"
+                >
+                        {% filter force_escape %}
+                            {% blocktrans %}View Course{% endblocktrans %}
+                        {% endfilter %}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div style="flex: 50%;">
+        <div style="height: 140px;min-width: 320px;background: url({{lms_url|add:course_image_url}})">
+            {% if partner_image_url %}
+                <div style="padding-top: 82px;padding-left: 24px;">
+                    <img style="width: 116px;
+                    height: 66px;
+                    background: #FFFFFF;
+                    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15), 0px 1px 4px rgba(0, 0, 0, 0.15);
+                    border-radius: 4px;
+                    "src={{partner_image_url}} />
+                </div>
+            {% endif %}
+        </div>
+        <div style="background: #FBFAF9;">
+            <h2 style="color: #002121;
+                font-weight: bold;
+                font-size: 22px;
+                line-height: 28px;
+                padding-top: 24px;
+                padding-left: 24px;
+                padding-right: 24px;
+                padding-bottom: 20px;
+                margin: 0;"
+            >
+                {{ display_name }}
+            </h2>
+            <p style="color: #707070;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 12px;
+                line-height: 20px;
+                padding-left: 24px;
+                padding-right: 24px;
+                padding-bottom: 20px;
+                margin: 0;"
+            >
+                {{ short_description }}
+            </p>
+        </div>
+    </div>
+</div>
+<div style="background-color: #F2F0EF;display: flex;color: #00262B;">
+    <div style="width: 33.3%;">
+        <div style="display: inline-block;">
+            <svg width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+                 role="img"
+                 focusable="false"
+                 aria-hidden="true"
+                 style="margin-bottom: 5px;margin-left: 20px;"
+            >
+                <path d="M16.24 7.76A5.974 5.974 0 0012 6v6l-4.24 4.24c2.34 2.34 6.14 2.34 8.49 0a5.99 5.99 0 00-.01-8.48zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="currentColor"></path>
+            </svg>
+        </div>
+        <div style="display: inline-block;margin-left: 5px !important">
+            <p style="padding-top: 8px;
+                margin: 0;
+                font-weight: bold;
+                font-size: 14px;
+                line-height: 24px;"
+            >
+                {% trans "Estimated 6 weeks" as estimated_weeks_heading %}{{ estimated_weeks_heading | force_escape }}
+            </p>
+            <p style=" margin: 0;
+                padding-bottom: 9px;
+                font-size: 12px;
+                color: #707070;"
+            >
+                {% trans "4-6 hours per week" as estimated_weeks_msg %}{{ estimated_weeks_msg | force_escape }}
+            </p>
+        </div>
+    </div>
+    <div style="width: 33.3%;">
+        <div style="display: inline-block;">
+            <svg width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+                 role="img"
+                 focusable="false"
+                 aria-hidden="true"
+                 style="margin-bottom: 5px;"
+            >
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"></path>
+            </svg>
+        </div>
+        <div style="display: inline-block;margin-left: 5px;">
+            <p style="padding-top: 8px;
+                margin: 0;
+                font-weight: bold;
+                font-size: 14px;
+                line-height: 24px;"
+            >
+                {% trans "Self-paced" as self_paced_heading %}{{ self_paced_heading | force_escape }}
+            </p>
+            <p style=" margin: 0;
+                padding-bottom: 9px;
+                font-size: 12px;
+                color: #707070;"
+            >
+                {% trans "Progress at your own speed" as self_paced_msg %}{{ self_paced_msg | force_escape }}
+            </p>
+        </div>
+    </div>
+    <div style="width: 33.3%">
+        <div style="display: inline-block;">
+            <svg width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+                 role="img"
+                 focusable="false"
+                 aria-hidden="true"
+                 style="margin-bottom: 5px;"
+            >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z" fill="currentColor"></path>
+            </svg>
+        </div>
+        <div style="display: inline-block;margin-left: 5px;">
+            <p style="padding-top: 8px;
+                margin: 0;
+                font-weight: bold;
+                font-size: 14px;
+                line-height: 24px;"
+            >
+                {% trans "Free" as upgrade_heading %}{{ upgrade_heading | force_escape }}
+            </p>
+            <p style=" margin: 0;
+                padding-bottom: 9px;
+                font-size: 12px;
+                color: #707070;"
+            >
+                {% trans "Optional upgrade available" as upgrade_msg %}{{ upgrade_msg | force_escape }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

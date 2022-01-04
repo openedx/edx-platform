@@ -7,10 +7,12 @@ import itertools
 from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+from opaque_keys.edx.keys import CourseKey
 
 import ddt
 import httpretty
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -42,6 +44,7 @@ from lms.djangoapps.discussion.rest_api.api import (
     get_course_topics,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
     update_thread,
 )
@@ -67,6 +70,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role,
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+
+User = get_user_model()
 
 
 def _remove_discussion_tab(course, user_id):
@@ -139,6 +144,7 @@ def _set_course_discussion_blackout(course, user_id):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@ddt.ddt
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
 
@@ -179,7 +185,23 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'topics_url': 'http://testserver/api/discussion/v1/course_topics/x/y/z',
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,
+            'user_is_privileged': False,
+            'user_roles': {'Student'},
         }
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+    )
+    def test_privileged_roles(self, role):
+        """
+        Test that the api returns the correct roles and privileges.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role)
+        course_meta = get_course(self.request, self.course.id)
+        assert course_meta["user_is_privileged"]
+        assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
 
 
 @ddt.ddt
@@ -1568,6 +1590,119 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         # Page past the end
         with pytest.raises(PageNotFoundError):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
+
+
+@ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
+    """
+    Tests for get_user_comments.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
+
+        self.course = CourseFactory.create()
+
+        # create staff user so that we don't need to worry about
+        # permissions here
+        self.user = UserFactory.create(is_staff=True)
+        self.register_get_user_response(self.user)
+
+        self.request = RequestFactory().get(f'/api/discussion/v1/users/{self.user.username}/{self.course.id}')
+        self.request.user = self.user
+
+    def test_call_with_single_results_page(self):
+        """
+        Assert that a minimal call with valid inputs, and single result,
+        returns the expected response structure.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+        )
+        assert "results" in response.data
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 1
+        assert response.data["pagination"]["num_pages"] == 1
+        assert response.data["pagination"]["next"] is None
+        assert response.data["pagination"]["previous"] is None
+
+    @ddt.data(1, 2, 3)
+    def test_call_with_paginated_results(self, page):
+        """
+        Assert that paginated results return the correct pagination
+        information at the pagination boundaries.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment() for _ in range(30)],
+            page=page,
+            num_pages=3,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+            page=page,
+        )
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 30
+        assert response.data["pagination"]["num_pages"] == 3
+
+        if page in (1, 2):
+            assert response.data["pagination"]["next"] is not None
+            assert f"page={page+1}" in response.data["pagination"]["next"]
+        if page in (2, 3):
+            assert response.data["pagination"]["previous"] is not None
+            assert f"page={page-1}" in response.data["pagination"]["previous"]
+        if page == 1:
+            assert response.data["pagination"]["previous"] is None
+        if page == 3:
+            assert response.data["pagination"]["next"] is None
+
+    def test_call_with_invalid_page(self):
+        """
+        Assert that calls for pages that exceed the existing number of
+        results pages raise PageNotFoundError.
+        """
+        self.register_get_comments_response([], page=2, num_pages=1)
+        with pytest.raises(PageNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=self.course.id,
+                page=2,
+            )
+
+    def test_call_with_non_existent_course(self):
+        """
+        Assert that calls for comments in a course that doesn't exist
+        result in a CourseNotFoundError error.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        with pytest.raises(CourseNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=CourseKey.from_string("x/y/z"),
+                page=2,
+            )
 
 
 @ddt.ddt

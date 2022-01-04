@@ -7,15 +7,15 @@ import datetime
 import pytest
 import ddt
 from pytz import UTC
-from unittest.mock import patch
+from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
 
 from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 EXAMPLE_CERTIFICATE_AVAILABLE_DATE = datetime.date(2020, 1, 1)
 

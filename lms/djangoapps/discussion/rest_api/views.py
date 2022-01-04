@@ -6,9 +6,10 @@ Discussion API views
 import logging
 import uuid
 
-from django.core.exceptions import BadRequest
+import edx_api_doc_tools as apidocs
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import BadRequest, ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
@@ -21,8 +22,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
 from common.djangoapps.util.file import store_uploaded_file
-from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -32,7 +33,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from ..rest_api.api import (
     create_comment,
     create_thread,
@@ -44,21 +45,24 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
     update_thread,
 )
 from ..rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
+    UserCommentListGetForm,
     CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
 )
+from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 from ..rest_api.serializers import (
+    CourseMetadataSerailizer,
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
 )
-from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
 
 log = logging.getLogger(__name__)
 
@@ -68,41 +72,28 @@ User = get_user_model()
 @view_auth_classes()
 class CourseView(DeveloperErrorViewMixin, APIView):
     """
-    **Use Cases**
-
-        Retrieve general discussion metadata for a course.
-
-    **Example Requests**:
-
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
-
-    **Response Values**:
-
-        * id: The identifier of the course
-
-        * blackouts: A list of objects representing blackout periods (during
-            which discussions are read-only except for privileged users). Each
-            item in the list includes:
-
-            * start: The ISO 8601 timestamp for the start of the blackout period
-
-            * end: The ISO 8601 timestamp for the end of the blackout period
-
-        * thread_list_url: The URL of the list of all threads in the course.
-
-        * following_thread_list_url: thread_list_url with parameter following=True
-
-        * topics_url: The URL of the topic listing for the course.
-
-        * allow_anonymous: A boolean which indicating whether anonymous posts
-            are allowed or not.
-
-        * allow_anonymous_to_peers: A boolean which indicating whether posts
-            anonymous to peers are allowed or not.
+    General discussion metadata API.
     """
 
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID")
+        ],
+        responses={
+            200: CourseMetadataSerailizer(read_only=True, required=False),
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        }
+    )
     def get(self, request, course_id):
-        """Implements the GET method as described in the class docstring."""
+        """
+        Retrieve general discussion metadata for a course.
+
+        **Example Requests**:
+
+            GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
+        """
         course_key = CourseKey.from_string(course_id)  # TODO: which class is right?
         # Record user activity for tracking progress towards a user's course goals (for mobile app)
         UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
@@ -414,10 +405,15 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
     **Use Cases**
 
         Retrieve the list of comments in a thread, retrieve the list of
-        child comments for a response comment, create a comment, or modify
-        or delete an existing comment.
+        comments from an user in a course, retrieve the list of child
+        comments for a response comment, create a comment, or modify or
+        delete an existing comment.
 
     **Example Requests**:
+
+        GET /api/discussion/v1/comments/?username=edx&course_id=course-v1:edX+DemoX+Demo_Course
+
+        GET /api/discussion/v1/comments/?username=edx&course_id=course-v1:edX+DemoX+Demo_Course&flagged=true
 
         GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
 
@@ -437,11 +433,20 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
     **GET Comment List Parameters**:
 
-        * thread_id (required): The thread to retrieve comments for
+        * thread_id (required when username is not provided): The thread to retrieve comments for
+
+        * username (required when thread_id is not provided): The user from whom to retrieve comments
+
+        * course_id (required when username is provided): The course from which to retrive the user's comments
 
         * endorsed: If specified, only retrieve the endorsed or non-endorsed
           comments accordingly. Required for a question thread, must be absent
           for a discussion thread.
+          This parameter has no effect when fetching comments by `username`.
+
+        * flagged: Only retrieve comments that were flagged for abuse.
+          This requires the requester to have elevated privileges, and
+          has no effect otherwise.
 
         * page: The (1-indexed) page to retrieve (default is 1)
 
@@ -560,8 +565,31 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
     def list(self, request):
         """
-        Implements the GET method for the list endpoint as described in the
-        class docstring.
+        Implements the GET method for the list endpoint as described in
+        the class docstring.
+
+        This endpoint implements two distinct usage contexts.
+
+        When `username` is provided, the `course_id` parameter is
+        required, and `thread_id` is ignored.
+        The behavior is to retrieve all of the user's non-anonymous
+        comments from the specified course, outside of the context of a
+        forum thread. In this context, endorsement information is
+        unavailable.
+
+        When `username` is not provided, `thread_id` is required, and
+        `course_id` is ignored, since the thread already belongs to a course.
+        In this context, all information relevant to usage in the
+        discussions forum is available.
+        """
+        if "username" in request.GET:
+            return self.list_by_user(request)
+        else:
+            return self.list_by_thread(request)
+
+    def list_by_thread(self, request):
+        """
+        Handles the case of fetching a thread's comments.
         """
         form = CommentListGetForm(request.GET)
         if not form.is_valid():
@@ -570,6 +598,25 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             request,
             form.cleaned_data["thread_id"],
             form.cleaned_data["endorsed"],
+            form.cleaned_data["page"],
+            form.cleaned_data["page_size"],
+            form.cleaned_data["flagged"],
+            form.cleaned_data["requested_fields"],
+        )
+
+    def list_by_user(self, request):
+        """
+        Handles the case of fetching an user's comments.
+        """
+        form = UserCommentListGetForm(request.GET)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        author = get_object_or_404(User, username=request.GET["username"])
+        return get_user_comments(
+            request,
+            author,
+            form.cleaned_data["course_id"],
+            form.cleaned_data["flagged"],
             form.cleaned_data["page"],
             form.cleaned_data["page_size"],
             form.cleaned_data["requested_fields"],

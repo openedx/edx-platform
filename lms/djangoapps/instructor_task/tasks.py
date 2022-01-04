@@ -24,7 +24,7 @@ import logging
 from functools import partial
 
 from celery import shared_task
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
@@ -75,7 +75,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     to instantiate an xmodule instance.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('rescored')
+    action_name = gettext_noop('rescored')
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
 
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
@@ -89,7 +89,7 @@ def override_problem_score(entry_id, xmodule_instance_args):
     Overrides a specific learner's score on a problem.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('overridden')
+    action_name = gettext_noop('overridden')
     update_fcn = partial(override_score_module_state, xmodule_instance_args)
 
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
@@ -113,7 +113,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     to instantiate an xmodule instance.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('reset')
+    action_name = gettext_noop('reset')
     update_fcn = partial(reset_attempts_module_state, xmodule_instance_args)
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
@@ -136,7 +136,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     to instantiate an xmodule instance.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('deleted')
+    action_name = gettext_noop('deleted')
     update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
@@ -159,7 +159,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     to instantiate an xmodule instance.  This is unused here.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('emailed')
+    action_name = gettext_noop('emailed')
     visit_fcn = perform_delegate_email_batches
     return run_main_task(entry_id, visit_fcn, action_name)
 
@@ -175,7 +175,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     an S3 bucket for download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(ProblemResponses.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -187,7 +187,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     Grade a course and push the results to an S3 bucket for download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('graded')
+    action_name = gettext_noop('graded')
     TASK_LOG.info(
         "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
@@ -205,7 +205,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     grades and push the results to an S3 bucket for download.
     """
     # Translators: This is a past-tense phrase that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('problem distribution graded')
+    action_name = gettext_noop('problem distribution graded')
     TASK_LOG.info(
         "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
@@ -223,7 +223,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     CSV to an S3 bucket for download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(upload_students_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -236,7 +236,7 @@ def course_survey_report_csv(entry_id, xmodule_instance_args):
     generated report to an S3 bucket for download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(upload_course_survey_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -262,7 +262,7 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(upload_may_enroll_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -274,7 +274,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     Grade students and generate certificates.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('certificates generated')
+    action_name = gettext_noop('certificates generated')
     TASK_LOG.info(
         "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
@@ -292,7 +292,7 @@ def cohort_students(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
-    action_name = ugettext_noop('cohorted')
+    action_name = gettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -305,7 +305,7 @@ def generate_anonymous_ids_for_course(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
-    action_name = ugettext_noop('generate_anonymized_id')
+    action_name = gettext_noop('generate_anonymized_id')
     task_fn = partial(generate_anonymous_ids, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -316,7 +316,7 @@ def export_ora2_data(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2 responses and push it to S3.
     """
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(upload_ora2_data, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -328,7 +328,7 @@ def export_ora2_submission_files(entry_id, xmodule_instance_args):
     Download all submission files, generate csv downloads list,
     put all this into zip archive and push it to S3.
     """
-    action_name = ugettext_noop('compressed')
+    action_name = gettext_noop('compressed')
     task_fn = partial(upload_ora2_submission_files, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
@@ -339,6 +339,6 @@ def export_ora2_summary(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2/student summaries and push it to S3.
     """
-    action_name = ugettext_noop('generated')
+    action_name = gettext_noop('generated')
     task_fn = partial(upload_ora2_summary, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

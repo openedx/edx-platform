@@ -35,7 +35,7 @@ import os
 import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
@@ -817,7 +817,7 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
-    # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
+    # .. toggle_name: FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
@@ -1000,6 +1000,9 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_creation_date: 2021-10-27
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
 ENABLE_COPPA_COMPLIANCE = False
+
+# VAN-741 - save for later api put behind a flag to make it only available for edX
+ENABLE_SAVE_FOR_LATER = False
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1450,12 +1453,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -2950,6 +2951,9 @@ INSTALLED_APPS = [
     # Course home api
     'lms.djangoapps.course_home_api',
 
+    # User tours
+    'lms.djangoapps.user_tours',
+
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
 
@@ -3191,6 +3195,9 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
+
+    # For save for later
+    'lms.djangoapps.save_for_later'
 ]
 
 ######################### CSRF #########################################
@@ -4027,6 +4034,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "id",
+        "verified_name",
         "extended_profile",
         "gender",
         "state",
@@ -4558,6 +4566,13 @@ RESET_PASSWORD_API_RATELIMIT = '30/7d'
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
+#### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
+SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_
@@ -4681,7 +4696,6 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: ORA_GRADING_MICROFRONTEND_URL
 # .. setting_default: None
@@ -4690,6 +4704,20 @@ LEARNING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based discussions page.
+# .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
+DISCUSSIONS_MICROFRONTEND_URL = None
+# .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   HIBP Policy.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-12-03
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
+ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']

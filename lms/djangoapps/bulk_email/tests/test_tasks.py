@@ -9,11 +9,11 @@ paths actually work.
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import json
-from itertools import chain, cycle, repeat
-from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
-from unittest.mock import Mock, patch
-from uuid import uuid4
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+from itertools import chain, cycle, repeat  # lint-amnesty, pylint: disable=wrong-import-order
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
 import pytest
 from boto.exception import AWSConnectionError
 from boto.ses.exceptions import (
@@ -39,7 +39,7 @@ from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtas
 from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 
