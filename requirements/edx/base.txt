@@ -50,7 +50,7 @@ asgiref==3.4.1
     # via django
 async-timeout==4.0.2
     # via aiohttp
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   -r requirements/edx/base.in
     #   aiohttp
@@ -675,13 +675,13 @@ newrelic==7.2.4.171
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
-nltk==3.6.6
+nltk==3.6.7
     # via
     #   -r requirements/edx/base.in
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.in
-numpy==1.21.5
+numpy==1.22.0
     # via
     #   chem
     #   openedx-calc
@@ -727,14 +727,14 @@ pbr==5.8.0
     #   stevedore
 piexif==1.1.3
     # via -r requirements/edx/base.in
-pillow==8.4.0
+pillow==9.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-organizations
 polib==1.1.1
     # via edx-i18n-tools
-psutil==5.8.0
+psutil==5.9.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
@@ -752,7 +752,7 @@ pycryptodomex==3.12.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pygments==2.10.0
+pygments==2.11.1
     # via
     #   -r requirements/edx/base.in
     #   py2neo
@@ -863,7 +863,7 @@ redis==4.1.0
     # via -r requirements/edx/base.in
 regex==2021.11.10
     # via nltk
-requests==2.26.0
+requests==2.27.0
     # via
     #   -r requirements/edx/paver.txt
     #   analytics-python
@@ -887,7 +887,7 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/base.in
     #   social-auth-core
-ruamel.yaml==0.17.19
+ruamel.yaml==0.17.20
     # via drf-yasg
 ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
@@ -1082,7 +1082,7 @@ xss-utils==0.3.0
     # via -r requirements/edx/base.in
 yarl==1.7.2
     # via aiohttp
-zipp==3.6.0
+zipp==3.7.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
