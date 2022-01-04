@@ -384,6 +384,11 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
         assert response.data['display_name'] == 'sequence'
         assert len(response.data['items']) == 1
 
+    def test_unit_error(self):
+        """Verify that we return a proper error when passed a non-sequence"""
+        response = self.client.get(f'/api/courseware/sequence/{self.unit.location}')
+        assert response.status_code == 422
+
     @ddt.data(
         (False, None, False, False),
         (True, None, True, False),
