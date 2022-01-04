@@ -11,13 +11,17 @@ Currently, the courses are being stored in the Modulestore and we want the libra
 To achieve this we need a referencing mechanism to reference the libraries to the courses. This referencing helps in replacing
 v1 libraries (current content libraries stored on Modulestore) with v2 libraries (Blockstore backed) which are:
 
-#. not dependent on edx-platform
-#.simpler to maintain than modulestore
+Currently, courses are stored in Modulestore (MongoDB), and libraries can be stored in either Modulestore (libraries v1) or blockstore (libraries v2).
+We are currently building out the functionality of libraries v2, and trying to migrate all usage of content libraries onto Blockstore.
+The benefits of using the Blockstore backed v2 libraries are:
+
+#. Blockstore is much more flexible than modulestore and can store anything that can be represented as a file - unlike modulestore, which only stores courses built of XBlocks. Also, the Blockstore is being moved into the edx-platform.
+#. simpler to maintain than modulestore
 #. increases re-usability of the content
 
 Terminology Used
 ^^^^^^^^^^^^^^^^
-#. Blocks: Each reusable piece of content in a library. Example: problems, videos, HTML
+#. Blocks: Each reusable piece of content in a library. Example: problems, videos, HTML. Also known as Xblocks.
 #. Library: Collection of blocks in a course.
 
 
