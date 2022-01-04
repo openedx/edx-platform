@@ -155,6 +155,22 @@ class CommentsServiceMockMixin:
             status=200
         )
 
+    def register_get_comments_response(self, comments, page, num_pages):
+        """Register a mock response for GET on the CS comments list endpoint"""
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/comments",
+            body=json.dumps({
+                "collection": comments,
+                "page": page,
+                "num_pages": num_pages,
+                "comment_count": len(comments),
+            }),
+            status=200
+        )
+
     def register_post_comment_response(self, comment_data, thread_id, parent_id=None):
         """
         Register a mock response for POST on the CS comments endpoint for the

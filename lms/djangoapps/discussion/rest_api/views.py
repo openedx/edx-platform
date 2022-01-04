@@ -7,6 +7,7 @@ import logging
 import uuid
 
 import edx_api_doc_tools as apidocs
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -44,12 +45,14 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
     update_thread,
 )
 from ..rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
+    UserCommentListGetForm,
     CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
@@ -402,10 +405,15 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
     **Use Cases**
 
         Retrieve the list of comments in a thread, retrieve the list of
-        child comments for a response comment, create a comment, or modify
-        or delete an existing comment.
+        comments from an user in a course, retrieve the list of child
+        comments for a response comment, create a comment, or modify or
+        delete an existing comment.
 
     **Example Requests**:
+
+        GET /api/discussion/v1/comments/?username=edx&course_id=course-v1:edX+DemoX+Demo_Course
+
+        GET /api/discussion/v1/comments/?username=edx&course_id=course-v1:edX+DemoX+Demo_Course&flagged=true
 
         GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
 
@@ -425,11 +433,20 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
     **GET Comment List Parameters**:
 
-        * thread_id (required): The thread to retrieve comments for
+        * thread_id (required when username is not provided): The thread to retrieve comments for
+
+        * username (required when thread_id is not provided): The user from whom to retrieve comments
+
+        * course_id (required when username is provided): The course from which to retrive the user's comments
 
         * endorsed: If specified, only retrieve the endorsed or non-endorsed
           comments accordingly. Required for a question thread, must be absent
           for a discussion thread.
+          This parameter has no effect when fetching comments by `username`.
+
+        * flagged: Only retrieve comments that were flagged for abuse.
+          This requires the requester to have elevated privileges, and
+          has no effect otherwise.
 
         * page: The (1-indexed) page to retrieve (default is 1)
 
@@ -548,8 +565,31 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
     def list(self, request):
         """
-        Implements the GET method for the list endpoint as described in the
-        class docstring.
+        Implements the GET method for the list endpoint as described in
+        the class docstring.
+
+        This endpoint implements two distinct usage contexts.
+
+        When `username` is provided, the `course_id` parameter is
+        required, and `thread_id` is ignored.
+        The behavior is to retrieve all of the user's non-anonymous
+        comments from the specified course, outside of the context of a
+        forum thread. In this context, endorsement information is
+        unavailable.
+
+        When `username` is not provided, `thread_id` is required, and
+        `course_id` is ignored, since the thread already belongs to a course.
+        In this context, all information relevant to usage in the
+        discussions forum is available.
+        """
+        if "username" in request.GET:
+            return self.list_by_user(request)
+        else:
+            return self.list_by_thread(request)
+
+    def list_by_thread(self, request):
+        """
+        Handles the case of fetching a thread's comments.
         """
         form = CommentListGetForm(request.GET)
         if not form.is_valid():
@@ -558,6 +598,25 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             request,
             form.cleaned_data["thread_id"],
             form.cleaned_data["endorsed"],
+            form.cleaned_data["page"],
+            form.cleaned_data["page_size"],
+            form.cleaned_data["flagged"],
+            form.cleaned_data["requested_fields"],
+        )
+
+    def list_by_user(self, request):
+        """
+        Handles the case of fetching an user's comments.
+        """
+        form = UserCommentListGetForm(request.GET)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        author = get_object_or_404(User, username=request.GET["username"])
+        return get_user_comments(
+            request,
+            author,
+            form.cleaned_data["course_id"],
+            form.cleaned_data["flagged"],
             form.cleaned_data["page"],
             form.cleaned_data["page_size"],
             form.cleaned_data["requested_fields"],

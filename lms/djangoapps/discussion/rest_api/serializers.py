@@ -392,7 +392,10 @@ class CommentSerializer(_ContentSerializer):
         """
         Returns the username of the endorsing user, if the information is
         available and would not identify the author of an anonymous thread.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         if endorsement:
             endorser_id = int(endorsement["user_id"])
@@ -408,8 +411,11 @@ class CommentSerializer(_ContentSerializer):
     def get_endorsed_by_label(self, obj):
         """
         Returns the role label (i.e. "Staff" or "Community TA") for the
-        endorsing user
+        endorsing user.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         if endorsement:
             return self._get_user_label(int(endorsement["user_id"]))
@@ -419,7 +425,10 @@ class CommentSerializer(_ContentSerializer):
     def get_endorsed_at(self, obj):
         """
         Returns the timestamp for the endorsement, if available.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         return endorsement["time"] if endorsement else None
 
