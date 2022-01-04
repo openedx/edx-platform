@@ -15,7 +15,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.course_goals.models import CourseGoal
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -28,7 +27,6 @@ User = get_user_model()
 
 
 @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
 class TestCourseGoalsAPI(SharedModuleStoreTestCase):
     """
     Testing the Course Goals API.

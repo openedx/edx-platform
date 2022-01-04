@@ -16,7 +16,6 @@ from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from lms.djangoapps.course_goals.models import CourseGoal, CourseGoalReminderStatus, UserActivity
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 log = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ class Command(BaseCommand):
     @staticmethod
     def handle_goal(goal, today, sunday_date, monday_date):
         """Sends an email reminder for a single CourseGoal, if it passes all our checks"""
-        if not COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled(goal.course_key):
+        if not ENABLE_COURSE_GOALS.is_enabled(goal.course_key):
             return False
 
         enrollment = CourseEnrollment.get_enrollment(goal.user, goal.course_key, select_related=['course'])
