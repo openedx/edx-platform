@@ -330,7 +330,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             <iframe
                 id='discussions-mfe-tab-embed'
                 title='Discussions'
-                src='http://test.url/discussions/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
+                src='http://test.url/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
             />
             """,
             html,
