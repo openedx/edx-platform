@@ -67,7 +67,7 @@ asgiref==3.4.1
     #   -r requirements/edx/testing.txt
     #   django
     #   uvicorn
-astroid==2.9.0
+astroid==2.9.2
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -76,7 +76,7 @@ async-timeout==4.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -94,10 +94,6 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-backports.entry-points-selectable==1.1.1
-    # via
-    #   -r requirements/edx/testing.txt
-    #   virtualenv
 beautifulsoup4==4.10.0
     # via
     #   -r requirements/edx/testing.txt
@@ -153,11 +149,12 @@ cffi==1.15.0
     # via
     #   -r requirements/edx/testing.txt
     #   cryptography
+    #   pynacl
 chardet==4.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   pysrt
-charset-normalizer==2.0.9
+charset-normalizer==2.0.10
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -248,7 +245,7 @@ distlib==0.3.4
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.10
+django==3.2.11
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -326,7 +323,7 @@ django-classy-tags==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -432,7 +429,7 @@ django-simple-history==3.0.0
     #   ora2
 django-splash==1.1.0
     # via -r requirements/edx/testing.txt
-django-statici18n==2.1.1
+django-statici18n==2.2.0
     # via -r requirements/edx/testing.txt
 django-storages==1.8
     # via
@@ -578,7 +575,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -588,7 +585,7 @@ edx-rbac==1.5.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-rest-api-client==5.4.0
+edx-rest-api-client==5.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -646,7 +643,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==10.0.0
+faker==11.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -654,7 +651,7 @@ fastapi==0.70.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-filelock==3.4.0
+filelock==3.4.2
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -794,7 +791,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.3.2
+jsonschema==4.3.3
     # via sphinxcontrib-openapi
 jwcrypto==1.0
     # via
@@ -875,7 +872,7 @@ mccabe==0.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-mistune==2.0.0
+mistune==2.0.1
     # via m2r
 mock==4.0.3
     # via
@@ -900,7 +897,7 @@ multidict==5.2.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.920
+mypy==0.930
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -910,13 +907,13 @@ newrelic==7.2.4.171
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
-nltk==3.6.6
+nltk==3.6.7
     # via
     #   -r requirements/edx/testing.txt
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/testing.txt
-numpy==1.21.5
+numpy==1.22.0
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -943,9 +940,10 @@ packaging==21.3
     #   drf-yasg
     #   py2neo
     #   pytest
+    #   redis
     #   sphinx
     #   tox
-pact-python==1.4.5
+pact-python==1.4.6
     # via -r requirements/edx/testing.txt
 pansi==2020.7.3
     # via
@@ -975,14 +973,14 @@ pep517==0.12.0
     #   pip-tools
 piexif==1.1.3
     # via -r requirements/edx/testing.txt
-pillow==8.4.0
+pillow==9.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-organizations
 pip-tools==6.4.0
     # via -r requirements/edx/pip-tools.txt
-platformdirs==2.4.0
+platformdirs==2.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -997,7 +995,7 @@ polib==1.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
-psutil==5.8.0
+psutil==5.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -1027,11 +1025,11 @@ pycryptodomex==3.12.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==1.8.2
+pydantic==1.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-pygments==2.10.0
+pygments==2.11.1
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
@@ -1068,11 +1066,11 @@ pylint-celery==0.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-lint
-pylint-django==2.4.4
+pylint-django==2.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-lint
-pylint-plugin-utils==0.6
+pylint-plugin-utils==0.7
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-celery
@@ -1089,6 +1087,8 @@ pymongo==3.10.1
     #   event-tracking
     #   mongodbproxy
     #   mongoengine
+pynacl==1.4.0
+    # via -r requirements/edx/testing.txt
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
 pyparsing==3.0.6
@@ -1210,13 +1210,13 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.0.2
+redis==4.1.0
     # via -r requirements/edx/testing.txt
 regex==2021.11.10
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-requests==2.26.0
+requests==2.27.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
@@ -1243,7 +1243,7 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-ruamel.yaml==0.17.17
+ruamel.yaml==0.17.20
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
@@ -1251,7 +1251,7 @@ ruamel.yaml.clib==0.2.6
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-rules==3.0
+rules==3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1321,6 +1321,7 @@ six==1.16.0
     #   paver
     #   py2neo
     #   pyjwkest
+    #   pynacl
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
@@ -1439,7 +1440,7 @@ tomli==2.0.0
     #   coverage
     #   mypy
     #   pep517
-tox==3.24.4
+tox==3.24.5
     # via
     #   -r requirements/edx/testing.txt
     #   tox-battery
@@ -1449,7 +1450,7 @@ tqdm==4.62.3
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-transifex-client==0.14.3
+transifex-client==0.14.4
     # via -r requirements/edx/testing.txt
 typing-extensions==4.0.1
     # via
@@ -1491,7 +1492,7 @@ vine==1.3.0
     #   -r requirements/edx/testing.txt
     #   amqp
     #   celery
-virtualenv==20.10.0
+virtualenv==20.13.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -1521,7 +1522,7 @@ webob==1.8.7
     #   -r requirements/edx/testing.txt
     #   xblock
     #   xmodule
-wheel==0.37.0
+wheel==0.37.1
     # via
     #   -r requirements/edx/pip-tools.txt
     #   pip-tools
@@ -1572,7 +1573,7 @@ yarl==1.7.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
-zipp==3.6.0
+zipp==3.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   importlib-metadata
