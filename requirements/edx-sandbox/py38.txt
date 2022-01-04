@@ -42,7 +42,7 @@ networkx==2.5.1
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-nltk==3.6.6
+nltk==3.6.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -55,7 +55,7 @@ numpy==1.16.6
     #   scipy
 openedx-calc==2.0.1
     # via -r requirements/edx-sandbox/py38.in
-pillow==8.4.0
+pillow==9.0.0
     # via matplotlib
 pycparser==2.21
     # via cffi
