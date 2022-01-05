@@ -109,6 +109,16 @@ def validate_name(name):
         raise forms.ValidationError(_('Enter a valid name'))
 
 
+def validate_country(country):
+    """
+    Verifies a country is valid, raises a ValidationError otherwise.
+    Args:
+        country (unicode): The country to validate.
+    """
+    if country not in countries:
+        raise forms.ValidationError(_('Enter a valid country name'))
+
+
 class UsernameField(forms.CharField):
     """
     A CharField that validates usernames based on the `ENABLE_UNICODE_USERNAME` feature.
@@ -208,6 +218,26 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
+                elif field_name == "country":
+                    required_value = field_value == "required"
+                    error_message = error_message_dict.get(
+                        field_name,
+                        _("You are missing one or more required fields")
+                    )
+                    # country code should only be 2 char long according to ISO Alpha-2 format
+                    min_length = 2
+                    max_length = 2
+                    self.fields[field_name] = forms.CharField(
+                        required=required_value,
+                        min_length=min_length,
+                        max_length=max_length,
+                        validators=[validate_country],
+                        error_messages={
+                            "required": error_message,
+                            "min_length": error_message,
+                            "max_length": error_message,
+                        }
+                    )
                 else:
                     required = field_value == "required"
                     min_length = 1
