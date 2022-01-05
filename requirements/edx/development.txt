@@ -149,11 +149,12 @@ cffi==1.15.0
     # via
     #   -r requirements/edx/testing.txt
     #   cryptography
+    #   pynacl
 chardet==4.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   pysrt
-charset-normalizer==2.0.9
+charset-normalizer==2.0.10
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -244,7 +245,7 @@ distlib==0.3.4
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.10
+django==3.2.11
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -1086,6 +1087,8 @@ pymongo==3.10.1
     #   event-tracking
     #   mongodbproxy
     #   mongoengine
+pynacl==1.4.0
+    # via -r requirements/edx/testing.txt
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
 pyparsing==3.0.6
@@ -1318,6 +1321,7 @@ six==1.16.0
     #   paver
     #   py2neo
     #   pyjwkest
+    #   pynacl
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
