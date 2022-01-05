@@ -53,6 +53,9 @@
 
 .window-wrap {
   background: $body-bg;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .login-register-content {
@@ -954,4 +957,3 @@ ul.fa-ul{
 body.open-modal {
   overflow: hidden;
 }
-
