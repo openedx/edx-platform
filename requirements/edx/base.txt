@@ -93,7 +93,7 @@ botocore==1.8.17
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.in
-celery==5.2.1
+celery==5.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -606,7 +606,7 @@ jsonfield==3.1.0
     #   ora2
 jwcrypto==1.0
     # via pylti1p3
-kombu==5.2.2
+kombu==5.2.3
     # via celery
 laboratory==1.0.2
     # via -r requirements/edx/base.in
@@ -747,7 +747,7 @@ polib==1.1.1
     # via edx-i18n-tools
 prompt-toolkit==3.0.24
     # via click-repl
-psutil==5.8.0
+psutil==5.9.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
