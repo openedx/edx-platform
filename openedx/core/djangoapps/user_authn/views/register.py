@@ -245,11 +245,6 @@ def create_account_with_params(request, params):
 
     _track_user_registration(user, profile, params, third_party_provider)
 
-    # Announce registration
-    REGISTER_USER.send(sender=None, user=user, registration=registration)
-
-    create_comments_service_user(user)
-
     if not is_request_for_new_amc_site(request):
         # When _new_ trial is requested, we register the user first, then the
         # Organization and SiteConfiguration.
@@ -263,6 +258,11 @@ def create_account_with_params(request, params):
                 organization=current_org,
                 is_amc_admin=is_request_for_amc_admin(request),
             )
+
+    # Announce registration
+    REGISTER_USER.send(sender=None, user=user, registration=registration)
+
+    create_comments_service_user(user)
 
     try:
         _record_registration_attributions(request, new_user)
