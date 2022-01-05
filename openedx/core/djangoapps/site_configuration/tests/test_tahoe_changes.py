@@ -122,6 +122,10 @@ class SiteConfigAPIClientTests(TestCase):
         "$brand-accent-color": "#7f8c8d",
     }
 
+    about_page = {
+        'title': 'About page from site configuration service',
+    }
+
     @classmethod
     def setUpClass(cls):
         super(SiteConfigAPIClientTests, cls).setUpClass()
@@ -132,6 +136,7 @@ class SiteConfigAPIClientTests(TestCase):
         cls.api_adapter = Mock(
             get_value=cls.test_config.get,
             get_amc_v1_theme_css_variables=Mock(return_value=cls.sass_variables),
+            get_amc_v1_page=Mock(return_value=cls.about_page),
         )
 
     def test_get_value_with_adapter(self):
@@ -156,3 +161,36 @@ class SiteConfigAPIClientTests(TestCase):
         )
         site_configuration.api_adapter = self.api_adapter
         assert site_configuration._formatted_sass_variables()
+
+    def test_page_content_without_adapter(self):
+        """
+        Test `get_page_content()` without the SiteConfig adapter.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            page_elements={
+                'about': {
+                    'title': 'About page in Django model.',
+                },
+            },
+        )
+        assert site_configuration.get_page_content('about') == {
+            'title': 'About page in Django model.',
+        }
+
+    def test_page_content_with_adapter(self):
+        """
+        Ensure `get_page_content()` uses the SiteConfig adapter when available.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            page_elements={
+                'about': {
+                    'title': 'About page in Django model.',
+                },
+            },
+        )
+        site_configuration.api_adapter = self.api_adapter
+        assert site_configuration.get_page_content('about') == {
+            'title': 'About page from site configuration service',
+        }
