@@ -13,16 +13,11 @@ from lxml import etree
 from requests import exceptions
 
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
-from common.djangoapps.third_party_auth.utils import parse_metadata_xml
+from common.djangoapps.third_party_auth.utils import MetadataParseError, parse_metadata_xml
 
 log = logging.getLogger(__name__)
 
 SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'  # The SAML Metadata XML namespace
-
-
-class MetadataParseError(Exception):
-    """ An error occurred while parsing the SAML metadata from an IdP """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @shared_task
