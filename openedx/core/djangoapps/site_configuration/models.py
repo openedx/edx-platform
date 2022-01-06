@@ -167,6 +167,27 @@ class SiteConfiguration(models.Model):
 
         return default
 
+    @beeline.traced('site_config.get_page_content')
+    def get_page_content(self, name, default=None):
+        """
+        Tahoe: Get page content from Site Configuration service settings.
+
+        If SiteConfiguration adapter isn't in use, fallback to the deprecated `SiteConfiguration.page_elements` field.
+
+        Args:
+            name (str): Name of the page to fetch.
+            default: default value to return if page is not found in the configuration.
+
+        Returns:
+            Page content `dict`.
+        """
+        if self.api_adapter:
+            beeline.add_context_field('page_source', 'site_config_service')
+            return self.api_adapter.get_amc_v1_page(name, default)
+        else:
+            beeline.add_context_field('page_source', 'django_model')
+            return self.page_elements.get(name, default)
+
     @classmethod
     def get_configuration_for_org(cls, org, select_related=None):
         """
