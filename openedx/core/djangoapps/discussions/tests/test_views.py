@@ -319,7 +319,6 @@ class DataTest(AuthorizedApiTest):
         Provider.INSCRIBE,
         Provider.PIAZZA,
         Provider.YELLOWDIG,
-        Provider.LEGACY
     )
     def test_add_valid_configuration(self, provider_type):
         """
@@ -337,7 +336,7 @@ class DataTest(AuthorizedApiTest):
         data = self.get()
         assert data['enabled']
         assert data['provider_type'] == provider_type
-        assert data['plugin_configuration'] == DEFAULT_LEGACY_CONFIGURATION
+        assert data['plugin_configuration'] == {'key': 'value'}
         assert data['lti_configuration'] == DEFAULT_LTI_CONFIGURATION
 
     def test_change_plugin_configuration(self):
@@ -354,7 +353,10 @@ class DataTest(AuthorizedApiTest):
         }
         response = self._post(payload)
         data = response.json()
-        assert data['plugin_configuration'] == DEFAULT_LEGACY_CONFIGURATION
+        assert data['plugin_configuration'] == {
+            'allow_anonymous': False,
+            'custom_field': 'custom_value',
+        }
 
         course = self.store.get_course(self.course.id)
         # Only configuration fields not stored in the course, or
@@ -532,10 +534,7 @@ class DataTest(AuthorizedApiTest):
         data = self.get()
         assert data['enabled']
         assert data['provider_type'] == Provider.ED_DISCUSS
-        assert data['plugin_configuration'] == {
-            **DEFAULT_LEGACY_CONFIGURATION,
-            'allow_anonymous': False,
-        }
+        assert data['plugin_configuration'] == {}
         assert data['lti_configuration'] == DATA_LTI_CONFIGURATION_DISABLED_PII
 
     def test_change_from_lti(self):
@@ -756,10 +755,12 @@ class PIISettingsAPITests(DataTest):
         """
         data = self._configure_lti_discussion_provider(provider=provider)
         self._assert_pii_flag_for_course(enabled=False)
+        expected_providers = AVAILABLE_PROVIDER_MAP[provider]
+        expected_providers.pop('admin_only_config', None)
         assert data['enabled']
         assert data['provider_type'] == provider
-        assert data['providers']['available'][provider] == AVAILABLE_PROVIDER_MAP[provider]
-        assert data['plugin_configuration'] == DEFAULT_LEGACY_CONFIGURATION
+        assert data['providers']['available'][provider] == expected_providers
+        assert data['plugin_configuration'] == {}
         assert data['lti_configuration'] == DATA_LTI_CONFIGURATION_DISABLED_PII
 
         response_data = self.get()
@@ -779,10 +780,12 @@ class PIISettingsAPITests(DataTest):
         with self._pii_sharing_for_course(enabled=True):
             self._assert_pii_flag_for_course(enabled=True)
             data = self._configure_lti_discussion_provider(provider=provider)
+            expected_providers = AVAILABLE_PROVIDER_MAP[provider]
+            expected_providers.pop('admin_only_config', None)
             assert data['enabled']
             assert data['provider_type'] == provider
-            assert data['providers']['available'][provider] == AVAILABLE_PROVIDER_MAP[provider]
-            assert data['plugin_configuration'] == DEFAULT_LEGACY_CONFIGURATION
+            assert data['providers']['available'][provider] == expected_providers
+            assert data['plugin_configuration'] == {}
             assert data['lti_configuration'] == DATA_LTI_CONFIGURATION_ENABLED_PII
 
             response_data = self.get()

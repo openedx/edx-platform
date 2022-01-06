@@ -64,6 +64,15 @@ class DiscussionsConfigurationView(APIView):
 
     @staticmethod
     def get_configuration_data(request: Request, course_key_string: str) -> Dict:
+        """
+        Get discussions configuration data for the course
+        Args:
+            request (Request): a DRF request
+            course_key_string (str): a course key string
+
+        Returns:
+            Dict: Discussion configuration data for the course
+        """
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         provider_type = request.query_params.get('provider_id', None)
@@ -87,6 +96,15 @@ class DiscussionsConfigurationView(APIView):
 
     @staticmethod
     def update_configuration_data(request, course_key_string):
+        """
+        Update discussion configuration for the course based on data in the request.
+        Args:
+            request (Request): a DRF request
+            course_key_string (str): a course key string
+
+        Returns:
+            Dict: modified course configuration data
+        """
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         course = CourseOverview.get_from_id(course_key)
@@ -141,7 +159,15 @@ class DiscussionsProvidersView(APIView):
         return Response(data)
 
     @staticmethod
-    def get_provider_data(course_key_string: str):
+    def get_provider_data(course_key_string: str) -> Dict:
+        """
+        Get provider data for specified course
+        Args:
+            course_key_string (str): course key string
+
+        Returns:
+            Dict: course discussion providers
+        """
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         hidden_providers = []
