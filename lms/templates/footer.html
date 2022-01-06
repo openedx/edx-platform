@@ -94,11 +94,18 @@
       <div class="colophon">
         <nav class="nav-colophon" aria-label="${_('About')}">
           <ol>
-              % for item_num, link in enumerate(footer['navigation_links'], start=1):
-              <li class="nav-colophon-0${item_num}">
-                <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
-              </li>
-              % endfor
+          ##    % for item_num, link in enumerate(footer['navigation_links'], start=1):
+          ##    <li class="nav-colophon-0${item_num}">
+          ##      <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
+          ##    </li>
+          ##    % endfor
+	  <li class="nav-colophon-0${item_num}">
+	 	 <a id="About" href="https://nimbal.co.nz/">About</a>
+	  </li>
+	  <li class="nav-colophon-0${item_num}">
+                 <a id="Contact" href="https://nimbal.co.nz/#contact">Contact</a>
+          </li>
+
           </ol>
         </nav>
 
@@ -116,7 +123,7 @@
               ## can be included in the footer on other sites
               ## (e.g. a blog or marketing front-end) to provide a consistent
               ## user experience.  See the branding app for details.
-              <img alt="${_('organization logo')}" src="${footer['logo_image']}">
+              <img alt="${_('organization logo')}" src="${static.url("images/nimbal.svg")}">
             </a>
           </p>
         </div>
@@ -132,14 +139,14 @@
           </p>
 
         <nav class="nav-legal" aria-label="${_('Legal')}">
-          <ul>
-            % for item_num, link in enumerate(footer['legal_links'], start=1):
-              <li class="nav-legal-0${item_num}">
-                <a href="${link['url']}">${link['title']}</a>
-              </li>
-            % endfor
-            <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
-          </ul>
+         ## <ul>
+         ##   % for item_num, link in enumerate(footer['legal_links'], start=1):
+         ##     <li class="nav-legal-0${item_num}">
+         ##       <a href="${link['url']}">${link['title']}</a>
+         ##     </li>
+         ##   % endfor
+         ##   <li><a href="https://nimbal.io">Nimbal Academy</a></li>
+         ## </ul>
         </nav>
       </div>
 
@@ -150,8 +157,8 @@
       % if not hide_openedx_link:
       <div class="footer-about-openedx">
         <p>
-          <a href="${footer['openedx_link']['url']}">
-            <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="175" />
+          <a href="https://nimbal.io">
+            <img src="${static.url("images/nimbal.svg")}" alt="${footer['openedx_link']['title']}" width="175" />
           </a>
         </p>
       </div>
