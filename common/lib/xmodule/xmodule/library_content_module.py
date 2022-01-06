@@ -363,7 +363,7 @@ class LibraryContentBlock(
                 block.save()
 
         self.selected = []
-        return Response(json.dumps(self.student_view().content))
+        return Response(json.dumps(self.student_view({}).content))
 
     def _get_selected_child_blocks(self):
         """
