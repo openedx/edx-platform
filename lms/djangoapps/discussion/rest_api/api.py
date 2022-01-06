@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import itertools
 from collections import defaultdict
+from enum import Enum
 from typing import Dict, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
 
@@ -12,11 +13,12 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
-from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
+from xmodule.course_module import CourseBlock
+from xmodule.tabs import CourseTabList
 
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -44,8 +46,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
-from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import CourseTabList
 from .exceptions import (
     CommentNotFoundError,
     DiscussionBlackOutException,

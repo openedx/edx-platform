@@ -5,8 +5,8 @@ URL definitions for the course_modes v1 API.
 
 from django.conf import settings
 
-from common.djangoapps.course_modes.rest_api.v1 import views
 from django.urls import re_path
+from common.djangoapps.course_modes.rest_api.v1 import views
 
 app_name = 'v1'
 

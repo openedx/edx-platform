@@ -2,9 +2,9 @@
 
 
 from django.conf import settings
+from django.urls import path, re_path
 
 from .views import ThirdPartyAuthUserStatusView, UserMappingView, UserView, UserViewV2
-from django.urls import path, re_path
 
 PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'
 

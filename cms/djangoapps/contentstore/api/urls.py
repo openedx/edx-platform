@@ -2,9 +2,9 @@
 
 
 from django.conf import settings
+from django.urls import re_path
 
 from cms.djangoapps.contentstore.api.views import course_import, course_quality, course_validation
-from django.urls import re_path
 
 app_name = 'contentstore'
 

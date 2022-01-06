@@ -5,8 +5,8 @@ URLs for the V1 of the Entitlements API.
 from django.conf.urls import include
 from rest_framework.routers import DefaultRouter
 
-from .views import EntitlementEnrollmentViewSet, EntitlementViewSet
 from django.urls import path, re_path
+from .views import EntitlementEnrollmentViewSet, EntitlementViewSet
 
 router = DefaultRouter()
 router.register(r'entitlements', EntitlementViewSet, basename='entitlements')

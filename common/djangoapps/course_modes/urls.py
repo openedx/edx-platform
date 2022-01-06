@@ -3,8 +3,8 @@
 
 from django.conf import settings
 
-from common.djangoapps.course_modes import views
 from django.urls import re_path
+from common.djangoapps.course_modes import views
 
 urlpatterns = [
     re_path(fr'^choose/{settings.COURSE_ID_PATTERN}/$', views.ChooseModeView.as_view(), name='course_modes_choose'),
