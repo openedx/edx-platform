@@ -505,8 +505,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
                     # add a session hash custom attribute for all requests to help monitoring
                     #   requests that come both before and after a mistmatch
-                    session_hash = obscure_token(request.cookie_session_field)
-                    set_custom_attribute('safe_sessions.session_id_hash.parsed_cookie', session_hash)
+                    if hasattr(request, 'cookie_session_field'):
+                        session_hash = obscure_token(request.cookie_session_field)
+                        set_custom_attribute('safe_sessions.session_id_hash.parsed_cookie', session_hash)
 
                     # log request header if this user id was involved in an earlier mismatch
                     log_request_headers = cache.get(
