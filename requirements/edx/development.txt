@@ -888,7 +888,7 @@ mccabe==0.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-mistune==2.0.1
+mistune==0.8.4
     # via m2r
 mock==4.0.3
     # via
