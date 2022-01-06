@@ -120,7 +120,9 @@ LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 #      headers will be logged for all requests up until LOG_REQUEST_USER_CHANGE_HEADERS_DURATION seconds after
 #      the time of the last mismatch. The header details will be encrypted, and only available with the private key.
 # .. toggle_warnings: To work correctly, LOG_REQUEST_USER_CHANGES must be enabled and ENFORCE_SAFE_SESSIONS must be
-#      disabled.
+#      disabled. Also, SAFE_SESSIONS_DEBUG_PUBLIC_KEY must be set. See
+#      https://github.com/edx/edx-platform/blob/master/common/djangoapps/util/log_sensitive.py
+#      for instructions.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-12-22
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1940
