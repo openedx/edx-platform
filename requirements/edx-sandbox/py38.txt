@@ -12,7 +12,7 @@ cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
-click==7.1.2
+click==8.0.3
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
