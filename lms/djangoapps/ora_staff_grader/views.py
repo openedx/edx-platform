@@ -56,7 +56,8 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         data = {'target_rubric_block_id': usage_id}
         response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
-        return json.loads(response.content)
+        response_data = json.loads(response.content)
+        return response_data['rubric']
 
     def get_submission_info(self, request, usage_id, submission_uuid):
         """
