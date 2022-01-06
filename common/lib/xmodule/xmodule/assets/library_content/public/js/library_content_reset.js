@@ -4,8 +4,14 @@ function LibraryContentReset(runtime, element) {
     e.preventDefault();
     $.post({
       url: runtime.handlerUrl(element, 'reset_selected_children'),
-      success() {
-        location.reload();
+      success(data) {
+        $(element).html(data);
+        // Rebind the reset button for the block
+        XBlock.initializeBlock(element);
+        // Render the new set of problems (XBlocks)
+        $(".xblock", element).each(function(i, child) {
+          XBlock.initializeBlock(child);
+        });
       },
     });
   });
