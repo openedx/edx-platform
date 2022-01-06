@@ -22,6 +22,9 @@ click>=8.0,<9.0
 # edx-platform currently only supported for Django 3.2.x
 django<3.3
 
+# Newer versions need celery >= 5.0
+django-celery-results==2.0.1
+
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
 
@@ -94,5 +97,3 @@ py2neo<2022
 
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
-
-django-celery-results==2.0.1
