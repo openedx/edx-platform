@@ -1236,7 +1236,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @ddt.data(
-        (True, 'http://test.url/discussions/{}/'),
+        (True, 'http://test.url/{}/'),
         (False, '/courses/{}/discussion/forum/'),
     )
     @ddt.unpack

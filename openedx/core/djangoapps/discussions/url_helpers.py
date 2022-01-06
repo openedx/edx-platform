@@ -16,7 +16,7 @@ def get_discussions_mfe_url(course_key: CourseKey) -> str:
         (str) URL link for MFE. Empty if the base url isn't configured
     """
     if settings.DISCUSSIONS_MICROFRONTEND_URL is not None:
-        return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/discussions/{course_key}/"
+        return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{course_key}/"
     return ''
 
 
@@ -26,6 +26,7 @@ def get_discussions_mfe_topic_url(course_key: CourseKey, topic_id: str) -> str:
 
     Args:
         course_key (CourseKey): course key of course for which to get url
+        topic_id (str): topic id for which to generate URL
 
     Returns:
         (str) URL link for MFE. Empty if the base url isn't configured

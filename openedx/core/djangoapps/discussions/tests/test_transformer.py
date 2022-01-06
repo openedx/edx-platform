@@ -59,7 +59,7 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
             self.discussable_unit.location,
             self.TRANSFORMER_CLASS_TO_TEST.EMBED_URL,
         )
-        assert embed_url == f"http://discussions-mfe/discussions/{self.course.id}/topics/{self.test_topic_id}"
+        assert embed_url == f"http://discussions-mfe/{self.course.id}/topics/{self.test_topic_id}"
 
         external_id = block_structure.get_xblock_field(
             self.discussable_unit.location,
