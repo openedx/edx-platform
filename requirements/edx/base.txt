@@ -267,3 +267,4 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 # setuptools
 
 django-debug-toolbar==2.2
+fpdf==1.7.2
