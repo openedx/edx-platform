@@ -2,10 +2,9 @@
 The utility methods and functions to help the djangoapp logic
 """
 
-
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_DISCUSSIONS
+from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW, ENABLE_MASTERS_PROGRAM_TAB_VIEW
 
 FAKE_COURSE_KEY = CourseKey.from_string('course-v1:fake+course+run')
 
@@ -19,8 +18,15 @@ def strip_course_id(path):
     return path.split(course_id)[0]
 
 
-def program_discussions_is_enabled():
+def program_tab_view_is_enabled() -> bool:
     """
     check if program discussion is enabled.
     """
-    return ENABLE_PROGRAM_DISCUSSIONS.is_enabled()
+    return ENABLE_PROGRAM_TAB_VIEW.is_enabled()
+
+
+def masters_program_tab_view_is_enabled() -> bool:
+    """
+    check if masters program discussion is enabled.
+    """
+    return ENABLE_MASTERS_PROGRAM_TAB_VIEW.is_enabled()

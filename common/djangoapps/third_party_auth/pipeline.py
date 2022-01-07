@@ -87,6 +87,7 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.third_party_auth.utils import (
@@ -1007,7 +1008,8 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
         while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
-            username = short_username + uuid4().hex[:uuid_length]
+            # adding a dash between user-supplied and system-generated values to avoid weird combinations
+            username = short_username + '-' + username_suffix_generator(uuid_length)
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
                 username=final_username))

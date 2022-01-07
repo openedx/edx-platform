@@ -8,7 +8,7 @@ import ddt
 from django.test.utils import override_settings
 
 from openedx.core.lib.tests.assertions.events import assert_events_equal
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import transformers
 from ..shim import PrefixedEventProcessor

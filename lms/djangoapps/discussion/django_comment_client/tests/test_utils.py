@@ -9,9 +9,10 @@ from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
@@ -26,6 +27,7 @@ from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -53,6 +55,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+from xmodule.tabs import CourseTabList
 
 
 class DictionaryTestCase(TestCase):
@@ -1198,6 +1201,7 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         assert reparsed == text
 
 
+@ddt.ddt
 class DiscussionTabTestCase(ModuleStoreTestCase):
     """ Test visibility of the discussion tab. """
 
@@ -1229,6 +1233,20 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             assert not self.discussion_tab_present(self.enrolled_user)
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(
+        (True, 'http://test.url/discussions/{}/'),
+        (False, '/courses/{}/discussion/forum/'),
+    )
+    @ddt.unpack
+    def test_tab_with_mfe_flag(self, mfe_enabled, tab_link):
+        """
+        Tests that the correct link is used for the MFE tab
+        """
+        discussion_tab = CourseTabList.get_tab_by_type(self.course.tabs, 'discussion')
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, mfe_enabled):
+            assert discussion_tab.link_func(self.course, reverse) == tab_link.format(self.course.id)
 
 
 class IsCommentableDividedTestCase(ModuleStoreTestCase):

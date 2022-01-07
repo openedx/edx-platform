@@ -19,7 +19,7 @@ from lms.djangoapps.experiments.utils import (
     get_unenrolled_courses,
     is_enrolled_in_course_run
 )
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
@@ -63,7 +63,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
     def test_unenrolled_courses_for_empty_courses(self):
         unenrolled_courses = get_unenrolled_courses([], [])
-        assert [] == unenrolled_courses
+        assert not unenrolled_courses
 
     def test_unenrolled_courses_for_single_course(self):
         course = {'key': 'UQx+ENGY1x'}

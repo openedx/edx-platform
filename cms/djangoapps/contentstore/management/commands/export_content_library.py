@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
 from cms.djangoapps.contentstore import tasks
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class Command(BaseCommand):
@@ -61,6 +61,6 @@ class Command(BaseCommand):
                 filename = prefix + suffix
                 target = os.path.join(dest_path, filename)
                 tarball.file.seek(0)
-                with open(target, 'w') as f:
+                with open(target, 'wb') as f:
                     shutil.copyfileobj(tarball.file, f)
                 print(f'Library "{library.location.library_key}" exported to "{target}"')

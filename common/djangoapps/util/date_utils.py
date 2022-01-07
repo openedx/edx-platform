@@ -7,7 +7,7 @@ import re
 from datetime import datetime, timedelta
 
 import crum
-from django.utils.translation import get_language, pgettext, gettext
+from django.utils.translation import get_language, gettext, pgettext
 from pytz import UnknownTimeZoneError, timezone, utc
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs

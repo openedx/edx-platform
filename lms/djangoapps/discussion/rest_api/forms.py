@@ -118,8 +118,26 @@ class CommentListGetForm(_PaginationForm):
     A form to validate query parameters in the comment list retrieval endpoint
     """
     thread_id = CharField()
+    flagged = BooleanField(required=False)
     endorsed = ExtendedNullBooleanField(required=False)
     requested_fields = MultiValueField(required=False)
+
+
+class UserCommentListGetForm(_PaginationForm):
+    """
+    A form to validate query parameters in the comment list retrieval endpoint
+    """
+    course_id = CharField()
+    flagged = BooleanField(required=False)
+    requested_fields = MultiValueField(required=False)
+
+    def clean_course_id(self):
+        """Validate course_id"""
+        value = self.cleaned_data["course_id"]
+        try:
+            return CourseLocator.from_string(value)
+        except InvalidKeyError:
+            raise ValidationError(f"'{value}' is not a valid course id")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CommentActionsForm(Form):

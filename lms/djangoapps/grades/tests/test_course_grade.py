@@ -9,8 +9,8 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle_switch
 from ..course_data import CourseData

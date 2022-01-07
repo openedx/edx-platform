@@ -107,6 +107,9 @@ def set_course_tag(user, course_id, key, value):
     # simultaneous calls from many processes. Handle by retrying after
     # a short delay?
 
+    if not user.id:
+        return
+
     record, _ = UserCourseTag.objects.get_or_create(
         user=user,
         course_id=course_id,

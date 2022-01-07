@@ -19,8 +19,8 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @override_settings(

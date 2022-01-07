@@ -43,16 +43,16 @@ from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from openedx.core.toggles import ENTRANCE_EXAMS
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
-from xmodule.tabs import CourseTabList
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from xmodule.course_module import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import (
     ancestor_has_staff_lock,

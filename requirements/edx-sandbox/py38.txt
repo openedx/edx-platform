@@ -16,7 +16,7 @@ click==7.1.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
-cryptography==35.0.0
+cryptography==36.0.1
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
@@ -42,7 +42,7 @@ networkx==2.5.1
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-nltk==3.6.5
+nltk==3.6.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -55,11 +55,11 @@ numpy==1.16.6
     #   scipy
 openedx-calc==2.0.1
     # via -r requirements/edx-sandbox/py38.in
-pillow==8.4.0
+pillow==9.0.0
     # via matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.0.5
+pyparsing==3.0.6
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -71,9 +71,9 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.11.2
+regex==2021.11.10
     # via nltk
-scipy==1.7.2
+scipy==1.7.3
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem

@@ -12,8 +12,8 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.gating.api import evaluate_prerequisite
 from openedx.core.lib.gating import api as gating_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):

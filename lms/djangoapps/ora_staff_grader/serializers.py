@@ -115,6 +115,28 @@ class SubmissionMetadataSerializer(serializers.Serializer):
         read_only_fields = fields
 
 
+class RubricCriterionOptionsSerializer(serializers.Serializer):
+    label = serializers.CharField()
+    points = serializers.IntegerField()
+    explanation = serializers.CharField()
+    name = serializers.CharField()
+    orderNum = serializers.IntegerField(source="order_num")
+
+
+class RubricCriterionSerializer(serializers.Serializer):
+    label = serializers.CharField()
+    prompt = serializers.CharField()
+    feedback = serializers.ChoiceField(choices=["optional", "disabled", "required"])
+    name = serializers.CharField()
+    orderNum = serializers.IntegerField(source="order_num")
+    options = serializers.ListField(child=RubricCriterionOptionsSerializer())
+
+
+class RubricConfigSerializer(serializers.Serializer):
+    feedbackPrompt = serializers.CharField(source="feedback_prompt")
+    criteria = serializers.ListField(child=RubricCriterionSerializer())
+
+
 class InitializeSerializer(serializers.Serializer):
     """
     Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
@@ -122,7 +144,7 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
-    rubricConfig = serializers.DictField()
+    rubricConfig = RubricConfigSerializer()
 
     class Meta:
         fields = [
@@ -139,6 +161,7 @@ class UploadedFileSerializer(serializers.Serializer):
     downloadUrl = serializers.URLField(source='download_url')
     description = serializers.CharField()
     name = serializers.CharField()
+    size = serializers.IntegerField()
 
 
 class ResponseSerializer(serializers.Serializer):
@@ -194,3 +217,59 @@ class LockStatusSerializer(serializers.Serializer):
             'lockStatus'
         ]
         read_only_fields = fields
+
+
+class StaffAssessSerializer(serializers.Serializer):
+    """
+    Converts grade data to the format used for doing staff assessments
+
+    From: {
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {
+                "name": "<criterion_name_1>",
+                "feedback": (string),
+                "selectedOption": <selected_option_name>
+            }
+        ]
+    }
+
+    To: {
+        'options_selected': {
+            '<criterion_name_1>': <selected_option_name>,
+            '<criterion_name_2>': <selected_option_name>,
+        },
+        'criterion_feedback': {
+            '<criterion_label_1>': (string)
+        },
+        'overall_feedback': (string)
+        'submission_uuid': (string)
+        'assess_type': (string) one of ['regrade', full-grade']
+    }
+    """
+    # Context should include 'submission_uuid' for serialization
+    requires_context = True
+
+    options_selected = serializers.SerializerMethodField()
+    criterion_feedback = serializers.SerializerMethodField()
+    overall_feedback = serializers.CharField(source='overallFeedback', allow_null=True)
+    submission_uuid = serializers.SerializerMethodField()
+    assess_type = serializers.CharField(default='full-grade')
+
+    def get_options_selected(self, instance):
+        options_selected = {}
+        for criterion in instance.get('criteria'):
+            options_selected[criterion['name']] = criterion['selectedOption']
+
+        return options_selected
+
+    def get_criterion_feedback(self, instance):
+        criterion_feedback = {}
+        for criterion in instance.get('criteria'):
+            if criterion.get('feedback'):
+                criterion_feedback[criterion['name']] = criterion['feedback']
+
+        return criterion_feedback
+
+    def get_submission_uuid(self, instance):  # pylint: disable=unused-argument
+        return self.context.get('submission_uuid')

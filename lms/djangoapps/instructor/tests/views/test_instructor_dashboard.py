@@ -23,6 +23,7 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseAccess
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import XssTestMixin
+from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -35,9 +36,9 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def intercept_renderer(path, context):
@@ -581,6 +582,21 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         # assert we don't get a 500 error
         assert 200 == response.status_code
+
+    @patch("lms.djangoapps.instructor.views.instructor_dashboard.get_plugins_view_context")
+    def test_external_plugin_integration(self, mock_get_plugins_view_context):
+        """
+        Tests that whether context from plugins is being reflected/added in instructor dashboard.
+        """
+        test_studio_url = get_studio_url(self.course, 'course')
+
+        context = {
+            'studio_url': test_studio_url
+        }
+        mock_get_plugins_view_context.return_value = context
+
+        response = self.client.get(self.url)
+        self.assertContains(response, test_studio_url)
 
 
 @ddt.ddt
