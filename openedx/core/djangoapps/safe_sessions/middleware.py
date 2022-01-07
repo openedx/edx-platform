@@ -509,9 +509,10 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                         session_hash = obscure_token(request.cookie_session_field)
                         set_custom_attribute('safe_sessions.session_id_hash.parsed_cookie', session_hash)
 
+                    # In the off chance that either userid_in_session or request.user.id could
+                    #   be None while the other contains the actual user id, we'll use either.
                     user_id = userid_in_session or hasattr(request, 'user') and request.user.id
-                    if user_id is not None:
-
+                    if user_id:
                         # log request header if this user id was involved in an earlier mismatch
                         log_request_headers = cache.get(
                             SafeSessionMiddleware._get_recent_user_change_cache_key(user_id), False
