@@ -267,6 +267,51 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 25),
         ], any_order=True)
 
+    @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
+    @patch('common.djangoapps.util.log_sensitive.encrypt_for_log')
+    def test_log_encrypted_cookies_no_key(self, mock_encrypt):
+        middleware = CookieMonitoringMiddleware()
+
+        cookies_dict = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        factory = RequestFactory()
+        for name, value in cookies_dict.items():
+            factory.cookies[name] = value
+
+        mock_request = factory.request()
+
+        middleware.process_request(mock_request)
+        mock_encrypt.assert_not_called()
+
+    @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
+    @override_settings(COOKIE_HEADER_DEBUG_PUBLIC_KEY="fake-key")
+    @patch('openedx.core.lib.request_utils.encrypt_for_log')
+    def test_log_encrypted_cookies(self, mock_encrypt):
+
+        middleware = CookieMonitoringMiddleware()
+
+        cookies_dict = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        factory = RequestFactory()
+        for name, value in cookies_dict.items():
+            factory.cookies[name] = value
+
+        mock_request = factory.request()
+        cookie_header = str(mock_request.META.get('HTTP_COOKIE', ''))
+
+
+        middleware.process_request(mock_request)
+        mock_encrypt.assert_has_called([
+            call(cookie_header, "fake-key")
+        ])
+
+
 
 class TestGetExpectedErrorSettingsDict(unittest.TestCase):
     """
