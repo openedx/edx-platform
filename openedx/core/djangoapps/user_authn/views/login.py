@@ -133,12 +133,11 @@ def _get_user_by_email_or_username(request, api_version):
     if any(f not in request.POST.keys() for f in login_fields):
         raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
 
-    email_or_username = request.POST.get('email', None)
+    email_or_username = request.POST.get('email', None) or request.POST.get('email_or_username', None)
     user = _get_user_by_email(email_or_username)
 
     if not user and is_api_v2:
         # If user not found with email and API_V2, try username lookup
-        email_or_username = request.POST.get('email_or_username', None)
         user = _get_user_by_username(email_or_username)
 
     if not user:
