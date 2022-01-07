@@ -501,24 +501,27 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
             try:
 
-                if LOG_REQUEST_USER_CHANGE_HEADERS.is_enabled() and request.user.id is not None:
+                if LOG_REQUEST_USER_CHANGE_HEADERS.is_enabled():
 
                     # add a session hash custom attribute for all requests to help monitoring
-                    #   requests that come both before and after a mistmatch
+                    #   requests that come both before and after a mismatch
                     if hasattr(request, 'cookie_session_field'):
                         session_hash = obscure_token(request.cookie_session_field)
                         set_custom_attribute('safe_sessions.session_id_hash.parsed_cookie', session_hash)
 
-                    # log request header if this user id was involved in an earlier mismatch
-                    log_request_headers = cache.get(
-                        SafeSessionMiddleware._get_recent_user_change_cache_key(request.user.id), False
-                    )
-                    if log_request_headers:
-                        log.info(
-                            f'SafeCookieData request header for {request.user.id}: '
-                            f'{SafeSessionMiddleware._get_encrypted_request_headers(request)}'
+                    user_id = userid_in_session or hasattr(request, 'user') and request.user.id
+                    if user_id is not None:
+
+                        # log request header if this user id was involved in an earlier mismatch
+                        log_request_headers = cache.get(
+                            SafeSessionMiddleware._get_recent_user_change_cache_key(user_id), False
                         )
-                        set_custom_attribute('safe_sessions.headers_logged', True)
+                        if log_request_headers:
+                            log.info(
+                                f'SafeCookieData request header for {user_id}: '
+                                f'{SafeSessionMiddleware._get_encrypted_request_headers(request)}'
+                            )
+                            set_custom_attribute('safe_sessions.headers_logged', True)
 
             except BaseException as e:
                 log.exception("SafeCookieData error while logging request headers.")
