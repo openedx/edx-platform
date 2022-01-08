@@ -2,7 +2,7 @@
 Unit tests for SafeSessionMiddleware
 """
 
-from unittest.mock import call, patch
+from unittest.mock import call, patch, MagicMock
 
 import ddt
 from crum import set_current_request
@@ -431,7 +431,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
     @override_settings(LOG_REQUEST_USER_CHANGE_HEADERS=True)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.cache")
-    def test_with_header_logging(self, mock_cache):
+    def test_user_change_with_header_logging(self, mock_cache):
         self.set_up_for_success()
         self.request.user = UserFactory.create()
         with self.assert_logged('SafeCookieData: Changing request user. ', log_level='warning'):
@@ -452,6 +452,24 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         #   for some reason. Rather than asserting that we log the header appropriately, we'll
         #   simply verify that we are checking the cache.
         mock_cache.get.assert_called_with('safe_sessions.middleware.recent_user_change_detected_1', False)
+
+    @override_settings(LOG_REQUEST_USER_CHANGE_HEADERS=True)
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
+    def test_no_request_user_with_header_logging(self):
+        """
+        Test header logging enabled with request not containing a user object.
+
+        Notes:
+        * In Production, failures happened for some requests that did not have
+            request.user set, so we test this case here.
+        * An attempt at creating a unit test for an anonymous user started
+            failing due to a missing request.session, which never happens in
+            Production, so this case assumes a working session object.
+        """
+        self.request.session = MagicMock()
+        del self.request.user
+        with self.assert_not_logged():
+            SafeSessionMiddleware().process_response(self.request, self.client.response)
 
     def test_no_warn_on_expected_user_change(self):
         """
