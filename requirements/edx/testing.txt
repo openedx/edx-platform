@@ -1484,3 +1484,4 @@ zipp==3.7.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+-e git+https://github.com/open-craft/problem-builder.git@026449b916a59fbd57d0529e26eba8f2c2906021#egg=xblock-problem-builder
