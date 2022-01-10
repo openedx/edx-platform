@@ -1113,6 +1113,285 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         assert expected_info == render_call_dict['learner_program_enrollments']
 
 
+@ddt.ddt
+class ProgramEnrollmentsInspectorAPIViewTests(SupportViewTestCase):
+    """
+    View tests for Program Enrollments Inspector API
+    """
+    _url = reverse("support:program_enrollments_inspector_details")
+
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.external_user_key = 'abcaaa'
+        # Setup three orgs and their SAML providers
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+        self.no_saml_org_key = 'no_saml_org'
+        self.no_saml_lms_org = OrganizationFactory(
+            short_name=self.no_saml_org_key
+        )
+
+    def _serialize_datetime(self, dt):
+        return dt.strftime('%Y-%m-%dT%H:%M:%S')
+
+    def test_default_response(self):
+        response = self.client.get(self._url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert '' == content['org_keys']
+
+    def _construct_user(self, username, org_key=None, external_user_key=None):
+        """
+        Provided the username, create an edx account user. If the org_key is provided,
+        SSO link the user with the IdP associated with org_key. Return the created user and
+        expected user info object from the view
+        """
+        user = UserFactory(username=username)
+        user_info = {
+            'username': user.username,
+            'email': user.email
+        }
+        if org_key and external_user_key:
+            user_social_auth = UserSocialAuth.objects.create(
+                user=user,
+                uid=f'{org_key}:{external_user_key}',
+                provider='tpa-saml'
+            )
+            user_info['sso_list'] = [{
+                'uid': user_social_auth.uid
+            }]
+        return user, user_info
+
+    def _construct_enrollments(self, program_uuids, course_ids, external_user_key, edx_user=None):
+        """
+        A helper function to setup the program enrollments for a given learner.
+        If the edx user is provided, it will try to SSO the user with the enrollments
+        Return the expected info object that should be created based on the model setup
+        """
+        program_enrollments = []
+        for program_uuid in program_uuids:
+            course_enrollment = None
+            program_enrollment = ProgramEnrollmentFactory.create(
+                external_user_key=external_user_key,
+                program_uuid=program_uuid,
+                user=edx_user
+            )
+
+            for course_id in course_ids:
+                if edx_user:
+                    course_enrollment = CourseEnrollmentFactory.create(
+                        course_id=course_id,
+                        user=edx_user,
+                        mode=CourseMode.MASTERS,
+                        is_active=True
+                    )
+
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(  # lint-amnesty, pylint: disable=unused-variable
+                    program_enrollment=program_enrollment,
+                    course_key=course_id,
+                    course_enrollment=course_enrollment,
+                    status='active',
+                )
+
+            program_enrollments.append(program_enrollment)
+
+        serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
+        return serialized.data
+
+    def _construct_id_verification(self, user):
+        """
+        Helper function to create the SSO verified record for the user
+        so that the user is ID Verified
+        """
+        SSOVerificationFactory(
+            identity_provider_slug=self.org_key_list[0],
+            user=user,
+        )
+        return IDVerificationService.user_status(user)
+
+    def test_search_username_well_connected_user(self):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_not_connected(self):
+        created_user, expected_user_info = self._construct_user('user_not_connected')
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user)
+        }
+
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_no_enrollment(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_no_course_enrollment(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+            created_user,
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_not_connected_with_enrollments(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_id_verified(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': id_verified
+        }
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        assert expected_info == response['learner_program_enrollments']
+
+    @ddt.data(
+        ('', 'test_org'),
+        ('bad_key', '')
+    )
+    @ddt.unpack
+    def test_search_no_external_user_key(self, user_key, org_key):
+        response = self.client.get(self._url + f'?external_user_key={user_key}&org_key={org_key}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_error = (
+            "To perform a search, you must provide either the student's "
+            "(a) edX username, "
+            "(b) email address associated with their edX account, or "
+            "(c) Identity-providing institution and external key!"
+        )
+
+        assert {} == response['learner_program_enrollments']
+        assert expected_error == response['error']
+
+    def test_search_external_user_not_connected(self):
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+        )
+        response = self.client.get(
+            self._url + f'?external_user_key={self.external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': {
+                'external_user_key': self.external_user_key,
+            },
+            'enrollments': expected_enrollments
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_external_user_not_in_system(self):
+        external_user_key = 'not_in_system'
+        response = self.client.get(
+            self._url + f'?external_user_key={external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_error = 'No user found for external key {} for institution {}'.format(
+            external_user_key, self.org_key_list[0]
+        )
+        assert expected_error == response['error']
+
+    def test_search_external_user_case_insensitive(self):
+        external_user_key = 'AbCdEf123'
+        requested_external_user_key = 'aBcDeF123'
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            external_user_key,
+            created_user
+        )
+        id_verified = self._construct_id_verification(created_user)
+        response = self.client.get(
+            self._url + f'?external_user_key={requested_external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified,
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+
 class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):

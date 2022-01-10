@@ -17,6 +17,7 @@ from .views.program_enrollments import (
     LinkProgramEnrollmentSupportAPIView,
     ProgramEnrollmentsInspectorView,
     SAMLProvidersWithOrg,
+    ProgramEnrollmentsInspectorAPIView,
 )
 from .views.sso_records import SsoView
 from .views.onboarding_status import OnboardingView
@@ -70,6 +71,11 @@ urlpatterns = [
         r'get_saml_providers/?$',
         SAMLProvidersWithOrg.as_view(),
         name='get_saml_providers'
+    ),
+    re_path(
+        r'program_enrollments_inspector_details/?$',
+        ProgramEnrollmentsInspectorAPIView.as_view(),
+        name='program_enrollments_inspector_details'
     ),
     re_path(r'sso_records/(?P<username_or_email>[\w.@+-]+)?$', SsoView.as_view(), name='sso_records'),
     re_path(
