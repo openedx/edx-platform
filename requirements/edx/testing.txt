@@ -63,7 +63,7 @@ asgiref==3.4.1
     #   -r requirements/edx/base.txt
     #   django
     #   uvicorn
-astroid==2.9.2
+astroid==2.9.3
     # via
     #   pylint
     #   pylint-celery
@@ -485,7 +485,7 @@ docutils==0.17.1
     #   botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.txt
-drf-jwt==1.19.1
+drf-jwt==1.19.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
@@ -642,8 +642,12 @@ factory-boy==3.2.1
     # via -r requirements/edx/testing.in
 faker==11.3.0
     # via factory-boy
-fastapi==0.70.1
+fastapi==0.71.0
     # via pact-python
+fastavro==1.4.9
+    # via
+    #   -r requirements/edx/base.txt
+    #   openedx-events
 filelock==3.4.2
     # via
     #   tox
@@ -678,7 +682,7 @@ geoip2==4.5.0
     # via -r requirements/edx/base.txt
 gitdb==4.0.9
     # via gitpython
-gitpython==3.1.24
+gitpython==3.1.25
     # via transifex-client
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -896,7 +900,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.6.0
+openedx-events==0.7.0
     # via -r requirements/edx/base.txt
 ora2==3.7.8
     # via -r requirements/edx/base.txt
@@ -915,7 +919,7 @@ pansi==2020.7.3
     # via
     #   -r requirements/edx/base.txt
     #   py2neo
-path==16.2.0
+path==16.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
@@ -976,7 +980,7 @@ py2neo==2021.2.3
     #   -r requirements/edx/base.txt
 pycodestyle==2.8.0
     # via -r requirements/edx/testing.in
-pycountry==20.7.3
+pycountry==22.1.10
     # via -r requirements/edx/base.txt
 pycparser==2.21
     # via
@@ -990,7 +994,7 @@ pycryptodomex==3.12.0
     #   pyjwkest
 pydantic==1.9.0
     # via fastapi
-pygments==2.11.1
+pygments==2.11.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
@@ -1042,7 +1046,7 @@ pymongo==3.10.1
     #   event-tracking
     #   mongodbproxy
     #   mongoengine
-pynacl==1.4.0
+pynacl==1.5.0
     # via -r requirements/edx/base.txt
 pynliner==0.8.0
     # via -r requirements/edx/base.txt
@@ -1268,7 +1272,6 @@ six==1.16.0
     #   paver
     #   py2neo
     #   pyjwkest
-    #   pynacl
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
@@ -1311,7 +1314,7 @@ sqlparse==0.4.2
     #   django
 staff-graded-xblock==1.6.0
     # via -r requirements/edx/base.txt
-starlette==0.16.0
+starlette==0.17.1
     # via fastapi
 stevedore==3.5.0
     # via
@@ -1366,7 +1369,6 @@ transifex-client==0.14.4
 typing-extensions==4.0.1
     # via
     #   astroid
-    #   gitpython
     #   pydantic
     #   pylint
 unicodecsv==0.14.1
@@ -1380,7 +1382,7 @@ uritemplate==4.1.1
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.7
+urllib3==1.26.8
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -1454,10 +1456,13 @@ xblock==1.5.1
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
     #   xblock-poll
+    #   xblock-problem-builder
     #   xblock-utils
 xblock-drag-and-drop-v2 @ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5
     # via -r requirements/edx/base.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
+    # via -r requirements/edx/base.txt
+xblock-problem-builder @ git+https://github.com/open-craft/problem-builder.git@026449b916a59fbd57d0529e26eba8f2c2906021
     # via -r requirements/edx/base.txt
 xblock-utils==2.2.0
     # via
@@ -1467,6 +1472,7 @@ xblock-utils==2.2.0
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
+    #   xblock-problem-builder
 xmlsec==1.3.12
     # via
     #   -r requirements/edx/base.txt
@@ -1484,4 +1490,3 @@ zipp==3.7.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
--e git+https://github.com/open-craft/problem-builder.git@026449b916a59fbd57d0529e26eba8f2c2906021#egg=xblock-problem-builder
