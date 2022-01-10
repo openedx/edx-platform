@@ -335,15 +335,22 @@ class ProviderConfig(ConfigurationModel):
         Appsembler: We will skip same verification if the backend is Auth0.
                     Auth0 will handle this for us.
         """
-        same_site = self.site_id == Site.objects.get_current(get_current_request()).id
-        is_auth0_enabled = self.is_auth0_enabled()
+        if self.is_tahoe_auth0_backend():
+            # Tahoe: Share one backend between all Tahoe sites.
+            return self.is_auth0_enabled()
 
-        return self.enabled and (is_auth0_enabled or same_site)
+        # Tahoe: Normal upstream-logic for other backends.
+        return self.enabled and self.site_id == Site.objects.get_current(get_current_request()).id
+
+    def is_tahoe_auth0_backend(self):
+        """
+        Check if `tahoe-auth0` backend in use to enable spacial handling.
+        """
+        return self.backend_name == "tahoe-auth0"
 
     def is_auth0_enabled(self):
         is_auth0_enabled = False
-
-        if self.backend_name == "tahoe-auth0":
+        if self.is_tahoe_auth0_backend():
             from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
             is_auth0_enabled = configuration_helpers.get_value(
                 'ENABLE_TAHOE_AUTH0',
