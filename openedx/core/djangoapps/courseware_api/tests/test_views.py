@@ -216,7 +216,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['course_access']['has_access']
-                assert response.data['course_goals'] is None
+                assert response.data['course_goals']['selected_goal'] is None
+                assert response.data['course_goals']['weekly_learning_goal_enabled'] is False
             else:
                 assert not response.data['course_access']['has_access']
 
