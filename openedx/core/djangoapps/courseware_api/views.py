@@ -226,19 +226,20 @@ class CoursewareMeta:
         """
         Returns a dict of course goals
         """
+        course_goals = {
+            'selected_goal': None,
+            'weekly_learning_goal_enabled': False,
+        }
         user_is_enrolled = CourseEnrollment.is_enrolled(self.effective_user, self.course_key)
         if (user_is_enrolled and ENABLE_COURSE_GOALS.is_enabled(self.course_key)):
-            course_goals = {
-                'selected_goal': None,
-                'weekly_learning_goal_enabled': True,
-            }
+            course_goals['weekly_learning_goal_enabled'] = True
             selected_goal = get_course_goal(self.effective_user, self.course_key)
             if selected_goal:
                 course_goals['selected_goal'] = {
                     'days_per_week': selected_goal.days_per_week,
                     'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
                 }
-            return course_goals
+        return course_goals
 
     @property
     def user_has_passing_grade(self):
@@ -593,8 +594,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         try:
             usage_key = UsageKey.from_string(usage_key_string)
-        except InvalidKeyError:
-            raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
+        except InvalidKeyError as exc:
+            raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
         _, request.user = setup_masquerade(
             request,
             usage_key.course_key,

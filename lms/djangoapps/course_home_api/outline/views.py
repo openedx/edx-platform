@@ -210,8 +210,8 @@ class OutlineTabView(RetrieveAPIView):
         cert_data = None
         course_blocks = None
         course_goals = {
-            'goal_options': [],
-            'selected_goal': None
+            'selected_goal': None,
+            'weekly_learning_goal_enabled': False,
         }
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         dates_widget = {
@@ -250,10 +250,7 @@ class OutlineTabView(RetrieveAPIView):
             enable_proctored_exams = course_overview.enable_proctored_exams
 
             if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
-                course_goals = {
-                    'selected_goal': None,
-                    'weekly_learning_goal_enabled': True,
-                }
+                course_goals['weekly_learning_goal_enabled'] = True
                 selected_goal = get_course_goal(request.user, course_key)
                 if selected_goal:
                     course_goals['selected_goal'] = {
@@ -410,8 +407,8 @@ def save_course_goal(request):  # pylint: disable=missing-function-docstring
             'header': _('Your course goal has been successfully set.'),
             'message': _('Course goal updated successfully.'),
         })
-    except Exception:
-        raise UnableToSaveCourseGoal  # pylint: disable=raise-missing-from
+    except Exception as exc:
+        raise UnableToSaveCourseGoal from exc
 
 
 @api_view(['POST'])
