@@ -73,7 +73,7 @@ def mixed_store_config(data_dir, mappings, store_order=None, modulestore_options
             to use in creating courses.
     """
     if store_order is None:
-        store_order = [StoreConstructors.draft, StoreConstructors.split]
+        store_order = [StoreConstructors.split, StoreConstructors.draft]
 
     options = {
         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
