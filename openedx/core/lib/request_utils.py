@@ -167,7 +167,6 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         #       for instructions on decrypting.
         debug_key = getattr(settings, "COOKIE_HEADER_DEBUG_PUBLIC_KEY", None)
 
-
         if logging_threshold and cookie_header_size > logging_threshold:
             if not debug_key:
                 log.warning("COOKIE_SIZE_LOGGING_THRESHOLD set without COOKIE_HEADER_DEBUG_PUBLIC_KEY")
@@ -176,7 +175,6 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
                                                           debug_key)
                 log.info(f"Large (> {logging_threshold}) cookie header detected."
                          f" Encrypted contents: {encrypted_cookie_header}")
-
 
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return

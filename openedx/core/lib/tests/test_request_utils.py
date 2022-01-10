@@ -267,7 +267,6 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies_total_size', 25),
         ], any_order=True)
 
-
     @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
     @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
     @patch('openedx.core.lib.request_utils.encrypt_for_log')
@@ -308,12 +307,10 @@ class RequestUtilTestCase(unittest.TestCase):
         mock_request = factory.request()
         cookie_header = str(mock_request.META.get('HTTP_COOKIE', ''))
 
-
         middleware.process_request(mock_request)
         mock_encrypt.assert_has_called([
             call(cookie_header, "fake-key")
         ])
-
 
 
 class TestGetExpectedErrorSettingsDict(unittest.TestCase):
