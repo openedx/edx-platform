@@ -268,7 +268,7 @@ class RequestUtilTestCase(unittest.TestCase):
         ], any_order=True)
 
     @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
-    @patch('common.djangoapps.util.log_sensitive.encrypt_for_log')
+    @patch('openedx.core.lib.request_utils.encrypt_for_log')
     def test_log_encrypted_cookies_no_key(self, mock_encrypt):
         middleware = CookieMonitoringMiddleware()
 
