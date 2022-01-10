@@ -11,7 +11,7 @@ jobs:
       upstream_branch: 'master'
       exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      custom_github_token: ${{ secrets.GITHUB_TOKEN }}
 
   report_koa:
     name: 'koa'
@@ -22,4 +22,4 @@ jobs:
       upstream_branch: 'open-release/koa.master'
       exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      custom_github_token: ${{ secrets.GITHUB_TOKEN }}
