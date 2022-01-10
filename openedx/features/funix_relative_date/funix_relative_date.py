@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime, time
+from datetime import timedelta, datetime, time, date
 import pytz
 import math
 from django.urls import reverse
@@ -67,6 +67,8 @@ class FunixRelativeDateLibary():
 			assignment_blocks = courseware_courses.funix_get_assginment_date_blocks(course=course, user=user, request=None, include_past_dates=True)
 
 		last_complete_date = FunixRelativeDateDAO.get_enroll_by_id(user_id=user.id, course_id=course_id).date
+		if last_complete_date is None:
+			last_complete_date = date.today()
 
 		# Delete all old date
 		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
