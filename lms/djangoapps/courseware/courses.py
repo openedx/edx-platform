@@ -949,7 +949,8 @@ def get_course_granded_lesson(course_key, user, include_access=False):
                 assignment_released = not start or start < now
                 if assignment_released:
                     # url = reverse('jump_to', args=[course_key, subsection_key])
-                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                    complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+                    # complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 else:
                     complete = False
 
