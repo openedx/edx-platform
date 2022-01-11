@@ -216,6 +216,11 @@ def create_account_with_params(request, params):
     create_user_link_with_edly_sub_organization(request, user)
     user = create_learner_link_with_permission_groups(user)
 
+    # Sites using multiple languages need to record the language used during registration.
+    # If not, compose_and_send_activation_email will be sent in site's default language only.
+    create_or_set_user_attribute_created_on_site(user, request.site)
+    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
         user, running_pipeline, third_party_provider,
@@ -225,11 +230,6 @@ def create_account_with_params(request, params):
         registration.activate()
     else:
         compose_and_send_activation_email(user, profile, registration)
-
-    # Perform operations that are non-critical parts of account creation
-    create_or_set_user_attribute_created_on_site(user, request.site)
-
-    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
