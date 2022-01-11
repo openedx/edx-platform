@@ -71,6 +71,82 @@ class TestInitializeView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:initialize'
 
+    # Options split for reuse
+    example_options = [
+        {
+            "order_num": 0,
+            "name": "troll",
+            "label": "Troll",
+            "explanation": "Failing grade",
+            "points": 0
+        },
+        {
+            "order_num": 1,
+            "name": "dreadful",
+            "label": "Dreadful",
+            "explanation": "Failing grade",
+            "points": 1
+        },
+        {
+            "order_num": 2,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 2
+        },
+        {
+            "order_num": 3,
+            "name": "poor",
+            "label": "Poor",
+            "explanation": "Failing grade (may repeat)",
+            "points": 3
+        },
+        {
+            "order_num": 4,
+            "name": "acceptable",
+            "label": "Acceptable",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 4
+        },
+        {
+            "order_num": 5,
+            "name": "exceeds_expectations",
+            "label": "Exceeds Expectations",
+            "explanation": "Passing grade (may continue to N.E.W.T)",
+            "points": 5
+        },
+        {
+            "order_num": 6,
+            "name": "outstanding",
+            "label": "Outstanding",
+            "explanation": "Passing grade (will continue to N.E.W.T)",
+            "points": 6
+        }
+    ]
+
+    test_rubric = {
+        "feedback_prompt": "How did this student do?",
+        "feedback_default_text": "For the O.W.L exams, this student...",
+        "criteria": [
+            {
+                "order_num": 0,
+                "name": "potions",
+                "label": "Potions",
+                "prompt": "How did this student perform in the Potions exam",
+                "feedback": "optional",
+                "options": example_options
+            },
+            {
+                "order_num": 1,
+                "name": "charms",
+                "label": "Charms",
+                "prompt": "How did this student perform in the Charms exam",
+                "feedback": "required",
+                "options": example_options
+            }
+        ]
+    }
+
     def test_missing_ora_location(self):
         """ Missing ORA location param should return 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
@@ -111,9 +187,7 @@ class TestInitializeView(BaseViewTest):
                 }
             }
         }
-
-        # Rubric data is passed through directly, so we can use a toy data payload
-        mock_get_rubric_config.return_value = {"foo": "bar"}
+        mock_get_rubric_config.return_value = self.test_rubric
 
         self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
