@@ -117,10 +117,10 @@ class SiteConfigAPIClientTests(TestCase):
         "course_about_show_social_links": False,
     }
 
-    sass_variables = {
-        "$brand-primary-color": "#0090C1",
-        "$brand-accent-color": "#7f8c8d",
-    }
+    sass_variables = [
+        ["$brand-primary-color", ["#0090C1", "#0090C1"]],
+        ["$brand-accent-color", ["#7f8c8d", "#7f8c8d"]],
+    ]
 
     about_page = {
         'title': 'About page from site configuration service',
