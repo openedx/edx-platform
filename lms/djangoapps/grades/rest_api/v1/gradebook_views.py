@@ -1088,9 +1088,9 @@ class SubsectionGradeView(GradeViewMixin, APIView):
             if original_grade is not None and hasattr(original_grade, 'override'):
                 override = original_grade.override
                 # pylint: disable=no-member
-                history = list(PersistentSubsectionGradeOverride.history.filter(grade_id=original_grade.id).order_by(
-                    'history_date'
-                )[:history_record_limit])
+                history = list(reversed(PersistentSubsectionGradeOverride.history.filter(
+                    grade_id=original_grade.id
+                ).order_by('-history_date')[:history_record_limit]))
             grade_data = {
                 'earned_all': original_grade.earned_all,
                 'possible_all': original_grade.possible_all,
