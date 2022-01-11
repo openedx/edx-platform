@@ -3,10 +3,10 @@ Tests for the course tab API.
 """
 
 import json
+import random
 from urllib.parse import urlencode
 
 import ddt
-import random
 from django.urls import reverse
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.tabs import CourseTabList

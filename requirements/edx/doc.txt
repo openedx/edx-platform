@@ -10,7 +10,7 @@ babel==2.9.1
     # via sphinx
 certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.9
+charset-normalizer==2.0.10
     # via requests
 click==7.1.2
     # via
@@ -42,7 +42,7 @@ packaging==21.3
     # via sphinx
 pbr==5.8.0
     # via stevedore
-pygments==2.10.0
+pygments==2.11.1
     # via sphinx
 pyparsing==3.0.6
     # via packaging
@@ -54,7 +54,7 @@ pytz==2021.3
     # via babel
 pyyaml==6.0
     # via code-annotations
-requests==2.26.0
+requests==2.27.0
     # via sphinx
 six==1.16.0
     # via edx-sphinx-theme

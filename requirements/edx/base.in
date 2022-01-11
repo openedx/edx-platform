@@ -133,6 +133,7 @@ pyjwkest
 PyJWT>=1.6.3
 pylti1p3                            # Required by content_libraries core library to suport LTI 1.3 launches
 pymongo                             # MongoDB driver
+PyNaCl                              # User-friendly cryptography (wrapper and bindings for libsodium)
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
 python-Levenshtein

@@ -656,7 +656,7 @@ class SetupMasqueradeTests(SharedModuleStoreTestCase, ):
 
         # Warning: the SafeSessions middleware relies on the `real_user` attribute to see if a
         # user is masquerading as another user.  If the name of this attribute is changing, please update
-        # the check in SafeSessionMiddleware._verify_user as well.
+        # the check in SafeSessionMiddleware._verify_user_unchanged as well.
         assert masquerade_user.real_user == self.staff
         assert masquerade_user == self.student
         assert self.request.user.masquerade_settings == masquerade_settings

@@ -15,7 +15,6 @@ from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -102,37 +101,50 @@ def _do_third_party_auth(request):
         raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _get_user_by_email(request):
+def _get_user_by_email(email):
     """
-    Finds a user object in the database based on the given request, ignores all fields except for email.
+    Finds a user object in the database based on the given email, ignores all fields except for email.
     """
-    if 'email' not in request.POST or 'password' not in request.POST:
-        raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
-
-    email = request.POST['email']
-
     try:
         return USER_MODEL.objects.get(email=email)
     except USER_MODEL.DoesNotExist:
-        digest = hashlib.shake_128(email.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
-        AUDIT_LOG.warning(f"Login failed - Unknown user email {digest}")
+        return None
 
 
-def _get_user_by_email_or_username(request):
+def _get_user_by_username(username):
+    """
+    Finds a user object in the database based on the given username.
+    """
+    try:
+        return USER_MODEL.objects.get(username=username)
+    except USER_MODEL.DoesNotExist:
+        return None
+
+
+def _get_user_by_email_or_username(request, api_version):
     """
     Finds a user object in the database based on the given request, ignores all fields except for email and username.
     """
-    if 'email_or_username' not in request.POST or 'password' not in request.POST:
+    is_api_v2 = api_version != API_V1
+    login_fields = ['email', 'password']
+    if is_api_v2:
+        login_fields = ['email_or_username', 'password']
+
+    if any(f not in request.POST.keys() for f in login_fields):
         raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
 
-    email_or_username = request.POST.get('email_or_username', None)
-    try:
-        return USER_MODEL.objects.get(
-            Q(username=email_or_username) | Q(email=email_or_username)
-        )
-    except USER_MODEL.DoesNotExist:
+    email_or_username = request.POST.get('email', None) or request.POST.get('email_or_username', None)
+    user = _get_user_by_email(email_or_username)
+
+    if not user and is_api_v2:
+        # If user not found with email and API_V2, try username lookup
+        user = _get_user_by_username(email_or_username)
+
+    if not user:
         digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
-        AUDIT_LOG.warning(f"Login failed - Unknown user username/email {digest}")
+        AUDIT_LOG.warning(f"Login failed - Unknown user email or username {digest}")
+
+    return user
 
 
 def _check_excessive_login_attempts(user):
@@ -545,10 +557,8 @@ def login_user(request, api_version='v1'):
                 # user successfully authenticated with a third party provider, but has no linked Open edX account
                 response_content = e.get_response()
                 return JsonResponse(response_content, status=403)
-        elif api_version == API_V1:
-            user = _get_user_by_email(request)
         else:
-            user = _get_user_by_email_or_username(request)
+            user = _get_user_by_email_or_username(request, api_version)
 
         _check_excessive_login_attempts(user)
 

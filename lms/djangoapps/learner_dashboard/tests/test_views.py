@@ -2,8 +2,8 @@
 Unit tests covering the program discussion iframe API.
 """
 
-import ddt
 from uuid import uuid4
+import ddt
 
 from django.urls import reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag

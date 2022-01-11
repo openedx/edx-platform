@@ -2,12 +2,13 @@
 Tests for discussions course block transformer
 """
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import TransformerRegistryTestMixin
 from openedx.core.djangoapps.discussions.models import DEFAULT_PROVIDER_TYPE, DiscussionTopicLink
 from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
@@ -59,7 +60,7 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
             self.discussable_unit.location,
             self.TRANSFORMER_CLASS_TO_TEST.EMBED_URL,
         )
-        assert embed_url == f"http://discussions-mfe/discussions/{self.course.id}/topics/{self.test_topic_id}"
+        assert embed_url == f"http://discussions-mfe/{self.course.id}/topics/{self.test_topic_id}"
 
         external_id = block_structure.get_xblock_field(
             self.discussable_unit.location,

@@ -262,3 +262,38 @@ class ProgramEnrollmentsInspectorView(View):
         ).prefetch_related('program_course_enrollments')
         serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
         return serialized.data
+
+
+class SAMLProvidersWithOrg(APIView):
+    """
+    Support-only API View for fetching a list of all
+    organizations names which will be utilized as keys.
+    """
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """
+        The get request returns a list of all
+        organizations names which will be utilized as keys.
+        * Example Request:
+            - GET /support/get_saml_providers/
+        * Example Response:
+            [
+                'test_org',
+                'donut_org',
+                'tri_org'
+            ]
+        """
+        org_key_names = self._get_org_key_names()
+        return Response(data=org_key_names)
+
+    def _get_org_key_names(self):
+        """
+        From our Third_party_auth models, return a list of
+        of organizations names which will be utilized as keys.
+        """
+        saml_providers = SAMLProviderConfig.objects.current_set().filter(
+            enabled=True,
+            organization__isnull=False
+        ).select_related('organization')
+
+        return [saml_provider.organization.short_name for saml_provider in saml_providers]
