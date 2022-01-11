@@ -248,7 +248,7 @@ django-config-models==2.2.2
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.10.1
+django-cors-headers==3.11.0
     # via -r requirements/edx/base.in
 django-countries==7.2.1
     # via
@@ -306,7 +306,7 @@ django-mptt==0.13.4
     #   django-wiki
 django-multi-email-field==0.6.2
     # via edx-enterprise
-django-mysql==4.3.0
+django-mysql==4.4.0
     # via -r requirements/edx/base.in
 django-oauth-toolkit==1.3.2
     # via
@@ -314,7 +314,7 @@ django-oauth-toolkit==1.3.2
     #   -r requirements/edx/base.in
 django-object-actions==3.1.0
     # via edx-enterprise
-django-pipeline==2.0.7
+django-pipeline==2.0.8
     # via -r requirements/edx/base.in
 django-pyfs==3.1.0
     # via -r requirements/edx/base.in
@@ -348,7 +348,7 @@ django-storages==1.8
     #   edxval
 django-user-tasks==2.1.0
     # via -r requirements/edx/base.in
-django-waffle==2.2.1
+django-waffle==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -388,7 +388,7 @@ docutils==0.17.1
     #   botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in
-drf-jwt==1.19.1
+drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-yasg==1.20.0
     # via edx-api-doc-tools
@@ -523,6 +523,8 @@ event-tracking==1.1.4
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
+fastavro==1.4.9
+    # via openedx-events
 frozenlist==1.2.0
     # via
     #   aiohttp
@@ -698,7 +700,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-openedx-events==0.6.0
+openedx-events==0.7.0
     # via -r requirements/edx/base.in
 ora2==3.7.8
     # via -r requirements/edx/base.in
@@ -710,7 +712,7 @@ packaging==21.3
     #   redis
 pansi==2020.7.3
     # via py2neo
-path==16.2.0
+path==16.3.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-i18n-tools
@@ -744,7 +746,7 @@ py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-pycountry==20.7.3
+pycountry==22.1.10
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
@@ -754,7 +756,7 @@ pycryptodomex==3.12.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pygments==2.11.1
+pygments==2.11.2
     # via
     #   -r requirements/edx/base.in
     #   py2neo
@@ -786,7 +788,7 @@ pymongo==3.10.1
     #   event-tracking
     #   mongodbproxy
     #   mongoengine
-pynacl==1.4.0
+pynacl==1.5.0
     # via -r requirements/edx/base.in
 pynliner==0.8.0
     # via -r requirements/edx/base.in
@@ -867,7 +869,7 @@ redis==4.1.0
     # via -r requirements/edx/base.in
 regex==2021.11.10
     # via nltk
-requests==2.27.0
+requests==2.27.1
     # via
     #   -r requirements/edx/paver.txt
     #   analytics-python
@@ -947,7 +949,6 @@ six==1.16.0
     #   paver
     #   py2neo
     #   pyjwkest
-    #   pynacl
     #   python-dateutil
     #   python-memcached
     #   python-swiftclient
@@ -1012,7 +1013,7 @@ uritemplate==4.1.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.7
+urllib3==1.26.8
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
