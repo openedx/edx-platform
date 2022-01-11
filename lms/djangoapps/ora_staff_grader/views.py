@@ -15,6 +15,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
+    ExceptionWithContext,
     GradeContestedResponse,
     LockContestedError,
     SubmitGradeErrorResponse,
@@ -34,7 +35,11 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 
 class StaffGraderBaseView(RetrieveAPIView):
-    """ Base view for common auth/permission setup and XBlock handlers used across ESG views """
+    """
+    Base view for common auth/permission setup and XBlock handlers used across ESG views.
+
+    All XBlock handlers are wrapped to either return data or raise an exception to make error-handling clear.
+    """
     authentication_classes = (
         JwtAuthentication,
         BearerAuthenticationAllowInactiveUser,
@@ -48,6 +53,10 @@ class StaffGraderBaseView(RetrieveAPIView):
         Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
         """
         response = call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
+
+        if response.status_code != 200:
+            raise Exception()
+
         return json.loads(response.content)
 
     def get_rubric_config(self, request, usage_id):
@@ -56,7 +65,17 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         data = {'target_rubric_block_id': usage_id}
         response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
+
+        # Unhandled errors might not be JSON, catch before loading
+        if response.status_code != 200:
+            raise Exception()
+
         response_data = json.loads(response.content)
+
+        # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message "msg"
+        if not response_data.get('success', False):
+            raise ExceptionWithContext(context={"msg": response_data.get('msg', '')})
+
         return response_data['rubric']
 
     def get_submission_info(self, request, usage_id, submission_uuid):
@@ -65,6 +84,10 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         data = {'submission_uuid': submission_uuid}
         response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
+
+        if response.status_code != 200:
+            raise Exception()
+
         return json.loads(response.content)
 
     def get_assessment_info(self, request, usage_id, submission_uuid):
@@ -73,6 +96,10 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         data = {'submission_uuid': submission_uuid}
         response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
+
+        if response.status_code != 200:
+            raise Exception()
+
         return json.loads(response.content)
 
     def submit_grade(self, request, usage_id, grade_data):
@@ -82,7 +109,18 @@ class StaffGraderBaseView(RetrieveAPIView):
         Returns: {'success': True/False, 'msg': err_msg}
         """
         response = call_xblock_json_handler(request, usage_id, 'staff_assess', grade_data)
-        return json.loads(response.content)
+
+        # Unhandled errors might not be JSON, catch before loading
+        if response.status_code != 200:
+            raise Exception()
+
+        response_data = json.loads(response.content)
+
+        # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message "msg"
+        if not response_data.get('success', False):
+            raise ExceptionWithContext(context={"msg": response_data.get('msg', '')})
+
+        return response_data
 
     def check_submission_lock(self, request, usage_id, submission_uuid):
         """
@@ -90,6 +128,11 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         data = {'submission_uuid': submission_uuid}
         response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
+
+        # Unclear that there would every be an error (except network/auth) but good to catch here
+        if response.status_code != 200:
+            raise Exception()
+
         return json.loads(response.content)
 
     def claim_submission_lock(self, request, usage_id, submission_uuid):
@@ -101,7 +144,6 @@ class StaffGraderBaseView(RetrieveAPIView):
         """
         body = {"submission_uuid": submission_uuid}
         response = call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
-        response_data = json.loads(response.content)
 
         # Lock contested returns a 403
         if response.status_code == 403:
@@ -109,9 +151,9 @@ class StaffGraderBaseView(RetrieveAPIView):
 
         # Other errors should raise a blanket exception
         elif response.status_code != 200:
-            raise Exception(response_data)
+            raise Exception()
 
-        return response_data
+        return json.loads(response.content)
 
     def delete_submission_lock(self, request, usage_id, submission_uuid):
         """
@@ -124,7 +166,6 @@ class StaffGraderBaseView(RetrieveAPIView):
 
         # Return raw response to preserve HTTP status codes for failure states
         response = call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
-        response_data = json.loads(response.content)
 
         # Lock contested returns a 403
         if response.status_code == 403:
@@ -132,9 +173,9 @@ class StaffGraderBaseView(RetrieveAPIView):
 
         # Other errors should raise a blanket exception
         elif response.status_code != 200:
-            raise Exception(response_data)
+            raise Exception()
 
-        return response_data
+        return json.loads(response.content)
 
 
 class InitializeView(StaffGraderBaseView):
