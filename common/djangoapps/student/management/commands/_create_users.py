@@ -35,8 +35,8 @@ def create_users(
             try:
                 user = User.objects.get(username=single_user_data['username'])
                 if user.email == single_user_data['email'] and ignore_user_already_exists:
-                        user_already_exists = True
-                        print(f'Test user {user.username} already exists. Continuing to attempt to enroll.')
+                    user_already_exists = True
+                    print(f'Test user {user.username} already exists. Continuing to attempt to enroll.')
                 else:
                     raise e
             except User.DoesNotExist:
