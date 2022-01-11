@@ -934,8 +934,8 @@ def get_course_granded_lesson(course_key, user, include_access=False):
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due', None)
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
-            if graded:
-                effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
+            effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
+            if graded and effort_time != -1:
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
@@ -949,7 +949,8 @@ def get_course_granded_lesson(course_key, user, include_access=False):
                 assignment_released = not start or start < now
                 if assignment_released:
                     # url = reverse('jump_to', args=[course_key, subsection_key])
-                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                    complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+                    # complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 else:
                     complete = False
 
