@@ -147,10 +147,11 @@ class TestInitializeView(BaseViewTest):
         ]
     }
 
-    def test_missing_ora_location(self):
+    @ddt.data({}, {PARAM_ORA_LOCATION: ''})
+    def test_missing_param(self, query_params):
         """ Missing ORA location param should return 400 and error message """
         self.client.login(username=self.staff.username, password=self.password)
-        response = self.client.get(self.api_url)
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
@@ -204,34 +205,11 @@ class TestFetchSubmissionView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission'
 
-    def test_missing_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+    @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: ''})
+    def test_missing_params(self, query_params):
+        """ Missing or blank params should return 400 and error message """
         self.log_in()
-        response = self.client.get(self.api_url)
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_ora_location(self):
-        """ Blank ORA location should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ''})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_missing_submission_uuid(self):
-        """ Missing submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_submission_uuid(self):
-        """ Blank submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
@@ -314,18 +292,19 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
-    def test_missing_submission_uuid(self):
-        """ Missing submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
 
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
+@ddt.ddt
+class TestFetchSubmissionStatusView(BaseViewTest):
+    """
+    Tests for the submission fetch view
+    """
+    view_name = 'ora-staff-grader:fetch-submission-status'
 
-    def test_blank_submission_uuid(self):
-        """ Blank submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+    @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: Mock()}, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+    def test_missing_param(self, query_params):
+        """ Missing ORA location or submission ID param should return 400 and error message """
+        self.client.login(username=self.staff.username, password=self.password)
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
