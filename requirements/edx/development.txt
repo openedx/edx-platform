@@ -326,7 +326,7 @@ django-classy-tags==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -432,7 +432,7 @@ django-simple-history==3.0.0
     #   ora2
 django-splash==1.1.0
     # via -r requirements/edx/testing.txt
-django-statici18n==2.1.1
+django-statici18n==2.2.0
     # via -r requirements/edx/testing.txt
 django-storages==1.8
     # via
@@ -578,7 +578,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -588,7 +588,7 @@ edx-rbac==1.5.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-rest-api-client==5.4.0
+edx-rest-api-client==5.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -646,7 +646,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==10.0.0
+faker==11.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -654,7 +654,7 @@ fastapi==0.70.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-filelock==3.4.0
+filelock==3.4.2
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -900,7 +900,7 @@ multidict==5.2.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.920
+mypy==0.930
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -943,6 +943,7 @@ packaging==21.3
     #   drf-yasg
     #   py2neo
     #   pytest
+    #   redis
     #   sphinx
     #   tox
 pact-python==1.4.5
@@ -982,7 +983,7 @@ pillow==8.4.0
     #   edx-organizations
 pip-tools==6.4.0
     # via -r requirements/edx/pip-tools.txt
-platformdirs==2.4.0
+platformdirs==2.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -1210,7 +1211,7 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.0.2
+redis==4.1.0
     # via -r requirements/edx/testing.txt
 regex==2021.11.10
     # via
@@ -1243,7 +1244,7 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-ruamel.yaml==0.17.17
+ruamel.yaml==0.17.19
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
@@ -1251,7 +1252,7 @@ ruamel.yaml.clib==0.2.6
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel.yaml
-rules==3.0
+rules==3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1449,7 +1450,7 @@ tqdm==4.62.3
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-transifex-client==0.14.3
+transifex-client==0.14.4
     # via -r requirements/edx/testing.txt
 typing-extensions==4.0.1
     # via
@@ -1521,7 +1522,7 @@ webob==1.8.7
     #   -r requirements/edx/testing.txt
     #   xblock
     #   xmodule
-wheel==0.37.0
+wheel==0.37.1
     # via
     #   -r requirements/edx/pip-tools.txt
     #   pip-tools

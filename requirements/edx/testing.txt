@@ -312,7 +312,7 @@ django-classy-tags==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
-django-config-models==2.2.0
+django-config-models==2.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -416,7 +416,7 @@ django-simple-history==3.0.0
     #   ora2
 django-splash==1.1.0
     # via -r requirements/edx/base.txt
-django-statici18n==2.1.1
+django-statici18n==2.2.0
     # via -r requirements/edx/base.txt
 django-storages==1.8
     # via
@@ -561,7 +561,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.8.1
+edx-proctoring==4.8.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -571,7 +571,7 @@ edx-rbac==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.4.0
+edx-rest-api-client==5.4.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -625,11 +625,11 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==10.0.0
+faker==11.0.0
     # via factory-boy
 fastapi==0.70.1
     # via pact-python
-filelock==3.4.0
+filelock==3.4.2
     # via
     #   tox
     #   virtualenv
@@ -892,6 +892,7 @@ packaging==21.3
     #   drf-yasg
     #   py2neo
     #   pytest
+    #   redis
     #   tox
 pact-python==1.4.5
     # via -r requirements/edx/testing.in
@@ -924,7 +925,7 @@ pillow==8.4.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-organizations
-platformdirs==2.4.0
+platformdirs==2.4.1
     # via
     #   pylint
     #   virtualenv
@@ -1136,7 +1137,7 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==4.0.2
+redis==4.1.0
     # via -r requirements/edx/base.txt
 regex==2021.11.10
     # via
@@ -1168,7 +1169,7 @@ requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-ruamel.yaml==0.17.17
+ruamel.yaml==0.17.19
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
@@ -1176,7 +1177,7 @@ ruamel.yaml.clib==0.2.6
     # via
     #   -r requirements/edx/base.txt
     #   ruamel.yaml
-rules==3.0
+rules==3.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1337,7 +1338,7 @@ tqdm==4.62.3
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-transifex-client==0.14.3
+transifex-client==0.14.4
     # via -r requirements/edx/testing.in
 typing-extensions==4.0.1
     # via

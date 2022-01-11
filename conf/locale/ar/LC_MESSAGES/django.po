@@ -4,9 +4,9 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013-2015
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ali Hasan <ahasan@qrf.org>, 2014,2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
@@ -70,9 +70,9 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013,2015
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013,2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # a.nassif <a.nassif@sit-mena.com>, 2013
@@ -109,9 +109,9 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013-2015
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
@@ -173,9 +173,9 @@
 #
 # Translators:
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013-2014
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013-2014
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -248,7 +248,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:43+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -271,6 +271,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "المناقشة"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "نصّ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3869,10 +3874,6 @@ msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
 msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "نصّ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -12932,10 +12933,6 @@ msgstr "رُفِض التصريح: تعذّر التحقّق من هوية ال�
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "مستويات دعم {platform_name}:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "HTML "
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"

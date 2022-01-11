@@ -73,7 +73,7 @@ from ..models import (
     UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser, CanGetAccountInfoUsingId, CanReplaceUsername, CanRetireUser
+from .permissions import CanDeactivateUser, CanGetAccountInfo, CanReplaceUsername, CanRetireUser
 from .serializers import (
     PendingNameChangeSerializer,
     UserRetirementPartnerReportSerializer,
@@ -182,6 +182,7 @@ class AccountViewSet(ViewSet):
             * secondary_email: A secondary email address for the user. Unlike
               the email field, GET will reflect the latest update to this field
               even if changes have yet to be confirmed.
+            * verified_name: Approved verified name of the learner present in name affirmation plugin
             * gender: One of the following values:
 
                 * null
@@ -290,7 +291,7 @@ class AccountViewSet(ViewSet):
     authentication_classes = (
         JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
-    permission_classes = (permissions.IsAuthenticated, CanGetAccountInfoUsingId)
+    permission_classes = (permissions.IsAuthenticated, CanGetAccountInfo)
     parser_classes = (JSONParser, MergePatchParser,)
 
     def get(self, request):
@@ -302,7 +303,7 @@ class AccountViewSet(ViewSet):
     def list(self, request):
         """
         GET /api/user/v1/accounts?username={username1,username2}
-        GET /api/user/v1/accounts?email={user_email}
+        GET /api/user/v1/accounts?email={user_email} (Staff Only)
         GET /api/user/v1/accounts?lms_user_id={lms_user_id} (Staff Only)
         """
         usernames = request.GET.get('username')
