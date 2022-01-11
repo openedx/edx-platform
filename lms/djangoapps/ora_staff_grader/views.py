@@ -18,7 +18,6 @@ from lms.djangoapps.ora_staff_grader.errors import (
     ExceptionWithContext,
     GradeContestedResponse,
     LockContestedError,
-    SubmitGradeErrorResponse,
     LockContestedResponse,
     UnknownErrorResponse,
 )
@@ -192,29 +191,35 @@ class InitializeView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - BadOraLocationResponse (HTTP 400) for bad ORA location
+    - UnknownError (HTTP 500) for ORA/platform internal errors
     """
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
-        response_data = {}
-
-        # Get ORA block
         try:
+            response_data = {}
+
+            # Get ORA block
             ora_usage_key = UsageKey.from_string(ora_location)
             response_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
+
+            # Get course metadata
+            course_id = str(ora_usage_key.course_key)
+            response_data['courseMetadata'] = get_course_overview_or_none(course_id)
+
+            # Get list of submissions for this ORA
+            response_data['submissions'] = self.get_submissions(request, ora_location)
+
+            # Get the rubric config for this ORA
+            response_data['rubricConfig'] = self.get_rubric_config(request, ora_location)
+
+            return Response(InitializeSerializer(response_data).data)
+
+        # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
             return BadOraLocationResponse()
 
-        # Get course metadata
-        course_id = str(ora_usage_key.course_key)
-        response_data['courseMetadata'] = get_course_overview_or_none(course_id)
-
-        # Get list of submissions for this ORA
-        response_data['submissions'] = self.get_submissions(request, ora_location)
-
-        # Get the rubric config for this ORA
-        response_data['rubricConfig'] = self.get_rubric_config(request, ora_location)
-
-        return Response(InitializeSerializer(response_data).data)
+        except Exception:
+            return UnknownErrorResponse()
 
 
 class SubmissionFetchView(StaffGraderBaseView):
@@ -247,20 +252,26 @@ class SubmissionFetchView(StaffGraderBaseView):
 
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
+    - UnknownError (HTTP 500) for ORA/platform internal errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        submission_info = self.get_submission_info(request, ora_location, submission_uuid)
-        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+        try:
+            submission_info = self.get_submission_info(request, ora_location, submission_uuid)
+            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
 
-        serializer = SubmissionFetchSerializer({
-            'submission_info': submission_info,
-            'assessment_info': assessment_info,
-            'lock_info': lock_info,
-        })
+            serializer = SubmissionFetchSerializer({
+                'submission_info': submission_info,
+                'assessment_info': assessment_info,
+                'lock_info': lock_info,
+            })
 
-        return Response(serializer.data)
+            return Response(serializer.data)
+
+        # Blanket exception handling
+        except Exception:
+            return UnknownErrorResponse()
 
 
 class SubmissionStatusFetchView(StaffGraderBaseView):
@@ -287,18 +298,24 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
 
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
+    - UnknownError (HTTP 500) for ORA/platform internal errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+        try:
+            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
 
-        serializer = SubmissionStatusFetchSerializer({
-            'assessment_info': assessment_info,
-            'lock_info': lock_info,
-        })
+            serializer = SubmissionStatusFetchSerializer({
+                'assessment_info': assessment_info,
+                'lock_info': lock_info,
+            })
 
-        return Response(serializer.data)
+            return Response(serializer.data)
+
+        # Blanket exception handling
+        except Exception:
+            return UnknownErrorResponse()
 
 
 class UpdateGradeView(StaffGraderBaseView):
@@ -337,45 +354,40 @@ class UpdateGradeView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - GradeContestedResponse (HTTP 409) for trying to submit a grade for a submission you don't have an active lock for
-    - SubmitGradeErrorResponse (HTTP 500) for ORA failures to submit a grade
+    - UnknownError (HTTP 500) for ORA/platform internal errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
-        # Reassert that we have ownership of the submission lock
-        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
-        if not lock_info.get('lock_status') == 'in-progress':
+        try:
+            # Reassert that we have ownership of the submission lock
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            if not lock_info.get('lock_status') == 'in-progress':
+                assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+                submission_status = SubmissionStatusFetchSerializer({
+                    'assessment_info': assessment_info,
+                    'lock_info': lock_info,
+                }).data
+                return GradeContestedResponse(context=submission_status)
+
+            # Transform grade data and submit assessment, rasies on failure
+            context = {'submission_uuid': submission_uuid}
+            grade_data = StaffAssessSerializer(request.data, context=context).data
+            self.submit_grade(request, ora_location, grade_data)
+
+            # Clear the lock on the graded submission
+            self.delete_submission_lock(request, ora_location, submission_uuid)
+
+            # Return submission status info to frontend
             assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-            submission_status = SubmissionStatusFetchSerializer({
+            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            serializer = SubmissionStatusFetchSerializer({
                 'assessment_info': assessment_info,
                 'lock_info': lock_info,
-            }).data
+            })
+            return Response(serializer.data)
 
-            return GradeContestedResponse(context=submission_status)
-
-        # Transform data from frontend format to staff assess format
-        context = {'submission_uuid': submission_uuid}
-        grade_data = StaffAssessSerializer(request.data, context=context).data
-
-        # Perform the staff assessment
-        response = self.submit_grade(request, ora_location, grade_data)
-
-        # Failed response returns 'success': False with an error message
-        if not response['success']:
-            return SubmitGradeErrorResponse(context={"msg": response['msg']})
-
-        # Remove the lock on the graded submission
-        self.delete_submission_lock(request, ora_location, submission_uuid)
-
-        # Return submission status info to frontend
-        assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-        lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
-
-        serializer = SubmissionStatusFetchSerializer({
-            'assessment_info': assessment_info,
-            'lock_info': lock_info,
-        })
-
-        return Response(serializer.data)
+        except Exception:
+            return UnknownErrorResponse()
 
 
 class SubmissionLockView(StaffGraderBaseView):
@@ -394,6 +406,7 @@ class SubmissionLockView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - LockContestedResponse (HTTP 409) for contested lock
+    - UnknownError (HTTP 500) for ORA/platform internal errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
