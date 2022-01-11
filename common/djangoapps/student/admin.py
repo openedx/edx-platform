@@ -524,7 +524,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
 class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """Admin interface for the CourseEnrollmentCelebration model. """
     raw_id_fields = ('enrollment',)
-    list_display = ('id', 'course', 'user', 'celebrate_first_section')
+    list_display = ('id', 'course', 'user', 'celebrate_first_section', 'celebrate_weekly_goal',)
     search_fields = ('enrollment__course__id', 'enrollment__user__username')
 
     class Meta:

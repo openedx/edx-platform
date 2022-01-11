@@ -20,6 +20,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
             'first_section': False,
             'streak_length_to_celebrate': None,
             'streak_discount_enabled': False,
+            'weekly_goal': False,
         }
 
     streak_length_to_celebrate = UserCelebration.perform_streak_updates(
@@ -29,6 +30,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
         'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(enrollment),
         'streak_length_to_celebrate': streak_length_to_celebrate,
         'streak_discount_enabled': False,
+        'weekly_goal': CourseEnrollmentCelebration.should_celebrate_weekly_goal(enrollment),
     }
 
     if streak_length_to_celebrate:

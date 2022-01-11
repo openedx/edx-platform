@@ -407,6 +407,12 @@ class CoursewareInformation(RetrieveAPIView):
             * masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
             * upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
             * upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
+        * celebrations: An object detailing which celebrations to render
+            * first_section: (bool) If the first section celebration should render
+                Note: Also uses information from frontend so this value is not final
+            * streak_length_to_celebrate: (int) The streak length to celebrate for the learner
+            * streak_discount_enabled: (bool) If the frontend should render an upgrade discount for hitting the streak
+            * weekly_goal: (bool) If the weekly goal celebration should render
         * course_goals:
             * selected_goal:
                 * days_per_week: (int) The number of days the learner wants to learn per week
@@ -697,6 +703,7 @@ class Celebration(DeveloperErrorViewMixin, APIView):
         Body consists of the following fields:
 
             * first_section (bool): whether we should celebrate when a user finishes their first section of a course
+            * weekly_goal (bool): whether we should celebrate when a user hits their weekly learning goal in a course
 
     **Returns**
 
@@ -731,6 +738,7 @@ class Celebration(DeveloperErrorViewMixin, APIView):
 
         data = dict(request.data)
         first_section = data.pop('first_section', None)
+        weekly_goal = data.pop('weekly_goal', None)
         if data:
             return Response(status=400)  # there were parameters we didn't recognize
 
@@ -741,6 +749,8 @@ class Celebration(DeveloperErrorViewMixin, APIView):
         defaults = {}
         if first_section is not None:
             defaults['celebrate_first_section'] = first_section
+        if weekly_goal is not None:
+            defaults['celebrate_weekly_goal'] = weekly_goal
 
         if defaults:
             _, created = CourseEnrollmentCelebration.objects.update_or_create(enrollment=enrollment, defaults=defaults)

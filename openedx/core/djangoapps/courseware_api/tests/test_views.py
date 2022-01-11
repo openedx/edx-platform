@@ -166,6 +166,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             assert found, 'external link not in course tabs'
 
             assert not response.data['user_has_passing_grade']
+            assert response.data['celebrations']['first_section']
+            assert not response.data['celebrations']['weekly_goal']
 
             # This import errors in cms if it is imported at the top level
             from lms.djangoapps.course_goals.api import get_course_goal
@@ -532,13 +534,15 @@ class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     @ddt.data(True, False)
     def test_happy_path(self, update):
         if update:
-            CourseEnrollmentCelebrationFactory(enrollment=self.enrollment, celebrate_first_section=False)
+            CourseEnrollmentCelebrationFactory(enrollment=self.enrollment)
 
-        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        data = {'first_section': True, 'weekly_goal': True}
+        response = self.client.post(self.url, data, content_type='application/json')
         assert response.status_code == (200 if update else 201)
 
         celebration = CourseEnrollmentCelebration.objects.first()
         assert celebration.celebrate_first_section
+        assert celebration.celebrate_weekly_goal
         assert celebration.enrollment.id == self.enrollment.id
 
     def test_extra_data(self):
@@ -572,12 +576,16 @@ class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         user = UserFactory()
         CourseEnrollment.enroll(user, self.course.id, 'verified')
 
-        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        data = {'first_section': True, 'weekly_goal': False}
+        response = self.client.post(self.url, data, content_type='application/json')
         assert response.status_code == 201
 
         self.update_masquerade(username=user.username)
-        response = self.client.post(self.url, {'first_section': False}, content_type='application/json')
+        data = {'first_section': False, 'weekly_goal': True}
+        response = self.client.post(self.url, data, content_type='application/json')
         assert response.status_code == 202
 
         celebration = CourseEnrollmentCelebration.objects.first()
-        assert celebration.celebrate_first_section  # make sure it didn't change during masquerade attempt
+        # make sure they didn't change during masquerade attempt
+        assert celebration.celebrate_first_section
+        assert not celebration.celebrate_weekly_goal
