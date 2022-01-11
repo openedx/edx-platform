@@ -25,6 +25,8 @@ SINGLE_PROVIDER_CONFIG = {
     'enabled': 'true',
     'slug': 'test-slug',
     'country': 'https://example.customer.com/countrycode',
+    'attr_first_name': 'jon',
+    'attr_last_name': 'snow',
 }
 
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
@@ -144,6 +146,7 @@ class SAMLProviderConfigTests(APITestCase):
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
         assert provider_config.name == 'name-of-config-2'
         assert provider_config.country == SINGLE_PROVIDER_CONFIG_2['country']
+        assert provider_config.attr_username == SINGLE_PROVIDER_CONFIG['attr_first_name']
 
         # check association has also been created
         assert EnterpriseCustomerIdentityProvider.objects.filter(

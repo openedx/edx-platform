@@ -22,7 +22,8 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):  # lint-amnesty
             saml_configuration = SAMLConfiguration.objects.current_set().get(id=validated_data['saml_config_id'])
             del validated_data['saml_config_id']
             validated_data['saml_configuration'] = saml_configuration
-
+        if validated_data.get('attr_first_name'):
+            validated_data['attr_username'] = validated_data['attr_first_name']
         return SAMLProviderConfig.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
