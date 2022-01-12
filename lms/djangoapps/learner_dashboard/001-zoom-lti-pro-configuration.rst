@@ -18,9 +18,9 @@ with programs.
 
 Decisions
 =========
-We can use the ``program_discussion_configuration`` model to add zoom lti pro
-configurations for the program. A new type will be added so we can identify the
-type of configuration if it is a discussion or live configuration.
+
+New model ``program_live_configuration`` will be created which will allow us
+to map LTI credentials to programs.
 
 We are going ahead with LTI 1.1 to configure zoom for now due to some
 constraints in current implementation.
@@ -35,8 +35,10 @@ minimal effort.
 Alternatives
 ============
 
-1.  New model ``program_live_configuration`` can be created which will allow us
-    to map LTI credentials to programs.
+1.  We can use the ``program_discussion_configuration`` model to add zoom lti
+    pro configurations for the program. A new type will be added so we can
+    identify the type of configuration if it is a discussion or live
+    configuration.
 2.  ``program_discussion_configuration`` model can be renamed to a more generic
     name like ``program_lti_configuration`` but it will require major
     refactoring of code.
