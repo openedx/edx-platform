@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
@@ -25,6 +26,7 @@
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Grégory Petit <petit.gregory.51@gmail.com>, 2020
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
+# iderr <ibrahim@derraz.fr>, 2021
 # INARES <contact@inares.org>, 2015
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
@@ -63,7 +65,7 @@
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2014-2015
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015-2016
 # Serge Bibauw <sbibauw@gmail.com>, 2016
@@ -80,6 +82,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Alexandre DS <alexandre@cleverm8.com>, 2020
 # 0169fee580ff5de3f9b7241d14f30af9_5f30934 <1948a2319336319ed4429b6139c8c1c2_916898>, 2020
@@ -97,6 +100,7 @@
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # harifetraram <harifetraram@gmail.com>, 2017
 # harifetraram <harifetraram@gmail.com>, 2017
+# iderr <ibrahim@derraz.fr>, 2021
 # John Burke <johnb@matinee.co.uk>, 2018
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
@@ -117,7 +121,7 @@
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # Sébastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
@@ -181,6 +185,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
 # 0169fee580ff5de3f9b7241d14f30af9_5f30934 <1948a2319336319ed4429b6139c8c1c2_916898>, 2020
 # Benjamin PENA <benjamin.pena@fun-mooc.fr>, 2019
 # Daniel Le Berre, 2014
@@ -189,6 +194,7 @@
 # Eric Fortin, 2016
 # eric maginot <eric_maginot@hotmail.fr>, 2017
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
+# iderr <ibrahim@derraz.fr>, 2021
 # INARES <contact@inares.org>, 2015
 # John Burke <johnb@matinee.co.uk>, 2018
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
@@ -209,9 +215,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-05-11 08:54+0000\n"
-"PO-Revision-Date: 2021-02-28 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2022-01-10 11:58+0000\n"
+"PO-Revision-Date: 2021-11-08 15:37+0000\n"
+"Last-Translator: iderr <ibrahim@derraz.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -294,6 +300,7 @@ msgstr "Supprimer"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/EnterpriseLearnerPortalModal.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: common/static/bundles/commons.js
@@ -329,17 +336,17 @@ msgstr "Annuler"
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error during the upload process."
-msgstr "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
+msgstr "Une erreur est survenue lors de la génération du lien du rapport."
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while unpacking the file."
-msgstr "Il y a eu une erreur lors de la mise à jour de votre objectif."
+msgstr "Une erreur est survenue lors de la génération du lien du rapport."
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
+msgstr "Une erreur est survenue lors de la génération du lien du rapport."
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
@@ -354,12 +361,12 @@ msgstr "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while importing the new course to our database."
-msgstr "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
+msgstr "Une erreur est survenue lors de la génération du lien du rapport."
 
 #: cms/static/js/features/import/views/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error with the upload"
-msgstr "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
+msgstr "Une erreur est survenue lors de la génération du lien du rapport."
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
@@ -443,6 +450,8 @@ msgstr "Plus"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
 #: common/static/bundles/commons.js lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -475,12 +484,6 @@ msgstr "Choisir le fichier"
 #: common/static/bundles/js/factories/library.js
 msgid "Adding"
 msgstr "Titre"
-
-#: cms/static/js/views/container.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "{startTag}{requestToken}{endTag}{selector}"
-msgstr ""
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -678,10 +681,6 @@ msgid "Moving"
 msgstr "Suppression en cours"
 
 #: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Delete this {xblock_type}?"
-msgstr "Supprimer cette équipe ?"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
 msgid "section"
 msgstr "Description"
 
@@ -802,31 +801,37 @@ msgid "text_word_{uniqueId}"
 msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Show Annotations"
 msgstr "Afficher les annotations"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Hide Annotations"
 msgstr "Cacher les annotations"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Expand Instructions"
 msgstr "Déplier les instructions"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Collapse Instructions"
 msgstr "Replier les instructions"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Commentary"
 msgstr "Commentaires"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableBlockPreview.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Reply to Annotation"
 msgstr "Répondre à l'annotation"
@@ -864,8 +869,8 @@ msgstr[1] "{num_points} points possibles (graded)"
 #: common/static/bundles/ProblemBlockPreview.js
 msgid "{num_points} point possible (ungraded)"
 msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} point possible (pas noté)"
+msgstr[1] "{num_points} points possibles (pas noté)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -875,8 +880,8 @@ msgstr[1] ""
 #: common/static/bundles/ProblemBlockPreview.js
 msgid "{earned}/{possible} point (graded)"
 msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{earned}/{possible} point (noté)"
+msgstr[1] "{earned}/{possible} points (noté)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -886,8 +891,8 @@ msgstr[1] ""
 #: common/static/bundles/ProblemBlockPreview.js
 msgid "{earned}/{possible} point (ungraded)"
 msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{earned}/{possible} point (pas noté)"
+msgstr[1] "{earned}/{possible} points (pas noté)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/ProblemBlockPreview.js
@@ -954,6 +959,7 @@ msgstr "non envoyé"
 msgid ""
 "{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1852,6 +1858,8 @@ msgstr "Nouvelle fenêtre"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
 #: common/static/bundles/commons.js cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -2394,7 +2402,7 @@ msgid "Insert/Edit Image"
 msgstr "Insérer/Modifier l'image"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
+#: common/static/bundles/LTIBlockPreview.js common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -2405,7 +2413,7 @@ msgstr ""
 "Cliquez sur Annuler pour retourner à la page précédente sans envoyer d'information."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
+#: common/static/bundles/LTIBlockPreview.js common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username sent to a 3rd party application.\n"
 "\n"
@@ -2416,7 +2424,7 @@ msgstr ""
 "Cliquez sur Annuler pour retourner à la page précédente sans envoyer d'information."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
+#: common/static/bundles/LTIBlockPreview.js common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -2462,6 +2470,7 @@ msgid "Explanation"
 msgstr "Explication"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: common/static/bundles/SequenceBlockPreview.js
 #: common/static/bundles/commons.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
@@ -2471,6 +2480,7 @@ msgstr ""
 "SequenceModule en cours. Veuillez contacter les responsables du cours."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: common/static/bundles/SequenceBlockPreview.js
 #: common/static/bundles/VerticalStudentView.js
 #: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
@@ -2791,6 +2801,186 @@ msgstr "Tout déplier"
 msgid "Collapse All"
 msgstr "Tout replier"
 
+#: common/static/bundles/DemographicsCollectionBanner.js
+msgid "Want to make edX better for everyone?"
+msgstr "Vous voulez rendre edX meilleur pour tout le monde ?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+msgid "Get started"
+msgstr "Commencez"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Section {currentPage} of {totalPages}"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Help make edX better for everyone!"
+msgstr "Aidez-nous à rendre edX meilleur pour tous !"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid ""
+"Welcome to edX! Before you get started, please take a few minutes to fill-in"
+" the additional information below to help us understand a bit more about "
+"your background. You can always edit this information later in Account "
+"Settings."
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Why does edX collect this information?"
+msgstr "Pourquoi edX collecte-t-il ces informations ?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+"Une erreur s'est produite lors de la tentative de récupération ou "
+"d'enregistrement des informations ci-dessous. Veuillez réessayer plus tard."
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "What is your gender identity?"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select gender"
+msgstr "Sélectionner une session"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Which of the following describes you best?"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Check all that apply"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+"Quel a été le revenu total combiné, au cours des 12 derniers mois, de tous "
+"les membres de votre famille?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select income"
+msgstr "Sélectionner une session"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+"Avez-vous déjà servi en service actif dans les forces armées, les réserves "
+"ou la garde nationale?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select military status"
+msgstr "Sélectionnez le statut d'emploi"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+"Quel est le niveau d'éducation le plus élevé que vous ayez atteint jusqu'à "
+"présent?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select level of education"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+"Quel est le niveau de scolarité le plus élevé que l'un de vos parents ou "
+"tuteurs ait atteint?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select guardian education"
+msgstr "Choisissez une catégorie"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select employment status"
+msgstr "Sélectionnez le statut d'emploi"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "What industry do you currently work in?"
+msgstr "Dans quel secteur travaillez-vous actuellement?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select current industry"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "What industry do you want to work in?"
+msgstr "Dans quel secteur souhaitez-vous travailler?"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Select prospective industry"
+msgstr ""
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr "Aidez-nous à rendre edX meilleur pour tous !"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Clear all"
+msgstr "Tout effacer"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "demographics questionnaire"
+msgstr "questionnaire démographique"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "close questionnaire"
+msgstr "Fermer le questionnaire"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "finish later"
+msgstr "terminer plus tard"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Return to my dashboard"
+msgstr "Retour à mon tableau de bord"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "Finish later"
+msgstr "Terminer plus tard"
+
+#: common/static/bundles/DemographicsCollectionBanner.js
+#: common/static/bundles/DemographicsCollectionModal.js
+msgid "next page"
+msgstr "page suivante"
+
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -2841,7 +3031,8 @@ msgstr ""
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
 msgstr ""
-"Avant de poursuivre, veuillez {htmlStart}activer votre compte{htmlEnd}."
+"Avant de poursuivre, veuillez {htmlStart}annuler le lien avec tous vos "
+"comptes de réseaux sociaux{htmlEnd}."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -2874,9 +3065,9 @@ msgid ""
 "cannot be undone. We will not be able to recover your account or the data "
 "that is deleted."
 msgstr ""
-"Vous avez sélectionné « Supprimer mon compte ». La suppression d'un compte "
-"et des données personnelles est permanente et ne peut être annulée. "
-"{platformName} ne pourra récupérer ni votre compte ni les données effacées."
+"Veuillez noter: La suppression de votre compte et de vos données "
+"personnelles est permanente et ne peut être annulée. ne pourra pas récupérer"
+" votre compte ou les données supprimées."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -2969,9 +3160,6 @@ msgid ""
 " data is permanent and cannot be undone. We will not be able to recover your"
 " account or the data that is deleted."
 msgstr ""
-"Vous avez sélectionné « Supprimer mon compte ». La suppression d'un compte "
-"et des données personnelles est permanente et ne peut être annulée. "
-"{platformName} ne pourra récupérer ni votre compte ni les données effacées."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -3037,6 +3225,22 @@ msgstr ""
 "prendre quelques semaines afin de traiter entièrement notre système. Si vous"
 " souhaitez renoncer aux e-mails ultérieurement, veuillez vous désinscrire en"
 " consultant le pied de page de n'importe quel e-mail."
+
+#: common/static/bundles/EnterpriseLearnerPortalModal.js
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
+
+#: common/static/bundles/EnterpriseLearnerPortalModal.js
+msgid ""
+"To access the courses available to you through {enterpriseName}, visit the "
+"{enterpriseName} dashboard."
+msgstr ""
+"Pour accéder aux cours disponibles via {enterpriseName}, visitez le tableau "
+"de bord {enterpriseName}."
+
+#: common/static/bundles/EnterpriseLearnerPortalModal.js
+msgid "Go to dashboard"
+msgstr "Aller au tableau de bord"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
@@ -3155,6 +3359,14 @@ msgid ""
 msgstr ""
 "Êtes-vous sûr de vouloir vous désinscrire de {courseName} ({courseNumber}) ?"
 " Le montant que vous aviez payé vous sera remboursé. "
+
+#: common/static/bundles/LibrarySourcedBlockPicker.js
+msgid "Loading..."
+msgstr "Chargement..."
+
+#: common/static/bundles/LibrarySourcedBlockPicker.js
+msgid "Selected blocks"
+msgstr "Blocs sélectionnés"
 
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
@@ -3327,7 +3539,7 @@ msgstr "Vérification de la photo"
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
+msgstr "Proctoring"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -3343,7 +3555,7 @@ msgstr "Autre"
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Discussion Forum"
-msgstr ""
+msgstr "Forum de discussions du cours"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -3353,6 +3565,12 @@ msgid ""
 "proper procedures in each course. Please post all course related questions "
 "within the Discussion Forum where the Course Staff can directly respond."
 msgstr ""
+"Bien que notre équipe d'assistance soit heureuse de vous aider avec la "
+"plateforme edX, le personnel du cours possède l'expertise nécessaire pour "
+"répondre à des questions spécifiques sur les devoirs, la notation ou les "
+"procédures appropriées dans chaque cours. Veuillez poster toutes les "
+"questions relatives au cours dans le forum de discussion où le personnel du "
+"cours peut répondre directement."
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -3362,12 +3580,12 @@ msgstr "Détails"
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "le plus rapidement et efficacement que nous pouvons répondre !"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Créer un billet de support"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -3412,7 +3630,7 @@ msgstr ""
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Sélectionnez un sujet pour votre demande d'assistance."
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -3472,6 +3690,8 @@ msgid ""
 "Thank you for submitting a request! We appreciate your patience while we "
 "work to review your request."
 msgstr ""
+"Merci de nous avoir soumis une demande ! Nous apprécions votre patience "
+"pendant que nous examinons votre demande."
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -3499,6 +3719,9 @@ msgid ""
 "cannot be undone. {platformName} will not be able to recover your account or"
 " the data that is deleted."
 msgstr ""
+"Veuillez noter: La suppression de votre compte et de vos données "
+"personnelles est permanente et ne peut être annulée. {platformName} ne "
+"pourra pas récupérer votre compte ou les données supprimées."
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -3507,6 +3730,9 @@ msgid ""
 "Once your account is deleted, you cannot use it to take courses on the "
 "{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
+"Une fois votre compte supprimé, vous ne pouvez plus l'utiliser pour suivre "
+"des cours sur l'application {platformName}, {siteName} ou sur tout autre "
+"site hébergé par {platformName}."
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -3516,6 +3742,8 @@ msgid ""
 "This includes access to {siteName} from your employer’s or university’s "
 "system{additionalSiteSpecificDeletionText}."
 msgstr ""
+"Cela inclut l’accès à {siteName} à partir du système de votre employeur ou "
+"de votre université {additionalSiteSpecificDeletionText}."
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -3537,6 +3765,9 @@ msgid ""
 "the {platformName} app, {siteName}, or any other site hosted by "
 "{platformName}."
 msgstr ""
+"Si vous continuez, vous ne pourrez plus utiliser ce compte pour suivre des "
+"cours sur l'application {platformName}, {siteName} ou sur tout autre site "
+"hébergé par {platformName}."
 
 #: common/static/bundles/UnenrollmentFactory.js
 #: lms/static/js/dashboard/legacy.js
@@ -4149,6 +4380,8 @@ msgid ""
 "This learner will be removed from the team,allowing another learner to take "
 "the available spot."
 msgstr ""
+"Cet apprenant sera retiré de l'équipe, permettant à un autre apprenant de "
+"prendre la place vacante."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -4159,6 +4392,9 @@ msgid ""
 "Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"Supprimer une équipe est une action à effet permanent et ne peut pas être "
+"annulée. Tous les membres seront retirés de l'équipe et les discussions de "
+"l'équipe ne seront plus accessibles."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -4187,7 +4423,7 @@ msgstr "Dernière activité {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View {span_start} {team_name} {span_end}"
-msgstr ""
+msgstr "Voir {span_start} {team_name} {span_end}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -4203,6 +4439,8 @@ msgid ""
 "If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
+"Si vous quittez, vous ne pouvez plus poster dans les discussions de cette "
+"équipe. Votre place sera disponible pour un autre apprenant."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -4212,7 +4450,7 @@ msgstr "Confirmer"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team in this team set."
-msgstr ""
+msgstr "Vous appartenez déjà à une autre équipe de cet ensemble d'équipe."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -4220,7 +4458,7 @@ msgstr "Cette équipe est pleine."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "Cannot join instructor managed team"
-msgstr ""
+msgstr "Impossible de rejoindre l'équipe dirigée par un instructeur"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid " Member"
@@ -4320,16 +4558,22 @@ msgid ""
 "by topic. Join an open public team to collaborate with other learners who "
 "are interested in the same topic as you are."
 msgstr ""
+"Voir toutes les équipes auxquelles vous appartenez et toutes les équipes "
+"publiques de votre cours, organisé par sujet. Joignez vous à une équipe "
+"publique ouverte pour collaborer avec d'autres apprenants qui sont "
+"intéressés dans le même sujet que vous."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams you belong to and all public teams in your course, organized "
 "by topic."
 msgstr ""
+"Voir toutes les équipes auxquelles vous appartenez et toutes les équipes "
+"publiques du cours, organisé par sujet."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "See all teams you belong to."
-msgstr ""
+msgstr "Voir toutes les équipes auxquelles vous appartenez."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
@@ -4351,8 +4595,8 @@ msgstr "L'équipe \"{team}\" n'a pu être trouvée."
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{team_count} Équipe"
+msgstr[1] "{team_count} Équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
@@ -4360,7 +4604,7 @@ msgstr "Sujet"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgstr "Voir les Équipes du sujet {topic_name}"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -4544,9 +4788,9 @@ msgid ""
 "now. Click Cancel to stay on this page (you must log in again to save your "
 "work)."
 msgstr ""
-"Vous avez été déconnecté de votre compte edX. Cliquez sur OK pour vous "
-"reconnecter dès maintenant. Cliquez sur Annuler pour rester sur cette page "
-"(afin de sauvegarder votre travail, vous devriez vous reconnecter)."
+"Vous avez été déconnecté de votre compte. Cliquez sur OK pour vous "
+"reconnecter maintenant. Cliquez sur Annuler pour rester sur cette page (vous"
+" devez vous reconnecter pour sauvegarder votre travail)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -4620,59 +4864,60 @@ msgstr "Liste des fichiers envoyés. Cliquez sur \"+\" pour voir."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr "apprenants ajoutés avec succès à la liste d'exception"
+msgstr "apprenants ajoutés avec succès à la liste de dérogations"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr "apprenant ajouté avec succès à la liste d'exception"
+msgstr "apprenant ajouté avec succès à la liste de dérogations"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to the exception list"
 msgstr ""
-"enregistrements ne sont pas dans le bon format et n'ont pas été ajoutés à la"
-" liste des exceptions"
+"les enregistrements ne sont pas dans le bon format et n'ont pas été ajoutés "
+"à la liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format and not added to the exception list"
 msgstr ""
-"enregistrement n'est pas dans le bon format et n'a pas été ajouté à la liste"
-" des exceptions"
+"l'enregistrement n'est pas dans le bon format et n'a pas été ajouté à la "
+"liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS and not added to the exception list"
 msgstr ""
-"ces étudiants n'existent pas dans le LMS et n'ont pas été ajoutés à la liste"
-" des exceptions"
+"les apprenants ne sont pas inscrits à ce cours et n'ont pas été ajoutés à la"
+" liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS and not added to the exception list"
 msgstr ""
-"apprenant n'existant pas dans le LMS et non ajouté dans la liste d'exception"
+"les comptes des apprenants sont introuvables et n'ont pas été ajoutés à la "
+"liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed and not added to the exception list"
 msgstr ""
-"ces étudiants sont déjà dans la liste blanche et non ajoutés à la liste des "
-"exceptions"
+"les apprenants ne sont pas inscrits à ce cours et n'ont pas été ajoutés à la"
+" liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is already white listed and not added to the exception list"
 msgstr ""
-"cet étudiant déjà ajouté à la liste blanche et non ajouté à la liste des "
-"exceptions"
+"l'apprenant n'est pas inscrit  à ce cours et n'a pas été ajouté à la liste "
+"des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid ""
 " learners are not enrolled in course and not added to the exception list"
 msgstr ""
-"ces étudiants ne sont pas inscrits au cours et ne sont pas ajoutés à la "
-"liste des exceptions"
+"les apprenants ne sont pas inscrits à ce cours et n'ont pas été ajoutés à la"
+" liste des exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
-"cet étudiant n'est pas inscrit au cours et n'est pas ajouté à la liste des "
-"exceptions"
+"l'apprenant n'est pas inscrit  à ce cours et n'a pas été ajouté à la liste "
+"des exceptions"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
@@ -4711,15 +4956,15 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid "Student Removed from certificate white list successfully."
-msgstr "Étudiant retiré avec succès de la liste blanche des certificats."
+msgstr "Étudiant retiré de la liste d'autorisation d'attestation avec succès."
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid ""
 "Could not find Certificate Exception in white list. Please refresh the page "
 "and try again"
 msgstr ""
-"Impossible de trouver le Certificat d'Exception dans la liste blanche. Merci"
-" de rafraîchir la page et réessayer."
+"Impossible de trouver l'exception d'attestation dans la liste "
+"d'autorisation. Veuillez actualiser la page et réessayer"
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "<%= user %> already in exception list."
@@ -4779,22 +5024,29 @@ msgid ""
 "Are you sure you want to unenroll from the purchased course {courseName} "
 "({courseNumber})?"
 msgstr ""
+"Êtes-vous sûr de vouloir vous désinscrire du cours acheté {courseName} "
+"({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
+"Êtes-vous sûr de vouloir vous désinscrire de {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
 "Are you sure you want to unenroll from the verified {certNameLong}  track of"
 " {courseName}  ({courseNumber})?"
 msgstr ""
+"Voulez-vous vraiment vous désinscrire de la piste {certNameLong} de "
+"{courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
 "Are you sure you want to unenroll from the verified {certNameLong} track of "
 "{courseName} ({courseNumber})?"
 msgstr ""
+"Voulez-vous vraiment vous désinscrire de la piste {certNameLong} de "
+"{courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -5610,10 +5862,12 @@ msgid ""
 "Error getting enrollment status for '<%- student_id %>'. Make sure that the "
 "student identifier is spelled correctly."
 msgstr ""
+"Erreur lors de l'obtention du statut d'inscription pour '<%- student_id %>'."
+" Assurez-vous que l'identifiant de l'étudiant est orthographié correctement."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Retrieving enrollment status..."
-msgstr ""
+msgstr "Récupération du statut d'inscription..."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -5642,9 +5896,6 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Erreur dans la récupération de l'historique du problème '<%- problem_id %>' "
-"pour l'étudiant '<%- student_id %>'. Vérifiez qu'il n'y a pas d'erreur dans "
-"les identifiants du problème et de l'étudiant."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -6067,6 +6318,15 @@ msgid ""
 "or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
+"{paragraphStart}Vous avez entré {boldStart}{email}{boldEnd}. Si cette "
+"adresse courriel est associée à votre compte {platform_name}, nous vous "
+"enverrons un message avec les instructions pour réinitialiser votre mot de "
+"passe à cette adresse courriel.{paragraphEnd} {paragraphStart}Si vous ne "
+"recevez pas un courriel de réinitialisation après 1 minute, vérifiez que "
+"vous avez entré votre adresse courriel correctement ou vérifiez votre "
+"dossier de pourriel. {paragraphEnd}{paragraphStart}Si vous avez besoin "
+"d'aide, {anchorStart}contacter le support "
+"technique{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6754,8 +7014,8 @@ msgstr "Montrer moins"
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
-msgstr[0] "{total_results} résultat trouvé pour le \"{search_term}\""
-msgstr[1] "{total_results} résultats trouvés pour le \"{search_term}\""
+msgstr[0] ""
+msgstr[1] ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -7492,7 +7752,7 @@ msgstr "Faits marquants de {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable Weekly Highlight Emails"
-msgstr ""
+msgstr "Activer les e-mails de mise à jour du cours"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -9620,7 +9880,7 @@ msgstr "Récupérer mon mot de passe"
 #: lms/templates/student_account/register.underscore
 #: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "Vous possédez déjà un compte {platformName} ?"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
@@ -10876,7 +11136,7 @@ msgstr "Copier l'emplacement du composant"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
-msgstr ""
+msgstr "E-mails de mise à jour du cours"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -11915,9 +12175,12 @@ msgid ""
 "exam. The videos are then reviewed to ensure that learners follow all "
 "examination rules."
 msgstr ""
-"Les examens vérifiés sont minutés et un enregistrement vidéo est fait que "
-"chaque étudiant. Les vidéo sont ensuite vérifiées pour s'assurer que les "
-"conditions de l'examen étaient correctes;"
+"Les examens surveillés sont chronométrés et ils enregistrent une vidéo de "
+"chaque apprenant passant l'examen. Les vidéos sont ensuite examinées pour "
+"s'assurer que les apprenants respectent toutes les règles. Veuillez noter "
+"que si vous définissez cet examen comme étant surveillé, les paramètres de "
+"visibilité seront modifiés en \"Masquer le contenu après la date "
+"d'échéance\"."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
@@ -12359,6 +12622,9 @@ msgstr "Utiliser la transcription courante"
 #~ msgid "This component has validation issues."
 #~ msgstr "Ce composant a des problèmes de validation."
 
+#~ msgid "{startTag}{requestToken}{endTag}{selector}"
+#~ msgstr "{startTag}{requestToken}{endTag}{selector}"
+
 #~ msgid "Upload a new PDF to “<%- name %>”"
 #~ msgstr "Charger un nouveau PDF en “<%- name %>”"
 
@@ -12566,6 +12832,9 @@ msgstr "Utiliser la transcription courante"
 #~ msgid "Yes, delete this {xblock_type}"
 #~ msgstr "Oui, supprimer ce {xblock_type}"
 
+#~ msgid "Delete this {xblock_type}?"
+#~ msgstr "Supprimer ce {xblock_type}?"
+
 #~ msgid "Please select a file in .srt format."
 #~ msgstr "Sélectionner un fichier au format .srt."
 
@@ -12594,29 +12863,94 @@ msgstr "Utiliser la transcription courante"
 #~ msgid "New {component_type}"
 #~ msgstr "Nouveau {component_type}"
 
-#~ msgid "Loading..."
-#~ msgstr "Chargement..."
-
 #~ msgid "Unable to update settings"
 #~ msgstr "Impossible de mettre à jours les paramètres"
+
+#~ msgid ""
+#~ "An answer option has been left blank. Please review and edit the component."
+#~ msgstr ""
+#~ "Une option de réponse a été laissée en blanc. Veuillez vérifier et modifier "
+#~ "le composant."
+
+#~ msgid "Create a report of problem responses"
+#~ msgstr "Créer un rapport des réponses aux problèmes"
+
+#~ msgid "Your report is being generated..."
+#~ msgstr "Votre rapport est en cours de génération..."
+
+#~ msgid "Your report has been successfully generated."
+#~ msgstr "Votre rapport a été généré avec succès."
+
+#~ msgid "View Report"
+#~ msgstr "Afficher le rapport"
+
+#~ msgid "There was an error generating your report."
+#~ msgstr "Une erreur est survenue lors de la génération de votre rapport."
+
+#~ msgid "Unable to get report generation status."
+#~ msgstr "Impossible d'obtenir l'état de la génération de rapport."
+
+#~ msgid "Unable to submit request to generate report."
+#~ msgstr "Impossible de soumettre la requête de génération de rapport."
 
 #~ msgid "No assignments for team"
 #~ msgstr "Pas de tâches pour l'équipe"
 
-#~ msgid "close questionnaire"
-#~ msgstr "Fermer le questionnaire"
+#~ msgid ""
+#~ "An error occurred while looking up team membership. Try refreshing the page."
+#~ msgstr ""
+#~ "Une erreur s'est produite lors de la recherche des membres de l'équipe. "
+#~ "Essayez d'actualiser la page."
 
-#~ msgid "finish later"
-#~ msgstr "terminer plus tard"
+#~ msgid ""
+#~ " learner account cannot be found and has not been added to the exception "
+#~ "list"
+#~ msgstr ""
+#~ " le compte de l'apprenant est introuvable et n'a pas été ajouté à la liste "
+#~ "des exceptions"
 
-#~ msgid "Return to my dashboard"
-#~ msgstr "Retour à mon tableau de bord"
+#~ msgid " learners already appear on the exception list in this course"
+#~ msgstr ""
+#~ " les apprenants figurent déjà sur la liste des exceptions dans ce cours"
 
-#~ msgid "Finish later"
-#~ msgstr "Terminer plus tard"
+#~ msgid " learner already appears on the exception list in this course"
+#~ msgstr " l'apprenant apparaît déjà sur la liste des exceptions dans ce cours"
 
-#~ msgid "next page"
-#~ msgstr "page suivante"
+#~ msgid ""
+#~ " learners have an active certificate invalidation in this course and have "
+#~ "not been added to the exception list"
+#~ msgstr ""
+#~ " les apprenants ont une invalidation d'attestation active dans ce cours et "
+#~ "n'ont pas été ajoutés à la liste des exceptions"
+
+#~ msgid ""
+#~ " learner has an active certificate invalidation in this course and has not "
+#~ "been added to the exception list"
+#~ msgstr ""
+#~ " l'apprenant a une invalidation d'attestation active dans ce cours et n'a "
+#~ "pas été ajouté à la liste des exceptions"
+
+#~ msgid " learners encountered unknown errors"
+#~ msgstr "apprenants ont rencontré des erreurs inconnues"
+
+#~ msgid " learner encountered an unknown error"
+#~ msgstr "apprenant a rencontré une erreur inconnue"
+
+#~ msgid "Error generating anonymous IDs. Please try again."
+#~ msgstr "Erreur lors de la génération des ID anonymes. Veuillez réessayer."
+
+#~ msgid ""
+#~ "In order to sign in, you need to activate your "
+#~ "account.{line_break}{line_break}We just sent an activation link to "
+#~ "{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+#~ "your spam folders or  {anchorStart}contact {platform_name} "
+#~ "Support{anchorEnd}."
+#~ msgstr ""
+#~ "Pour vous connecter, vous devez activer votre compte.{line_break} "
+#~ "{line_break}Nous venons d'envoyer un lien d'activation à {strong_start} "
+#~ "{email} {strong_end}. Si vous ne recevez pas un courriel, vérifiez vos "
+#~ "dossiers de courrier indésirable ou {anchorStart}contacter le Support "
+#~ "{platform_name}{anchorEnd}."
 
 #~ msgid "{platform_display_name} Link"
 #~ msgstr "{platform_display_name} Lien"
@@ -12627,6 +12961,21 @@ msgstr "Utiliser la transcription courante"
 #~ msgstr ""
 #~ "Entrez votre {platform_display_name} nom d'utilisateur ou l'URL vers votre "
 #~ "{platform_display_name} page. Effacez l'URL pour enlever le lien."
+
+#~ msgid "The certificate display behavior must be one of: {behavior_options}"
+#~ msgstr ""
+#~ "Le comportement d'affichage de l'attestation doit être l'un des suivants : "
+#~ "{behavior_options}"
+
+#~ msgid ""
+#~ "The certificates display behavior must be {valid_option} if certificate "
+#~ "available date is set."
+#~ msgstr ""
+#~ "Le comportement d'affichage des attestations doit être {valid_option} si la "
+#~ "date de disponibilité de l'attestation est définie."
+
+#~ msgid "Studio's having trouble parsing the problem component's content"
+#~ msgstr "Studio a du mal à analyser le contenu du composant problématique"
 
 #~ msgid "Team Assignments"
 #~ msgstr "Devoirs de l'équipe"
@@ -12645,6 +12994,33 @@ msgstr "Utiliser la transcription courante"
 
 #~ msgid "Create an account"
 #~ msgstr "Créer un compte"
+
+#~ msgid "Due in:"
+#~ msgstr "Dû le :"
+
+#~ msgid "weeks from learner enrollment date"
+#~ msgstr "semaines à compter de la date d'inscription de l'apprenant"
+
+#~ msgid ""
+#~ "If a learner starts on {startDate}, this subsection will be due on "
+#~ "{projectedDueIn}."
+#~ msgstr ""
+#~ "Si un apprenant commence le {startDate}, cette sous-section sera due le "
+#~ "{projectedDueIn}."
+
+#~ msgid ""
+#~ "The maximum number of weeks this subsection can be due in is 18 weeks from "
+#~ "the learner enrollment date."
+#~ msgstr ""
+#~ "Le nombre maximum de semaines dans lesquelles cette sous-section peut être "
+#~ "due est de 18 semaines à compter de la date d'inscription de l'apprenant."
+
+#~ msgid ""
+#~ "The minimum number of weeks this subsection can be due in is 1 week from the"
+#~ " learner enrollment date."
+#~ msgstr ""
+#~ "Le nombre minimum de semaines dans lesquelles cette sous-section peut être "
+#~ "due est de 1 semaine à compter de la date d'inscription de l'apprenant."
 
 #~ msgid ""
 #~ "This subsection was released to learners as a special exam, but was reverted"

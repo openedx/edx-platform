@@ -181,9 +181,13 @@ generate_merge:
         - mako-studio.po
         - wiki.po
         - edx_proctoring_proctortrack.po
+        - edly_panel_app.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
         - djangojs-account-settings-view.po
         - underscore.po
         - underscore-studio.po
+
+third_party:
+    - edly_panel_app
