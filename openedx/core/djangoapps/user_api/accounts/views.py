@@ -76,7 +76,7 @@ from ..models import (
     UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
+from .permissions import CanDeactivateUser, CanGetAccountInfo, CanReplaceUsername, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 from .utils import create_retirement_request_and_deactivate_account
@@ -280,7 +280,7 @@ class AccountViewSet(ViewSet):
     authentication_classes = (
         JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, CanGetAccountInfo)
     parser_classes = (MergePatchParser,)
 
     def get(self, request):
@@ -292,10 +292,12 @@ class AccountViewSet(ViewSet):
     def list(self, request):
         """
         GET /api/user/v1/accounts?username={username1,username2}
-        GET /api/user/v1/accounts?email={user_email}
+        GET /api/user/v1/accounts?email={user_email} (Staff Only)
+        GET /api/user/v1/accounts?lms_user_id={lms_user_id} (Staff Only)
         """
         usernames = request.GET.get('username')
         user_email = request.GET.get('email')
+        lms_user_id = request.GET.get('lms_user_id')
         search_usernames = []
 
         if usernames:
@@ -304,6 +306,12 @@ class AccountViewSet(ViewSet):
             user_email = user_email.strip('')
             try:
                 user = User.objects.get(email=user_email)
+            except (UserNotFound, User.DoesNotExist):
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            search_usernames = [user.username]
+        elif lms_user_id:
+            try:
+                user = User.objects.get(id=lms_user_id)
             except (UserNotFound, User.DoesNotExist):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             search_usernames = [user.username]
