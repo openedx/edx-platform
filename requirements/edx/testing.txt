@@ -52,7 +52,7 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
-anyio==3.4.0
+anyio==3.5.0
     # via starlette
 appdirs==1.4.4
     # via
@@ -498,7 +498,7 @@ edx-celeryutils==1.1.1
     #   super-csv
 edx-completion==4.1.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.1.0
+edx-django-release-util==1.1.1
     # via -r requirements/edx/base.txt
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.txt
@@ -560,7 +560,7 @@ edx-opaque-keys[django]==2.2.2
     #   xmodule
 edx-organizations==6.10.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.8.2
+edx-proctoring==4.8.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -660,7 +660,6 @@ future==0.18.2
     #   -r requirements/edx/base.txt
     #   django-ses
     #   edx-celeryutils
-    #   edx-enterprise
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/base.txt
@@ -1233,7 +1232,6 @@ six==1.16.0
     #   edx-ccx-keys
     #   edx-django-release-util
     #   edx-drf-extensions
-    #   edx-enterprise
     #   edx-lint
     #   edx-milestones
     #   edx-rbac
