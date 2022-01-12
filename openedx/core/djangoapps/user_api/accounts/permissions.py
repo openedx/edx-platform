@@ -32,3 +32,15 @@ class CanReplaceUsername(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.username == getattr(settings, "USERNAME_REPLACEMENT_WORKER", False)
+
+
+class CanGetAccountInfo(permissions.BasePermission):
+    """
+    Grants access to AccountViewSet if the requesting user is a superuser/staff
+    and requesting to get account info based on non-public information.
+    """
+
+    def has_permission(self, request, view):
+        return (request.GET.get('lms_user_id') is None and request.GET.get('email') is None) or (
+            request.user.is_staff or request.user.is_superuser
+        )
