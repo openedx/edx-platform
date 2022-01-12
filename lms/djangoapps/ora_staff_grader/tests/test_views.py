@@ -197,7 +197,6 @@ class TestInitializeView(BaseViewTest):
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
 
-
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
@@ -286,8 +285,7 @@ class TestFetchSubmissionView(BaseViewTest):
         expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()
         assert response.data['gradeData'].keys() == expected_assessment_keys
 
-
-    @ddt.data(0,1,2)
+    @ddt.data(0, 1, 2)
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_info')
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_assessment_info')
     @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.check_submission_lock')
