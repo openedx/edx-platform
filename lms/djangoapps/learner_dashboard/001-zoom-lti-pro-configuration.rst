@@ -4,7 +4,7 @@ Configure Zoom Lti in Programs
 Status
 ======
 
-PENDING
+Approved
 
 Context
 =======
@@ -22,6 +22,8 @@ We can use the ``program_discussion_configuration`` model to add zoom lti pro
 configurations for the program. A new type will be added so we can identify the
 type of configuration if it is a discussion or live configuration.
 
+We are going ahead with LTI 1.1 to configure zoom for now due to some
+constraints in current implementation.
 
 Consequences
 ============
