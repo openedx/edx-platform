@@ -2195,13 +2195,10 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
 
-# .. toggle_name: COURSEGRAPH_JOB_QUEUE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: value of LOW_PRIORITY_QUEUE
-# .. toggle_description: The name of the Celery queue to which CourseGraph refresh
+# .. setting_name: COURSEGRAPH_JOB_QUEUE
+# .. setting_default: value of LOW_PRIORITY_QUEUE
+# .. setting_description: The name of the Celery queue to which CourseGraph refresh
 #      tasks will be sent
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-10-01
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 ########## Settings for video transcript migration tasks ############
