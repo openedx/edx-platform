@@ -413,7 +413,7 @@ edx-celeryutils==1.1.1
     #   super-csv
 edx-completion==4.1.0
     # via -r requirements/edx/base.in
-edx-django-release-util==1.1.0
+edx-django-release-util==1.1.1
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.in
@@ -543,7 +543,6 @@ future==0.18.2
     # via
     #   django-ses
     #   edx-celeryutils
-    #   edx-enterprise
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/base.in
@@ -935,7 +934,6 @@ six==1.16.0
     #   edx-ccx-keys
     #   edx-django-release-util
     #   edx-drf-extensions
-    #   edx-enterprise
     #   edx-milestones
     #   edx-rbac
     #   event-tracking

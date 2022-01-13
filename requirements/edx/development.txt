@@ -54,7 +54,7 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-tincan-py35
-anyio==3.4.0
+anyio==3.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   starlette
@@ -514,7 +514,7 @@ edx-celeryutils==1.1.1
     #   super-csv
 edx-completion==4.1.0
     # via -r requirements/edx/testing.txt
-edx-django-release-util==1.1.0
+edx-django-release-util==1.1.1
     # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/testing.txt
@@ -684,7 +684,6 @@ future==0.18.2
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   edx-celeryutils
-    #   edx-enterprise
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/testing.txt
@@ -795,7 +794,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.3.3
+jsonschema==4.4.0
     # via sphinxcontrib-openapi
 jwcrypto==1.0
     # via
@@ -1306,7 +1305,6 @@ six==1.16.0
     #   edx-ccx-keys
     #   edx-django-release-util
     #   edx-drf-extensions
-    #   edx-enterprise
     #   edx-lint
     #   edx-milestones
     #   edx-rbac
