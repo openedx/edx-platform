@@ -1,9 +1,18 @@
 """
 Views for Enhanced Staff Grader
 """
-import json
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from lms.djangoapps.ora_staff_grader.ora_api import (
+    check_submission_lock,
+    claim_submission_lock,
+    delete_submission_lock,
+    get_assessment_info,
+    get_rubric_config,
+    get_submission_info,
+    get_submissions,
+    submit_grade
+)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.generics import RetrieveAPIView
@@ -15,7 +24,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
-    ExceptionWithContext,
     GradeContestedResponse,
     LockContestedError,
     LockContestedResponse,
@@ -28,16 +36,14 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
 )
-from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, require_params
+from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 class StaffGraderBaseView(RetrieveAPIView):
     """
-    Base view for common auth/permission setup and XBlock handlers used across ESG views.
-
-    All XBlock handlers are wrapped to either return data or raise an exception to make error-handling clear.
+    Base view for common auth/permission setup used across ESG views.
     """
     authentication_classes = (
         JwtAuthentication,
@@ -46,135 +52,6 @@ class StaffGraderBaseView(RetrieveAPIView):
     )
 
     permission_classes = (IsAuthenticated,)
-
-    def get_submissions(self, request, usage_id):
-        """
-        Get a list of submissions from the ORA's 'list_staff_workflows' XBlock.json_handler
-        """
-        response = call_xblock_json_handler(request, usage_id, 'list_staff_workflows', {})
-
-        if response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
-
-    def get_rubric_config(self, request, usage_id):
-        """
-        Get rubric data from the ORA's 'get_rubric' XBlock.json_handler
-        """
-        data = {'target_rubric_block_id': usage_id}
-        response = call_xblock_json_handler(request, usage_id, 'get_rubric', data)
-
-        # Unhandled errors might not be JSON, catch before loading
-        if response.status_code != 200:
-            raise Exception()
-
-        response_data = json.loads(response.content)
-
-        # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message "msg"
-        if not response_data.get('success', False):
-            raise ExceptionWithContext(context={"msg": response_data.get('msg', '')})
-
-        return response_data['rubric']
-
-    def get_submission_info(self, request, usage_id, submission_uuid):
-        """
-        Get submission content from ORA 'get_submission_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_submission_info', data)
-
-        if response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
-
-    def get_assessment_info(self, request, usage_id, submission_uuid):
-        """
-        Get assessment data from ORA 'get_assessment_info' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'get_assessment_info', data)
-
-        if response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
-
-    def submit_grade(self, request, usage_id, grade_data):
-        """
-        Submit a grade for an assessment.
-
-        Returns: {'success': True/False, 'msg': err_msg}
-        """
-        response = call_xblock_json_handler(request, usage_id, 'staff_assess', grade_data)
-
-        # Unhandled errors might not be JSON, catch before loading
-        if response.status_code != 200:
-            raise Exception()
-
-        response_data = json.loads(response.content)
-
-        # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message "msg"
-        if not response_data.get('success', False):
-            raise ExceptionWithContext(context={"msg": response_data.get('msg', '')})
-
-        return response_data
-
-    def check_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Look up lock info for the given submission by calling the ORA's 'check_submission_lock' XBlock.json_handler
-        """
-        data = {'submission_uuid': submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'check_submission_lock', data)
-
-        # Unclear that there would every be an error (except network/auth) but good to catch here
-        if response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
-
-    def claim_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Attempt to claim a submission lock for grading.
-
-        Returns:
-        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
-        """
-        body = {"submission_uuid": submission_uuid}
-        response = call_xblock_json_handler(request, usage_id, 'claim_submission_lock', body)
-
-        # Lock contested returns a 403
-        if response.status_code == 403:
-            raise LockContestedError()
-
-        # Other errors should raise a blanket exception
-        elif response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
-
-    def delete_submission_lock(self, request, usage_id, submission_uuid):
-        """
-        Attempt to claim a submission lock for grading.
-
-        Returns:
-        - lockStatus (string) - One of ['not-locked', 'locked', 'in-progress']
-        """
-        body = {"submission_uuid": submission_uuid}
-
-        # Return raw response to preserve HTTP status codes for failure states
-        response = call_xblock_json_handler(request, usage_id, 'delete_submission_lock', body)
-
-        # Lock contested returns a 403
-        if response.status_code == 403:
-            raise LockContestedError()
-
-        # Other errors should raise a blanket exception
-        elif response.status_code != 200:
-            raise Exception()
-
-        return json.loads(response.content)
 
 
 class InitializeView(StaffGraderBaseView):
@@ -207,10 +84,10 @@ class InitializeView(StaffGraderBaseView):
             response_data['courseMetadata'] = get_course_overview_or_none(course_id)
 
             # Get list of submissions for this ORA
-            response_data['submissions'] = self.get_submissions(request, ora_location)
+            response_data['submissions'] = get_submissions(request, ora_location)
 
             # Get the rubric config for this ORA
-            response_data['rubricConfig'] = self.get_rubric_config(request, ora_location)
+            response_data['rubricConfig'] = get_rubric_config(request, ora_location)
 
             return Response(InitializeSerializer(response_data).data)
 
@@ -257,9 +134,9 @@ class SubmissionFetchView(StaffGraderBaseView):
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
-            submission_info = self.get_submission_info(request, ora_location, submission_uuid)
-            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            submission_info = get_submission_info(request, ora_location, submission_uuid)
+            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
             serializer = SubmissionFetchSerializer({
                 'submission_info': submission_info,
@@ -303,8 +180,8 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
-            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
             serializer = SubmissionStatusFetchSerializer({
                 'assessment_info': assessment_info,
@@ -360,9 +237,9 @@ class UpdateGradeView(StaffGraderBaseView):
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
             # Reassert that we have ownership of the submission lock
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
             if not lock_info.get('lock_status') == 'in-progress':
-                assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
+                assessment_info = get_assessment_info(request, ora_location, submission_uuid)
                 submission_status = SubmissionStatusFetchSerializer({
                     'assessment_info': assessment_info,
                     'lock_info': lock_info,
@@ -372,14 +249,14 @@ class UpdateGradeView(StaffGraderBaseView):
             # Transform grade data and submit assessment, rasies on failure
             context = {'submission_uuid': submission_uuid}
             grade_data = StaffAssessSerializer(request.data, context=context).data
-            self.submit_grade(request, ora_location, grade_data)
+            submit_grade(request, ora_location, grade_data)
 
             # Clear the lock on the graded submission
-            self.delete_submission_lock(request, ora_location, submission_uuid)
+            delete_submission_lock(request, ora_location, submission_uuid)
 
             # Return submission status info to frontend
-            assessment_info = self.get_assessment_info(request, ora_location, submission_uuid)
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
             serializer = SubmissionStatusFetchSerializer({
                 'assessment_info': assessment_info,
                 'lock_info': lock_info,
@@ -414,7 +291,7 @@ class SubmissionLockView(StaffGraderBaseView):
         try:
             # Validate ORA location
             UsageKey.from_string(ora_location)
-            lock_info = self.claim_submission_lock(request, ora_location, submission_uuid)
+            lock_info = claim_submission_lock(request, ora_location, submission_uuid)
             return Response(LockStatusSerializer(lock_info).data)
 
         # Catch bad ORA location
@@ -423,7 +300,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Return updated lock info on error
         except LockContestedError:
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
             return LockContestedResponse(context=lock_status)
 
@@ -437,7 +314,7 @@ class SubmissionLockView(StaffGraderBaseView):
         try:
             # Validate ORA location
             UsageKey.from_string(ora_location)
-            lock_info = self.delete_submission_lock(request, ora_location, submission_uuid)
+            lock_info = delete_submission_lock(request, ora_location, submission_uuid)
             return Response(LockStatusSerializer(lock_info).data)
 
         # Catch bad ORA location
@@ -446,7 +323,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Return updated lock info on error
         except LockContestedError:
-            lock_info = self.check_submission_lock(request, ora_location, submission_uuid)
+            lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
             return LockContestedResponse(context=lock_status)
 

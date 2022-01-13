@@ -165,8 +165,8 @@ class TestInitializeView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
     def test_init(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
         """ Any failure to fetch info returns an unknown error response """
@@ -197,8 +197,8 @@ class TestInitializeView(BaseViewTest):
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
 
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
     def test_init_exception(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
         """ If one of the XBlock handlers fails, the exception should be caught """
@@ -232,9 +232,9 @@ class TestFetchSubmissionView(BaseViewTest):
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission(
         self,
         has_assessment,
@@ -286,9 +286,9 @@ class TestFetchSubmissionView(BaseViewTest):
         assert response.data['gradeData'].keys() == expected_assessment_keys
 
     @ddt.data(0, 1, 2)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission_exceptions(
         self,
         inject_chaos,
@@ -342,8 +342,8 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission_status(
         self,
         has_assessment,
@@ -394,8 +394,8 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         }
         assert actual == expected
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission_status_exceptions(self, mock_check_submission_lock, mock_get_assessment_info):
         """ Exceptions in any of the endpoints return a generic error response"""
         mock_get_assessment_info.side_effect = Exception()
@@ -450,7 +450,7 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
     def test_claim_lock(self, mock_claim_lock):
         """ POST tries to claim a submission lock. Success returns lock status 'in-progress'. """
         mock_return_data = {
@@ -467,8 +467,8 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
     def test_claim_lock_contested(self, mock_claim_lock, mock_check_lock):
         """ Attempting to claim a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_claim_lock.side_effect = LockContestedError()
@@ -487,7 +487,7 @@ class TestSubmissionLockView(BaseViewTest):
 
     # Tests for deleting a lock (DELETE)
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
     def test_delete_lock(self, mock_delete_lock):
         """ DELETE indicates to clear submission lock. Success returns lock status 'unlocked'. """
         mock_delete_lock.return_value = {"lock_status": "unlocked"}
@@ -498,8 +498,8 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
     def test_delete_lock_contested(self, mock_delete_lock, mock_check_lock):
         """ Attempting to delete a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_delete_lock.side_effect = LockContestedError()
@@ -547,8 +547,8 @@ class TestUpdateGradeView(BaseViewTest):
         super().setUp()
         self.client.login(username=self.staff.username, password=self.password)
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_failure_handled(self, mock_submit_grade, mock_check_lock):
         """ A handled ORA failure to submit a grade returns a server error """
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
@@ -562,8 +562,8 @@ class TestUpdateGradeView(BaseViewTest):
             "error": ERR_UNKNOWN
         }
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_failure_unhandled(self, mock_submit_grade, mock_check_lock):
         """ An exception anywhere submitting a grade returns a server error """
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
@@ -577,10 +577,10 @@ class TestUpdateGradeView(BaseViewTest):
             "error": ERR_UNKNOWN
         }
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.delete_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock):
         """ A grade update success should clear the submission lock and return submission meta """
         mock_check_lock.side_effect = [
@@ -633,9 +633,9 @@ class TestUpdateGradeView(BaseViewTest):
         # Verify that clear lock was called
         mock_delete_lock.assert_called_once()
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_contested(self, mock_submit_grade, mock_get_info, mock_check_lock):
         """ Submitting a grade should be blocked if someone else has obtained the lock """
         mock_check_lock.side_effect = [{'lock_status': 'unlocked'}]
