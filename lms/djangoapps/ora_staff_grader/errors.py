@@ -19,6 +19,10 @@ class ExceptionWithContext(Exception):
         self.context = context
 
 
+class XBlockInternalError(ExceptionWithContext):
+    """ Errors from XBlock handlers"""
+
+
 class LockContestedError(ExceptionWithContext):
     """ Signal for trying to operate on a lock owned by someone else """
 
