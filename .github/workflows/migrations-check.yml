@@ -24,6 +24,13 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Start mysql service
+      run: sudo /etc/init.d/mysql start
+
+    - name: Verify mysql version
+      run: |
+        mysqld --version
+        mysqladmin -V
 
     - name: Install system Packages
       run: |
