@@ -140,6 +140,7 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
+
 class ProgramLiveIframeView(APIView, ProgramSpecificViewMixin):
     """
     A view for retrieving Program live IFrame .

@@ -111,6 +111,7 @@ class ProviderFilterAdmin(StackedConfigModelAdmin):
         DenyListFilter,
     )
 
+
 class ProgramLiveConfigurationAdmin(SimpleHistoryAdmin):
     """
     Customize the admin interface for the program discussions configuration
@@ -133,8 +134,6 @@ class ProgramLiveConfigurationAdmin(SimpleHistoryAdmin):
         'enabled',
         'provider_type',
     )
-
-
 
 admin.site.register(DiscussionsConfiguration, DiscussionsConfigurationAdmin)
 admin.site.register(ProgramDiscussionsConfiguration, ProgramDiscussionsConfigurationAdmin)

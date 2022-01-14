@@ -657,4 +657,3 @@ class ProgramLiveConfiguration(TimeStampedModel):
         return cls.objects.filter(
             program_uuid=program_uuid
         ).first()
-

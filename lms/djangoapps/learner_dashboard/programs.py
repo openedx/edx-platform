@@ -289,7 +289,7 @@ class ProgramDiscussionLTI:
         )
         return fragment.content
 
-class ProgramLiveLTI (ProgramDiscussionLTI):
-    def get_configuration (self) :
-        return ProgramLiveConfiguration.get(self.program_uuid)
 
+class ProgramLiveLTI(ProgramDiscussionLTI):
+    def get_configuration(self):
+        return ProgramLiveConfiguration.get(self.program_uuid)
