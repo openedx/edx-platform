@@ -614,3 +614,47 @@ class DiscussionTopicLink(models.Model):
             f'enabled_in_context={self.enabled_in_context}'
             f')'
         )
+
+
+class ProgramLiveConfiguration(TimeStampedModel):
+    """
+    Associates a program with a live lti provider i.e. zoom and configuration
+    """
+
+    program_uuid = models.CharField(
+        primary_key=True,
+        db_index=True,
+        max_length=50,
+        verbose_name=_("Program UUID"),
+    )
+    enabled = models.BooleanField(
+        default=True,
+        help_text=_("If disabled, the live lti in the associated program will be disabled.")
+    )
+    lti_configuration = models.ForeignKey(
+        LtiConfiguration,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("The LTI configuration data for this program/provider."),
+    )
+    provider_type = models.CharField(
+        blank=False,
+        max_length=50,
+        verbose_name=_("Live lti provider"),
+        help_text=_("The lti provider's id"),
+    )
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
+
+    @classmethod
+    def get(cls, program_uuid):
+        """
+        Lookup a program live configuration by program uuid.
+        """
+        return cls.objects.filter(
+            program_uuid=program_uuid
+        ).first()
+

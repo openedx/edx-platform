@@ -19,7 +19,7 @@ from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways, get_programs
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
-from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration
+from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration, ProgramLiveConfiguration
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
@@ -178,7 +178,10 @@ class ProgramDiscussionLTI:
         self.program_uuid = program_uuid
         self.program = get_programs(uuid=self.program_uuid)
         self.request = request
-        self.configuration = ProgramDiscussionsConfiguration.get(self.program_uuid)
+        self.configuration = self.get_configuration()
+
+    def get_configuration(self):
+        return ProgramDiscussionsConfiguration.get(self.program_uuid)
 
     @property
     def is_configured(self):
@@ -285,3 +288,8 @@ class ProgramDiscussionLTI:
             )
         )
         return fragment.content
+
+class ProgramLiveLTI (ProgramDiscussionLTI):
+    def get_configuration (self) :
+        return ProgramLiveConfiguration.get(self.program_uuid)
+
