@@ -22,6 +22,7 @@ from lms.djangoapps.ora_staff_grader.constants import (
     PARAM_SUBMISSION_ID,
 )
 from lms.djangoapps.ora_staff_grader.errors import LockContestedError, XBlockInternalError
+import lms.djangoapps.ora_staff_grader.tests.test_data as test_data
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -73,86 +74,10 @@ class TestInitializeView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:initialize'
 
-    # Options split for reuse
-    example_options = [
-        {
-            "order_num": 0,
-            "name": "troll",
-            "label": "Troll",
-            "explanation": "Failing grade",
-            "points": 0
-        },
-        {
-            "order_num": 1,
-            "name": "dreadful",
-            "label": "Dreadful",
-            "explanation": "Failing grade",
-            "points": 1
-        },
-        {
-            "order_num": 2,
-            "name": "poor",
-            "label": "Poor",
-            "explanation": "Failing grade (may repeat)",
-            "points": 2
-        },
-        {
-            "order_num": 3,
-            "name": "poor",
-            "label": "Poor",
-            "explanation": "Failing grade (may repeat)",
-            "points": 3
-        },
-        {
-            "order_num": 4,
-            "name": "acceptable",
-            "label": "Acceptable",
-            "explanation": "Passing grade (may continue to N.E.W.T)",
-            "points": 4
-        },
-        {
-            "order_num": 5,
-            "name": "exceeds_expectations",
-            "label": "Exceeds Expectations",
-            "explanation": "Passing grade (may continue to N.E.W.T)",
-            "points": 5
-        },
-        {
-            "order_num": 6,
-            "name": "outstanding",
-            "label": "Outstanding",
-            "explanation": "Passing grade (will continue to N.E.W.T)",
-            "points": 6
-        }
-    ]
-
-    test_rubric = {
-        "feedback_prompt": "How did this student do?",
-        "feedback_default_text": "For the O.W.L exams, this student...",
-        "criteria": [
-            {
-                "order_num": 0,
-                "name": "potions",
-                "label": "Potions",
-                "prompt": "How did this student perform in the Potions exam",
-                "feedback": "optional",
-                "options": example_options
-            },
-            {
-                "order_num": 1,
-                "name": "charms",
-                "label": "Charms",
-                "prompt": "How did this student perform in the Charms exam",
-                "feedback": "required",
-                "options": example_options
-            }
-        ]
-    }
-
     @ddt.data({}, {PARAM_ORA_LOCATION: ''})
     def test_missing_param(self, query_params):
         """ Missing ORA location param should return 400 and error message """
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
@@ -160,7 +85,7 @@ class TestInitializeView(BaseViewTest):
 
     def test_bad_ora_location(self):
         """ Bad ORA location should return a 400 and error message """
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: 'not_a_real_location'})
 
         assert response.status_code == 400
@@ -173,25 +98,10 @@ class TestInitializeView(BaseViewTest):
         """ Any failure to fetch info returns an unknown error response """
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
-        mock_get_submissions.return_value = {
-            "a": {
-                "submissionUuid": "a",
-                "username": "foo",
-                "teamName": None,
-                "dateSubmitted": "1969-07-16 13:32:00",
-                "dateGraded": None,
-                "gradedBy": None,
-                "gradingStatus": "ungraded",
-                "lockStatus": "unlocked",
-                "score": {
-                    "pointsEarned": 0,
-                    "pointsPossible": 10
-                }
-            }
-        }
-        mock_get_rubric_config.return_value = self.test_rubric
+        mock_get_submissions.return_value = test_data.example_submission_list
+        mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions', 'rubricConfig'])
@@ -207,9 +117,9 @@ class TestInitializeView(BaseViewTest):
         mock_get_course_overview.return_value = mock_course_overview
         # Mock an error getting submissions
         mock_get_submissions.side_effect = XBlockInternalError(context={'handler':'list_staff_workflows'})
-        mock_get_rubric_config.return_value = self.test_rubric
+        mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         assert response.status_code == 500
@@ -224,9 +134,9 @@ class TestInitializeView(BaseViewTest):
         mock_get_course_overview.return_value = mock_course_overview
         # Mock a bad returned data shape which would break serialization
         mock_get_submissions.return_value = {'bad': 'wolf'}
-        mock_get_rubric_config.return_value = self.test_rubric
+        mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         assert response.status_code == 500
@@ -239,34 +149,6 @@ class TestFetchSubmissionView(BaseViewTest):
     Tests for the submission fetch view
     """
     view_name = 'ora-staff-grader:fetch-submission'
-
-    example_submission = {
-            'text': ['This is the answer'],
-            'files': [
-                {
-                    'name': 'name_0',
-                    'description': 'description_0',
-                    'download_url': 'www.file_url.com/key_0',
-                    'size': 123455,
-                }
-            ]
-        }
-
-    example_assessment = {
-            'feedback': "Base Assessment Feedback",
-            'score': {
-                'pointsEarned': 5,
-                'pointsPossible': 6,
-            },
-            'criteria': [
-                {
-                    'name': "Criterion 1",
-                    'option': "Three",
-                    'points': 3,
-                    'feedback': "Feedback 1"
-                },
-            ]
-        }
 
     @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: ''})
     def test_missing_params(self, query_params):
@@ -289,8 +171,8 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_submission_info,
     ):
         """ Successfull submission fetch status returns submission, lock, and grade data """
-        mock_get_submission_info.return_value = self.example_submission
-        mock_get_assessment_info.return_value = {} if not has_assessment else self.example_assessment
+        mock_get_submission_info.return_value = test_data.example_submission
+        mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
 
         self.log_in()
@@ -313,7 +195,7 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_submission_info,
     ):
         """ Other generic exceptions should return the "unknown" error response """
-        mock_get_submission_info.return_value = self.example_submission
+        mock_get_submission_info.return_value = test_data.example_submission
         # Mock an error in getting the assessment info
         mock_get_assessment_info.side_effect = XBlockInternalError(context={'handler': 'get_assessment_info'})
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
@@ -335,8 +217,8 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_submission_info,
     ):
         """ An exception in any XBlock handler returns an error response """
-        mock_get_submission_info.return_value = self.example_submission
-        mock_get_assessment_info.return_value = self.example_assessment
+        mock_get_submission_info.return_value = test_data.example_submission
+        mock_get_assessment_info.return_value = test_data.example_assessment
         # Mock a bad data shape to break serialization
         mock_check_submission_lock.return_value = {'mad': 'hatter'}
 
@@ -355,26 +237,10 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission-status'
 
-    example_assessment = {
-        'feedback': "Base Assessment Feedback",
-        'score': {
-            'pointsEarned': 5,
-            'pointsPossible': 6,
-        },
-        'criteria': [
-            {
-                'name': "Criterion 1",
-                'option': "Three",
-                'points': 3,
-                'feedback': "Feedback 1"
-            },
-        ]
-    }
-
     @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: Mock()}, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
     def test_missing_param(self, query_params):
         """ Missing ORA location or submission ID param should return 400 and error message """
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
         response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
@@ -390,7 +256,7 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         mock_get_assessment_info,
     ):
         """ Successful fetch submission returns submission and related lock/assessment info """
-        mock_get_assessment_info.return_value = {} if not has_assessment else self.example_assessment
+        mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'in-progress'}
 
         self.log_in()
@@ -403,8 +269,8 @@ class TestFetchSubmissionStatusView(BaseViewTest):
             'gradeStatus': 'graded' if has_assessment else 'ungraded',
             'lockStatus': mock_check_submission_lock.return_value['lock_status'],
             'gradeData': {} if not has_assessment else {
-                'score': self.example_assessment['score'],
-                'overallFeedback': self.example_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
@@ -468,7 +334,7 @@ class TestSubmissionLockView(BaseViewTest):
             PARAM_SUBMISSION_ID: self.test_submission_uuid
         }
 
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
 
     def claim_lock(self, params):
         """ Wrapper for easier calling of 'claim_submission_lock' """
@@ -609,40 +475,9 @@ class TestUpdateGradeView(BaseViewTest):
     test_anon_user_id = 'anon-user-id'
     test_timestamp = '2020-08-29T02:14:00-04:00'
 
-    test_grade_data = {
-        "overallFeedback": "was pretty good",
-        "criteria": [
-            {
-                "name": "Ideas",
-                "feedback": "did alright",
-                "selectedOption": "Fair"
-            },
-            {
-                "name": "Content",
-                "selectedOption": "Excellent"
-            }
-        ]
-    }
-
-    example_assessment = {
-        'feedback': "Base Assessment Feedback",
-        'score': {
-            'pointsEarned': 5,
-            'pointsPossible': 6,
-        },
-        'criteria': [
-            {
-                'name': "Criterion 1",
-                'option': "Three",
-                'points': 3,
-                'feedback': "Feedback 1"
-            },
-        ]
-    }
-
     def setUp(self):
         super().setUp()
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
 
     @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
@@ -651,7 +486,7 @@ class TestUpdateGradeView(BaseViewTest):
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
         mock_submit_grade.side_effect = XBlockInternalError(context={'handler': 'staff_assess', 'msg': 'Danger, Will Robinson!'})
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
         assert response.status_code == 500
@@ -668,7 +503,7 @@ class TestUpdateGradeView(BaseViewTest):
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
         mock_submit_grade.return_value = {'error': 'time paradox encountered'}
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
         assert response.status_code == 500
@@ -685,10 +520,10 @@ class TestUpdateGradeView(BaseViewTest):
             {'lock_status': 'unlocked'}
         ]
         mock_submit_grade.return_value = {'success': True, 'msg': ''}
-        mock_get_info.return_value = self.example_assessment
+        mock_get_info.return_value = test_data.example_assessment
 
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
 
@@ -696,8 +531,8 @@ class TestUpdateGradeView(BaseViewTest):
             'gradeStatus': 'graded',
             'lockStatus': 'unlocked',
             'gradeData': {
-                'score': self.example_assessment['score'],
-                'overallFeedback': self.example_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
@@ -721,10 +556,10 @@ class TestUpdateGradeView(BaseViewTest):
     def test_submit_grade_contested(self, mock_submit_grade, mock_get_info, mock_check_lock):
         """ Submitting a grade should be blocked if someone else has obtained the lock """
         mock_check_lock.side_effect = [{'lock_status': 'unlocked'}]
-        mock_get_info.return_value = self.example_assessment
+        mock_get_info.return_value = test_data.example_assessment
 
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
 
@@ -734,8 +569,8 @@ class TestUpdateGradeView(BaseViewTest):
             'gradeStatus': 'graded',
             'lockStatus': 'unlocked',
             'gradeData': {
-                'score': self.example_assessment['score'],
-                'overallFeedback': self.example_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
