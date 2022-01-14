@@ -17,6 +17,12 @@ jobs:
         python-version: [ 3.8 ]
 
     steps:
+      - uses: actions/checkout@v2
+      - uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '5.7'
+      - run: mysql -uroot -h127.0.0.1 -e 'SELECT version()'
+
     - name: Checkout repo
       uses: actions/checkout@v2
 
