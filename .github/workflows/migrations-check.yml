@@ -1,84 +1,68 @@
-name: Migrations check
+name: MySQL Service Example
 
 on:
-  workflow_dispatch:
-  pull_request:
   push:
     branches:
-      - master
+    - main
+  pull_request:
+    branches:
+    - main
+
+defaults:
+  run:
+    working-directory: ./mysql
 
 jobs:
-  check_migrations:
-    name: check migrations
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-20.04 ]
-        python-version: [ 3.8 ]
+  container-job:
+    runs-on: ubuntu-latest
+
+    # runs all of the steps inside the specified container rather than on the VM host.
+    # Because of this the network configuration changes from host based network to a container network.
+    container:
+      image:  node:10.16-jessie
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        ports:
+        - 3306:3306
+        # needed because the mysql container does not provide a healthcheck
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Start mysql service
-      run: sudo /etc/init.d/mysql start
-
-    - name: Verify mysql version
-      run: |
-        mysqld --version
-        mysqladmin -V
-
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libxmlsec1-dev
-
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
-
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-
-    - name: Install Python dependencies
-      run: |
-        pip install -r requirements/pip.txt
-        pip install -r requirements/edx/development.txt
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
-        pip uninstall -y xmlsec
-        pip install --no-binary xmlsec xmlsec
-
-    - name: Initiate Services
-      run: |
-        sudo systemctl start mongod
-        sudo /etc/init.d/mysql start
-
-    - name: Reset mysql password
-      run: |
-        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
-          UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-          FLUSH PRIVILEGES;
-        EOF
-
-    - name: Run Tests
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: node client.js
       env:
-        LMS_CFG: lms/envs/bok_choy.yml
-      run: |
-        echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
-        echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
+        # use mysql for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        MYSQL_HOST: mysql
+        MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
 
-        echo "Running the LMS migrations."
-        ./manage.py lms --settings bok_choy migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms --settings bok_choy migrate
+  # Runs all steps on the VM
+  # The service containers will use host port binding instead of container networking so you access them via localhost rather than the service name
+  vm-job:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        ports:
+        # will assign a random free host port
+        - 3306/tcp
+        # needed because the mysql container does not provide a healthcheck
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: node client.js
+      env:
+        # use localhost for the host here because we are running the job on the VM.
+        # If we were running the job on in a container this would be mysql
+        MYSQL_HOST: localhost
+        MYSQL_PORT: ${{ job.services.mysql.ports[3306] }} # get randomly assigned published port
