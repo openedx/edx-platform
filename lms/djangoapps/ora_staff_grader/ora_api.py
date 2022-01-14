@@ -96,7 +96,7 @@ def submit_grade(request, usage_id, grade_data):
 
     # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message 'msg'
     if not response_data.get('success', False):
-        raise XBlockInternalError(context={'msg': response_data.get('msg', '')})
+        raise XBlockInternalError(context={'handler': handler_name, 'msg': response_data.get('msg', '')})
 
     return response_data
 
