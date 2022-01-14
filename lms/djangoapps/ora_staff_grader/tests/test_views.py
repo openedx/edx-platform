@@ -74,10 +74,13 @@ class TestInitializeView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:initialize'
 
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
     @ddt.data({}, {PARAM_ORA_LOCATION: ''})
     def test_missing_param(self, query_params):
         """ Missing ORA location param should return 400 and error message """
-        self.log_in()
         response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
@@ -85,7 +88,6 @@ class TestInitializeView(BaseViewTest):
 
     def test_bad_ora_location(self):
         """ Bad ORA location should return a 400 and error message """
-        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: 'not_a_real_location'})
 
         assert response.status_code == 400
@@ -101,7 +103,6 @@ class TestInitializeView(BaseViewTest):
         mock_get_submissions.return_value = test_data.example_submission_list
         mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions', 'rubricConfig'])
@@ -119,7 +120,6 @@ class TestInitializeView(BaseViewTest):
         mock_get_submissions.side_effect = XBlockInternalError(context={'handler':'list_staff_workflows'})
         mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         assert response.status_code == 500
@@ -136,7 +136,6 @@ class TestInitializeView(BaseViewTest):
         mock_get_submissions.return_value = {'bad': 'wolf'}
         mock_get_rubric_config.return_value = test_data.example_rubric
 
-        self.log_in()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         assert response.status_code == 500
@@ -150,10 +149,13 @@ class TestFetchSubmissionView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission'
 
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
     @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: ''})
     def test_missing_params(self, query_params):
         """ Missing or blank params should return 400 and error message """
-        self.log_in()
         response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
@@ -175,7 +177,6 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -200,7 +201,6 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_assessment_info.side_effect = XBlockInternalError(context={'handler': 'get_assessment_info'})
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -222,7 +222,6 @@ class TestFetchSubmissionView(BaseViewTest):
         # Mock a bad data shape to break serialization
         mock_check_submission_lock.return_value = {'mad': 'hatter'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -237,10 +236,13 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission-status'
 
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
     @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: Mock()}, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
     def test_missing_param(self, query_params):
         """ Missing ORA location or submission ID param should return 400 and error message """
-        self.log_in()
         response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
@@ -259,7 +261,6 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'in-progress'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -291,7 +292,6 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         mock_get_assessment_info.return_value = {}
         mock_check_submission_lock.side_effect = XBlockInternalError(context={'handler': 'claim_submission_lock'})
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -306,7 +306,6 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         # Mock a bad data shape to throw a serializer exception
         mock_check_submission_lock.return_value = {'jekyll', 'hyde'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
