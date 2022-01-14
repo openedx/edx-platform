@@ -25,9 +25,11 @@ from lms.djangoapps.ora_staff_grader.constants import PARAM_ORA_LOCATION, PARAM_
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
     GradeContestedResponse,
+    InternalErrorResponse,
     LockContestedError,
     LockContestedResponse,
     UnknownErrorResponse,
+    XBlockInternalError,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer,
@@ -68,7 +70,8 @@ class InitializeView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - BadOraLocationResponse (HTTP 400) for bad ORA location
-    - UnknownError (HTTP 500) for ORA/platform internal errors
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
     """
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
@@ -95,6 +98,11 @@ class InitializeView(StaffGraderBaseView):
         except (InvalidKeyError, ItemNotFoundError):
             return BadOraLocationResponse()
 
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling
         except Exception:
             return UnknownErrorResponse()
 
@@ -129,7 +137,8 @@ class SubmissionFetchView(StaffGraderBaseView):
 
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
-    - UnknownError (HTTP 500) for ORA/platform internal errors
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -145,6 +154,10 @@ class SubmissionFetchView(StaffGraderBaseView):
             })
 
             return Response(serializer.data)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
         except Exception:
@@ -175,7 +188,8 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
 
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
-    - UnknownError (HTTP 500) for ORA/platform internal errors
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -189,6 +203,10 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             })
 
             return Response(serializer.data)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
         except Exception:
@@ -231,7 +249,8 @@ class UpdateGradeView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - GradeContestedResponse (HTTP 409) for trying to submit a grade for a submission you don't have an active lock for
-    - UnknownError (HTTP 500) for ORA/platform internal errors
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -263,6 +282,11 @@ class UpdateGradeView(StaffGraderBaseView):
             })
             return Response(serializer.data)
 
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling
         except Exception:
             return UnknownErrorResponse()
 
@@ -283,7 +307,8 @@ class SubmissionLockView(StaffGraderBaseView):
     Errors:
     - MissingParamResponse (HTTP 400) for missing params
     - LockContestedResponse (HTTP 409) for contested lock
-    - UnknownError (HTTP 500) for ORA/platform internal errors
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
@@ -303,6 +328,10 @@ class SubmissionLockView(StaffGraderBaseView):
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
             return LockContestedResponse(context=lock_status)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
         except Exception:
@@ -326,6 +355,10 @@ class SubmissionLockView(StaffGraderBaseView):
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
             return LockContestedResponse(context=lock_status)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
         except Exception:
