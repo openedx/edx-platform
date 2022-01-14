@@ -11,6 +11,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -552,7 +553,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         * 400 if an invalid parameter was sent.
         * 403 if a user who does not have permission to masquerade as
           another user specifies a username other than their own.
-        * 404 if the course is not available or cannot be seen.
+        * 404 if the course/usage_key is not available or cannot be seen.
+        * 422 if the usage key is valid but does not have sequence metadata (like a unit or a problem)
     """
 
     authentication_classes = (
@@ -582,6 +584,10 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             str(usage_key),
             disable_staff_debug_info=True,
             will_recheck_access=True)
+
+        if not hasattr(sequence, 'get_metadata'):
+            # Looks like we were asked for metadata on something that is not a sequence (or section).
+            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         view = STUDENT_VIEW
         if request.user.is_anonymous:
