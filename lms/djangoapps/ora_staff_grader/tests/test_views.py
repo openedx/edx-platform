@@ -117,7 +117,7 @@ class TestInitializeView(BaseViewTest):
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
         # Mock an error getting submissions
-        mock_get_submissions.side_effect = XBlockInternalError(context={'handler':'list_staff_workflows'})
+        mock_get_submissions.side_effect = XBlockInternalError(context={'handler': 'list_staff_workflows'})
         mock_get_rubric_config.return_value = test_data.example_rubric
 
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
