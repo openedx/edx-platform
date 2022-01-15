@@ -133,23 +133,25 @@ LOG_REQUEST_USER_CHANGE_HEADERS_DURATION = getattr(settings, 'LOG_REQUEST_USER_C
 
 # .. toggle_name: ENFORCE_SAFE_SESSIONS
 # .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: Turn this toggle on to enforce safe-sessions policy.
+# .. toggle_default: True
+# .. toggle_description: Invalidate session and response if mismatch detected.
 #   That is, when the `user` attribute of the request object gets changed or
 #   no longer matches the session, the session will be invalidated and the
 #   response cancelled (changed to an error). This is intended as a backup
 #   safety measure in case an attacker (or bug) is able to change the user
-#   on a session in an unexpected way.  The behavior will be available for
-#   the Nutmeg named release and will become permanent in Olive.
-# .. toggle_warnings: Before enabling, confirm that incidences of the string
-#   "SafeCookieData user at request" in the logs only show false positives,
-#   such as people logging in while in possession of an already-valid session
-#   cookie.
+#   on a session in an unexpected way.
+# .. toggle_warnings: Should be disabled if debugging mismatches using the
+#   LOG_REQUEST_USER_CHANGE_HEADERS toggle, otherwise series of mismatching
+#   requests from the same user cannot be investigated.  Additionally, if
+#   enabling for the first time, confirm that incidences of the string
+#   "SafeCookieData user at request" in the logs are very rare; if they are
+#   not, it is likely that there is either a bug or that a login or
+#   registration endpoint needs to call ``mark_user_change_as_expected``.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-12-01
 # .. toggle_target_removal_date: 2022-08-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1861
-ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=False)
+ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=True)
 
 log = getLogger(__name__)
 
