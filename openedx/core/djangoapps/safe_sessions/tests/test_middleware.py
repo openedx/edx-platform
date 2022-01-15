@@ -341,9 +341,10 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
         self.verify_error(401)
 
+    @override_settings(ENFORCE_SAFE_SESSIONS=False)
     def test_warn_on_user_change_before_response(self):
         """
-        Verifies that warnings are emitted and custom attributes set if
+        Verifies that when enforcement disabled, warnings are emitted and custom attributes set if
         the user changes unexpectedly between request and response.
         """
         self.set_up_for_success()
@@ -358,10 +359,9 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         set_attr_call_args = [call.args for call in mock_attr.call_args_list]
         assert ("safe_sessions.user_mismatch", "request-response-mismatch") in set_attr_call_args
 
-    @override_settings(ENFORCE_SAFE_SESSIONS=True)
     def test_enforce_on_user_change_before_response(self):
         """
-        Copy of test_warn_on_user_change_before_response but with enforcement enabled.
+        Copy of test_warn_on_user_change_before_response but with enforcement enabled (default).
         The differences should be the status code and the session deletion.
         """
         self.set_up_for_success()
@@ -379,6 +379,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         set_attr_call_args = [call.args for call in mock_attr.call_args_list]
         assert ("safe_sessions.user_mismatch", "request-response-mismatch") in set_attr_call_args
 
+    @override_settings(ENFORCE_SAFE_SESSIONS=False)
     def test_warn_on_user_change_from_session(self):
         """
         Verifies that warnings are emitted and custom attributes set if
@@ -395,6 +396,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         set_attr_call_args = [call.args for call in mock_attr.call_args_list]
         assert ("safe_sessions.user_mismatch", "request-session-mismatch") in set_attr_call_args
 
+    @override_settings(ENFORCE_SAFE_SESSIONS=False)
     def test_warn_on_user_change_in_both(self):
         """
         Verifies that warnings are emitted and custom attributes set if
