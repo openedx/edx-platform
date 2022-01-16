@@ -111,6 +111,10 @@ from lms.envs.common import (
     # Enterprise service settings
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
 
+    # Blockstore
+    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
+    BUNDLE_ASSET_STORAGE_SETTINGS,
+
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
@@ -1746,6 +1750,9 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
+
+    # Blockstore
+    'blockstore.apps.bundles',
 ]
 
 
@@ -2102,6 +2109,7 @@ ENABLE_COMPREHENSIVE_THEMING = False
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
