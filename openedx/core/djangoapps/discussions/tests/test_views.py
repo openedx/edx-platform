@@ -10,16 +10,17 @@ import ddt
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+
 from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE, Provider
 
 DATA_LEGACY_COHORTS = {
