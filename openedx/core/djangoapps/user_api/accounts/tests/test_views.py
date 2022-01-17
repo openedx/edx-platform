@@ -2,7 +2,6 @@
 Test cases to cover Accounts-related behaviors of the User API application
 """
 
-
 import datetime
 import hashlib
 import json
@@ -16,6 +15,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
@@ -94,7 +94,7 @@ class UserAPITestCase(APITestCase):
         """
         Helper method for sending a GET to the server. Verifies the expected status and returns the response.
         """
-        url = self.url + '?' + query_parameters if query_parameters else self.url    # pylint: disable=no-member
+        url = self.url + '?' + query_parameters if query_parameters else self.url  # pylint: disable=no-member
         response = client.get(url)
         assert expected_status == response.status_code
         return response
@@ -370,21 +370,61 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         assert response.data["activation_key"] is not None
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_get_account_by_email(self, api_client, user):
+    def test_successful_get_account_by_email(self):
         """
-        Test that requesting a user email search works.
+        Test that request using email by a staff user successfully retrieves Account Info.
         """
+        api_client = "staff_client"
+        user = "staff_user"
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
         response = self.send_get(client, query_parameters=f'email={self.user.email}')
         self._verify_full_account_response(response)
+
+    def test_unsuccessful_get_account_by_email(self):
+        """
+        Test that request using email by a normal user fails to retrieve Account Info.
+        """
+        api_client = "client"
+        user = "user"
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(
+            client, query_parameters=f'email={self.user.email}', expected_status=status.HTTP_403_FORBIDDEN
+        )
+        assert response.data.get('detail') == 'You do not have permission to perform this action.'
+
+    def test_successful_get_account_by_user_id(self):
+        """
+        Test that request using lms user id by a staff user successfully retrieves Account Info.
+        """
+        api_client = "staff_client"
+        user = "staff_user"
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(client, query_parameters=f'lms_user_id={self.user.id}')
+        self._verify_full_account_response(response)
+
+    def test_unsuccessful_get_account_by_user_id(self):
+        """
+        Test that requesting using lms user id by a normal user fails to retrieve Account Info.
+        """
+        api_client = "client"
+        user = "user"
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(
+            client, query_parameters=f'lms_user_id={self.user.id}', expected_status=status.HTTP_403_FORBIDDEN
+        )
+        assert response.data.get('detail') == 'You do not have permission to perform this action.'
 
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')
@@ -460,6 +500,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Test the return from GET based on user visibility setting.
         """
+
         def verify_fields_visible_to_all_users(response):
             """
             Confirms that private fields are private, and public/shareable fields are public/shareable
@@ -485,7 +526,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
 
-        response = self.send_get(client, query_parameters=f'view=shared&email={self.user.email}')
+        response = self.send_get(client, query_parameters=f'view=shared&username={self.user.username}')
         verify_fields_visible_to_all_users(response)
 
     @ddt.data(
@@ -688,11 +729,11 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
             assert expected_user_message == error_response.data['field_errors'][field]['user_message']
 
-            assert "Value '{value}' is not valid for field '{field}': {messages}"\
-                .format(value=fails_validation_value,
-                        field=field,
-                        messages=[developer_validation_message]) ==\
-                   error_response.data['field_errors'][field]['developer_message']
+            assert "Value '{value}' is not valid for field '{field}': {messages}".format(
+                value=fails_validation_value,
+                field=field,
+                messages=[developer_validation_message]
+            ) == error_response.data['field_errors'][field]['developer_message']
 
         elif field != "account_privacy":
             # If there are no values that would fail validation, then empty string should be supported;
@@ -720,8 +761,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             Internal helper to check the error messages returned
             """
             assert 'This field is not editable via this API' == data['field_errors'][field_name]['developer_message']
-            assert "The '{}' field cannot be edited."\
-                .format(field_name) == data['field_errors'][field_name]['user_message']
+            assert "The '{}' field cannot be edited.".format(
+                field_name) == data['field_errors'][field_name]['user_message']
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
             response = self.send_patch(client, {field_name: "will_error", "gender": "o"}, expected_status=400)
@@ -765,6 +806,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Test the metadata stored when changing the name field.
         """
+
         def get_name_change_info(expected_entries):
             """
             Internal method to encapsulate the retrieval of old names used
@@ -799,7 +841,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Now change the name again and verify meta information.
         self.send_patch(self.client, {"name": "Donald Duck"})
         name_change_info = get_name_change_info(2)
-        verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)
+        verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck", )
         verify_change_info(name_change_info[1], "Mickey Mouse", self.user.username, "Donald Duck")
 
     @mock.patch.dict(
@@ -850,7 +892,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Try changing to an invalid email to make sure error messages are appropriately returned.
         error_response = self.send_patch(client, {"email": bad_email}, expected_status=400)
         field_errors = error_response.data["field_errors"]
-        assert "Error thrown from validate_new_email: 'Valid e-mail address required.'" ==\
+        assert "Error thrown from validate_new_email: 'Valid e-mail address required.'" == \
                field_errors['email']['developer_message']
         assert 'Valid e-mail address required.' == field_errors['email']['user_message']
 
@@ -919,7 +961,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         client = self.login_client("client", "user")
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         assert response.data['field_errors']['language_proficiencies']['developer_message'] == \
-            f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
+               f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_patch_serializer_save_fails(self, serializer_save):
@@ -941,9 +983,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
-        assert response.data['profile_image'] ==\
-            {'has_image': False,
-             'image_url_full': 'http://testserver/static/default_50.png',
+        assert response.data['profile_image'] == \
+               {'has_image': False,
+                'image_url_full': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_10.png'}
 
     @ddt.data(
