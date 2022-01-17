@@ -32,7 +32,7 @@ from lms.djangoapps.instructor_task.tasks import (
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -83,7 +83,6 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
         return {
-            'xqueue_callback_url_prefix': 'dummy_value',
             'request_info': {
                 'username': 'dummy_username',
                 'user_id': 'dummy_id',

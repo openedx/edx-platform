@@ -8,11 +8,13 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
-from uuid import uuid4
-
 from unittest.mock import MagicMock, PropertyMock, call, create_autospec, patch
 from urllib.parse import quote, urlencode
+from uuid import uuid4
+
 import ddt
+from capa.tests.response_xml_factory import \
+    MultipleChoiceResponseXMLFactory
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
@@ -24,6 +26,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from freezegun import freeze_time
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -31,17 +34,47 @@ from pytz import UTC, utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xmodule.course_module import (
+    COURSE_VISIBILITY_PRIVATE,
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
+)
+from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.graders import ShowCorrectness
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    CourseUserType,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import (
+    CourseFactory,
+    ItemFactory,
+    check_mongo_calls
+)
 
 import lms.djangoapps.courseware.views.views as views
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import (
+    TEST_PASSWORD,
+    AdminFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    RequestFactoryNoCsrf,
+    UserFactory
+)
+from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
+from common.djangoapps.util.url import reload_django_url_config
+from common.djangoapps.util.views import ensure_valid_course_key
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
+    CertificateGenerationCourseSetting,
     CertificateStatuses
 )
 from lms.djangoapps.certificates.tests.factories import (
@@ -63,7 +96,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
     COURSEWARE_USE_LEGACY_FRONTEND,
-    courseware_mfe_is_advertised,
+    courseware_mfe_is_advertised
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
@@ -71,6 +104,7 @@ from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_s
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -91,30 +125,12 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
+    ExperienceOption,
     get_courseware_url,
     get_learning_mfe_home_url,
-    make_learning_mfe_courseware_url,
-    ExperienceOption,
+    make_learning_mfe_courseware_url
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
-from common.djangoapps.util.url import reload_django_url_config
-from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.graders import ShowCorrectness  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
-    TEST_DATA_SPLIT_MODULESTORE,
-    CourseUserType,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -1928,6 +1944,30 @@ class ProgressPageTests(ProgressPageBaseTests):
         assert response.cert_status == 'earned_but_not_available'
         assert response.title == 'Your certificate will be available soon!'
 
+    @ddt.data(True, False)
+    def test_no_certs_generated_and_not_verified(self, waffle_override):
+        """
+        Verify if the learner is not ID Verified, and the certs are not yet generated,
+        but the learner is eligible, the get_cert_data would return cert status Unverified
+        """
+        CertificateGenerationConfiguration(enabled=True).save()
+        CertificateGenerationCourseSetting(
+            course_key=self.course.id, self_generation_enabled=True
+        ).save()
+        with override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=waffle_override):
+            with patch(
+                'lms.djangoapps.certificates.api.certificate_downloadable_status',
+                return_value=self.mock_certificate_downloadable_status()
+            ):
+                response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+
+        if waffle_override:
+            assert response.cert_status == 'requesting'
+            assert response.title == 'Congratulations, you qualified for a certificate!'
+        else:
+            assert response.cert_status == 'unverified'
+            assert response.title == 'Certificate unavailable'
+
     def assert_invalidate_certificate(self, certificate):
         """ Dry method to mark certificate as invalid. And assert the response. """
         CertificateInvalidationFactory.create(
@@ -3477,47 +3517,40 @@ class DatesTabTestCase(ModuleStoreTestCase):
             vertical = ItemFactory.create(category='vertical', parent_location=subsection.location)
             ItemFactory.create(category='problem', parent_location=vertical.location, has_score=True)
 
-        with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
-            mock_get_enrollment.return_value = {
-                'mode': enrollment.mode
-            }
-            response = self._get_response(self.course)
-            self.assertContains(response, subsection.display_name)
-            # Show the Verification Deadline for verified only
-            self.assertContains(response, 'Verification Deadline')
-            # Make sure pill exists for today's date
-            self.assertContains(response, '<div class="pill today">')
-            # Make sure pill exists for next due assignment
-            self.assertContains(response, '<div class="pill due-next">')
-            # No pills for verified enrollments
-            self.assertNotContains(response, '<div class="pill verified">')
-            # Make sure the assignment type is rendered
-            self.assertContains(response, 'Homework:')
+        response = self._get_response(self.course)
+        self.assertContains(response, subsection.display_name)
+        # Show the Verification Deadline for verified only
+        self.assertContains(response, 'Verification Deadline')
+        # Make sure pill exists for today's date
+        self.assertContains(response, '<div class="pill today">')
+        # Make sure pill exists for next due assignment
+        self.assertContains(response, '<div class="pill due-next">')
+        # No pills for verified enrollments
+        self.assertNotContains(response, '<div class="pill verified">')
+        # Make sure the assignment type is rendered
+        self.assertContains(response, 'Homework:')
 
-            enrollment.delete()
-            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-            mock_get_enrollment.return_value = {
-                'mode': enrollment.mode
-            }
+        enrollment.delete()
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
 
-            expected_calls = [
-                call('course_id', str(self.course.id)),
-                call('user_id', self.user.id),
-                call('is_staff', self.user.is_staff),
-            ]
+        expected_calls = [
+            call('course_id', str(self.course.id)),
+            call('user_id', self.user.id),
+            call('is_staff', self.user.is_staff),
+        ]
 
-            response = self._get_response(self.course)
+        response = self._get_response(self.course)
 
-            mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
-            self.assertContains(response, subsection.display_name)
-            # Don't show the Verification Deadline for audit
-            self.assertNotContains(response, 'Verification Deadline')
-            # Pill doesn't exist for assignment due tomorrow
-            self.assertNotContains(response, '<div class="pill due-next">')
-            # Should have verified pills for audit enrollments
-            self.assertContains(response, '<div class="pill verified">')
-            # Make sure the assignment type is rendered
-            self.assertContains(response, 'Homework:')
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
+        self.assertContains(response, subsection.display_name)
+        # Don't show the Verification Deadline for audit
+        self.assertNotContains(response, 'Verification Deadline')
+        # Pill doesn't exist for assignment due tomorrow
+        self.assertNotContains(response, '<div class="pill due-next">')
+        # Should have verified pills for audit enrollments
+        self.assertContains(response, '<div class="pill verified">')
+        # Make sure the assignment type is rendered
+        self.assertContains(response, 'Homework:')
 
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_deadlines_banner_displays(self):

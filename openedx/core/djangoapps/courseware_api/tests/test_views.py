@@ -15,6 +15,12 @@ from django.test.client import RequestFactory
 
 from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.api import get_certificate_url
@@ -38,12 +44,6 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
 from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
-
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
 User = get_user_model()
@@ -127,19 +127,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         )
 
     @ddt.data(
-        (True, None, ACCESS_DENIED),
-        (True, 'audit', ACCESS_DENIED),
-        (True, 'verified', ACCESS_DENIED),
-        (False, None, ACCESS_DENIED),
-        (False, None, ACCESS_GRANTED),
+        (True, 'audit'),
+        (True, 'verified'),
     )
     @ddt.unpack
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @mock.patch('openedx.core.djangoapps.courseware_api.views.CoursewareMeta.is_microfrontend_enabled_for_user')
-    def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous, is_microfrontend_enabled_for_user):
+    def test_enrolled_course_metadata(self, logged_in, enrollment_mode, is_microfrontend_enabled_for_user):
         is_microfrontend_enabled_for_user.return_value = True
         check_public_access = mock.Mock()
-        check_public_access.return_value = enable_anonymous
+        check_public_access.return_value = ACCESS_DENIED
         with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
             if not logged_in:
                 self.client.logout()
@@ -155,68 +152,89 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
 
             response = self.client.get(self.url)
             assert response.status_code == 200
-            if enrollment_mode:
-                enrollment = response.data['enrollment']
-                assert enrollment_mode == enrollment['mode']
-                assert enrollment['is_active']
-                assert len(response.data['tabs']) == 5
-                found = False
-                for tab in response.data['tabs']:
-                    if tab['type'] == 'external_link':
-                        assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
-                        if tab['url'] == 'http://zombo.com':
-                            found = True
-                assert found, 'external link not in course tabs'
 
-                assert not response.data['user_has_passing_grade']
+            enrollment = response.data['enrollment']
+            assert enrollment_mode == enrollment['mode']
+            assert enrollment['is_active']
+            assert len(response.data['tabs']) == 5
+            found = False
+            for tab in response.data['tabs']:
+                if tab['type'] == 'external_link':
+                    assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
+                    if tab['url'] == 'http://zombo.com':
+                        found = True
+            assert found, 'external link not in course tabs'
 
-                # This import errors in cms if it is imported at the top level
-                from lms.djangoapps.course_goals.api import get_course_goal
-                selected_goal = get_course_goal(self.user, self.course.id)
-                if selected_goal:
-                    assert response.data['course_goals']['selected_goal'] == {
-                        'days_per_week': selected_goal.days_per_week,
-                        'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
-                    }
+            assert not response.data['user_has_passing_grade']
 
-                if enrollment_mode == 'audit':
-                    assert response.data['verify_identity_url'] is None
-                    assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
-                    assert response.data['linkedin_add_to_profile_url'] is None
-                else:
-                    assert response.data['certificate_data']['cert_status'] == 'earned_but_not_available'
-                    expected_verify_identity_url = IDVerificationService.get_verify_location(
-                        course_id=self.course.id
+            # This import errors in cms if it is imported at the top level
+            from lms.djangoapps.course_goals.api import get_course_goal
+            selected_goal = get_course_goal(self.user, self.course.id)
+            if selected_goal:
+                assert response.data['course_goals']['selected_goal'] == {
+                    'days_per_week': selected_goal.days_per_week,
+                    'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
+                }
+
+            if enrollment_mode == 'audit':
+                assert response.data['verify_identity_url'] is None
+                assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
+                assert response.data['linkedin_add_to_profile_url'] is None
+            else:
+                assert response.data['certificate_data']['cert_status'] == 'earned_but_not_available'
+                expected_verify_identity_url = IDVerificationService.get_verify_location(
+                    course_id=self.course.id
+                )
+                # The response contains an absolute URL so this is only checking the path of the final
+                assert expected_verify_identity_url in response.data['verify_identity_url']
+                assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
+
+                request = RequestFactory().request()
+                cert_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)
+                linkedin_url_params = {
+                    'name': '{platform_name} Verified Certificate for {course_name}'.format(
+                        platform_name=settings.PLATFORM_NAME, course_name=self.course.display_name,
+                    ),
+                    'certUrl': request.build_absolute_uri(cert_url),
+                    # default value from the LinkedInAddToProfileConfigurationFactory company_identifier
+                    'organizationId': 1337,
+                    'certId': cert.verify_uuid,
+                    'issueYear': cert.created_date.year,
+                    'issueMonth': cert.created_date.month,
+                }
+                expected_linkedin_url = (
+                    'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}'.format(
+                        params=urlencode(linkedin_url_params)
                     )
-                    # The response contains an absolute URL so this is only checking the path of the final
-                    assert expected_verify_identity_url in response.data['verify_identity_url']
-                    assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
+                )
+                assert response.data['linkedin_add_to_profile_url'] == expected_linkedin_url
 
-                    request = RequestFactory().request()
-                    cert_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)
-                    linkedin_url_params = {
-                        'name': '{platform_name} Verified Certificate for {course_name}'.format(
-                            platform_name=settings.PLATFORM_NAME, course_name=self.course.display_name,
-                        ),
-                        'certUrl': request.build_absolute_uri(cert_url),
-                        # default value from the LinkedInAddToProfileConfigurationFactory company_identifier
-                        'organizationId': 1337,
-                        'certId': cert.verify_uuid,
-                        'issueYear': cert.created_date.year,
-                        'issueMonth': cert.created_date.month,
-                    }
-                    expected_linkedin_url = (
-                        'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}'.format(
-                            params=urlencode(linkedin_url_params)
-                        )
-                    )
-                    assert response.data['linkedin_add_to_profile_url'] == expected_linkedin_url
-            elif enable_anonymous and not logged_in:
+    @ddt.data(
+        (True, ACCESS_DENIED),
+        (False, ACCESS_DENIED),
+        (False, ACCESS_GRANTED),
+    )
+    @ddt.unpack
+    @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @mock.patch('openedx.core.djangoapps.courseware_api.views.CoursewareMeta.is_microfrontend_enabled_for_user')
+    def test_unenrolled_course_metadata(self, logged_in, enable_anonymous, is_microfrontend_enabled_for_user):
+        is_microfrontend_enabled_for_user.return_value = True
+        check_public_access = mock.Mock()
+        check_public_access.return_value = enable_anonymous
+        with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
+            if not logged_in:
+                self.client.logout()
+
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+
+            if enable_anonymous and not logged_in:
                 # multiple checks use this handler
                 check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['course_access']['has_access']
-                assert response.data['course_goals'] is None
+                assert response.data['course_goals']['selected_goal'] is None
+                assert response.data['course_goals']['weekly_learning_goal_enabled'] is False
             else:
                 assert not response.data['course_access']['has_access']
 
@@ -420,6 +438,11 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
         assert response.status_code == 200
         assert response.data['display_name'] == 'sequence'
         assert len(response.data['items']) == 1
+
+    def test_unit_error(self):
+        """Verify that we return a proper error when passed a non-sequence"""
+        response = self.client.get(f'/api/courseware/sequence/{self.unit.location}')
+        assert response.status_code == 422
 
     @ddt.data(
         (False, None, False, False),

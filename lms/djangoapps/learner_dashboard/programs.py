@@ -16,7 +16,6 @@ from web_fragments.fragment import Fragment
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_view_is_enabled, strip_course_id
-
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways, get_programs
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url

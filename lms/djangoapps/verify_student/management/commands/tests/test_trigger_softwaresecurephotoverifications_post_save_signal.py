@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management import call_command
 
 from freezegun import freeze_time
-from unittest.mock import call, patch, ANY
+from unittest.mock import call, patch, ANY  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase

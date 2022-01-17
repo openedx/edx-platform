@@ -1453,12 +1453,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -3230,7 +3228,21 @@ REST_FRAMEWORK = {
     },
 }
 
+# .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
+# .. setting_default: 30/7d
+# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+#    is validated via RegistrationValidationView.
+#    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
+#    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/24664
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
+
+# .. setting_name: REGISTRATION_RATELIMIT
+# .. setting_default: 60/7d
+# .. setting_description: New users are registered on edx via RegistrationView.
+#    It's POST end-point is rate-limited up to 60 requests per IP Address in a week by default.
+#    Purpose of this setting is to restrict an attacker from registering numerous fake accounts.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/27060
 REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
@@ -4036,6 +4048,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "id",
+        "verified_name",
         "extended_profile",
         "gender",
         "state",
@@ -4552,7 +4565,26 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 ############### Settings for Django Rate limit #####################
+
+# .. toggle_name: RATELIMIT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When enabled, RATELIMIT_RATE is applied.
+#    When disabled, RATELIMIT_RATE is not applied.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2018-01-08
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_ENABLE = True
+
+# .. setting_name: RATELIMIT_RATE
+# .. setting_default: 120/m
+# .. setting_description: Due to some reports about attack on /oauth2/access_token/ which took LMS down,
+#    this setting was introduced to rate-limit all endpoints of AccessTokenView up to
+#    120 requests per IP Address in a minute by default.
+# .. setting_warning: RATELIMIT_ENABLE flag must also be enabled/set to True to use this RATELIMIT_RATE setting.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2018-01-08
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
@@ -4697,7 +4729,6 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
@@ -4859,10 +4890,6 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
-
-################# Settings for Chrome-specific origin trials ########
-# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
-CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
 
 ################# Documentation links for course apps #################
 

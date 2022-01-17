@@ -601,11 +601,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # This string only occurs in lms/templates/course_modes/track_selection.html
         # and related theme and translation files.
 
-        # Check for string unique to unfbe.html.
-        self.assertContains(response, "Some graded content may be locked")
-        # This string only occurs in lms/templates/course_modes/unfbe.html
-        # and related theme and translation files.
-
         # Check min_price was correctly passed in.
         self.assertContains(response, min_price)
 

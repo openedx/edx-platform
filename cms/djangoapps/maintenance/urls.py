@@ -2,6 +2,8 @@
 URLs for the maintenance app.
 """
 
+from django.urls import path, re_path
+
 from .views import (
     AnnouncementCreateView,
     AnnouncementDeleteView,
@@ -10,7 +12,6 @@ from .views import (
     ForcePublishCourseView,
     MaintenanceIndexView
 )
-from django.urls import path, re_path
 
 app_name = 'cms.djangoapps.maintenance'
 

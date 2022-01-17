@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:50+0000\n"
-"PO-Revision-Date: 2021-12-12 20:50:12.864119\n"
+"POT-Creation-Date: 2021-12-26 20:50+0000\n"
+"PO-Revision-Date: 2021-12-26 20:50:31.353784\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -60,6 +60,11 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -3249,10 +3254,6 @@ msgstr ""
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -10082,8 +10083,10 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
 msgid ""
-"This email is already associated with an existing or previous edX account"
+"This email is already associated with an existing or previous "
+"{settings.PLATFORM_NAME} account"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -11553,10 +11556,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/component.py
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -14771,10 +14770,6 @@ msgstr ""
 
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
-msgstr ""
-
-#: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be locked"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html

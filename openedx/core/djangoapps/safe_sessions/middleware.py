@@ -72,7 +72,7 @@ the entire cookie and use it to impersonate the victim.
 Custom Attributes:
     safe_sessions.user_mismatch: 'request-response-mismatch' | 'request-session-mismatch'
         This attribute can be one of the above two values which correspond to the kind of comparison
-        that failed when processing the response. See SafeSessionMiddleware._verify_user
+        that failed when processing the response. See SafeSessionMiddleware._verify_user_and_log_mismatch
 """
 
 import inspect
@@ -86,6 +86,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
@@ -93,6 +94,7 @@ from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
+from common.djangoapps.util.log_sensitive import encrypt_for_log
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # .. toggle_name: LOG_REQUEST_USER_CHANGES
@@ -109,6 +111,25 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
 LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
+
+# .. toggle_name: LOG_REQUEST_USER_CHANGE_HEADERS
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Turn this toggle on to log all request headers, for all requests, for all user ids involved in
+#      any user id change detected by safe sessions. The headers will provide additional debugging information. The
+#      headers will be logged for all requests up until LOG_REQUEST_USER_CHANGE_HEADERS_DURATION seconds after
+#      the time of the last mismatch. The header details will be encrypted, and only available with the private key.
+# .. toggle_warnings: To work correctly, LOG_REQUEST_USER_CHANGES must be enabled and ENFORCE_SAFE_SESSIONS must be
+#      disabled. Also, SAFE_SESSIONS_DEBUG_PUBLIC_KEY must be set. See
+#      https://github.com/edx/edx-platform/blob/master/common/djangoapps/util/log_sensitive.py
+#      for instructions.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-12-22
+# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1940
+LOG_REQUEST_USER_CHANGE_HEADERS = SettingToggle('LOG_REQUEST_USER_CHANGE_HEADERS', default=False)
+
+# Duration in seconds to log user change request headers for additional requests; defaults to 5 minutes
+LOG_REQUEST_USER_CHANGE_HEADERS_DURATION = getattr(settings, 'LOG_REQUEST_USER_CHANGE_HEADERS_DURATION', 300)
 
 # .. toggle_name: ENFORCE_SAFE_SESSIONS
 # .. toggle_implementation: SettingToggle
@@ -352,7 +373,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             else:
                 request.COOKIES[settings.SESSION_COOKIE_NAME] = safe_cookie_data.session_id  # Step 2
 
-                # Save off for debugging and logging in _verify_user
+                # Save off for debugging and logging in _verify_user_and_log_mismatch
                 request.cookie_session_field = safe_cookie_data.session_id
 
         process_request_response = super().process_request(request)  # Step 3  # lint-amnesty, pylint: disable=assignment-from-no-return, super-with-arguments
@@ -368,6 +389,9 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 request.safe_cookie_verified_user_id = user_id  # Step 5
                 request.safe_cookie_verified_session_id = request.session.session_key
                 if LOG_REQUEST_USER_CHANGES:
+                    # Although it is non-obvious, this seems to be early enough
+                    #   to track the very first setting of request.user for
+                    #   real requests, but not mocked/test requests.
                     track_request_user_changes(request)
             else:
                 # Return an error or redirect, and don't continue to
@@ -401,7 +425,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         response = super().process_response(request, response)  # Step 1
 
         user_id_in_session = self.get_user_id_from_session(request)
-        user_matches = self._verify_user(request, response, user_id_in_session)  # Step 2
+        user_matches = self._verify_user_and_log_mismatch(request, response, user_id_in_session)  # Step 2
 
         # If the user changed *unexpectedly* between the beginning and end of
         # the request (as observed by this middleware) or doesn't match the
@@ -459,45 +483,55 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return HttpResponse(status=401)
 
     @staticmethod
-    def _verify_user(request, response, userid_in_session):
+    def _verify_user_and_log_mismatch(request, response, userid_in_session):
         """
-        Logs an error if the user marked at the time of process_request
-        does not match either the current user in the request or the
-        given userid_in_session.
+        Logs an error if the user has changed unexpectedly.
+
+        Other side effects:
+        - Sets a variety of custom attributes for unexpected user changes with
+            a 'safe_sessions.' prefix, like 'safe_sessions.session_id_changed'.
+        - May log additional details for users involved in a past unexpected user change,
+            if toggle is enabled. Uses the cache to track past user changes.
 
         Returns True if user matches in all places, False otherwise.
         """
-        # It's expected that a small number of views may change the
-        # user over the course of the request. We have exemptions for
-        # the user changing to/from None, but the login view can
-        # sometimes change the user from one value to another between
-        # the request and response phases, specifically when the login
-        # page is used during an active session.
-        #
-        # The relevant views set a flag to indicate the exemption.
-        if getattr(response, 'safe_sessions_expected_user_change', None):
+        verify_user_results = SafeSessionMiddleware._verify_user_unchanged(request, response, userid_in_session)
+        if verify_user_results['user_unchanged'] is True:
+            # all is well; no unexpected user change was found
+
+            try:
+
+                if LOG_REQUEST_USER_CHANGE_HEADERS.is_enabled():
+
+                    # add a session hash custom attribute for all requests to help monitoring
+                    #   requests that come both before and after a mismatch
+                    if hasattr(request, 'cookie_session_field'):
+                        session_hash = obscure_token(request.cookie_session_field)
+                        set_custom_attribute('safe_sessions.session_id_hash.parsed_cookie', session_hash)
+
+                    # In the off chance that either userid_in_session or request.user.id could
+                    #   be None while the other contains the actual user id, we'll use either.
+                    user_id = userid_in_session or hasattr(request, 'user') and request.user.id
+                    if user_id:
+                        # log request header if this user id was involved in an earlier mismatch
+                        log_request_headers = cache.get(
+                            SafeSessionMiddleware._get_recent_user_change_cache_key(user_id), False
+                        )
+                        if log_request_headers:
+                            log.info(
+                                f'SafeCookieData request header for {user_id}: '
+                                f'{SafeSessionMiddleware._get_encrypted_request_headers(request)}'
+                            )
+                            set_custom_attribute('safe_sessions.headers_logged', True)
+
+            except BaseException as e:
+                log.exception("SafeCookieData error while logging request headers.")
+
             return True
 
-        if not hasattr(request, 'safe_cookie_verified_user_id'):
-            # Skip verification if request didn't come in with a session cookie
-            return True
-
-        if hasattr(request.user, 'real_user'):
-            # If a view overrode the request.user with a masqueraded user, this will
-            #   revert/clean-up that change during response processing.
-            request.user = request.user.real_user
-
-        # determine if the request.user is different now than it was on the initial request
-        request_user_object_mismatch = request.safe_cookie_verified_user_id != request.user.id and\
-            request.user.id is not None
-
-        # determine if the current session user is different than the user in the initial request
-        session_user_mismatch = request.safe_cookie_verified_user_id != userid_in_session and\
-            userid_in_session is not None
-
-        if not (request_user_object_mismatch or session_user_mismatch):
-            # Great! No mismatch.
-            return True
+        # unpack results of an unexpected user change
+        request_user_object_mismatch = verify_user_results['request_user_object_mismatch']
+        session_user_mismatch = verify_user_results['session_user_mismatch']
 
         # Log accumulated information stored on request for each change of user
         extra_logs = []
@@ -540,6 +574,24 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                     'An unsafe user transition was found. It either needs to be fixed or exempted.\n' +
                     '\n'.join(request.debug_user_changes)
                 )
+
+            if hasattr(request, 'user_id_list') and request.user_id_list:
+                user_ids_string = ','.join(str(user_id) for user_id in request.user_id_list)
+                set_custom_attribute('safe_sessions.user_id_list', user_ids_string)
+
+                if LOG_REQUEST_USER_CHANGE_HEADERS.is_enabled():
+                    # cache the fact that we should continue logging request headers for these user ids
+                    #   for future requests until the cache values timeout.
+                    cache_values = {
+                        SafeSessionMiddleware._get_recent_user_change_cache_key(user_id): True
+                        for user_id in set(request.user_id_list)
+                    }
+                    cache.set_many(cache_values, LOG_REQUEST_USER_CHANGE_HEADERS_DURATION)
+
+                    extra_logs.append(
+                        f'Safe session request headers: {SafeSessionMiddleware._get_encrypted_request_headers(request)}'
+                    )
+
         except BaseException as e:
             log.exception("SafeCookieData error while computing additional logs.")
 
@@ -578,6 +630,69 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return False
 
     @staticmethod
+    def _verify_user_unchanged(request, response, userid_in_session):
+        """
+        Verifies that the user has not unexpectedly changed.
+
+        Verifies that the user marked at the time of process_request
+        matches both the current user in the request and the provided
+        userid_in_session.
+
+        Returns dict with the following fields:
+            user_unchanged: True if user matches in all places, False otherwise.
+            request_user_object_mismatch: True if the request.user is different
+                now than it was on the initial request, False otherwise.
+            session_user_mismatch: True if the current session user is different
+                than the user in the initial request. False otherwise.
+
+        """
+        # default return value
+        no_mismatch_dict = {
+            'user_unchanged': True,
+            'request_user_object_mismatch': False,
+            'session_user_mismatch': False,
+        }
+
+        # It's expected that a small number of views may change the
+        # user over the course of the request. We have exemptions for
+        # the user changing to/from None, but the login view can
+        # sometimes change the user from one value to another between
+        # the request and response phases, specifically when the login
+        # page is used during an active session.
+        #
+
+        # The relevant views set a flag to indicate the exemption.
+        if getattr(response, 'safe_sessions_expected_user_change', None):
+            return no_mismatch_dict
+
+        if not hasattr(request, 'safe_cookie_verified_user_id'):
+            # Skip verification if request didn't come in with a session cookie
+            return no_mismatch_dict
+
+        if hasattr(request.user, 'real_user'):
+            # If a view overrode the request.user with a masqueraded user, this will
+            #   revert/clean-up that change during response processing.
+            request.user = request.user.real_user
+
+        # determine if the request.user is different now than it was on the initial request
+        request_user_object_mismatch = request.safe_cookie_verified_user_id != request.user.id and\
+            request.user.id is not None
+
+        # determine if the current session user is different than the user in the initial request
+        session_user_mismatch = request.safe_cookie_verified_user_id != userid_in_session and\
+            userid_in_session is not None
+
+        if not (request_user_object_mismatch or session_user_mismatch):
+            # Great! No mismatch.
+            return no_mismatch_dict
+
+        return {
+            'user_unchanged': False,
+            'request_user_object_mismatch': request_user_object_mismatch,
+            'session_user_mismatch': session_user_mismatch,
+        }
+
+    @staticmethod
     def get_user_id_from_session(request):
         """
         Return the user_id stored in the session of the request.
@@ -589,7 +704,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         except KeyError:
             return None
 
-    # TODO move to test code, maybe rename, get rid of old Django compat stuff
+    # TODO move to test code, maybe rename
     @staticmethod
     def set_user_id_in_session(request, user):
         """
@@ -615,6 +730,22 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         # Update the cookie's value with the safe_cookie_data.
         cookies[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
+
+    @staticmethod
+    def _get_recent_user_change_cache_key(user_id):
+        """ Get cache key for flagging a recent mismatch for the provided user id. """
+        return f"safe_sessions.middleware.recent_user_change_detected_{user_id}"
+
+    @staticmethod
+    def _get_encrypted_request_headers(request):
+        """
+        Return an encrypted version of the request headers preformatted for logging.
+
+        See encrypt_for_log documentation for how to read using private key.
+        """
+        # NOTE: request.headers seems to pick up initial values, but won't adjust as the request object is edited.
+        #   For example, the session cookie will likely be the safe session version.
+        return encrypt_for_log(str(request.headers), settings.SAFE_SESSIONS_DEBUG_PUBLIC_KEY)
 
 
 def obscure_token(value: Union[str, None]) -> Union[str, None]:
@@ -715,11 +846,15 @@ def track_request_user_changes(request):
                 location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:12])
 
                 if not hasattr(self, 'debug_user_changes'):
+                    # list of string debugging info for each user change (e.g. user id, stack trace, etc.)
                     self.debug_user_changes = []  # pylint: disable=attribute-defined-outside-init
+                    # list of changed user ids
+                    self.user_id_list = []  # pylint: disable=attribute-defined-outside-init
 
                 if not hasattr(request, name):
                     original_user = value
                     if hasattr(value, 'id'):
+                        self.user_id_list.append(value.id)
                         self.debug_user_changes.append(
                             f"SafeCookieData: Setting for the first time: {value.id!r}\n"
                             f"{location}"
@@ -732,6 +867,7 @@ def track_request_user_changes(request):
                 elif value != getattr(request, name):
                     current_user = getattr(request, name)
                     if hasattr(value, 'id'):
+                        self.user_id_list.append(value.id)
                         self.debug_user_changes.append(
                             f"SafeCookieData: Changing request user. "
                             f"Originally {original_user.id!r}, now {current_user.id!r} and will become {value.id!r}\n"

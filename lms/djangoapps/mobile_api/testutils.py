@@ -30,8 +30,8 @@ from lms.djangoapps.courseware.access_response import MobileAvailabilityError, S
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from lms.djangoapps.mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from lms.djangoapps.mobile_api.utils import API_V1
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):

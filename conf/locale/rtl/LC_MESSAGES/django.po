@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-12 20:50+0000\n"
-"PO-Revision-Date: 2021-12-12 20:50:12.864119\n"
+"POT-Creation-Date: 2021-12-26 20:50+0000\n"
+"PO-Revision-Date: 2021-12-26 20:50:31.353784\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -61,6 +61,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Ŧǝxʇ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3602,10 +3607,6 @@ msgid ""
 msgstr ""
 "ɆɌɌØɌ: \"{block_type}\" ᴉs ɐn nnʞnøʍn ɔøɯdønǝnʇ ʇʎdǝ. Ŧɥᴉs ɔøɯdønǝnʇ ʍᴉll bǝ"
 " ɥᴉddǝn ᴉn ŁMS."
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Ŧǝxʇ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -11232,10 +11233,13 @@ msgstr ""
 " ɐ dᴉɟɟǝɹǝnʇ ǝɯɐᴉl ɐddɹǝss."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
 msgid ""
-"This email is already associated with an existing or previous edX account"
+"This email is already associated with an existing or previous "
+"{settings.PLATFORM_NAME} account"
 msgstr ""
-"Ŧɥᴉs ǝɯɐᴉl ᴉs ɐlɹǝɐdʎ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐn ǝxᴉsʇᴉnƃ øɹ dɹǝʌᴉøns ǝdX ɐɔɔønnʇ"
+"Ŧɥᴉs ǝɯɐᴉl ᴉs ɐlɹǝɐdʎ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐn ǝxᴉsʇᴉnƃ øɹ dɹǝʌᴉøns "
+"{settings.PLATFORM_NAME} ɐɔɔønnʇ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -12865,10 +12869,6 @@ msgstr "ⱣǝɹɯᴉssᴉønĐǝnᴉǝd: Fɐᴉlǝd ᴉn ɐnʇɥǝnʇᴉɔɐʇ�
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} Snddøɹʇ Łǝʌǝls:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "ĦŦMŁ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
@@ -16563,10 +16563,6 @@ msgstr "Ⱥɔɔǝss ʇɥᴉs ɔønɹsǝ"
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
 msgstr "Ǥǝʇ ɐɔɔǝss ʇø ʇɥǝ ɔønɹsǝ ɯɐʇǝɹᴉɐl, ᴉnɔlndᴉnƃ ʌᴉdǝøs ɐnd ɹǝɐdᴉnƃs"
-
-#: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be locked"
-msgstr "Søɯǝ ƃɹɐdǝd ɔønʇǝnʇ ɯɐʎ bǝ løɔʞǝd"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"

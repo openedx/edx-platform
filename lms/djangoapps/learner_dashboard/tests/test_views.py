@@ -3,8 +3,9 @@ Unit tests covering the program discussion iframe API.
 """
 
 from uuid import uuid4
+import ddt
 
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import LtiConfiguration
 from markupsafe import Markup
@@ -19,6 +20,7 @@ from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, Cours
 from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration
 
 
+@ddt.ddt
 @override_waffle_flag(ENABLE_PROGRAM_TAB_VIEW, active=True)
 @override_waffle_flag(ENABLE_MASTERS_PROGRAM_TAB_VIEW, active=True)
 class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMixin):
@@ -93,10 +95,15 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_data)
 
-    def test_api_returns_discussions_iframe(self):
+    @ddt.data(True, False)
+    def test_api_returns_discussions_iframe(self, staff):
         """
-        Test if API returns iframe in case ProgramDiscussionsConfiguration model contains proper data
+        Test if API returns iframe in case ProgramDiscussionsConfiguration model contains proper data for staff
+        and non staff. In case of non staff user must be be enrolled in program.
         """
+        if staff:
+            self.user = UserFactory(is_staff=True)
+            self.client.login(username=self.user.username, password=self.password)
         discussion_config = ProgramDiscussionsConfiguration.objects.create(
             program_uuid=self.program_uuid,
             enabled=True,
@@ -114,18 +121,19 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         self.assertIsInstance(response.data['discussion']['iframe'], Markup)
         self.assertIn('iframe', str(response.data['discussion']['iframe']), )
 
-    def test_program_does_not_exist(self):
+    def test_program_without_enrollment(self):
         """
-        Test if API returns 404 in case program does not exist
-        """
-        response = self.client.get(reverse('program_discussion', kwargs={'program_uuid': str(uuid4())}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_program_access_denied(self):
-        """
-        Test if API returns 403 in case user has no access to program
+        Test if API returns default response in case a non staff user has no enrollment in the program
         """
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        default_response = {
+            'tab_view_enabled': False,
+            'discussion': {
+                'configured': False,
+                'iframe': ''
+            }
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, default_response)

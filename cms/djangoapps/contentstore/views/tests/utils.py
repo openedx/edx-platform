@@ -66,7 +66,7 @@ class StudioPageTestCase(CourseTestCase):
         )
         self.validate_html_for_action_button(
             html,
-            'button class="btn-default edit-button action-button">',
+            'button class="btn-default edit-button action-button"',
             can_edit
         )
         self.validate_html_for_action_button(

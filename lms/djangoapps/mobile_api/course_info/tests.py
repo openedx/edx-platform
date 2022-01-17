@@ -13,15 +13,15 @@ from rest_framework.test import APIClient  # pylint: disable=unused-import
 
 from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
-from xmodule.html_module import CourseInfoBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory  # pylint: disable=unused-import
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -230,7 +230,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         self.login_and_enroll()
 
 
-@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
+@override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
 class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals User Activity API.
@@ -280,7 +280,7 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
         response = self.client.post(self.apiUrl, post_data)
         assert response.status_code == 400
 
-    @override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=False)
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=False)
     @patch('lms.djangoapps.mobile_api.course_info.views.log')
     def test_flag_disabled(self, mock_logger):
         '''
