@@ -4,6 +4,7 @@ Unit tests for courseware context_processor
 
 from pytz import timezone
 from unittest.mock import Mock
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 
 from lms.djangoapps.courseware.context_processor import (
@@ -32,7 +33,7 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         self.request.user = AnonymousUser()
         context = user_timezone_locale_prefs(self.request)
         assert context['user_timezone'] is None
-        assert context['user_language'] is None
+        assert context['user_language'] == settings.LANGUAGE_CODE
 
     def test_no_timezone_preference(self):
         set_user_preference(self.user, 'pref-lang', 'en')
