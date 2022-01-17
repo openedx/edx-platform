@@ -25,7 +25,7 @@ from .serializers import (
 
 class DiscussionsConfigurationView(APIView):
     """
-    Handle configuration-related view-logic
+    View for configuring discussion settings for
     """
     authentication_classes = (
         JwtAuthentication,
@@ -127,7 +127,7 @@ class DiscussionsConfigurationView(APIView):
 
 class DiscussionsProvidersView(APIView):
     """
-    Handle configuration-related view-logic
+    Read only view that lists details of discussion providers available for a course.
     """
     authentication_classes = (
         JwtAuthentication,
@@ -202,7 +202,11 @@ class DiscussionsProvidersView(APIView):
 
 class CombinedDiscussionsConfigurationView(DiscussionsConfigurationView):
     """
-    Handle configuration-related view-logic
+    Combined view that includes both provider data and discussion configuration.
+
+    Note:
+        This is temporary code for backwards-compatibility and will be removed soon
+        after the frontend supports the new split APIs.
     """
 
     def get(self, request: Request, course_key_string: str, **_kwargs) -> Response:
