@@ -1349,6 +1349,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """ Create a course and user, then log in. """
         super().setUp()
         self.superuser = SuperuserFactory()
+        self.superuserClient = Client()
         # Pass emit_signals when creating the course so it would be cached
         # as a CourseOverview. Enrollments require a cached CourseOverview.
         self.first_org_course = CourseFactory.create(emit_signals=True, org="org", course="course", run="run")
@@ -1404,7 +1405,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     def test_deactivate_enrollments(self):
         self._assert_active()
         self._create_test_retirement(self.user)
-        response = self._submit_unenroll(self.superuser, self.user.username)
+        response = self._submit_unenroll(self.user.username)
         assert response.status_code == status.HTTP_200_OK
         data = json.loads(response.content.decode('utf-8'))
         # order doesn't matter so compare sets
@@ -1413,18 +1414,18 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def test_deactivate_enrollments_no_retirement_status(self):
         self._assert_active()
-        response = self._submit_unenroll(self.superuser, self.user.username)
+        response = self._submit_unenroll(self.user.username)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_deactivate_enrollments_unauthorized(self):
         self._assert_active()
-        response = self._submit_unenroll(self.user, self.user.username)
+        response = self._submit_unenroll(self.user.username, submitting_user=self.user, client=self.client)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         self._assert_active()
 
     def test_deactivate_enrollments_no_username(self):
         self._assert_active()
-        response = self._submit_unenroll(self.superuser, None)
+        response = self._submit_unenroll(None)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         data = json.loads(response.content.decode('utf-8'))
         assert data == 'Username not specified.'
@@ -1433,23 +1434,23 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     def test_deactivate_enrollments_empty_username(self):
         self._assert_active()
         self._create_test_retirement(self.user)
-        response = self._submit_unenroll(self.superuser, "")
+        response = self._submit_unenroll("")
         assert response.status_code == status.HTTP_404_NOT_FOUND
         self._assert_active()
 
     def test_deactivate_enrollments_invalid_username(self):
         self._assert_active()
         self._create_test_retirement(self.user)
-        response = self._submit_unenroll(self.superuser, "a made up username")
+        response = self._submit_unenroll("a made up username")
         assert response.status_code == status.HTTP_404_NOT_FOUND
         self._assert_active()
 
     def test_deactivate_enrollments_called_twice(self):
         self._assert_active()
         self._create_test_retirement(self.user)
-        response = self._submit_unenroll(self.superuser, self.user.username)
+        response = self._submit_unenroll(self.user.username)
         assert response.status_code == status.HTTP_200_OK
-        response = self._submit_unenroll(self.superuser, self.user.username)
+        response = self._submit_unenroll(self.user.username)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content.decode('utf-8') == ''
         self._assert_inactive()
@@ -1465,14 +1466,19 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
             _, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, course.id)
             assert not is_active
 
-    def _submit_unenroll(self, submitting_user, unenrolling_username):
+    def _submit_unenroll(self, unenrolling_username, submitting_user=None, client=None):
+        """ Submit enrollment, by default as superuser. """
+        # Avoid mixing cookies between two users
+        client = client or self.superuserClient
+        submitting_user = submitting_user or self.superuser
+
         data = {}
         if unenrolling_username is not None:
             data['username'] = unenrolling_username
 
         url = reverse('unenrollment')
         headers = self.build_jwt_headers(submitting_user)
-        return self.client.post(url, json.dumps(data), content_type='application/json', **headers)
+        return client.post(url, json.dumps(data), content_type='application/json', **headers)
 
 
 @ddt.ddt
