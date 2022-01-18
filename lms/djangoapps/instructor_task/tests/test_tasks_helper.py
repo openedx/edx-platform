@@ -371,8 +371,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 4, 46),
-        (ModuleStoreEnum.Type.split, 3, 46),
+        (ModuleStoreEnum.Type.mongo, 4, 47),
+        (ModuleStoreEnum.Type.split, 3, 47),
     )
     @ddt.unpack
     def test_query_counts(self, store_type, mongo_count, expected_query_count):
@@ -2081,7 +2081,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(82):
+        with self.assertNumQueries(83):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
