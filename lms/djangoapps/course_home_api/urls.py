@@ -13,6 +13,7 @@ from lms.djangoapps.course_home_api.outline.views import (
     OutlineTabView, dismiss_welcome_message, save_course_goal, unsubscribe_from_course_goal_by_token,
 )
 from lms.djangoapps.course_home_api.progress.views import ProgressTabView
+from openedx.features.funix_goal.views import ( set_goal )
 
 # This API is a BFF ("backend for frontend") designed for the learning MFE. It's not versioned because there is no
 # guarantee of stability over time. It may change from one open edx release to another. Don't write any scripts
@@ -35,6 +36,15 @@ urlpatterns += [
         fr'dates/{settings.COURSE_KEY_PATTERN}',
         DatesTabView.as_view(),
         name='dates-tab'
+    ),
+]
+
+# Funix Goal URLs
+urlpatterns += [
+    re_path(
+        r'set_goal',
+        set_goal,
+        name='set-goal'
     ),
 ]
 
