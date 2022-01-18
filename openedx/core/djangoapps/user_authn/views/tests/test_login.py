@@ -18,7 +18,7 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from freezegun import freeze_time
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from openedx_events.tests.utils import OpenEdxEventsTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
@@ -30,7 +30,6 @@ from openedx.core.djangoapps.password_policy.compliance import (
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login import (
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
     AllowedAuthUser,
@@ -192,7 +191,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         post_params = {}
@@ -215,7 +213,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
     @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
     @skip_unless_lms
@@ -265,7 +262,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.data(('', True), ('/enterprise/select/active/?success_url=', False))
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
     @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise')
     @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
