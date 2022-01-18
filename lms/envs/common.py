@@ -3197,7 +3197,8 @@ INSTALLED_APPS = [
     'edx_ace',
 
     # For save for later
-    'lms.djangoapps.save_for_later'
+    'lms.djangoapps.save_for_later',
+    'openedx.core.djangoapps.kafka_consumer'
 ]
 
 ######################### CSRF #########################################
@@ -4908,3 +4909,6 @@ CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-a
 # The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
 # a value of `3` would include learners who have logged in within the past 3 months.
 BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
+
+################## Kafka Settings ##########################
+KAFKA_ENABLED = False
