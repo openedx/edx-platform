@@ -3197,7 +3197,10 @@ INSTALLED_APPS = [
     'edx_ace',
 
     # For save for later
-    'lms.djangoapps.save_for_later'
+    'lms.djangoapps.save_for_later',
+
+    # TODO (EventBus): Make Kafka/event-bus optional
+    'openedx.core.djangoapps.kafka_consumer',
 ]
 
 ######################### CSRF #########################################

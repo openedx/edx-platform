@@ -176,6 +176,8 @@ code-annotations==1.2.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
+confluent-kafka==1.8.2
+    # via -r requirements/edx/base.txt
 contextlib2==21.6.0
     # via -r requirements/edx/base.txt
 coreapi==2.3.3
