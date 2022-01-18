@@ -2,27 +2,29 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
-
 import logging
+from functools import wraps
+from typing import Dict, Optional
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import get_language_bidi, gettext_lazy as _
+from django.utils.translation import get_language_bidi
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
-from functools import wraps  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
+from xmodule.modulestore.django import modulestore
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -58,12 +60,10 @@ from openedx.core.djangoapps.discussions.utils import (
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
+User = get_user_model()
 log = logging.getLogger("edx.discussions")
-
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -694,6 +694,38 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
+def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: User) -> Optional[Dict]:
+    """
+    Returns the context for rendering the MFE banner and MFE.
+
+    Args:
+        query_params (Dict): request query parameters
+        course_key (CourseKey): course for which to get URL
+
+    Returns:
+        A URL for the MFE experience if active for the current request or None
+    """
+    experience_param = query_params.get("discussions_experience", "").lower()
+    mfe_url = get_discussions_mfe_url(course_key)
+    if not mfe_url:
+        return {"show_banner": False, "show_mfe": False}
+    show_banner = bool(has_access(user, 'staff', course_key))
+    forum_url = reverse("forum_form_discussion", args=[course_key])
+    show_mfe = False
+    # Show the MFE if the new experience is requested,
+    # or if the legacy experience is not requested and the MFE is enabled
+    if experience_param == "new" or (experience_param != "legacy" and ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)):
+        show_mfe = True
+    return {
+        "show_mfe": show_mfe,
+        "legacy_url": f"{forum_url}?discussions_experience=legacy",
+        "mfe_url": f"{forum_url}?discussions_experience=new",
+        "course_key": course_key,
+        "show_banner": show_banner,
+        "discussions_mfe_url": mfe_url,
+    }
+
+
 class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
@@ -721,13 +753,9 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             Fragment: The fragment representing the discussion board
         """
         course_key = CourseKey.from_string(course_id)
-        mfe_url = get_discussions_mfe_url(course_key)
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and mfe_url:
-            fragment = Fragment(
-                HTML(
-                    "<iframe id='discussions-mfe-tab-embed' src='{src}'></iframe>"
-                ).format(src=mfe_url)
-            )
+        mfe_context = _discussions_mfe_context(request.GET, course_key, request.user)
+        if mfe_context["show_mfe"]:
+            fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
             fragment.add_css(
                 """
                 #discussions-mfe-tab-embed {
@@ -762,6 +790,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             context.update({
                 'course_expiration_fragment': course_expiration_fragment,
             })
+            context.update(mfe_context)
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)
