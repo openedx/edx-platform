@@ -8,6 +8,7 @@ from common.djangoapps.student.models import get_user_by_username_or_email, get_
 from openedx.features.funix_relative_date.models import FunixRelativeDate, FunixRelativeDateDAO
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.date_summary import FunixCourseStartDate, TodaysDate
+from openedx.features.funix_goal.models import LearnGoal
 
 class FunixRelativeDateLibary():
 	TIME_PER_DAY = 2.5 * 60
@@ -59,6 +60,15 @@ class FunixRelativeDateLibary():
 
 	@classmethod
 	def get_schedule(self, user_name, course_id, assignment_blocks=None):
+		def get_time(last_complete_date, goal, day=1):
+			last_complete_date += timedelta(days=day)
+			weekday = last_complete_date.weekday()
+
+			if not getattr(goal, f'weekday_{weekday}'):
+				return get_time(last_complete_date, goal)
+
+			return last_complete_date
+
 		user = get_user_by_username_or_email(user_name)
 		course_key = CourseKey.from_string(course_id)
 		course = courseware_courses.get_course_with_access(user, 'load', course_key=course_key, check_if_enrolled=False)
@@ -73,6 +83,8 @@ class FunixRelativeDateLibary():
 		# Delete all old date
 		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
 
+		# Get goal
+		goal = LearnGoal.get_goal(course_id=course_id, user_id=str(user.id))
 		index = 0
 		completed_assignments = [asm for asm in assignment_blocks if asm.complete]
 		uncompleted_assignments = [asm for asm in assignment_blocks if not asm.complete]
@@ -83,7 +95,7 @@ class FunixRelativeDateLibary():
 			last_complete_date = asm.complete_date
 			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 
-		left_time = self.TIME_PER_DAY
+		left_time = float(goal.hours_per_day) * 60
 		arr = []
 		for asm in uncompleted_assignments:
 			effort_time = asm.effort_time
@@ -91,16 +103,16 @@ class FunixRelativeDateLibary():
 				arr.append(asm)
 				left_time -= effort_time
 			else:
-				last_complete_date += timedelta(days=1)
+				last_complete_date = get_time(last_complete_date, goal)
 				for el in arr:
 					index += 1
 					FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index, date=last_complete_date).save()
-				left_time = self.TIME_PER_DAY
-				if effort_time > self.TIME_PER_DAY:
+				left_time = float(goal.hours_per_day) * 60
+				if effort_time > left_time:
 					index += 1
 
-					day_need = math.ceil(effort_time / self.TIME_PER_DAY)
-					last_complete_date += timedelta(days=day_need)
+					day_need = math.ceil(effort_time / left_time)
+					last_complete_date = get_time(last_complete_date, goal, day=day_need)
 					FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 					arr = []
 				else:

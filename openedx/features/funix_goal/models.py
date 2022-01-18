@@ -1,5 +1,5 @@
 from django.db import models
-from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
+import openedx.features.funix_relative_date.funix_relative_date as FunixRelativeDateModule
 
 
 class LearnGoal(models.Model):
@@ -31,4 +31,11 @@ class LearnGoal(models.Model):
 
 		goal_obj.save()
 
-		return FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
+		return FunixRelativeDateModule.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
+
+	@classmethod
+	def get_goal(self, course_id, user_id):
+		try:
+			return self.objects.filter(course_id=course_id, user_id=user_id).get()
+		except:
+			return LearnGoal(course_id=course_id, user_id=user_id)
