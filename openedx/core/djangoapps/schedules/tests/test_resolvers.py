@@ -247,7 +247,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
-        with self.assertNumQueries(36):
+        with self.assertNumQueries(38):
             sc = resolver.get_schedules()
             schedules = list(sc)
 
