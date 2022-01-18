@@ -74,7 +74,8 @@ jobs:
 
     - name: Reset mysql password
       run: |
-        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+        cat <<EOF | sudo mysql -u root
+          UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user = 'root';
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
