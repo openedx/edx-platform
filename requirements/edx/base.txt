@@ -563,7 +563,7 @@ idna==3.3
     #   -r requirements/edx/paver.txt
     #   requests
     #   yarl
-importlib-metadata==4.10.0
+importlib-metadata==4.10.1
     # via markdown
 inflection==0.5.1
     # via drf-yasg
@@ -684,7 +684,7 @@ nltk==3.6.7
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.in
-numpy==1.22.0
+numpy==1.22.1
     # via
     #   chem
     #   openedx-calc
@@ -699,7 +699,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-openedx-events==0.7.0
+openedx-events==0.7.1
     # via -r requirements/edx/base.in
 ora2==3.7.8
     # via -r requirements/edx/base.in
@@ -864,7 +864,7 @@ random2==1.0.1
     # via -r requirements/edx/base.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
-redis==4.1.0
+redis==4.1.1
     # via -r requirements/edx/base.in
 regex==2021.11.10
     # via nltk
@@ -959,7 +959,7 @@ social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-auth-backends
-social-auth-core==4.1.0
+social-auth-core==4.2.0
     # via
     #   -r requirements/edx/base.in
     #   edx-auth-backends
