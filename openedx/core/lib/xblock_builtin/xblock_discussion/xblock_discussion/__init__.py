@@ -11,16 +11,15 @@ from django.utils.translation import get_language_bidi
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Scope, String, UNIQUE_ID
+from xblock.fields import UNIQUE_ID, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
+from xmodule.xml_module import XmlParserMixin
 
-from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_topic_url
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_topic_url
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-from xmodule.xml_module import XmlParserMixin  # lint-amnesty, pylint: disable=wrong-import-order
-
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name

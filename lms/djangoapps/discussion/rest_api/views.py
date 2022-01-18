@@ -7,9 +7,9 @@ import logging
 import uuid
 
 import edx_api_doc_tools as apidocs
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
+from django.shortcuts import get_object_or_404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
@@ -20,6 +20,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_goals.models import UserActivity
@@ -33,7 +34,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+
 from ..rest_api.api import (
     create_comment,
     create_thread,
@@ -47,22 +48,18 @@ from ..rest_api.api import (
     get_thread_list,
     get_user_comments,
     update_comment,
-    update_thread,
+    update_thread
 )
 from ..rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
-    UserCommentListGetForm,
     CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
+    UserCommentListGetForm
 )
 from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
-from ..rest_api.serializers import (
-    CourseMetadataSerailizer,
-    DiscussionRolesListSerializer,
-    DiscussionRolesSerializer,
-)
+from ..rest_api.serializers import CourseMetadataSerailizer, DiscussionRolesListSerializer, DiscussionRolesSerializer
 
 log = logging.getLogger(__name__)
 
