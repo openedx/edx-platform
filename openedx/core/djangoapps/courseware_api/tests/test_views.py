@@ -356,7 +356,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     @ddt.data(
         (None, False, False, False),
         ('verified', False, False, True),
-        ('masters', False, False, True),
+        ('masters', False, False, False),
         ('audit', False, False, False),
         ('verified', False, True, False),
         ('masters', False, True, False),

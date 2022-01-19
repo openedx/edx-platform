@@ -328,14 +328,15 @@ class CoursewareMeta:
         """
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
-        enrollment_is_cert_relavant = (
+        integrity_signature_required = (
             self.enrollment_object
-            and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+            # Master's enrollments are excluded here as honor code is handled separately
+            and self.enrollment_object.mode in CourseMode.CREDIT_MODES + CourseMode.CREDIT_ELIGIBLE_MODES
         )
 
-        if not enrollment_is_cert_relavant:
+        if not integrity_signature_required:
             # Check masquerading as a non-audit enrollment
-            enrollment_is_cert_relavant = is_masquerading_as_non_audit_enrollment(
+            integrity_signature_required = is_masquerading_as_non_audit_enrollment(
                 self.effective_user,
                 self.course_key,
                 self.course_masquerade
@@ -343,7 +344,7 @@ class CoursewareMeta:
 
         if (
             integrity_signature_toggle(self.course_key)
-            and enrollment_is_cert_relavant
+            and integrity_signature_required
         ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
