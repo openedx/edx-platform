@@ -3,23 +3,12 @@ name: 'Merge conflicts'
 
 jobs:
   report_master:
-    name: 'master'
+    name: 'koa and master'
     uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
     with:
       local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
-      upstream_branch: 'master'
-      exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
-    secrets:
-      custom_github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  report_koa:
-    name: 'koa'
-    uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
-    with:
-      local_base_branch: ${{ github.base_ref }}
-      upstream_repo: 'https://github.com/edx/edx-platform.git'
-      upstream_branch: 'open-release/koa.master'
+      upstream_branches: 'open-release/koa.master,master'
       exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
       custom_github_token: ${{ secrets.GITHUB_TOKEN }}
