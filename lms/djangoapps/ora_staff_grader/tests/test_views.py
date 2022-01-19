@@ -14,13 +14,15 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.ora_staff_grader.constants import (
     ERR_BAD_ORA_LOCATION,
     ERR_GRADE_CONTESTED,
-    ERR_GRADE_SUBMIT,
+    ERR_INTERNAL,
     ERR_LOCK_CONTESTED,
     ERR_MISSING_PARAM,
+    ERR_UNKNOWN,
     PARAM_ORA_LOCATION,
     PARAM_SUBMISSION_ID,
 )
-from lms.djangoapps.ora_staff_grader.errors import LockContestedError
+from lms.djangoapps.ora_staff_grader.errors import LockContestedError, XBlockInternalError
+import lms.djangoapps.ora_staff_grader.tests.test_data as test_data
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -65,62 +67,79 @@ class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
         )
 
 
+@ddt.ddt
 class TestInitializeView(BaseViewTest):
     """
     Tests for the /initialize view, creating setup data for ESG
     """
     view_name = 'ora-staff-grader:initialize'
 
-    def test_missing_ora_location(self):
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    @ddt.data({}, {PARAM_ORA_LOCATION: ''})
+    def test_missing_param(self, query_params):
         """ Missing ORA location param should return 400 and error message """
-        self.client.login(username=self.staff.username, password=self.password)
-        response = self.client.get(self.api_url)
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
     def test_bad_ora_location(self):
         """ Bad ORA location should return a 400 and error message """
-        self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: 'not_a_real_location'})
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_rubric_config')
-    @patch('lms.djangoapps.ora_staff_grader.views.InitializeView.get_submissions')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
     def test_init(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
-        """ A successful call should return course, ORA, submissions, and rubric data """
+        """ Any failure to fetch info returns an unknown error response """
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
+        mock_get_submissions.return_value = test_data.example_submission_list
+        mock_get_rubric_config.return_value = test_data.example_rubric
 
-        mock_get_submissions.return_value = {
-            "a": {
-                "submissionUuid": "a",
-                "username": "foo",
-                "teamName": None,
-                "dateSubmitted": "1969-07-16 13:32:00",
-                "dateGraded": None,
-                "gradedBy": None,
-                "gradingStatus": "ungraded",
-                "lockStatus": "unlocked",
-                "score": {
-                    "pointsEarned": 0,
-                    "pointsPossible": 10
-                }
-            }
-        }
-
-        # Rubric data is passed through directly, so we can use a toy data payload
-        mock_get_rubric_config.return_value = {"foo": "bar"}
-
-        self.client.login(username=self.staff.username, password=self.password)
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions', 'rubricConfig'])
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
+
+    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
+    def test_init_xblock_exception(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
+        """ If one of the XBlock handlers fails, the exception should be caught """
+        mock_course_overview = CourseOverviewFactory.create()
+        mock_get_course_overview.return_value = mock_course_overview
+        # Mock an error getting submissions
+        mock_get_submissions.side_effect = XBlockInternalError(context={'handler': 'list_staff_workflows'})
+        mock_get_rubric_config.return_value = test_data.example_rubric
+
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_INTERNAL, "handler": "list_staff_workflows"}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
+    def test_init_generic_exception(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
+        """ If something else strange fails (e.g. bad data shape), an "unknown" error should be surfaced """
+        mock_course_overview = CourseOverviewFactory.create()
+        mock_get_course_overview.return_value = mock_course_overview
+        # Mock a bad returned data shape which would break serialization
+        mock_get_submissions.return_value = {'bad': 'wolf'}
+        mock_get_rubric_config.return_value = test_data.example_rubric
+
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_UNKNOWN}
 
 
 @ddt.ddt
@@ -130,42 +149,22 @@ class TestFetchSubmissionView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission'
 
-    def test_missing_ora_location(self):
-        """ Missing ora_location param should return 400 and error message """
+    def setUp(self):
+        super().setUp()
         self.log_in()
-        response = self.client.get(self.api_url)
 
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_ora_location(self):
-        """ Blank ORA location should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ''})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_missing_submission_uuid(self):
-        """ Missing submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_submission_uuid(self):
-        """ Blank submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+    @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: ''})
+    def test_missing_params(self, query_params):
+        """ Missing or blank params should return 400 and error message """
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_submission_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission(
         self,
         has_assessment,
@@ -173,40 +172,11 @@ class TestFetchSubmissionView(BaseViewTest):
         mock_get_assessment_info,
         mock_get_submission_info,
     ):
-        """ """
-        mock_submission = {
-            'text': ['This is the answer'],
-            'files': [
-                {
-                    'name': 'name_0',
-                    'description': 'description_0',
-                    'download_url': 'www.file_url.com/key_0',
-                    'size': 123455,
-                }
-            ]
-        }
-
-        mock_assessment = {} if not has_assessment else {
-            'feedback': "Base Assessment Feedback",
-            'score': {
-                'pointsEarned': 5,
-                'pointsPossible': 6,
-            },
-            'criteria': [
-                {
-                    'name': "Criterion 1",
-                    'option': "Three",
-                    'points': 3,
-                    'feedback': "Feedback 1"
-                },
-            ]
-        }
-
-        mock_get_submission_info.return_value = mock_submission
-        mock_get_assessment_info.return_value = mock_assessment
+        """ Successfull submission fetch status returns submission, lock, and grade data """
+        mock_get_submission_info.return_value = test_data.example_submission
+        mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -216,6 +186,48 @@ class TestFetchSubmissionView(BaseViewTest):
         expected_assessment_keys = set(['score', 'overallFeedback', 'criteria']) if has_assessment else set()
         assert response.data['gradeData'].keys() == expected_assessment_keys
 
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    def test_fetch_submission_generic_exception(
+        self,
+        mock_check_submission_lock,
+        mock_get_assessment_info,
+        mock_get_submission_info,
+    ):
+        """ Other generic exceptions should return the "unknown" error response """
+        mock_get_submission_info.return_value = test_data.example_submission
+        # Mock an error in getting the assessment info
+        mock_get_assessment_info.side_effect = XBlockInternalError(context={'handler': 'get_assessment_info'})
+        mock_check_submission_lock.return_value = {'lock_status': 'unlocked'}
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_INTERNAL, 'handler': 'get_assessment_info'}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.get_submission_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    def test_fetch_submission_xblock_exception(
+        self,
+        mock_check_submission_lock,
+        mock_get_assessment_info,
+        mock_get_submission_info,
+    ):
+        """ An exception in any XBlock handler returns an error response """
+        mock_get_submission_info.return_value = test_data.example_submission
+        mock_get_assessment_info.return_value = test_data.example_assessment
+        # Mock a bad data shape to break serialization
+        mock_check_submission_lock.return_value = {'mad': 'hatter'}
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_UNKNOWN}
+
 
 @ddt.ddt
 class TestFetchSubmissionStatusView(BaseViewTest):
@@ -224,68 +236,31 @@ class TestFetchSubmissionStatusView(BaseViewTest):
     """
     view_name = 'ora-staff-grader:fetch-submission-status'
 
-    def test_missing_ora_location(self):
-        """ Missing ORA location should return 400 and error message """
+    def setUp(self):
+        super().setUp()
         self.log_in()
-        response = self.client.get(self.api_url)
 
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_ora_location(self):
-        """ Empty ORA location should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ''})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_missing_submission_uuid(self):
-        """ Missing submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock()})
-
-        assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
-
-    def test_blank_submission_uuid(self):
-        """ Blank submission UUID should return 400 and error message """
-        self.log_in()
-        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+    @ddt.data({}, {PARAM_ORA_LOCATION: '', PARAM_SUBMISSION_ID: Mock()}, {PARAM_ORA_LOCATION: Mock(), PARAM_SUBMISSION_ID: ''})
+    def test_missing_param(self, query_params):
+        """ Missing ORA location or submission ID param should return 400 and error message """
+        response = self.client.get(self.api_url, query_params)
 
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionStatusFetchView.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
     def test_fetch_submission_status(
         self,
         has_assessment,
         mock_check_submission_lock,
         mock_get_assessment_info,
     ):
-
-        mock_assessment = {} if not has_assessment else {
-            'feedback': "Base Assessment Feedback",
-            'score': {
-                'pointsEarned': 5,
-                'pointsPossible': 6,
-            },
-            'criteria': [
-                {
-                    'name': "Criterion 1",
-                    'option': "Three",
-                    'points': 3,
-                    'feedback': "Feedback 1"
-                },
-            ]
-        }
-        mock_get_assessment_info.return_value = mock_assessment
-
+        """ Successful fetch submission returns submission and related lock/assessment info """
+        mock_get_assessment_info.return_value = {} if not has_assessment else test_data.example_assessment
         mock_check_submission_lock.return_value = {'lock_status': 'in-progress'}
 
-        self.log_in()
         ora_location, submission_uuid = Mock(), Mock()
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
 
@@ -295,8 +270,8 @@ class TestFetchSubmissionStatusView(BaseViewTest):
             'gradeStatus': 'graded' if has_assessment else 'ungraded',
             'lockStatus': mock_check_submission_lock.return_value['lock_status'],
             'gradeData': {} if not has_assessment else {
-                'score': mock_assessment['score'],
-                'overallFeedback': mock_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
@@ -308,6 +283,34 @@ class TestFetchSubmissionStatusView(BaseViewTest):
             }
         }
         assert actual == expected
+
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    def test_fetch_submission_status_xblock_exception(self, mock_check_submission_lock, mock_get_assessment_info):
+        """ Exceptions within an XBlock return an internal error response"""
+        # Mock a bad data shape to throw a serializer exception
+        mock_get_assessment_info.return_value = {}
+        mock_check_submission_lock.side_effect = XBlockInternalError(context={'handler': 'claim_submission_lock'})
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_INTERNAL, 'handler': 'claim_submission_lock'}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    def test_fetch_submission_status_generic_exception(self, mock_check_submission_lock, mock_get_assessment_info):
+        """ Exceptions outside of an XBlock return a generic error response"""
+        mock_get_assessment_info.return_value = {}
+        # Mock a bad data shape to throw a serializer exception
+        mock_check_submission_lock.return_value = {'jekyll', 'hyde'}
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid})
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_UNKNOWN}
 
 
 class TestSubmissionLockView(BaseViewTest):
@@ -330,7 +333,7 @@ class TestSubmissionLockView(BaseViewTest):
             PARAM_SUBMISSION_ID: self.test_submission_uuid
         }
 
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
 
     def claim_lock(self, params):
         """ Wrapper for easier calling of 'claim_submission_lock' """
@@ -351,7 +354,7 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
     def test_claim_lock(self, mock_claim_lock):
         """ POST tries to claim a submission lock. Success returns lock status 'in-progress'. """
         mock_return_data = {
@@ -368,8 +371,8 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.claim_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
     def test_claim_lock_contested(self, mock_claim_lock, mock_check_lock):
         """ Attempting to claim a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_claim_lock.side_effect = LockContestedError()
@@ -386,9 +389,30 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 409
         assert json.loads(response.content) == expected_value
 
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
+    def test_claim_lock_xblock_exception(self, mock_claim_lock,):
+        """ In the unlikely event of an error, the exits are to your left and behind you """
+        mock_claim_lock.side_effect = XBlockInternalError(context={'handler': 'claim_submission_lock'})
+
+        response = self.claim_lock(self.test_lock_params)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_INTERNAL, 'handler': 'claim_submission_lock'}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.claim_submission_lock')
+    def test_claim_lock_generic_exception(self, mock_claim_lock,):
+        """ In the even more unlikely event of an unhandled error, shrug exuberantly """
+        # Mock a bad data shape to break serialiation and raise a generic exception
+        mock_claim_lock.return_value = {'android': 'Rachel'}
+
+        response = self.claim_lock(self.test_lock_params)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_UNKNOWN}
+
     # Tests for deleting a lock (DELETE)
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
     def test_delete_lock(self, mock_delete_lock):
         """ DELETE indicates to clear submission lock. Success returns lock status 'unlocked'. """
         mock_delete_lock.return_value = {"lock_status": "unlocked"}
@@ -399,8 +423,8 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 200
         assert json.loads(response.content) == expected_value
 
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.SubmissionLockView.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
     def test_delete_lock_contested(self, mock_delete_lock, mock_check_lock):
         """ Attempting to delete a lock owned by another user returns a 403 - forbidden and passes error code. """
         mock_delete_lock.side_effect = LockContestedError()
@@ -417,6 +441,27 @@ class TestSubmissionLockView(BaseViewTest):
         assert response.status_code == 409
         assert json.loads(response.content) == expected_value
 
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
+    def test_delete_lock_xblock_exception(self, mock_delete_lock):
+        """ In the unlikely event of an error, the exits are to your left and behind you """
+        mock_delete_lock.side_effect = XBlockInternalError(context={'handler': 'delete_submission_lock'})
+
+        response = self.delete_lock(self.test_lock_params)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_INTERNAL, 'handler': 'delete_submission_lock'}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
+    def test_delete_lock_generic_exception(self, mock_delete_lock):
+        """ In the even more unlikely event of an unhandled error, shrug exuberantly """
+        # Mock a bad data shape to break serialiation and raise a generic exception
+        mock_delete_lock.return_value = {'android': 'Roy Batty'}
+
+        response = self.delete_lock(self.test_lock_params)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_UNKNOWN}
+
 
 class TestUpdateGradeView(BaseViewTest):
     """
@@ -429,45 +474,44 @@ class TestUpdateGradeView(BaseViewTest):
     test_anon_user_id = 'anon-user-id'
     test_timestamp = '2020-08-29T02:14:00-04:00'
 
-    test_grade_data = {
-        "overallFeedback": "was pretty good",
-        "criteria": [
-            {
-                "name": "Ideas",
-                "feedback": "did alright",
-                "selectedOption": "Fair"
-            },
-            {
-                "name": "Content",
-                "selectedOption": "Excellent"
-            }
-        ]
-    }
-
     def setUp(self):
         super().setUp()
-        self.client.login(username=self.staff.username, password=self.password)
+        self.log_in()
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
-    def test_submit_grade_failure(self, mock_submit_grade, mock_check_lock):
-        """ An ORA failure to submit a grade returns a server error """
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
+    def test_submit_grade_xblock_exception(self, mock_submit_grade, mock_check_lock):
+        """ A handled ORA failure to submit a grade returns a server error """
         mock_check_lock.return_value = {'lock_status': 'in-progress'}
-        mock_submit_grade.return_value = {'success': False, 'msg': 'Danger, Will Robinson!'}
+        mock_submit_grade.side_effect = XBlockInternalError(context={'handler': 'staff_assess', 'msg': 'Danger, Will Robinson!'})
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
         assert response.status_code == 500
         assert json.loads(response.content) == {
-            "error": ERR_GRADE_SUBMIT,
-            "msg": mock_submit_grade.return_value['msg']
+            'error': ERR_INTERNAL,
+            'handler': 'staff_assess',
+            'msg': 'Danger, Will Robinson!'
         }
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.delete_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
+    def test_submit_grade_xblock_exception(self, mock_submit_grade, mock_check_lock):
+        """ A handled ORA failure to submit a grade returns a server error """
+        mock_check_lock.return_value = {'lock_status': 'in-progress'}
+        mock_submit_grade.return_value = {'error': 'time paradox encountered'}
+        url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
+        data = test_data.example_grade_data
+
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 500
+        assert json.loads(response.content) == {'error': ERR_UNKNOWN}
+
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.delete_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_success(self, mock_submit_grade, mock_delete_lock, mock_get_info, mock_check_lock):
         """ A grade update success should clear the submission lock and return submission meta """
         mock_check_lock.side_effect = [
@@ -475,25 +519,10 @@ class TestUpdateGradeView(BaseViewTest):
             {'lock_status': 'unlocked'}
         ]
         mock_submit_grade.return_value = {'success': True, 'msg': ''}
-        mock_assessment = {
-            'feedback': "Base Assessment Feedback",
-            'score': {
-                'pointsEarned': 5,
-                'pointsPossible': 6,
-            },
-            'criteria': [
-                {
-                    'name': "Criterion 1",
-                    'option': "Three",
-                    'points': 3,
-                    'feedback': "Feedback 1"
-                },
-            ]
-        }
-        mock_get_info.return_value = mock_assessment
+        mock_get_info.return_value = test_data.example_assessment
 
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
 
@@ -501,8 +530,8 @@ class TestUpdateGradeView(BaseViewTest):
             'gradeStatus': 'graded',
             'lockStatus': 'unlocked',
             'gradeData': {
-                'score': mock_assessment['score'],
-                'overallFeedback': mock_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
@@ -520,31 +549,16 @@ class TestUpdateGradeView(BaseViewTest):
         # Verify that clear lock was called
         mock_delete_lock.assert_called_once()
 
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.check_submission_lock')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.get_assessment_info')
-    @patch('lms.djangoapps.ora_staff_grader.views.UpdateGradeView.submit_grade')
+    @patch('lms.djangoapps.ora_staff_grader.views.check_submission_lock')
+    @patch('lms.djangoapps.ora_staff_grader.views.get_assessment_info')
+    @patch('lms.djangoapps.ora_staff_grader.views.submit_grade')
     def test_submit_grade_contested(self, mock_submit_grade, mock_get_info, mock_check_lock):
         """ Submitting a grade should be blocked if someone else has obtained the lock """
         mock_check_lock.side_effect = [{'lock_status': 'unlocked'}]
-        mock_assessment = {
-            'feedback': "Base Assessment Feedback",
-            'score': {
-                'pointsEarned': 5,
-                'pointsPossible': 6,
-            },
-            'criteria': [
-                {
-                    'name': "Criterion 1",
-                    'option': "Three",
-                    'points': 3,
-                    'feedback': "Feedback 1"
-                },
-            ]
-        }
-        mock_get_info.return_value = mock_assessment
+        mock_get_info.return_value = test_data.example_assessment
 
         url = self.url_with_params({PARAM_ORA_LOCATION: self.ora_location, PARAM_SUBMISSION_ID: self.submission_uuid})
-        data = self.test_grade_data
+        data = test_data.example_grade_data
 
         response = self.client.post(url, data, format='json')
 
@@ -554,8 +568,8 @@ class TestUpdateGradeView(BaseViewTest):
             'gradeStatus': 'graded',
             'lockStatus': 'unlocked',
             'gradeData': {
-                'score': mock_assessment['score'],
-                'overallFeedback': mock_assessment['feedback'],
+                'score': test_data.example_assessment['score'],
+                'overallFeedback': test_data.example_assessment['feedback'],
                 'criteria': [
                     {
                         'name': "Criterion 1",
@@ -569,7 +583,3 @@ class TestUpdateGradeView(BaseViewTest):
 
         # Verify that submit grade was not called
         mock_submit_grade.assert_not_called()
-
-    def test_parital_success(self):
-        """ TODO - For success in updating a grade but failure to clear lock or get submission meta... ? """
-        pass
