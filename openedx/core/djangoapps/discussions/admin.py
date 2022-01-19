@@ -7,7 +7,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from openedx.core.djangoapps.config_model_utils.admin import StackedConfigModelAdmin
 
-from .forms import ProgramDiscussionsConfigurationForm
+from .forms import ProgramDiscussionsConfigurationForm, ProgramLiveConfigurationForm
 from .models import DiscussionsConfiguration, ProgramDiscussionsConfiguration, ProgramLiveConfiguration
 from .models import ProviderFilter
 
@@ -112,28 +112,11 @@ class ProviderFilterAdmin(StackedConfigModelAdmin):
     )
 
 
-class ProgramLiveConfigurationAdmin(SimpleHistoryAdmin):
+class ProgramLiveConfigurationAdmin(ProgramDiscussionsConfigurationAdmin):
     """
     Customize the admin interface for the program discussions configuration
     """
-    form = ProgramDiscussionsConfigurationForm
-
-    fieldsets = (
-        (None, {
-            'fields': ('program_uuid', 'enabled', 'lti_configuration', 'pii_share_username', 'pii_share_email',
-                       'provider_type'),
-        }),
-    )
-
-    search_fields = (
-        'program_uuid',
-        'enabled',
-        'provider_type',
-    )
-    list_filter = (
-        'enabled',
-        'provider_type',
-    )
+    form = ProgramLiveConfigurationForm
 
 admin.site.register(DiscussionsConfiguration, DiscussionsConfigurationAdmin)
 admin.site.register(ProgramDiscussionsConfiguration, ProgramDiscussionsConfigurationAdmin)

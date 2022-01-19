@@ -141,7 +141,7 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ProgramLiveIframeView(APIView, ProgramSpecificViewMixin):
+class ProgramLiveIframeView(ProgramDiscussionIframeView):
     """
     A view for retrieving Program live IFrame .
 
@@ -183,19 +183,6 @@ class ProgramLiveIframeView(APIView, ProgramSpecificViewMixin):
         }
 
     """
-    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def is_enrolled_or_staff(self, request, program_uuid):
-        """Returns true if the user is enrolled in the program or staff"""
-        if GlobalStaff().has_user(request.user):
-            return True
-
-        try:
-            get_program_enrollment(program_uuid=program_uuid, user=request.user)
-        except ObjectDoesNotExist:
-            return False
-        return True
 
     def get(self, request, program_uuid):
         """ GET handler """
