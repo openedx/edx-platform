@@ -68,7 +68,7 @@ def _generate_regular_certificate_task(user, course_key, generation_mode=None):
     eligible and a certificate can be generated.
     """
     enrollment_mode = _get_enrollment_mode(user, course_key)
-    course_grade = _get_course_grade(user, course_key)
+    course_grade = _get_course_grade(user, course_key, send_grade_signals=False)
     if _can_generate_regular_certificate(user, course_key, enrollment_mode, course_grade):
         return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
                                           course_grade=course_grade, generation_mode=generation_mode)
@@ -371,11 +371,11 @@ def _get_grade_value(course_grade):
     return ''
 
 
-def _get_course_grade(user, course_key):
+def _get_course_grade(user, course_key, send_grade_signals=False):
     """
     Get the user's course grade in this course run. Note that this may be None.
     """
-    return CourseGradeFactory().read(user, course_key=course_key)
+    return CourseGradeFactory().read(user, course_key=course_key, send_grade_signals=send_grade_signals)
 
 
 def _get_enrollment_mode(user, course_key):
