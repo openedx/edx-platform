@@ -689,6 +689,10 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         if hasattr(request.user, 'real_user'):
             # If a view overrode the request.user with a masqueraded user, this will
             #   revert/clean-up that change during response processing.
+            #   Known places this is set:
+            #
+            #   - lms.djangoapps.courseware.masquerade::setup_masquerade
+            #   - openedx.core.djangoapps.content.learning_sequences.views::CourseOutlineView
             request.user = request.user.real_user
 
         # determine if the request.user is different now than it was on the initial request
