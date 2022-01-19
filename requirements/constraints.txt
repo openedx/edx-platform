@@ -14,7 +14,7 @@
 
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
-celery>=5.2.1,<6.0.0
+celery>=5.2.2,<6.0.0
 
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
@@ -94,5 +94,3 @@ py2neo<2022
 
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
-
-
