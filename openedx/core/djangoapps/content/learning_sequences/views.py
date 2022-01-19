@@ -213,7 +213,12 @@ class CourseOutlineView(APIView):
 
         target_username = request.GET.get("user")
         if target_username is not None:
-            return self._get_target_user(request, course_key, has_staff_access, target_username)
+            target_user = self._get_target_user(request, course_key, has_staff_access, target_username)
+            # Just like in masquerading, set real_user so that the
+            # SafeSessions middleware can see that the user didn't
+            # change unexpectedly.
+            target_user.real_user = request.user
+            return target_user
 
         _course_masquerade, user = setup_masquerade(request, course_key, has_staff_access)
         return user
