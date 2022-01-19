@@ -5,7 +5,7 @@ from functools import wraps
 import json
 
 from django.http.response import HttpResponseBadRequest
-from lms.djangoapps.ora_staff_grader.errors import ERR_MISSING_PARAM
+from lms.djangoapps.ora_staff_grader.errors import MissingParamResponse
 
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.request import clone_request
@@ -21,7 +21,7 @@ def require_params(param_names):
     - param_name (string): the query param to unpack
 
     Raises:
-    - 404 if the param was not provided
+    - MissingParamResponse (HTTP 400)
     """
     def decorator(function):
         @wraps(function)
@@ -32,7 +32,7 @@ def require_params(param_names):
                 param = request.query_params.get(param_name)
 
                 if not param:
-                    return HttpResponseBadRequest(ERR_MISSING_PARAM)
+                    return MissingParamResponse()
 
                 passed_parameters.append(param)
             return function(self, request, *passed_parameters, *args, **kwargs)

@@ -66,9 +66,9 @@ def fetch_submission(ora_location, submission_id):
     return read_data_file("submissions.json")[ora_location].get(submission_id)
 
 
-def fetch_default_response(submission_id):  # pylint: disable=unused-argument
+def fetch_response(submission_id):  # pylint: disable=unused-argument
     """ Return a default response, the same for all submissions """
-    return read_data_file("responses.json").get("default")
+    return read_data_file("responses.json").get(submission_id)
 
 
 def save_submission_update(ora_location, submission):
