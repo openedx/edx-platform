@@ -17,7 +17,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,
+        DiscussionEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -934,6 +935,50 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    DiscussionEditor = AbstractEditor.extend({
+        templateName: 'discussion-editor',
+        className: 'edit-discussion',
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setStatus(this.currentValue());
+        },
+
+        currentValue: function() {
+            var discussionEnabled = this.model.get('discussion_enabled');
+            return discussionEnabled === true || discussionEnabled === 'enabled';
+        },
+
+        setStatus: function(value) {
+            this.$('#discussion_enabled').prop('checked', value);
+        },
+
+        isEnabled: function() {
+            return this.$('#discussion_enabled').is(':checked');
+        },
+
+        hasChanges: function() {
+            return this.currentValue() !== this.isEnabled();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        discussion_enabled: this.isEnabled()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return {
+                hasDiscussionEnabled: this.currentValue()
+            };
+        }
+    });
+
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
         templateName: 'content-visibility-editor',
         className: 'edit-content-visibility',
@@ -1169,7 +1214,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
+                editors = [StaffLockEditor, UnitAccessEditor, DiscussionEditor];
             } else {
                 tabs = [
                     {
@@ -1213,6 +1258,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 _.each(tabs, function(tab) {
                     tab.editors = _.without(tab.editors, ReleaseDateEditor, DueDateEditor);
                 });
+            }
+
+            if (!options.unit_level_discussions) {
+                editors = _.without(editors, DiscussionEditor);
             }
 
             return new SettingsXBlockModal($.extend({
