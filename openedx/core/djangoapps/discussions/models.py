@@ -518,7 +518,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         )
 
 
-class ProgramLTIConfiguration(TimeStampedModel):
+class AbstractProgramLTIConfiguration(TimeStampedModel):
     """
     Associates a program with a LTI provider and configuration
     """
@@ -617,10 +617,10 @@ class DiscussionTopicLink(models.Model):
         )
 
 
-class ProgramLiveConfiguration(ProgramLTIConfiguration):
+class ProgramLiveConfiguration(AbstractProgramLTIConfiguration):
     history = HistoricalRecords()
 
 
-class ProgramDiscussionsConfiguration(ProgramLTIConfiguration):
+class ProgramDiscussionsConfiguration(AbstractProgramLTIConfiguration):
     history = HistoricalRecords()
 

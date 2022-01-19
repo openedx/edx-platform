@@ -3,16 +3,20 @@ Fragments for rendering programs.
 """
 
 import json
-
+from abc import ABC, abstractmethod
 from urllib.parse import quote
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import get_language, to_locale, gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import to_locale
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from web_fragments.fragment import Fragment
 
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_view_is_enabled, strip_course_id
@@ -30,7 +34,6 @@ from openedx.core.djangoapps.programs.utils import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangolib.markup import HTML
-from common.djangoapps.student.models import anonymous_id_for_user
 
 
 class ProgramsFragmentView(EdxFragmentView):
@@ -167,9 +170,9 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         return _('Program Details')
 
 
-class ProgramDiscussionLTI:
+class ProgramLTI(ABC):
     """
-      Encapsulates methods for program discussion iframe rendering.
+      Encapsulates methods for program LTI iframe rendering.
     """
     DEFAULT_ROLE = 'Student'
     ADMIN_ROLE = 'Administrator'
@@ -180,8 +183,9 @@ class ProgramDiscussionLTI:
         self.request = request
         self.configuration = self.get_configuration()
 
+    @abstractmethod
     def get_configuration(self):
-        return ProgramDiscussionsConfiguration.get(self.program_uuid)
+        return
 
     @property
     def is_configured(self):
@@ -267,7 +271,7 @@ class ProgramDiscussionLTI:
 
     def render_iframe(self) -> str:
         """
-        Returns the program discussion fragment if program discussions configuration exists for a program uuid
+        Returns the program LTI iframe if program Lti configuration exists for a program uuid
         """
         if not self.is_configured:
             return ''
@@ -290,6 +294,11 @@ class ProgramDiscussionLTI:
         return fragment.content
 
 
-class ProgramLiveLTI(ProgramDiscussionLTI):
+class ProgramDiscussionLTI(ProgramLTI):
+    def get_configuration(self):
+        return ProgramDiscussionsConfiguration.get(self.program_uuid)
+
+
+class ProgramLiveLTI(ProgramLTI):
     def get_configuration(self):
         return ProgramLiveConfiguration.get(self.program_uuid)

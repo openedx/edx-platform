@@ -1,17 +1,14 @@
 """Learner dashboard views"""
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_GET
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from lms.djangoapps.learner_dashboard.utils import masters_program_tab_view_is_enabled
-from lms.djangoapps.program_enrollments.api import get_program_enrollment
+from lms.djangoapps.learner_dashboard.utils import masters_program_tab_view_is_enabled, is_enrolled_or_staff
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.learner_dashboard.programs import (
     ProgramDetailsFragmentView,
     ProgramDiscussionLTI,
@@ -107,21 +104,9 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
     authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    def is_enrolled_or_staff(self, request, program_uuid):
-        """Returns true if the user is enrolled in the program or staff"""
-
-        if GlobalStaff().has_user(request.user):
-            return True
-
-        try:
-            get_program_enrollment(program_uuid=program_uuid, user=request.user)
-        except ObjectDoesNotExist:
-            return False
-        return True
-
     def get(self, request, program_uuid):
         """ GET handler """
-        if not self.is_enrolled_or_staff(request, program_uuid):
+        if not is_enrolled_or_staff(request, program_uuid):
             default_response = {
                 'tab_view_enabled': False,
                 'discussion': {
@@ -186,7 +171,7 @@ class ProgramLiveIframeView(ProgramDiscussionIframeView):
 
     def get(self, request, program_uuid):
         """ GET handler """
-        if not self.is_enrolled_or_staff(request, program_uuid):
+        if not is_enrolled_or_staff(request, program_uuid):
             default_response = {
                 'tab_view_enabled': False,
                 'live': {

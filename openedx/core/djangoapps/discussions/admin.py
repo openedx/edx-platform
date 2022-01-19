@@ -111,12 +111,29 @@ class ProviderFilterAdmin(StackedConfigModelAdmin):
         DenyListFilter,
     )
 
-
-class ProgramLiveConfigurationAdmin(ProgramDiscussionsConfigurationAdmin):
+class ProgramLiveConfigurationAdmin(SimpleHistoryAdmin):
     """
-    Customize the admin interface for the program discussions configuration
+    Customize the admin interface for the program live configuration
     """
     form = ProgramLiveConfigurationForm
+
+    fieldsets = (
+        (None, {
+            'fields': ('program_uuid', 'enabled', 'lti_configuration', 'pii_share_username', 'pii_share_email',
+                       'provider_type'),
+        }),
+    )
+
+    search_fields = (
+        'program_uuid',
+        'enabled',
+        'provider_type',
+    )
+    list_filter = (
+        'enabled',
+        'provider_type',
+    )
+
 
 admin.site.register(DiscussionsConfiguration, DiscussionsConfigurationAdmin)
 admin.site.register(ProgramDiscussionsConfiguration, ProgramDiscussionsConfigurationAdmin)
