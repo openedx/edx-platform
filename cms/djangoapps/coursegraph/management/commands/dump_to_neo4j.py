@@ -5,13 +5,17 @@ Neo4j, a graph database.
 Example usages:
 
     # Dump all courses published since last dump.
+    # Use connection parameters from `settings.COURSEGRAPH_SETTINGS`.
+    python manage.py cms dump_to_neo4j
+
+    # Dump all courses published since last dump.
+    # Use custom connection parameters.
     python manage.py cms dump_to_neo4j --host localhost --port 7473 \
       --secure --user user --password password
 
     # Specify certain courses instead of dumping all of them.
-    python manage.py cms dump_to_neo4j --host localhost --port 7473 \
-      --secure --user user --password password \
-      --courses 'course-v1:A+B+1' 'course-v1:A+B+2'
+    # Use connection parameters from `settings.COURSEGRAPH_SETTINGS`.
+    python manage.py cms dump_to_neo4j --courses 'course-v1:A+B+1' 'course-v1:A+B+2'
 """
 
 
@@ -40,7 +44,6 @@ class Command(BaseCommand):
         parser.add_argument(
             '--port',
             type=int,
-            default=7687,
             help="the port on the Neo4j server that accepts Bolt requests",
         )
         parser.add_argument(
@@ -85,9 +88,13 @@ class Command(BaseCommand):
         """
 
         mss = ModuleStoreSerializer.create(options['courses'], options['skip'])
-
+        connection_overrides = {
+            key: options[key]
+            for key in ["host", "port", "secure", "user", "password"]
+        }
         submitted_courses, skipped_courses = mss.dump_courses_to_neo4j(
-            options, override_cache=options['override']
+            connection_overrides=connection_overrides,
+            override_cache=options['override'],
         )
 
         log.info(

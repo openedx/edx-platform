@@ -8,12 +8,13 @@ from datetime import datetime
 from unittest import mock
 import ddt
 from django.core.management import call_command
+from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
-from cms.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
+from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
 from cms.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
 from cms.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeMatcher
 from cms.djangoapps.coursegraph.tasks import (
@@ -217,6 +218,43 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_of_courses=2,
             number_commits=2,
             number_rollbacks=0,
+        )
+
+    @mock.patch('cms.djangoapps.coursegraph.tasks.Graph', autospec=True)
+    @override_settings(
+        COURSEGRAPH_CONNECTION=dict(
+            protocol='bolt',
+            host='coursegraph.example.edu',
+            port=7777,
+            secure=True,
+            user="neo4j",
+            password="default-password",
+        )
+    )
+    def test_dump_to_neo4j_connection_defaults(self, mock_graph_class):
+        """
+        Test that user can override individual settings.COURSEGRAPH_CONNECTION parameters
+        by passing them to `dump_to_neo4j`, whilst falling back to the ones that they
+        don't override.
+        """
+        call_command(
+            'dump_to_neo4j',
+            courses=self.course_strings[:1],
+            port=7788,
+            secure=False,
+            password="overridden-password",
+        )
+        mock_graph_class.assert_called_once_with(
+
+            # From settings:
+            protocol='bolt',
+            host='coursegraph.example.edu',
+            user="neo4j",
+
+            # Overriden by command:
+            port=7788,
+            secure=False,
+            password="overridden-password",
         )
 
 
