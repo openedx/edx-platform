@@ -23,9 +23,9 @@ from .serializers import (
 )
 
 
-class DiscussionsConfigurationView(APIView):
+class DiscussionsConfigurationSettingsView(APIView):
     """
-    View for configuring discussion settings for
+    View for configuring discussion settings.
     """
     authentication_classes = (
         JwtAuthentication,
@@ -200,7 +200,7 @@ class DiscussionsProvidersView(APIView):
         return serializer.data
 
 
-class CombinedDiscussionsConfigurationView(DiscussionsConfigurationView):
+class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView):
     """
     Combined view that includes both provider data and discussion configuration.
 
