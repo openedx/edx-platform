@@ -9,7 +9,7 @@ from lms.djangoapps.ora_staff_grader.errors import MissingParamResponse
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.request import clone_request
 
-from lms.djangoapps.courseware.module_render import handle_xblock_callback
+from lms.djangoapps.courseware.module_render import handle_xblock_callback_noauth
 
 
 def require_params(param_names):
@@ -67,4 +67,4 @@ def call_xblock_json_handler(request, usage_id, handler_name, data):
     course_id = str(usage_key.course_key)
 
     # Send the request and return the HTTP response from the XBlock
-    return handle_xblock_callback(proxy_request, course_id, usage_id, handler_name)
+    return handle_xblock_callback_noauth(proxy_request, course_id, usage_id, handler_name)
