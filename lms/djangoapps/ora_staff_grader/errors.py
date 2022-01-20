@@ -5,15 +5,26 @@ from rest_framework.response import Response
 from lms.djangoapps.ora_staff_grader.constants import (
     ERR_BAD_ORA_LOCATION,
     ERR_GRADE_CONTESTED,
-    ERR_GRADE_SUBMIT,
+    ERR_INTERNAL,
     ERR_LOCK_CONTESTED,
     ERR_MISSING_PARAM,
     ERR_UNKNOWN,
 )
 
 
-class LockContestedError(Exception):
-    """Signal for trying to operate on a lock owned by someone else"""
+class ExceptionWithContext(Exception):
+    """ An exception with optional context dict to be supplied in serialized result """
+
+    def __init__(self, context={}):
+        self.context = context
+
+
+class XBlockInternalError(ExceptionWithContext):
+    """ Errors from XBlock handlers"""
+
+
+class LockContestedError(ExceptionWithContext):
+    """ Signal for trying to operate on a lock owned by someone else """
 
 
 class ErrorSerializer(serializers.Serializer):
@@ -62,16 +73,6 @@ class MissingParamResponse(StaffGraderErrorResponse):
     err_code = ERR_MISSING_PARAM
 
 
-class SubmitGradeErrorResponse(StaffGraderErrorResponse):
-    """
-    Error response for errors encountered during grade submission (except for grade contest).
-    Returns an HTTP 500 with error code and error message from ORA.
-    """
-
-    status = 500
-    err_code = ERR_GRADE_SUBMIT
-
-
 class LockContestedResponse(StaffGraderErrorResponse):
     """
     Error response for when a user tries to operate on a submission that they do not have a lock for.
@@ -92,9 +93,19 @@ class GradeContestedResponse(StaffGraderErrorResponse):
     err_code = ERR_GRADE_CONTESTED
 
 
+class InternalErrorResponse(StaffGraderErrorResponse):
+    """
+    Generic error response for an issue in an XBlock handler.
+    Returns an HTTP 500 with internal error code.
+    """
+
+    status = 500
+    err_code = ERR_INTERNAL
+
+
 class UnknownErrorResponse(StaffGraderErrorResponse):
     """
-    Generic error response for caught but non-standard exception types.
+    Blanket exception for when something strange breaks
     Returns an HTTP 500 with generic error code.
     """
 

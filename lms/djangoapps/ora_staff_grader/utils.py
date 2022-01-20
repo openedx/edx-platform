@@ -4,7 +4,6 @@ Various helpful utilities for ESG
 from functools import wraps
 import json
 
-from django.http.response import HttpResponseBadRequest
 from lms.djangoapps.ora_staff_grader.errors import MissingParamResponse
 
 from opaque_keys.edx.keys import UsageKey
