@@ -1671,7 +1671,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = """
-            <video url_name="SampleProblem" transcripts='{transcripts}'>
+            <video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
@@ -1765,7 +1765,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         self.descriptor.edx_video_id = 'nonexistent'
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = """<video url_name="SampleProblem"/>"""
+        expected_str = """<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>"""
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
@@ -1778,7 +1778,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         mock_get_video_ids_info.return_value = True, []
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = '<video url_name="SampleProblem"></video>'
+        expected_str = '<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"></video>'
 
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
