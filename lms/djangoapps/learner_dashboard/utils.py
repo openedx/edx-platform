@@ -34,6 +34,7 @@ def masters_program_tab_view_is_enabled() -> bool:
     """
     return ENABLE_MASTERS_PROGRAM_TAB_VIEW.is_enabled()
 
+
 def is_enrolled_or_staff(request, program_uuid):
     """Returns true if the user is enrolled in the program or staff"""
 
