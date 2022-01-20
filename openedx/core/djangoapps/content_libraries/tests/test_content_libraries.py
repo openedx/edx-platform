@@ -888,7 +888,10 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             endpoint.format(**endpoint_parameters),
         )
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {'detail': "Invalid XBlock key"})
+        msg = f"XBlock {endpoint_parameters.get('block_key')} does not exist, or you don't have permission to view it."
+        self.assertEqual(response.json(), {
+            'detail': msg,
+        })
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""
