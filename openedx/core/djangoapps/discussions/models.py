@@ -623,4 +623,3 @@ class ProgramLiveConfiguration(AbstractProgramLTIConfiguration):
 
 class ProgramDiscussionsConfiguration(AbstractProgramLTIConfiguration):
     history = HistoricalRecords()
-
