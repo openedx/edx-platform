@@ -1611,7 +1611,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
-    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
+    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',

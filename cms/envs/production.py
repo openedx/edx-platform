@@ -602,7 +602,7 @@ EXPLICIT_QUEUES = {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
-    'openedx.core.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
+    'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
