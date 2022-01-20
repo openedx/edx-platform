@@ -126,7 +126,7 @@ class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ProgramLiveIframeView(ProgramDiscussionIframeView):
+class ProgramLiveIframeView(APIView, ProgramSpecificViewMixin):
     """
     A view for retrieving Program live IFrame .
 
@@ -168,6 +168,8 @@ class ProgramLiveIframeView(ProgramDiscussionIframeView):
         }
 
     """
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, program_uuid):
         """ GET handler """
