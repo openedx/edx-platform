@@ -78,4 +78,4 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-d
 
 # ORA Staff Grader feature branch
 # TODO: remove after ORA feature branch is merged
-git+https://github.com/edx/edx-ora2@feature/ora_staff_grader#egg=ora2
+git+https://github.com/edx/edx-ora2@qa/ora_staff_grader#egg=ora2

@@ -698,7 +698,7 @@ openedx-calc==2.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.6.0
     # via -r requirements/edx/base.in
-ora2 @ git+https://github.com/edx/edx-ora2@feature/ora_staff_grader
+ora2 @ git+https://github.com/edx/edx-ora2@qa/ora_staff_grader
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
