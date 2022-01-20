@@ -1,13 +1,13 @@
 ---
 metadata:
-    display_name: Quiz
-data: |
-      <div class="div-quiz"><img class="icon-image" src="/static/assessments.png" alt="" />
-      <div>
-      <h4>Quiz: [Enter Quiz Name]</h4>
-      <p>Complete the quiz below by [Enter Date]. Quiz scores contribute to your grade in the course.</p>
-      <p>Each of the following questions allow one or two attempts; note the number of attempts before answering. If you are unsure of an answer, we recommend that you review this module's content before you submit an answer.</p>
-      <p>Select the answer(s) to the question, then click Submit. The submission counts as one attempt. If your answer is incorrect and you are allowed another attempt, change your answer and click Submit again.</p>
-      <p><strong>Note:</strong> You can select Save to save your current response without submitting it for a grade. This enables you to stop working on a problem and come back to it later. Saving your response does not count as an attempt. You do not need to select Save after you submit an answer; when you select Submit, your attempt is completed.</p>
-      </div>
-      </div>
+  display_name: Quiz
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/assessments.png" alt="" />
+    <div>
+    <h4>Quiz: [Enter Quiz Name]</h4>
+    <p>Complete the quiz below by [Enter Date]. Quiz scores contribute to your grade in the course.</p>
+    <p>Each of the following questions allow one or two attempts; note the number of attempts before answering. If you are unsure of an answer, we recommend that you review this module's content before you submit an answer.</p>
+    <p>Select the answer(s) to the question, then click <em>Submit</em>. The submission counts as one attempt. If your answer is incorrect and you are allowed another attempt, change your answer and click <em>Submit</em> again.</p>
+    <p><strong>Note:</strong> You can select <em>Save</em> to save your current response without submitting it for a grade. This enables you to stop working on a problem and come back to it later. Saving your response does not count as an attempt. You do not need to select Save after you submit an answer; when you select <em>Submit</em>, your attempt is completed.</p>
+    </div>
+    </div>

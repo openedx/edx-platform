@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Questions
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/questions.png" alt="" />
+    <div>
+    <h4>H4</h4>
+    <p>Questions, either incoming (from learners) or outgoing (to learners) in the form of Polls, etc.</p>
+    </div>
+    </div>

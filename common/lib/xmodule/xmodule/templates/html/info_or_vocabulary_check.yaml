@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Info or Vocabulary Check
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/info.png" alt="" />
+    <div>
+    <h4>[H4 Title Goes Here]</h4>
+    <p>Brief informational bits, including Vocabulary Check components</p>
+    </div>
+    </div>

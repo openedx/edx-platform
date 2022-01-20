@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Section Overview
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/overview.png" alt="" />
+    <div>
+    <h4>Overview</h4>
+    <h6>Section Time: ( ) minutes</h6>
+    </div>
+    </div>

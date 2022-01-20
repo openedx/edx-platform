@@ -1,0 +1,9 @@
+---
+metadata:
+  display_name: Calendar
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/calendar.png" alt="" />
+    <div>
+    <h4>Calendar</h4>
+    </div>
+    </div>

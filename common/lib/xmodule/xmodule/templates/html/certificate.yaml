@@ -1,0 +1,9 @@
+---
+metadata:
+  display_name: Certificate
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/certificate.png" alt="" />
+    <div>
+    <h4>Certificate</h4>
+    </div>
+    </div>

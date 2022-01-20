@@ -1,14 +1,15 @@
 ---
 metadata:
-    display_name: References
-data: |
-      <div class="div-references">
-        <img class="icon-image" src="/static/references.png" alt=""/>
-      <div>
-      <h4>References</h4>
-      <h5>[Enter Module Reference e.g. 1.2.1]</h5>
-      <p>[Example] Coble, Sarah. "Florida Student Discovers Flaws in Leading Doorbell Security Cameras." Infosecurity, 05 June 2020, https://www.infosecurity-magazine.com/news/flaws-in-leading-doorbell-security. Accessed 7 June 2021.</p>
-      <h5>[Enter Module Reference e.g. 1.2.2]</h5>
-      <p>[Example] Hardjono, Thomas, David Shrier, and Alex Pentland, editors. Trusted Data: A New Framework for Identity and Data Sharing. MIT Press, 2019.</p>
-      </div>
-      </div>
+  display_name: References
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/references.png" alt="" />
+    <div>
+    <h4>References</h4>
+    <p>Accessed 10 September, 2021.</p>
+    <p>To deliver the highest quality content, we collate information from many leading sources. References are included to attribute works to their original authors. Some of the sources used are freely available, and some are not. Subsequently, the links found in module reference lists may require you to purchase access.</p>
+    <h5>[Enter Module Reference e.g. 1.2.1]</h5>
+    <p>[Example] Coble, S. (2020, 5 June). Florida Student Discovers Flaws in Leading Doorbell Security Cameras. <em>Infosecurity</em>. <a href="https://www.infosecurity-magazine.com/news/flaws-in-leading-doorbell-security" target="[object Object]">https://www.infosecurity-magazine.com/news/flaws-in-leading-doorbell-security</a></p>
+    <h5>[Enter Module Reference e.g. 1.2.2]</h5>
+    <p>Shrier, D. (2021, July). Futurecasting II. Visionary Future.<br /><a href="https://docs.google.com/presentation/d/1wLRiiOvM9ww2VbxYPAuZAaYInKcMrwM_/edit#slide=id.p65" target="[object Object]">https://docs.google.com/presentation/d/1wLRiiOvM9ww2VbxYPAuZAaYInKcMrwM_/edit#slide=id.p65</a></p>
+    </div>
+    </div>

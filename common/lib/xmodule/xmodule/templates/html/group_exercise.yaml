@@ -1,0 +1,12 @@
+---
+metadata:
+  display_name: Group Exercise
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/group_exercise.png" alt="" />
+    <div>
+    <h4>Group Exercise: [Enter Exercise Name]</h4>
+    <p>[Frame the exercise here]</p>
+    <h5>Instructions</h5>
+    <p>[Provide step by step instructions for learners here.]</p>
+    </div>
+    </div>

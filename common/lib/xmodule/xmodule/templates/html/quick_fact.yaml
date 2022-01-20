@@ -1,11 +1,10 @@
 ---
 metadata:
-    display_name: Quick Fact
-data: |
-      <div class="div-quickfact">
-      <img class="icon-image" src="/static/quick_fact.png" alt="">
-      <div>
-      <h4>Quick Fact</h4>
-      <p>[Delete existing text and enter your own in this section] Eric Knorr (2020) of Network World reports that with over 21 billion devices now running, and accelerating growth, the internet of things (IoT) is rapidly becoming an essential part of life. The benefits are huge: for example, internet-connected thermometers are collecting data to make early predictions on Covid-19 outbreaks. However, he continues, while these devices dramatically expand networks, they also expand the attack surface, and thus increase vulnerability. </p>
-      </div>
-      </div>
+  display_name: Quick Fact
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/quick_fact.png" alt="" />
+    <div>
+    <h4>Quick Fact</h4>
+    <p>Quick Facts and quotable/"pull quotes"</p>
+    </div>
+    </div>

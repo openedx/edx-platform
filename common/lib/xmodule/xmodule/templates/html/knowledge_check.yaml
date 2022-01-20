@@ -1,0 +1,11 @@
+---
+metadata:
+  display_name: Knowledge Check (non-edX/H5P)
+  data: |
+    <h3>1.2.3 Knowledge Check</h3>
+    <p></p>
+    <div class="div-info"><img class="icon-image" src="/static/knowledge-check.png" alt="" />
+    <div>
+    <p>Try the question below to check your understanding of this lesson. This question is not graded, and you have unlimited attempts.</p>
+    </div>
+    </div>

@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: In the News
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/In_The_News.png" alt="" />
+    <div>
+    <h4>In the News</h4>
+    <p>Current events, etc.</p>
+    </div>
+    </div>

@@ -2,10 +2,9 @@
 metadata:
     display_name: Case Study
 data: |
-      <div class="div-casestudy">
-        <img class="icon-image" src="/static/quick_fact.png" alt="">
-        <div>
-          <h4>Quick Facts</h4>
-      		<p>[Enter text here]</p>
-        </div>
-      </div>
+  <div class="div-info"><img class="icon-image" src="/static/Case_Study.png" alt="" />
+  <div>
+  <h4>Case Study</h4>
+  <p>Enter the case study content here.</p>
+  </div>
+  </div>

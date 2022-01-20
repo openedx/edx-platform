@@ -1,19 +1,19 @@
 ---
 metadata:
-    display_name: Objectives
-data: |
-      <div class="div-objectives"><img class="icon-image" src="/static/objectives_outcomes.png" alt="" />
-      <div>
-      <h4>Objectives</h4>
-      <p>Our goals for this module are to:</p>
-      <ul>
-      <li>[Enter Goal 1]</li>
-      <li>[Enter Goal 2]</li>
-      </ul>
-      <p>At the end of this module, you will be able to:</p>
-      <ul>
-      <li>[Enter Learning Objective 1]</li>
-      <li>[Enter Learnign Objective 2]</li>
-      </ul>
-      </div>
-      </div>
+  display_name: Objectives
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/Objectives_outcomes.png" alt="" />
+    <div>
+    <h4>Objectives</h4>
+    <p>Our goals for this module are to:</p>
+    <ul>
+    <li>[Enter Goal 1]</li>
+    <li>[Enter Goal 2]</li>
+    </ul>
+    <p>At the end of this module, you will be able to:</p>
+    <ul>
+    <li>[Enter Learning Objective 1]</li>
+    <li>[Enter Learning Objective 2]</li>
+    </ul>
+    </div>
+    </div>

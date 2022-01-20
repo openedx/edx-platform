@@ -1,16 +1,15 @@
 ---
 metadata:
-    display_name: Graded Assignments
-data: |
-      <div class="div-assignments"><img class="icon-image" src="/static/assessments.png" alt="" />
-      <div>
-      <h4>Graded Assignments</h4>
-      <p>We will also complete individual and group assignments, which count towards your completion of the programme. This week, we:</p>
-      <ul>
-      <li>[Assignment 1]</li>
-      <li>[Assignment 2]</li>
-      </ul>
-      <p>You must submit all graded assignments in Module 1 <strong>by [Enter Date], 23:59 UTC</strong>. (Try the <a href="https://www.thetimezoneconverter.com/?t=11%3A00%20AM&amp;tz=UTC%20(Coordinated%20Universal%20Time)" target="_blank" s="">Time Zone Converter</a> to get your local time.)</p>
-      </div>
-      </div>
-      <p></p>
+  display_name: Graded Assignments
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/assessments.png" alt="" />
+    <div>
+    <h4>Graded Assignments</h4>
+    <p>We will also complete individual and group assignments, which count towards your completion of the course. This week, we:</p>
+    <ul>
+    <li>[Assignment 1]</li>
+    <li>[Assignment 2]</li>
+    </ul>
+    <p>You must submit all graded assignments in Module 1 <strong>by [Enter Date], 23:59 UTC</strong>. (Try the <a href="https://www.thetimezoneconverter.com/?t=11%3A00%20AM&amp;tz=UTC%20(Coordinated%20Universal%20Time)" target="_blank" s="">Time Zone Converter</a> to get your local time.)</p>
+    </div>
+    </div>

@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Video
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/video.png" alt="" />
+    <div>
+    <h4>Video: [Enter Video Title Here]</h4>
+    <p>In the following video...</p>
+    </div>
+    </div>

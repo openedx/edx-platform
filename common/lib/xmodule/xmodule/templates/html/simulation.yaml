@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Simulation
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/Simulation.png" alt="" />
+    <div>
+    <h4>H4</h4>
+    <p>Enter text framing the simulation here.</p>
+    </div>
+    </div>

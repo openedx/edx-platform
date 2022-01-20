@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Podcast
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/podcast.png" alt="" />
+    <div>
+    <h4>H4</h4>
+    <p>Internal (Esme-produced) podcasts or audio-only guest speaker interview bits, and links to external podcasts</p>
+    </div>
+    </div>

@@ -1,0 +1,11 @@
+---
+metadata:
+  display_name: Summary
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/Summary.png" alt="" />
+    <div>
+    <h4>H4</h4>
+    <p>Module summaries, recaps, and reviews of information already covered previously</p>
+    </div>
+    </div>
+    <p></p>

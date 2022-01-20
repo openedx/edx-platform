@@ -1,11 +1,10 @@
 ---
 metadata:
-    display_name: Individual Exercise
-data: |
-      <div class="div-exercise">
-      <img class="icon-image" src="/static/exercises.png" alt="">
-      <div>
-        <h4>Individual Exercise</h4>
-       <p>[Enter the description and instructions for the exercise. You will add the exercise as it's own component.]</p>
-      </div>
-      </div>
+  display_name: Individual Exercise
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/exercises.png" alt="" />
+    <div>
+    <h4>Individual Exercise</h4>
+    <p>[Enter the description and instructions for the exercise.]</p>
+    </div>
+    </div>

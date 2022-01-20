@@ -1,0 +1,11 @@
+---
+metadata:
+  display_name: Unit Head
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/Section_head.png" alt="" />
+    <div>
+    <h4>H4</h4>
+    <p>Use this unit head template at the beginning of every unit (for example, 2.4.1).</p>
+    </div>
+    </div>
+    <p></p>

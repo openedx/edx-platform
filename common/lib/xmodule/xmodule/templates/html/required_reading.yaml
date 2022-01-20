@@ -1,0 +1,9 @@
+---
+metadata:
+  display_name: Required Reading
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/reading.png" alt="" />
+    <div>
+    <h4>Required Reading</h4>
+    </div>
+    </div>

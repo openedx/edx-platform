@@ -1,0 +1,10 @@
+---
+metadata:
+  display_name: Downloads
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/!downloads.png" alt="" />
+    <div>
+    <h4>Downloads</h4>
+    </div>
+    </div>
+    <p></p>

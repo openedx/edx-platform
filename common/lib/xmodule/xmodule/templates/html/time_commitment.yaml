@@ -1,11 +1,11 @@
 ---
 metadata:
-    display_name: Time Commitment
-data: |
-      <div class="div-overview"><img class="icon-image" src="/static/module-length.png" alt="" />
-      <div>
-      <h4>Time Commitment</h4>
-      <p>Plan to spend seven to ten hours on Module [X] this week. As there is much reading material, and many videos, you might want to divide your work into several sessions. The module is broken up into sections by theme, giving you potential break points.</p>
-      <p>Make sure you plan time to meet with your team, and to complete the assignments.</p>
-      </div>
-      </div>
+  display_name: Time Commitment
+  data: |
+    <div class="div-info"><img class="icon-image" src="/static/module-length.png" alt="" />
+    <div>
+    <h4>Time Commitment</h4>
+    <p>Plan to spend seven to ten hours on Module [X] this week. As there is much reading material, and many videos, you might want to divide your work into several sessions. The module is broken up into sections by theme, giving you potential break points.</p>
+    <p>Make sure you plan time to meet with your team, and to complete the assignments.</p>
+    </div>
+    </div>
