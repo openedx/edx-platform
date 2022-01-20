@@ -187,7 +187,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-01-18 13:38+0000\n"
+"POT-Creation-Date: 2022-01-20 07:49+0000\n"
 "PO-Revision-Date: 2022-01-16 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -279,7 +279,10 @@ msgstr "حذف"
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -510,7 +513,10 @@ msgstr "غير معروف "
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "هل ترغب بالتأكيد؟"
 
@@ -2794,8 +2800,14 @@ msgstr "طي جميع الأقسام"
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You may also lose access to verified certificates and other program "
 "credentials like MicroMasters certificates. If you want to make a copy of "
@@ -2811,7 +2823,10 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Before proceeding, please {htmlStart}unlink all social media "
 "accounts{htmlEnd}."
@@ -2823,13 +2838,17 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
 msgstr ""
 "قبل المتابعة ، يرجى {htmlStart} إلغاء ربط جميع حسابات وسائل التواصل "
 "الاجتماعي {htmlEnd}."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
@@ -2845,12 +2864,18 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
 msgstr "نأسف لذهابك!"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
 "cannot be undone. We will not be able to recover your account or the data "
@@ -2860,7 +2885,10 @@ msgstr ""
 " من استعادة حسابك أو البيانات التي تم حذفها "
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Once your account is deleted, you cannot use it to take courses on this "
 "site."
@@ -2871,7 +2899,10 @@ msgstr "بمجرد حذف حسابك ، لا يمكنك استخدامه لأخ�
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Delete My Account"
 msgstr "احذف حسابي"
 
@@ -2879,7 +2910,10 @@ msgstr "احذف حسابي"
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Password is incorrect"
 msgstr "كلمة المرور المدخلة غير صحيحة"
 
@@ -2887,7 +2921,10 @@ msgstr "كلمة المرور المدخلة غير صحيحة"
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Unable to delete account"
 msgstr "تعذر حذف الحساب"
 
@@ -2895,7 +2932,10 @@ msgstr "تعذر حذف الحساب"
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Please re-enter your password."
 msgstr "الرجاء إعادة ادخال كلمة المرور مرة أخرى."
 
@@ -2903,7 +2943,10 @@ msgstr "الرجاء إعادة ادخال كلمة المرور مرة أخرى
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Sorry, there was an error trying to process your request. Please try again "
 "later."
@@ -2913,12 +2956,18 @@ msgstr "نأسف لحدوث خطأ أثناء معالجة طلبك. يُرجى 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "A Password is required"
 msgstr "كلمة المرور مطلوبة"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
 " data is permanent and cannot be undone. We will not be able to recover your"
@@ -2928,7 +2977,10 @@ msgstr ""
 "التراجع عنه.. لن نتمكن من استعادة حسابك أو البيانات المحذوفة"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "If you proceed, you cannot use it to take courses on this site."
 msgstr ""
 
@@ -2936,7 +2988,10 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you still wish to continue and delete your account, please enter your "
 "account password:"
@@ -2947,7 +3002,10 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
 msgstr "نعم، أحذف"
 
@@ -2955,7 +3013,10 @@ msgstr "نعم، أحذف"
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
 msgstr "نحن آسفون أن نراك تذهب! سيتم حذف حسابك قريبا."
 
@@ -2963,7 +3024,10 @@ msgstr "نحن آسفون أن نراك تذهب! سيتم حذف حسابك ق�
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/adroit/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
 "to fully process through our system. If you want to opt-out of emails before"
@@ -3115,7 +3179,10 @@ msgstr "إعادة ضبط كلمة مرور حسابي"
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Reset Your Password"
 msgstr "غيّر كلمة مرور حسابك"
 
@@ -3312,12 +3379,15 @@ msgstr "يُرجى تسجيل الدخول إلى {platform} لنتمكن من �
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/templates/student_account/institution_register.underscore
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "Create an Account"
 msgstr "إنشاء حساب"
 
@@ -4008,7 +4078,10 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Language"
 msgstr "اللغة"
 
@@ -5230,7 +5303,10 @@ msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -6013,6 +6089,7 @@ msgstr "لم نتمكّن من إنشاء حسابك. "
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Create Account"
 msgstr "إنشاء حساب "
 
@@ -6033,7 +6110,10 @@ msgstr ""
 "%(platformName)s. "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
 "administrator or {link_start}edX Support{link_end} for help."
@@ -6042,12 +6122,18 @@ msgstr ""
 "{link_start} الدعم الفني {link_end} للمساعدة."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Email Address (Sign In)"
 msgstr "البريد الالكتروني (الدخول)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr "تتلقى رسائل من {platform_name} وفرق المساقات على هذا العنوان."
@@ -6066,24 +6152,36 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Full Name"
 msgstr "الاسم الكامل"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that is used for ID verification and that appears on your "
 "certificates."
 msgstr "الاسم المستخدم للتحقق من هويتك والذي سوف يظهر على الشهادات الخاصة بك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Country or Region of Residence"
 msgstr "بلد أو منطقة الإقامة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "The country or region where you live."
 msgstr "البلد أو المنطقة التي تعيش فيها."
 
@@ -6092,12 +6190,18 @@ msgid "Basic Account Information"
 msgstr "معلومات الحساب الأساسية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "These settings include basic information about your account."
 msgstr "تتضمن هذه الإعدادات معلومات أساسية عن حسابك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
@@ -6106,20 +6210,29 @@ msgstr ""
 "المستخدم الخاص بك لاحقاً."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Password"
 msgstr "كلمة المرور"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
 msgstr ""
 "تحقق من حساب بريدك الإلكتروني للحصول على تعليمات إعادة تعيين كلمة المرور "
 "الخاصة بك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages. Changing the value of this field will cause "
@@ -6129,12 +6242,18 @@ msgstr ""
 "من اللغات. سيؤدي تغيير قيمة هذا الحقل إلى تحديث الصفحة."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Time Zone"
 msgstr "المنطقة الزمنية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 "time zone, course dates, including assignment deadlines, will be displayed "
@@ -6145,12 +6264,18 @@ msgstr ""
 "المحلي في المتصفح."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "All Time Zones"
 msgstr "جميع المناطق الزمنية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Default (Local Time Zone)"
 msgstr "الافتراضي (منطقة التوقيت المحلي)"
 
@@ -6159,28 +6284,43 @@ msgid "Additional Information"
 msgstr "معلومات إضافية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Education Completed"
 msgstr "استُكمِل التعليم"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Gender"
 msgstr "الجنس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Year of Birth"
 msgstr "سنة الميلاد"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Preferred Language"
 msgstr "اللغة المفضّلة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
@@ -6201,24 +6341,39 @@ msgstr ""
 "التعريف الخاص بك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid " Link"
 msgstr "الربط"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Enter your "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/adroit/lms/static/js/student_account/views/account_settings_view.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/account_settings_view.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Linked Accounts"
 msgstr "الحسابات المرتبطة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
@@ -6227,32 +6382,50 @@ msgstr ""
 " دخولك إلى {platform_name} في وقت لاحق."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NAME"
 msgstr "اسم الطلب"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER PLACED"
 msgstr "تم وضع الطلب"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "TOTAL"
 msgstr "المجموع الكلي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NUMBER"
 msgstr "رقم الطلب"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "My Orders"
 msgstr "طلبات شرائي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
@@ -6331,7 +6504,10 @@ msgid "Successfully unlinked."
 msgstr "نجح فصل الربط"
 
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/adroit/lms/static/js/student_account/views/account_settings_view.js
+#: themes/gestalt/lms/static/js/student_account/views/account_settings_view.js
 #: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr "معلومات الحساب الأساسية"
 
@@ -6660,23 +6836,44 @@ msgstr "الإنجازات"
 msgid "Profile"
 msgstr "الملف الشخصي"
 
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Secondary Email Address"
 msgstr "عنوان البريد الإلكتروني للاسترداد"
 
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "You may access your account when single-sign on is not available."
 msgstr ""
 "يمكنك الوصول إلى حسابك باستخدام هذا العنوان إذا كان تسجيل الدخول الموحد أو "
 "الوصول إلى بريدك الإلكتروني الأساسي غير متاح."
 
+#: themes/adroit/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/gestalt/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
 "profile."
 msgstr ""
 "اختياريا، قم بربط حساباتك الشخصية بأيقونات منصات التواصل الاجتماعي في ملف "
 "التعريف الخاص بك."
+
+#: themes/gestalt/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email this "
+"site.{strongEnd}"
+msgstr ""
+"{strongStart} تحذير: حذف الحساب إجراء نهائي لا يمكن التراجع عنه، {strongEnd}"
+" يرجى قراءة ما ورد أعلاه بعناية قبل المتابعة، و {strongStart} لن تتمكن بعد "
+"الآن من استخدام نفس البريد الإلكتروني على موقع الكتروني {strongEnd}"
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
@@ -9224,7 +9421,10 @@ msgid "Switch Language Back"
 msgstr "إعادة تبديل اللغة"
 
 #: lms/templates/student_account/account_settings_section.underscore
+#: themes/adroit/lms/templates/student_account/account_settings_section.underscore
+#: themes/gestalt/lms/templates/student_account/account_settings_section.underscore
 #: themes/st-lutherx/lms/templates/student_account/account_settings_section.underscore
+#: themes/st-normanx/lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة."
 
@@ -9260,6 +9460,7 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "التسجيل باستخدام بيانات المؤسّسة/ الحرم الجامعي"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "First time here?"
 msgstr "لأول مرة هنا؟"
 
@@ -9268,19 +9469,23 @@ msgid "Create an Account."
 msgstr "إنشاء حساب."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
 msgstr "تسجيل الدخول لمتابعة التعلم كـ {email}"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning"
 msgstr "تسجيل الدخول لمتابعة التعلم"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
 msgstr "لديك حساب edX سابق بعنوان بريدك الإلكتروني في {enterprise_name}."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid ""
 "Going forward, your account information will be updated and maintained by "
 "{enterprise_name}."
@@ -9289,6 +9494,7 @@ msgstr ""
 "{enterprise_name}."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid ""
 "You can view your information or unlink from {enterprise_name} anytime in "
 "your Account Settings."
@@ -9297,14 +9503,17 @@ msgstr ""
 "إعدادات حسابك."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "To continue learning with this account, sign in below."
 msgstr "لمتابعة التعلم باستخدام هذا الحساب ، قم بتسجيل الدخول أدناه."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr "تسجيل الدخول"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -9313,10 +9522,12 @@ msgstr ""
 "أحد المزوِّدين المذكورين أدناه."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
 msgstr "يُرجى تسجيل دخولك باستخدام عنوان بريدك الإلكتروني وكلمة المرور."
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
 msgstr "إذا لم تكن تملك حسابًا بعد، يُرجى استخدام الزرّ أدناه للتسجيل."
 
@@ -9325,10 +9536,12 @@ msgid "Use my university info"
 msgstr "استخدام معلومات جامعتي"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "أو سجّل الدخول باستخدام"
 
 #: lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "يُرجى منك تسجيل دخولك باستخدام %(providerName)s"
@@ -9350,6 +9563,7 @@ msgid "Recover my password"
 msgstr "استعادة كلمة المرور الخاصة بي"
 
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Already have an account?"
 msgstr "لديك بالفعل حساب؟"
 
@@ -9362,11 +9576,14 @@ msgid "Create an account using"
 msgstr "أنشئ حساباً باستخدام"
 
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
 msgstr "أنشئ حساباً باستخدام %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/login.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
 msgstr "استخدام بياناتي لدى المؤسّسة/ الحرم الجامعي"
 
@@ -9375,6 +9592,7 @@ msgid "or create a new one here"
 msgstr "أو أنشئ حساباً جديداً باستخدام"
 
 #: lms/templates/student_account/register.underscore
+#: themes/gestalt/lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
 msgstr "إدعم البحوث التعليمية من خلال توفير معلومات إضافية"
 
@@ -10085,8 +10303,8 @@ msgstr "مكتمِل"
 
 #: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 #, python-format
-msgid "username"
-msgstr "اسم المستخدم"
+msgid " %(username)s "
+msgstr " %(username)s "
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
@@ -10184,6 +10402,14 @@ msgstr ""
 "{download_link_start} قم بتنزيل هذه الصورة (انقر بزر الفأرة الأيمن أو انقر "
 "فوق زر الخيار ، ثم احفظها باسم) {link_end} ثم {upload_link_start} حمّلها "
 "{link_end} إلى backpack."
+
+#: themes/gestalt/lms/templates/student_account/register.underscore
+msgid "Create An Account"
+msgstr "إنشاء حساب"
+
+#: themes/gestalt/lms/templates/student_account/register.underscore
+msgid "or Create an account using"
+msgstr "أنشئ حساباً باستخدام"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

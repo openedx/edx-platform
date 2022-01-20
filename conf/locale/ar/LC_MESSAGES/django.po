@@ -256,13 +256,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-01-18 12:53+0000\n"
+"POT-Creation-Date: 2022-01-20 07:51+0000\n"
 "PO-Revision-Date: 2022-01-18 12:53:31.836835\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
@@ -455,8 +455,14 @@ msgid "Display Name"
 msgstr "اسم العرض"
 
 #: common/djangoapps/course_modes/models.py
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr "السعر"
@@ -3978,7 +3984,10 @@ msgstr "أي نوع"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Library"
 msgstr "مكتبة"
 
@@ -4448,7 +4457,10 @@ msgstr ""
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Group Configurations"
 msgstr "إعدادات المجموعة"
 
@@ -4808,10 +4820,22 @@ msgstr "الصفحة الرئيسية"
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/adroit/lms/templates/courseware/course_navigation.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/cms/templates/widgets/header.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/course_navigation.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/course_navigation.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/course_navigation.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "المساق "
 
@@ -5234,9 +5258,12 @@ msgstr "فتح الحساب"
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/signup_modal.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/signup_modal.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Close"
 msgstr "إغلاق "
 
@@ -5992,9 +6019,15 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "جميع الحقوق محفوظة"
 
@@ -6034,7 +6067,10 @@ msgstr "الرقم التعريفي للشهادة"
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
 #: lms/templates/certificates/url_unsupported.html
+#: themes/adroit/lms/templates/certificates/invalid.html
+#: themes/gestalt/lms/templates/certificates/invalid.html
 #: themes/st-lutherx/lms/templates/certificates/invalid.html
+#: themes/st-normanx/lms/templates/certificates/invalid.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "نبذة عن شهادات {platform_name}"
@@ -6279,7 +6315,10 @@ msgid "Not sure yet"
 msgstr "لست متأكدا بعد"
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
-#: lms/templates/wiki/base.html themes/st-lutherx/lms/templates/wiki/base.html
+#: lms/templates/wiki/base.html themes/adroit/lms/templates/wiki/base.html
+#: themes/gestalt/lms/templates/wiki/base.html
+#: themes/st-lutherx/lms/templates/wiki/base.html
+#: themes/st-normanx/lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Wiki"
 msgstr "الويكي"
@@ -6335,7 +6374,10 @@ msgstr "يجب عليك تسجيل الدخول لمشاهدة هذا المسا
 
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
 msgstr "قم بالترقية لتحصل على شهادة موثّقة"
 
@@ -6444,7 +6486,10 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/adroit/lms/templates/learner_profile/learner_profile.html
+#: themes/gestalt/lms/templates/learner_profile/learner_profile.html
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr "الملف الشخصي للمتعلّم"
 
@@ -6602,7 +6647,10 @@ msgstr "العلامات"
 #. course' textbooks
 #: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "الكتب"
 
@@ -7158,7 +7206,10 @@ msgstr "الطالب"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Staff"
 msgstr "طاقم المساق"
 
@@ -7484,8 +7535,14 @@ msgstr "حساب معطَّل"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/subscriptions/models.py
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -7871,7 +7928,10 @@ msgstr "امتحانات مخصّصة"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/support/views/index.py cms/templates/certificates.html
 #: cms/templates/export.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Certificates"
 msgstr "الشهادات"
 
@@ -8409,8 +8469,11 @@ msgstr "(من أصل {total})"
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/adroit/lms/templates/learner_dashboard/programs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/gestalt/lms/templates/learner_dashboard/programs.html
 #: themes/st-lutherx/lms/templates/learner_dashboard/programs.html
+#: themes/st-normanx/lms/templates/learner_dashboard/programs.html
 msgid "Programs"
 msgstr "برامج"
 
@@ -9021,9 +9084,18 @@ msgid "Order ID"
 msgstr "رقم المستخدم"
 
 #: lms/djangoapps/shoppingcart/reports.py
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Quantity"
 msgstr ""
 
@@ -9898,11 +9970,17 @@ msgstr ""
 msgid "You have been removed from a beta test for %(course_name)s"
 msgstr "لقد تمت إزالتك من الاختبار التجريبي لـ %(course_name)s"
 
-#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
+#: lms/templates/logout.html themes/adroit/lms/templates/logout.html
+#: themes/gestalt/lms/templates/logout.html
+#: themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 msgid "Signed Out"
 msgstr "سُجِّل خروجك"
 
-#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
+#: lms/templates/logout.html themes/adroit/lms/templates/logout.html
+#: themes/gestalt/lms/templates/logout.html
+#: themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 msgid "You have signed out."
 msgstr "لقد قمت بتسجيل خروجك."
 
@@ -9937,10 +10015,18 @@ msgstr ""
 "إذا لم تتم إعادة توجيهك خلال ٥ ثوان، {start_anchor} انقر هنا للذهاب إلى "
 "الصفحة الرئيسية {end_anchor}."
 
-#: lms/templates/main_django.html
-#: themes/st-lutherx/lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html themes/st-lutherx/cms/templates/base.html
+#: lms/templates/main_django.html themes/adroit/lms/templates/main_django.html
+#: themes/gestalt/lms/templates/main_django.html
+#: themes/st-lutherx/lms/templates/main_django.html
+#: themes/st-normanx/lms/templates/main_django.html cms/templates/base.html
+#: lms/templates/main.html themes/adroit/cms/templates/base.html
+#: themes/adroit/lms/templates/main.html
+#: themes/gestalt/cms/templates/base.html
+#: themes/gestalt/lms/templates/main.html
+#: themes/st-lutherx/cms/templates/base.html
 #: themes/st-lutherx/lms/templates/main.html
+#: themes/st-normanx/cms/templates/base.html
+#: themes/st-normanx/lms/templates/main.html
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 
@@ -10168,9 +10254,12 @@ msgstr "معاينة صفحة الويكي"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
+#: themes/adroit/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "window open"
 msgstr "النافذة مفتوحة"
 
@@ -10434,9 +10523,15 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
@@ -10542,89 +10637,152 @@ msgstr "ACE Common"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr "انتقل إلى الصفحة الرئيسية لـ %(platform_name)s"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "تسجيل الدخول"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr "%(platform_name)s على لينكد إن"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr "%(platform_name)s على تويتر"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr "%(platform_name)s على فيسبوك"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr "%(platform_name)s على جوجل بلاس"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr "%(platform_name)s على راديت"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr "نزل تطبيق iOS على متجر أبل"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr "نزّل تطبيق أندرويد على متجر جوجل بلاي"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: openedx/features/subscriptions/templates/subscriptions/edx_ace/common/base_body.html
+#: themes/adroit/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/adroit/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/gestalt/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "عنواننا البريدي هو"
 
@@ -10737,7 +10895,10 @@ msgstr "'%s' ليس نطاقًا صحيحًا."
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "Bookmarks"
 msgstr "العلامات"
 
@@ -11527,8 +11688,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/adroit/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/gestalt/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr "ابدأ التعلم الآن"
 
@@ -11950,7 +12114,10 @@ msgid "Your Account Has Been Queued For Deletion"
 msgstr "تم وضع حسابك في قائمة الانتظار للحذف"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
 msgstr "تغيير كلمة المرور"
@@ -11967,7 +12134,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #, python-format
 msgid ""
 "However, there is currently no user account associated with your email "
@@ -11978,12 +12148,18 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 msgid "If you did not request this change, you can ignore this email."
 msgstr "إذا لم تطلب هذا التغيير ، يمكنك تجاهل هذا البريد الإلكتروني."
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
 msgstr "أنشئ كلمة مرور"
 
@@ -12616,7 +12792,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Updates"
 msgstr "التحديثات"
 
@@ -12852,41 +13031,28 @@ msgstr ""
 msgid "Your subscription is about to end!"
 msgstr ""
 
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
-msgstr ""
-"هل تتذكر عندما قمت بالتسجيل في %(course_name)s ، ودورات أخرى على edX.org؟نحن"
-" نفعل ذلك ، ويسعدنا أن تكون معنا! تعال وانظر ما يتعلمه الجميع."
-
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
-msgstr ""
-"هل تتذكر عندما قمت بالتسجيل في %(course_name)s على edX.org؟ نحن نفعل ذلك ، "
-"ويسعدنا أن تكون معنا! تعال وانظر ما يتعلمه الجميع."
-
-#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_head.html
-#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_head.html
-msgid "St. LutherX Email"
-msgstr ""
-
+#: themes/adroit/lms/templates/static_templates/404.html
+#: themes/gestalt/lms/templates/static_templates/404.html
 #: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
 msgid "Page not found!"
 msgstr "هذه الصفحة غير موجودة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/404.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/404.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/404.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/404.html
 msgid "The page you are looking for may have been moved or renamed."
 msgstr "ربما تم نقل الصفحة التي تبحث عنها أو إعادة تسميتها."
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/courses/course_app.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/courses/course_app.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/courses/course_app.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/courses/course_app.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 #: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -12899,35 +13065,62 @@ msgstr "ربما تم نقل الصفحة التي تبحث عنها أو إعا
 msgid "Courses"
 msgstr "مساقات"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/courses/course_app.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/courses/course_app.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/courses/course_app.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/courses/course_app.html
 #, python-format
 msgid "%(platform_name)s Course Administration Tool"
 msgstr "إضافات %(platform_name)s:"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/courses/menu_options.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/courses/menu_options.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/courses/menu_options.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/courses/menu_options.html
 msgid "Student Dashboard"
 msgstr "إجابة الطالب"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/courses/menu_options.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/courses/menu_options.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/courses/menu_options.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/courses/menu_options.html
 msgid "Course Admin Tool"
 msgstr "محرّر المساق"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/courses/menu_options.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/courses/menu_options.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/courses/menu_options.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/courses/menu_options.html
 msgid "E-Commerce Dashboard"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid "Receipt for %(order_number)s"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Thank you for your order!"
 msgstr "شكرًا لك على تقديم صورك!"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #, python-format
 msgid ""
 "Your order is complete. You will receive a confirmation message and your "
@@ -12935,56 +13128,116 @@ msgid ""
 "a receipt, you can print this page."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 msgid ""
 "Your order is in pending state. If you need a fawry code, you can print this"
 " page. You will also receive an sms with this information. Please pay the "
 "order amount at your nearest fawry outlet to complete your order."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Order Number:"
 msgstr "مرتّبة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Payment Method:"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Order Date:"
 msgstr "مرتّبة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Order Information"
 msgstr "معلومات عن تعلم الدورة التدريبية"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 msgid "Fawry:"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Item Price"
 msgstr "السعر"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Description:"
 msgstr "السؤال"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Item Price:"
 msgstr "السعر"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Subtotal"
 msgstr ""
 
@@ -12992,21 +13245,39 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "Total"
 msgstr "المجموع "
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Go to dashboard"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/cowpay_receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/cowpay_receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Find more courses"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid ""
 "Your order is complete. You will receive a confirmation message and your "
@@ -13014,7 +13285,10 @@ msgid ""
 "receipt, you can print this page."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid ""
 "Your order is complete. If you need a receipt, you can print this page. You "
@@ -13022,39 +13296,63 @@ msgid ""
 "%(link_start)s%(email)s%(link_end)s."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Quantity:"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Discount"
 msgstr "حساب معطَّل"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid "%(voucher_discount_amount)s off"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid "Discount of type %(type)s provided by %(enterprise_name)s"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid "Discount of type %(type)s is provided."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid "Courtesy of %(enterprise_name)s."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 msgid "Get Your Course Credit"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/checkout/receipt.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #, python-format
 msgid ""
 "To receive academic credit for this course, you must apply for credit at the"
@@ -13063,7 +13361,10 @@ msgid ""
 "the course name."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/error.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/error.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/error.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/error.html
 #, python-format
 msgid ""
 "\n"
@@ -13071,27 +13372,45 @@ msgid ""
 "                "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 msgid "Coupons"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 msgid "Subscriptions & Bundles"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 msgid "Enterprise Coupons"
 msgstr "التحاق المجموعات في المساق"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 msgid "Program Offers"
 msgstr "برامج"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
 msgid "Enterprise Offers"
 msgstr "التحاق المجموعات في المساق"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_base_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
 msgid "Toggle navigation"
 msgstr "إعدادات الفِرَق"
 
@@ -13099,39 +13418,66 @@ msgstr "إعدادات الفِرَق"
 msgid "Dashboard for:"
 msgstr "لوحة المعلومات لـ:"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_base_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
 msgid "Toggle Dropdown"
 msgstr "قائمة منسدلة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_base_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
 msgid "Login"
 msgstr "آخر تسجيل دخول"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_staff_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Course Administration"
 msgstr "إدارة لغة المعاينة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_staff_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Coupon Administration"
 msgstr "إدارة المظهر"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_staff_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Subscription Administration"
 msgstr "إدارة المظهر"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_staff_navbar.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Program Offers Administration"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/basket.html
 msgid "Basket"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/basket.html
 msgid "Your basket is empty"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/basket.html
 #, python-brace-format
 msgid ""
 "\n"
@@ -13140,42 +13486,75 @@ msgid ""
 "                            "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
 msgid "Applying..."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Apply"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "in your cart"
 msgstr "أدخل مدينتك."
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Your purchase contains the following"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Updating..."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Update"
 msgstr "التحديثات"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "summary"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Discounts applied"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #, python-format
 msgid ""
 "\n"
@@ -13183,7 +13562,10 @@ msgid ""
 "                                "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #, python-format
 msgid ""
 "\n"
@@ -13191,118 +13573,205 @@ msgid ""
 "                                    "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Remove coupon"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Add coupon code"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "(optional)"
 msgstr "مشروط"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "TOTAL"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "order details"
 msgstr "تفاصيل البرنامج"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "select payment method"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with Cowpay Fawry"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with a Credit Card"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with PayPal"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with Authorize Net"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with Apple Pay"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "card holder information"
 msgstr "تأكيد التسجيل"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "billing information"
 msgstr "تأكيد التسجيل"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Credit cards"
 msgstr "بيانات الدخول"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Card Number (required)"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Secure"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Credit card icon"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Security Code (required)"
 msgstr "يجب إدخال المدينة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Help with CVV"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid ""
 "The three last digits in the signature area on the back of your card. For "
 "American Express, it is the four digits on the front of the card."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Expiration (required)"
 msgstr "يجب إدخال المدينة"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Month"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Year"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Place Order"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with Fawry"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "Pay with Credit Card"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Earn a valuable certificate to showcase the skills you learn in"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #, python-format
 msgid ""
 "\n"
@@ -13310,7 +13779,10 @@ msgid ""
 "                                        "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #, python-format
 msgid ""
 "\n"
@@ -13318,78 +13790,126 @@ msgid ""
 "                                    "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Apply a coupon code"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Total:"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Make Payment with"
 msgstr "القيام بالدفع"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Or"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "CyberSource"
 msgstr ""
 
 #. Translators: Do NOT translate the name PayPal.
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "PayPal"
 msgstr ""
 
 #. Translators: Do NOT translate the name Authorizenet.
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "AuthorizeNet"
 msgstr "تفويض"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid ""
 "<strong>Note:</strong> To earn a verified certificate, you must verify your "
 "identity with a <strong>webcam</strong> and a <strong>government-issued "
 "photo ID</strong>. "
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Government-Issued Photo ID"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid ""
 "You need a computer that has a webcam. When you receive a browser prompt, "
 "make sure that you allow access to the camera."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Webcam"
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid ""
 "You need a driver's license, passport, or other government-issued ID that "
 "has your name and photo."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid ""
 "<strong>Note:</strong> To complete your enrollment, select a payment method."
 msgstr ""
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: lms/templates/verify_student/_verification_help.html
 msgid "Have questions?"
 msgstr "سؤال الاستطلاع"
 
+#: themes/adroit/ecommerce/adroit-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Please read our FAQs to view common questions about our certificates."
 msgstr ""
 
+#: themes/adroit/lms/templates/logout.html
+#: themes/gestalt/lms/templates/logout.html
 #: themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 #, python-format
 msgid ""
 "If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
@@ -13398,7 +13918,36 @@ msgstr ""
 "إذا لم تتم إعادة توجيهك في غضون 5 ثوانٍ ، <a href=\"%(target)s\"> فانقر هنا "
 "للانتقال إلى الصفحة الرئيسية </a>."
 
+#: themes/adroit/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/gestalt/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
+" We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+"هل تتذكر عندما قمت بالتسجيل في %(course_name)s ، ودورات أخرى على edX.org؟نحن"
+" نفعل ذلك ، ويسعدنا أن تكون معنا! تعال وانظر ما يتعلمه الجميع."
+
+#: themes/adroit/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/gestalt/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
+"glad to have you! Come see what everyone is learning."
+msgstr ""
+"هل تتذكر عندما قمت بالتسجيل في %(course_name)s على edX.org؟ نحن نفعل ذلك ، "
+"ويسعدنا أن تكون معنا! تعال وانظر ما يتعلمه الجميع."
+
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #, python-format
 msgid ""
 "You are receiving this e-mail because you requested a password reset for "
@@ -13407,13 +13956,25 @@ msgstr ""
 "وصلتك رسالة البريد الالكتروني هذه بناءً على طلبك بتغيير كلمة المرور لحسابك "
 "على %(platform_name)s."
 
+#: themes/adroit/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/gestalt/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: themes/st-lutherx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/user_authn/edx_ace/passwordreset/email/body.html
 msgid ""
 "If you did not request this change, you can disregard this email - we have "
 "not yet reset your password."
 msgstr ""
 "إذا لم تطلب هذا التغيير، يمكنك تجاهل هذه الرسالة - لم نقم بعد بتغيير كلمة "
 "المرور الخاصة بك."
+
+#: themes/gestalt/ecommerce/gestalt-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Journal Bundle Offers"
+msgstr ""
+
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_head.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_head.html
+msgid "St. LutherX Email"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Video"
@@ -13988,9 +14549,12 @@ msgstr "لا يُسمح لك بإزالة المشرِف الأخير. يُرج�
 msgid "Uploading"
 msgstr "جاري التحميل"
 
+#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status for a video that the servers are currently
 #. processing
 #: cms/djangoapps/contentstore/views/videos.py
+#: themes/gestalt/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/learner_dashboard/programs.html
 msgid "In Progress"
 msgstr "قيد المعالجة"
 
@@ -14199,7 +14763,10 @@ msgstr "إدارة الإستوديو"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
+#: themes/adroit/lms/templates/static_templates/404.html
+#: themes/gestalt/lms/templates/static_templates/404.html
 #: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
 msgid "Page Not Found"
 msgstr "هذه الصفحة غير موجودة"
 
@@ -14208,7 +14775,10 @@ msgid "Page not found"
 msgstr "هذه الصفحة غير موجودة"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "الملفات والتحميلات"
 
@@ -14217,8 +14787,14 @@ msgstr "الملفات والتحميلات"
 #: cms/templates/textbooks.html cms/templates/videos_index.html
 #: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/adroit/lms/templates/static_pdfbook.html
+#: themes/gestalt/cms/templates/widgets/header.html
+#: themes/gestalt/lms/templates/static_pdfbook.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/static_pdfbook.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+#: themes/st-normanx/lms/templates/static_pdfbook.html
 msgid "Content"
 msgstr "المحتوى"
 
@@ -14227,7 +14803,10 @@ msgstr "المحتوى"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: wiki/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
@@ -14240,14 +14819,20 @@ msgstr "الإعدادات"
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/adroit/lms/templates/learner_profile/learner_profile.html
+#: themes/gestalt/lms/templates/learner_profile/learner_profile.html
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "جاري التحميل"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Grading"
 msgstr "تقييم الزملاء"
 
@@ -14255,26 +14840,38 @@ msgstr "تقييم الزملاء"
 #: cms/templates/manage_users.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Course Team"
 msgstr "اسم المساق"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "حفظ الإعدادات"
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Checklists"
 msgstr "قوائم المراجعة"
 
 #: cms/templates/checklists.html cms/templates/export.html
 #: cms/templates/export_git.html cms/templates/import.html
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Tools"
 msgstr "المدارس"
 
@@ -14299,12 +14896,18 @@ msgstr "تحذير"
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/export.html
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Pages"
 msgstr "الصفحة"
 
 #: cms/templates/export_git.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Export to Git"
 msgstr "تصدير إلى Git"
 
@@ -14335,12 +14938,18 @@ msgid "example: username@domain.com"
 msgstr "مثال:  username@domain.com "
 
 #: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "User Access"
 msgstr "الوصول إلى واجهة برمجة التطبيقات"
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "وضع جدول لوحدة"
 
@@ -14372,12 +14981,18 @@ msgid "View"
 msgstr "عرض"
 
 #: cms/templates/videos_index.html cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Video Uploads"
 msgstr "عمليات تحميل الفيديو"
 
 #: cms/templates/emails/course_creator_granted.txt
+#: themes/adroit/cms/templates/emails/course_creator_granted.txt
+#: themes/gestalt/cms/templates/emails/course_creator_granted.txt
 #: themes/st-lutherx/cms/templates/emails/course_creator_granted.txt
+#: themes/st-normanx/cms/templates/emails/course_creator_granted.txt
 msgid ""
 "Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
 "\n"
@@ -14426,61 +15041,97 @@ msgstr ""
 "تجارية لمؤسّسة {link_start}edX Inc.{link_end}"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Current Course:"
 msgstr "إبدأ المساق"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Course Navigation"
 msgstr "تصفّح النشرات"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "مخطّط المساق"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Import"
 msgstr "هام!"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Export"
 msgstr "الإبلاغات"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Current Library:"
 msgstr "المكتبة الحالية:"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Language preference"
 msgstr "رمز اللغة"
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Choose Language"
 msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/cms/templates/widgets/header.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr "الحساب"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Account Navigation"
 msgstr "تصفّح النشرات"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "المساعدة السياقية عبر الإنترنت"
 
@@ -14489,15 +15140,24 @@ msgstr "المساعدة السياقية عبر الإنترنت"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/gestalt/cms/templates/widgets/header.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "المساعدة"
 
 #: cms/templates/widgets/header.html
+#: themes/adroit/cms/templates/widgets/header.html
+#: themes/gestalt/cms/templates/widgets/header.html
 #: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Sign Up"
 msgstr "تسجيل الدخول"
 
@@ -14555,7 +15215,10 @@ msgstr "أرسل رسالةً إلكترونية إلى {email}"
 #: lms/templates/courseware/static_tab.html
 #: lms/templates/courseware/tab-view-v2.html
 #: lms/templates/courseware/tab-view.html
+#: themes/adroit/lms/templates/courseware/tab-view.html
+#: themes/gestalt/lms/templates/courseware/tab-view.html
 #: themes/st-lutherx/lms/templates/courseware/tab-view.html
+#: themes/st-normanx/lms/templates/courseware/tab-view.html
 msgid "name"
 msgstr "الاسم"
 
@@ -14569,7 +15232,10 @@ msgstr "قائمة المستخدم"
 
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
 
@@ -14690,7 +15356,10 @@ msgid ""
 msgstr "تخضع المناقشات حاليًّا لأعمال الصيانة. سنعيد تفعيلها قريبًا! "
 
 #: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Content Locked"
 msgstr "المحتوى مغلق"
 
@@ -14719,7 +15388,10 @@ msgid "Hide Annotations"
 msgstr "إخفاء الملاحظات التوضيحية"
 
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Bookmarked"
 msgstr "جرى وضع علامة"
 
@@ -14748,11 +15420,18 @@ msgid "View all Courses"
 msgstr "عرض جميع المساقات"
 
 #: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html themes/adroit/lms/templates/dashboard.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/adroit/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
+#: themes/st-normanx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
 
@@ -14764,8 +15443,11 @@ msgstr "تم عرض النتائج بنجاح"
 msgid "Click to load all enrolled courses"
 msgstr "أنقر لتحميل جميع الدورات الملتحق بها"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
 msgstr "لست ملتحقًا بأية مساقات بعد."
 
@@ -14773,31 +15455,49 @@ msgstr "لست ملتحقًا بأية مساقات بعد."
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/adroit/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "تصفح المساقات"
 
 #: lms/templates/dashboard.html
 #: lms/templates/registration/account_activation_sidebar_notice.html
+#: themes/adroit/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Activate your account!"
 msgstr "قم بتفعيل حسابك!"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "الأخطاء الخاصة بتحميل المساقات "
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Search Your Courses"
 msgstr "ابحث في مساقاتك"
 
 #: lms/templates/courseware/courseware.html lms/templates/dashboard.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "حذف البحث"
 
@@ -14805,23 +15505,35 @@ msgstr "حذف البحث"
 msgid "Skip to list of announcements"
 msgstr "التخطي مباشرة إلى قائمة الإعلانات"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Account Status Info"
 msgstr "معلومات وضع الحساب"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "إعدادات البريد الإلكتروني للمساق رقم {course_number} "
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Receive course emails"
 msgstr "استلام رسائل البريد الإلكتروني الخاصة بالمساق"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/adroit/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Save Settings"
 msgstr "حفظ الإعدادات "
 
@@ -14830,10 +15542,16 @@ msgstr "حفظ الإعدادات "
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/adroit/lms/templates/dashboard.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/gestalt/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unenroll"
 msgstr "إلغاء التسجيل "
 
@@ -15308,47 +16026,74 @@ msgid "Raw data:"
 msgstr "البيانات الأوّلية:"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "استعراض المساق"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "View this course as:"
 msgstr "مشاهدة هذا المساق كـ:"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Learner"
 msgstr "المتعلم"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Specific learner"
 msgstr "متعلم محدد"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Learner in {content_group}"
 msgstr "متعلم في {content_group}"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Username or email:"
 msgstr "اسم المستخدم أو البريد الإلكتروني:"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "Set preview mode"
 msgstr "ضبط وضعية المعاينة"
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "أنت الآن تستعرض المساق بصفتك {i_start}{user_name}{i_end}."
 
 #: lms/templates/preview_menu.html
+#: themes/adroit/lms/templates/preview_menu.html
+#: themes/gestalt/lms/templates/preview_menu.html
 #: themes/st-lutherx/lms/templates/preview_menu.html
+#: themes/st-normanx/lms/templates/preview_menu.html
 msgid "View this unit in the new experience"
 msgstr "عرض في التجربة الجديدة"
 
@@ -15542,8 +16287,10 @@ msgstr ""
 "تم تنشيط بريدك الإلكتروني الثانوي. يرجى زيارة {link_start} لوحة المعلومات "
 "{link_end} للمساقات."
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_module.html themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Important!"
 msgstr "هام!"
 
@@ -15559,8 +16306,10 @@ msgctxt "unit"
 msgid "Next"
 msgstr "التالي"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_module.html themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "تسلسل"
 
@@ -15718,18 +16467,27 @@ msgstr "استعراض التاريخ"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
+#: themes/adroit/lms/templates/static_pdfbook.html
+#: themes/gestalt/lms/templates/static_pdfbook.html
 #: themes/st-lutherx/lms/templates/static_pdfbook.html
+#: themes/st-normanx/lms/templates/static_pdfbook.html
 msgid "{course_number} Textbook"
 msgstr "كتاب المساق {course_number} "
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
+#: themes/adroit/lms/templates/static_pdfbook.html
+#: themes/gestalt/lms/templates/static_pdfbook.html
 #: themes/st-lutherx/lms/templates/static_pdfbook.html
+#: themes/st-normanx/lms/templates/static_pdfbook.html
 msgid "Textbook Navigation"
 msgstr "تصفّح الكتاب"
 
 #: lms/templates/courseware/gradebook.html lms/templates/staticbook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "Page"
 msgstr "الصفحة"
 
@@ -15910,7 +16668,10 @@ msgstr "المزيد من الخيارات"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "More Options"
 msgstr "المزيد من الخيارات"
 
@@ -17284,8 +18045,11 @@ msgstr "انشر على فيسبوك"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Twitter"
 msgstr "شارك على تويتر"
 
@@ -17331,12 +18095,18 @@ msgstr ""
 "{link_start}صفحة مساعدة توثيق شهادات الويب{link_end}."
 
 #: lms/templates/certificates/invalid.html
+#: themes/adroit/lms/templates/certificates/invalid.html
+#: themes/gestalt/lms/templates/certificates/invalid.html
 #: themes/st-lutherx/lms/templates/certificates/invalid.html
+#: themes/st-normanx/lms/templates/certificates/invalid.html
 msgid "Cannot Find Certificate"
 msgstr "عذرًا، لم نتمكّن من إيجاد الشهادة"
 
 #: lms/templates/certificates/invalid.html
+#: themes/adroit/lms/templates/certificates/invalid.html
+#: themes/gestalt/lms/templates/certificates/invalid.html
 #: themes/st-lutherx/lms/templates/certificates/invalid.html
+#: themes/st-normanx/lms/templates/certificates/invalid.html
 msgid ""
 "We cannot find a certificate with this URL or ID number. If you are trying "
 "to validate a certificate, make sure that the URL or ID number is correct. "
@@ -17637,15 +18407,24 @@ msgid "{chapter} current chapter"
 msgstr "الفصل الحالي {chapter}"
 
 #: lms/templates/courseware/accordion.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
 msgid "{span_start}current section{span_end}"
 msgstr "{span_start}القسم الحالي{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "تاريخ الاستحقاق {date}"
 
@@ -17655,7 +18434,10 @@ msgstr "{section_format} مستحق في {{date}}"
 
 #: lms/templates/courseware/accordion.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "جرى تقييم هذا المحتوى"
 
@@ -17674,8 +18456,11 @@ msgstr "أنت مسجّل في هذا المساق"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
 msgstr "استعراض المساق "
 
@@ -17717,7 +18502,10 @@ msgstr "المتطلّبات الأساسية"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
@@ -17768,8 +18556,14 @@ msgstr ""
 "مراسلة شخص ما عبر البريد الإلكتروني لإخباره أنّك التحقت بطلاب هذا المساق "
 
 #: lms/templates/courseware/course_navigation.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/adroit/lms/templates/courseware/course_navigation.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/course_navigation.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/course_navigation.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/course_navigation.html
 msgid "current location"
 msgstr "الموقع الحالي"
 
@@ -17777,9 +18571,18 @@ msgstr "الموقع الحالي"
 #. notification image that indicates the tab "needs attention".
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/tabs.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/adroit/lms/templates/courseware/course_navigation.html
+#: themes/adroit/lms/templates/courseware/tabs.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/course_navigation.html
+#: themes/gestalt/lms/templates/courseware/tabs.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/course_navigation.html
 #: themes/st-lutherx/lms/templates/courseware/tabs.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/course_navigation.html
+#: themes/st-normanx/lms/templates/courseware/tabs.html
 msgid "needs attention"
 msgstr "يستدعي الانتباه"
 
@@ -17810,13 +18613,19 @@ msgstr "خصِّص بحثك"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
 msgstr "محتويات المساق {course_number}"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "Course Utilities"
 msgstr "خدمات المساق"
 
@@ -17825,17 +18634,26 @@ msgid "Courseware"
 msgstr "محتويات المساق"
 
 #: lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "البحث في المساق"
 
 #: lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
 msgstr "لم يُضاف أي محتوى إلى هذا المساق بعد"
 
 #: lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 #, python-format
 msgid ""
 "To access course materials, you must score {required_score}% or higher on "
@@ -17845,7 +18663,10 @@ msgstr ""
 " هذا الامتحان. نتيجتك الحالية هي {current_score}%."
 
 #: lms/templates/courseware/courseware.html
+#: themes/adroit/lms/templates/courseware/courseware.html
+#: themes/gestalt/lms/templates/courseware/courseware.html
 #: themes/st-lutherx/lms/templates/courseware/courseware.html
+#: themes/st-normanx/lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "علامتك هي {current_score}%. لقد نجحت في اختبار الدخول."
 
@@ -17882,27 +18703,42 @@ msgstr ""
 "ممكن."
 
 #: lms/templates/courseware/gradebook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "دفتر الدرجات"
 
 #: lms/templates/courseware/gradebook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "Search students"
 msgstr "البحث عن الطلّاب"
 
 #: lms/templates/courseware/gradebook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "الصفحة السابقة"
 
 #: lms/templates/courseware/gradebook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "of"
 msgstr "من"
 
 #: lms/templates/courseware/gradebook.html
+#: themes/adroit/lms/templates/courseware/gradebook.html
+#: themes/gestalt/lms/templates/courseware/gradebook.html
 #: themes/st-lutherx/lms/templates/courseware/gradebook.html
+#: themes/st-normanx/lms/templates/courseware/gradebook.html
 msgid "next page"
 msgstr "الصفحة التالية"
 
@@ -18075,52 +18911,82 @@ msgid "Starts on {}"
 msgstr "تبدأ في {}"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
 msgstr "تقدّم العمل {course_number}"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "استعراض عملية التقييم في استوديو"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Course Progress for '{username}' ({email})"
 msgstr "مستوى التقدم في المساق ل '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "معاينة الشهادة"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
 msgstr "الفتح في نافذة متصفح جديدة"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "تنزيل شهادتك"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr "اطلب الشهادة"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Requirements for Course Credit"
 msgstr "متطلبات النجاح في مواد المساق"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "{student_name}, you are no longer eligible for credit in this course."
 msgstr "{student_name}، لم تعد مؤهلاً للحصول على مواد هذا المساق."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid ""
 "{student_name}, you have met the requirements for credit in this course. "
 "{a_start}Go to your dashboard{a_end} to purchase course credit."
@@ -18129,103 +18995,163 @@ msgstr ""
 "توجه لزيارة لوحة معلوماتك{a_end} tلشراء مواد الدورة التعليمية."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
 msgstr "{student_name}، لم تحقق متطلبات النجاح بعد."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Information about course credit requirements"
 msgstr "معلومات حول متطلبات النجاح في مواد المقرر"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "display_name"
 msgstr "display_name"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Verification Submitted"
 msgstr "تم تقديم التحقق"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Verification Failed"
 msgstr "فشل التحقق"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Verification Declined"
 msgstr "عذرًا، لقد جرى رفض عملية التحقّق"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Completed by {date}"
 msgstr "تم إكماله في {date}"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Upcoming"
 msgstr "قريبًا"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "أقل"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Details for each chapter"
 msgstr "تفاصيل كل فصل"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
 msgstr "حصلت على {earned} من أصل {total}  نقاط محتملة."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid ""
 "Suspicious activity detected during proctored exam review. Exam score 0."
 msgstr "الكشف عن نشاط مشبوه خلال مراجعة الإمتحان المراقب. نتيجة الامتحان 0."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Section grade has been overridden."
 msgstr "تم تجاوز درجة القسم."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Problem Scores: "
 msgstr "درجات المسألة:"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Practice Scores: "
 msgstr "درجات التدريب:"
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Problem scores are hidden until the due date."
 msgstr "يتم إخفاء نتائج المسائل حتى تاريخ الاستحقاق."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Practice scores are hidden until the due date."
 msgstr "يتم إخفاء درجات التمارين حتى تاريخ الاستحقاق."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Problem scores are hidden."
 msgstr "تم إخفاء نتائج المسائل."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "Practice scores are hidden."
 msgstr "تم إخفاء نتائج التمرينات."
 
 #: lms/templates/courseware/progress.html
+#: themes/adroit/lms/templates/courseware/progress.html
+#: themes/gestalt/lms/templates/courseware/progress.html
 #: themes/st-lutherx/lms/templates/courseware/progress.html
+#: themes/st-normanx/lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "لا توجد درجات للمسائل في هذا القسم"
 
@@ -18309,7 +19235,10 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/order_confirmation_email.txt
+#: themes/adroit/lms/templates/emails/activation_email.txt
+#: themes/gestalt/lms/templates/emails/activation_email.txt
 #: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فريق {platform_name}"
 
@@ -18440,72 +19369,114 @@ msgstr ""
 "{cert_name_short}، ومنحناك عوضًا عنها شهادة ميثاق شرف {cert_name_short}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr "تفاصيل المساق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} الصفحة الرئيسية"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
 msgstr "صورة الغلاف {course_number} {course_name} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "مسجَّل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "قريبًا"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
 msgstr "الانتهاء - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
 msgstr "البدء - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
 msgstr "يبدأ  - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
 msgstr "ل {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr "يجب عليك تحديد جلسة قبل تاريخ {expiration_date} للوصول إلى المساق."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session to access the course."
 msgstr "يجب عليك تحديد جلسة للوصول إلى المساق."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Change or Leave Session"
 msgstr "تغيير أو مغادرة الجلسة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can no longer change sessions."
 msgstr "لا يمكنك تغيير الجلسات بعد الآن."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr "يمكنك تغيير الجلسات حتى تاريخ {entitlement_expiration_date}.."
 
@@ -18514,55 +19485,85 @@ msgid "View Archived Course"
 msgstr "استعراض المساق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr "أنا آخذ {course_name} عبر الإنترنت مع {facebook_brand}. قم بتجربته!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "شارك {course_name} على فيسبوك"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "شارك على فيسبوك"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
 msgstr "أنا آخذ {course_name} عبر الإنترنت مع {twitter_brand}. قم بتجربته!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Twitter"
 msgstr "شارك {course_name} على تويتر"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
 msgstr "خيارات المساق ل"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
 msgstr "الإجراءات المتاحة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "إعدادات عنوان البريد الإلكتروني "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "البرامج ذات الصلة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
 "received. You can contact the account holder to request payment, or you can "
@@ -18570,7 +19571,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
 "received. You can {contact_link_start}contact the account "
@@ -18579,12 +19583,18 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
 msgstr "عذرًا، لقد جرى رفض عملية التحقّق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
 msgstr[0] "لم يتبقى لديك أي {days} يوم لتثبيت هذا المساق."
@@ -18595,22 +19605,34 @@ msgstr[4] "تبقى لديك {days} أيام فقط لتثبيت هذا المس
 msgstr[5] "تبقّى لديك {days} أيام فقط لتجري عملية التحقق لهذا المساق."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
 msgstr "أوشكتَ على الانتهاء!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You still need to verify for this course."
 msgstr "ما زال عليك خوض عملية التحقّق لهذا المساق."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verify Now"
 msgstr "إجراء التحقّق الآن"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have submitted your verification information."
 msgstr "قمت بتقديم معلومات التحقّق الخاصة بك."
 
@@ -18623,7 +19645,10 @@ msgstr ""
 "غضون ٥-٧ أيام)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
 msgstr "سوف تنتهي صلاحية التحقق الحالية قريباً!"
 
@@ -18637,24 +19662,36 @@ msgstr ""
 "اكتمال عملية التحقق (عادة في غضون ٥-٧ أيام)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
 msgstr "لقد نجحت في التحقق من هويتك مع edX"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
 msgstr "عملية التحقّق من هويّتك الحالية سارية حتى تاريخ {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
 msgstr "سوف تنتهي صلاحية التحقق الحالية من هويتك قريباً."
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Your current verification will expire in {days} days. {start_link}Re-verify "
 "your identity now{end_link} using a webcam and a government-issued photo ID."
@@ -18664,14 +19701,20 @@ msgstr ""
 " الحكومة."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
 "this course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "It's official. It's easily shareable. It's a proven motivator to complete "
 "the course. {line_break}{link_start}Learn more about the verified "
@@ -18849,7 +19892,10 @@ msgstr ""
 "ولن تتمكن من الحصول على شهادة أو إجراء اختبار مراقب حتى تتم الموافقة عليه."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_third_party_error.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
 msgstr "نأسف لتعذّر ربط الحسابات"
 
@@ -18861,7 +19907,10 @@ msgstr "نأسف لتعذّر ربط الحسابات"
 #. third-party authentication provider, and platform_name is the name of the
 #. edX deployment.
 #: lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/adroit/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_third_party_error.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_third_party_error.html
 msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
@@ -19694,12 +20743,18 @@ msgstr "تقدّم بطلب للحصول على دعم مالي"
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
 #: lms/templates/navigation/navbar-logo-header.html
+#: themes/adroit/lms/templates/header/navbar-logo-header.html
+#: themes/gestalt/lms/templates/header/navbar-logo-header.html
 #: themes/st-lutherx/lms/templates/header/navbar-logo-header.html
+#: themes/st-normanx/lms/templates/header/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr "الصفحة الرئيسية لمنصّة {platform_name}"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Options Menu"
 msgstr "قائمة الخيارات"
 
@@ -19732,7 +20787,9 @@ msgid "Shopping Cart"
 msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
+#: themes/gestalt/lms/templates/header/navbar-not-authenticated.html
 #: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "روابط تكميلية"
 
@@ -19748,17 +20805,26 @@ msgid "Schools"
 msgstr "المدارس"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "استئناف مساقك الأخير"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adroit/lms/templates/header/user_dropdown.html
+#: themes/gestalt/lms/templates/header/user_dropdown.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "الملف الشخصي"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adroit/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "تاريخ الطلب"
 
@@ -20374,8 +21440,8 @@ msgid "{code}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "description"
-msgstr "الوصف"
+msgid "{description}"
+msgstr "{description}"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "{discount}"
@@ -21460,8 +22526,11 @@ msgid "Show the status for the tasks that you submitted for this problem."
 msgstr "عرض حالة المهام التي قدمتها في هذه المسألة."
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
+#: themes/adroit/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "مساقاتي"
 
@@ -22202,7 +23271,10 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr "تعمل مخدمات المنصة {platform_name} حالياً بمستوى تحميل يتجاوز طاقتها"
 
 #: lms/templates/student_account/account_settings.html
+#: themes/adroit/lms/templates/student_account/account_settings.html
+#: themes/gestalt/lms/templates/student_account/account_settings.html
 #: themes/st-lutherx/lms/templates/student_account/account_settings.html
+#: themes/st-normanx/lms/templates/student_account/account_settings.html
 msgid "Account Settings"
 msgstr "إعدادات الحساب"
 
@@ -22219,7 +23291,10 @@ msgid "Please Wait"
 msgstr "يرجى الانتظار"
 
 #: lms/templates/student_account/login_and_register.html
+#: themes/adroit/lms/templates/student_account/login_and_register.html
+#: themes/gestalt/lms/templates/student_account/login_and_register.html
 #: themes/st-lutherx/lms/templates/student_account/login_and_register.html
+#: themes/st-normanx/lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
 msgstr "يرجى تسجيل الدخول أو التسجيل"
 
@@ -22554,7 +23629,10 @@ msgid "Upcoming Dates"
 msgstr "مواعيد القادمة"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
 msgid "Overview"
 msgstr "مراجعة"
 
@@ -22746,7 +23824,10 @@ msgid "View My Records"
 msgstr "عرض سجلّاتي"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/adroit/lms/templates/learner_profile/learner_profile.html
+#: themes/gestalt/lms/templates/learner_profile/learner_profile.html
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "My Profile"
 msgstr "ملفي الشخصي"
 
@@ -22756,9 +23837,306 @@ msgid ""
 msgstr "أنشئ ملفك الشخصي لتخصيص هويتك على {platform_name}."
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/adroit/lms/templates/learner_profile/learner_profile.html
+#: themes/gestalt/lms/templates/learner_profile/learner_profile.html
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
 msgstr "حدث خطأ. حاول تحميل الصفحة مرة أخرى."
+
+#: themes/adroit/cms/templates/emails/account_access_denied.txt
+#: themes/adroit/cms/templates/emails/account_access_granted.txt
+#: themes/adroit/lms/templates/emails/account_access_denied.txt
+#: themes/adroit/lms/templates/emails/account_access_granted.txt
+#: themes/gestalt/cms/templates/emails/account_access_denied.txt
+#: themes/gestalt/cms/templates/emails/account_access_granted.txt
+#: themes/gestalt/lms/templates/emails/account_access_denied.txt
+#: themes/gestalt/lms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/cms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/cms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/lms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/lms/templates/emails/account_access_granted.txt
+msgid "Hi {user},"
+msgstr "مرحبًا {user}،"
+
+#: themes/adroit/cms/templates/emails/account_access_denied.txt
+#: themes/adroit/lms/templates/emails/account_access_denied.txt
+#: themes/gestalt/cms/templates/emails/account_access_denied.txt
+#: themes/gestalt/lms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/cms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/lms/templates/emails/account_access_denied.txt
+msgid ""
+"Your account on {platform_name} [{url}] has been deactivated. If you think "
+"this was done in error, please reach out to us at {email}"
+msgstr ""
+"تم إلغاء تنشيط حسابك على {platform_name} [{url}].إذا كنت تعتقد أن هذا حدث عن"
+" طريق الخطأ ، فيرجى التواصل معنا على {email}"
+
+#: themes/adroit/cms/templates/emails/account_access_denied.txt
+#: themes/adroit/cms/templates/emails/account_access_granted.txt
+#: themes/adroit/lms/templates/emails/account_access_denied.txt
+#: themes/adroit/lms/templates/emails/account_access_granted.txt
+#: themes/gestalt/cms/templates/emails/account_access_denied.txt
+#: themes/gestalt/cms/templates/emails/account_access_granted.txt
+#: themes/gestalt/lms/templates/emails/account_access_denied.txt
+#: themes/gestalt/lms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/cms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/cms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/lms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/lms/templates/emails/account_access_granted.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
+msgid "Best,"
+msgstr "الأفضل،"
+
+#: themes/adroit/cms/templates/emails/account_access_denied.txt
+#: themes/adroit/cms/templates/emails/account_access_granted.txt
+#: themes/adroit/lms/templates/emails/account_access_denied.txt
+#: themes/adroit/lms/templates/emails/account_access_granted.txt
+#: themes/gestalt/cms/templates/emails/account_access_denied.txt
+#: themes/gestalt/cms/templates/emails/account_access_granted.txt
+#: themes/gestalt/lms/templates/emails/account_access_denied.txt
+#: themes/gestalt/lms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/cms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/cms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/lms/templates/emails/account_access_denied.txt
+#: themes/st-normanx/lms/templates/emails/account_access_granted.txt
+msgid "{platform_name}"
+msgstr "{platform_name} الرئيسية"
+
+#: themes/adroit/cms/templates/emails/account_access_denied_subject.txt
+#: themes/adroit/lms/templates/emails/account_access_denied_subject.txt
+#: themes/gestalt/cms/templates/emails/account_access_denied_subject.txt
+#: themes/gestalt/lms/templates/emails/account_access_denied_subject.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_denied_subject.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_denied_subject.txt
+#: themes/st-normanx/cms/templates/emails/account_access_denied_subject.txt
+#: themes/st-normanx/lms/templates/emails/account_access_denied_subject.txt
+msgid "Your account has been deactivated | {platform_name}"
+msgstr "تم إلغاء تنشيط حسابك | {platform_name}"
+
+#: themes/adroit/cms/templates/emails/account_access_granted.txt
+#: themes/adroit/lms/templates/emails/account_access_granted.txt
+#: themes/gestalt/cms/templates/emails/account_access_granted.txt
+#: themes/gestalt/lms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/cms/templates/emails/account_access_granted.txt
+#: themes/st-normanx/lms/templates/emails/account_access_granted.txt
+msgid "Thank you for verifying your account. To start exploring, visit: {url}"
+msgstr "شكرا لك على التحقق من حسابك. لبدء الاستكشاف ، تفضل بزيارة: {url}"
+
+#: themes/adroit/cms/templates/emails/account_access_granted_subject.txt
+#: themes/adroit/lms/templates/emails/account_access_granted_subject.txt
+#: themes/gestalt/cms/templates/emails/account_access_granted_subject.txt
+#: themes/gestalt/lms/templates/emails/account_access_granted_subject.txt
+#: themes/st-lutherx/cms/templates/emails/account_access_granted_subject.txt
+#: themes/st-lutherx/lms/templates/emails/account_access_granted_subject.txt
+#: themes/st-normanx/cms/templates/emails/account_access_granted_subject.txt
+#: themes/st-normanx/lms/templates/emails/account_access_granted_subject.txt
+msgid "Your account has been activated | {platform_name}"
+msgstr "تم تفعيل حسابك | {platform_name}"
+
+#: themes/adroit/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
+msgid ""
+"Please wait for the confirmation email as your request is being processed. "
+"Course: {course_name} will be upgraded soon."
+msgstr ""
+"يرجى انتظار رسالة التأكيد الإلكترونية أثناء معالجة طلبك. الدورة التدريبية: "
+"سيتم ترقية {course_name} قريبًا."
+
+#: themes/adroit/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
+msgid "Past Courses"
+msgstr "إبدأ المساق"
+
+#: themes/adroit/lms/templates/edly_progress_widget.html
+#: themes/gestalt/lms/templates/edly_progress_widget.html
+#: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
+msgid "TOTAL COURSE PROGRESS"
+msgstr "إجمالي التقدم في الدورة"
+
+#: themes/adroit/lms/templates/edly_progress_widget.html
+#: themes/gestalt/lms/templates/edly_progress_widget.html
+#: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
+msgid "Problems"
+msgstr "اسم المسألة"
+
+#: themes/adroit/lms/templates/edly_progress_widget.html
+#: themes/gestalt/lms/templates/edly_progress_widget.html
+#: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
+msgid "Videos"
+msgstr "فيديو"
+
+#: themes/adroit/lms/templates/edly_progress_widget.html
+#: themes/gestalt/lms/templates/edly_progress_widget.html
+#: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
+msgid "Readings"
+msgstr "جاري التحميل"
+
+#: themes/adroit/lms/templates/edly_progress_widget.html
+#: themes/gestalt/lms/templates/edly_progress_widget.html
+#: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
+msgid "Others"
+msgstr "آخر"
+
+#: themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/dashboard.html
+#: themes/gestalt/lms/templates/seq_module.html
+#: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
+msgid "Previous"
+msgstr "السابق"
+
+#: themes/adroit/lms/templates/seq_module.html
+#: themes/gestalt/lms/templates/seq_module.html
+#: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
+msgid "Next"
+msgstr "التالي"
+
+#: themes/adroit/lms/templates/courseware/accordion.html
+#: themes/gestalt/lms/templates/courseware/accordion.html
+#: themes/st-lutherx/lms/templates/courseware/accordion.html
+#: themes/st-normanx/lms/templates/courseware/accordion.html
+msgid "{section} current chapter"
+msgstr "الفصل الحالي {section}"
+
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Back to Course"
+msgstr "إبدأ المساق"
+
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You will see a message on your dashboard when the verification process is "
+"complete (usually within 1-2 days)."
+msgstr ""
+"سترى رسالة على لوحة المعلومات الخاصة بك عند اكتمال عملية التحقق (عادة في "
+"غضون ٥-٧ أيام)."
+
+#: themes/adroit/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/gestalt/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You have submitted your reverification information. You will see a message "
+"on your dashboard when the verification process is complete (usually within "
+"1-2 days)."
+msgstr ""
+"تم إرسال معلومات إعادة التحقق الخاصة بك. ستصلك رسالة على لوحة المعلومات عند "
+"اكتمال عملية التحقق (عادة في غضون ٥-٧ أيام)."
+
+#: themes/adroit/lms/templates/emails/activation_email.txt
+#: themes/gestalt/lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
+msgid ""
+"You're almost there! Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: themes/adroit/lms/templates/emails/activation_email.txt
+#: themes/gestalt/lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
+msgid "Enjoy learning with {platform_name}."
+msgstr "هل تحتاج إلى المساعدة على التسجيل في {platform_name}؟"
+
+#: themes/adroit/lms/templates/emails/activation_email.txt
+#: themes/gestalt/lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
+msgid ""
+"If you need help or have any further questions, please email us to "
+"{support_email}."
+msgstr ""
+"إذا لديك أي استفسارات حول الفواتير، يُرجى مراسلتنا على {support_email}."
+
+#: themes/adroit/lms/templates/emails/activation_email.txt
+#: themes/gestalt/lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
+msgid ""
+"This email message was automatically sent by {lms_url} because someone "
+"attempted to create an account on {platform_name} using this email address."
+msgstr ""
+"تم إرسال رسالة البريد الإلكتروني هذه تلقائيًا بواسطة {lms_url}لأن شخصًا ما "
+"حاول إنشاء حساب على {platform_name} باستخدام عنوان البريد الإلكتروني هذا"
+
+#: themes/adroit/lms/templates/learner_dashboard/_dashboard_navigation_programs.html
+#: themes/st-lutherx/lms/templates/learner_dashboard/_dashboard_navigation_programs.html
+#: themes/st-normanx/lms/templates/learner_dashboard/_dashboard_navigation_programs.html
+msgid "Programs Dashboard"
+msgstr "لوحة المعلومات"
+
+#: themes/adroit/lms/templates/learner_dashboard/programs.html
+#: themes/gestalt/lms/templates/learner_dashboard/_dashboard_navigation_programs.html
+#: themes/st-lutherx/lms/templates/learner_dashboard/programs.html
+#: themes/st-normanx/lms/templates/learner_dashboard/programs.html
+msgid "My Programs"
+msgstr "البرامج"
+
+#: themes/adroit/lms/templates/static_templates/404.html
+#: themes/gestalt/lms/templates/static_templates/404.html
+#: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
+msgid ""
+"The page you are looking for may have been moved or renamed. {line_break}If "
+"you continue to have issues, please visit our  {link_start}FAQ{link_end} "
+"page or contact {support_link_start}Support{link_end}."
+msgstr ""
+"ربما تم نقل الصفحة التي تبحث عنها أو إعادة تسميتها.{line_break} إذا استمرت "
+"المشكلات ، فيرجى زيارة صفحة{link_start} الأسئلة الشائعة {link_end} أو "
+"الاتصال {support_link_start} بالدعم {link_end}"
+
+#: themes/adroit/lms/templates/static_templates/server-error.html
+#: themes/gestalt/lms/templates/static_templates/server-error.html
+#: themes/st-lutherx/lms/templates/static_templates/server-error.html
+#: themes/st-normanx/lms/templates/static_templates/server-error.html
+msgid "Internal Server Error!"
+msgstr "خطأ في الخادم الداخلي!"
+
+#: themes/adroit/lms/templates/static_templates/server-error.html
+#: themes/gestalt/lms/templates/static_templates/server-error.html
+#: themes/st-lutherx/lms/templates/static_templates/server-error.html
+#: themes/st-normanx/lms/templates/static_templates/server-error.html
+msgid ""
+"There seems to be a small problem with our servers. We apologize for the "
+"inconvenience.{line_break}Please refresh this page after a few seconds."
+msgstr ""
+"يبدو أن هناك مشكلة صغيرة في خوادمنا.نأسف للإزعاج. {line_break} يرجى تحديث "
+"هذه الصفحة بعد بضع ثوان."
 
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid ""
@@ -22904,176 +24282,6 @@ msgid ""
 msgstr ""
 "{tos_link_start}شروط الخدمة{tos_link_end} و{honor_link_start}ميثاق "
 "الشرف{honor_link_end}"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
-msgid "Hi {user},"
-msgstr "مرحبًا {user}،"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
-msgid ""
-"Your account on {platform_name} has been deactivated. If you think this was "
-"done in error, please reach out to us at {email}"
-msgstr ""
-"تم رفض طلبك للوصول إلى واجهة برمجة تطبيقات مساقات {platform_name}. إذا كنت "
-"تعتقد أن هذا خطأ، أو إذا كانت لديك استفسارات أخرى بشأن استخدام واجهة برمجة "
-"التطبيقات هذه، فاتصل ب{email}."
-
-#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
-msgid "Best,"
-msgstr "الأفضل،"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_denied.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
-msgid "{platform_name}"
-msgstr "{platform_name} الرئيسية"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_denied_subject.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_denied_subject.txt
-msgid "Your account has been deactivated | {platform_name}"
-msgstr "تم إلغاء تنشيط حسابك | {platform_name}"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_granted.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_granted.txt
-msgid "Thank you for verifying your account. To start exploring, visit: {url}"
-msgstr "شكرا لك على التحقق من حسابك. لبدء الاستكشاف ، تفضل بزيارة: {url}"
-
-#: themes/st-lutherx/cms/templates/emails/account_access_granted_subject.txt
-#: themes/st-lutherx/lms/templates/emails/account_access_granted_subject.txt
-msgid "Your account has been activated | {platform_name}"
-msgstr "تم تفعيل حسابك | {platform_name}"
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-msgid ""
-"Please wait for the confirmation email as your request is being processed. "
-"Course: {course_name} will be upgraded soon."
-msgstr ""
-"يرجى انتظار رسالة التأكيد الإلكترونية أثناء معالجة طلبك. الدورة التدريبية: "
-"سيتم ترقية {course_name} قريبًا."
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-msgid "Past Courses"
-msgstr "إبدأ المساق"
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-msgid "TOTAL COURSE PROGRESS"
-msgstr "إجمالي التقدم في الدورة"
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-msgid "Problems"
-msgstr "اسم المسألة"
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-msgid "Videos"
-msgstr "فيديو"
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-msgid "Readings"
-msgstr "جاري التحميل"
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-msgid "Others"
-msgstr "آخر"
-
-#: themes/st-lutherx/lms/templates/seq_module.html
-msgid "Previous"
-msgstr "السابق"
-
-#: themes/st-lutherx/lms/templates/seq_module.html
-msgid "Next"
-msgstr "التالي"
-
-#: themes/st-lutherx/lms/templates/courseware/accordion.html
-msgid "{section} current chapter"
-msgstr "الفصل الحالي {section}"
-
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Back to Course"
-msgstr "إبدأ المساق"
-
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
-msgstr ""
-"سترى رسالة على لوحة المعلومات الخاصة بك عند اكتمال عملية التحقق (عادة في "
-"غضون ٥-٧ أيام)."
-
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You have submitted your reverification information. You will see a message "
-"on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
-msgstr ""
-"تم إرسال معلومات إعادة التحقق الخاصة بك. ستصلك رسالة على لوحة المعلومات عند "
-"اكتمال عملية التحقق (عادة في غضون ٥-٧ أيام)."
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr "هل تحتاج إلى المساعدة على التسجيل في {platform_name}؟"
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help or have any further questions, please email us to "
-"{support_email}."
-msgstr ""
-"إذا لديك أي استفسارات حول الفواتير، يُرجى مراسلتنا على {support_email}."
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"تم إرسال رسالة البريد الإلكتروني هذه تلقائيًا بواسطة {lms_url}لأن شخصًا ما "
-"حاول إنشاء حساب على {platform_name} باستخدام عنوان البريد الإلكتروني هذا"
-
-#: themes/st-lutherx/lms/templates/learner_dashboard/_dashboard_navigation_programs.html
-msgid "Programs Dashboard"
-msgstr "لوحة المعلومات"
-
-#: themes/st-lutherx/lms/templates/learner_dashboard/programs.html
-msgid "My Programs"
-msgstr "البرامج"
-
-#: themes/st-lutherx/lms/templates/static_templates/404.html
-msgid ""
-"The page you are looking for may have been moved or renamed. {line_break}If "
-"you continue to have issues, please visit our  {link_start}FAQ{link_end} "
-"page or contact {support_link_start}Support{link_end}."
-msgstr ""
-"ربما تم نقل الصفحة التي تبحث عنها أو إعادة تسميتها.{line_break} إذا استمرت "
-"المشكلات ، فيرجى زيارة صفحة{link_start} الأسئلة الشائعة {link_end} أو "
-"الاتصال {support_link_start} بالدعم {link_end}"
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-msgid "Internal Server Error!"
-msgstr "خطأ في الخادم الداخلي!"
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-msgid ""
-"There seems to be a small problem with our servers. We apologize for the "
-"inconvenience.{line_break}Please refresh this page after a few seconds."
-msgstr ""
-"يبدو أن هناك مشكلة صغيرة في خوادمنا.نأسف للإزعاج. {line_break} يرجى تحديث "
-"هذه الصفحة بعد بضع ثوان."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -27847,8 +29055,6 @@ msgid "Set Password"
 msgstr "ضبط كلمة السر"
 
 #: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.html
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
 #, python-format
 msgid "Hi %(user)s,"
 msgstr "أهلا %(user)s,"
@@ -27868,6 +29074,12 @@ msgid "The %(platform_name)s team."
 msgstr "فريق %(platform_name)s."
 
 #: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
+msgid "Hi"
+msgstr "أهلا"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
 #, python-format
 msgid ""
 "Your account on %(platform_name)s has been blocked. If you think this was "
@@ -27875,10 +29087,6 @@ msgid ""
 msgstr ""
 "تم حظر حسابك على %(platform_name)s.إذا كنت تعتقد أن هذا حدث عن طريق الخطأ ، "
 "فيرجى التواصل معنا على %(contact_email)s."
-
-#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
-msgid "Hi"
-msgstr "أهلا"
 
 #: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
 #, python-format
