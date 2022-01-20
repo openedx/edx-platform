@@ -9,7 +9,7 @@ from textwrap import dedent
 
 from django.core.management.base import BaseCommand
 
-from openedx.core.djangoapps.coursegraph.tasks import ModuleStoreSerializer
+from cms.djangoapps.coursegraph.tasks import ModuleStoreSerializer
 
 log = logging.getLogger(__name__)
 
