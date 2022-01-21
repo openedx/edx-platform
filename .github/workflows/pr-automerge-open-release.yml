@@ -1,11 +1,6 @@
-# For non-draft changes to named release branches:
-# - Check if the user is a maintainer (listed in the MERGERS env var in the
-#     .github/workflows/pr-automerge-open-release.yml workflow).
-# - If so, approve the pull request.
-#   - Merge the PR when the author comments `@openedx-community-bot merge`.
-#
-# Required organization secrets
-# - CC_GITHUB_TOKEN or GITHUB_TOKEN
+# Enable automerging for named release branches.
+# See the reusable workflow for details:
+# https://github.com/openedx/.github/.github/workflows/pr-automerge-open-release.yml
 
 name: Automerge BTR open-release PRs
 
