@@ -76,23 +76,21 @@ class InitializeView(StaffGraderBaseView):
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
         try:
-            response_data = {}
+            init_data = {}
 
-            # Get ORA block
+            # Get ORA block and rubric
             ora_usage_key = UsageKey.from_string(ora_location)
-            response_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
+            init_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
+            init_data['rubricConfig'] = get_rubric_config(request, ora_location)
 
             # Get course metadata
             course_id = str(ora_usage_key.course_key)
-            response_data['courseMetadata'] = get_course_overview_or_none(course_id)
+            init_data['courseMetadata'] = get_course_overview_or_none(course_id)
 
             # Get list of submissions for this ORA
-            response_data['submissions'] = get_submissions(request, ora_location)
+            init_data['submissions'] = get_submissions(request, ora_location)
 
-            # Get the rubric config for this ORA
-            response_data['rubricConfig'] = get_rubric_config(request, ora_location)
-
-            return Response(InitializeSerializer(response_data).data)
+            return Response(InitializeSerializer(init_data).data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):

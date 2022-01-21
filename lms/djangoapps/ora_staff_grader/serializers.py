@@ -144,14 +144,18 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
-    rubricConfig = RubricConfigSerializer()
+
+    def to_representation(self, instance):
+        """ Move rubric config inside of ORA metadata """
+        representation = super().to_representation(instance)
+        representation['oraMetadata']['rubricConfig'] = RubricConfigSerializer(instance['rubricConfig']).data
+        return representation
 
     class Meta:
         fields = [
             'courseMetadata',
             'oraMetadata',
             'submissions',
-            'rubricConfig',
         ]
         read_only_fields = fields
 
