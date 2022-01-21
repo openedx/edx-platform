@@ -143,6 +143,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'program_record_url': program_record_url,
         }
         program_discussion_lti = ProgramDiscussionLTI(program_uuid, request)
+        program_live_lti = ProgramLiveLTI(program_uuid, request)
         context = {
             'urls': urls,
             'user_preferences': get_user_preferences(user),
@@ -155,6 +156,10 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'discussion_fragment': {
                 'configured': program_discussion_lti.is_configured,
                 'iframe': program_discussion_lti.render_iframe()
+            },
+            'live_iframe': {
+                'configured': program_live_lti.is_configured,
+                'iframe': program_live_lti.render_iframe()
             }
         }
 
