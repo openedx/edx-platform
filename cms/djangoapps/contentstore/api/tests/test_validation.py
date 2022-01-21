@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@override_settings(PROCTORING_BACKENDS={'DEFAULT': 'null', 'proctortrack': {}})
+@override_settings(PROCTORING_BACKENDS={'DEFAULT': 'proctortrack', 'proctortrack': {}})
 class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test course validation view via a RESTful API
