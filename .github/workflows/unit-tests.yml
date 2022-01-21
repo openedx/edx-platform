@@ -22,10 +22,13 @@ jobs:
             "lms-6",
             "openedx-1",
             "openedx-2",
+            "openedx-3",
+            "openedx-4",
             "cms-1",
             "cms-2",
             "common-1",
             "common-2",
+            "common-3",
         ]
 
 
@@ -38,13 +41,9 @@ jobs:
         run: |
           sudo /etc/init.d/mongodb start
 
-      - name: set top-level module name
-        run: |
-          echo "module_name=$(echo '${{ matrix.shard_name }}' | awk -F '-' '{print $1}')" >> $GITHUB_ENV
-
       - name: set settings path
         run: |
-          echo "settings_path=$(if [ '${{ env.module_name }}' = 'cms' ]; then echo 'cms.envs.test'; else echo 'lms.envs.test' ; fi)" >> $GITHUB_ENV
+          echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
 
 #      - name: set pytest randomly option
 #        run: |
