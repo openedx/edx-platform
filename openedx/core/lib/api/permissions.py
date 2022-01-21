@@ -4,6 +4,8 @@ API library for Django REST Framework permissions-oriented workflows
 
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys import InvalidKeyError
@@ -13,6 +15,7 @@ from rest_framework import permissions
 
 from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
+from openedx.features.edly.utils import user_belongs_to_edly_sub_organization
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -38,6 +41,19 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
                       path=request.path,
                       ip=request.META.get("REMOTE_ADDR"))
             set_custom_metric('deprecated_api_key_header', True)
+            return True
+
+        username = request.data.get('user', request.user.username)
+        try:
+            user = get_user_model().objects.get(username=username)
+        except ObjectDoesNotExist:
+            return False
+
+        is_edly_api_user = request.user.groups.filter(
+            name=settings.EDLY_API_USERS_GROUP
+        ).exists()
+        if is_edly_api_user and username != request.user.username and \
+                user_belongs_to_edly_sub_organization(request, user):
             return True
 
         return False

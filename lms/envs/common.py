@@ -1614,6 +1614,7 @@ EDLY_PANEL_ADMIN_USERS_GROUP = 'Edly Panel Admin Users'
 EDLY_PANEL_RESTRICTED_USERS_GROUP = 'Edly Panel Restricted Users'
 EDLY_WP_ADMIN_USERS_GROUP = 'WordPress Edly Admin Users'
 EDLY_WP_SUBSCRIBER_USERS_GROUP = 'WordPress Subscriber Users'
+EDLY_API_USERS_GROUP = 'Edly API Users'
 
 EDLY_USER_ROLES = {
     'panel_restricted': EDLY_PANEL_RESTRICTED_USERS_GROUP,
