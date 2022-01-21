@@ -17,6 +17,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request, CacheIsolatio
 from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import (
+    CONTEXT,
     SafeCookieData,
     SafeSessionMiddleware,
     mark_user_change_as_expected,
@@ -156,6 +157,10 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.request.session = {}
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
+        # Gross, but this test class skips process_request() entirely
+        # and this is necessary for faking up the request phase
+        # piecemeal.
+        CONTEXT.data = {}
 
     def assert_response(self, set_request_user=False, set_session_cookie=False):
         """
@@ -482,7 +487,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         new_user = UserFactory.create()
         self.request.user = new_user
         # ...but so does session, and view sets a flag to say it's OK.
-        mark_user_change_as_expected(self.client.response, new_user.id)
+        mark_user_change_as_expected(new_user.id)
 
         with self.assert_no_warning_logged():
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:

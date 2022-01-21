@@ -605,7 +605,7 @@ def login_user(request, api_version='v1'):
         set_custom_attribute('login_user_auth_failed_error', False)
         set_custom_attribute('login_user_response_status', response.status_code)
         set_custom_attribute('login_user_redirect_url', redirect_url)
-        mark_user_change_as_expected(response, user.id)
+        mark_user_change_as_expected(user.id)
         return response
     except AuthFailedError as error:
         response_content = error.get_response()

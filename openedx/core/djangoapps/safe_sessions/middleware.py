@@ -76,6 +76,7 @@ Custom Attributes:
 """
 
 import inspect
+import threading
 from hashlib import sha1, sha256
 from logging import getLogger
 from typing import Union
@@ -90,7 +91,6 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
-
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
@@ -152,6 +152,21 @@ LOG_REQUEST_USER_CHANGE_HEADERS_DURATION = getattr(settings, 'LOG_REQUEST_USER_C
 ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=False)
 
 log = getLogger(__name__)
+
+# Thread-local for storing information about the current response. For
+# simplicity, all information is kept in a CONTEXT.data dictionary,
+# making it easy to clear for each new request.
+#
+# Rejected alternatives for where to place the annotation:
+#
+# - request object: Different request objects presented to middleware and
+#   view, so the attribute would be lost.
+# - response object: Doesn't help in cases where an exception is thrown
+#   instead of a response returned. Still want to validate that users don't
+#   change unexpectedly on a 404, for example.
+# - RequestCache: Gets cleared on exception before SafeSessionMiddleware's
+#   process_response can run.
+CONTEXT = threading.local()
 
 
 class SafeCookieError(Exception):
@@ -343,6 +358,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         final verification before sending the response (in
         process_response).
         """
+        CONTEXT.data = {}  # clear context for new request
+
         # 2021-12-01: Temporary debugging attr to answer the question
         # "are browsers sometimes sending in multiple session
         # cookies?" Answer: Yes, this sometimes happens, although it
@@ -662,7 +679,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         #
 
         # The relevant views set a flag to indicate the exemption.
-        if getattr(response, 'safe_sessions_expected_user_change', None):
+        if CONTEXT.data.get('expected_user_change') is not None:
             return no_mismatch_dict
 
         if not hasattr(request, 'safe_cookie_verified_user_id'):
@@ -887,7 +904,7 @@ def track_request_user_changes(request):
     request.__class__ = SafeSessionRequestWrapper
 
 
-def mark_user_change_as_expected(response, new_user_id):
+def mark_user_change_as_expected(new_user_id):
     """
     Indicate to the safe-sessions middleware that it is expected that
     the user is changing between the request and response phase of
@@ -896,4 +913,4 @@ def mark_user_change_as_expected(response, new_user_id):
     The new_user_id may be None or an LMS user ID, and may be the same
     as the previous user ID.
     """
-    response.safe_sessions_expected_user_change = {'new_user_id': new_user_id}
+    CONTEXT.data['expected_user_change'] = new_user_id
