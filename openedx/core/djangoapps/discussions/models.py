@@ -267,7 +267,7 @@ AVAILABLE_PROVIDER_MAP = {
         ],
         'supports_lti': True,
         'external_links': ProviderExternalLinks(
-            learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
+            learn_more='https://youtu.be/oOcvjjMVFAw',
             configuration='',
             general='https://hubs.ly/H0J5Bn70',
             accessibility='',
