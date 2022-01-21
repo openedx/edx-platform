@@ -482,7 +482,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         new_user = UserFactory.create()
         self.request.user = new_user
         # ...but so does session, and view sets a flag to say it's OK.
-        mark_user_change_as_expected(self.client.response, new_user.id)
+        mark_user_change_as_expected(new_user.id)
 
         with self.assert_no_warning_logged():
             with patch('openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute') as mock_attr:

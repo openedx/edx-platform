@@ -589,7 +589,7 @@ class RegistrationView(APIView):
                 path='/',
                 secure=request.is_secure()
             )  # setting the cookie to show account activation dialogue in platform and learning MFE
-        mark_user_change_as_expected(response, user.id)
+        mark_user_change_as_expected(user.id)
         return response
 
     def _handle_duplicate_email_username(self, request, data):
