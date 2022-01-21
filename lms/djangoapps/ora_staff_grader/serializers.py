@@ -90,7 +90,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
     """
     Submission metadata for displaying submissions table in ESG
     """
-    submissionUuid = serializers.CharField()
+    submissionUUID = serializers.CharField(source='submissionUuid')
     username = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
@@ -102,7 +102,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
     class Meta:
         fields = [
-            'submissionUuid',
+            'submissionUUID',
             'username',
             'teamName',
             'dateSubmitted',
