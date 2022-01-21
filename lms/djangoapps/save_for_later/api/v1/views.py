@@ -118,7 +118,7 @@ class ProgramSaveForLaterApiView(APIView):
         """
         user = request.user
         data = request.data
-        program_uuid = data.get('uuid')
+        program_uuid = data.get('program_uuid')
         email = data.get('email')
 
         if getattr(request, 'limited', False):

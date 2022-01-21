@@ -125,7 +125,7 @@ class ProgramSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         mock_get_programs.return_value = self.program
         request_payload = {
             'email': self.email,
-            'uuid': self.uuid,
+            'program_uuid': self.uuid,
         }
         response = self.client.post(self.api_url, data=request_payload)
         assert response.status_code == 200
@@ -144,7 +144,7 @@ class ProgramSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         request_payload = {
             'email': self.email,
-            'uuid': self.uuid,
+            'program_uuid': self.uuid,
         }
         for _ in range(int(settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT.split('/')[0])):
             response = self.client.post(self.api_url, data=request_payload)
@@ -167,6 +167,6 @@ class ProgramSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test email validation
         """
-        request_payload = {'email': self.invalid_email, 'uuid': self.uuid}
+        request_payload = {'email': self.invalid_email, 'program_uuid': self.uuid}
         response = self.client.post(self.api_url, data=request_payload)
         assert response.status_code == 400
