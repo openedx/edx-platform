@@ -62,7 +62,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/edx/testing.txt
     #   fs
-asgiref==3.4.1
+asgiref==3.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   django
@@ -136,7 +136,6 @@ celery==4.4.7
     #   -r requirements/edx/testing.txt
     #   django-celery-results
     #   django-user-tasks
-    #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
 certifi==2021.10.8
@@ -236,7 +235,6 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/testing.txt
     #   jwcrypto
-    #   redis
 diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -279,7 +277,6 @@ django==3.2.11
     #   edx-api-doc-tools
     #   edx-auth-backends
     #   edx-bulk-grades
-    #   edx-celeryutils
     #   edx-completion
     #   edx-django-release-util
     #   edx-django-sites-extensions
@@ -319,11 +316,11 @@ django-celery-results==2.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-django-classy-tags==2.0.0
+django-classy-tags==3.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.2.2
+django-config-models==2.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -373,7 +370,6 @@ django-model-utils==4.2.0
     #   -r requirements/edx/testing.txt
     #   django-user-tasks
     #   edx-bulk-grades
-    #   edx-celeryutils
     #   edx-completion
     #   edx-enterprise
     #   edx-milestones
@@ -394,7 +390,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-mysql==4.4.0
+django-mysql==4.5.0
     # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -406,7 +402,7 @@ django-object-actions==3.1.0
     #   edx-enterprise
 django-pipeline==2.0.8
     # via -r requirements/edx/testing.txt
-django-pyfs==3.1.0
+django-pyfs==3.2.0
     # via -r requirements/edx/testing.txt
 django-ratelimit==3.0.1
     # via -r requirements/edx/testing.txt
@@ -414,7 +410,7 @@ django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.g
     # via -r requirements/edx/testing.txt
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/testing.txt
-django-sekizai==2.0.0
+django-sekizai==3.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
@@ -507,7 +503,7 @@ edx-bulk-grades==0.9.2
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/testing.txt
-edx-celeryutils==1.1.1
+edx-celeryutils @ git+https://github.com/openedx/edx-celeryutils.git@8f3a796a430409fd91ffff04ea9068326b70cf0c
     # via
     #   -r requirements/edx/testing.txt
     #   edx-name-affirmation
@@ -581,11 +577,11 @@ edx-proctoring==4.8.4
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-rbac==1.5.1
+edx-rbac==1.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-rest-api-client==5.4.1
+edx-rest-api-client==5.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -647,7 +643,7 @@ faker==11.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.72.0
+fastapi==0.73.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -664,7 +660,7 @@ freezegun==0.3.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-frozenlist==1.2.0
+frozenlist==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -683,7 +679,6 @@ future==0.18.2
     # via
     #   -r requirements/edx/testing.txt
     #   django-ses
-    #   edx-celeryutils
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/testing.txt
@@ -699,11 +694,11 @@ glob2==0.7
     # via -r requirements/edx/testing.txt
 gunicorn==20.1.0
     # via -r requirements/edx/testing.txt
-h11==0.12.0
+h11==0.13.0
     # via
     #   -r requirements/edx/testing.txt
     #   uvicorn
-help-tokens==2.1.0
+help-tokens==2.2.0
     # via -r requirements/edx/testing.txt
 html5lib==1.1
     # via
@@ -789,7 +784,6 @@ jsondiff==1.3.0
 jsonfield==3.1.0
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-celeryutils
     #   edx-enterprise
     #   edx-proctoring
     #   edx-submissions
@@ -826,7 +820,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==3.2.0
+lti-consumer-xblock==3.3.0
     # via -r requirements/edx/testing.txt
 lxml==4.5.0
     # via
@@ -896,7 +890,7 @@ mpmath==1.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   sympy
-multidict==5.2.0
+multidict==6.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -907,7 +901,7 @@ mypy-extensions==0.4.3
     # via mypy
 mysqlclient==2.1.0
     # via -r requirements/edx/testing.txt
-newrelic==7.2.4.171
+newrelic==7.4.0.172
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -932,7 +926,9 @@ oauthlib==3.0.1
     #   requests-oauthlib
     #   social-auth-core
 openedx-calc==2.0.1
-    # via -r requirements/edx/testing.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 openedx-events==0.7.1
     # via -r requirements/edx/testing.txt
 ora2==3.7.8
@@ -944,7 +940,6 @@ packaging==21.3
     #   drf-yasg
     #   py2neo
     #   pytest
-    #   redis
     #   sphinx
     #   tox
 pact-python==1.4.6
@@ -1023,7 +1018,7 @@ pycparser==2.21
     # via
     #   -r requirements/edx/testing.txt
     #   cffi
-pycryptodomex==3.12.0
+pycryptodomex==3.13.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
@@ -1095,7 +1090,7 @@ pynacl==1.5.0
     # via -r requirements/edx/testing.txt
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
-pyparsing==3.0.6
+pyparsing==3.0.7
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1214,9 +1209,11 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.1.1
-    # via -r requirements/edx/testing.txt
-regex==2021.11.10
+redis==3.5.3
+    # via
+    #   -c requirements/edx/../common_constraints.txt
+    #   -r requirements/edx/testing.txt
+regex==2022.1.18
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1568,7 +1565,7 @@ xmlsec==1.3.12
     # via
     #   -r requirements/edx/testing.txt
     #   python3-saml
-xss-utils==0.3.0
+xss-utils==0.4.0
     # via -r requirements/edx/testing.txt
 yarl==1.7.2
     # via
