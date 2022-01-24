@@ -8,8 +8,7 @@ Pending
 Context
 =======
 Currently, the courses are being stored in the Modulestore and the libraries are stored in both Modulestore and the Blockstore. We want the library content to be stored in the Blockstore.
-To achieve this we need a referencing mechanism to reference the libraries to the courses. This referencing helps in replacing
-v1 libraries (current content libraries stored on Modulestore) with v2 libraries (Blockstore backed) which are:
+We want to have a content reuse mechanism that allows authors to incorporate content (XBlocks) from content libraries into their courses without making a copy of it; in other words, we want a referencing mechanism for library content. 
 
 We are currently building out the functionality of libraries v2, and trying to migrate all usage of content libraries onto Blockstore.
 The benefits of using the Blockstore backed v2 libraries are:
@@ -37,7 +36,7 @@ The workflow discussed for the interface for library content referencing would b
 Current Architecture/Implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Currently, the courses are stored in modulestore and the libraries can either be stored in modulestore or blockstore.
-Since the course lives in the modulestore and some of the libraries in blockstore, we use the [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py) to make a copy of that blockstore based library and store it in modulestore itself as the child.
+Since the course lives in the modulestore and some of the libraries in blockstore, we use the [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py) to make a copy of that blockstore based library block and store it in modulestore itself as the child.
 
 
 Proposed Implementation
