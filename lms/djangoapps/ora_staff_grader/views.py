@@ -8,7 +8,6 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     claim_submission_lock,
     delete_submission_lock,
     get_assessment_info,
-    get_rubric_config,
     get_submission_info,
     get_submissions,
     submit_grade
@@ -64,7 +63,6 @@ class InitializeView(StaffGraderBaseView):
         courseMetadata
         oraMetadata
         submissions
-        rubricConfig
     }
 
     Errors:
@@ -78,10 +76,9 @@ class InitializeView(StaffGraderBaseView):
         try:
             init_data = {}
 
-            # Get ORA block and rubric
+            # Get ORA block and config (incl. rubric)
             ora_usage_key = UsageKey.from_string(ora_location)
             init_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
-            init_data['rubricConfig'] = get_rubric_config(request, ora_location)
 
             # Get course metadata
             course_id = str(ora_usage_key.course_key)
