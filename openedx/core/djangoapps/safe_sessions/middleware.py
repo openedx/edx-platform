@@ -147,9 +147,8 @@ LOG_REQUEST_USER_CHANGE_HEADERS_DURATION = getattr(settings, 'LOG_REQUEST_USER_C
 #   "SafeCookieData user at request" in the logs are very rare; if they are
 #   not, it is likely that there is either a bug or that a login or
 #   registration endpoint needs to call ``mark_user_change_as_expected``.
-# .. toggle_use_cases: temporary
+# .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2021-12-01
-# .. toggle_target_removal_date: 2022-08-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1861
 ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=True)
 
