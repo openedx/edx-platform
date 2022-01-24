@@ -1468,6 +1468,9 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def _submit_unenroll(self, unenrolling_username, submitting_user=None, client=None):
         """ Submit enrollment, by default as superuser. """
+        # Provide both or neither of the overrides
+        assert (submitting_user is None) == (client is None)
+
         # Avoid mixing cookies between two users
         client = client or self.superuser_client
         submitting_user = submitting_user or self.superuser
