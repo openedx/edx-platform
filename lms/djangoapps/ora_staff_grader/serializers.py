@@ -52,7 +52,7 @@ class RubricCriterionOptionsSerializer(serializers.Serializer):
 class RubricCriterionSerializer(serializers.Serializer):
     label = serializers.CharField()
     prompt = serializers.CharField()
-    feedback = serializers.ChoiceField(choices=["optional", "disabled", "required"])
+    feedback = serializers.ChoiceField(required=False, choices=["optional", "disabled", "required"], default="disabled")
     name = serializers.CharField()
     orderNum = serializers.IntegerField(source="order_num")
     options = serializers.ListField(child=RubricCriterionOptionsSerializer())
