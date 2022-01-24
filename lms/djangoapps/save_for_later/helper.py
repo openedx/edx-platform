@@ -12,7 +12,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 log = logging.getLogger(__name__)
 
-USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.save.for.later.email.sent'
+USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.saveforlater.email.sent'
 
 
 def _get_event_properties(data):
