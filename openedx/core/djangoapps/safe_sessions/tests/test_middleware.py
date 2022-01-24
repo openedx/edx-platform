@@ -17,7 +17,6 @@ from openedx.core.djangolib.testing.utils import get_mock_request, CacheIsolatio
 from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import (
-    CONTEXT,
     SafeCookieData,
     SafeSessionMiddleware,
     mark_user_change_as_expected,
@@ -157,10 +156,6 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.request.session = {}
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
-        # Gross, but this test class skips process_request() entirely
-        # and this is necessary for faking up the request phase
-        # piecemeal.
-        CONTEXT.data = {}
 
     def assert_response(self, set_request_user=False, set_session_cookie=False):
         """

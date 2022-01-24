@@ -76,7 +76,6 @@ Custom Attributes:
 """
 
 import inspect
-import threading
 from hashlib import sha1, sha256
 from logging import getLogger
 from typing import Union
@@ -91,6 +90,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
+from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
@@ -154,24 +154,19 @@ ENFORCE_SAFE_SESSIONS = SettingToggle('ENFORCE_SAFE_SESSIONS', default=True)
 
 log = getLogger(__name__)
 
-# Thread-local for storing information about the current response. For
-# simplicity, all information is kept in a CONTEXT.data dictionary,
-# making it easy to clear for each new request.
+# RequestCache for conveying information from views back up to the
+# middleware -- specifically, information about expected changes to
+# request.user
 #
 # Rejected alternatives for where to place the annotation:
 #
-# - request object: Different request objects presented to middleware and
-#   view, so the attribute would be lost.
+# - request object: Different request objects are presented to middlewares
+#   and views, so the attribute would be lost.
 # - response object: Doesn't help in cases where an exception is thrown
 #   instead of a response returned. Still want to validate that users don't
 #   change unexpectedly on a 404, for example.
-# - RequestCache: Gets cleared on exception before SafeSessionMiddleware's
-#   process_response can run.
-CONTEXT = threading.local()
+request_cache = RequestCache(namespace="safe-sessions")
 
-# Don't break tests elsewhere that don't go through SafeSessionMiddleware.
-# (Otherwise could cause order-dependent test failures.)
-CONTEXT.data = {}
 
 class SafeCookieError(Exception):
     """
@@ -362,8 +357,6 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         final verification before sending the response (in
         process_response).
         """
-        CONTEXT.data = {}  # clear context for new request
-
         # 2021-12-01: Temporary debugging attr to answer the question
         # "are browsers sometimes sending in multiple session
         # cookies?" Answer: Yes, this sometimes happens, although it
@@ -683,7 +676,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         #
 
         # The relevant views set a flag to indicate the exemption.
-        if CONTEXT.data.get('expected_user_change') is not None:
+        if request_cache.get_cached_response('expected_user_change').is_found:
             return no_mismatch_dict
 
         if not hasattr(request, 'safe_cookie_verified_user_id'):
@@ -921,4 +914,4 @@ def mark_user_change_as_expected(new_user_id):
     The new_user_id may be None or an LMS user ID, and may be the same
     as the previous user ID.
     """
-    CONTEXT.data['expected_user_change'] = new_user_id
+    request_cache.set('expected_user_change', new_user_id)
