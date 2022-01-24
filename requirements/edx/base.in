@@ -75,7 +75,7 @@ edx-auth-backends                   # Allow Studio to use LMS SSO
 edx-braze-client
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
 edx-ccx-keys
-edx-celeryutils
+git+https://github.com/openedx/edx-celeryutils.git@8f3a796a430409fd91ffff04ea9068326b70cf0c#egg=edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
