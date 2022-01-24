@@ -97,7 +97,7 @@ def switch_user(request, lti_user, lti_consumer):
         # users by this point, but just in case we can return a 403.
         raise PermissionDenied()
     login(request, edx_user)
-    mark_user_change_as_expected(lti_user.id)
+    mark_user_change_as_expected(edx_user.id)
 
 
 def generate_random_edx_username():
