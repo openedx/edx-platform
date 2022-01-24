@@ -93,48 +93,42 @@ class TestInitializeView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
-    def test_init(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
+    def test_init(self, mock_get_course_overview, mock_get_submissions):
         """ Any failure to fetch info returns an unknown error response """
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
         mock_get_submissions.return_value = test_data.example_submission_list
-        mock_get_rubric_config.return_value = test_data.example_rubric
 
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
-        expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions', 'rubricConfig'])
+        expected_keys = set(['courseMetadata', 'oraMetadata', 'submissions'])
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
 
-    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
-    def test_init_xblock_exception(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
+    def test_init_xblock_exception(self, mock_get_course_overview, mock_get_submissions):
         """ If one of the XBlock handlers fails, the exception should be caught """
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
         # Mock an error getting submissions
         mock_get_submissions.side_effect = XBlockInternalError(context={'handler': 'list_staff_workflows'})
-        mock_get_rubric_config.return_value = test_data.example_rubric
 
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
         assert response.status_code == 500
         assert json.loads(response.content) == {"error": ERR_INTERNAL, "handler": "list_staff_workflows"}
 
-    @patch('lms.djangoapps.ora_staff_grader.views.get_rubric_config')
     @patch('lms.djangoapps.ora_staff_grader.views.get_submissions')
     @patch('lms.djangoapps.ora_staff_grader.views.get_course_overview_or_none')
-    def test_init_generic_exception(self, mock_get_course_overview, mock_get_submissions, mock_get_rubric_config):
+    def test_init_generic_exception(self, mock_get_course_overview, mock_get_submissions):
         """ If something else strange fails (e.g. bad data shape), an "unknown" error should be surfaced """
         mock_course_overview = CourseOverviewFactory.create()
         mock_get_course_overview.return_value = mock_course_overview
         # Mock a bad returned data shape which would break serialization
         mock_get_submissions.return_value = {'bad': 'wolf'}
-        mock_get_rubric_config.return_value = test_data.example_rubric
 
         response = self.client.get(self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key})
 
