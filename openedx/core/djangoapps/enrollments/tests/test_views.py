@@ -1349,7 +1349,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """ Create a course and user, then log in. """
         super().setUp()
         self.superuser = SuperuserFactory()
-        self.superuserClient = Client()
+        self.superuser_client = Client()
         # Pass emit_signals when creating the course so it would be cached
         # as a CourseOverview. Enrollments require a cached CourseOverview.
         self.first_org_course = CourseFactory.create(emit_signals=True, org="org", course="course", run="run")
@@ -1469,7 +1469,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     def _submit_unenroll(self, unenrolling_username, submitting_user=None, client=None):
         """ Submit enrollment, by default as superuser. """
         # Avoid mixing cookies between two users
-        client = client or self.superuserClient
+        client = client or self.superuser_client
         submitting_user = submitting_user or self.superuser
 
         data = {}
