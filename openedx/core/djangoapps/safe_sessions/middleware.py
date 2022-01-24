@@ -170,6 +170,9 @@ log = getLogger(__name__)
 #   process_response can run.
 CONTEXT = threading.local()
 
+# Don't break tests elsewhere that don't go through SafeSessionMiddleware.
+# (Otherwise could cause order-dependent test failures.)
+CONTEXT.data = {}
 
 class SafeCookieError(Exception):
     """
