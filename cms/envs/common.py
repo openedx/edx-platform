@@ -2253,6 +2253,16 @@ COURSEGRAPH_CONNECTION: dict = {
     "password": None,
 }
 
+# .. toggle_name: COURSEGRAPH_DUMP_COURSE_ON_PUBLISH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_creation_date: 2022-01-27
+# .. toggle_use_cases: open_edx
+# .. toggle_default: False
+# .. toggle_description: Whether, upon publish, a course should automatically
+#      be exported to Neo4j via the connection parameters specified in
+#      `COURSEGRAPH_CONNECTION`.
+COURSEGRAPH_DUMP_COURSE_ON_PUBLISH: bool = False
+
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
