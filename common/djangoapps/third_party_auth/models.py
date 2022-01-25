@@ -351,11 +351,9 @@ class ProviderConfig(ConfigurationModel):
     def is_auth0_enabled(self):
         is_auth0_enabled = False
         if self.is_tahoe_auth0_backend():
-            from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-            is_auth0_enabled = configuration_helpers.get_value(
-                'ENABLE_TAHOE_AUTH0',
-                settings.FEATURES.get('ENABLE_TAHOE_AUTH0', False),
-            )
+            # Tahoe: Local imports to avoid circular import errors.
+            from openedx.core.djangoapps.site_configuration import tahoe_auth0_helpers
+            is_auth0_enabled = tahoe_auth0_helpers.is_tahoe_auth0_enabled()
 
         return is_auth0_enabled
 
