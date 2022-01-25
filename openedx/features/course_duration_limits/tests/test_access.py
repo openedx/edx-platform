@@ -19,7 +19,6 @@ from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
     generate_course_expired_message,
     get_access_expiration_data,
@@ -30,7 +29,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 
 
 @ddt.ddt
-class TestAccess(ModuleStoreTestCase, CacheIsolationTestCase):
+class TestAccess(ModuleStoreTestCase):
     """Tests of openedx.features.course_duration_limits.access"""
     def setUp(self):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
