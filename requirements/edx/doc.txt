@@ -46,7 +46,7 @@ pbr==5.8.0
     # via stevedore
 pygments==2.11.2
     # via sphinx
-pyparsing==3.0.6
+pyparsing==3.0.7
     # via packaging
 python-slugify==4.0.1
     # via
