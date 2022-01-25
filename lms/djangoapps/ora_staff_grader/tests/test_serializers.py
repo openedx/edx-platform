@@ -27,7 +27,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
-
+from lms.djangoapps.ora_staff_grader.tests import test_data
 
 class TestErrorSerializer(TestCase):
     """ Tests for error serialization """
@@ -96,16 +96,17 @@ class TestOpenResponseMetadataSerializer(TestCase):
     """
     Tests for OpenResponseMetadataSerializer
     """
-    ora_data = {
-        "display_name": "Week 1: Time Travel Paradoxes",
-        "prompts": ["<p>In your own words, explain a famous time travel paradox</p>"],
-        "teams_enabled": False,
-        "text_response": None,
-        "file_upload_response": None,
-    }
-
     def setUp(self):
         super().setUp()
+
+        self.ora_data = {
+            "display_name": "Week 1: Time Travel Paradoxes",
+            "prompts": ["<p>In your own words, explain a famous time travel paradox</p>"],
+            "teams_enabled": False,
+            "text_response": None,
+            "file_upload_response": None,
+            **test_data.example_rubric
+        }
 
         self.mock_ora_instance = Mock(name='openassessment-block', **self.ora_data)
 
@@ -119,6 +120,27 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "type": "individual",
             "textResponseConfig": "none",
             "fileUploadResponseConfig": "none",
+            "rubricConfig": {
+                "feedbackPrompt": "How did this student do?",
+                "criteria": [
+                    {
+                        "orderNum": 0,
+                        "name": "potions",
+                        "label": "Potions",
+                        "prompt": "How did this student perform in the Potions exam",
+                        "feedback": "optional",
+                        "options": test_data.example_rubric_options_serialized
+                    },
+                    {
+                        "orderNum": 1,
+                        "name": "charms",
+                        "label": "Charms",
+                        "prompt": "How did this student perform in the Charms exam",
+                        "feedback": "disabled",
+                        "options": test_data.example_rubric_options_serialized
+                    }
+                ]
+            }
         }
 
     def test_team_ora(self):
@@ -132,6 +154,27 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "type": "team",
             "textResponseConfig": "none",
             "fileUploadResponseConfig": "none",
+            "rubricConfig": {
+                "feedbackPrompt": "How did this student do?",
+                "criteria": [
+                    {
+                        "orderNum": 0,
+                        "name": "potions",
+                        "label": "Potions",
+                        "prompt": "How did this student perform in the Potions exam",
+                        "feedback": "optional",
+                        "options": test_data.example_rubric_options_serialized
+                    },
+                    {
+                        "orderNum": 1,
+                        "name": "charms",
+                        "label": "Charms",
+                        "prompt": "How did this student perform in the Charms exam",
+                        "feedback": "disabled",
+                        "options": test_data.example_rubric_options_serialized
+                    }
+                ]
+            }
         }
 
     @ddt.unpack
@@ -173,7 +216,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "pointsPossible": <num>
         }
     }
-    Right now, this is just passed through without any transforms.
+    Right now, this is just passed through with only one name transform
     """
     submission_data = {
         "a": {
@@ -224,8 +267,12 @@ class TestSubmissionMetadataSerializer(TestCase):
         for submission_id, submission_data in self.submission_data.items():
             data = SubmissionMetadataSerializer(submission_data).data
 
-            # For each submission, data is just passed through
-            assert self.submission_data[submission_id] == data
+            # For each submission, the only transform is to change "submissionUuid" to "submissionUUID"
+            # Create that "expected" object here by updating the key name
+            expected_data = self.submission_data[submission_id].copy()
+            expected_data['submissionUUID'] = expected_data.pop('submissionUuid')
+
+            assert data == expected_data
 
     def test_empty_score(self):
         """
@@ -243,7 +290,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         }
 
         expected_output = {
-            "submissionUuid": "empty-score",
+            "submissionUUID": "empty-score",
             "username": "WOPR",
             "teamName": None,
             "dateSubmitted": "1983-06-03 00:00:00",
@@ -271,6 +318,8 @@ class TestInitializeSerializer(TestCase):
             "teams_enabled": False
         }
 
+        # Add rubric data here for succinctness
+        ora_data.update(test_data.example_rubric)
         return Mock(name='openassessment-block', **ora_data)
 
     def set_up_course_metadata(self):
@@ -292,161 +341,35 @@ class TestInitializeSerializer(TestCase):
 
         self.mock_ora_instance = self.set_up_ora()
         self.mock_course_metadata = self.set_up_course_metadata()
-
-        # Submissions data gets some minor transforms
-        # This test data does not undergo any transforms so we can do easier comparison tests
-        self.mock_submissions_data = {
-            "space-oddity": {
-                "submissionUuid": "space-oddity",
-                "username": "Major Tom",
-                "teamName": None,
-                "dateSubmitted": "1969-06-20 00:00:00",
-                "dateGraded": "1969-07-11 00:00:00",
-                "gradedBy": "Ground Control",
-                "gradingStatus": "graded",
-                "lockStatus": "unlocked",
-                "score": {
-                    "pointsEarned": 10,
-                    "pointsPossible": 10,
-                }
-            }
-        }
-
-        # Simple rubric example
-        self.mock_rubric_data = {
-            "feedback_prompt": "How would you grade this response?",
-            "feedback_default_text": "I believe this response...",
-            "criteria": [
-                {
-                    "order_num": 0,
-                    "name": "grammar",
-                    "label": "Grammar",
-                    "prompt": "How correct is the submitter's grammar?",
-                    "feedback": "optional",
-                    "options": [
-                        {
-                            "order_num": 0,
-                            "name": "poor",
-                            "label": "Poor",
-                            "explanation": "Absolute rubbish",
-                            "points": 0
-                        },
-                        {
-                            "order_num": 1,
-                            "name": "excellent",
-                            "label": "Excelent",
-                            "explanation": "Not absolute rubbish",
-                            "points": 5
-                        }
-                    ]
-                }
-            ]
-        }
+        self.mock_submissions_data = test_data.example_submission_list.copy()
 
     def test_serializer_output(self):
         input_data = {
             "courseMetadata": self.mock_course_metadata,
             "oraMetadata": self.mock_ora_instance,
             "submissions": self.mock_submissions_data,
-            "rubricConfig": self.mock_rubric_data,
         }
 
         output_data = InitializeSerializer(input_data).data
 
+        # There's a level of unpacking that happens in the serializer, perform that here
+        expected_submissions_data = {}
+        for submission_id, submission_data in self.mock_submissions_data.items():
+            serialized_data = SubmissionMetadataSerializer(submission_data).data
+            expected_submissions_data[submission_id] = serialized_data
+
         # Check that each of the sub-serializers assembles data correctly
         assert output_data['courseMetadata'] == CourseMetadataSerializer(self.mock_course_metadata).data
         assert output_data['oraMetadata'] == OpenResponseMetadataSerializer(self.mock_ora_instance).data
-        assert output_data['submissions'] == self.mock_submissions_data
-        assert output_data['rubricConfig'] == RubricConfigSerializer(self.mock_rubric_data).data
+        assert output_data['submissions'] == expected_submissions_data
 
 
 class TestRubricConfigSerializer(TestCase):
     """ Tests for RubricConfigSerializer """
 
-    # Options split for reuse
-    example_options = [
-        {
-            "order_num": 0,
-            "name": "troll",
-            "label": "Troll",
-            "explanation": "Failing grade",
-            "points": 0
-        },
-        {
-            "order_num": 1,
-            "name": "dreadful",
-            "label": "Dreadful",
-            "explanation": "Failing grade",
-            "points": 1
-        },
-        {
-            "order_num": 2,
-            "name": "poor",
-            "label": "Poor",
-            "explanation": "Failing grade (may repeat)",
-            "points": 2
-        },
-        {
-            "order_num": 3,
-            "name": "poor",
-            "label": "Poor",
-            "explanation": "Failing grade (may repeat)",
-            "points": 3
-        },
-        {
-            "order_num": 4,
-            "name": "acceptable",
-            "label": "Acceptable",
-            "explanation": "Passing grade (may continue to N.E.W.T)",
-            "points": 4
-        },
-        {
-            "order_num": 5,
-            "name": "exceeds_expectations",
-            "label": "Exceeds Expectations",
-            "explanation": "Passing grade (may continue to N.E.W.T)",
-            "points": 5
-        },
-        {
-            "order_num": 6,
-            "name": "outstanding",
-            "label": "Outstanding",
-            "explanation": "Passing grade (will continue to N.E.W.T)",
-            "points": 6
-        }
-    ]
-
-    example_rubric = {
-        "feedback_prompt": "How did this student do?",
-        "feedback_default_text": "For the O.W.L exams, this student...",
-        "criteria": [
-            {
-                "order_num": 0,
-                "name": "potions",
-                "label": "Potions",
-                "prompt": "How did this student perform in the Potions exam",
-                "feedback": "optional",
-                "options": example_options
-            },
-            {
-                "order_num": 1,
-                "name": "charms",
-                "label": "Charms",
-                "prompt": "How did this student perform in the Charms exam",
-                "feedback": "required",
-                "options": example_options
-            }
-        ]
-    }
-
     def basic_test_case(self):
         """ Basic test for complex rubric """
-        # Options have only one naming transform, done here for succinctness
-        expected_options = self.example_options.copy()
-        for option in expected_options:
-            option['orderNum'] = option.pop("order_num")
-
-        assert RubricConfigSerializer(self.example_rubric).data == {
+        assert RubricConfigSerializer(test_data.example_rubric).data == {
             "feedbackPrompt": "How did this student do?",
             "criteria": [
                 {
@@ -455,15 +378,15 @@ class TestRubricConfigSerializer(TestCase):
                     "label": "Potions",
                     "prompt": "How did this student perform in the Potions exam",
                     "feedback": "optional",
-                    "options": expected_options
+                    "options": test_data.example_rubric_options_serialized
                 },
                 {
                     "order_num": 1,
                     "name": "charms",
                     "label": "Charms",
                     "prompt": "How did this student perform in the Charms exam",
-                    "feedback": "required",
-                    "options": expected_options
+                    "feedback": "disabled",
+                    "options": test_data.example_rubric_options_serialized
                 }
             ]
         }
