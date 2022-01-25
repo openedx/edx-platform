@@ -518,7 +518,7 @@ class CertificateAvailableDate(DateSummary):
         Registers an alert close to the certificate delivery date.
         """
         is_enrolled = CourseEnrollment.get_enrollment(request.user, course.id)
-        if not is_enrolled or not self.is_enabled or course.end > self.current_time:
+        if not is_enrolled or not self.is_enabled or (course.end and course.end > self.current_time):
             return
         if self.date > self.current_time:
             CourseHomeMessages.register_info_message(
