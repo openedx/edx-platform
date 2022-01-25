@@ -11,6 +11,7 @@ from slumber.exceptions import SlumberBaseException
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED  # lint-amnesty, pylint: disable=line-too-long
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
@@ -41,16 +42,16 @@ def enrollment_mode_display(mode, verification_status, course_id):
     display_mode = _enrollment_mode_display(mode, verification_status, course_id)
 
     if display_mode == DISPLAY_VERIFIED:
-        if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
-            enrollment_title = _("Your verification is pending")
-            enrollment_value = _("Verified: Pending Verification")
-            show_image = True
-            image_alt = _("ID verification pending")
-        elif verification_status == VERIFY_STATUS_APPROVED:
+        if is_integrity_signature_enabled(course_id) or verification_status == VERIFY_STATUS_APPROVED:
             enrollment_title = _("You're enrolled as a verified student")
             enrollment_value = _("Verified")
             show_image = True
             image_alt = _("ID Verified Ribbon/Badge")
+        elif verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+            enrollment_title = _("Your verification is pending")
+            enrollment_value = _("Verified: Pending Verification")
+            show_image = True
+            image_alt = _("ID verification pending")
     elif display_mode == DISPLAY_HONOR:
         enrollment_title = _("You're enrolled as an honor code student")
         enrollment_value = _("Honor Code")
@@ -63,7 +64,7 @@ def enrollment_mode_display(mode, verification_status, course_id):
         'enrollment_value': str(enrollment_value),
         'show_image': show_image,
         'image_alt': str(image_alt),
-        'display_mode': _enrollment_mode_display(mode, verification_status, course_id)
+        'display_mode': display_mode
     }
 
 
@@ -79,7 +80,10 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
     course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
 
     if enrollment_mode == CourseMode.VERIFIED:
-        if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+        if (
+            is_integrity_signature_enabled(course_id)
+            or verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]
+        ):
             display_mode = DISPLAY_VERIFIED
         elif DISPLAY_HONOR in course_mode_slugs:
             display_mode = DISPLAY_HONOR
