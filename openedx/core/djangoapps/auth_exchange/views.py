@@ -153,5 +153,5 @@ class LoginWithAccessTokenView(APIView):
 
         login(request, request.user)  # login generates and stores the user's cookies in the session
         response = HttpResponse(status=204)  # cookies stored in the session are returned with the response
-        mark_user_change_as_expected(response, request.user.id)
+        mark_user_change_as_expected(request.user.id)
         return response
