@@ -2,7 +2,7 @@
 Helper method to indicate when the blockstore app API is enabled.
 """
 from django.conf import settings
-from .waffle import BLOCKSTORE_USE_BLOCKSTORE_APP_API
+from .waffle import BLOCKSTORE_USE_BLOCKSTORE_APP_API  # pylint: disable=invalid-django-waffle-import
 
 
 def use_blockstore_app():

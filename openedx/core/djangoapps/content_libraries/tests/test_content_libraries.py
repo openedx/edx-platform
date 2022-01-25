@@ -19,6 +19,7 @@ from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import (
+    ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
     elasticsearch_test,
     URL_BLOCK_METADATA_URL,
@@ -33,8 +34,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
-@elasticsearch_test
-class ContentLibrariesTest(ContentLibrariesRestApiTest):
+class ContentLibrariesTestMixin:
     """
     General tests for Blockstore-based Content Libraries
 
@@ -872,6 +872,26 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             assert len(types) > 1
 
 
+@elasticsearch_test
+class ContentLibrariesBlockstoreServiceTest(
+    ContentLibrariesTestMixin,
+    ContentLibrariesRestApiBlockstoreServiceTest,
+):
+    """
+    General tests for Blockstore-based Content Libraries, using the standalone Blockstore service.
+    """
+
+
+@elasticsearch_test
+class ContentLibrariesTest(
+    ContentLibrariesTestMixin,
+    ContentLibrariesRestApiTest,
+):
+    """
+    General tests for Blockstore-based Content Libraries, using the installed Blockstore app.
+    """
+
+
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
     """Tests only focused on service validation, no Blockstore needed."""
@@ -941,8 +961,7 @@ class AltBlock(XBlock):
 
 
 @ddt.ddt
-@elasticsearch_test
-class ContentLibrariesXBlockTypeOverrideTest(ContentLibrariesRestApiTest):
+class ContentLibrariesXBlockTypeOverrideTestMixin:
     """
     Tests for Blockstore-based Content Libraries XBlock API,
     where the expected XBlock type returned is overridden in the request.
@@ -1073,3 +1092,23 @@ class ContentLibrariesXBlockTypeOverrideTest(ContentLibrariesRestApiTest):
             assert f"lb:CL-TEST:handler-{slug}:video:handler-{slug}" in response['transcripts']['en']
             del response['transcripts']['en']
         assert response == expected_response
+
+
+@elasticsearch_test
+class ContentLibrariesXBlockTypeOverrideBlockstoreServiceTest(
+    ContentLibrariesXBlockTypeOverrideTestMixin,
+    ContentLibrariesRestApiBlockstoreServiceTest,
+):
+    """
+    Tests for the Content Libraries XBlock API type override using the standalone Blockstore service.
+    """
+
+
+@elasticsearch_test
+class ContentLibrariesXBlockTypeOverrideTest(
+    ContentLibrariesXBlockTypeOverrideTestMixin,
+    ContentLibrariesRestApiTest,
+):
+    """
+    Tests for the Content Libraries XBlock API type override using the installed Blockstore app.
+   """
