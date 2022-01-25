@@ -2,20 +2,20 @@
 Tests for xblock_utils.py
 """
 
-import unittest
 from uuid import UUID
 
 import pytest
-from django.conf import settings
+from django.test import TestCase
 
 from openedx.core.lib import blockstore_api as api
+from openedx.core.djangoapps.content_libraries.tests.base import requires_blockstore
 
 # A fake UUID that won't represent any real bundle/draft/collection:
 BAD_UUID = UUID('12345678-0000-0000-0000-000000000000')
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-class BlockstoreApiClientTest(unittest.TestCase):
+@requires_blockstore
+class BlockstoreApiClientTest(TestCase):
     """
     Test for the Blockstore API Client.
 

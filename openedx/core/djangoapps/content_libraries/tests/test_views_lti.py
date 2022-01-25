@@ -66,12 +66,12 @@ class LibraryBlockLtiUrlViewTest(ContentLibrariesRestApiTest):
         )
 
         block = self._add_block_to_library(library['id'], PROBLEM, PROBLEM)
-        usage_key = str(block.usage_key)
+        usage_key = str(block['id'])
 
         url = f'/api/libraries/v2/blocks/{usage_key}/lti/'
         expected_lti_url = f"/api/libraries/v2/lti/1.3/launch/?id={usage_key}"
 
-        response = self._api("GET", url, None, expect_response=200)
+        response = self._api("get", url, None, expect_response=200)
 
         self.assertDictEqual(response, {"lti_url": expected_lti_url})
 
@@ -79,9 +79,4 @@ class LibraryBlockLtiUrlViewTest(ContentLibrariesRestApiTest):
         """
         Test the LTI URL cannot be generated as the block not found.
         """
-
-        self._create_library(
-            slug="libgg", title="A Test Library", description="Testing library", library_type=PROBLEM,
-        )
-
-        self._api("GET", '/api/libraries/v2/blocks/not-existing-key/lti/', None, expect_response=404)
+        self._api("get", '/api/libraries/v2/blocks/lb:CL-TEST:libgg:problem:bad-block/lti/', None, expect_response=404)
