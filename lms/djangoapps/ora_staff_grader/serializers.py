@@ -147,7 +147,6 @@ class InitializeSerializer(serializers.Serializer):
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
 
-
     class Meta:
         fields = [
             'courseMetadata',
