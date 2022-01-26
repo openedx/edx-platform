@@ -12,7 +12,7 @@ from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
 from storages.backends.s3boto3 import S3Boto3Storage
 
-from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeMixin
+from openedx.core.djangoapps.theming.storage import ThemeManifestFilesMixin, ThemePipelineMixin, ThemeMixin
 
 
 class PipelineForgivingMixin(object):
@@ -44,7 +44,7 @@ class ProductionMixin(
         PipelineForgivingMixin,
         OptimizedFilesMixin,
         ThemePipelineMixin,
-        ThemeCachedFilesMixin,
+        ThemeManifestFilesMixin,
         ThemeMixin,
 ):
     """
