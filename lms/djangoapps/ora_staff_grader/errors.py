@@ -15,7 +15,8 @@ from lms.djangoapps.ora_staff_grader.constants import (
 class ExceptionWithContext(Exception):
     """An exception with optional context dict to be supplied in serialized result"""
 
-    def __init__(self, context={}):
+    def __init__(self, context=None):
+        super().__init__(self)
         self.context = context
 
 
@@ -35,8 +36,10 @@ class ErrorSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Override to unpack context alongside error code"""
         output = super().to_representation(instance)
-        for key, value in self.context.items():
-            output[key] = value
+
+        if self.context:
+            for key, value in self.context.items():
+                output[key] = value
 
         return output
 
@@ -47,7 +50,7 @@ class StaffGraderErrorResponse(Response):
     status = 500
     err_code = ERR_UNKNOWN
 
-    def __init__(self, context={}):
+    def __init__(self, context=None):
         # Unpack provided content into error structure
         content = ErrorSerializer({"error": self.err_code}, context=context).data
         super().__init__(content, status=self.status)

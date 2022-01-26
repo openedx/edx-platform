@@ -2,6 +2,7 @@
 Serializers for Enhanced Staff Grader (ESG)
 """
 # pylint: disable=abstract-method
+# pylint: disable=missing-function-docstring
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework import serializers
@@ -45,6 +46,8 @@ class CourseMetadataSerializer(serializers.Serializer):
 
 
 class RubricCriterionOptionsSerializer(serializers.Serializer):
+    """Serializer for selectable options in a rubric criterion"""
+
     label = serializers.CharField()
     points = serializers.IntegerField()
     explanation = serializers.CharField()
@@ -53,6 +56,8 @@ class RubricCriterionOptionsSerializer(serializers.Serializer):
 
 
 class RubricCriterionSerializer(serializers.Serializer):
+    """Serializer for individual criteria in a rubric"""
+
     label = serializers.CharField()
     prompt = serializers.CharField()
     feedback = serializers.ChoiceField(
@@ -64,6 +69,8 @@ class RubricCriterionSerializer(serializers.Serializer):
 
 
 class RubricConfigSerializer(serializers.Serializer):
+    """Serializer for rubric config"""
+
     feedbackPrompt = serializers.CharField(source="rubric_feedback_prompt")
     criteria = serializers.ListField(
         source="rubric_criteria", child=RubricCriterionSerializer()
@@ -104,6 +111,8 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
 
 
 class ScoreField(serializers.Field):
+    """Returns None if score is not given for a submission"""
+
     def to_representation(self, value):
         if ("pointsEarned" not in value) and ("pointsPossible" not in value):
             return None

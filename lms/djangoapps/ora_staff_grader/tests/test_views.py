@@ -590,8 +590,8 @@ class TestUpdateGradeView(BaseViewTest):
 
     @patch("lms.djangoapps.ora_staff_grader.views.check_submission_lock")
     @patch("lms.djangoapps.ora_staff_grader.views.submit_grade")
-    def test_submit_grade_xblock_exception(self, mock_submit_grade, mock_check_lock):
-        """A handled ORA failure to submit a grade returns a server error"""
+    def test_submit_grade_generic_exception(self, mock_submit_grade, mock_check_lock):
+        """A fall-through failure returns an unknown error"""
         mock_check_lock.return_value = {"lock_status": "in-progress"}
         mock_submit_grade.return_value = {"error": "time paradox encountered"}
         url = self.url_with_params(

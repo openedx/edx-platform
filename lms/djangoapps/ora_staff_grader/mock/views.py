@@ -1,13 +1,20 @@
 """
 Mock views for ESG
 """
-from django.http.response import HttpResponseBadRequest
+
+# pylint: disable=arguments-differ
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
-from lms.djangoapps.ora_staff_grader.errors import ERR_MISSING_PARAM
 
-from lms.djangoapps.ora_staff_grader.mock.utils import *
+from lms.djangoapps.ora_staff_grader.mock.utils import (
+    get_course_metadata,
+    get_ora_metadata,
+    get_submissions,
+    fetch_submission,
+    fetch_response,
+    save_submission_update,
+)
 
 PARAM_ORA_LOCATION = "oraLocation"
 PRAM_SUBMISSION_ID = "submissionUUID"
@@ -98,6 +105,7 @@ class UpdateGradeView(RetrieveAPIView):
     """Submit a grade"""
 
     def update_grade_data(self, submission, grade_data):
+        """Mutate grade shape and add a mock score"""
         submission["gradeData"] = grade_data
         submission["gradeStatus"] = "graded"
         submission["lockStatus"] = "unlocked"
@@ -107,6 +115,7 @@ class UpdateGradeView(RetrieveAPIView):
         }
 
     def post(self, request):
+        """Save a grade update to the data store"""
         ora_location = request.query_params[PARAM_ORA_LOCATION]
         submission_id = request.query_params[PRAM_SUBMISSION_ID]
         grade_data = request.data

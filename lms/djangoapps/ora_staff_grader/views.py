@@ -1,6 +1,12 @@
 """
 Views for Enhanced Staff Grader
 """
+# NOTE: we intentionally do broad exception checking to return a clean error shape
+# pylint: disable=broad-except
+
+# NOTE: we intentionally add extra args using @require_params
+# pylint: disable=arguments-differ
+
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,

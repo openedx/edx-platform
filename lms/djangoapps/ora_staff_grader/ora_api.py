@@ -163,7 +163,7 @@ def delete_submission_lock(request, usage_id, submission_uuid):
         raise LockContestedError()
 
     # Other errors should raise a blanket exception
-    elif response.status_code != 200:
+    if response.status_code != 200:
         raise XBlockInternalError(context={"handler": handler_name})
 
     return json.loads(response.content)

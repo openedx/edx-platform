@@ -36,8 +36,8 @@ def update_data_file(file_name, update_key_path, update_value):
 
     get_updated_dict(update_data, update_key_path, update_value)
 
-    with open(path.join(DATA_ROOT, file_name), "w") as update_data_file:
-        json.dump(update_data, update_data_file, indent=4)
+    with open(path.join(DATA_ROOT, file_name), "w") as data_file:
+        json.dump(update_data, data_file, indent=4)
 
 
 def get_course_metadata(ora_location):

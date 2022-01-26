@@ -418,13 +418,14 @@ class TestScoreFieldAndSerializer(TestCase):
 
     def test_serializer_no_values(self):
         """Passing the ScoreSerializer an empty dict should result in an empty serializer"""
+        # pylint: disable=use-implicit-booleaness-not-comparison
         assert ScoreSerializer({}).data == {}
 
     def test_serialier(self):
         """Base serialization behavior for ScoreSerializer"""
-        input = {"pointsEarned": 10, "pointsPossible": 200}
-        data = ScoreSerializer(input).data
-        assert data == input
+        input_data = {"pointsEarned": 10, "pointsPossible": 200}
+        data = ScoreSerializer(input_data).data
+        assert data == input_data
 
     @ddt.data("pointsEarned", "pointsPossible")
     def test_serializer_missing_field(self, missing_field):
@@ -440,14 +441,14 @@ class TestUploadedFileSerializer(TestCase):
 
     def test_uploaded_file_serializer(self):
         """Base serialization behavior"""
-        input = MagicMock(size=89794)
-        data = UploadedFileSerializer(input).data
+        input_data = MagicMock(size=89794)
+        data = UploadedFileSerializer(input_data).data
 
         expected_value = {
-            "downloadUrl": str(input.download_url),
-            "description": str(input.description),
-            "name": str(input.name),
-            "size": input.size,
+            "downloadUrl": str(input_data.download_url),
+            "description": str(input_data.description),
+            "name": str(input_data.name),
+            "size": input_data.size,
         }
         assert data == expected_value
 
@@ -458,27 +459,29 @@ class TestResponseSerializer(TestCase):
 
     def test_response_serializer__empty(self):
         """Empty fields should be allowed"""
-        input = {"files": [], "text": []}
-        assert ResponseSerializer(input).data == input
+        input_data = {"files": [], "text": []}
+        assert ResponseSerializer(input_data).data == input_data
 
     @ddt.unpack
     @ddt.data((True, True), (True, False), (False, True), (False, False))
     def test_response_serializer(self, has_text, has_files):
         """Base serialization behavior"""
-        input = MagicMock()
+        input_data = MagicMock()
         if has_files:
-            input.files = [Mock(size=111), Mock(size=222), Mock(size=333)]
+            input_data.files = [Mock(size=111), Mock(size=222), Mock(size=333)]
         if has_text:
-            input.text = [Mock(), Mock(), Mock()]
+            input_data.text = [Mock(), Mock(), Mock()]
 
-        data = ResponseSerializer(input).data
+        data = ResponseSerializer(input_data).data
         expected_value = {
             "files": [
-                UploadedFileSerializer(mock_file).data for mock_file in input.files
+                UploadedFileSerializer(mock_file).data for mock_file in input_data.files
             ]
             if has_files
             else [],
-            "text": [str(mock_text) for mock_text in input.text] if has_text else [],
+            "text": [str(mock_text) for mock_text in input_data.text]
+            if has_text
+            else [],
         }
         assert data == expected_value
 
@@ -488,28 +491,28 @@ class TestAssessmentCriteriaSerializer(TestCase):
 
     def test_assessment_criteria_serializer(self):
         """Base serialization behavior"""
-        input = Mock(points=595)
-        data = AssessmentCriteriaSerializer(input).data
+        input_data = Mock(points=595)
+        data = AssessmentCriteriaSerializer(input_data).data
 
         expected_value = {
-            "name": str(input.name),
-            "feedback": str(input.feedback),
-            "points": input.points,
-            "selectedOption": str(input.option),
+            "name": str(input_data.name),
+            "feedback": str(input_data.feedback),
+            "points": input_data.points,
+            "selectedOption": str(input_data.option),
         }
         assert data == expected_value
 
     def test_assessment_criteria_serializer__feedback_only(self):
         """Test for serialization behavior of a feedback-only criterion"""
-        input = {
+        input_data = {
             "name": "SomeCriterioOn",
             "feedback": "Pathetic Effort",
             "points": None,
             "option": None,
         }
-        data = AssessmentCriteriaSerializer(input).data
+        data = AssessmentCriteriaSerializer(input_data).data
 
-        expected_value = dict(input)
+        expected_value = dict(input_data)
         expected_value["selectedOption"] = expected_value["option"]
         del expected_value["option"]
 
@@ -522,24 +525,25 @@ class TestGradeDataSerializer(TestCase):
 
     def test_grade_data_serializer__no_assessment(self):
         """Passing an empty dict should result in an empty dict"""
+        # pylint: disable=use-implicit-booleaness-not-comparison
         assert GradeDataSerializer({}).data == {}
 
     @ddt.data(True, False)
     def test_grade_data_serializer__assessment(self, has_criteria):
         """Base serialization behavior, with and without criteria"""
-        input = MagicMock()
+        input_data = MagicMock()
         if has_criteria:
-            input.criteria = [Mock(points=123), Mock(points=11), Mock(points=22)]
-        data = GradeDataSerializer(input).data
+            input_data.criteria = [Mock(points=123), Mock(points=11), Mock(points=22)]
+        data = GradeDataSerializer(input_data).data
 
         expected_value = {
-            "score": ScoreField().to_representation(input.score),
-            "overallFeedback": str(input.feedback),
+            "score": ScoreField().to_representation(input_data.score),
+            "overallFeedback": str(input_data.feedback),
         }
         if has_criteria:
             expected_value["criteria"] = [
                 AssessmentCriteriaSerializer(criterion).data
-                for criterion in input.criteria
+                for criterion in input_data.criteria
             ]
         else:
             expected_value["criteria"] = []
@@ -552,27 +556,27 @@ class TestSubmissionStatusFetchSerializer(TestCase):
 
     def test_submission_status_fetch_serializer(self):
         """Base serialization behavior"""
-        input = MagicMock()
-        serializer = SubmissionStatusFetchSerializer(input)
+        input_data = MagicMock()
+        serializer = SubmissionStatusFetchSerializer(input_data)
         with patch.object(serializer, "get_gradeStatus") as mock_get_grade_status:
             data = serializer.data
 
         expected_value = {
-            "gradeData": GradeDataSerializer(input.assessment_info).data,
+            "gradeData": GradeDataSerializer(input_data.assessment_info).data,
             "gradeStatus": mock_get_grade_status.return_value,
             "lockStatus": LockStatusField().to_representation(
-                input.lock_info.lock_status
+                input_data.lock_info.lock_status
             ),
         }
-        mock_get_grade_status.assert_called_once_with(input)
+        mock_get_grade_status.assert_called_once_with(input_data)
         assert data == expected_value
 
     @ddt.data(True, False)
     def test_get__gradeStatus(self, has_assessment):
         """Unit test for get_gradeStatus"""
         assessment = {"somekey": "somevalue"} if has_assessment else {}
-        input = {"assessment_info": assessment}
-        value = SubmissionStatusFetchSerializer().get_gradeStatus(input)
+        input_data = {"assessment_info": assessment}
+        value = SubmissionStatusFetchSerializer().get_gradeStatus(input_data)
         expected = "graded" if has_assessment else "ungraded"
         assert value == expected
 
@@ -582,20 +586,20 @@ class TestSubmissionFetchSerializer(TestCase):
 
     def test_submission_fetch_serializer(self):
         """Base serialization behavior"""
-        input = MagicMock()
-        serializer = SubmissionFetchSerializer(input)
+        input_data = MagicMock()
+        serializer = SubmissionFetchSerializer(input_data)
         with patch.object(serializer, "get_gradeStatus") as mock_get_grade_status:
             data = serializer.data
 
         expected_value = {
-            "gradeData": GradeDataSerializer(input.assessment_info).data,
+            "gradeData": GradeDataSerializer(input_data.assessment_info).data,
             "gradeStatus": mock_get_grade_status.return_value,
             "lockStatus": LockStatusField().to_representation(
-                input.lock_info.lock_status
+                input_data.lock_info.lock_status
             ),
-            "response": ResponseSerializer(input.submission_info).data,
+            "response": ResponseSerializer(input_data.submission_info).data,
         }
-        mock_get_grade_status.assert_called_once_with(input)
+        mock_get_grade_status.assert_called_once_with(input_data)
         assert data == expected_value
 
 
@@ -623,9 +627,6 @@ class TestLockStatusSerializer(SharedModuleStoreTestCase):
     lock_owned_by_other_user_expected = {"lockStatus": "locked"}
 
     course_id = "course-v1:Oxford+TT101+2054"
-
-    def setUp(self):
-        super().setUp()
 
     def test_happy_path(self):
         """For simple cases, lock status is passed through directly"""
