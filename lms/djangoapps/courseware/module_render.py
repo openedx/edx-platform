@@ -39,6 +39,12 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
+from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import SandboxService
 from common.djangoapps import static_replace
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
@@ -90,12 +96,7 @@ from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.lib.cache_utils import CacheService
 
 log = logging.getLogger(__name__)
 
@@ -772,9 +773,6 @@ def get_module_system_for_user(
         node_path=settings.NODE_PATH,
         publish=publish,
         course_id=course_id,
-        cache=cache,
-        can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
-        get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
@@ -792,6 +790,8 @@ def get_module_system_for_user(
             'grade_utils': GradesUtilService(course_id=course_id),
             'user_state': UserStateService(),
             'content_type_gating': ContentTypeGatingService(),
+            'cache': CacheService(cache),
+            'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
