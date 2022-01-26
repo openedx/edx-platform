@@ -6,10 +6,7 @@ This is not inside a django app because it is a global property of the system.
 
 from django.test import Client, TestCase
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from common.djangoapps.student.tests.factories import UserFactory, TEST_PASSWORD
-
-from openedx.core.djangoapps.user_authn.views.login import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 
 
 class TestAdminView(TestCase):
@@ -39,10 +36,7 @@ class TestAdminView(TestCase):
         assert response.status_code == 302
 
     def test_admin_login_redirect(self):
-        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, True):
-            response = self.client.get(reverse('admin:login'))
-            assert response.url == '/login?next=/admin'
-            assert response.status_code == 302
-        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, False):
-            response = self.client.get(reverse('admin:login'))
-            assert response.template_name == ['admin/login.html']
+        """Admin login will redirect towards the site login page."""
+        response = self.client.get(reverse('admin:login'))
+        assert response.url == '/login?next=/admin'
+        assert response.status_code == 302

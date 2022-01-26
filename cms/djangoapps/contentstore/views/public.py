@@ -12,7 +12,10 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from ..config import waffle
 
-__all__ = ['register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility']
+__all__ = [
+    'register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility',
+    'redirect_to_lms_login_for_admin'
+]
 
 
 def register_redirect_to_lms(request):
@@ -37,6 +40,13 @@ def login_redirect_to_lms(request):
         params=_build_next_param(request),
     )
     return redirect(login_url)
+
+
+def redirect_to_lms_login_for_admin(request):
+    """
+    This view redirect the admin/login url to the site's login page.
+    """
+    return redirect('/login?next=/admin')
 
 
 def _build_next_param(request):
