@@ -4,11 +4,12 @@ Tests for DOT Adapter
 
 import unittest
 from datetime import timedelta
-import pytest
 
 import ddt
+import pytest
 from django.conf import settings
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.timezone import now
 from oauth2_provider import models
 
@@ -17,8 +18,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
     from ..adapters import DOTAdapter
-    from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
     from ..models import RestrictedApplication
+    from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
 
 
 @ddt.ddt
@@ -106,6 +107,10 @@ class DOTAdapterTestCase(TestCase):
         Make sure when generating an access_token for a restricted client
         that the token is immediately expired
         """
+
+        # for this test it requires to call AccessTokenView(_DispatchingView) otherwise it fails
+        # to set the expiry.
+        self.client.post(reverse('access_token'), {})
         self.adapter.create_access_token_for_test(
             'expired-token-id',
             client=self.restricted_client,
