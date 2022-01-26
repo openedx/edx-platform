@@ -41,6 +41,28 @@ class CourseMetadataSerializer(serializers.Serializer):
         read_only_fields = fields
 
 
+class RubricCriterionOptionsSerializer(serializers.Serializer):
+    label = serializers.CharField()
+    points = serializers.IntegerField()
+    explanation = serializers.CharField()
+    name = serializers.CharField()
+    orderNum = serializers.IntegerField(source="order_num")
+
+
+class RubricCriterionSerializer(serializers.Serializer):
+    label = serializers.CharField()
+    prompt = serializers.CharField()
+    feedback = serializers.ChoiceField(required=False, choices=["optional", "disabled", "required"], default="disabled")
+    name = serializers.CharField()
+    orderNum = serializers.IntegerField(source="order_num")
+    options = serializers.ListField(child=RubricCriterionOptionsSerializer())
+
+
+class RubricConfigSerializer(serializers.Serializer):
+    feedbackPrompt = serializers.CharField(source="rubric_feedback_prompt")
+    criteria = serializers.ListField(source="rubric_criteria", child=RubricCriterionSerializer())
+
+
 class OpenResponseMetadataSerializer(serializers.Serializer):
     """
     Serialize ORA metadata, used for setting up views in ESG
@@ -50,6 +72,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
     type = serializers.SerializerMethodField()
     textResponseConfig = serializers.SerializerMethodField()
     fileUploadResponseConfig = serializers.SerializerMethodField()
+    rubricConfig = RubricConfigSerializer(source='*')
 
     def get_textResponseConfig(self, instance):
         return instance.text_response or 'none'
@@ -67,6 +90,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
             'type',
             'textResponseConfig',
             'fileUploadResponseConfig',
+            'rubricConfig'
         ]
         read_only_fields = fields
 
@@ -90,7 +114,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
     """
     Submission metadata for displaying submissions table in ESG
     """
-    submissionUuid = serializers.CharField()
+    submissionUUID = serializers.CharField(source='submissionUuid')
     username = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
@@ -102,7 +126,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
     class Meta:
         fields = [
-            'submissionUuid',
+            'submissionUUID',
             'username',
             'teamName',
             'dateSubmitted',
@@ -115,28 +139,6 @@ class SubmissionMetadataSerializer(serializers.Serializer):
         read_only_fields = fields
 
 
-class RubricCriterionOptionsSerializer(serializers.Serializer):
-    label = serializers.CharField()
-    points = serializers.IntegerField()
-    explanation = serializers.CharField()
-    name = serializers.CharField()
-    orderNum = serializers.IntegerField(source="order_num")
-
-
-class RubricCriterionSerializer(serializers.Serializer):
-    label = serializers.CharField()
-    prompt = serializers.CharField()
-    feedback = serializers.ChoiceField(choices=["optional", "disabled", "required"])
-    name = serializers.CharField()
-    orderNum = serializers.IntegerField(source="order_num")
-    options = serializers.ListField(child=RubricCriterionOptionsSerializer())
-
-
-class RubricConfigSerializer(serializers.Serializer):
-    feedbackPrompt = serializers.CharField(source="feedback_prompt")
-    criteria = serializers.ListField(child=RubricCriterionSerializer())
-
-
 class InitializeSerializer(serializers.Serializer):
     """
     Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
@@ -144,14 +146,12 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
-    rubricConfig = RubricConfigSerializer()
 
     class Meta:
         fields = [
             'courseMetadata',
             'oraMetadata',
             'submissions',
-            'rubricConfig',
         ]
         read_only_fields = fields
 
