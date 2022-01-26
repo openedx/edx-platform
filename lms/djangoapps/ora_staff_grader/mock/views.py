@@ -124,13 +124,3 @@ class UpdateGradeView(RetrieveAPIView):
                 "gradeData": grade_data,
             }
         )
-        """
-        return Response({
-            'errorCode': ERR_MISSING_PARAM,
-            'submissionStatus': {
-                'gradeStatus': 'ungraded',
-                'lockStatus': 'locked',
-                'gradeData': submission['gradeData'],
-            },
-        }, 409)
-        """
