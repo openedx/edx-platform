@@ -50,7 +50,7 @@ from ..rest_api.api import (
     get_thread_list,
     get_user_comments,
     update_comment,
-    update_thread
+    update_thread,
 )
 from ..rest_api.forms import (
     CommentGetForm,
