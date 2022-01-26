@@ -120,6 +120,7 @@ nodeenv                             # Utility for managing Node.js environments;
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.

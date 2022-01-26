@@ -66,6 +66,7 @@ from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
 )
+from openedx_filters.learning.filters import CourseEnrollmentStarted
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
@@ -1117,6 +1118,10 @@ class AlreadyEnrolledError(CourseEnrollmentException):
     pass
 
 
+class EnrollmentNotAllowed(CourseEnrollmentException):
+    pass
+
+
 class CourseEnrollmentManager(models.Manager):
     """
     Custom manager for CourseEnrollment with Table-level filter methods.
@@ -1627,6 +1632,13 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
+        try:
+            user, course_key, mode = CourseEnrollmentStarted.run_filter(
+                user=user, course_key=course_key, mode=mode,
+            )
+        except CourseEnrollmentStarted.PreventEnrollment as exc:
+            raise EnrollmentNotAllowed(str(exc)) from exc
+
         if mode is None:
             mode = _default_course_mode(str(course_key))
         # All the server-side checks for whether a user is allowed to enroll.

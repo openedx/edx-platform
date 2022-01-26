@@ -224,6 +224,7 @@ django==3.2.11
     #   jsonfield
     #   lti-consumer-xblock
     #   openedx-events
+    #   openedx-filters
     #   ora2
     #   super-csv
     #   xss-utils
@@ -700,6 +701,8 @@ openedx-calc==2.0.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
 openedx-events==0.7.1
+    # via -r requirements/edx/base.in
+openedx-filters==0.4.3
     # via -r requirements/edx/base.in
 ora2==3.7.8
     # via -r requirements/edx/base.in

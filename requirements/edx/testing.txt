@@ -291,6 +291,7 @@ distlib==0.3.4
     #   jsonfield
     #   lti-consumer-xblock
     #   openedx-events
+    #   openedx-filters
     #   ora2
     #   super-csv
     #   xss-utils
@@ -885,6 +886,8 @@ openedx-calc==2.0.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
 openedx-events==0.7.1
+    # via -r requirements/edx/base.txt
+openedx-filters==0.4.3
     # via -r requirements/edx/base.txt
 ora2==3.7.8
     # via -r requirements/edx/base.txt
