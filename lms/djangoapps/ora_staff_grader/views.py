@@ -2,7 +2,9 @@
 Views for Enhanced Staff Grader
 """
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.session.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+)
 from lms.djangoapps.ora_staff_grader.ora_api import (
     check_submission_lock,
     claim_submission_lock,
@@ -10,7 +12,7 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    submit_grade
+    submit_grade,
 )
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -20,7 +22,10 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.ora_staff_grader.constants import PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID
+from lms.djangoapps.ora_staff_grader.constants import (
+    PARAM_ORA_LOCATION,
+    PARAM_SUBMISSION_ID,
+)
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
     GradeContestedResponse,
@@ -38,7 +43,9 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     SubmissionStatusFetchSerializer,
 )
 from lms.djangoapps.ora_staff_grader.utils import require_params
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+from openedx.core.djangoapps.content.course_overviews.api import (
+    get_course_overview_or_none,
+)
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
@@ -46,6 +53,7 @@ class StaffGraderBaseView(RetrieveAPIView):
     """
     Base view for common auth/permission setup used across ESG views.
     """
+
     authentication_classes = (
         JwtAuthentication,
         BearerAuthenticationAllowInactiveUser,
@@ -71,6 +79,7 @@ class InitializeView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
         try:
@@ -78,14 +87,14 @@ class InitializeView(StaffGraderBaseView):
 
             # Get ORA block and config (incl. rubric)
             ora_usage_key = UsageKey.from_string(ora_location)
-            init_data['oraMetadata'] = modulestore().get_item(ora_usage_key)
+            init_data["oraMetadata"] = modulestore().get_item(ora_usage_key)
 
             # Get course metadata
             course_id = str(ora_usage_key.course_key)
-            init_data['courseMetadata'] = get_course_overview_or_none(course_id)
+            init_data["courseMetadata"] = get_course_overview_or_none(course_id)
 
             # Get list of submissions for this ORA
-            init_data['submissions'] = get_submissions(request, ora_location)
+            init_data["submissions"] = get_submissions(request, ora_location)
 
             return Response(InitializeSerializer(init_data).data)
 
@@ -135,18 +144,25 @@ class SubmissionFetchView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
-            submission_info = get_submission_info(request, ora_location, submission_uuid)
-            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            submission_info = get_submission_info(
+                request, ora_location, submission_uuid
+            )
+            assessment_info = get_assessment_info(
+                request, ora_location, submission_uuid
+            )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionFetchSerializer({
-                'submission_info': submission_info,
-                'assessment_info': assessment_info,
-                'lock_info': lock_info,
-            })
+            serializer = SubmissionFetchSerializer(
+                {
+                    "submission_info": submission_info,
+                    "assessment_info": assessment_info,
+                    "lock_info": lock_info,
+                }
+            )
 
             return Response(serializer.data)
 
@@ -186,16 +202,21 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
-            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            assessment_info = get_assessment_info(
+                request, ora_location, submission_uuid
+            )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionStatusFetchSerializer({
-                'assessment_info': assessment_info,
-                'lock_info': lock_info,
-            })
+            serializer = SubmissionStatusFetchSerializer(
+                {
+                    "assessment_info": assessment_info,
+                    "lock_info": lock_info,
+                }
+            )
 
             return Response(serializer.data)
 
@@ -247,21 +268,26 @@ class UpdateGradeView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
         try:
             # Reassert that we have ownership of the submission lock
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
-            if not lock_info.get('lock_status') == 'in-progress':
-                assessment_info = get_assessment_info(request, ora_location, submission_uuid)
-                submission_status = SubmissionStatusFetchSerializer({
-                    'assessment_info': assessment_info,
-                    'lock_info': lock_info,
-                }).data
+            if not lock_info.get("lock_status") == "in-progress":
+                assessment_info = get_assessment_info(
+                    request, ora_location, submission_uuid
+                )
+                submission_status = SubmissionStatusFetchSerializer(
+                    {
+                        "assessment_info": assessment_info,
+                        "lock_info": lock_info,
+                    }
+                ).data
                 return GradeContestedResponse(context=submission_status)
 
             # Transform grade data and submit assessment, rasies on failure
-            context = {'submission_uuid': submission_uuid}
+            context = {"submission_uuid": submission_uuid}
             grade_data = StaffAssessSerializer(request.data, context=context).data
             submit_grade(request, ora_location, grade_data)
 
@@ -269,12 +295,16 @@ class UpdateGradeView(StaffGraderBaseView):
             delete_submission_lock(request, ora_location, submission_uuid)
 
             # Return submission status info to frontend
-            assessment_info = get_assessment_info(request, ora_location, submission_uuid)
+            assessment_info = get_assessment_info(
+                request, ora_location, submission_uuid
+            )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
-            serializer = SubmissionStatusFetchSerializer({
-                'assessment_info': assessment_info,
-                'lock_info': lock_info,
-            })
+            serializer = SubmissionStatusFetchSerializer(
+                {
+                    "assessment_info": assessment_info,
+                    "lock_info": lock_info,
+                }
+            )
             return Response(serializer.data)
 
         # Issues with the XBlock handlers
@@ -305,9 +335,10 @@ class SubmissionLockView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
-        """ Claim a submission lock """
+        """Claim a submission lock"""
         try:
             # Validate ORA location
             UsageKey.from_string(ora_location)
@@ -334,7 +365,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def delete(self, request, ora_location, submission_uuid, *args, **kwargs):
-        """ Clear a submission lock """
+        """Clear a submission lock"""
         try:
             # Validate ORA location
             UsageKey.from_string(ora_location)

@@ -8,35 +8,38 @@ from rest_framework import serializers
 
 
 class GradeStatusField(serializers.ChoiceField):
-    """ Field that can have the values ['graded' 'ungraded'] """
+    """Field that can have the values ['graded' 'ungraded']"""
+
     def __init__(self, *args, **kwargs):
-        kwargs['choices'] = ['graded', 'ungraded']
+        kwargs["choices"] = ["graded", "ungraded"]
         super().__init__(*args, **kwargs)
 
 
 class LockStatusField(serializers.ChoiceField):
-    """ Field that can have the values ['unlocked', 'locked', 'in-progress'] """
+    """Field that can have the values ['unlocked', 'locked', 'in-progress']"""
+
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, choices=['unlocked', 'locked', 'in-progress'])
+        super().__init__(*args, **kwargs, choices=["unlocked", "locked", "in-progress"])
 
 
 class CourseMetadataSerializer(serializers.Serializer):
     """
     Serialize top-level info about a course, used for creating header in ESG
     """
-    title = serializers.CharField(source='display_name')
-    org = serializers.CharField(source='display_org_with_default')
-    number = serializers.CharField(source='display_number_with_default')
-    courseId = serializers.CharField(source='id')
+
+    title = serializers.CharField(source="display_name")
+    org = serializers.CharField(source="display_org_with_default")
+    number = serializers.CharField(source="display_number_with_default")
+    courseId = serializers.CharField(source="id")
 
     class Meta:
         model = CourseOverview
 
         fields = [
-            'title',
-            'org',
-            'number',
-            'courseId',
+            "title",
+            "org",
+            "number",
+            "courseId",
         ]
         read_only_fields = fields
 
@@ -52,7 +55,9 @@ class RubricCriterionOptionsSerializer(serializers.Serializer):
 class RubricCriterionSerializer(serializers.Serializer):
     label = serializers.CharField()
     prompt = serializers.CharField()
-    feedback = serializers.ChoiceField(required=False, choices=["optional", "disabled", "required"], default="disabled")
+    feedback = serializers.ChoiceField(
+        required=False, choices=["optional", "disabled", "required"], default="disabled"
+    )
     name = serializers.CharField()
     orderNum = serializers.IntegerField(source="order_num")
     options = serializers.ListField(child=RubricCriterionOptionsSerializer())
@@ -60,44 +65,47 @@ class RubricCriterionSerializer(serializers.Serializer):
 
 class RubricConfigSerializer(serializers.Serializer):
     feedbackPrompt = serializers.CharField(source="rubric_feedback_prompt")
-    criteria = serializers.ListField(source="rubric_criteria", child=RubricCriterionSerializer())
+    criteria = serializers.ListField(
+        source="rubric_criteria", child=RubricCriterionSerializer()
+    )
 
 
 class OpenResponseMetadataSerializer(serializers.Serializer):
     """
     Serialize ORA metadata, used for setting up views in ESG
     """
-    name = serializers.CharField(source='display_name')
+
+    name = serializers.CharField(source="display_name")
     prompts = serializers.ListField()
     type = serializers.SerializerMethodField()
     textResponseConfig = serializers.SerializerMethodField()
     fileUploadResponseConfig = serializers.SerializerMethodField()
-    rubricConfig = RubricConfigSerializer(source='*')
+    rubricConfig = RubricConfigSerializer(source="*")
 
     def get_textResponseConfig(self, instance):
-        return instance.text_response or 'none'
+        return instance.text_response or "none"
 
     def get_fileUploadResponseConfig(self, instance):
-        return instance.file_upload_response or 'none'
+        return instance.file_upload_response or "none"
 
     def get_type(self, instance):
-        return 'team' if instance.teams_enabled else 'individual'
+        return "team" if instance.teams_enabled else "individual"
 
     class Meta:
         fields = [
-            'name',
-            'prompts',
-            'type',
-            'textResponseConfig',
-            'fileUploadResponseConfig',
-            'rubricConfig'
+            "name",
+            "prompts",
+            "type",
+            "textResponseConfig",
+            "fileUploadResponseConfig",
+            "rubricConfig",
         ]
         read_only_fields = fields
 
 
 class ScoreField(serializers.Field):
     def to_representation(self, value):
-        if ('pointsEarned' not in value) and ('pointsPossible' not in value):
+        if ("pointsEarned" not in value) and ("pointsPossible" not in value):
             return None
         return ScoreSerializer(value).data
 
@@ -106,6 +114,7 @@ class ScoreSerializer(serializers.Serializer):
     """
     Score (points earned/possible) for use in SubmissionMetadataSerializer
     """
+
     pointsEarned = serializers.IntegerField(required=False)
     pointsPossible = serializers.IntegerField(required=False)
 
@@ -114,7 +123,8 @@ class SubmissionMetadataSerializer(serializers.Serializer):
     """
     Submission metadata for displaying submissions table in ESG
     """
-    submissionUUID = serializers.CharField(source='submissionUuid')
+
+    submissionUUID = serializers.CharField(source="submissionUuid")
     username = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
@@ -126,15 +136,15 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
     class Meta:
         fields = [
-            'submissionUUID',
-            'username',
-            'teamName',
-            'dateSubmitted',
-            'dateGraded',
-            'gradedBy',
-            'gradingStatus',
-            'lockStatus',
-            'score'
+            "submissionUUID",
+            "username",
+            "teamName",
+            "dateSubmitted",
+            "dateGraded",
+            "gradedBy",
+            "gradingStatus",
+            "lockStatus",
+            "score",
         ]
         read_only_fields = fields
 
@@ -143,59 +153,67 @@ class InitializeSerializer(serializers.Serializer):
     """
     Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
     """
+
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
 
     class Meta:
         fields = [
-            'courseMetadata',
-            'oraMetadata',
-            'submissions',
+            "courseMetadata",
+            "oraMetadata",
+            "submissions",
         ]
         read_only_fields = fields
 
 
 class UploadedFileSerializer(serializers.Serializer):
-    """ Serializer for a file uploaded as a part of a response """
-    downloadUrl = serializers.URLField(source='download_url')
+    """Serializer for a file uploaded as a part of a response"""
+
+    downloadUrl = serializers.URLField(source="download_url")
     description = serializers.CharField()
     name = serializers.CharField()
     size = serializers.IntegerField()
 
 
 class ResponseSerializer(serializers.Serializer):
-    """ Serializer for the responseData api construct, which represents the contents of a submitted learner response """
+    """Serializer for the responseData api construct, which represents the contents of a submitted learner response"""
+
     files = serializers.ListField(child=UploadedFileSerializer(), allow_empty=True)
     text = serializers.ListField(child=serializers.CharField(), allow_empty=True)
 
 
 class AssessmentCriteriaSerializer(serializers.Serializer):
-    """ Serializer for information about a criterion, in the context of a completed assessment """
+    """Serializer for information about a criterion, in the context of a completed assessment"""
+
     name = serializers.CharField()
     feedback = serializers.CharField()
     points = serializers.IntegerField()
-    selectedOption = serializers.CharField(source='option')
+    selectedOption = serializers.CharField(source="option")
 
 
 class GradeDataSerializer(serializers.Serializer):
-    """ Serializer for the `gradeData` api construct, which represents a completed staff assessment """
+    """Serializer for the `gradeData` api construct, which represents a completed staff assessment"""
+
     score = ScoreField(required=False)
-    overallFeedback = serializers.CharField(source='feedback', required=False)
-    criteria = serializers.ListField(child=AssessmentCriteriaSerializer(), allow_empty=True, required=False)
+    overallFeedback = serializers.CharField(source="feedback", required=False)
+    criteria = serializers.ListField(
+        child=AssessmentCriteriaSerializer(), allow_empty=True, required=False
+    )
 
 
 class SubmissionStatusFetchSerializer(serializers.Serializer):
-    """ Serializer for the response from the submission status fetch endpoint"""
-    gradeData = GradeDataSerializer(source='assessment_info')
+    """Serializer for the response from the submission status fetch endpoint"""
+
+    gradeData = GradeDataSerializer(source="assessment_info")
     gradeStatus = serializers.SerializerMethodField()
-    lockStatus = LockStatusField(source='lock_info.lock_status')
+    lockStatus = LockStatusField(source="lock_info.lock_status")
 
     def get_gradeStatus(self, obj):
-        if not obj.get('assessment_info', {}) == {}:
-            return 'graded'
+        if not obj.get("assessment_info", {}) == {}:
+            return "graded"
         else:
-            return 'ungraded'
+            return "ungraded"
 
 
 class SubmissionFetchSerializer(SubmissionStatusFetchSerializer):
@@ -203,19 +221,19 @@ class SubmissionFetchSerializer(SubmissionStatusFetchSerializer):
     Serializer for the response from the submission fetch endpoint
     Same as the SubmissionStatusFetchSerializer with an added submission_info field
     """
-    response = ResponseSerializer(source='submission_info')
+
+    response = ResponseSerializer(source="submission_info")
 
 
 class LockStatusSerializer(serializers.Serializer):
     """
     Info about the status of a submission lock, with extra metadata stripped out.
     """
-    lockStatus = LockStatusField(source='lock_status')
+
+    lockStatus = LockStatusField(source="lock_status")
 
     class Meta:
-        fields = [
-            'lockStatus'
-        ]
+        fields = ["lockStatus"]
         read_only_fields = fields
 
 
@@ -247,29 +265,30 @@ class StaffAssessSerializer(serializers.Serializer):
         'assess_type': (string) one of ['regrade', full-grade']
     }
     """
+
     # Context should include 'submission_uuid' for serialization
     requires_context = True
 
     options_selected = serializers.SerializerMethodField()
     criterion_feedback = serializers.SerializerMethodField()
-    overall_feedback = serializers.CharField(source='overallFeedback', allow_null=True)
+    overall_feedback = serializers.CharField(source="overallFeedback", allow_null=True)
     submission_uuid = serializers.SerializerMethodField()
-    assess_type = serializers.CharField(default='full-grade')
+    assess_type = serializers.CharField(default="full-grade")
 
     def get_options_selected(self, instance):
         options_selected = {}
-        for criterion in instance.get('criteria'):
-            options_selected[criterion['name']] = criterion['selectedOption']
+        for criterion in instance.get("criteria"):
+            options_selected[criterion["name"]] = criterion["selectedOption"]
 
         return options_selected
 
     def get_criterion_feedback(self, instance):
         criterion_feedback = {}
-        for criterion in instance.get('criteria'):
-            if criterion.get('feedback'):
-                criterion_feedback[criterion['name']] = criterion['feedback']
+        for criterion in instance.get("criteria"):
+            if criterion.get("feedback"):
+                criterion_feedback[criterion["name"]] = criterion["feedback"]
 
         return criterion_feedback
 
     def get_submission_uuid(self, instance):  # pylint: disable=unused-argument
-        return self.context.get('submission_uuid')
+        return self.context.get("submission_uuid")

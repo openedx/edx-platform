@@ -9,25 +9,27 @@ from lms.djangoapps.ora_staff_grader.errors import ERR_MISSING_PARAM
 
 from lms.djangoapps.ora_staff_grader.mock.utils import *
 
-PARAM_ORA_LOCATION = 'oraLocation'
-PRAM_SUBMISSION_ID = 'submissionUUID'
+PARAM_ORA_LOCATION = "oraLocation"
+PRAM_SUBMISSION_ID = "submissionUUID"
 
 
 class InitializeView(RetrieveAPIView):
-    """ Returns initial app state """
+    """Returns initial app state"""
 
     def get(self, request):
         ora_location = request.query_params[PARAM_ORA_LOCATION]
 
-        return Response({
-            'courseMetadata': get_course_metadata(ora_location),
-            'oraMetadata': get_ora_metadata(ora_location),
-            'submissions': get_submissions(ora_location),
-        })
+        return Response(
+            {
+                "courseMetadata": get_course_metadata(ora_location),
+                "oraMetadata": get_ora_metadata(ora_location),
+                "submissions": get_submissions(ora_location),
+            }
+        )
 
 
 class SubmissionFetchView(RetrieveAPIView):
-    """ Get a submission """
+    """Get a submission"""
 
     def get(self, request):
         ora_location = request.query_params[PARAM_ORA_LOCATION]
@@ -36,16 +38,18 @@ class SubmissionFetchView(RetrieveAPIView):
         submission = fetch_submission(ora_location, submission_id)
         response = fetch_response(submission_id)
 
-        return Response({
-            'gradeData': submission['gradeData'],
-            'response': response,
-            'gradeStatus': submission['gradeStatus'],
-            'lockStatus': submission['lockStatus'],
-        })
+        return Response(
+            {
+                "gradeData": submission["gradeData"],
+                "response": response,
+                "gradeStatus": submission["gradeStatus"],
+                "lockStatus": submission["lockStatus"],
+            }
+        )
 
 
 class SubmissionStatusFetchView(RetrieveAPIView):
-    """ Get a submission status, leaving out the response """
+    """Get a submission status, leaving out the response"""
 
     def get(self, request):
         ora_location = request.query_params[PARAM_ORA_LOCATION]
@@ -53,55 +57,53 @@ class SubmissionStatusFetchView(RetrieveAPIView):
 
         submission = fetch_submission(ora_location, submission_id)
 
-        return Response({
-            'gradeStatus': submission['gradeStatus'],
-            'lockStatus': submission['lockStatus'],
-            'gradeData': submission['gradeData']
-        })
+        return Response(
+            {
+                "gradeStatus": submission["gradeStatus"],
+                "lockStatus": submission["lockStatus"],
+                "gradeData": submission["gradeData"],
+            }
+        )
 
 
 class SubmissionLockView(APIView):
-    """ Lock a submission for grading """
+    """Lock a submission for grading"""
 
     def post(self, request):
-        """ Claim a submission lock, updating lock status """
+        """Claim a submission lock, updating lock status"""
         ora_location = request.query_params[PARAM_ORA_LOCATION]
         submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
-        submission['lockStatus'] = 'in-progress'
+        submission["lockStatus"] = "in-progress"
 
         save_submission_update(ora_location, submission)
 
-        return Response({
-            "lockStatus": submission['lockStatus']
-        })
+        return Response({"lockStatus": submission["lockStatus"]})
 
     def delete(self, request):
-        """ Delete a submission lock, updating lock status """
+        """Delete a submission lock, updating lock status"""
         ora_location = request.query_params[PARAM_ORA_LOCATION]
         submission_id = request.query_params[PRAM_SUBMISSION_ID]
 
         submission = fetch_submission(ora_location, submission_id)
-        submission['lockStatus'] = 'unlocked'
+        submission["lockStatus"] = "unlocked"
 
         save_submission_update(ora_location, submission)
 
-        return Response({
-            "lockStatus": submission['lockStatus']
-        })
+        return Response({"lockStatus": submission["lockStatus"]})
 
 
 class UpdateGradeView(RetrieveAPIView):
-    """ Submit a grade """
+    """Submit a grade"""
 
     def update_grade_data(self, submission, grade_data):
-        submission['gradeData'] = grade_data
-        submission['gradeStatus'] = 'graded'
-        submission['lockStatus'] = 'unlocked'
-        submission['score'] = {
-            'pointsEarned': 70,
-            'pointsPossible': 100,
+        submission["gradeData"] = grade_data
+        submission["gradeStatus"] = "graded"
+        submission["lockStatus"] = "unlocked"
+        submission["score"] = {
+            "pointsEarned": 70,
+            "pointsPossible": 100,
         }
 
     def post(self, request):
@@ -110,20 +112,19 @@ class UpdateGradeView(RetrieveAPIView):
         grade_data = request.data
 
         # this is static test data
-        grade_data['score'] = {
-            "pointsEarned": 70,
-            "pointsPossible": 100
-        }
+        grade_data["score"] = {"pointsEarned": 70, "pointsPossible": 100}
 
         submission = fetch_submission(ora_location, submission_id)
         self.update_grade_data(submission, grade_data)
         save_submission_update(ora_location, submission)
-        return Response({
-            'gradeStatus': submission['gradeStatus'],
-            'lockStatus': submission['lockStatus'],
-            'gradeData': grade_data,
-        })
-        '''
+        return Response(
+            {
+                "gradeStatus": submission["gradeStatus"],
+                "lockStatus": submission["lockStatus"],
+                "gradeData": grade_data,
+            }
+        )
+        """
         return Response({
             'errorCode': ERR_MISSING_PARAM,
             'submissionStatus': {
@@ -132,4 +133,4 @@ class UpdateGradeView(RetrieveAPIView):
                 'gradeData': submission['gradeData'],
             },
         }, 409)
-        '''
+        """

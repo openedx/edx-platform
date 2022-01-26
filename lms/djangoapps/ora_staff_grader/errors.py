@@ -13,18 +13,18 @@ from lms.djangoapps.ora_staff_grader.constants import (
 
 
 class ExceptionWithContext(Exception):
-    """ An exception with optional context dict to be supplied in serialized result """
+    """An exception with optional context dict to be supplied in serialized result"""
 
     def __init__(self, context={}):
         self.context = context
 
 
 class XBlockInternalError(ExceptionWithContext):
-    """ Errors from XBlock handlers"""
+    """Errors from XBlock handlers"""
 
 
 class LockContestedError(ExceptionWithContext):
-    """ Signal for trying to operate on a lock owned by someone else """
+    """Signal for trying to operate on a lock owned by someone else"""
 
 
 class ErrorSerializer(serializers.Serializer):
