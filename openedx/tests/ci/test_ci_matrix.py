@@ -7,9 +7,7 @@ import os
 import yaml
 
 DIRS_TO_EXCLUDE = [
-    'cms/djangoapps/ora_staff_grader',  # temp: to remove in https://openedx.atlassian.net/browse/AU-349
     'lms/djangoapps',
-    'lms/djangoapps/ora_staff_grader',  # temp: to remove in https://openedx.atlassian.net/browse/AU-349
     'lms/static',
     'lms/templates',
     'openedx/core',
