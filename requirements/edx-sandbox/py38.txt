@@ -30,8 +30,11 @@ lxml==4.5.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
+    #   openedx-calc
 markupsafe==2.0.1
-    # via chem
+    # via
+    #   chem
+    #   openedx-calc
 matplotlib==3.3.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
@@ -53,13 +56,13 @@ numpy==1.16.6
     #   matplotlib
     #   openedx-calc
     #   scipy
-openedx-calc==2.0.1
+openedx-calc==3.0.0
     # via -r requirements/edx-sandbox/py38.in
 pillow==9.0.0
     # via matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.0.6
+pyparsing==3.0.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -71,7 +74,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2021.11.10
+regex==2022.1.18
     # via nltk
 scipy==1.7.3
     # via
@@ -86,6 +89,7 @@ sympy==1.6.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
+    #   openedx-calc
     #   symmath
 tqdm==4.62.3
     # via nltk
