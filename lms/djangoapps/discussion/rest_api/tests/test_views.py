@@ -2675,6 +2675,39 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         assertion(any(user.username in x['username'] for x in content['results']))
 
 
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class DiscussionModerationSettingsViewTests(APITestCase):
+    def get_path(self):
+        """
+        Returns the API endpoint.
+        """
+        return "/api/discussion/v1/moderation_settings"
+
+    @mock.patch("django.conf.settings.ENABLE_DISCUSSION_MODERATION_REASON_CODES", True)
+    @mock.patch("django.conf.settings.DISCUSSION_MODERATION_EDIT_REASON_CODES", {
+        "test-edit-reason": "Test Edit Reason",
+    })
+    @mock.patch("django.conf.settings.DISCUSSION_MODERATION_CLOSE_REASON_CODES", {
+        "test-close-reason": "Test Close Reason",
+    })
+    def test_retrieve(self):
+        """
+        Verify that the view returns the reason codes from the settings.
+        """
+        response = self.client.get(self.get_path())
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content_type == "application/json"
+        assert json.loads(response.content) == {
+            "enabled": True,
+            "edit_reason_codes": [
+                {"key": "test-edit-reason", "label": "Test Edit Reason"},
+            ],
+            "close_reason_codes": [
+                {"key": "test-close-reason", "label": "Test Close Reason"},
+            ],
+        }
+
+
 @ddt.ddt
 @httpretty.activate
 class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):

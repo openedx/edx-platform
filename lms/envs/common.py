@@ -4780,8 +4780,8 @@ LEARNING_MICROFRONTEND_URL = None
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
-# .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.
+# .. setting_default: None
 # .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
 DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL = None
@@ -4797,8 +4797,8 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_creation_date: 2021-12-03
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
-
 ############### Settings for the ace_common plugin #################
+
 ACE_ENABLED_CHANNELS = ['django_email']
 ACE_ENABLED_POLICIES = ['bulk_email_optout']
 ACE_CHANNEL_SAILTHRU_DEBUG = True
@@ -4961,3 +4961,28 @@ CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-a
 # The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
 # a value of `3` would include learners who have logged in within the past 3 months.
 BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
+
+################ Settings for the Discussion Service #########
+# Set this to False to disable the reason code selection UI for
+# moderators when editing or closing users' posts.
+ENABLE_DISCUSSION_MODERATION_REASON_CODES = True
+# Provide a list of reason codes for moderators editing posts and
+# comments, as a mapping from the internal reason code representation,
+# and an internationalizable label to be shown to moderators in the form
+# UI.
+DISCUSSION_MODERATION_EDIT_REASON_CODES = {
+    "grammar-spelling": _("Has grammar / spelling issues"),
+    "needs-clarity": _("Content needs clarity"),
+    "academic-integrity": _("Has academic integrity concern"),
+    "inappropriate-language": _("Has inappropriate language"),
+    "contains-pii": _("Contains personally identifiable information"),
+}
+# Provide a list of reason codes for moderators to close posts, in the
+# form of tuples containing the internal reason code representation, and
+# an internationalizable label to be shown to moderators in the form UI.
+DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
+    "academic-integrity": _("Post violates honour code or academic integrity"),
+    "read-only": _("Post should be read-only"),
+    "duplicate": _("Post is a duplicate"),
+    "off-topic": _("Post is off-topic"),
+}

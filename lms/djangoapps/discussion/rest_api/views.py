@@ -6,6 +6,7 @@ import logging
 import uuid
 
 import edx_api_doc_tools as apidocs
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
 from django.shortcuts import get_object_or_404
@@ -1271,3 +1272,46 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
+
+
+class DiscussionModerationSettingsView(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+    Retrieve the available reason codes for editing and closing posts to
+    privileged members.
+
+    **Example Requests**
+
+        GET /api/discussion/v1/reason_codes/
+        {
+            "edit_reason_codes": [
+                {"key": "reason-code", "label": "Human-readable label"},
+            ],
+            "close_reason_codes": [
+                {"key": "reason-code", "label": "Human-readable label"},
+            ],
+        }
+    """
+
+    ENABLED = getattr(settings, "ENABLE_DISCUSSION_MODERATION_REASON_CODES", {})
+    EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
+    CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+
+    def get(self, _):
+        """
+        Implements the GET method as described in the class documentation.
+        """
+        return Response(
+            {
+                "enabled": self.ENABLED,
+                "edit_reason_codes": [
+                    {"key": reason_code, "label": label}
+                    for (reason_code, label) in self.EDIT_REASON_CODES.items()
+                ],
+                "close_reason_codes": [
+                    {"key": reason_code, "label": label}
+                    for (reason_code, label) in self.CLOSE_REASON_CODES.items()
+                ],
+            },
+            content_type="application/json",
+        )

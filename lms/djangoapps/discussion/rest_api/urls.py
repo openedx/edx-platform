@@ -19,6 +19,7 @@ from lms.djangoapps.discussion.rest_api.views import (
     RetireUserView,
     ThreadViewSet,
     UploadFileView,
+    DiscussionModerationSettingsView,
 )
 
 ROUTER = SimpleRouter()
@@ -62,6 +63,7 @@ urlpatterns = [
         CourseTopicsView.as_view(),
         name="course_topics"
     ),
+    path('v1/moderation_settings', DiscussionModerationSettingsView.as_view(), name="discussion_moderation_settings"),
     re_path(
         fr"^v2/course_topics/{settings.COURSE_ID_PATTERN}",
         CourseTopicsViewV2.as_view(),
