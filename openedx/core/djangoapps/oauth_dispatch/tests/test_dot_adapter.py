@@ -4,9 +4,9 @@ Tests for DOT Adapter
 
 import unittest
 from datetime import timedelta
+import pytest
 
 import ddt
-import pytest
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
@@ -18,8 +18,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
     from ..adapters import DOTAdapter
-    from ..models import RestrictedApplication
     from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
+    from ..models import RestrictedApplication
 
 
 @ddt.ddt
