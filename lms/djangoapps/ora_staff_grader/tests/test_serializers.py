@@ -348,21 +348,18 @@ class TestInitializeSerializer(TestCase):
 
         output_data = InitializeSerializer(input_data).data
 
-        # There's a level of unpacking that happens in the serializer, perform that here
+        expected_course_data = CourseMetadataSerializer(self.mock_course_metadata).data
+        expected_ora_data = OpenResponseMetadataSerializer(self.mock_ora_instance).data
         expected_submissions_data = {}
+
+        # There's a level of unpacking that happens in the serializer, perform that here
         for submission_id, submission_data in self.mock_submissions_data.items():
             serialized_data = SubmissionMetadataSerializer(submission_data).data
             expected_submissions_data[submission_id] = serialized_data
 
         # Check that each of the sub-serializers assembles data correctly
-        assert (
-            output_data["courseMetadata"]
-            == CourseMetadataSerializer(self.mock_course_metadata).data
-        )
-        assert (
-            output_data["oraMetadata"]
-            == OpenResponseMetadataSerializer(self.mock_ora_instance).data
-        )
+        assert output_data["courseMetadata"] == expected_course_data
+        assert output_data["oraMetadata"] == expected_ora_data
         assert output_data["submissions"] == expected_submissions_data
 
 

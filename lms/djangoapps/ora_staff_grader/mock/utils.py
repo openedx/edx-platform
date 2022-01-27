@@ -55,10 +55,8 @@ def get_submissions(ora_location):  # pylint: disable=unused-argument
     submissions = read_data_file("submissions.json")[ora_location]
 
     # For the list view, we don't return grade data
-    for (
-        submission_id,
-        submission,
-    ) in submissions.items():  # pylint: disable=unused-variable
+    # pylint: disable=unused-variable
+    for (submission_id, submission) in submissions.items():
         submission.pop("gradeData")
 
     return submissions
