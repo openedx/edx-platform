@@ -195,8 +195,8 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     (useNewVideoEditor === "True" && blockType === "video") ||
                     (useNewProblemEditor === "True" && blockType === "problem")
                 ) {
-                    var destinationUrl = this.$('.edit-button').attr("authoring_MFE_base_url") + '/' + blockType + '/' + this.$('.studio-xblock-wrapper').attr("data-locator");
-                    window.location.replace(destinationUrl);
+                    var destinationUrl = this.$('.edit-button').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(xblockElement.find('.xblock').attr("data-usage-id"));
+                    window.location.href = destinationUrl;
                     return;
                 }
                 modal.edit(xblockElement, this.model, {
