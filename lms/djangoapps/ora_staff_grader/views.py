@@ -277,6 +277,7 @@ class UpdateGradeView(StaffGraderBaseView):
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def post(self, request, ora_location, submission_uuid, *args, **kwargs):
+        """Update a grade"""
         try:
             # Reassert that we have ownership of the submission lock
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
