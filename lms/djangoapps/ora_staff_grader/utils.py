@@ -22,9 +22,12 @@ def require_params(param_names):
     Raises:
     - MissingParamResponse (HTTP 400)
     """
+
     def decorator(function):
         @wraps(function)
-        def wrapped_function(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        def wrapped_function(
+            self, request, *args, **kwargs
+        ):  # pylint: disable=unused-argument
             passed_parameters = []
 
             for param_name in param_names:
@@ -35,7 +38,9 @@ def require_params(param_names):
 
                 passed_parameters.append(param)
             return function(self, request, *passed_parameters, *args, **kwargs)
+
         return wrapped_function
+
     return decorator
 
 
@@ -67,4 +72,6 @@ def call_xblock_json_handler(request, usage_id, handler_name, data):
     course_id = str(usage_key.course_key)
 
     # Send the request and return the HTTP response from the XBlock
-    return handle_xblock_callback_noauth(proxy_request, course_id, usage_id, handler_name)
+    return handle_xblock_callback_noauth(
+        proxy_request, course_id, usage_id, handler_name
+    )
