@@ -939,7 +939,7 @@ openedx-events==0.7.1
     # via -r requirements/edx/testing.txt
 openedx-filters==0.4.3
     # via -r requirements/edx/testing.txt
-ora2==3.8.0
+ora2==3.8.1
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
