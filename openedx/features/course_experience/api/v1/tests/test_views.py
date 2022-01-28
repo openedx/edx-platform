@@ -47,7 +47,7 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
 
     def test_reset_deadlines_with_masquerade(self):
         """ Staff users should be able to masquerade as a learner and reset the learner's schedule """
-        course = CourseFactory.create(self_paced=True)
+        course = CourseFactory.create(self_paced=True, start=timezone.now() - datetime.timedelta(days=1))
         student_username = self.user.username
         student_user_id = self.user.id
         student_enrollment = CourseEnrollment.enroll(self.user, course.id)
