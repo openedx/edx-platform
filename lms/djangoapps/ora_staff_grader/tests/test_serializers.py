@@ -1,10 +1,13 @@
 """
 Tests for ESG Serializers
 """
-import ddt
-from django.test import TestCase
 from unittest.mock import Mock, MagicMock, patch
 
+import ddt
+from django.test import TestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
 from lms.djangoapps.ora_staff_grader.serializers import (
     AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
@@ -23,13 +26,10 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     SubmissionMetadataSerializer,
     UploadedFileSerializer,
 )
+from lms.djangoapps.ora_staff_grader.tests import test_data
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
-from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
-from lms.djangoapps.ora_staff_grader.tests import test_data
 
 
 class TestErrorSerializer(TestCase):

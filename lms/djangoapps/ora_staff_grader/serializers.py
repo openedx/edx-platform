@@ -4,8 +4,9 @@ Serializers for Enhanced Staff Grader (ESG)
 # pylint: disable=abstract-method
 # pylint: disable=missing-function-docstring
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework import serializers
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
 class GradeStatusField(serializers.ChoiceField):

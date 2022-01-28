@@ -11,15 +11,6 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
-from lms.djangoapps.ora_staff_grader.ora_api import (
-    check_submission_lock,
-    claim_submission_lock,
-    delete_submission_lock,
-    get_assessment_info,
-    get_submission_info,
-    get_submissions,
-    submit_grade,
-)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.generics import RetrieveAPIView
@@ -40,6 +31,15 @@ from lms.djangoapps.ora_staff_grader.errors import (
     LockContestedResponse,
     UnknownErrorResponse,
     XBlockInternalError,
+)
+from lms.djangoapps.ora_staff_grader.ora_api import (
+    check_submission_lock,
+    claim_submission_lock,
+    delete_submission_lock,
+    get_assessment_info,
+    get_submission_info,
+    get_submissions,
+    submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     InitializeSerializer,

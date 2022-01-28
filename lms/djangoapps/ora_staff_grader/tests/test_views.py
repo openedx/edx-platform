@@ -1,14 +1,20 @@
 """
 Tests for ESG views
 """
-import ddt
 import json
-
+from unittest.mock import Mock, patch
 from uuid import uuid4
+
+import ddt
 from django.http import QueryDict
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from unittest.mock import Mock, patch
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import ItemFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.ora_staff_grader.constants import (
@@ -29,12 +35,6 @@ import lms.djangoapps.ora_staff_grader.tests.test_data as test_data
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase,
-)
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.factories import ItemFactory
 
 
 class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
