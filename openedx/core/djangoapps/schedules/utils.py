@@ -34,7 +34,7 @@ class PrefixedDebugLoggerMixin:  # lint-amnesty, pylint: disable=missing-class-d
         LOG.info(self.log_prefix + ': ' + message, *args, **kwargs)
 
 
-def reset_self_paced_schedule(user, course_key, use_availability_date=False):
+def reset_self_paced_schedule(user, course_key, use_enrollment_date=False):
     """
     Reset the user's schedule if self-paced.
 
@@ -44,7 +44,7 @@ def reset_self_paced_schedule(user, course_key, use_availability_date=False):
     Arguments:
         user (User)
         course_key (CourseKey or str)
-        use_availability_date (bool): if False, reset to now, else reset to when user got access to course material
+        use_enrollment_date (bool): if False, reset to now, else reset to original enrollment creation date
     """
     with transaction.atomic(savepoint=False):
         try:
@@ -56,10 +56,13 @@ def reset_self_paced_schedule(user, course_key, use_availability_date=False):
         except Schedule.DoesNotExist:
             return
 
-        if use_availability_date:
-            enrollment = schedule.enrollment
-            schedule.start_date = max(enrollment.created, enrollment.course.start)
-            schedule.save()
+        if use_enrollment_date:
+            new_start_date = schedule.enrollment.created
         else:
-            schedule.start_date = datetime.datetime.now(pytz.utc)
-            schedule.save()
+            new_start_date = datetime.datetime.now(pytz.utc)
+
+        # Make sure we don't start the clock on the learner's schedule before the course even starts
+        new_start_date = max(new_start_date, schedule.enrollment.course.start)
+
+        schedule.start_date = new_start_date
+        schedule.save()

@@ -71,7 +71,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         # pylint: disable=super-method-not-called
         with super().setUpClassAndTestData():
             cls.courses = []
-            course = CourseFactory.create(self_paced=True)
+            course = CourseFactory.create(self_paced=True, start=timezone.now() - datetime.timedelta(days=1))
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
