@@ -131,6 +131,8 @@ code-annotations==1.2.0
     # via
     #   edx-enterprise
     #   edx-toggles
+confluent-kafka==1.8.2
+    # via -r requirements/edx/base.in
 contextlib2==21.6.0
     # via -r requirements/edx/base.in
 coreapi==2.3.3
@@ -336,7 +338,7 @@ django-simple-history==3.0.0
     #   edx-organizations
     #   edx-proctoring
     #   ora2
-django-splash==1.1.0
+django-splash==1.2.1
     # via -r requirements/edx/base.in
 django-statici18n==2.2.0
     # via -r requirements/edx/base.in
@@ -345,7 +347,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
-django-user-tasks==2.1.0
+django-user-tasks==2.2.0
     # via -r requirements/edx/base.in
 django-waffle==2.3.0
     # via
@@ -395,7 +397,7 @@ edx-ace==1.4.1
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.5.0
     # via -r requirements/edx/base.in
-edx-auth-backends==4.0.1
+edx-auth-backends==4.1.0
     # via -r requirements/edx/base.in
 edx-braze-client==0.1.0
     # via -r requirements/edx/base.in
@@ -450,7 +452,7 @@ edx-milestones==0.3.3
     # via -r requirements/edx/base.in
 edx-name-affirmation==2.1.0
     # via -r requirements/edx/base.in
-edx-opaque-keys[django]==2.2.2
+edx-opaque-keys[django]==2.3.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-bulk-grades
@@ -523,7 +525,9 @@ event-tracking==1.1.4
     #   edx-proctoring
     #   edx-search
 fastavro==1.4.9
-    # via openedx-events
+    # via
+    #   -r requirements/edx/base.in
+    #   openedx-events
 frozenlist==1.3.0
     # via
     #   aiohttp
@@ -704,7 +708,7 @@ openedx-events==0.7.1
     # via -r requirements/edx/base.in
 openedx-filters==0.4.3
     # via -r requirements/edx/base.in
-ora2==3.7.8
+ora2==3.8.0
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
