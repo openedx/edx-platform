@@ -196,7 +196,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('Ed Discussion')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.INSCRIBE: {
         'features': [
@@ -224,7 +225,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('InScribe')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.PIAZZA: {
         'features': [
@@ -248,7 +250,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='team@piazza.com',
         )._asdict(),
         'messages': [],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True
     },
     Provider.YELLOWDIG: {
         'features': [
