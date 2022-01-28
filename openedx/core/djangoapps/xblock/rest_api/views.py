@@ -36,8 +36,7 @@ LX_BLOCK_TYPES_OVERRIDE = {
 }
 
 
-class InvalidNotFound(NotFound):
-    default_detail = "Invalid XBlock key"
+invalid_not_found_fmt = "XBlock {usage_key} does not exist, or you don't have permission to view it."
 
 
 def _block_type_overrides(request_args):
@@ -71,7 +70,7 @@ def block_metadata(request, usage_key_str):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise InvalidNotFound from e
+        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
     block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
     includes = request.GET.get("include", "").split(",")
@@ -97,7 +96,7 @@ def render_block_view(request, usage_key_str, view_name):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise InvalidNotFound from e
+        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
     block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
     fragment = _render_block_view(block, view_name, request.user)
@@ -122,7 +121,7 @@ def get_handler_url(request, usage_key_str, handler_name):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise InvalidNotFound from e
+        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
     handler_url = _get_handler_url(usage_key, handler_name, request.user, request.GET)
     return Response({"handler_url": handler_url})
