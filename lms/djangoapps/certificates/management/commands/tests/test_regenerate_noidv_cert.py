@@ -35,12 +35,12 @@ class RegenerateNoIDVCertTests(ModuleStoreTestCase):
     Tests for the regenerate_noidv_cert management command
     """
 
-    def test_command_with_missing_param_course_key(self):
+    def test_command_with_course_key_and_excluded_keys(self):
         """
         Verify command with a missing param -- course key.
         """
-        with pytest.raises(CommandError, match="You must specify a course-key or keys"):
-            call_command("regenerate_noidv_cert")
+        with pytest.raises(CommandError, match="You may not specify both course keys and excluded course keys."):
+            call_command("regenerate_noidv_cert", "-c", "blah", "--excluded-keys", "bleh")
 
     def test_command_with_invalid_key(self):
         """
@@ -48,6 +48,13 @@ class RegenerateNoIDVCertTests(ModuleStoreTestCase):
         """
         with pytest.raises(CommandError, match=" is not a valid course-key"):
             call_command("regenerate_noidv_cert", "-c", "blah")
+
+    def test_command_with_invalid_key_to_exclude(self):
+        """
+        Verify command with an invalid course run key as an excluded key
+        """
+        with pytest.raises(CommandError, match=" is not a valid course-key"):
+            call_command("regenerate_noidv_cert", "--excluded-keys", "blah")
 
     def test_regeneration(self):
         """
@@ -226,4 +233,21 @@ class RegenerateNoIDVCertTests(ModuleStoreTestCase):
         self.assertEqual('2', regenerated)
 
         regenerated = call_command("regenerate_noidv_cert", "-c", course_run_key2)
+        self.assertEqual('1', regenerated)
+
+    def test_regenerate_all(self):
+        """
+        Verify that all unverified certs are regenerated
+        """
+        self._multisetup()
+        regenerated = call_command("regenerate_noidv_cert")
+        self.assertEqual('3', regenerated)
+
+    def test_regenerate_all_with_excluded_keys(self):
+        """
+        Verify that all unverified certs are regenerated except for those from courses in the excluded keys
+        """
+        course_run_key, course_run_key2 = self._multisetup()
+
+        regenerated = call_command("regenerate_noidv_cert", "--excluded-keys", course_run_key)
         self.assertEqual('1', regenerated)

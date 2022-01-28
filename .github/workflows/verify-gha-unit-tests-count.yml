@@ -50,8 +50,10 @@ jobs:
           echo All root unit tests count: ${{ env.root_all_unit_tests_count }}
           echo All shards unit tests count: ${{ env.shards_all_unit_tests_count }}
 
-      - name: verify unit tests count
+      - name: fail the check
         if: ${{ env.root_all_unit_tests_count != env.shards_all_unit_tests_count }}
         run: |
-          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows to add any missing apps and match the count"
+          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests
+          workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
+          to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
           exit 1

@@ -7,7 +7,7 @@ This app exists to write data to "Coursegraph", a tool enabling Open edX develop
 Deploying Coursegraph
 =====================
 
-As of the Maple Open edX release, Coursegraph is *not* automatically provisioned by the community installation, and is *not* considered a "supported" part of the platform. However, operators may find the the `neo4j Ansible playbook`_ useful as a starting point for deploying their own Coursegraph instance. Alternatively, Neo4j also maintains an official `Docker image`_.
+As of the Maple Open edX release, Coursegraph is *not* automatically provisioned by the community installation, and is *not* considered a "supported" part of the platform. However, operators may find the `neo4j Ansible playbook`_ useful as a starting point for deploying their own Coursegraph instance. Alternatively, Neo4j also maintains an official `Docker image`_.
 
 In order for Coursegraph to have queryable data, learning content from LMS must be written to Coursegraph using the ``dump_to_neo4j`` management command included in this app. In order for the data to stay up to date, it must be periodically refreshed, either manually or via an automation server such as Jenkins.
 

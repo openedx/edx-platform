@@ -528,6 +528,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retirement.save()
 
         self.superuser = SuperuserFactory()
+        self.superuser_client = APIClient()
         self.retired_username = get_retired_username_by_username(self.user.username)
         self.url = reverse("retire_discussion_user")
 
@@ -555,7 +556,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user)
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 204, b"")
 
     def test_downstream_forums_error(self):
@@ -565,7 +566,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user, status=500, body="Server error")
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 500, '"Server error"')
 
     def test_nonexistent_user(self):
@@ -576,7 +577,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retired_username = get_retired_username_by_username(nonexistent_username)
         data = {'username': nonexistent_username}
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 404, None)
 
     def test_not_authenticated(self):
@@ -594,8 +595,9 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
     def setUp(self):
         super().setUp()
-        self.client_user = UserFactory()
-        self.client_user.username = "test_replace_username_service_worker"
+        self.worker = UserFactory()
+        self.worker.username = "test_replace_username_service_worker"
+        self.worker_client = APIClient()
         self.new_username = "test_username_replacement"
         self.url = reverse("replace_discussion_username")
 
@@ -616,11 +618,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    def call_api(self, user, data):
+    def call_api(self, user, client, data):
         """ Helper function to call API with data """
         data = json.dumps(data)
         headers = self.build_jwt_headers(user)
-        return self.client.post(self.url, data, content_type='application/json', **headers)
+        return client.post(self.url, data, content_type='application/json', **headers)
 
     @ddt.data(
         [{}, {}],
@@ -632,7 +634,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         data = {
             "username_mappings": mapping_data
         }
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 400
 
     def test_auth(self):
@@ -650,11 +652,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test non-service worker
         random_user = UserFactory()
-        response = self.call_api(random_user, data)
+        response = self.call_api(random_user, APIClient(), data)
         assert response.status_code == 403
 
         # Test service worker
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
 
     def test_basic(self):
@@ -669,7 +671,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'successful_replacements': data["username_mappings"]
         }
         self.register_get_username_replacement_response(self.user)
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
         assert response.data == expected_response
 

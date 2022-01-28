@@ -418,12 +418,15 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         api_client = "staff_client"
         user = "staff_user"
+        url = reverse("accounts_detail_api")
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
         self.create_mock_verified_name(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
-        response = self.send_get(client, query_parameters=f'lms_user_id={self.user.id}')
+        response = client.get(url + f'?lms_user_id={self.user.id}')
+        assert response.status_code == status.HTTP_200_OK
+        response.data = response.data[0]
         self._verify_full_account_response(response)
 
     def test_unsuccessful_get_account_by_user_id(self):
@@ -432,14 +435,30 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         api_client = "client"
         user = "user"
+        url = reverse("accounts_detail_api")
         client = self.login_client(api_client, user)
         self.create_mock_profile(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
 
-        response = self.send_get(
-            client, query_parameters=f'lms_user_id={self.user.id}', expected_status=status.HTTP_403_FORBIDDEN
-        )
+        response = client.get(url + f'?lms_user_id={self.user.id}')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data.get('detail') == 'You do not have permission to perform this action.'
+
+    @ddt.data('abc', '2f', '1.0', "2/8")
+    def test_get_account_by_user_id_non_integer(self, non_integer_id):
+        """
+        Test that request using a non-integer lms user id by a staff user fails to retrieve Account Info.
+        """
+        api_client = "staff_client"
+        user = "staff_user"
+        url = reverse("accounts_detail_api")
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        self.create_mock_verified_name(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = client.get(url + f'?lms_user_id={non_integer_id}')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')

@@ -288,6 +288,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase, OpenEdxEventsTest
     @patch.dict(
         'django.conf.settings.PROCTORING_BACKENDS', {'test_provider_honor_mode': {'allow_honor_mode': True}}
     )
+    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
     def test_enroll_in_proctored_course_honor_mode_allowed(self):
         """
         If the proctoring provider allows honor mode, send proctoring requirements email when learners

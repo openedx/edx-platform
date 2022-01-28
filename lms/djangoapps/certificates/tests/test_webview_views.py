@@ -237,6 +237,39 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         )
         template.save()
 
+    def _create_custom_template_with_verified_description(self, org_id=None, course_key=None, language=None):
+        """
+        Creates a custom certificate template entry in DB. This custom certificate can be used to test
+        that the correct language is used if the integrity signature feature has been enabled for a course.
+        """
+        template_html = """
+            <%namespace name='static' file='static_content.html'/>
+            <html>
+            <body>
+                lang: ${LANGUAGE_CODE}
+                course name: ${accomplishment_copy_course_name}
+                mode: verified
+                ${accomplishment_copy_course_description}
+                ${certificate_type_description}
+                % if is_integrity_signature_enabled_for_course:
+                <p> Integrity signature enabled </p>
+                %endif
+                ${twitter_url}
+                <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
+            </body>
+            </html>
+        """
+        template = CertificateTemplate(
+            name='custom template',
+            template=template_html,
+            organization_id=org_id,
+            course_key=course_key,
+            mode='verified',
+            is_active=True,
+            language=language
+        )
+        template.save()
+
     def _add_certificate_date_override(self):
         """
         Creates a mock CertificateDateOverride and adds it to the certificate
@@ -1608,6 +1641,36 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         else:
             self.assertContains(response, self.user.profile.name)
             self.assertNotContains(response, verified_name)
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    @patch('lms.djangoapps.certificates.views.webview.is_integrity_signature_enabled')
+    @ddt.data(
+        True,
+        False
+    )
+    def test_verified_certificate_description(self, integrity_signature_enabled, mock_integrity_signature):
+        """
+        Test that for a verified cert, the correct language is used when the integrity signature feature is enabled.
+        """
+        mock_integrity_signature.return_value = integrity_signature_enabled
+        self._add_course_certificates(count=1, signatory_count=2, is_active=True)
+        self._create_custom_template_with_verified_description()
+        self.cert.mode = 'verified'
+        self.cert.save()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
+
+        response = self.client.get(test_url)
+        assert response.status_code == 200
+        if not integrity_signature_enabled:
+            self.assertContains(response, 'identity of the learner has been checked and is valid')
+            self.assertNotContains(response, 'Integrity signature enabled')
+        else:
+            self.assertNotContains(response, 'identity of the learner has been checked and is valid')
+            self.assertContains(response, 'Integrity signature enabled')
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):

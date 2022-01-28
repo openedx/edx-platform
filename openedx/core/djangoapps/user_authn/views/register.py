@@ -25,6 +25,7 @@ from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
+from openedx_filters.learning.filters import StudentRegistrationRequested
 from pytz import UTC
 from ratelimit.decorators import ratelimit
 from requests import HTTPError
@@ -569,6 +570,14 @@ class RegistrationView(APIView):
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
+        try:
+            data = StudentRegistrationRequested.run_filter(form_data=data)
+        except StudentRegistrationRequested.PreventRegistration as exc:
+            errors = {
+                "error_message": [{"user_message": str(exc)}],
+            }
+            return self._create_response(request, errors, status_code=exc.status_code)
+
         response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
@@ -589,7 +598,7 @@ class RegistrationView(APIView):
                 path='/',
                 secure=request.is_secure()
             )  # setting the cookie to show account activation dialogue in platform and learning MFE
-        mark_user_change_as_expected(response, user.id)
+        mark_user_change_as_expected(user.id)
         return response
 
     def _handle_duplicate_email_username(self, request, data):

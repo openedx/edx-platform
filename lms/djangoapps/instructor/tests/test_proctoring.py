@@ -160,13 +160,15 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
         self._assert_escalation_email_available(False)
 
-    @patch.dict(settings.PROCTORING_BACKENDS,
-                {
-                    'DEFAULT': 'test_proctoring_provider',
-                    'test_proctoring_provider': {},
-                    'proctortrack': {}
-                },
-                )
+    @patch.dict(
+        settings.PROCTORING_BACKENDS,
+        {
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {},
+            'proctortrack': {}
+        },
+    )
+    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
     def test_proctortrack_provider_with_email(self):
         """
         Escalation email will be visible if proctortrack is the proctoring provider, and there

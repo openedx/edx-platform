@@ -14,6 +14,7 @@ import ddt
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
@@ -24,6 +25,7 @@ from common.djangoapps.course_modes.models import (
     invalidate_course_mode_cache
 )
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -341,36 +343,49 @@ class CourseModeModelTest(TestCase):
             assert exc.messages == ['Professional education modes are not allowed to have expiration_datetime set.']
 
     @ddt.data(
-        ("verified", "verify_need_to_verify"),
-        ("verified", "verify_submitted"),
-        ("verified", "verify_approved"),
-        ("verified", 'dummy'),
-        ("verified", None),
-        ('honor', None),
-        ('honor', 'dummy'),
-        ('audit', None),
-        ('professional', None),
-        ('no-id-professional', None),
-        ('no-id-professional', 'dummy')
+        ("verified", "verify_need_to_verify", True),
+        ("verified", "verify_submitted", True),
+        ("verified", "verify_approved", True),
+        ("verified", 'dummy', True),
+        ("verified", None, True),
+        ('honor', None, True),
+        ('honor', 'dummy', True),
+        ('audit', None, True),
+        ('professional', None, True),
+        ('no-id-professional', None, True),
+        ('no-id-professional', 'dummy', True),
+        ("verified", "verify_need_to_verify", False),
+        ("verified", "verify_submitted", False),
+        ("verified", "verify_approved", False),
+        ("verified", 'dummy', False),
+        ("verified", None, False),
+        ('honor', None, False),
+        ('honor', 'dummy', False),
+        ('audit', None, False),
+        ('professional', None, False),
+        ('no-id-professional', None, False),
+        ('no-id-professional', 'dummy', False)
     )
     @ddt.unpack
-    def test_enrollment_mode_display(self, mode, verification_status):
-        if mode == "verified":
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(verification_status)
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(verification_status)
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(verification_status)
-        elif mode == "honor":
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(mode)
-        elif mode == "audit":
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(mode)
-        elif mode == "professional":
-            assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                   self._enrollment_display_modes_dicts(mode)
+    def test_enrollment_mode_display(self, mode, verification_status, enable_flag):
+
+        with override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=enable_flag):
+            if mode == "verified":
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+            elif mode == "honor":
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
+            elif mode == "audit":
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
+            elif mode == "professional":
+                assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
+                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
 
     @ddt.data(
         (['honor', 'verified', 'credit'], ['honor', 'verified']),
@@ -394,7 +409,7 @@ class CourseModeModelTest(TestCase):
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
         self.assertCountEqual(list(all_modes.keys()), available_modes)
 
-    def _enrollment_display_modes_dicts(self, dict_type):
+    def _enrollment_display_modes_dicts(self, mode, dict_type, enable_flag):
         """
         Helper function to generate the enrollment display mode dict.
         """
@@ -410,7 +425,9 @@ class CourseModeModelTest(TestCase):
             "professional": ["You're enrolled as a professional education student", "Professional Ed", False, '',
                              'professional']
         }
-        if dict_type in ['verify_need_to_verify', 'verify_submitted']:
+        if mode == 'verified' and enable_flag:
+            return dict(list(zip(dict_keys, display_values.get('verify_approved'))))
+        elif dict_type in ['verify_need_to_verify', 'verify_submitted']:
             return dict(list(zip(dict_keys, display_values.get('verify_need_to_verify'))))
         elif dict_type is None or dict_type == 'dummy':
             return dict(list(zip(dict_keys, display_values.get('verify_none'))))

@@ -25,3 +25,6 @@ Django<3.3
 elasticsearch<7.14.0
 
 setuptools<60
+
+# redis 4 client doesn't play nicely with redis 3 server
+redis<4

@@ -10,6 +10,7 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 
 import logging
 import threading
+from urllib.parse import urlencode
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -58,7 +59,7 @@ def get_runtime_system():
     return getattr(get_runtime_system, cache_name)
 
 
-def load_block(usage_key, user):
+def load_block(usage_key, user, block_type_overrides=None):
     """
     Load the specified XBlock for the given user.
 
@@ -67,6 +68,12 @@ def load_block(usage_key, user):
     Exceptions:
         NotFound - if the XBlock doesn't exist or if the user doesn't have the
                    necessary permissions
+
+    Args:
+        usage_key(OpaqueKey): block identifier
+        user(User): user requesting the block
+        block_type_overrides(dict): optional dict of block types to override in returned block metadata:
+            {'from_block_type': 'to_block_type'}
     """
     # Is this block part of a course, a library, or what?
     # Get the Learning Context Implementation based on the usage key
@@ -85,7 +92,7 @@ def load_block(usage_key, user):
 
     runtime = get_runtime_system().get_runtime(user=user)
 
-    return runtime.get_block(usage_key)
+    return runtime.get_block(usage_key, block_type_overrides=block_type_overrides)
 
 
 def get_block_metadata(block, includes=()):
@@ -215,7 +222,7 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
     return fragment
 
 
-def get_handler_url(usage_key, handler_name, user):
+def get_handler_url(usage_key, handler_name, user, extra_params=None):
     """
     A method for getting the URL to any XBlock handler. The URL must be usable
     without any authentication (no cookie, no OAuth/JWT), and may expire. (So
@@ -232,6 +239,7 @@ def get_handler_url(usage_key, handler_name, user):
         usage_key       - Usage Key (Opaque Key object or string)
         handler_name    - Name of the handler or a dummy name like 'any_handler'
         user            - Django User (registered or anonymous)
+        extra_params    - Optional extra params to append to the handler_url (dict)
 
     This view does not check/care if the XBlock actually exists.
     """
@@ -255,8 +263,11 @@ def get_handler_url(usage_key, handler_name, user):
         'secure_token': secure_token,
         'handler_name': handler_name,
     })
+    qstring = urlencode(extra_params) if extra_params else ''
+    if qstring:
+        qstring = '?' + qstring
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method
     # can be called by the XBlock from python as well and in that case we don't
     # have access to the request.
-    return site_root_url + path
+    return site_root_url + path + qstring

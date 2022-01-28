@@ -114,6 +114,19 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
 )
 
+# .. toggle_name: COURSES_INVITE_ONLY
+# .. toggle_implementation: SettingToggle
+# .. toggle_type: feature_flag
+# .. toggle_default: False
+# .. toggle_description: Setting this sets the default value of INVITE_ONLY across all courses in a given deployment
+# .. toggle_category: admin
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2019-05-16
+# .. toggle_expiration_date: None
+# .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
+# .. toggle_status: unsupported
+COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
+
 
 def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     """
@@ -238,16 +251,6 @@ def streak_celebration_is_active(course_key):
     )
 
 
-# .. toggle_name: COURSES_INVITE_ONLY
-# .. toggle_implementation: SettingToggle
-# .. toggle_type: feature_flag
-# .. toggle_default: False
-# .. toggle_description: Setting this sets the default value of INVITE_ONLY across all courses in a given deployment
-# .. toggle_category: admin
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2019-05-16
-# .. toggle_expiration_date: None
-# .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
-# .. toggle_status: unsupported
-def is_courses_default_invite_only_enabled():
-    return SettingToggle("COURSES_INVITE_ONLY", default=False).is_enabled()
+def course_is_invitation_only(courselike) -> bool:
+    """Returns whether the course is invitation only or not."""
+    return COURSES_INVITE_ONLY.is_enabled() or courselike.invitation_only

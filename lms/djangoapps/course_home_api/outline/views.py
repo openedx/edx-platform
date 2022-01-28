@@ -2,7 +2,6 @@
 Outline Tab Views
 """
 from datetime import datetime, timezone
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 from completion.exceptions import UnavailableCompletionData  # lint-amnesty, pylint: disable=wrong-import-order
 from completion.utilities import get_key_to_last_completed_block  # lint-amnesty, pylint: disable=wrong-import-order
@@ -26,14 +25,9 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,
-    add_course_goal_deprecated,
     get_course_goal,
-    get_course_goal_text,
-    has_course_goal_permission,
-    valid_course_goals_ordered
 )
 from lms.djangoapps.course_goals.models import CourseGoal
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.course_home_api.outline.serializers import OutlineTabSerializer
 from lms.djangoapps.course_home_api.toggles import (
     course_home_legacy_is_active,
@@ -43,7 +37,9 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.learning_sequences.api import (
     get_user_course_outline,
     public_api_available as learning_sequences_api_available,
@@ -113,6 +109,7 @@ class OutlineTabView(RetrieveAPIView):
             selected_goal:
                 days_per_week: (int) The number of days the learner wants to learn per week
                 subscribed_to_reminders: (bool) Whether the learner wants email reminders about their goal
+            weekly_learning_goal_enabled: Flag indicating if this feature is enabled for this call
         course_tools: List of serialized Course Tool objects. Each serialization has the following fields:
             analytics_id: (str) The unique id given to the tool.
             title: (str) The display title of the tool.
@@ -214,8 +211,8 @@ class OutlineTabView(RetrieveAPIView):
         cert_data = None
         course_blocks = None
         course_goals = {
-            'goal_options': [],
-            'selected_goal': None
+            'selected_goal': None,
+            'weekly_learning_goal_enabled': False,
         }
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         dates_widget = {
@@ -253,36 +250,14 @@ class OutlineTabView(RetrieveAPIView):
 
             enable_proctored_exams = course_overview.enable_proctored_exams
 
-            if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
-                if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
-
-                    course_goals = {
-                        'selected_goal': None,
-                        'weekly_learning_goal_enabled': True,
+            if (is_enrolled and ENABLE_COURSE_GOALS.is_enabled(course_key)):
+                course_goals['weekly_learning_goal_enabled'] = True
+                selected_goal = get_course_goal(request.user, course_key)
+                if selected_goal:
+                    course_goals['selected_goal'] = {
+                        'days_per_week': selected_goal.days_per_week,
+                        'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
                     }
-                    selected_goal = get_course_goal(request.user, course_key)
-                    if selected_goal:
-                        course_goals['selected_goal'] = {
-                            'days_per_week': selected_goal.days_per_week,
-                            'subscribed_to_reminders': selected_goal.subscribed_to_reminders,
-                        }
-            else:
-                # Only show the set course goal message for enrolled, unverified
-                # users in a course that allows for verified statuses.
-                is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
-                if not is_already_verified and has_course_goal_permission(request, course_key_string,
-                                                                          {'is_enrolled': is_enrolled}):
-                    course_goals = {
-                        'goal_options': valid_course_goals_ordered(include_unsure=True),
-                        'selected_goal': None
-                    }
-
-                    selected_goal = get_course_goal(request.user, course_key)
-                    if selected_goal:
-                        course_goals['selected_goal'] = {
-                            'key': selected_goal.goal_key,
-                            'text': get_course_goal_text(selected_goal.goal_key),
-                        }
 
             try:
                 resume_block = get_key_to_last_completed_block(request.user, course.id)
@@ -301,14 +276,14 @@ class OutlineTabView(RetrieveAPIView):
             if allow_public or user_is_masquerading:
                 handouts_html = get_course_info_section(request, request.user, course, 'handouts')
 
-        if not show_enrolled:
+        if not is_enrolled:
             if CourseMode.is_masters_only(course_key):
                 enroll_alert['can_enroll'] = False
                 enroll_alert['extra_text'] = _(
                     'Please contact your degree administrator or '
                     '{platform_name} Support if you have questions.'
                 ).format(platform_name=settings.PLATFORM_NAME)
-            elif course.invitation_only:
+            elif course_is_invitation_only(course):
                 enroll_alert['can_enroll'] = False
 
         # Sometimes there are sequences returned by Course Blocks that we
@@ -423,33 +398,18 @@ def save_course_goal(request):  # pylint: disable=missing-function-docstring
     if not course_id:
         raise ParseError("'course_id' is required.")
 
-    if COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled():
-        # If body doesn't contain the required goals fields, return 400 to client.
-        if subscribed_to_reminders is None:
-            raise ParseError("'subscribed_to_reminders' is required.")
+    # If body doesn't contain the required goals fields, return 400 to client.
+    if subscribed_to_reminders is None:
+        raise ParseError("'subscribed_to_reminders' is required.")
 
-        try:
-            add_course_goal(request.user, course_id, subscribed_to_reminders, days_per_week)
-            return Response({
-                'header': _('Your course goal has been successfully set.'),
-                'message': _('Course goal updated successfully.'),
-            })
-        except Exception:
-            raise UnableToSaveCourseGoal  # pylint: disable=raise-missing-from
-
-    else:
-        # If body doesn't contain 'goal', return 400 to client.
-        if not goal_key:
-            raise ParseError("'goal_key' is required.")
-
-        try:
-            add_course_goal_deprecated(request.user, course_id, goal_key)
-            return Response({
-                'header': _('Your course goal has been successfully set.'),
-                'message': _('Course goal updated successfully.'),
-            })
-        except Exception:
-            raise UnableToSaveCourseGoal  # pylint: disable=raise-missing-from
+    try:
+        add_course_goal(request.user, course_id, subscribed_to_reminders, days_per_week)
+        return Response({
+            'header': _('Your course goal has been successfully set.'),
+            'message': _('Course goal updated successfully.'),
+        })
+    except Exception as exc:
+        raise UnableToSaveCourseGoal from exc
 
 
 @api_view(['POST'])

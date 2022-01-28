@@ -34,13 +34,13 @@ from xblock.fields import (
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
 
-from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
+from openedx.core.djangolib.markup import HTML
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
@@ -1906,6 +1906,59 @@ class ModuleSystemShim:
             }
         return None
 
+    @property
+    def can_execute_unsafe_code(self):
+        """
+        Returns a function which returns a boolean, indicating whether or not to allow the execution of unsafe,
+        unsandboxed code.
+
+        Deprecated in favor of the sandbox service.
+        """
+        warnings.warn(
+            'runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        sandbox_service = self._services.get('sandbox')
+        if sandbox_service:
+            return sandbox_service.can_execute_unsafe_code
+        # Default to saying "no unsafe code".
+        return lambda: False
+
+    @property
+    def get_python_lib_zip(self):
+        """
+        Returns a function returning a bytestring or None.
+
+        The bytestring is the contents of a zip file that should be importable by other Python code running in the
+        module.
+
+        Deprecated in favor of the sandbox service.
+        """
+        warnings.warn(
+            'runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        sandbox_service = self._services.get('sandbox')
+        if sandbox_service:
+            return sandbox_service.get_python_lib_zip
+        # Default to saying "no lib data"
+        return lambda: None
+
+    @property
+    def cache(self):
+        """
+        Returns a cache object with two methods:
+        * .get(key) returns an object from the cache or None.
+        * .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
+
+        Deprecated in favor of the cache service.
+        """
+        warnings.warn(
+            'runtime.cache is deprecated. Please use the cache service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self._services.get('cache') or DoNothingCache()
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1925,10 +1978,10 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
             replace_urls, descriptor_runtime, filestore=None,
             debug=False, hostname="", publish=None, node_path="",
             course_id=None,
-            cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
+            replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
-            get_python_lib_zip=None, **kwargs):
+            **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1956,17 +2009,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        cache - A cache object with two methods:
-            .get(key) returns an object from the cache or None.
-            .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
-
-        can_execute_unsafe_code - A function returning a boolean, whether or
-            not to allow the execution of unsafe, unsandboxed code.
-
-        get_python_lib_zip - A function returning a bytestring or None.  The
-            bytestring is the contents of a zip file that should be importable
-            by other Python code running in the module.
-
         error_descriptor_class - The class to use to render XModules with errors
 
         field_data - the `FieldData` to use for backing XBlock storage.
@@ -1993,10 +2035,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         if publish:
             self.publish = publish
-
-        self.cache = cache or DoNothingCache()
-        self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
-        self.get_python_lib_zip = get_python_lib_zip or (lambda: None)
         self.replace_course_urls = replace_course_urls
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class

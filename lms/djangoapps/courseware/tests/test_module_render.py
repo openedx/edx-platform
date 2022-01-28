@@ -42,6 +42,21 @@ from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
 from capa.xqueue_interface import XQueueInterface
+from xmodule.capa_module import ProblemBlock
+from xmodule.contentstore.django import contentstore
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.lti_module import LTIBlock
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    upload_file_to_course,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
@@ -69,19 +84,6 @@ from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from common.djangoapps.xblock_django.models import XBlockConfiguration
-from xmodule.capa_module import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.lti_module import LTIBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -2565,6 +2567,8 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
     """
     COURSE_ID = 'edX/LmsModuleShimTest/2021_Fall'
+    PYTHON_LIB_FILENAME = 'test_python_lib.zip'
+    PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'
 
     @classmethod
     def setUpClass(cls):
@@ -2586,6 +2590,16 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.student_data = Mock()
         self.track_function = Mock()
         self.request_token = Mock()
+        self.contentstore = contentstore()
+        self.runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
 
     @ddt.data(
         ('seed', 232),
@@ -2597,16 +2611,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         """
         Tests that the deprecated attributes provided by the user service match expected values.
         """
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            self.descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        assert getattr(runtime, attribute) == expected_value
+        assert getattr(self.runtime, attribute) == expected_value
 
     @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
     def test_user_is_staff(self):
@@ -2636,16 +2641,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert runtime.get_user_role() == 'instructor'
 
     def test_anonymous_student_id(self):
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            self.descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        assert runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        assert self.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
 
     def test_anonymous_student_id_bug(self):
         """
@@ -2715,29 +2711,11 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert runtime.get_real_user() == self.user  # pylint: disable=not-callable
 
     def test_render_template(self):
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            self.descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        rendered = runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
+        rendered = self.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
 
     def test_xqueue(self):
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            self.descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        xqueue = runtime.xqueue
+        xqueue = self.runtime.xqueue
         assert isinstance(xqueue['interface'], XQueueInterface)
         assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
@@ -2777,3 +2755,37 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         callback_url = f'http://alt.url/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/{self.descriptor.location}'
         assert xqueue['construct_callback']() == f'{callback_url}/score_update'
         assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
+
+    @override_settings(COURSES_WITH_UNSAFE_CODE=[COURSE_ID])
+    def test_can_execute_unsafe_code_when_allowed(self):
+        assert self.runtime.can_execute_unsafe_code()
+
+    @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/full/2012_Fall'])
+    def test_cannot_execute_unsafe_code_when_disallowed(self):
+        assert not self.runtime.can_execute_unsafe_code()
+
+    def test_cannot_execute_unsafe_code(self):
+        assert not self.runtime.can_execute_unsafe_code()
+
+    @override_settings(PYTHON_LIB_FILENAME=PYTHON_LIB_FILENAME)
+    def test_get_python_lib_zip(self):
+        zipfile = upload_file_to_course(
+            course_key=self.course.id,
+            contentstore=self.contentstore,
+            source_file=self.PYTHON_LIB_SOURCE_FILE,
+            target_filename=self.PYTHON_LIB_FILENAME,
+        )
+        assert self.runtime.get_python_lib_zip() == zipfile
+
+    def test_no_get_python_lib_zip(self):
+        zipfile = upload_file_to_course(
+            course_key=self.course.id,
+            contentstore=self.contentstore,
+            source_file=self.PYTHON_LIB_SOURCE_FILE,
+            target_filename=self.PYTHON_LIB_FILENAME,
+        )
+        assert self.runtime.get_python_lib_zip() is None
+
+    def test_cache(self):
+        assert hasattr(self.runtime.cache, 'get')
+        assert hasattr(self.runtime.cache, 'set')

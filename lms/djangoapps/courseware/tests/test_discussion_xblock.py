@@ -330,7 +330,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             <iframe
                 id='discussions-mfe-tab-embed'
                 title='Discussions'
-                src='http://test.url/discussions/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
+                src='http://test.url/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
             />
             """,
             html,
@@ -431,12 +431,13 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 4 queries are required to do first discussion xblock render:
+        # 5 queries are required to do first discussion xblock render:
         # * waffle_utils_wafflecourseoverridemodel
+        # * waffle_utils_waffleorgoverridemodel
         # * waffle_flag
         # * django_comment_client_role
         # * lms_xblock_xblockasidesconfig
-        num_queries = 4
+        num_queries = 5
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
                 user=user,

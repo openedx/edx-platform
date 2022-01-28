@@ -14,7 +14,13 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@patch.dict(
+    'django.conf.settings.FEATURES',
+    {
+        'ENABLE_SPECIAL_EXAMS': True,
+        'ENABLE_PROCTORED_EXAMS': True,
+    }
+)
 class PermissionTests(ModuleStoreTestCase):
     """
     Tests for permissions defined in courseware.rules

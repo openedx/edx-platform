@@ -673,9 +673,7 @@ class VideoBlock(
         """
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)
-        # Mild workaround to ensure that tests pass -- if a field
-        # is set to its default value, we don't need to write it out.
-        if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
+        if youtube_string:
             xml.set('youtube', str(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = [

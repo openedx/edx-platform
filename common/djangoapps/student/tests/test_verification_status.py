@@ -332,19 +332,19 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         else:
             self._setup_mode_and_enrollment(None, "verified")
 
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
 
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
         attempt.mark_ready()
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
         attempt.submit()
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
         attempt.approve()
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
         attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(None, "verified")
 
     @ddt.data(True, False)
     def test_integrity_disables_sidebar(self, integrity_flag):
@@ -416,7 +416,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_RESUBMITTED: "audit"
     }
 
-    def _assert_course_verification_status(self, status):
+    def _assert_course_verification_status(self, status, enrollment_mode=None):
         """Check whether the specified verification status is shown on the dashboard.
 
         Arguments:
@@ -437,10 +437,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         if alt_text:
             self.assertContains(response, alt_text)
 
+        mode = enrollment_mode if enrollment_mode else self.MODE_CLASSES[status]
+
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            f"<article class=\"course {self.MODE_CLASSES[status]}\""
+            f"<article class=\"course {mode}\""
         )
 
         # Verify that the correct copy is rendered on the dashboard

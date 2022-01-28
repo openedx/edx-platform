@@ -1,6 +1,7 @@
 """Url configuration for the auth module."""
 
 from django.conf.urls import include
+from django.urls import path, re_path
 
 from .views import (
     IdPRedirectView,
@@ -9,7 +10,6 @@ from .views import (
     post_to_custom_auth_form,
     saml_metadata_view
 )
-from django.urls import path, re_path
 
 urlpatterns = [
     path('auth/inactive', inactive_user_view, name="third_party_inactive_redirect"),
