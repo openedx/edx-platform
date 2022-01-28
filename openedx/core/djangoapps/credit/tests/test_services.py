@@ -3,9 +3,11 @@ Tests for the Credit xBlock service
 """
 
 
+from unittest.mock import patch
 import ddt
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.services import CreditService
@@ -260,6 +262,22 @@ class CreditServiceTests(ModuleStoreTestCase):
         credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
         assert 'course_name' in credit_state
         assert credit_state['course_name'] == self.course.display_name
+
+    @patch("openedx.core.djangoapps.credit.services.log")
+    def test_course_exception_log(self, exception_log):
+        """
+        Make sure we catch the CourseOverview.DoesNotExist exception and log it instead of raising
+        """
+        with patch("openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id",
+                   side_effect=CourseOverview.DoesNotExist):
+
+            self.enroll()
+            credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
+            assert credit_state is not None
+            exception_log.exception.assert_called_once_with(
+                "Could not get name and end_date for course %s, This happened because we were unable to "
+                "get/create CourseOverview object for the course. It's possible that the Course has been deleted.",
+                str(self.course.id))
 
     def test_set_status_non_credit(self):
         """

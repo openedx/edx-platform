@@ -100,11 +100,18 @@ class CreditService:
         }
 
         if return_course_info:
-            course_overview = CourseOverview.get_from_id(course_key)
-            result.update({
-                'course_name': course_overview.display_name,
-                'course_end_date': course_overview.end,
-            })
+            try:
+                course_overview = CourseOverview.get_from_id(course_key)
+                result.update({
+                    'course_name': course_overview.display_name,
+                    'course_end_date': course_overview.end,
+                })
+            except CourseOverview.DoesNotExist:
+                log.exception(
+                    "Could not get name and end_date for course %s, This happened because we were unable to "
+                    "get/create CourseOverview object for the course. It's possible that the Course has been deleted.",
+                    str(course_key),
+                )
         return result
 
     def set_credit_requirement_status(self, user_id, course_key_or_id, req_namespace,
