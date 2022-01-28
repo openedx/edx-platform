@@ -42,8 +42,8 @@ class CourseWaffleFlag(LegacyWaffleFlag):
             overriding any behavior configured on the waffle flag itself. "Force off" will disable the waffle flag
             for all users in a course, overriding any behavior configured on the waffle flag itself. Requires
             "Enabled" (see below) to apply.
-        Enabled: This must be marked as enabled in order for the override to be applied. These settings can't be
-            deleted, so instead, you need to disable if it should no longer apply.
+        Enabled: Must be marked as "enabled" in order for the override to be applied. These settings can't be
+            deleted, so instead, you need to add another disabled override entry to disable the override.
 
     To configure an org-level override, go to Django Admin "waffle_utils" -> "Waffle flag org overrides".
 
@@ -53,8 +53,8 @@ class CourseWaffleFlag(LegacyWaffleFlag):
             overriding any behavior configured on the waffle flag itself. "Force off" will disable the waffle flag
             for all users in a org's courses, overriding any behavior configured on the waffle flag itself. Requires
             "Enabled" (see below) to apply.
-        Enabled: This must be marked as enabled in order for the override to be applied. These settings can't be
-            deleted, so instead, you need to disable if it should no longer apply.
+        Enabled: Must be marked as "enabled" in order for the override to be applied. These settings can't be
+            deleted, so instead, you need to add another disabled override entry to disable the override.
 
     """
 
