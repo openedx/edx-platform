@@ -1042,3 +1042,6 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
 
 ################# show account activate cta after register ########################
 SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
+
+################# Discussions micro frontend URL ########################
+DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', DISCUSSIONS_MICROFRONTEND_URL)
