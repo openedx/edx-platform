@@ -55,6 +55,7 @@ jobs:
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
           sudo pip install "django~=${{ matrix.django-version }}.0"
+          sudo pip install pytest-random-order pytest-flakefinder
 
       - name: get unit tests for shard
         run: |
@@ -62,7 +63,7 @@ jobs:
 
       - name: run tests
         run: |
-          python -Wd -m pytest  ${{ env.pytest_randomly_option }} --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+          python -Wd -m pytest --random-order --random-order-bucket=global --flake-finder --flake-runs=4 --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
 
       - name: rename warnings json file
         if: success()
