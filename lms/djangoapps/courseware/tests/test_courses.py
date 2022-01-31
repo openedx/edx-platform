@@ -54,7 +54,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
     GET_COURSE_WITH_ACCESS = 'get_course_with_access'
     GET_COURSE_OVERVIEW_WITH_ACCESS = 'get_course_overview_with_access'
@@ -90,7 +89,7 @@ class CoursesTest(ModuleStoreTestCase):
         assert not error.value.access_response.has_access
 
     @ddt.data(
-        (GET_COURSE_WITH_ACCESS, 1),
+        (GET_COURSE_WITH_ACCESS, 3),
         (GET_COURSE_OVERVIEW_WITH_ACCESS, 0),
     )
     @ddt.unpack
@@ -370,11 +369,11 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
         self.factory = RequestFactory()
 
-    @ddt.data(*itertools.product(range(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
+    @ddt.data(*itertools.product(range(5), [None, 0, 5]))
     @ddt.unpack
-    def test_repeated_course_module_instantiation(self, loops, default_store, course_depth):
+    def test_repeated_course_module_instantiation(self, loops, course_depth):
 
-        with modulestore().default_store(default_store):
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory(parent=course, category='chapter', graded=True)
             section = ItemFactory(parent=chapter, category='sequential')

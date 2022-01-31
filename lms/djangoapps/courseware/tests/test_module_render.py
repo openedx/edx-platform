@@ -1012,20 +1012,14 @@ class TestTOC(ModuleStoreTestCase):
                     self.course_key, self.request.user, self.toy_course, depth=2
                 )
 
-    # Mongo makes 3 queries to load the course to depth 2:
-    #     - 1 for the course
-    #     - 1 for its children
-    #     - 1 for its grandchildren
     # Split makes 2 queries to load the course to depth 2:
     #     - 1 for the structure
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 0))
-    @ddt.unpack
-    def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
-        with self.store.default_store(default_ms):
-            self.setup_request_and_course(setup_finds, setup_sends)
+    def test_toc_toy_from_chapter(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            self.setup_request_and_course(2, 0)
 
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': 'Toy Videos', 'graded': True,
@@ -1043,7 +1037,7 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             course = self.store.get_course(self.toy_course.id, depth=2)
-            with check_mongo_calls(toc_finds):
+            with check_mongo_calls(0):
                 actual = render.toc_for_course(
                     self.request.user, self.request, course, self.chapter, None, self.field_data_cache
                 )
@@ -1052,20 +1046,14 @@ class TestTOC(ModuleStoreTestCase):
         assert actual['previous_of_active_section'] is None
         assert actual['next_of_active_section'] is None
 
-    # Mongo makes 3 queries to load the course to depth 2:
-    #     - 1 for the course
-    #     - 1 for its children
-    #     - 1 for its grandchildren
     # Split makes 2 queries to load the course to depth 2:
     #     - 1 for the structure
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 0))
-    @ddt.unpack
-    def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
-        with self.store.default_store(default_ms):
-            self.setup_request_and_course(setup_finds, setup_sends)
+    def test_toc_toy_from_section(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            self.setup_request_and_course(2, 0)
             section = 'Welcome'
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': 'Toy Videos', 'graded': True,
@@ -1082,7 +1070,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
-            with check_mongo_calls(toc_finds):
+            with check_mongo_calls(0):
                 actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache
                 )
@@ -1094,20 +1082,14 @@ class TestTOC(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-class TestProctoringRendering(SharedModuleStoreTestCase):
+class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course_key = ToyCourseFactory.create(enable_proctored_exams=True).id
-
     def setUp(self):
         """
         Set up the initial mongo datastores
         """
         super().setUp()
+        self.course_key = ToyCourseFactory.create(enable_proctored_exams=True).id
         self.chapter = 'Overview'
         chapter_url = '{}/{}/{}'.format('/courses', self.course_key, self.chapter)
         factory = RequestFactoryNoCsrf()
@@ -1342,15 +1324,15 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         test harness data
         """
         usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
-        sequence = self.modulestore.get_item(usage_key)
 
-        sequence.is_time_limited = True
-        sequence.is_proctored_exam = True
-        sequence.is_practice_exam = is_practice_exam
+        with self.modulestore.bulk_operations(self.toy_course.id):
+            sequence = self.modulestore.get_item(usage_key)
+            sequence.is_time_limited = True
+            sequence.is_proctored_exam = True
+            sequence.is_practice_exam = is_practice_exam
+            self.modulestore.update_item(sequence, self.user.id)
 
-        self.modulestore.update_item(sequence, self.user.id)
-
-        self.toy_course = self.modulestore.get_course(self.course_key)
+        self.toy_course = self.update_course(self.toy_course, self.user.id)
 
         # refresh cache after update
         self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1375,7 +1357,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
 
         exam_id = create_exam(
             course_id=str(self.course_key),
-            content_id=str(sequence.location),
+            content_id=str(sequence.location.replace(branch=None, version=None)),
             exam_name='foo',
             time_limit_mins=10,
             is_proctored=True,
@@ -1415,26 +1397,17 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         return None
 
 
-class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
+class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the toc for a course is rendered correctly when there is gated content
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-        cls.course.enable_subsection_gating = True
-        cls.course.save()
-        cls.store.update_item(cls.course, 0)
-
     def setUp(self):
         """
         Set up the initial test data
         """
         super().setUp()
 
+        self.course = CourseFactory.create(enable_subsection_gating=True)
         self.chapter = ItemFactory.create(
             parent=self.course,
             category="chapter",
@@ -1450,6 +1423,8 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
             category='sequential',
             display_name="Gated Sequential"
         )
+        self.course = self.update_course(self.course, 0)
+
         self.request = RequestFactoryNoCsrf().get(f'/courses/{self.course.id}/{self.chapter.display_name}')
         self.request.user = UserFactory()
         self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(

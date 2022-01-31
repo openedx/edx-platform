@@ -22,7 +22,7 @@ from pyquery import PyQuery as pq
 from pytz import UTC
 from waffle.models import Switch
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -60,7 +60,6 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     Test the course outline view.
     """
 
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -77,35 +76,28 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             course = CourseFactory.create(self_paced=True, start=timezone.now() - datetime.timedelta(days=1))
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True,
+                                                format="Homework")
                 vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
-                problem = ItemFactory.create(category='problem', parent_location=vertical.location)
-            course.children = [chapter]
-            chapter.children = [sequential]
-            sequential.children = [vertical]
-            vertical.children = [problem]
-            cls.courses.append(course)
+                ItemFactory.create(category='problem', parent_location=vertical.location)
+            cls.courses.append(cls.store.publish(course.location, ModuleStoreEnum.UserID.test))
 
             course = CourseFactory.create()
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                vertical = ItemFactory.create(
+                ItemFactory.create(
                     category='vertical',
                     parent_location=sequential.location,
                     display_name="Vertical 1"
                 )
-                vertical2 = ItemFactory.create(
+                ItemFactory.create(
                     category='vertical',
                     parent_location=sequential2.location,
                     display_name="Vertical 2"
                 )
-            course.children = [chapter]
-            chapter.children = [sequential, sequential2]
-            sequential.children = [vertical]
-            sequential2.children = [vertical2]
-            cls.courses.append(course)
+            cls.courses.append(cls.store.publish(course.location, ModuleStoreEnum.UserID.test))
 
             course = CourseFactory.create()
             with cls.store.bulk_operations(course.id):
@@ -117,11 +109,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
                     graded=True,
                     format='Homework',
                 )
-                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
-            course.children = [chapter]
-            chapter.children = [sequential]
-            sequential.children = [vertical]
-            cls.courses.append(course)
+                ItemFactory.create(category='vertical', parent_location=sequential.location)
+            cls.courses.append(cls.store.publish(course.location, ModuleStoreEnum.UserID.test))
 
     @classmethod
     def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called

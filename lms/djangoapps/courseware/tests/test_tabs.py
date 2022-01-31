@@ -237,8 +237,6 @@ class TextbooksTestCase(TabTestCase):
 class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -294,8 +292,6 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests for the static tab dates of an XML course
     """
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
     def setUp(self):
         """
         Set up the tests
@@ -308,7 +304,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.xml_course_key = self.store.make_course_key('edX', 'detached_pages', '2014')
         import_course_from_xml(
             self.store,
-            'test_user',
+            self.user.id,
             TEST_DATA_DIR,
             source_dirs=['2014'],
             static_content_store=None,
@@ -341,8 +337,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
     """
     Validate tab behavior when dealing with Entrance Exams
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
         """
@@ -351,10 +345,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         super().setUp()
 
         self.course = CourseFactory.create()
-        self.instructor_tab = ItemFactory.create(
-            category="instructor", parent_location=self.course.location,
-            data="Instructor Tab", display_name="Instructor"
-        )
         self.extra_tab_2 = ItemFactory.create(
             category="static_tab", parent_location=self.course.location,
             data="Extra Tab", display_name="Extra Tab 2"
@@ -376,7 +366,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         entrance_exam = ItemFactory.create(
             category="chapter",
             parent_location=self.course.location,
-            data="Exam Data",
             display_name="Entrance Exam",
             is_entrance_exam=True
         )

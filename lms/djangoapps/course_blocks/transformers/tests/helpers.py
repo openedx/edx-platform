@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -43,7 +43,6 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     """
     Helper for test cases that need to build course structures.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         """
@@ -116,6 +115,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                 Mapping from '#ref' values to their XBlocks.
 
         """
+        store = modulestore()
         parents = block_hierarchy.get('#parents', [])
         if parents:
             block_key = block_map[block_hierarchy['#ref']].location
@@ -123,14 +123,16 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             # First remove the block from the course.
             # It would be re-added to the course if the course was
             # explicitly listed in parents.
-            course = modulestore().get_item(block_map['course'].location)
+            with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, block_map['course'].id):
+                course = store.get_item(block_map['course'].location)
             if block_key in course.children:
                 course.children.remove(block_key)
                 block_map['course'] = update_block(course)
 
             # Add this to block to each listed parent.
             for parent_ref in parents:
-                parent_block = modulestore().get_item(block_map[parent_ref].location)
+                with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+                    parent_block = store.get_item(block_map[parent_ref].location)
                 parent_block.children.append(block_key)
                 block_map[parent_ref] = update_block(parent_block)
 
@@ -208,8 +210,6 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     Test helper class for creating a test course of
     a graph of vertical blocks based on a parents_map.
     """
-
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     # Tree formed by parent_map:
     #        0
@@ -310,7 +310,9 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         Helper method to retrieve the requested block (index) from the
         modulestore
         """
-        return modulestore().get_item(self.xblock_keys[block_index])
+        store = modulestore()
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            return store.get_item(self.xblock_keys[block_index])
 
     def _check_results(self, user, expected_accessible_blocks, blocks_with_differing_access, transformers):
         """
@@ -350,7 +352,9 @@ def update_block(block):
     """
     Helper method to update the block in the modulestore
     """
-    return modulestore().update_item(block, ModuleStoreEnum.UserID.test)
+    store = modulestore()
+    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, block.course_id):
+        return store.update_item(block, ModuleStoreEnum.UserID.test)
 
 
 def publish_course(course):

@@ -103,7 +103,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             {
                 '#type': 'split_test',
                 '#ref': 'BSplit',
-                'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
                     '0': location('E'),
@@ -128,7 +127,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             {
                 '#type': 'split_test',
                 '#ref': 'KSplit',
-                'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
                     '1': location('M'),
@@ -143,7 +141,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             {
                 '#type': 'split_test',
                 '#ref': 'CSplit',
-                'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
                     '0': location('H'),

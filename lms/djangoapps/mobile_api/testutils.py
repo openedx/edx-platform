@@ -22,7 +22,7 @@ from django.urls import reverse
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student import auth
@@ -41,8 +41,6 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
        REVERSE_INFO = {'name': <django reverse name>, 'params': [<list of params in the URL>]}
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(

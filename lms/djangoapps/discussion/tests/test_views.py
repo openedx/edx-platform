@@ -19,7 +19,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_MONGO_AMNESTY_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
@@ -477,32 +476,19 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     Ensures the number of modulestore queries and number of sql queries are
     independent of the number of responses retrieved for a given discussion thread.
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-
     @ddt.data(
-        # Old mongo with cache. There is an additional SQL query for old mongo
-        # because the first time that disabled_xblocks is queried is in call_single_thread,
-        # vs. the creation of the course (CourseFactory.create). The creation of the
-        # course is outside the context manager that is verifying the number of queries,
-        # and with split mongo, that method ends up querying disabled_xblocks (which is then
-        # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 7),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 2, 2, 21, 8),
-        (ModuleStoreEnum.Type.split, False, 50, 2, 2, 21, 8),
+        (False, 1, 2, 2, 21, 8),
+        (False, 50, 2, 2, 21, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 7),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 2, 2, 21, 8),
-        (ModuleStoreEnum.Type.split, True, 50, 2, 2, 21, 8),
+        (True, 1, 2, 2, 21, 8),
+        (True, 50, 2, 2, 21, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
             self,
-            default_store,
             enterprise_enabled,
             num_thread_responses,
             num_uncached_mongo_calls,
@@ -512,7 +498,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             mock_request
     ):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        with modulestore().default_store(default_store):
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
 
         student = UserFactory.create()
