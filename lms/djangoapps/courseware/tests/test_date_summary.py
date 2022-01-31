@@ -724,33 +724,25 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             assert block.relative_datestring == expected_date_string
 
     @ddt.data(
-        ('info', True),
-        ('info', False),
-        ('openedx.course_experience.course_home', True),
-        ('openedx.course_experience.course_home', False),
+        'info',
+        'openedx.course_experience.course_home',
     )
-    @ddt.unpack
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
-    def test_dates_tab_link_render(self, url_name, legacy_active):
+    def test_dates_tab_link_render(self, url_name):
         """ The dates tab link should only show for enrolled or staff users """
         course = create_course_run()
         html_elements = [
             'class="dates-tab-link"',
             'View all course dates</a>',
+            f'/course/{course.id}/dates',
         ]
-        # The url should change based on the mfe being active.
-        if legacy_active:
-            html_elements.append('/courses/' + str(course.id) + '/dates')
-        else:
-            html_elements.append('/course/' + str(course.id) + '/dates')
         url = reverse(url_name, args=(course.id,))
 
         def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            with override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=legacy_active):
-                response = self.client.get(url, follow=True)
-            if legacy_active or user.is_staff:
+            response = self.client.get(url, follow=True)
+            if user.is_staff:
                 for html in html_elements:
                     assert_function(response, html)
             else:

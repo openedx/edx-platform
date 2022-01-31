@@ -32,7 +32,6 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
-from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
 from markupsafe import escape
@@ -77,7 +76,6 @@ from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
     get_course,
-    get_course_date_blocks,
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
@@ -125,7 +123,6 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -141,7 +138,6 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
-from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from ..tabs import _get_dynamic_tabs
@@ -1054,82 +1050,12 @@ def program_marketing(request, program_uuid):
     return render_to_response('courseware/program_marketing.html', context)
 
 
-@login_required
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def dates(request, course_id):
     """
-    Display the course's dates.html, or 404 if there is no such course.
-    Assumes the course_id is in a valid format.
+    Simply redirects to the MFE dates tab, as this legacy view for dates no longer exists.
     """
-    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
-
-    course_key = CourseKey.from_string(course_id)
-    if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
-        raise Redirect(get_learning_mfe_home_url(
-            course_key=course_key, url_fragment=COURSE_DATES_NAME, params=request.GET,
-        ))
-
-    # Enable NR tracing for this view based on course
-    monitoring_utils.set_custom_attribute('course_id', str(course_key))
-    monitoring_utils.set_custom_attribute('user_id', request.user.id)
-    monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
-
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
-
-    masquerade = None
-    can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
-    if can_masquerade:
-        masquerade, masquerade_user = setup_masquerade(
-            request,
-            course.id,
-            can_masquerade,
-            reset_masquerade_data=True,
-        )
-        request.user = masquerade_user
-
-    user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
-    user_is_staff = bool(has_access(request.user, 'staff', course_key))
-
-    # Render the full content to enrolled users, as well as to course and global staff.
-    # Unenrolled users who are not course or global staff are redirected to the Outline Tab.
-    if not user_is_enrolled and not user_is_staff:
-        raise CourseAccessRedirect(reverse('openedx.course_experience.course_home', args=[course_id]))
-
-    course_date_blocks = get_course_date_blocks(course, request.user, request,
-                                                include_access=True, include_past_dates=True)
-
-    learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(request.user, course_key)
-
-    # User locale settings
-    user_timezone_locale = user_timezone_locale_prefs(request)
-    user_timezone = user_timezone_locale['user_timezone']
-    user_language = user_timezone_locale['user_language']
-
-    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
-
-    context = {
-        'course': course,
-        'course_date_blocks': course_date_blocks,
-        'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-        'learner_is_full_access': learner_is_full_access,
-        'user_timezone': user_timezone,
-        'user_language': user_language,
-        'supports_preview_menu': True,
-        'can_masquerade': can_masquerade,
-        'masquerade': masquerade,
-        'on_dates_tab': True,
-        'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
-            course_key=course_key,
-        ),
-        'missed_deadlines': missed_deadlines,
-        'missed_gated_content': missed_gated_content,
-        'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
-        'has_ended': course.has_ended(),
-    }
-
-    return render_to_response('courseware/dates.html', context)
+    raise Redirect(get_learning_mfe_home_url(course_key=course_id, url_fragment='dates', params=request.GET))
 
 
 @transaction.non_atomic_requests
