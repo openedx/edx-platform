@@ -6,6 +6,7 @@ Views for Enhanced Staff Grader
 
 # NOTE: we intentionally add extra args using @require_params
 # pylint: disable=arguments-differ
+import logging
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
@@ -53,6 +54,8 @@ from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
+log = logging.getLogger(__name__)
 
 
 class StaffGraderBaseView(RetrieveAPIView):
@@ -112,8 +115,9 @@ class InitializeView(StaffGraderBaseView):
         except XBlockInternalError as ex:
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -176,10 +180,10 @@ class SubmissionFetchView(StaffGraderBaseView):
         except XBlockInternalError as ex:
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
-
 
 class SubmissionStatusFetchView(StaffGraderBaseView):
     """
@@ -230,8 +234,9 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
         except XBlockInternalError as ex:
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -318,8 +323,9 @@ class UpdateGradeView(StaffGraderBaseView):
         except XBlockInternalError as ex:
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -393,6 +399,7 @@ class SubmissionLockView(StaffGraderBaseView):
         except XBlockInternalError as ex:
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
