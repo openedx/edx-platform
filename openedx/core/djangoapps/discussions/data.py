@@ -24,6 +24,7 @@ class DiscussionTopicContext:
     usage_key = attr.ib(type=UsageKey, default=None)
     group_id = attr.ib(type=int, default=None)
     external_id = attr.ib(type=str, default=None)
+    ordering = attr.ib(type=int, default=None)
 
 
 @attr.s(frozen=True)

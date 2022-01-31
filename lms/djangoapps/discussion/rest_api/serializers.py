@@ -6,6 +6,7 @@ from urllib.parse import urlencode, urlunparse
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
@@ -25,21 +26,31 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
+from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
 from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
+    CourseDiscussionSettings,
     Role,
 )
 from openedx.core.lib.api.serializers import CourseKeyField
 
 User = get_user_model()
+
+
+class TopicOrdering(TextChoices):
+    """
+    Enum for the available options for ordering topics.
+    """
+    COURSE_STRUCTURE = "course_structure", "Course Structure"
+    ACTIVITY = "activity", "Activity"
+    NAME = "name", "Name"
 
 
 def get_context(course, request, thread=None):
@@ -523,13 +534,48 @@ class DiscussionTopicSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class DiscussionTopicSerializerV2(serializers.Serializer):
+    """
+    Serializer for new style topics.
+    """
+    id = serializers.CharField(  # pylint: disable=invalid-name
+        read_only=True,
+        source="external_id",
+        help_text="Provider-specific unique id for the topic"
+    )
+    usage_key = serializers.CharField(
+        read_only=True,
+        help_text="Usage context for the topic",
+    )
+    name = serializers.CharField(
+        read_only=True,
+        source="title",
+        help_text="Topic name",
+    )
+    thread_counts = serializers.SerializerMethodField(
+        read_only=True,
+        help_text="Mapping of thread counts by type of thread",
+    )
+    enabled_in_context = serializers.BooleanField(
+        read_only=True,
+        help_text="Whether this topic is enabled in its context",
+    )
+
+    def get_thread_counts(self, obj: DiscussionTopicLink) -> Dict[str, int]:
+        """
+        Get thread counts from provided context
+        """
+        return self.context['thread_counts'].get(obj.external_id, {
+            "discussion": 0,
+            "question": 0,
+        })
 
 
 class DiscussionRolesSerializer(serializers.Serializer):
@@ -548,12 +594,20 @@ class DiscussionRolesSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    def validate_user_id(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def validate_user_id(self, user_id):
+        """
+        Validate user id
+        Args:
+            user_id (str): username or email
+
+        Returns:
+            str: user id if valid
+        """
         try:
             self.user = get_user_by_username_or_email(user_id)
             return user_id
-        except User.DoesNotExist:
-            raise ValidationError(f"'{user_id}' is not a valid student identifier")  # lint-amnesty, pylint: disable=raise-missing-from
+        except User.DoesNotExist as err:
+            raise ValidationError(f"'{user_id}' is not a valid student identifier") from err
 
     def validate(self, attrs):
         """Validate the data at an object level."""
@@ -567,13 +621,11 @@ class DiscussionRolesSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesMemberSerializer(serializers.Serializer):
@@ -600,13 +652,11 @@ class DiscussionRolesMemberSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesListSerializer(serializers.Serializer):
@@ -634,13 +684,11 @@ class DiscussionRolesListSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class BlackoutDateSerializer(serializers.Serializer):
