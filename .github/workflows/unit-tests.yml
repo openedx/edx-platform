@@ -10,6 +10,7 @@ jobs:
   run-tests:
     runs-on: [ edx-platform-runner ]
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.8']
         django-version: ["3.2"]
