@@ -1026,3 +1026,8 @@ if settings.ENABLE_SAVE_FOR_LATER:
     urlpatterns += [
         path('', include('lms.djangoapps.save_for_later.urls')),
     ]
+
+# Enhanced Staff Grader (ESG) URLs
+urlpatterns += [
+    path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
+]

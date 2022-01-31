@@ -1,0 +1,93 @@
+{
+    "block-a": {
+        "name": "Individual ORA",
+        "prompts": [
+            "<p>Enter a text/files response.</p>"
+        ],
+        "type": "individual",
+        "rubricConfig": {
+            "feedback_prompt": "How would you grade this response?",
+            "feedback_default_text": "I believe this response...",
+            "feedback": "optional",
+            "criteria": [
+                {
+                    "orderNum": 0,
+                    "name": "grammar",
+                    "label": "Grammar",
+                    "prompt": "How correct is the submitter's grammar?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "orderNum": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "orderNum": 1,
+                            "name": "good",
+                            "label": "Good",
+                            "explanation": "pretty good",
+                            "points": 3
+                        },
+                        {
+                            "orderNum": 2,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
+        },
+        "textResponseConfig": "optional",
+        "fileUploadResponseConfig": "optional"
+    },
+    "block-b": {
+        "name": "Team ORA",
+        "prompts": [
+            "<p>Enter a text/files response.</p>"
+        ],
+        "type": "team",
+        "rubricConfig": {
+            "feedbackPrompt": "How would you grade this response?",
+            "feedback": "optional",
+            "criteria": [
+                {
+                    "orderNum": 0,
+                    "name": "correctness",
+                    "label": "Correctness",
+                    "prompt": "How correct is the team's answer?",
+                    "feedback": "optional",
+                    "options": [
+                        {
+                            "orderNum": 0,
+                            "name": "poor",
+                            "label": "Poor",
+                            "explanation": "Absolute rubbish",
+                            "points": 0
+                        },
+                        {
+                            "orderNum": 1,
+                            "name": "good",
+                            "label": "Good",
+                            "explanation": "pretty good",
+                            "points": 3
+                        },
+                        {
+                            "orderNum": 2,
+                            "name": "excellent",
+                            "label": "Excelent",
+                            "explanation": "Not absolute rubbish",
+                            "points": 5
+                        }
+                    ]
+                }
+            ]
+        },
+        "textResponseConfig": "optional",
+        "fileUploadResponseConfig": "required"
+    }
+}

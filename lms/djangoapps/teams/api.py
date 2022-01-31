@@ -375,6 +375,22 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
         ).first()
 
 
+def get_teams_in_teamset(course_id, topic_id):
+    """
+    Given a course_id and topic_id, return all CourseTeams in the course and topic
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError as exc:
+        raise ValueError("The supplied course id {course_id} is not valid.".format(
+            course_id=course_id
+        )) from exc
+    return CourseTeam.objects.filter(
+        course_id=course_key,
+        topic_id=topic_id,
+    ).all()
+
+
 def anonymous_user_ids_for_team(user, team):
     """ Get the anonymous user IDs for members of a team, used in team submissions
         Requesting user must be a member of the team or course staff

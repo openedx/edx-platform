@@ -11,6 +11,15 @@ class TeamsService:
         from . import api
         return api.get_team_for_user_course_topic(user, course_id, topic_id)
 
+    def get_team_names(self, course_id, topic_id):
+        """
+        Given a course and topic id, return a dict mapping from team id to team name for teams in that topic
+        """
+        from . import api
+        teams = api.get_teams_in_teamset(course_id, topic_id)
+        name_mapping = {team.team_id: team.name for team in teams}
+        return name_mapping
+
     def get_team_by_team_id(self, team_id):
         from . import api
         return api.get_team_by_team_id(team_id)

@@ -704,7 +704,7 @@ openedx-events==0.7.1
     # via -r requirements/edx/base.in
 openedx-filters==0.4.3
     # via -r requirements/edx/base.in
-ora2==3.7.8
+ora2==3.8.1
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
