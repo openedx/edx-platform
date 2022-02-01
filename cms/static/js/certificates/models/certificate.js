@@ -18,7 +18,7 @@ define([
             defaults: {
                 // Metadata fields currently displayed in web forms
                 course_title: '',
-
+                course_description: '',
                 // Metadata fields not currently displayed in web forms
                 name: 'Name of the certificate',
                 description: 'Description of the certificate',
