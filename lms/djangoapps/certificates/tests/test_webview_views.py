@@ -140,6 +140,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
+                'course_description': 'course_description_' + str(i),
                 'org_logo_path': f'/t4x/orgX/testX/asset/org-logo-{i}.png',
                 'signatories': signatories,
                 'version': 1,
@@ -460,11 +461,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertContains(
-            response,
-            'a course of study offered by test_organization, an online learning initiative of test organization',
-        )
-        self.assertNotContains(response, 'a course of study offered by testorg')
         self.assertContains(response, f'<title>test_organization {self.course.number} Certificate |')
         self.assertContains(response, 'logo_test1.png')
 
@@ -549,21 +545,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(response, '<a class="logo" href="http://test_site.localhost">')
         # Test an item from course info
         self.assertContains(response, 'course_title_0')
+        # Test an item from course description
+        self.assertContains(response, 'course_description_0')
         # Test an item from user info
         self.assertContains(response, f"{self.user.profile.name}, you earned a certificate!")
         # Test an item from social info
         self.assertContains(response, "Post on Facebook")
         self.assertContains(response, "Share on Twitter")
-        # Test an item from certificate/org info
-        self.assertContains(
-            response,
-            "a course of study offered by {partner_short_name}, "
-            "an online learning initiative of "
-            "{partner_long_name}.".format(
-                partner_short_name=short_org_name,
-                partner_long_name=long_org_name,
-            ),
-        )
         # Test item from badge info
         self.assertContains(response, "Add to Mozilla Backpack")
         # Test item from site configuration
