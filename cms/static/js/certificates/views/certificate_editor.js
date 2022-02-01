@@ -24,6 +24,7 @@ function($, _, Backbone, gettext,
             'change .collection-name-input': 'setName',
             'change .certificate-description-input': 'setDescription',
             'change .certificate-course-title-input': 'setCourseTitle',
+            'change .certificate-course-description-input': 'setCourseDescription',
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
             submit: 'setAndClose',
@@ -103,6 +104,7 @@ function($, _, Backbone, gettext,
                 name: this.model.get('name'),
                 description: this.model.get('description'),
                 course_title: this.model.get('course_title'),
+                course_description: this.model.get('course_description'),
                 org_logo_path: this.model.get('org_logo_path'),
                 is_active: this.model.get('is_active'),
                 isNew: this.model.isNew()
@@ -143,11 +145,22 @@ function($, _, Backbone, gettext,
             );
         },
 
+        setCourseDescription: function(event) {
+            // Updates the indicated model field (still requires persistence on server)
+            if (event && event.preventDefault) { event.preventDefault(); }
+            this.model.set(
+                'course_description',
+                this.$('.certificate-course-description-input').val(),
+                {silent: true}
+            );
+        },
+
         setValues: function() {
             // Update the specified values in the local model instance
             this.setName();
             this.setDescription();
             this.setCourseTitle();
+            this.setCourseDescription();
             return this;
         }
     });
