@@ -6,9 +6,9 @@
 #
 certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.10
+charset-normalizer==2.0.11
     # via requests
-edx-opaque-keys==2.2.2
+edx-opaque-keys==2.3.0
     # via -r requirements/edx/paver.in
 idna==3.3
     # via requests
