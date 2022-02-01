@@ -696,7 +696,7 @@ importlib-metadata==4.10.1
     #   -r requirements/edx/base.txt
     #   markdown
     #   pytest-randomly
-inflect==5.3.0
+inflect==5.4.0
     # via
     #   -r requirements/edx/coverage.txt
     #   jinja2-pluralize
@@ -1020,7 +1020,7 @@ pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
 pylti1p3==1.10.0
     # via -r requirements/edx/base.txt
-pymongo==3.10.1
+pymongo==3.11.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

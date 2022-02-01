@@ -166,7 +166,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==3.2.11
+django==3.2.12
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -780,7 +780,7 @@ pylatexenc==2.10
     # via olxcleaner
 pylti1p3==1.10.0
     # via -r requirements/edx/base.in
-pymongo==3.10.1
+pymongo==3.11.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
