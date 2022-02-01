@@ -254,7 +254,10 @@ def _update_course_context(request, context, course, platform_name):
     course_number = course.display_coursenumber if course.display_coursenumber else course.number
     context['course_number'] = course_number
     context['idv_enabled_for_certificates'] = settings.FEATURES.get('ENABLE_CERTIFICATES_IDV_REQUIREMENT')
-    if context['organization_long_name']:
+    course_description_override = context['certificate_data'].get('course_description', '')
+    if course_description_override:
+        context['accomplishment_copy_course_description'] = course_description_override
+    elif context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
                                                               'an online learning initiative of '

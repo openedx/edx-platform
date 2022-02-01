@@ -231,6 +231,8 @@ class CertificateManager:
         # Some keys are not required, such as the title override...
         if certificate_data.get('course_title'):
             certificate_response["course_title"] = certificate_data['course_title']
+        if certificate_data.get('course_description'):
+            certificate_response['course_description'] = certificate_data['course_description']
 
         return certificate_response
 

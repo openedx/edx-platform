@@ -31,6 +31,11 @@
                 <input id="certificate-course-title-<%- uniqueId %>" class="certificate-course-title-input input-text" name="certificate-course-title" type="text" placeholder="<%- gettext("Course title") %>" value="<%- course_title %>" aria-describedby="certificate-course-title-<%-uniqueId %>-tip" />
                 <span id="certificate-course-title-<%- uniqueId %>-tip" class="tip tip-stacked"><%- gettext("Specify an alternative to the official course title to display on certificates. Leave blank to use the official course title.") %></span>
             </div>
+            <div class="input-wrap field text add-certification-course-description">
+                <label for="certificate-course-description-<%- uniqueId %>"><%- gettext("Course Description") %></label>
+                <input id="certificate-course-description-<%- uniqueId %>" class="certificate-course-description-input input-text" name="certificate-course-description" type="text" placeholder="<%- gettext("Course Description") %>" value="<%- course_description %>" aria-describedby="certificate-course-description-<%-uniqueId %>-tip" />
+                <span id="certificate-course-description-<%- uniqueId %>-tip" class="tip tip-stacked"><%- gettext("Specify an alternative to the official course description to display on certificates. Leave blank to use default text.") %></span>
+            </div>
         </fieldset>
          <header>
             <h2 class="title title-2"><%- gettext("Certificate Signatories") %></h2>
