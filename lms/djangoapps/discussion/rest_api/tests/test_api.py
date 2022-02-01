@@ -191,6 +191,9 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'topics_url': 'http://testserver/api/discussion/v1/course_topics/course-v1:x+y+z',
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,
+            'enable_in_context': True,
+            'group_at_subsection': False,
+            'provider': 'legacy',
             'user_is_privileged': False,
             'user_roles': {'Student'},
         }

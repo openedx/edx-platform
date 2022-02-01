@@ -278,6 +278,8 @@ def get_course(request, course_key):
 
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
+    course_config = DiscussionsConfiguration.get(course_key)
+
     return {
         "id": str(course_key),
         "blackouts": [
@@ -299,7 +301,10 @@ def get_course(request, course_key):
             FORUM_ROLE_ADMINISTRATOR,
             FORUM_ROLE_MODERATOR,
             FORUM_ROLE_COMMUNITY_TA,
-        })
+        }),
+        "provider": course_config.provider_type,
+        "enable_in_context": course_config.enable_in_context,
+        "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
     }
 
 

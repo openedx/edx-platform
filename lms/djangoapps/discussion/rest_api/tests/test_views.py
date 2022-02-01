@@ -512,6 +512,9 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz&following=True"
                 ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/course-v1:x+y+z",
+                'enable_in_context': True,
+                'group_at_subsection': False,
+                'provider': 'legacy',
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
                 'user_is_privileged': False,
