@@ -682,13 +682,33 @@ class DiscussionRolesListSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """
-        Overriden create abstract method
+        Overridden create abstract method
         """
 
     def update(self, instance, validated_data):
         """
-        Overriden update abstract method
+        Overridden update abstract method
         """
+
+
+class UserStatsSerializer(serializers.Serializer):
+    """
+    Serializer for course user stats.
+    """
+    threads = serializers.IntegerField()
+    replies = serializers.IntegerField()
+    responses = serializers.IntegerField()
+    active_flags = serializers.IntegerField()
+    inactive_flags = serializers.IntegerField()
+    username = serializers.CharField()
+
+    def to_representation(self, instance):
+        """Remove flag counts if user is not privileged."""
+        data = super().to_representation(instance)
+        if not self.context.get("is_privileged", False):
+            data["active_flags"] = None
+            data["inactive_flags"] = None
+        return data
 
 
 class BlackoutDateSerializer(serializers.Serializer):

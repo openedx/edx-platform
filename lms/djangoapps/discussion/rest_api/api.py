@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
+from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
@@ -27,7 +28,10 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
-from openedx.core.djangoapps.django_comment_common.comment_client.course import get_course_commentable_counts
+from openedx.core.djangoapps.django_comment_common.comment_client.course import (
+    get_course_commentable_counts,
+    get_course_user_stats,
+)
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -49,14 +53,8 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
-from ..django_comment_client.base.views import (
-    track_comment_created_event,
-    track_thread_created_event,
-    track_voted_event,
-)
-from ..django_comment_client.utils import get_group_id_for_user, get_user_role_names, is_commentable_divided
 from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
-from .forms import CommentActionsForm, ThreadActionsForm
+from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
     can_delete,
@@ -70,9 +68,21 @@ from .serializers import (
     DiscussionTopicSerializerV2,
     ThreadSerializer,
     TopicOrdering,
+    UserStatsSerializer,
     get_context,
 )
 from .utils import discussion_open_for_user
+from ..django_comment_client.base.views import (
+    track_comment_created_event,
+    track_thread_created_event,
+    track_voted_event,
+)
+from ..django_comment_client.utils import (
+    get_group_id_for_user,
+    get_user_role_names,
+    has_discussion_privileges,
+    is_commentable_divided,
+)
 
 User = get_user_model()
 
@@ -244,6 +254,7 @@ def get_course(request, course_key):
         CourseNotFoundError: if the course does not exist or is not accessible
         to the requesting user
     """
+
     def _format_datetime(dt):
         """
         Provide backwards compatible datetime formatting.
@@ -576,7 +587,7 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
 
 
 def _add_additional_response_fields(
-        request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
+    request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
 ):
     """
     Adds additional data to serialized discussion thread/comment.
@@ -998,7 +1009,7 @@ def _handle_voted_field(form_value, cc_content, api_content, request, context):
         context["cc_requester"].unvote(cc_content)
         api_content["vote_count"] -= 1
     track_voted_event(
-        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
+        request, context["course"], cc_content, vote_value="up", undo_vote=not form_value
     )
 
 
@@ -1411,3 +1422,55 @@ def delete_comment(request, comment_id):
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
     else:
         raise PermissionDenied
+
+
+@function_trace("get_course_discussion_user_stats")
+def get_course_discussion_user_stats(
+    request,
+    course_key_str: str,
+    page: int,
+    page_size: int,
+    order_by: UserOrdering = None,
+) -> Dict:
+    """
+    Get paginated course discussion stats for users in the course.
+
+    Args:
+        request (Request): DRF request
+        course_key_str (str): course key string
+        page (int): Page number to fetch
+        page_size (int): Number of items in each page
+        order_by (UserOrdering): The ordering to use for the user stats
+
+    Returns:
+        Paginated data of a user's discussion stats sorted based on the specified ordering.
+
+    """
+    course_key = CourseKey.from_string(course_key_str)
+    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key)
+    if is_privileged:
+        order_by = order_by or UserOrdering.BY_FLAGS
+    else:
+        order_by = order_by or UserOrdering.BY_ACTIVITY
+        if order_by != UserOrdering.BY_ACTIVITY:
+            raise ValidationError({"order_by": "Invalid value"})
+    course_stats_response = get_course_user_stats(course_key, {
+        'sort_key': str(order_by),
+        'page': page,
+        'per_page': page_size,
+    })
+    serializer = UserStatsSerializer(
+        course_stats_response["user_stats"],
+        context={"is_privileged": is_privileged},
+        many=True,
+    )
+
+    paginator = DiscussionAPIPagination(
+        request,
+        course_stats_response["page"],
+        course_stats_response["num_pages"],
+        course_stats_response["count"],
+    )
+    return paginator.get_paginated_response({
+        "results": serializer.data,
+    })
