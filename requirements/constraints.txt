@@ -58,7 +58,7 @@ networkx<2.6
 wrapt==1.11.*
 
 # tests failing for pymongo==3.11
-pymongo<3.11
+pymongo>=3.11,<3.12
 
 # sympy latest version causing test failures.
 # may be related to python35 version drop in 1.7.0. Needs to be tested before removing.
