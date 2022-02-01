@@ -591,8 +591,11 @@ def login_user(request, api_version='v1'):
 
         if third_party_auth_requested:
             running_pipeline = pipeline.get(request)
-            finish_auth_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
-
+            if running_pipeline:
+                finish_auth_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
+            else:
+                log.warning("Unable to find finish_auth_url for user %s. Using default of ''.", user.id) 
+                
         if is_user_third_party_authenticated:
             redirect_url = finish_auth_url
         elif should_redirect_to_authn_microfrontend():
