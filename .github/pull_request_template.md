@@ -1,11 +1,12 @@
 <!--
-##
-####         Note: the Lilac master branch has been created.  Please consider whether your change
-    ####     should also be applied to Lilac.  If so, make another pull request against the
-####         open-release/lilac.master branch, or ping @nedbat for help or questions.
-##
 
-Please give the pull request a short but descriptive title.
+🍁🍁
+🍁🍁🍁🍁         🍁 Note: the Maple master branch has been created.  Please consider whether your change
+    🍁🍁🍁🍁     should also be applied to Maple. If so, make another pull request against the
+🍁🍁🍁🍁         open-release/maple.master branch, or ping @nedbat for help or questions.
+🍁🍁
+
+Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:
 https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
 

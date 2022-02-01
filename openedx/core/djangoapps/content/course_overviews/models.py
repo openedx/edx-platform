@@ -13,7 +13,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import (
-    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, NullBooleanField, TextField
+    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 )
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
@@ -30,11 +30,11 @@ from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
-from xmodule import block_metadata_utils, course_metadata_utils
-from xmodule.course_module import DEFAULT_START_DATE, CourseBlock
-from xmodule.error_module import ErrorBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from xmodule import block_metadata_utils, course_metadata_utils  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_module import DEFAULT_START_DATE, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     # Course highlight info, used to guide course update emails
-    has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+    has_highlights = BooleanField(null=True, default=None)  # if None, you have to look up the answer yourself
 
     # Proctoring
     enable_proctored_exams = BooleanField(default=False)

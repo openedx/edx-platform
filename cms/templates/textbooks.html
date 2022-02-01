@@ -3,8 +3,9 @@
 <%def name="online_help_token()"><% return "textbooks" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
 %>
 
 <%block name="title">${_("Textbooks")}</%block>
@@ -36,11 +37,39 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE | n, js_escaped_string}"
 
 <%block name="content">
   <div class="wrapper-mast wrapper">
+    % if context_course:
+      <%
+        pages_and_resources_mfe_url = get_pages_and_resources_url(context_course.id)
+        pages_and_resources_mfe_enabled = bool(pages_and_resources_mfe_url)
+      %>
+    % endif
+
+    % if pages_and_resources_mfe_enabled:
+    <header class="mast has-actions">
+      <div class="jump-nav">
+        <nav class="nav-dd title ui-left">
+          <ol>
+              <li class="nav-item">
+                  <span class="label">${_("Content")}</span>
+                  <span class="spacer"> &rsaquo;</span>
+              </li>
+              <li class="nav-item">
+                <a class="hyperlink" href="${pages_and_resources_mfe_url}" rel="external">${_("Pages & Resources")}</a>
+                <span class="spacer"> &rsaquo;</span>
+              </li>
+          </ol>
+        </nav>
+      </div>
+      <h1 class="page-header">
+        <span class="sr">&gt; </span>${_("Textbooks")}
+      </h1>
+    % else:
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
         <small class="subtitle">${_("Content")}</small>
         <span class="sr">&gt; </span>${_("Textbooks")}
       </h1>
+    % endif
 
       <nav class="nav-actions" aria-label="${_('Page Actions')}">
         <h3 class="sr">${_("Page Actions")}</h3>

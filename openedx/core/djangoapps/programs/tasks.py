@@ -22,6 +22,7 @@ from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = get_task_logger(__name__)
 # Maximum number of retries before giving up on awarding credentials.
@@ -32,8 +33,7 @@ MAX_RETRIES = 11
 
 PROGRAM_CERTIFICATE = 'program'
 COURSE_CERTIFICATE = 'course-run'
-VISIBLE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-DATE_OVERRIDE_FORMAT = '%Y-%m-%d'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_completed_programs(site, student):
@@ -90,15 +90,15 @@ def get_certified_programs(student):
     return certified_programs
 
 
-def award_program_certificate(client, username, program_uuid, visible_date):
+def award_program_certificate(client, user, program_uuid, visible_date):
     """
     Issue a new certificate of completion to the given student for the given program.
 
     Args:
         client:
             credentials API client (EdxRestApiClient)
-        username:
-            The username of the student
+        user:
+            The student's user data
         program_uuid:
             uuid of the completed program
         visible_date:
@@ -109,7 +109,8 @@ def award_program_certificate(client, username, program_uuid, visible_date):
 
     """
     client.credentials.post({
-        'username': username,
+        'username': user.username,
+        'lms_user_id': user.id,
         'credential': {
             'type': PROGRAM_CERTIFICATE,
             'program_uuid': program_uuid
@@ -117,7 +118,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
         'attributes': [
             {
                 'name': 'visible_date',
-                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
+                'value': visible_date.strftime(DATE_FORMAT)
             }
         ]
     })
@@ -230,7 +231,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
             visible_date = completed_programs[program_uuid]
             try:
                 LOGGER.info(f"Visible date for user {username} : program {program_uuid} is {visible_date}")
-                award_program_certificate(credentials_client, username, program_uuid, visible_date)
+                award_program_certificate(credentials_client, student, program_uuid, visible_date)
                 LOGGER.info(f"Awarded certificate for program {program_uuid} to user {username}")
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
@@ -307,11 +308,11 @@ def post_course_certificate(client, username, certificate, visible_date, date_ov
             'mode': certificate.mode,
             'type': COURSE_CERTIFICATE,
         },
-        'date_override': {'date': date_override.strftime(DATE_OVERRIDE_FORMAT)} if date_override else None,
+        'date_override': {'date': date_override.strftime(DATE_FORMAT)} if date_override else None,
         'attributes': [
             {
                 'name': 'visible_date',
-                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
+                'value': visible_date.strftime(DATE_FORMAT)
             }
         ]
     })
@@ -447,7 +448,7 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
             # Date is being passed via JSON and is encoded in the EMCA date time string format. The rest of the code
             # expects a datetime.
             if certificate_available_date:
-                certificate_available_date = datetime.strptime(certificate_available_date, VISIBLE_DATE_FORMAT)
+                certificate_available_date = datetime.strptime(certificate_available_date, DATE_FORMAT)
 
             # Even in the cases where this task is called with a certificate_available_date, we still need to retrieve
             # the course overview because it's required to determine if we should use the certificate_available_date or
@@ -726,10 +727,13 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
     # update the course certificate with the new certificate available date if:
-    # - The course is self paced
-    # - The certificates_display_behavior is not "end"
+    # - The course is not self paced
+    # - The certificates_display_behavior is not "end_with_date"
     course_overview = CourseOverview.get_from_id(course_key)
-    if course_overview.self_paced is False and course_overview.certificates_display_behavior == 'end':
+    if (
+        course_overview.self_paced is False and
+        course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+    ):
         update_credentials_course_certificate_configuration_available_date.delay(
             str(course_key),
             certificate_available_date

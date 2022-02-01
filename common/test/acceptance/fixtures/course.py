@@ -14,7 +14,7 @@ from path import Path
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
 from common.test.acceptance.fixtures.base import FixtureError, XBlockContainerFixture
-from xmodule.contentstore.utils import course_location_from_key
+from common.djangoapps.util.course import course_location_from_key
 
 
 class XBlockFixtureDesc:
@@ -354,7 +354,7 @@ class CourseFixture(XBlockContainerFixture):
             'children': None,
             'data': handouts_html,
             'id': self._handouts_loc,
-            'metadata': dict(),
+            'metadata': {},
         })
 
         response = self.session.post(url, data=payload, headers=self.headers)

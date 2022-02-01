@@ -63,7 +63,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_changed_value(self):
         with self.assertNumQueries(SELECT + UPDATE + 2 * SAVEPOINT + 2 * OTHER):
-            # OTHER = user exists, completion exists
+            # OTHER = user exists, completion exists, 2x look up course in splitmodulestorecourseindex
             completion, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 block_key=self.block_key,
@@ -88,7 +88,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_user(self):
         newuser = UserFactory()
-        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT):
+        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT + 0 * OTHER):
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=newuser,
                 block_key=self.block_key,
@@ -99,7 +99,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_block(self):
         newblock = UsageKey.from_string('block-v1:edx+test+run+type@video+block@puppers')
-        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT):
+        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT + 0 * OTHER):
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 block_key=newblock,

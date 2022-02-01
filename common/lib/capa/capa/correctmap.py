@@ -26,7 +26,7 @@ class CorrectMap(object):
 
     def __init__(self, *args, **kwargs):
         # start with empty dict
-        self.cmap = dict()
+        self.cmap = {}
         self.items = self.cmap.items
         self.keys = self.cmap.keys
         self.overall_message = ""

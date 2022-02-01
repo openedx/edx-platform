@@ -13,9 +13,9 @@ from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubm
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ... import events
 
@@ -135,20 +135,33 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
             }
         )
-
-        events_tracker.emit.assert_called_with(
-            events.COURSE_GRADE_CALCULATED,
-            {
-                'percent_grade': 0.0,
-                'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': str(self.student.id),
-                'letter_grade': '',
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-                'course_id': str(self.course.id),
-                'course_edited_timestamp': str(course.subtree_edited_on),
-                'course_version': str(course.course_version),
-            }
+        events_tracker.emit.assert_has_calls(
+            [
+                mock_call(
+                    events.COURSE_GRADE_CALCULATED,
+                    {
+                        'percent_grade': 0.0,
+                        'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                        'user_id': str(self.student.id),
+                        'letter_grade': '',
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                        'course_id': str(self.course.id),
+                        'course_edited_timestamp': str(course.subtree_edited_on),
+                        'course_version': str(course.course_version),
+                    }
+                ),
+                mock_call(
+                    events.COURSE_GRADE_NOW_FAILED_EVENT_TYPE,
+                    {
+                        'user_id': str(self.student.id),
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                        'course_id': str(self.course.id),
+                    }
+                ),
+            ],
+            any_order=True,
         )
 
     def test_rescoring_events(self):

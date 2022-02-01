@@ -1,7 +1,8 @@
 <%page expression_filter="h"/>
 <%!
 from openedx.core.djangolib.markup import HTML, Text
-from django.utils.translation import ugettext as _
+from django.conf import settings
+from django.utils.translation import gettext as _
 
 %>
 <%inherit file="../main.html" />
@@ -34,8 +35,9 @@ from django.utils.translation import ugettext as _
 
             %endif
             <br><br>
-            ${Text(_("{link_start}Return to edX.org{link_end}")).format(
-            link_start=HTML("<u> <a href='https://www.edx.org/'>"),
+            ${Text(_("{link_start}Return to {platform_name}{link_end}")).format(
+            link_start=HTML("<u> <a href={lms_route_url}>").format(lms_route_url=settings.LMS_ROOT_URL),
+            platform_name=settings.PLATFORM_NAME,
             link_end=HTML("</a> </u> "),
             )}
 

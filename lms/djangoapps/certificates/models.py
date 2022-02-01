@@ -17,9 +17,8 @@ from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -34,6 +33,9 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+
+from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx_events.learning.signals import CERTIFICATE_CHANGED, CERTIFICATE_CREATED, CERTIFICATE_REVOKED  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -391,6 +393,29 @@ class GeneratedCertificate(models.Model):
             status=self.status,
         )
 
+        # .. event_implemented_name: CERTIFICATE_REVOKED
+        CERTIFICATE_REVOKED.send_event(
+            certificate=CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
+                    ),
+                    id=self.user.id,
+                    is_active=self.user.is_active,
+                ),
+                course=CourseData(
+                    course_key=self.course_id,
+                ),
+                mode=self.mode,
+                grade=self.grade,
+                current_status=self.status,
+                download_url=self.download_url,
+                name=self.name,
+            )
+        )
+
         if previous_certificate_status == CertificateStatuses.downloadable:
             # imported here to avoid a circular import issue
             from lms.djangoapps.certificates.utils import emit_certificate_event
@@ -411,7 +436,7 @@ class GeneratedCertificate(models.Model):
         """
         name_to_use = student_api.get_name(user.id)
 
-        if is_verified_name_enabled() and should_use_verified_name_for_certs(user):
+        if should_use_verified_name_for_certs(user):
             verified_name_obj = get_verified_name(user, is_verified=True)
             if verified_name_obj:
                 name_to_use = verified_name_obj.verified_name
@@ -446,6 +471,30 @@ class GeneratedCertificate(models.Model):
             mode=self.mode,
             status=self.status,
         )
+
+        # .. event_implemented_name: CERTIFICATE_CHANGED
+        CERTIFICATE_CHANGED.send_event(
+            certificate=CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
+                    ),
+                    id=self.user.id,
+                    is_active=self.user.is_active,
+                ),
+                course=CourseData(
+                    course_key=self.course_id,
+                ),
+                mode=self.mode,
+                grade=self.grade,
+                current_status=self.status,
+                download_url=self.download_url,
+                name=self.name,
+            )
+        )
+
         if CertificateStatuses.is_passing_status(self.status):
             COURSE_CERT_AWARDED.send_robust(
                 sender=self.__class__,
@@ -453,6 +502,29 @@ class GeneratedCertificate(models.Model):
                 course_key=self.course_id,
                 mode=self.mode,
                 status=self.status,
+            )
+
+            # .. event_implemented_name: CERTIFICATE_CREATED
+            CERTIFICATE_CREATED.send_event(
+                certificate=CertificateData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course_id,
+                    ),
+                    mode=self.mode,
+                    grade=self.grade,
+                    current_status=self.status,
+                    download_url=self.download_url,
+                    name=self.name,
+                )
             )
 
 
@@ -902,15 +974,15 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             "certificate template."
         )
     )
-    include_hours_of_effort = models.NullBooleanField(
+    include_hours_of_effort = models.BooleanField(
         default=None,
         help_text=(
             "Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
             "times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
             "attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its "
             "certificate template includes Hours of Effort."
-        )
-    )
+        ),
+        null=True)
 
     class Meta:
         get_latest_by = 'created'
@@ -1214,8 +1286,8 @@ class CertificateDateOverride(TimeStampedModel):
         related_name='date_override',
         help_text="The id of the Generated Certificate to override",
     )
-    date = models.DateField(
-        help_text="The date to display on the certificate",
+    date = models.DateTimeField(
+        help_text="The date to display on the certificate. Set 'Time' to midnight (00:00:00).",
     )
     reason = models.TextField(
         help_text="The reason why you are overriding the certificate date (Update this when you add OR edit the date.)",
@@ -1240,12 +1312,7 @@ class CertificateDateOverride(TimeStampedModel):
         return "Certificate %s, date overridden to %s by %s on %s." % \
                (self.generated_certificate, self.date, self.overridden_by, self.created)
 
-    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
-        """
-        After the base save() method finishes, fire the COURSE_CERT_CHANGED
-        signal.
-        """
-        super().save(*args, **kwargs)
+    def send_course_cert_changed_signal(self):
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,
             user=self.generated_certificate.user,
@@ -1254,16 +1321,24 @@ class CertificateDateOverride(TimeStampedModel):
             status=self.generated_certificate.status,
         )
 
-    def delete(self, *args, **kwargs):  # pylint: disable=signature-differs
+    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
         """
-        After the base delete() method finishes, fire the COURSE_CERT_CHANGED
+        After the base save() method finishes, fire the COURSE_CERT_CHANGED
         signal.
         """
-        super().delete(*args, **kwargs)
-        COURSE_CERT_CHANGED.send_robust(
-            sender=self.__class__,
-            user=self.generated_certificate.user,
-            course_key=self.generated_certificate.course_id,
-            mode=self.generated_certificate.mode,
-            status=self.generated_certificate.status,
-        )
+        super().save(*args, **kwargs)
+        transaction.on_commit(self.send_course_cert_changed_signal)
+
+
+@receiver(models.signals.post_delete, sender=CertificateDateOverride)
+def handle_certificate_date_override_delete(sender, instance, **kwargs):    # pylint: disable=unused-argument
+    """
+    After a CertificateDateOverride is deleted, fire the COURSE_CERT_CHANGED
+    signal.
+
+    We do this in a signal handler instead of overriding the
+    CertificateDateOverride delete method so that this will be executed for both
+    individual and bulk deletes from the Django admin. (The delete() method for
+    an object is not necessarily called when deleting objects in bulk.)
+    """
+    transaction.on_commit(instance.send_course_cert_changed_signal)

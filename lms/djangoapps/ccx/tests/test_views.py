@@ -15,7 +15,7 @@ from django.conf import settings
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import resolve, reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -42,15 +42,15 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
-from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def intercept_renderer(path, context):
@@ -605,7 +605,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         outbox = self.get_outbox()
-        assert outbox == []
+        assert not outbox
 
         url = reverse(
             view_name,
@@ -687,7 +687,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course_key)
         student = enrollment.user
         outbox = self.get_outbox()
-        assert outbox == []
+        assert not outbox
 
         url = reverse(
             view_name,
@@ -729,7 +729,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
         course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         outbox = self.get_outbox()
-        assert outbox == []
+        assert not outbox
 
         url = reverse(
             view_name,
@@ -777,7 +777,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_key = CCXLocator.from_course_locator(course.id, ccx.id)
         outbox = self.get_outbox()
         CourseEnrollmentAllowed(course_id=course_key, email=identifier)
-        assert outbox == []
+        assert not outbox
 
         url = reverse(
             view_name,

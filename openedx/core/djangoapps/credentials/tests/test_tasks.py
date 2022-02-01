@@ -18,7 +18,7 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
@@ -155,6 +155,17 @@ class TestHandleNotifyCredentialsTask(TestCase):
         with freeze_time(datetime(2017, 5, 1, 3)):
             cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+22')
 
+        # `auto` execution should include certificates with date overrides
+        # modified within the time range. See the next test
+        # (`test_certs_with_modified_date_overrides`) for more.
+        with freeze_time(datetime(2017, 4, 30, 0)):
+            cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+33')
+        with freeze_time(datetime(2017, 5, 1, 2)):
+            CertificateDateOverrideFactory(
+                generated_certificate=cert3,
+                overridden_by=self.user,
+            )
+
         with freeze_time(datetime(2017, 5, 1, 0)):
             grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+11',
                                                           percent_grade=1)
@@ -171,11 +182,72 @@ class TestHandleNotifyCredentialsTask(TestCase):
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
 
         assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [cert1, cert2])
+        self.assertListEqual(list(mock_send.call_args[0][0]), [cert3, cert1, cert2])
         self.assertListEqual(list(mock_send.call_args[0][1]), [grade1, grade2])
 
         assert len(list(mock_send.call_args[0][0])) <= len(total_certificates)
         assert len(list(mock_send.call_args[0][1])) <= len(total_grades)
+
+    @mock.patch(TASKS_MODULE + '.send_notifications')
+    def test_certs_with_modified_date_overrides(self, mock_send):
+        # Set up a time range for the call
+        self.options['start_date'] = '2017-05-01T00:00:00'
+        self.options['end_date'] = '2017-05-04T04:00:00'
+
+        # First, call the task without adding any overrides to verify that the
+        # certs would not be included because of their modified_date
+        tasks.handle_notify_credentials(options=self.options, course_keys=[])
+        assert mock_send.called
+        assert self.cert1 not in mock_send.call_args[0][0]
+        assert self.cert2 not in mock_send.call_args[0][0]
+        assert self.cert3 not in mock_send.call_args[0][0]
+
+        # ADD
+        # cert1 was created January 1, 2017. We add a date override to it on
+        # May 1, 2017.
+        with freeze_time(datetime(2017, 5, 1, 1)):
+            CertificateDateOverrideFactory(
+                generated_certificate=self.cert1,
+                overridden_by=self.user,
+            )
+
+        # UPDATE
+        # cert2 was created February 1, 2017. We add a date override to it on
+        # April 1, 2017; but edit the date override on May 2, 2017.
+        with freeze_time(datetime(2017, 4, 1)):
+            cert2_override = CertificateDateOverrideFactory(
+                generated_certificate=self.cert2,
+                overridden_by=self.user,
+            )
+
+        with freeze_time(datetime(2017, 5, 2, 1)):
+            cert2_override.date = datetime(2018, 1, 1)
+            cert2_override.save()
+
+        # DELETE
+        # cert3 was created March 1, 2017. We add a date override to it on April
+        # 2, 2017; but delete the override on May 3, 2017.
+        with freeze_time(datetime(2017, 4, 2)):
+            cert3_override = CertificateDateOverrideFactory(
+                generated_certificate=self.cert3,
+                overridden_by=self.user,
+            )
+        with freeze_time(datetime(2017, 5, 3, 1)):
+            cert3_override.delete()
+
+        # None of the certs have modified dates within the time range, but they
+        # each have date overrides that were added, updated, or deleted within
+        # the time range.
+
+        tasks.handle_notify_credentials(options=self.options, course_keys=[])
+
+        # The three certs should now be included in the arguments because of the
+        # the altered date overrides.
+        assert mock_send.called
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert3])
+        assert self.cert1 in mock_send.call_args[0][0]
+        assert self.cert2 in mock_send.call_args[0][0]
+        assert self.cert3 in mock_send.call_args[0][0]
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_date_args(self, mock_send):

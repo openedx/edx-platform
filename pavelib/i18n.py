@@ -135,7 +135,7 @@ def i18n_validate_transifex_config():
     home = path('~').expanduser()
     config = home / '.transifexrc'
 
-    if not config.isfile or config.getsize == 0:
+    if not config.isfile or config.getsize == 0:  # pylint: disable=comparison-with-callable
         msg = colorize(
             'red',
             "Cannot connect to Transifex, config file is missing"

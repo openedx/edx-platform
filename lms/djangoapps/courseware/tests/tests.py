@@ -12,10 +12,10 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from xmodule.error_module import ErrorBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -37,14 +37,6 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         Test logout -- setup function does login.
         """
         self.logout()
-
-    def test_request_attr_on_logout(self):
-        """
-        Test request object after logging out to see whether it
-        has 'is_from_log_out' attribute set to true.
-        """
-        response = self.client.get(reverse('logout'))
-        assert getattr(response.wsgi_request, 'is_from_logout', False)
 
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):

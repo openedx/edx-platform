@@ -2,6 +2,7 @@
 Discussion API forms
 """
 import urllib.parse
+
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
@@ -9,6 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
@@ -110,6 +112,7 @@ class ThreadActionsForm(Form):
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
     read = BooleanField(required=False)
+    pinned = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
@@ -117,8 +120,26 @@ class CommentListGetForm(_PaginationForm):
     A form to validate query parameters in the comment list retrieval endpoint
     """
     thread_id = CharField()
+    flagged = BooleanField(required=False)
     endorsed = ExtendedNullBooleanField(required=False)
     requested_fields = MultiValueField(required=False)
+
+
+class UserCommentListGetForm(_PaginationForm):
+    """
+    A form to validate query parameters in the comment list retrieval endpoint
+    """
+    course_id = CharField()
+    flagged = BooleanField(required=False)
+    requested_fields = MultiValueField(required=False)
+
+    def clean_course_id(self):
+        """Validate course_id"""
+        value = self.cleaned_data["course_id"]
+        try:
+            return CourseLocator.from_string(value)
+        except InvalidKeyError:
+            raise ValidationError(f"'{value}' is not a valid course id")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CommentActionsForm(Form):
@@ -185,3 +206,15 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
 
             self.cleaned_data['role'] = role
             return rolename
+
+
+class TopicListGetForm(Form):
+    """
+    Form for the topics API get query parameters.
+    """
+    topic_id = CharField(required=False)
+    order_by = ChoiceField(choices=TopicOrdering.choices, required=False)
+
+    def clean_topic_id(self):
+        topic_ids = self.cleaned_data.get("topic_id", None)
+        return set(topic_ids.strip(',').split(',')) if topic_ids else None

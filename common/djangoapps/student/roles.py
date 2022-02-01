@@ -218,6 +218,12 @@ class RoleBase(AccessRole):
         )
         return entries
 
+    def get_orgs_for_user(self, user):
+        """
+        Returns a list of org short names for the user with given role.
+        """
+        return CourseAccessRole.objects.filter(user=user, role=self._role_name).values_list('org', flat=True)
+
 
 class CourseRole(RoleBase):
     """
@@ -330,6 +336,16 @@ class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
         super().__init__('instructor', *args, **kwargs)
+
+
+@register_access_role
+class OrgContentCreatorRole(OrgRole):
+    """An organization content creator"""
+
+    ROLE = "org_course_creator_group"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgLibraryUserRole(OrgRole):

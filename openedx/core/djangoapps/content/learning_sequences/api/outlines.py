@@ -348,7 +348,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
 
     # Run each OutlineProcessor in order to figure out what items we have to
     # remove from the CourseOutline.
-    processors = dict()
+    processors = {}
     usage_keys_to_remove = set()
     inaccessible_sequences = set()
     for name, processor_cls in processor_classes:
@@ -356,7 +356,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         # particular ordering).
         processor = processor_cls(course_key, user, at_time)
         processors[name] = processor
-        processor.load_data()
+        processor.load_data(full_course_outline)
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
             with function_trace(f'learning_sequences.api.outline_processors.{name}'):

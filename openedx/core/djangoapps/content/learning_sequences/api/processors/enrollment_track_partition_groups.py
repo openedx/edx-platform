@@ -1,13 +1,19 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
+from datetime import datetime
+from typing import Dict
 
-from xmodule.partitions.enrollment_track_partition_generator import (
+from opaque_keys.edx.keys import CourseKey
+from openedx.core import types
+
+from xmodule.partitions.enrollment_track_partition_generator import (  # lint-amnesty, pylint: disable=wrong-import-order
     create_enrollment_track_partition_with_course_id
 )
-from xmodule.partitions.partitions import (
+from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ENROLLMENT_TRACK_PARTITION_ID,
 )
-from xmodule.partitions.partitions_service import get_user_partition_groups
+from xmodule.partitions.partitions_service import get_user_partition_groups  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .base import OutlineProcessor
 
@@ -22,12 +28,12 @@ class EnrollmentTrackPartitionGroupsOutlineProcessor(OutlineProcessor):
     significant limitation. Nonetheless, it is a step towards the goal of
     supporting all partition schemes in the future.
     """
-    def __init__(self, course_key, user, at_time):
+    def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         super().__init__(course_key, user, at_time)
-        self.enrollment_track_groups = {}
+        self.enrollment_track_groups: Dict[str, Group] = {}
         self.user_group = None
 
-    def load_data(self):
+    def load_data(self, full_course_outline) -> None:
         """
         Pull track groups for this course and which group the user is in.
         """

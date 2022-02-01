@@ -16,8 +16,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
@@ -43,11 +43,8 @@ from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
-from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .services import IDVerificationService
 
@@ -142,12 +139,12 @@ class PayAndVerifyView(View):
     ]
 
     STEP_TITLES = {
-        INTRO_STEP: ugettext_lazy("Intro"),
-        MAKE_PAYMENT_STEP: ugettext_lazy("Make payment"),
-        FACE_PHOTO_STEP: ugettext_lazy("Take photo"),
-        ID_PHOTO_STEP: ugettext_lazy("Take a photo of your ID"),
-        REVIEW_PHOTOS_STEP: ugettext_lazy("Review your info"),
-        ENROLLMENT_CONFIRMATION_STEP: ugettext_lazy("Enrollment confirmation"),
+        INTRO_STEP: gettext_lazy("Intro"),
+        MAKE_PAYMENT_STEP: gettext_lazy("Make payment"),
+        FACE_PHOTO_STEP: gettext_lazy("Take photo"),
+        ID_PHOTO_STEP: gettext_lazy("Take a photo of your ID"),
+        REVIEW_PHOTOS_STEP: gettext_lazy("Review your info"),
+        ENROLLMENT_CONFIRMATION_STEP: gettext_lazy("Enrollment confirmation"),
     }
 
     # Messages
@@ -815,7 +812,7 @@ class SubmitPhotosView(View):
         return super().dispatch(request, *args, **kwargs)
 
     @method_decorator(login_required)
-    @method_decorator(outer_atomic(read_committed=True))
+    @method_decorator(outer_atomic())
     def post(self, request):
         """
         Submit photos for verification.
@@ -845,11 +842,9 @@ class SubmitPhotosView(View):
         if response is not None:
             return response
 
-        # If necessary, update the user's full name
+        full_name = None
         if "full_name" in params:
-            response = self._update_full_name(request, params["full_name"])
-            if response is not None:
-                return response
+            full_name = params["full_name"]
 
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
@@ -866,7 +861,7 @@ class SubmitPhotosView(View):
             return response
 
         # Submit the attempt
-        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification)
+        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
 
         # Send event to segment for analyzing A/B testing data
         data = {
@@ -939,36 +934,6 @@ class SubmitPhotosView(View):
 
         return params, None
 
-    def _update_full_name(self, request, full_name):
-        """
-        Update the user's full name.
-
-        Arguments:
-            user (User): The user to update.
-            full_name (unicode): The user's updated full name.
-
-        Returns:
-            HttpResponse or None
-
-        """
-        try:
-            update_account_settings(request.user, {"name": full_name})
-        except UserNotFound:
-            log.error(("No profile found for user {user_id}").format(user_id=request.user.id))
-            return HttpResponseBadRequest(_("No profile found for user"))
-        except AccountValidationError:
-            msg = _(
-                "Name must be at least {min_length} character long."
-            ).format(min_length=NAME_MIN_LENGTH)
-            log.error(
-                (
-                    "User {user_id} suffered ID verification error while submitting a full_name change"
-                ).format(
-                    user_id=request.user.id
-                )
-            )
-            return HttpResponseBadRequest(msg)
-
     def _validate_and_decode_image_data(self, request, face_data, photo_id_data=None):
         """
         Validate and decode image data sent with the request.
@@ -1018,7 +983,7 @@ class SubmitPhotosView(View):
             log.error(("Image data for user {user_id} is not valid").format(user_id=request.user.id))
             return None, None, HttpResponseBadRequest(msg)
 
-    def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None):
+    def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None, provided_name=None):
         """
         Submit a verification attempt.
 
@@ -1029,8 +994,11 @@ class SubmitPhotosView(View):
         Keyword Arguments:
             photo_id_image (str or None): Decoded photo ID image data.
             initial_verification (SoftwareSecurePhotoVerification): The initial verification attempt.
+            provided_name (str or None): full name given by user for this attempt
         """
         attempt = SoftwareSecurePhotoVerification(user=user)
+        if provided_name:
+            attempt.name = provided_name
 
         # We will always have face image data, so upload the face image
         attempt.upload_face_image(face_image)

@@ -46,8 +46,8 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise,
     update_third_party_auth_context_for_enterprise
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 
@@ -469,6 +469,7 @@ class TestEnterpriseUtils(TestCase):
         ) as mock_cache_set:
             EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
             assert is_enterprise_learner(self.user)
+            assert is_enterprise_learner(self.user.id)
 
         assert mock_cache_set.called
 
@@ -478,6 +479,15 @@ class TestEnterpriseUtils(TestCase):
         ) as mock_cache_set:
             assert not is_enterprise_learner(self.user)
 
+        assert not mock_cache_set.called
+
+    @mock.patch('django.core.cache.cache.set')
+    @mock.patch('django.core.cache.cache.get')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=False)
+    def test_is_enterprise_learner_enterprise_disabled(self, _, mock_cache_get, mock_cache_set):
+        assert not is_enterprise_learner(self.user)
+        assert not is_enterprise_learner(self.user.id)
+        assert not mock_cache_get.called
         assert not mock_cache_set.called
 
     @mock.patch('openedx.features.enterprise_support.utils.reverse')

@@ -44,12 +44,19 @@ def tst_render_template(template, context):  # pylint: disable=unused-argument
     return '<div>{0}</div>'.format(saxutils.escape(repr(context)))
 
 
-def calledback_url(dispatch='score_update'):
-    """A callback url method to use in tests."""
-    return dispatch
+class StubXQueueService:
+    """
+    Stubs out the XQueueService for Capa problem tests.
+    """
+    def __init__(self):
+        self.interface = MagicMock()
+        self.interface.send_to_queue.return_value = (0, 'Success!')
+        self.default_queuename = 'testqueue'
+        self.waittime = 10
 
-xqueue_interface = MagicMock()  # pylint: disable=invalid-name
-xqueue_interface.send_to_queue.return_value = (0, 'Success!')
+    def construct_callback(self, dispatch='score_update'):
+        """A callback url method to use in tests."""
+        return dispatch
 
 
 def test_capa_system(render_template=None):
@@ -72,12 +79,7 @@ def test_capa_system(render_template=None):
         seed=0,
         STATIC_URL='/dummy-static/',
         STATUS_CLASS=Status,
-        xqueue={
-            'interface': xqueue_interface,
-            'construct_callback': calledback_url,
-            'default_queuename': 'testqueue',
-            'waittime': 10
-        },
+        xqueue=StubXQueueService(),
     )
     return the_system
 
@@ -90,7 +92,7 @@ def mock_capa_module():
         """
         Mock implementation of __unicode__ or __str__ for the module's location.
         """
-        return u'i4x://Foo/bar/mock/abc'
+        return 'i4x://Foo/bar/mock/abc'
 
     capa_module = Mock()
     if six.PY2:

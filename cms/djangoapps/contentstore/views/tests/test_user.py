@@ -12,18 +12,21 @@ from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UsersTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
-        self.ext_user = User.objects.create_user(
-            "joe", "joe@comedycentral.com", "haha")
+        self.ext_user = UserFactory.create(
+            username="joe", email="joe@comedycentral.com", password="haha",
+        )
         self.ext_user.is_active = True
         self.ext_user.is_staff = False
         self.ext_user.save()
-        self.inactive_user = User.objects.create_user(
-            "carl", "carl@comedycentral.com", "haha")
+        self.inactive_user = UserFactory.create(
+            username="carl", email="carl@comedycentral.com", password="haha",
+        )
         self.inactive_user.is_active = False
         self.inactive_user.is_staff = False
         self.inactive_user.save()

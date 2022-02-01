@@ -1,11 +1,10 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import pgettext
 from django.urls import reverse
 from lms.djangoapps.courseware.courses import get_course_about_section
-from lms.djangoapps.courseware.toggles import is_courses_default_invite_only_enabled
 from django.conf import settings
 from six import text_type
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -90,7 +89,7 @@ from six import string_types
           <span class="register disabled">
             ${_("Course is full")}
           </span>
-        % elif (is_courses_default_invite_only_enabled() or invitation_only) and not can_enroll:
+        % elif invitation_only and not can_enroll:
           <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
         ## Shib courses need the enrollment button to be displayed even when can_enroll is False,
         ## because AnonymousUsers cause can_enroll for shib courses to be False, but we need them to be able to click

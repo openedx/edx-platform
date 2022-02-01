@@ -5,14 +5,23 @@ Tests for course_info
 
 import ddt
 from django.conf import settings
+from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
+from rest_framework.test import APIClient  # pylint: disable=unused-import
 
+from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
+from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
-from xmodule.html_module import CourseInfoBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -219,3 +228,72 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         self.course.mobile_available = True
         self.store.update_item(self.course, self.user.id)
         self.login_and_enroll()
+
+
+@override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
+class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCase):
+    """
+    Testing the Course Goals User Activity API.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.apiUrl = reverse('record_user_activity', args=['v1'])
+        self.login_and_enroll()
+
+    def test_record_activity(self):
+        '''
+        Test the happy path of recording user activity
+        '''
+        post_data = {
+            'course_key': self.course.id,
+            'user_id': self.user.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 200
+
+    def test_invalid_parameters(self):
+        '''
+        Ensure that we check that parameters meet the requirements
+        and return a 400 otherwise.
+        '''
+        post_data = {
+            'course_key': self.course.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400
+
+        post_data = {
+            'user_id': self.user.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400
+
+        post_data = {
+            'user_id': self.user.id,
+            'course_key': 'invalidcoursekey',
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 400
+
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=False)
+    @patch('lms.djangoapps.mobile_api.course_info.views.log')
+    def test_flag_disabled(self, mock_logger):
+        '''
+        Test the API behavior when the goals flag is disabled
+        '''
+        post_data = {
+            'user_id': self.user.id,
+            'course_key': self.course.id,
+        }
+
+        response = self.client.post(self.apiUrl, post_data)
+        assert response.status_code == 200
+        mock_logger.warning.assert_called_with(
+            'For this mobile request, user activity is not enabled for this user {} and course {}'.format(
+                str(self.user.id), str(self.course.id))
+        )

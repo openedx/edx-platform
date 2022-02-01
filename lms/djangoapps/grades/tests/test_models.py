@@ -425,10 +425,12 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         assert grade.letter_grade == ''
         assert grade.passed_timestamp == passed_timestamp
 
-    def test_passed_timestamp_is_now(self):
+    @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_FIRST_TIME.send')
+    def test_passed_timestamp_is_now(self, mock):
         with freeze_time(now()):
             grade = PersistentCourseGrade.update_or_create(**self.params)
             assert now() == grade.passed_timestamp
+            self.assertEqual(mock.call_count, 1)
 
     def test_create_and_read_grade(self):
         created_grade = PersistentCourseGrade.update_or_create(**self.params)

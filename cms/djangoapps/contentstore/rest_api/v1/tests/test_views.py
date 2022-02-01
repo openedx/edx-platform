@@ -4,6 +4,7 @@ Unit tests for Contentstore views.
 
 import ddt
 from mock import patch
+from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
@@ -13,9 +14,9 @@ from rest_framework.test import APITestCase
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ProctoringExamSettingsTestMixin():
@@ -87,7 +88,7 @@ class ProctoringExamSettingsTestMixin():
 class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStoreTestCase, APITestCase):
     """ Tests for proctored exam settings GETs """
     @classmethod
-    def get_expected_response_data(cls, course, user):
+    def get_expected_response_data(cls, course, user):  # pylint: disable=unused-argument
         return {
             'proctored_exam_settings': {
                 'enable_proctored_exams': course.enable_proctored_exams,
@@ -150,7 +151,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'null',
+            'DEFAULT': 'proctortrack',
             'proctortrack': {}
         },
     )
@@ -184,7 +185,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'null',
+            'DEFAULT': 'test_proctoring_provider',
             'test_proctoring_provider': {}
         },
     )
@@ -250,11 +251,14 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
     )
     def test_update_exam_settings_invalid_value(self):
         self.client.login(username=self.global_staff.username, password=self.password)
-        data = self.get_request_data(
-            enable_proctored_exams=True,
-            proctoring_provider='notvalidprovider',
-        )
-        response = self.make_request(data=data)
+        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
+        PROCTORED_EXAMS_ENABLED_FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
+            data = self.get_request_data(
+                enable_proctored_exams=True,
+                proctoring_provider='notvalidprovider',
+            )
+            response = self.make_request(data=data)
 
         # response is correct
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -278,7 +282,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'null',
+            'DEFAULT': 'proctortrack',
             'proctortrack': {}
         },
     )
@@ -296,7 +300,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'null',
+            'DEFAULT': 'proctortrack',
             'proctortrack': {},
             'software_secure': {},
         },

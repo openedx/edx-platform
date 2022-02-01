@@ -29,7 +29,7 @@ import re
 from abc import abstractmethod
 
 import xblock
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -647,7 +647,7 @@ class CourseImportManager(ImportManager):
                 courselike_key.course,
                 courselike_key.run
             )
-            if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
+            if course.wiki_slug in (original_unique_wiki_slug, courselike_key.course):
                 course.wiki_slug = '{}.{}.{}'.format(
                     course.id.org,
                     course.id.course,
@@ -897,16 +897,20 @@ def _update_and_import_module(
             if lib_content_block_already_published:
                 return block
 
-            # Update library content block's children on draft branch
-            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store, user_id).update_children(
-                    block,
-                    version=block.source_library_version,
-                )
-
-            # Publish it if importing the course for branch setting published_only.
-            if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                store.publish(block.location, user_id)
+            try:
+                # Update library content block's children on draft branch
+                with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+                    LibraryToolsService(store, user_id).update_children(
+                        block,
+                        version=block.source_library_version,
+                    )
+            except ValueError as err:
+                # The specified library version does not exist.
+                log.error(err)
+            else:
+                # Publish it if importing the course for branch setting published_only.
+                if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+                    store.publish(block.location, user_id)
 
     return block
 

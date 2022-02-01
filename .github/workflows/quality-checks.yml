@@ -1,0 +1,80 @@
+name: Quality checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - open-release/lilac.master
+
+jobs:
+  run_tests:
+    name: Quality Others
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python-version: [ 3.8 ]
+        node-version: [ 12 ]
+
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Fetch base branch for comparison
+      run: git fetch --depth=1 origin ${{ github.base_ref }}
+
+    - name: Install Required System Packages
+      run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Python Dependencies
+      env:
+        PIP_SRC_DIR: ${{ runner.temp }}
+      run: |
+        pip install -r requirements/pip.txt
+        pip install -r requirements/edx/testing.txt -r requirements/edx/django.txt --src $PIP_SRC_DIR
+
+    - name: Run Quality Tests
+      env:
+        TEST_SUITE: quality
+        SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
+        SHARD: 4
+        PIP_SRC_DIR: ${{ runner.temp }}
+        TARGET_BRANCH: ${{ github.base_ref }}
+      run: |
+        ./scripts/all-tests.sh
+
+    - name: Save Job Artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Build-Artifacts
+        path: |
+          **/reports/**/*
+          test_root/log/**/*.log
+          *.log

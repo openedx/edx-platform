@@ -65,14 +65,12 @@ class EnrollmentUtilsTest(TestCase):
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_course_enrollment_error_raises(
         self,
         mock_tx,
         mock_user_model,
-        mock_add_user_to_course_cohort,
         mock_get_enrollment_api,
         mock_add_enrollment_api,
     ):
@@ -87,19 +85,16 @@ class EnrollmentUtilsTest(TestCase):
 
         with self.assertRaises(CourseEnrollmentError):
             lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
-            mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_course_group_error_raises(
         self,
         mock_tx,
         mock_user_model,
-        mock_add_user_to_course_cohort,
         mock_get_enrollment_api,
         mock_add_enrollment_api,
     ):
@@ -114,19 +109,16 @@ class EnrollmentUtilsTest(TestCase):
 
         with self.assertRaises(CourseUserGroup.DoesNotExist):
             lms_enroll_user_in_course(USERNAME, COURSE_ID, COURSE_MODE, ENTERPRISE_UUID)
-            mock_add_user_to_course_cohort.assert_not_called()
             mock_get_enrollment_api.assert_called_once()
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_calls_enrollment_and_cohort_apis(
         self,
         mock_tx,
         mock_user_model,
-        mock_add_user_to_course_cohort,
         mock_get_enrollment_api,
         mock_add_enrollment_api,
     ):
@@ -153,19 +145,16 @@ class EnrollmentUtilsTest(TestCase):
             enterprise_uuid=ENTERPRISE_UUID,
         )
 
-        mock_add_user_to_course_cohort.assert_called_once()
         mock_get_enrollment_api.assert_called_once_with(USERNAME, str(COURSE_ID))
 
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
-    @mock.patch('openedx.features.enterprise_support.enrollments.utils.add_user_to_course_cohort')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
     @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
     def test_existing_enrollment_does_not_fail(
         self,
         mock_tx,
         mock_user_model,
-        mock_add_user_to_course_cohort,
         mock_get_enrollment_api,
         mock_add_enrollment_api,
     ):
@@ -192,5 +181,4 @@ class EnrollmentUtilsTest(TestCase):
             enterprise_uuid=ENTERPRISE_UUID,
         )
 
-        mock_add_user_to_course_cohort.assert_not_called()
         mock_get_enrollment_api.assert_called_once()

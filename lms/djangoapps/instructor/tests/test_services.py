@@ -15,10 +15,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.instructor.services import InstructorService
-from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class InstructorServiceTests(SharedModuleStoreTestCase):
@@ -31,16 +30,12 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.email = 'escalation@test.com'
         cls.course = CourseFactory.create(proctoring_escalation_email=cls.email)
-        cls.problem_location = msk_from_problem_urlname(
-            cls.course.id,
-            'robot-some-problem-urlname'
-        )
-        cls.other_problem_location = msk_from_problem_urlname(
-            cls.course.id,
-            'robot-some-other_problem-urlname'
-        )
-        cls.problem_urlname = str(cls.problem_location)
-        cls.other_problem_urlname = str(cls.other_problem_location)
+        cls.section = ItemFactory.create(parent=cls.course, category='chapter')
+        cls.subsection = ItemFactory.create(parent=cls.section, category='sequential')
+        cls.unit = ItemFactory.create(parent=cls.subsection, category='vertical')
+        cls.problem = ItemFactory.create(parent=cls.unit, category='problem')
+        cls.unit_2 = ItemFactory.create(parent=cls.subsection, category='vertical')
+        cls.problem_2 = ItemFactory.create(parent=cls.unit_2, category='problem')
         cls.complete_error_prefix = ('Error occurred while attempting to complete student attempt for '
                                      'user {user} for content_id {content_id}. ')
 
@@ -54,12 +49,13 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
-            module_state_key=self.problem_location,
+            module_state_key=self.problem.location,
             state=json.dumps({'attempts': 2}),
         )
 
     @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    def test_reset_student_attempts_delete(self, _mock_signal):
+    @mock.patch('completion.handlers.BlockCompletion.objects.submit_completion')
+    def test_reset_student_attempts_delete(self, mock_submit, _mock_signal):
         """
         Test delete student state.
         """
@@ -68,16 +64,22 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
                                             module_state_key=self.module_to_reset.module_state_key).count() == 1
 
-        self.service.delete_student_attempt(
-            self.student.username,
-            str(self.course.id),
-            self.problem_urlname,
-            requesting_user=self.student,
-        )
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
+            self.service.delete_student_attempt(
+                self.student.username,
+                str(self.course.id),
+                str(self.subsection.location),
+                requesting_user=self.student,
+            )
 
         # make sure the module has been deleted
         assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
                                             module_state_key=self.module_to_reset.module_state_key).count() == 0
+
+        # Assert we send completion == 0.0 for both problems even though the second problem was never viewed
+        assert mock_submit.call_count == 2
+        mock_submit.assert_any_call(user=self.student, block_key=self.problem.location, completion=0.0)
+        mock_submit.assert_any_call(user=self.student, block_key=self.problem_2.location, completion=0.0)
 
     def test_reset_bad_content_id(self):
         """
@@ -113,7 +115,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             self.student.username,
             str(self.course.id),
-            self.other_problem_urlname,
+            str(self.problem_2.location),
             requesting_user=self.student,
         )
         assert result is None
@@ -198,9 +200,10 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         Assert complete_student_attempt with a bad user raises error and returns None
         """
         username = 'bad_user'
-        self.service.complete_student_attempt(username, self.problem_urlname)
+        block_id = str(self.problem.location)
+        self.service.complete_student_attempt(username, block_id)
         mock_logger.assert_called_once_with(
-            self.complete_error_prefix.format(user=username, content_id=self.problem_urlname) + 'User does not exist!'
+            self.complete_error_prefix.format(user=username, content_id=block_id) + 'User does not exist!'
         )
 
     @mock.patch('lms.djangoapps.instructor.tasks.log.error')
@@ -221,7 +224,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         raises error and returns None
         """
         username = self.student.username
-        block = self.problem_urlname
+        block = 'i4x://org.0/course_0/problem/fake_problem'
         self.service.complete_student_attempt(username, block)
         mock_logger.assert_called_once_with(
             self.complete_error_prefix.format(user=username, content_id=block) + 'Block not found in the modulestore!'

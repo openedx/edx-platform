@@ -9,13 +9,20 @@ from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email
+from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email, user_by_anonymous_id
 
-ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
-ATTR_KEY_USER_ID = 'edx-platform.user_id'
-ATTR_KEY_USERNAME = 'edx-platform.username'
-ATTR_KEY_USER_IS_STAFF = 'edx-platform.user_is_staff'
-ATTR_KEY_USER_PREFERENCES = 'edx-platform.user_preferences'
+from .constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_IS_AUTHENTICATED,
+    ATTR_KEY_REQUEST_COUNTRY_CODE,
+    ATTR_KEY_USER_ID,
+    ATTR_KEY_USERNAME,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_PREFERENCES,
+    ATTR_KEY_USER_ROLE,
+)
+
+
 USER_PREFERENCES_WHITE_LIST = ['pref-lang', 'time_zone']
 
 
@@ -24,10 +31,21 @@ class DjangoXBlockUserService(UserService):
     A user service that converts Django users to XBlockUser
     """
     def __init__(self, django_user, **kwargs):
+        """
+        Constructs a DjangoXBlockUserService object.
+
+        Args:
+            user_is_staff(bool): optional - whether the user is staff in the course
+            user_role(str): optional -- user's role in the course ('staff', 'instructor', or 'student')
+            anonymous_user_id(str): optional - anonymous_user_id for the user in the course
+            request_country_code(str): optional -- country code determined from the user's request IP address.
+        """
         super().__init__(**kwargs)
         self._django_user = django_user
-        if self._django_user:
-            self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
+        self._user_is_staff = kwargs.get('user_is_staff', False)
+        self._user_role = kwargs.get('user_role', 'student')
+        self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
+        self._request_country_code = kwargs.get('request_country_code', None)
 
     def get_current_user(self):
         """
@@ -68,6 +86,16 @@ class DjangoXBlockUserService(UserService):
         course_id = CourseKey.from_string(course_id)
         return anonymous_id_for_user(user=user, course_id=course_id)
 
+    def get_user_by_anonymous_id(self, uid=None):
+        """
+        Returns the Django User object corresponding to the given anonymous user id.
+
+        Returns None if there is no user with the given anonymous user id.
+
+        If no `uid` is provided, then the current anonymous user ID is used.
+        """
+        return user_by_anonymous_id(uid or self._anonymous_user_id)
+
     def _convert_django_user_to_xblock_user(self, django_user):
         """
         A function that returns an XBlockUser from the current Django request.user
@@ -82,10 +110,13 @@ class DjangoXBlockUserService(UserService):
                 full_name = None
             xblock_user.full_name = full_name
             xblock_user.emails = [django_user.email]
+            xblock_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] = self._anonymous_user_id
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True
+            xblock_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] = self._request_country_code
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
             xblock_user.opt_attrs[ATTR_KEY_USERNAME] = django_user.username
-            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = django_user.user_is_staff
+            xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = self._user_is_staff
+            xblock_user.opt_attrs[ATTR_KEY_USER_ROLE] = self._user_role
             user_preferences = get_user_preferences(django_user)
             xblock_user.opt_attrs[ATTR_KEY_USER_PREFERENCES] = {
                 pref: user_preferences.get(pref)
@@ -94,5 +125,6 @@ class DjangoXBlockUserService(UserService):
             }
         else:
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = False
+            xblock_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] = self._request_country_code
 
         return xblock_user

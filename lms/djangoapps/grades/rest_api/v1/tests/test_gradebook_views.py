@@ -48,8 +48,8 @@ from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 # pylint: disable=unused-variable
@@ -142,7 +142,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         return reverse(
             self.view_name,
             kwargs={
-                'course_id': course_id
+                'course_id': course_id,
             }
         )
 
@@ -1383,7 +1383,7 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_filter_course_roles(self, excluded_course_roles):
         """ Test that excluded_course_roles=all filters out any user with a course role """
         # Create test users, enroll them in the course, and give them roles.
-        role_user_usernames = dict()
+        role_user_usernames = {}
         course_roles_to_create = [
             CourseInstructorRole,
             CourseStaffRole,
@@ -1849,7 +1849,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         }
         cls.grade = PersistentSubsectionGrade.update_or_create_grade(**cls.params)
 
-    def get_url(self, subsection_id=None, user_id=None):  # pylint: disable=arguments-differ
+    def get_url(self, subsection_id=None, user_id=None, history_record_limit=5):  # pylint: disable=arguments-differ
         """
         Helper function to create the course gradebook API url.
         """
@@ -1859,7 +1859,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 'subsection_id': subsection_id or self.subsection_id,
             }
         )
-        return f"{base_url}?user_id={user_id or self.user_id}"
+        return f"{base_url}?user_id={user_id or self.user_id}&history_record_limit={history_record_limit}"
 
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create')
     @ddt.data(
@@ -1996,6 +1996,32 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         }
 
         assert expected_data == resp.data
+
+    @freeze_time('2019-01-01')
+    def test_with_override_with_long_history(self):
+        """
+        Test that history is truncated to 5 most recent entries
+        """
+        self.login_staff()
+
+        for i in range(6):
+            override = PersistentSubsectionGradeOverride.update_or_create_override(
+                requesting_user=self.global_staff,
+                subsection_grade_model=self.grade,
+                earned_all_override=i,
+                earned_graded_override=i,
+                feature=GradeOverrideFeatureEnum.gradebook,
+            )
+
+        resp = self.client.get(
+            self.get_url(
+                subsection_id=self.usage_key,
+                history_record_limit=5,
+            )
+        )
+
+        assert len(resp.data['history']) == 5
+        assert resp.data['history'][0]['earned_all_override'] != 0.0
 
     @ddt.data(
         'login_staff',

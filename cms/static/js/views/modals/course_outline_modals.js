@@ -17,7 +17,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,
+        DiscussionEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -521,6 +522,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             'change input.onboarding_exam': 'setSpecialExamWithoutRules',
             'focusout .field-time-limit input': 'timeLimitFocusout'
         },
+        startingExamType: '',
+
         notTimedExam: function(event) {
             event.preventDefault();
             this.$('.exam-options').hide();
@@ -575,6 +578,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.field-exam-review-rules').hide();
 
             if (!isTimeLimited) {
+                this.startingExamType = 'no_special_exam';
                 this.$('input.no_special_exam').prop('checked', true);
                 return;
             }
@@ -583,10 +587,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
             if (this.options.enable_proctored_exams && isProctoredExam) {
                 if (isOnboardingExam) {
+                    this.startingExamType = 'onboarding_exam';
                     this.$('input.onboarding_exam').prop('checked', true);
                 } else if (isPracticeExam) {
+                    this.startingExamType = 'practice_exam';
                     this.$('input.practice_exam').prop('checked', true);
                 } else {
+                    this.startingExamType = 'proctored_exam';
                     this.$('input.proctored_exam').prop('checked', true);
                     this.$('.field-exam-review-rules').show();
                 }
@@ -594,6 +601,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 // Since we have an early exit at the top of the method
                 // if the subsection is not time limited, then
                 // here we rightfully assume that it just a timed exam
+                this.startingExamType = 'timed_exam';
                 this.$('input.timed_exam').prop('checked', true);
             }
         },
@@ -631,20 +639,27 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var timeLimit = this.getExamTimeLimit();
             var examReviewRules = this.$('.field-exam-review-rules textarea').val();
 
+            var metadata = {
+                is_practice_exam: isPracticeExamChecked,
+                is_time_limited: !isNoSpecialExamChecked,
+                exam_review_rules: examReviewRules,
+                // We have to use the legacy field name
+                // as the Ajax handler directly populates
+                // the xBlocks fields. We will have to
+                // update this call site when we migrate
+                // seq_module.py to use 'is_proctored_exam'
+                is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
+                default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
+                is_onboarding_exam: isOnboardingExamChecked
+            };
+
+            // If setting as a proctored exam, set to hide after due by default
+            if (isProctoredExamChecked && this.startingExamType !== 'proctored_exam') {
+                metadata.hide_after_due = true;
+            }
+
             return {
-                metadata: {
-                    is_practice_exam: isPracticeExamChecked,
-                    is_time_limited: !isNoSpecialExamChecked,
-                    exam_review_rules: examReviewRules,
-                    // We have to use the legacy field name
-                    // as the Ajax handler directly populates
-                    // the xBlocks fields. We will have to
-                    // update this call site when we migrate
-                    // seq_module.py to use 'is_proctored_exam'
-                    is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
-                    default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
-                    is_onboarding_exam: isOnboardingExamChecked
-                }
+                metadata: metadata
             };
         }
     });
@@ -920,6 +935,50 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    DiscussionEditor = AbstractEditor.extend({
+        templateName: 'discussion-editor',
+        className: 'edit-discussion',
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setStatus(this.currentValue());
+        },
+
+        currentValue: function() {
+            var discussionEnabled = this.model.get('discussion_enabled');
+            return discussionEnabled === true || discussionEnabled === 'enabled';
+        },
+
+        setStatus: function(value) {
+            this.$('#discussion_enabled').prop('checked', value);
+        },
+
+        isEnabled: function() {
+            return this.$('#discussion_enabled').is(':checked');
+        },
+
+        hasChanges: function() {
+            return this.currentValue() !== this.isEnabled();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        discussion_enabled: this.isEnabled()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return {
+                hasDiscussionEnabled: this.currentValue()
+            };
+        }
+    });
+
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
         templateName: 'content-visibility-editor',
         className: 'edit-content-visibility',
@@ -1155,7 +1214,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
+                editors = [StaffLockEditor, UnitAccessEditor, DiscussionEditor];
             } else {
                 tabs = [
                     {
@@ -1201,6 +1260,23 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 });
             }
 
+            if (!options.unit_level_discussions) {
+                editors = _.without(editors, DiscussionEditor);
+            }
+
+            return new SettingsXBlockModal($.extend({
+                tabs: tabs,
+                editors: editors,
+                model: xblockInfo
+            }, options));
+        },
+
+        /**
+         * This function allows comprehensive themes to create custom editors without adding boilerplate code.
+         *
+         * A simple example theme for this can be found at https://github.com/open-craft/custom-unit-icons-theme
+         **/
+        getCustomEditModal: function(tabs, editors, xblockInfo, options) {
             return new SettingsXBlockModal($.extend({
                 tabs: tabs,
                 editors: editors,

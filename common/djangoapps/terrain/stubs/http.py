@@ -118,7 +118,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             }
 
         except:  # lint-amnesty, pylint: disable=bare-except
-            return dict()
+            return {}
 
     @lazy
     def get_params(self):
@@ -154,7 +154,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             Each POST parameter is the configuration key.
             Each POST value is a JSON-encoded string value for the configuration.
         """
-        if self.path == "/set_config" or self.path == "/set_config/":
+        if self.path in ("/set_config", "/set_config/"):
 
             if len(self.post_dict) > 0:
                 for key, value in self.post_dict.items():
@@ -252,7 +252,7 @@ class StubHttpService(ThreadingMixIn, HTTPServer):
         HTTPServer.__init__(self, address, self.HANDLER_CLASS)
 
         # Create a dict to store configuration values set by the client
-        self.config = dict()
+        self.config = {}
 
         # Start the server in a separate thread
         server_thread = threading.Thread(target=self.serve_forever)

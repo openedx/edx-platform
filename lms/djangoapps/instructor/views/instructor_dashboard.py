@@ -15,13 +15,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseServerError
 from django.urls import reverse
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
+from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
@@ -38,6 +39,7 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
@@ -49,20 +51,23 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
+from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
+from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from xmodule.html_module import HtmlBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from xmodule.html_module import HtmlBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled
@@ -77,9 +82,10 @@ class InstructorDashboardTab(CourseTab):
     """
 
     type = "instructor"
-    title = ugettext_noop('Instructor')
+    title = gettext_noop('Instructor')
     view_name = "instructor_dashboard"
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
+    priority = 300
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -128,10 +134,6 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
-    is_white_label = CourseMode.is_white_label(course_key)  # lint-amnesty, pylint: disable=unused-variable
-
-    reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)  # lint-amnesty, pylint: disable=unused-variable
-
     sections = []
     if access['staff']:
         sections_content = [
@@ -179,7 +181,11 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if is_bulk_email_feature_enabled(course_key) and (access['staff'] or access['instructor']):
+    if (
+        is_bulk_email_feature_enabled(course_key) and not
+        is_bulk_email_disabled_for_course(course_key) and
+        (access['staff'] or access['instructor'])
+    ):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
@@ -251,6 +257,14 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
+
+    context_from_plugins = get_plugins_view_context(
+        ProjectType.LMS,
+        INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME,
+        context
+    )
+
+    context.update(context_from_plugins)
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 

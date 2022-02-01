@@ -1,0 +1,68 @@
+## This template is for track selection with Feature Based Enrollment (FBE).
+## This means a learner in the default audit track will have a limited time to
+## complete the course (course access duration) and may have some of the content
+## of the course unavailable (gated content).
+
+<%page expression_filter="h"/>
+<%inherit file="track_selection.html" />
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%block name="track_selection_certificate_bullets">
+<div class="choice-bullets track-selection-type-fbe">
+    <ul>
+        <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
+                link_start=HTML('<b><u><a class="verified" href="{track_verified_url}" target="_blank">').format(track_verified_url=track_links['verified_certificate']),
+                link_end=HTML('</a></u></b>')
+            )}
+        </li>
+        <li>${Text(_("Get {start_bold}access to all course activities{end_bold}, including both graded and non-graded assignments, while the course is running")).format(
+            start_bold=HTML('<b>'),
+            end_bold=HTML('</b>'),
+        )}</li>
+        <button class="btn btn-link collapsible">${_("Show more")}</button>
+        <li class="collapsible-item">
+            ${Text(_("{start_bold}Full access{end_bold} to course content and materials, even after the course ends")).format(
+                start_bold=HTML('<b>'),
+                end_bold=HTML('</b>'),
+            )}
+            <span class="popover-icon">
+                <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.0212 6C12.0212 9.31444 9.33472 12 6.02124 12C2.70776 12 0.0212402 9.31444 0.0212402 6C0.0212402 2.68749 2.70776 0 6.02124 0C9.33472 0 12.0212 2.68749 12.0212 6ZM6.02124 7.20968C5.4066 7.20968 4.90834 7.70794 4.90834 8.32258C4.90834 8.93722 5.4066 9.43548 6.02124 9.43548C6.63588 9.43548 7.13414 8.93722 7.13414 8.32258C7.13414 7.70794 6.63588 7.20968 6.02124 7.20968ZM4.96464 3.20937L5.1441 6.49969C5.1525 6.65366 5.2798 6.77419 5.43399 6.77419H6.60849C6.76268 6.77419 6.88998 6.65366 6.89838 6.49969L7.07785 3.20937C7.08692 3.04306 6.95451 2.90323 6.78796 2.90323H5.2545C5.08795 2.90323 4.95556 3.04306 4.96464 3.20937Z" fill="#00262B"/>
+                </svg>
+                <span class="popover">
+                    ${Text(_("{link_start}Learn more{link_end} about course access")).format(
+                        link_start=HTML('<u><a href="{track_comparison_url}" target="_blank">').format(track_comparison_url=track_links['learn_more']),
+                        link_end=HTML('</a></u>')
+                    )}
+                </span>
+            </span>
+        </li>
+        <li class="collapsible-item">${Text(_("Support our {start_bold}mission{end_bold} to increase access to high-quality education for everyone, everywhere")).format(
+            start_bold=HTML('<b>'),
+            end_bold=HTML('</b>'),
+        )}</li>
+    </ul>
+</div>
+</%block>
+
+<%block name="track_selection_audit_bullets">
+<div class="choice-bullets track-selection-type-fbe">
+    <ul>
+        <li>${Text(_("Get temporary access to  {start_bold}non-graded{end_bold} activities, including discussion forums and non-graded assignments")).format(
+            start_bold=HTML('<b>'),
+            end_bold=HTML('</b>'),
+        )}</li>
+        <li>${Text(_("Get {start_bold}temporary access{end_bold} to the course material, including videos and readings")).format(
+            start_bold=HTML('<b>'),
+            end_bold=HTML('</b>'),
+        )}</li>
+        % if audit_access_deadline:
+        <li class="font-italic">${_("Access expires and all progress will be lost on")} ${audit_access_deadline}</li>
+        % else:
+        <li class="font-italic">${_("Access expires and all progress will be lost")}</li>
+        % endif
+    </ul>
+</div>
+</%block>

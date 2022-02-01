@@ -39,13 +39,13 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml import factories as xml
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests.xml import XModuleXmlImportTest  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests.xml import factories as xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -139,7 +139,7 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
-            assert list(no_courses) == []
+            assert not list(no_courses)
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
@@ -432,7 +432,8 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that we treat a sequential with incomplete (but not scored) items (like a video maybe) as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
+        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
+                              start=datetime.datetime.now() - datetime.timedelta(hours=1))
         sequential = ItemFactory(parent=chapter, category='sequential')
         problem = ItemFactory(parent=sequential, category='problem', has_score=True)
         ItemFactory(parent=sequential, category='video', has_score=False)
@@ -453,6 +454,25 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         course = CourseFactory()
         chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
         ItemFactory(parent=chapter, category='sequential')
+
+        assignments = get_course_assignments(course.location.context_key, self.user, None)
+        assert len(assignments) == 1
+        assert not assignments[0].complete
+
+    def test_completion_does_not_treat_unreleased_as_complete(self):
+        """
+        Test that unreleased assignments are not treated as complete.
+        """
+        course = CourseFactory()
+        chapter = ItemFactory(parent=course, category='chapter', graded=True,
+                              due=datetime.datetime.now() + datetime.timedelta(hours=2),
+                              start=datetime.datetime.now() + datetime.timedelta(hours=1))
+        sequential = ItemFactory(parent=chapter, category='sequential')
+        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
+        ItemFactory(parent=sequential, category='video', has_score=False)
+
+        self.override_waffle_switch(True)
+        BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
 
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1

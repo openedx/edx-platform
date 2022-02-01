@@ -27,8 +27,8 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @override_settings(ENABLE_BULK_ENROLLMENT_VIEW=True)
@@ -107,7 +107,8 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         """ Test that non global staff users are forbidden from API use. """
         self.staff.is_staff = False
         self.staff.save()
-        response = self.request_bulk_enroll()
+        with self.allow_transaction_exception():
+            response = self.request_bulk_enroll()
         assert response.status_code == 403
 
     def test_missing_params(self):

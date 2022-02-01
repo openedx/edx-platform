@@ -8,11 +8,11 @@ import logging
 
 from django.urls import reverse
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
 from lms.djangoapps.badges.utils import requires_badges_enabled, site_prefix
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,11 @@ def course_slug(course_key, mode):
         f"{str(course_key)}{str(mode)}".encode('utf-8')
     ).hexdigest()[:7]
     base_slug = slugify(str(course_key) + f'_{mode}_')[:248]
-    return base_slug + digest
+
+    # slugify() now removes leading and trailing dashes and underscores.
+    # Reference: Django 3.2 Release Notes https://docs.djangoproject.com/en/3.2/releases/3.2/#miscellaneous
+    # TODO: Remove this condition and make this return as default when platform is upgraded to 3.2
+    return f'{base_slug}_{digest}'
 
 
 def badge_description(course, mode):

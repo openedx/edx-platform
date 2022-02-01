@@ -28,7 +28,7 @@ from django.urls import reverse
 
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -398,10 +398,10 @@ class PhotoVerification(IDVerificationAttempt):
             they uploaded are good. Note that we don't actually do a submission
             anywhere yet.
         """
-        # At any point prior to this, they can change their names via their
-        # student dashboard. But at this point, we lock the value into the
-        # attempt.
-        self.name = self.user.profile.name  # pylint: disable=no-member
+        # If a name is not already set via the verified_name flow,
+        # pick up the profile name at this time.
+        if not self.name:
+            self.name = self.user.profile.name  # pylint: disable=no-member
         self.status = self.STATUS.ready
         self.save()
 
@@ -1086,11 +1086,11 @@ class VerificationDeadline(TimeStampedModel):
         max_length=255,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy("The course for which this deadline applies"),
+        help_text=gettext_lazy("The course for which this deadline applies"),
     )
 
     deadline = models.DateTimeField(
-        help_text=ugettext_lazy(
+        help_text=gettext_lazy(
             "The datetime after which users are no longer allowed "
             "to submit photos for verification."
         )

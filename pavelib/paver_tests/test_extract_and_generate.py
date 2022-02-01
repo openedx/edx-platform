@@ -77,11 +77,20 @@ class TestGenerate(TestCase):
         .mo files should exist, and be recently created (modified
         after start of test suite)
         """
-        # Change dummy_locales to not have Esperanto present.
-        self.configuration.dummy_locales = ['fake2']
+        # Change dummy_locales to only contain Esperanto.
+        self.configuration.dummy_locales = ['eo']
 
+        # Clear previous files.
+        for locale in self.configuration.dummy_locales:
+            for filename in ('django', 'djangojs'):
+                mofile = filename + '.mo'
+                path = os.path.join(self.configuration.get_messages_dir(locale), mofile)
+                if os.path.exists(path):
+                    os.remove(path)
+
+        # Regenerate files.
         generate.main(verbosity=0, strict=False)
-        for locale in self.configuration.translated_locales:
+        for locale in self.configuration.dummy_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename + '.mo'
                 path = os.path.join(self.configuration.get_messages_dir(locale), mofile)

@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n      Because the due date has passed, you are no longer able to take this exam.\n    ": "\n\u7de0\u5207\u65e5\u304c\u904e\u304e\u305f\u305f\u3081\u3001\u672c\u8a66\u9a13\u3092\u53d7\u3051\u308b\u3053\u3068\u304c\u3067\u304d\u307e\u305b\u3093\u3002",
     "\n      The due date for this exam has passed\n    ": "\n\u3053\u306e\u8a66\u9a13\u306e\u7de0\u5207\u306f\u65e2\u306b\u904e\u304e\u3066\u3044\u307e\u3059\u3002",
     " ${price} {currency} )": " ${price} {currency} )",
@@ -294,7 +295,6 @@
     "Could not submit order": "\u6ce8\u6587\u3092\u9001\u4fe1\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f",
     "Could not submit photos": "\u5199\u771f\u3092\u63d0\u51fa\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f",
     "Could not upload the video image file": "\u52d5\u753b\u753b\u50cf\u30d5\u30a1\u30a4\u30eb\u3092\u30a2\u30c3\u30d7\u30ed\u30fc\u30c9\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f",
-    "Couldn't Save This Assignment": "\u3053\u306e\u8ab2\u984c\u3092\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f",
     "Country": "\u56fd",
     "Country of residence": "\u5c45\u4f4f\u56fd",
     "Country or Region of Residence": "\u5c45\u4f4f\u56fd\u30fb\u5730\u57df",
@@ -781,7 +781,6 @@
     "Please add the instructor's title": "\u8b1b\u5e2b\u306e\u5f79\u8077\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044",
     "Please address the errors on this page first, and then save your progress.": "\u307e\u305a\u3053\u306e\u30da\u30fc\u30b8\u306e\u30a8\u30e9\u30fc\u3092\u89e3\u6c7a\u3057\u3066\u304b\u3089\u3001\u5909\u66f4\u3092\u4fdd\u5b58\u3057\u3066\u4e0b\u3055\u3044\u3002",
     "Please check the following validation feedbacks and reflect them in your course settings:": "\u4ee5\u4e0b\u306e\u8a8d\u8a3c\u30d5\u30a3\u30fc\u30c9\u30d0\u30c3\u30af\u3092\u78ba\u8a8d\u3057\u3066\u3001\u8b1b\u5ea7\u8a2d\u5b9a\u306b\u53cd\u6620\u3055\u305b\u3066\u304f\u3060\u3055\u3044: ",
-    "Please correct the outlined fields.": "\u7e01\u53d6\u3089\u308c\u305f\u6b04\u3092\u6b63\u3057\u304f\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "Please describe this image or agree that it has no contextual value by checking the checkbox.": "\u753b\u50cf\u306e\u8a73\u7d30\u3092\u5165\u529b\u3059\u308b\u304b\u3001\u30c1\u30a7\u30c3\u30af\u30dc\u30c3\u30af\u30b9\u306b\u30c1\u30a7\u30c3\u30af\u3092\u3057\u3066\u80cc\u666f\u7684\u306a\u5024\u304c\u306a\u3044\u3053\u3068\u306b\u540c\u610f\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "Please do not use any spaces in this field.": "\u3053\u306e\u6b04\u306b\u306f\u30b9\u30da\u30fc\u30b9\u3092\u4f7f\u7528\u3057\u306a\u3044\u3067\u4e0b\u3055\u3044\u3002",
     "Please do not use any spaces or special characters in this field.": "\u3053\u306e\u6b04\u306b\u306f\u30b9\u30da\u30fc\u30b9\u3084\u7279\u6b8a\u6587\u5b57\u3092\u4f7f\u7528\u3057\u306a\u3044\u3067\u4e0b\u3055\u3044\u3002",
@@ -822,7 +821,6 @@
     "Processing Re-run Request": "Re-run\u30ea\u30af\u30a8\u30b9\u30c8\u624b\u7d9a\u4e2d",
     "Proctored": "\u76e3\u7763\u4ed8\u304d",
     "Proctored Exam": "\u76e3\u7763\u4ed8\u304d\u8a66\u9a13",
-    "Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.": "\u76e3\u7763\u4ed8\u304d\u8a66\u9a13\u306f\u6642\u9593\u5236\u9650\u304c\u3042\u308a\u3001\u53d7\u8b1b\u8005\u304c\u8a66\u9a13\u3092\u53d7\u3051\u3066\u3044\u308b\u69d8\u5b50\u3092\u9332\u753b\u3057\u307e\u3059\u3002\u305d\u306e\u9332\u753b\u3092\u898b\u76f4\u3057\u3001\u30eb\u30fc\u30eb\u306b\u5f93\u3063\u3066\u8a66\u9a13\u3092\u53d7\u3051\u3066\u3044\u308b\u304b\u3092\u78ba\u8a8d\u3057\u307e\u3059\u3002",
     "Product Name": "\u88fd\u54c1\u540d",
     "Professional Certificate for {courseName}": "{courseName}\u8b1b\u5ea7\u306eProfessional Certificate",
     "Professional Education": "Professional Education",
@@ -1382,8 +1380,8 @@
     "You have not created any certificates yet.": "\u307e\u3060\u4fee\u4e86\u8a3c\u3092\u4f5c\u6210\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
     "You have not created any content groups yet.": "\u30b3\u30f3\u30c6\u30f3\u30c4\u30b0\u30eb\u30fc\u30d7\u304c\u307e\u3060\u4f5c\u6210\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
     "You have not created any group configurations yet.": "\u30b0\u30eb\u30fc\u30d7\u8a2d\u5b9a\u304c\u4f5c\u6210\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u5909\u66f4\u306f\u3042\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3082\u3057\u304b\u3057\u3066\u4fdd\u5b58\u30dc\u30bf\u30f3\u3067\u306f\u306a\u304f\u3066\u5b9f\u884c\u30dc\u30bf\u30f3\u3092\u304a\u63a2\u3057\u3067\u3059\u304b\u3002",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002OK\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u4fdd\u5b58\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u305d\u306e\u5f8c\u3001\u64cd\u4f5c\u3092\u518d\u5ea6\u5b9f\u884c\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u5909\u66f4\u306f\u3042\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3082\u3057\u304b\u3057\u3066\u4fdd\u5b58\u30dc\u30bf\u30f3\u3067\u306f\u306a\u304f\u3066\u5b9f\u884c\u30dc\u30bf\u30f3\u3092\u304a\u63a2\u3057\u3067\u3059\u304b\u3002",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002OK\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u4fdd\u5b58\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u305d\u306e\u5f8c\u3001\u64cd\u4f5c\u3092\u518d\u5ea6\u5b9f\u884c\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "%(currentProvider)s\u306b\u7121\u4e8b\u30b5\u30a4\u30f3\u30a4\u30f3\u3057\u307e\u3057\u305f\u304c\u3001%(currentProvider)s\u306e\u30a2\u30ab\u30a6\u30f3\u30c8\u306f%(platformName)s\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u306e\u9023\u643a\u8a2d\u5b9a\u306f\u3057\u3066\u3044\u307e\u305b\u3093\u3002\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u306e\u9023\u643a\u8a2d\u5b9a\u3092\u3059\u308b\u306b\u306f\u3001%(platformName)s\u306e\u30d1\u30b9\u30ef\u30fc\u30c9\u3067\u30b5\u30a4\u30f3\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002\u64cd\u4f5c\u3092\u5b9f\u884c\u3059\u308b\u3068\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u306f\u5931\u308f\u308c\u307e\u3059\u3002",
     "You haven't added any assets to this course yet.": "\u3053\u306e\u8b1b\u5ea7\u306b\u306f\u30a2\u30bb\u30c3\u30c8\u304c\u8ffd\u52a0\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
@@ -1543,24 +1541,24 @@
     "{type} Progress": "{type} \u306e\u9032\u6357",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1570,16 +1568,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1602,15 +1600,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "Y\u5e74n\u6708j\u65e5",
     "DATE_INPUT_FORMATS": [
@@ -1643,8 +1638,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1663,6 +1658,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

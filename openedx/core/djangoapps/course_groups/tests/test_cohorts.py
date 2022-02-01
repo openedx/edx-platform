@@ -12,12 +12,13 @@ from django.http import Http404
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import cohorts
 from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup, UnregisteredLearnerCohortAssignments
@@ -25,10 +26,23 @@ from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_co
 
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
-class TestCohortSignals(TestCase):
+class TestCohortSignals(TestCase, OpenEdxEventsTestMixin):
     """
     Test cases to validate event emissions for various cohort-related workflows
     """
+
+    ENABLED_OPENEDX_EVENTS = []
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -474,7 +488,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         config_course_cohorts(course, is_cohorted=True)
-        assert [] == cohorts.get_course_cohorts(course)
+        assert not cohorts.get_course_cohorts(course)
 
     def test_get_course_cohorts(self):
         """
@@ -729,7 +743,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             self.partition_id,
             self.group1_id,
         )
-        with pytest.raises(IntegrityError):
+        with pytest.raises(IntegrityError), self.allow_transaction_exception():
             self._link_cohort_partition_group(
                 self.first_cohort,
                 self.partition_id,

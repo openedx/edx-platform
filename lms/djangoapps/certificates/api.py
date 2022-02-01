@@ -32,6 +32,7 @@ from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION as _A
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
+    CertificateDateOverride,
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateInvalidation,
@@ -50,7 +51,7 @@ from lms.djangoapps.certificates.utils import (
 from lms.djangoapps.instructor import access
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -203,7 +204,51 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     if user_ids:
         cert_filter_args['user__id__in'] = user_ids
 
+    # Include certificates with a CertificateDateOverride modified within the
+    # given time range.
+    if start_date or end_date:
+        certs_with_modified_overrides = get_certs_with_modified_overrides(course_keys, start_date, end_date, user_ids)
+        return GeneratedCertificate.objects.filter(
+            **cert_filter_args
+        ).union(
+            certs_with_modified_overrides
+        ).order_by(
+            'modified_date'
+        )
+
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
+
+
+def get_certs_with_modified_overrides(course_keys=None, start_date=None, end_date=None, user_ids=None):
+    """
+    Returns a QuerySet of certificates with a CertificateDateOverride modified
+    within the given start_date and end_date. Uses the history table to catch
+    deleted overrides too.
+    """
+    override_filter_args = {}
+    if start_date:
+        override_filter_args['history_date__gte'] = start_date
+    if end_date:
+        override_filter_args['history_date__lte'] = end_date
+
+    # Get the HistoricalCertificateDateOverrides that have entries within the
+    # given date range. We check the history table to catch deleted overrides
+    # along with those created / updated
+    overrides = CertificateDateOverride.history.filter(**override_filter_args)
+
+    # Get the associated GeneratedCertificate ids.
+    override_cert_ids = overrides.values_list('generated_certificate', flat=True)
+
+    # Build the args for the GeneratedCertificate query. First, filter by all
+    # certs identified in override_cert_ids; then by the other arguments passed,
+    # if present.
+    cert_filter_args = {'pk__in': override_cert_ids}
+    if course_keys:
+        cert_filter_args['course_id__in'] = course_keys
+    if user_ids:
+        cert_filter_args['user__id__in'] = user_ids
+
+    return GeneratedCertificate.objects.filter(**cert_filter_args)
 
 
 def generate_certificate_task(user, course_key, generation_mode=None):
@@ -540,7 +585,7 @@ def get_certificate_footer_context():
     Return data to be used in Certificate Footer,
     data returned should be customized according to the site configuration.
     """
-    data = dict()
+    data = {}
 
     # get Terms of Service and Honor Code page url
     terms_of_service_and_honor_code = branding_api.get_tos_and_honor_code_url()

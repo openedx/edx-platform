@@ -7,6 +7,7 @@ import ast
 import json
 from collections import OrderedDict
 from datetime import timedelta
+from unittest.mock import Mock
 
 from django.contrib import messages
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -27,10 +28,10 @@ from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized_html
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.tests import get_test_descriptor_system, get_test_system
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests import get_test_descriptor_system, get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class BaseTestXmodule(ModuleStoreTestCase):
@@ -63,18 +64,18 @@ class BaseTestXmodule(ModuleStoreTestCase):
     METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def new_module_runtime(self):
+    def new_module_runtime(self, **kwargs):
         """
         Generate a new ModuleSystem that is minimally set up for testing
         """
-        return get_test_system(course_id=self.course.id)
+        return get_test_system(course_id=self.course.id, **kwargs)
 
-    def new_descriptor_runtime(self):
-        runtime = get_test_descriptor_system()
+    def new_descriptor_runtime(self, **kwargs):
+        runtime = get_test_descriptor_system(**kwargs)
         runtime.get_block = modulestore().get_item
         return runtime
 
-    def initialize_module(self, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def initialize_module(self, runtime_kwargs=None, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         kwargs.update({
             'parent_location': self.section.location,
             'category': self.CATEGORY
@@ -89,7 +90,9 @@ class BaseTestXmodule(ModuleStoreTestCase):
         student_data = DictFieldData(field_data)
         self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
 
-        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+        if runtime_kwargs is None:
+            runtime_kwargs = {}
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime(**runtime_kwargs)
 
         self.item_url = str(self.item_descriptor.location)
 
@@ -143,12 +146,14 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
 class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    def new_module_runtime(self):
+    def new_module_runtime(self, **kwargs):
         """
         Create a runtime that actually does html rendering
         """
-        runtime = super().new_module_runtime()
-        runtime.render_template = render_to_string
+        if 'render_template' not in kwargs:
+            kwargs['render_template'] = render_to_string
+        runtime = super().new_module_runtime(**kwargs)
+        runtime.modulestore = Mock()
         return runtime
 
 
@@ -326,14 +331,16 @@ class MasqueradeMixin:
     to pass in the course parameter below.
     """
 
-    def update_masquerade(self, course=None, role='student', group_id=None, username=None, user_partition_id=None):
+    def update_masquerade(self, course=None, course_id=None, role='student', group_id=None, username=None,
+                          user_partition_id=None):
         """
         Installs a masquerade for the specified user and course, to enable
         the user to masquerade as belonging to the specific partition/group
         combination.
 
         Arguments:
-            course (object): a course or None for self.course
+            course (object): a course or None for self.course (or you can pass course_id instead)
+            course_id (str|CourseKey): a course id, useful if you don't happen to have a full course object handy
             user_partition_id (int): the integer partition id, referring to partitions already
                configured in the course.
             group_id (int); the integer group id, within the specified partition.
@@ -342,11 +349,11 @@ class MasqueradeMixin:
 
         Returns: the response object for the AJAX call to update the user's masquerade.
         """
-        course = course or self.course
+        course_id = str(course_id or (course and course.id) or self.course.id)
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': str(course.id),
+                'course_key_string': course_id,
             }
         )
         response = self.client.post(

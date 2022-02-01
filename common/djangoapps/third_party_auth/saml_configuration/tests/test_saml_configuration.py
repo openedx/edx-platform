@@ -3,10 +3,10 @@ Tests for SAMLConfiguration endpoints
 """
 from django.urls import reverse
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.models import SAMLConfiguration
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 SAML_CONFIGURATIONS = [
@@ -52,7 +52,7 @@ class SAMLConfigurationTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = User.objects.create_user(username='testuser', password=TEST_PASSWORD)
+        cls.user = UserFactory.create(username='testuser', password=TEST_PASSWORD)
         cls.site, _ = Site.objects.get_or_create(domain='example.com')
         for config in SAML_CONFIGURATIONS:
             cls.samlconfiguration = SAMLConfiguration.objects.get_or_create(

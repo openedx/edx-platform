@@ -41,7 +41,9 @@ from openedx.features.enterprise_support.api import (
     get_consent_notification_data,
     get_consent_required_courses,
     get_dashboard_consent_notification,
+    get_data_sharing_consents,
     get_enterprise_consent_url,
+    get_enterprise_course_enrollments,
     get_enterprise_learner_data_from_api,
     get_enterprise_learner_data_from_db,
     get_enterprise_learner_portal_enabled_message,
@@ -50,6 +52,7 @@ from openedx.features.enterprise_support.api import (
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
     EnterpriseCustomerIdentityProviderFactory,
     EnterpriseCustomerUserFactory
 )
@@ -185,18 +188,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         username = 'spongebob'
         course_id = 'burger-flipping-101'
-        consent_granted = True
 
         if should_raise_http_error:
             with pytest.raises(EnterpriseApiException):
-                api_client.post_enterprise_course_enrollment(username, course_id, consent_granted)
+                api_client.post_enterprise_course_enrollment(username, course_id)
         else:
-            api_client.post_enterprise_course_enrollment(username, course_id, consent_granted)
+            api_client.post_enterprise_course_enrollment(username, course_id)
 
         mock_endpoint.post.assert_called_once_with(data={
             'username': username,
             'course_id': course_id,
-            'consent_granted': consent_granted,
         })
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
@@ -395,12 +396,47 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert request_mock.session['enterprise_customer']['uuid'] == str(enterprise_customer_uuid)
 
     def test_get_enterprise_learner_data_from_db_no_data(self):
-        assert [] == get_enterprise_learner_data_from_db(self.user)
+        assert not get_enterprise_learner_data_from_db(self.user)
 
     def test_get_enterprise_learner_data_from_db(self):
-        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)  # lint-amnesty, pylint: disable=unused-variable
+        EnterpriseCustomerUserFactory(user_id=self.user.id)
         user_data = get_enterprise_learner_data_from_db(self.user)[0]['user']
         assert user_data['username'] == self.user.username
+
+    @ddt.data(True, False)
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    def test_get_data_sharing_consents(self, is_enterprise_enabled, mock_enterprise_enabled):
+        mock_enterprise_enabled.return_value = is_enterprise_enabled
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+
+        if not is_enterprise_enabled:
+            assert get_data_sharing_consents(self.user) == []
+        else:
+            course_id = 'fake-course'
+            data_sharing_consent = DataSharingConsent(
+                course_id=course_id,
+                enterprise_customer=enterprise_customer_user.enterprise_customer,
+                username=self.user.username,
+                granted=False
+            )
+            data_sharing_consent.save()
+            data_sharing_consents = get_data_sharing_consents(self.user)
+            assert len(data_sharing_consents) == 1
+            assert data_sharing_consents[0].id == data_sharing_consent.id
+
+    @ddt.data(True, False)
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    def test_get_enterprise_course_enrollments(self, is_enterprise_enabled, mock_enterprise_enabled):
+        mock_enterprise_enabled.return_value = is_enterprise_enabled
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+
+        if not is_enterprise_enabled:
+            assert get_enterprise_course_enrollments(self.user) == []
+        else:
+            ece = EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user)
+            enterprise_course_enrollments = get_enterprise_course_enrollments(self.user)
+            assert len(enterprise_course_enrollments) == 1
+            assert enterprise_course_enrollments[0].id == ece.id
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')

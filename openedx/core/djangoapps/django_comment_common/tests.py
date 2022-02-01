@@ -7,11 +7,12 @@ from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
-from common.djangoapps.student.models import CourseEnrollment, User
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class RoleAssignmentTest(TestCase):
@@ -23,15 +24,15 @@ class RoleAssignmentTest(TestCase):
     def setUp(self):
         super().setUp()
         # Check a staff account because those used to get the Moderator role
-        self.staff_user = User.objects.create_user(
-            "patty",
-            "patty@fake.edx.org",
+        self.staff_user = UserFactory.create(
+            username="patty",
+            email="patty@fake.edx.org",
         )
         self.staff_user.is_staff = True
 
-        self.student_user = User.objects.create_user(
-            "hacky",
-            "hacky@fake.edx.org"
+        self.student_user = UserFactory.create(
+            username="hacky",
+            email="hacky@fake.edx.org",
         )
         self.course_key = CourseLocator("edX", "Fake101", "2012")
         CourseEnrollment.enroll(self.staff_user, self.course_key)

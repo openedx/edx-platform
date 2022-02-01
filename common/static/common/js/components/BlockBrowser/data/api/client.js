@@ -21,7 +21,7 @@ export function buildQueryString(data) {
 }
 
 export const getCourseBlocks = courseId => fetch(
-  `${COURSE_BLOCKS_API}/?${buildQueryString({
+  `${COURSE_BLOCKS_API}?${buildQueryString({
     course_id: courseId,
     all_blocks: true,
     depth: 'all',

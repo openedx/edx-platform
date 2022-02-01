@@ -7,7 +7,6 @@ import json
 from unittest.mock import patch
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import UsageKey
@@ -18,7 +17,7 @@ from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import milestones_helpers
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..entrance_exam import (
     add_entrance_exam_milestone,
@@ -173,7 +172,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 404)
 
-        user = User.objects.create(
+        user = UserFactory.create(
             username='test_user',
             email='test_user@edx.org',
             is_active=True,
@@ -287,7 +286,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         """
         Unit Test: test_contentstore_views_entrance_exam_get_invalid_user
         """
-        user = User.objects.create(
+        user = UserFactory.create(
             username='test_user',
             email='test_user@edx.org',
             is_active=True,

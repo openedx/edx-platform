@@ -20,9 +20,8 @@ class Command(BaseCommand):
 
     Takes the following named arguments:
       host: the host of the neo4j server
-      https_port: the port on the neo4j server that accepts https requests
-      http_port: the port on the neo4j server that accepts http requests
-      secure: if set, connects to server over https, otherwise uses http
+      port: the port on the neo4j server that accepts Bolt requests
+      secure: if set, connects to server over Bolt/TLS, otherwise uses Bolt
       user: the username for the neo4j user
       password: the user's password
       courses: list of course key strings to serialize. If not specified, all
@@ -39,8 +38,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--host', type=str)
-        parser.add_argument('--https_port', type=int, default=7473)
-        parser.add_argument('--http_port', type=int, default=7474)
+        parser.add_argument('--port', type=int, default=7687)
         parser.add_argument('--secure', action='store_true')
         parser.add_argument('--user', type=str)
         parser.add_argument('--password', type=str)

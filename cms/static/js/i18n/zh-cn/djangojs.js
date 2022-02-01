@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    \u8bf7\u786e\u4fdd\u60a8\u7684\u7535\u8111\u5e26\u6709\u7f51\u7edc\u6444\u50cf\u5934\uff0c\u5e76\u6709\u6709\u6548\u7684\u5e26\u7167\u7247\u8eab\u4efd\u8bc1\u660e\uff0c\n                    \u4f8b\u5982\u9a7e\u9a76\u8bc1\u6216\u62a4\u7167\u3002\n                ",
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    \u60a8\u7684\u8eab\u4efd\u8ba4\u8bc1\u5931\u8d25\u4e86\uff0c\u8bf7\u5148\u4ed4\u7ec6\u9605\u8bfb\u8bf4\u660e\uff0c\u786e\u4fdd\u60a8\u7406\u89e3\u6210\u529f\u5b8c\u6210\u8ba4\u8bc1\u7684\u8981\u6c42\uff0c\u7136\u540e\u91cd\u65b0\u8ba4\u8bc1\u3002\n                ",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                   \u60a8\u7684\u8eab\u4efd\u8ba4\u8bc1\u5df2\u8fc7\u671f\uff0c\u60a8\u5fc5\u987b\u91cd\u65b0\u6210\u529f\u5b8c\u6210\u8ba4\u8bc1\uff0c\n                    \u7136\u540e\u624d\u80fd\u8fdb\u884c\u76d1\u8003\u8003\u8bd5\u3002\n                ",
@@ -289,7 +290,6 @@
     "Basic Account Information": "\u57fa\u672c\u8d26\u53f7\u4fe1\u606f",
     "Be sure your entire face is inside the frame": "\u8bf7\u786e\u4fdd\u60a8\u7684\u6574\u5f20\u8138\u90fd\u5728\u6846\u5185",
     "Before proceeding, please confirm that your details match": "\u5728\u8fdb\u884c\u4e0b\u4e00\u6b65\u4e4b\u524d\uff0c\u8bf7\u786e\u8ba4\u60a8\u63d0\u4f9b\u7684\u4fe1\u606f\u4e4b\u95f4\u76f8\u7b26",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "\u7ee7\u7eed\u64cd\u4f5c\u524d\uff0c\u8bf7\u5148{htmlStart}\u6fc0\u6d3b\u60a8\u7684\u8d26\u53f7{htmlEnd}\u3002",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "\u7ee7\u7eed\u64cd\u4f5c\u524d\uff0c\u8bf7\u5148{htmlStart}\u89e3\u7ed1\u6240\u6709\u793e\u4ea4\u8f6f\u4ef6\u8d26\u53f7{htmlEnd}\u3002",
     "Before you upgrade to a certificate track, you must activate your account.": "\u5728\u60a8\u5347\u7ea7\u81f3\u8bc1\u4e66\u8def\u5f84\u4e4b\u524d\uff0c\u60a8\u5fc5\u987b\u6fc0\u6d3b\u60a8\u7684\u8d26\u53f7\u3002",
     "Biography": "\u7b80\u4ecb",
@@ -448,7 +448,6 @@
     "Could not submit order": "\u8ba2\u5355\u63d0\u4ea4\u5931\u8d25",
     "Could not submit photos": "\u7167\u7247\u63d0\u4ea4\u5931\u8d25",
     "Could not upload the video image file": "\u65e0\u6cd5\u4e0a\u4f20\u8be5\u89c6\u9891\u56fe\u7247\u6587\u4ef6",
-    "Couldn't Save This Assignment": "\u4fdd\u5b58\u4f5c\u4e1a\u5931\u8d25",
     "Country": "\u56fd\u5bb6\uff0f\u5730\u533a",
     "Country of residence": "\u5c45\u4f4f\u56fd\u5bb6",
     "Country or Region of Residence": "\u56fd\u5bb6\u6216\u5730\u533a",
@@ -1135,7 +1134,6 @@
     "Please add the instructor's title": "\u8bf7\u6dfb\u52a0\u5bfc\u5e08\u5934\u8854",
     "Please address the errors on this page first, and then save your progress.": "\u8bf7\u5148\u89e3\u51b3\u672c\u9875\u5b58\u5728\u7684\u9519\u8bef\uff0c\u7136\u540e\u4fdd\u5b58\u3002",
     "Please check the following validation feedbacks and reflect them in your course settings:": "\u8bf7\u68c0\u67e5\u4ee5\u4e0b\u9a8c\u8bc1\u53cd\u9988\u5e76\u7ed3\u5408\u8fd9\u6837\u53cd\u9988\u4fee\u6539\u60a8\u7684\u8bfe\u7a0b\u8bbe\u7f6e\uff1a",
-    "Please correct the outlined fields.": "\u8bf7\u6539\u6b63\u753b\u51fa\u533a\u57df",
     "Please describe this image or agree that it has no contextual value by checking the checkbox.": "\u8bf7\u63cf\u8ff0\u672c\u56fe\u7247\u6216\u52fe\u9009\u590d\u9009\u6846\u8868\u793a\u56fe\u7247\u4e0d\u542b\u4e0e\u5185\u5bb9\u76f8\u5173\u7684\u4ef7\u503c\u3002",
     "Please do not use any spaces in this field.": "\u6b64\u5b57\u6bb5\u7684\u5185\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c\u3002",
     "Please do not use any spaces or special characters in this field.": "\u6b64\u5b57\u6bb5\u7684\u5185\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c\u6216\u7279\u6b8a\u5b57\u7b26\u3002",
@@ -1201,7 +1199,6 @@
     "Proctored Exam": "\u76d1\u8003\u4e0b\u7684\u6d4b\u8bd5",
     "Proctored Option Available": "\u53ef\u542f\u7528\u76d1\u8003\u6a21\u5f0f",
     "Proctored Option No Longer Available": "\u65e0\u6cd5\u518d\u542f\u7528\u76d1\u8003\u6a21\u5f0f",
-    "Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.": "\u76d1\u8003\u4e0b\u7684\u8003\u8bd5\u662f\u8ba1\u65f6\u7684\uff0c\u5e76\u4e14\u6bcf\u4e2a\u5b66\u751f\u7684\u8003\u8bd5\u8fc7\u7a0b\u5c06\u88ab\u5f55\u50cf\u3002\u5f55\u50cf\u5c06\u88ab\u5ba1\u6838\u4ee5\u786e\u4fdd\u5b66\u751f\u9075\u5b88\u4e86\u8003\u8bd5\u7eaa\u5f8b\u3002",
     "Proctoring Settings": "\u76d1\u8003\u8bbe\u7f6e",
     "Product Name": "\u4ea7\u54c1\u540d\u79f0",
     "Professional Certificate for {courseName}": "{courseName} \u7684\u4e13\u4e1a\u8bc1\u4e66",
@@ -2166,24 +2163,24 @@
     "{type} Progress": "{type}\u8fdb\u5ea6",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2193,16 +2190,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2225,15 +2222,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "N j, Y",
     "DATE_INPUT_FORMATS": [
@@ -2266,8 +2260,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2286,6 +2280,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

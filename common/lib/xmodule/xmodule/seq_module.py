@@ -33,6 +33,7 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
 )
 
+from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
 from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 from .exceptions import NotFoundError
@@ -243,6 +244,7 @@ class ProctoringFields:
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 @XBlock.wants('content_type_gating')
 class SequenceBlock(
     SequenceMixin,
@@ -366,23 +368,37 @@ class SequenceBlock(
             return json.dumps(self._get_completion(data))
         raise NotFoundError('Unexpected dispatch type')
 
-    def get_metadata(self, view=STUDENT_VIEW):
+    def get_metadata(self, view=STUDENT_VIEW, context=None):
         """Returns a dict of some common block properties"""
-        context = {'exclude_units': True}
+        context = context or {}
+        context['exclude_units'] = True
         prereq_met = True
         prereq_meta_info = {}
         banner_text = None
         display_items = self.get_display_items()
+        course = self._get_course()
+        is_hidden_after_due = False
 
         if self._required_prereq():
-            if self.runtime.user_is_staff:
-                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
+            if self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
+                banner_text = _(
+                    'This subsection is unlocked for learners when they meet the prerequisite requirements.'
+                )
             else:
                 # check if prerequisite has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+
+        if prereq_met and view == STUDENT_VIEW and not self._can_user_view_content(course):
+            if context.get('specific_masquerade', False):
+                # Still show the content, but flag to the staff user that the learner wouldn't be able to see it
+                banner_text = self._hidden_content_banner_text(course)
+            else:
+                is_hidden_after_due = True
+
         meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view)
         meta['display_name'] = self.display_name_with_default
         meta['format'] = getattr(self, 'format', '')
+        meta['is_hidden_after_due'] = is_hidden_after_due
         return meta
 
     @classmethod
@@ -434,7 +450,10 @@ class SequenceBlock(
                 self, self.course_id
             )
 
-    def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def student_view(self, context):
+        """
+        Renders the normal student view of the block in the LMS.
+        """
         _ = self.runtime.service(self, "i18n").ugettext
         context = context or {}
         self._capture_basic_metrics()
@@ -442,8 +461,10 @@ class SequenceBlock(
         prereq_met = True
         prereq_meta_info = {}
         if self._required_prereq():
-            if self.runtime.user_is_staff:
-                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
+            if self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
+                banner_text = _(
+                    'This subsection is unlocked for learners when they meet the prerequisite requirements.'
+                )
             else:
                 # check if prerequisite has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
@@ -496,6 +517,16 @@ class SequenceBlock(
                     banner_text = _("This exam is hidden from the learner.")
                     return banner_text, special_exam_html
 
+    def _hidden_content_banner_text(self, course):
+        """
+        Chooses a banner message to show for hidden content
+        """
+        _ = self.runtime.service(self, 'i18n').gettext
+        if course.self_paced:
+            return _('Because the course has ended, this assignment is hidden from the learner.')
+        else:
+            return _('Because the due date has passed, this assignment is hidden from the learner.')
+
     def _hidden_content_student_view(self, context):
         """
         Checks whether the content of this sequential is hidden from the
@@ -505,12 +536,9 @@ class SequenceBlock(
         _ = self.runtime.service(self, "i18n").ugettext
         course = self._get_course()
         if not self._can_user_view_content(course):
-            if course.self_paced:
-                banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
-            else:
-                banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
+            banner_text = self._hidden_content_banner_text(course)
 
-            hidden_content_html = self.system.render_template(
+            hidden_content_html = self.runtime.service(self, 'mako').render_template(
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
@@ -527,7 +555,7 @@ class SequenceBlock(
         """
         hidden_date = course.end if course.self_paced else self.due
         return (
-            self.runtime.user_is_staff or
+            self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF) or
             self.verify_current_content_visibility(hidden_date, self.hide_after_due)
         )
 
@@ -535,7 +563,9 @@ class SequenceBlock(
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
+    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None,
+                             view=STUDENT_VIEW, fragment=None):
+        """Returns a dictionary of sequence metadata, used by render methods and for the courseware API"""
         if prereq_met and not self._is_gate_fulfilled():
             _ = self.runtime.service(self, "i18n").ugettext
             banner_text = _(
@@ -577,7 +607,7 @@ class SequenceBlock(
 
         fragment = Fragment()
         params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
-        fragment.add_content(self.system.render_template("seq_module.html", params))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)
@@ -615,8 +645,9 @@ class SequenceBlock(
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
             fulfilled = gating_service.is_gate_fulfilled(
-                self.course_id, self.location, self.runtime.user_id
+                self.course_id, self.location, user_id
             )
             return fulfilled
 
@@ -638,7 +669,7 @@ class SequenceBlock(
 
         return None
 
-    def descendants_are_gated(self):
+    def descendants_are_gated(self, context):
         """
         Sequences do their own access gating logic as to whether their content
         should be viewable, based on things like pre-reqs and time exam starts.
@@ -664,7 +695,8 @@ class SequenceBlock(
             comes to determining whether a student is allowed to access this,
             with other checks being done in has_access calls.
         """
-        if self.runtime.user_is_staff:
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        if user_is_staff or context.get('specific_masquerade', False):
             return False
 
         # We're not allowed to see it because of pre-reqs that haven't been
@@ -695,7 +727,8 @@ class SequenceBlock(
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
-            return gating_service.compute_is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+            return gating_service.compute_is_prereq_met(self.location, user_id, recalc_on_unmet)
 
         return True, {}
 
@@ -887,8 +920,10 @@ class SequenceBlock(
             self.is_time_limited
         )
         if feature_enabled:
-            user_id = self.runtime.user_id
-            user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
+            current_user = self.runtime.service(self, 'user').get_current_user()
+            user_id = current_user.opt_attrs.get(ATTR_KEY_USER_ID)
+            user_is_staff = current_user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            user_role_in_course = 'staff' if user_is_staff else 'student'
             course_id = self.runtime.course_id
             content_id = self.location
 

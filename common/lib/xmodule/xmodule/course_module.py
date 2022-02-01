@@ -103,7 +103,7 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 _cached_toc = {}
 
 
-class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, title, book_url):
         self.title = title
         self.book_url = book_url
@@ -146,7 +146,7 @@ class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-with
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except, unused-variable
             pass
 
         # Get the table of contents from S3
@@ -213,9 +213,14 @@ class ProctoringProvider(String):
         and include any inherited values from the platform default.
         """
         value = super().from_json(value)
-        self._validate_proctoring_provider(value)
-        value = self._get_proctoring_value(value)
-        return value
+        if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+            # Only validate the provider value if ProctoredExams are enabled on the environment
+            # Otherwise, the passed in provider does not matter. We should always return default
+            self._validate_proctoring_provider(value)
+            value = self._get_proctoring_value(value)
+            return value
+        else:
+            return self.default
 
     def _get_proctoring_value(self, value):
         """
@@ -406,6 +411,16 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "If false, they are sorted chronologically by creation date and time."
         )
     )
+    discussions_settings = Dict(
+        display_name=_("Discussions Plugin Settings"),
+        scope=Scope.settings,
+        help=_("Settings for discussions plugins."),
+        default={
+            "enable_in_context": True,
+            "enable_graded_units": False,
+            "unit_level_visibility": False,
+        }
+    )
     announcement = Date(
         display_name=_("Course Announcement Date"),
         help=_("Enter the date to announce your course."),
@@ -435,7 +450,9 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
-        help=_("Enter the unique identifier for your course's video files provided by edX."),
+        help=_(
+            "Enter the unique identifier for your course's video files provided by {platform_name}."
+        ).format(platform_name=settings.PLATFORM_NAME),
         scope=Scope.settings
     )
     no_grade = Boolean(
@@ -479,9 +496,10 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
             # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
             # his students.
-            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
-            " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
-        ),
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage "
+            "Custom Courses on {platform_name}. When false, Custom Courses cannot be created, "
+            "but existing Custom Courses will be preserved."
+        ).format(platform_name=settings.PLATFORM_NAME),
         default=False,
         scope=Scope.settings
     )
@@ -560,7 +578,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             "user can see their certificate for the course"
         ),
         scope=Scope.settings,
-        default=CertificatesDisplayBehaviors.END,
+        default=CertificatesDisplayBehaviors.END.value,
     )
     course_image = String(
         display_name=_("Course About Page Image"),
@@ -995,6 +1013,19 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings, default=False
     )
+
+    course_wide_js = List(
+        display_name=_("Course-wide Custom JS"),
+        help=_('Enter Javascript resource URLs you want to be loaded globally throughout the course pages.'),
+        scope=Scope.settings,
+    )
+
+    course_wide_css = List(
+        display_name=_("Course-wide Custom CSS"),
+        help=_('Enter CSS resource URLs you want to be loaded globally throughout the course pages.'),
+        scope=Scope.settings,
+    )
+
     other_course_settings = Dict(
         display_name=_("Other Course Settings"),
         help=_(

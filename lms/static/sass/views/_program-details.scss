@@ -259,6 +259,16 @@ $btn-color-primary: $primary-dark;
       @include margin-left(calc((100% - 1180px) / 2));
     }
   }
+  .tab-content{
+      .tab-pane {
+          .program-details-content {
+              padding-left: 40px;
+          }
+          .js-program-pathways {
+              padding-left: 40px;
+          }
+      }
+  }
 
   .course-list-heading {
     font-family: $font-family-sans-serif;
@@ -834,6 +844,47 @@ $btn-color-primary: $primary-dark;
 
     @include media-breakpoint-up(lg) {
       width: 120px;
+    }
+  }
+}
+
+.program-detail-nav {
+  @extend .content;
+
+  display: block;
+  width: 100%;
+  padding: 40px;
+
+  .program-detail-nav-list {
+    @extend %ui-no-list;
+
+    border-bottom: 1px solid $gray-base;
+
+    .nav-item {
+      @extend %t-copy-base;
+
+      font-weight: 500;
+      font-size: 1.125rem;
+      display: inline-block;
+
+      .btn-link {
+        display: inline-block;
+        padding: ($baseline/2);
+        border: 0;
+        box-shadow: none;
+        text-shadow: none;
+        color: theme-color("primary");
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          border-bottom: 3px solid theme-color("primary");
+        }
+
+        &.active {
+          border-bottom: 3px solid theme-color("primary");
+        }
+      }
     }
   }
 }

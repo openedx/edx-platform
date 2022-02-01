@@ -7,14 +7,14 @@ from unittest.mock import ANY, patch
 
 import ddt
 import pytest
-from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -32,7 +32,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
 
         cls.courses = [CourseFactory.create() for _ in range(cls.num_courses)]
         cls.course_keys = [str(course.id) for course in cls.courses]
-        cls.users = [get_user_model().objects.create(username=f'user{idx}') for idx in range(cls.num_users)]
+        cls.users = [UserFactory.create(username=f'user{idx}') for idx in range(cls.num_users)]
 
         for user in cls.users:
             for course in cls.courses:

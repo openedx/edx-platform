@@ -241,7 +241,7 @@ class ViewsTestCaseMixin:
             self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)
+            self.student = UserFactory.create(username=uname, email=email, password=self.password)
             self.student.is_active = True
             self.student.save()
 
@@ -402,7 +402,7 @@ class ViewsQueryCountTestCase(
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 3, 4, 39),
-        (ModuleStoreEnum.Type.split, 3, 13, 39),
+        (ModuleStoreEnum.Type.split, 3, 11, 39),
     )
     @ddt.unpack
     @count_queries
@@ -411,7 +411,7 @@ class ViewsQueryCountTestCase(
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 3, 3, 35),
-        (ModuleStoreEnum.Type.split, 3, 10, 35),
+        (ModuleStoreEnum.Type.split, 3, 9, 35),
     )
     @ddt.unpack
     @count_queries
@@ -464,7 +464,7 @@ class ViewsTestCase(
             self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)
+            self.student = UserFactory.create(username=uname, email=email, password=self.password)
             self.student.is_active = True
             self.student.save()
 

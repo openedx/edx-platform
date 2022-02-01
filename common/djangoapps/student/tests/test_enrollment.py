@@ -10,6 +10,7 @@ import ddt
 import pytest
 from django.conf import settings
 from django.urls import reverse
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -23,17 +24,19 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
+class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test student enrollment, especially with different course modes.
     """
+
+    ENABLED_OPENEDX_EVENTS = []
 
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
@@ -42,7 +45,14 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
         super().setUpClass()
+        cls.start_events_isolation()
         cls.course = CourseFactory.create()
         cls.course_limited = CourseFactory.create()
         cls.proctored_course = CourseFactory(
@@ -278,6 +288,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     @patch.dict(
         'django.conf.settings.PROCTORING_BACKENDS', {'test_provider_honor_mode': {'allow_honor_mode': True}}
     )
+    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
     def test_enroll_in_proctored_course_honor_mode_allowed(self):
         """
         If the proctoring provider allows honor mode, send proctoring requirements email when learners

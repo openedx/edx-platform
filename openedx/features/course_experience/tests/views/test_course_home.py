@@ -5,12 +5,13 @@ Tests for the course home page.
 
 from datetime import datetime, timedelta
 from unittest import mock
+from urllib.parse import quote_plus
 
 import ddt
 from django.conf import settings
 from django.http import QueryDict
+from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.http import urlquote_plus
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
@@ -54,10 +55,10 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
@@ -204,7 +205,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(72, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(65, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -225,6 +226,15 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
             url = course_home_url(future_course)
             response = self.client.get(url)
             assert response.status_code == 200
+
+    def test_legacy_redirect(self):
+        """
+        Verify that the legacy course home page redirects to the MFE correctly.
+        """
+        url = course_home_url(self.course) + '?foo=b$r'
+        response = self.client.get(url)
+        assert response.status_code == 302
+        assert response.get('Location') == 'http://learning-mfe/course/course-v1:edX+test+Test_Course/home?foo=b%24r'
 
 
 @ddt.ddt
@@ -370,7 +380,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         """
         url = course_home_url(self.course)
         response = self.client.get(url)
-        self.assertContains(response, f'/login?next={urlquote_plus(url)}')
+        self.assertContains(response, f'/login?next={quote_plus(url)}')
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_non_live_course(self):
@@ -613,6 +623,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
+    @override_settings(PLATFORM_NAME="edX")
     def test_masters_course_message(self):
         enroll_button_html = "<button class=\"enroll-btn btn-link\">Enroll now</button>"
 

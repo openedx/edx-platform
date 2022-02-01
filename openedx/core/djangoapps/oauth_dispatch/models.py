@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.db import models
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
 from oauth2_provider.settings import oauth2_settings
 from organizations.models import Organization

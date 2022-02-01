@@ -10,7 +10,7 @@ from functools import wraps
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -20,8 +20,8 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util import milestones_helpers
 from openedx.core import toggles as core_toggles
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import create_xblock, remove_entrance_exam_graders
 from .item import delete_item

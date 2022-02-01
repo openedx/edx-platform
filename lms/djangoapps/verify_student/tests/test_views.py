@@ -42,10 +42,10 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -906,7 +906,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             # ensure the mock api call was made.  NOTE: the following line
             # approximates the check - if the headers were empty it means
             # there was no last request.
-            assert httpretty.last_request().headers != {}
+            assert httpretty.last_request().headers
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):
@@ -1256,7 +1256,8 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         # Verify that the user's name wasn't changed
         self._assert_user_name(self.user.profile.name)
 
-    def test_submit_photos_and_change_name(self):
+    @ddt.data(True, False)
+    def test_submit_photos_and_change_name(self, flag_on):
         # Submit the photos, along with a name change
         self._submit_photos(
             face_image=self.IMAGE_DATA,
@@ -1264,8 +1265,10 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             full_name=self.FULL_NAME
         )
 
-        # Check that the user's name was changed in the database
-        self._assert_user_name(self.FULL_NAME)
+        # Since we are giving a full name, it should be written into the attempt
+        # whether or not the user name was updated
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        self.assertEqual(attempt.name, self.FULL_NAME)
 
     def test_submit_photos_sends_confirmation_email(self):
         self._submit_photos(
@@ -1355,15 +1358,6 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             'photo_id_image': image_data,
         }
         self._submit_photos(expected_status_code=status_code, **params)
-
-    def test_invalid_name(self):
-        response = self._submit_photos(
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            full_name="",
-            expected_status_code=400
-        )
-        assert response.content.decode('utf-8') == 'Name must be at least 1 character long.'
 
     def test_missing_required_param(self):
         # Missing face image parameter
@@ -1479,7 +1473,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             # Verify that photo submission confirmation email was not sent
             assert len(mail.outbox) == 0
 
-    def _assert_user_name(self, full_name):
+    def _assert_user_name(self, full_name, equality=True):
         """Check the user's name.
 
         Arguments:
@@ -1492,7 +1486,10 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         request = RequestFactory().get('/url')
         request.user = self.user
         account_settings = get_account_settings(request)[0]
-        assert account_settings['name'] == full_name
+        if equality:
+            assert account_settings['name'] == full_name
+        else:
+            assert not account_settings['name'] == full_name
 
     def _get_post_data(self):
         """Retrieve POST data from the last request. """

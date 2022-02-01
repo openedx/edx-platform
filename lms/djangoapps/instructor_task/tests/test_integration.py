@@ -40,8 +40,8 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 )
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -219,7 +219,7 @@ class TestRescoringTask(TestIntegrationTask):
         )
 
     @ddt.data(
-        RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+        RescoreTestData(edit={}, new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
         RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
     )
     @ddt.unpack

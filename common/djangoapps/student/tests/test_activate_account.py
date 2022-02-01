@@ -12,12 +12,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.http import urlencode
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 
 FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
@@ -166,9 +164,24 @@ class TestActivateAccount(TestCase):
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
 
+    @override_settings(MARKETING_EMAILS_OPT_IN=True)
+    def test_email_confirmation_notification_on_logistration(self):
+        """
+        Verify that logistration page displays success/error/info messages
+        about email confirmation instead of activation when MARKETING_EMAILS_OPT_IN
+        is set to True.
+        """
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+        self.assertContains(response, 'Success! You have confirmed your email.')
+
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+        self.assertContains(response, 'This email has already been confirmed.')
+
+        response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
+        self.assertContains(response, 'Your email could not be confirmed')
+
     @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
-    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
+    @override_settings(FEATURES={**FEATURES_WITH_AUTHN_MFE_ENABLED, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     def test_authenticated_account_activation_with_valid_next_url(self):
         """
         Verify that an activation link with a valid next URL will redirect
@@ -197,8 +210,6 @@ class TestActivateAccount(TestCase):
         self._assert_user_active_state(expected_active_state=True)
 
     @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:9876'])
-    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=False)
     def test_account_activation_invalid_next_url_redirects_dashboard(self):
         """
         Verify that an activation link with an invalid next URL (i.e. it's for a domain
@@ -225,7 +236,6 @@ class TestActivateAccount(TestCase):
         self._assert_user_active_state(expected_active_state=True)
 
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     def test_unauthenticated_user_redirects_to_mfe(self):
         """
         Verify that if Authn MFE is enabled then authenticated user redirects to
@@ -251,7 +261,6 @@ class TestActivateAccount(TestCase):
 
     @override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     def test_unauthenticated_user_redirects_to_mfe_with_valid_next_url(self):
         """
         Verify that if Authn MFE is enabled then authenticated user redirects to

@@ -91,10 +91,6 @@ class TestVerifyStudentCommand(TestCase):
              ),
             (LOGGER_NAME,
              'ERROR',
-             'Tried to verify email unknown@unknown.com, but user not found'
-             ),
-            (LOGGER_NAME,
-             'ERROR',
              'Completed manual verification. 1 of 4 failed.'
              ),
             (LOGGER_NAME,

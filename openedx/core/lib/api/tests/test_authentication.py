@@ -12,7 +12,6 @@ from datetime import timedelta
 import ddt
 from django.conf import settings
 from django.conf.urls import url
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -24,6 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
 
@@ -68,7 +68,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
         self.username = 'john'
         self.email = 'lennon@thebeatles.com'
         self.password = 'password'
-        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.user = UserFactory.create(username=self.username, email=self.email, password=self.password)
 
         self.dot_oauth2_client = self.dot_adapter.create_public_client(
             name='example',

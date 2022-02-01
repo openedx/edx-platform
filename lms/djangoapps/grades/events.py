@@ -12,6 +12,8 @@ from common.djangoapps.track.event_transaction_utils import (
     set_event_transaction_type
 )
 
+from openedx.features.enterprise_support.context import get_enterprise_event_context
+
 COURSE_GRADE_CALCULATED = 'edx.grades.course.grade_calculated'
 GRADES_OVERRIDE_EVENT_TYPE = 'edx.grades.problem.score_overridden'
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
@@ -19,6 +21,9 @@ PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
 STATE_DELETED_EVENT_TYPE = 'edx.grades.problem.state_deleted'
 SUBSECTION_OVERRIDE_EVENT_TYPE = 'edx.grades.subsection.score_overridden'
 SUBSECTION_GRADE_CALCULATED = 'edx.grades.subsection.grade_calculated'
+COURSE_GRADE_PASSED_FIRST_TIME_EVENT_TYPE = 'edx.course.grade.passed.first_time'
+COURSE_GRADE_NOW_PASSED_EVENT_TYPE = 'edx.course.grade.now_passed'
+COURSE_GRADE_NOW_FAILED_EVENT_TYPE = 'edx.course.grade.now_failed'
 
 
 def grade_updated(**kwargs):
@@ -133,5 +138,65 @@ def course_grade_calculated(course_grade):
                 'event_transaction_id': str(get_event_transaction_id()),
                 'event_transaction_type': str(get_event_transaction_type()),
                 'grading_policy_hash': str(course_grade.grading_policy_hash),
+            }
+        )
+
+
+def course_grade_passed_first_time(user_id, course_id):
+    """
+    Emits an event edx.course.grade.passed.first_time
+    with data from the passed course_grade.
+    """
+    event_name = COURSE_GRADE_PASSED_FIRST_TIME_EVENT_TYPE
+    context = contexts.course_context_from_course_id(course_id)
+    context_enterprise = get_enterprise_event_context(user_id, course_id)
+    context.update(context_enterprise)
+    # TODO (AN-6134): remove this context manager
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(
+            event_name,
+            {
+                'user_id': str(user_id),
+                'course_id': str(course_id),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(get_event_transaction_type())
+            }
+        )
+
+
+def course_grade_now_passed(user, course_id):
+    """
+    Emits an edx.course.grade.now_passed event
+    with data from the course and user passed now .
+    """
+    event_name = COURSE_GRADE_NOW_PASSED_EVENT_TYPE
+    context = contexts.course_context_from_course_id(course_id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(
+            event_name,
+            {
+                'user_id': str(user.id),
+                'course_id': str(course_id),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(get_event_transaction_type())
+            }
+        )
+
+
+def course_grade_now_failed(user, course_id):
+    """
+    Emits an edx.course.grade.now_failed event
+    with data from the course and user failed now .
+    """
+    event_name = COURSE_GRADE_NOW_FAILED_EVENT_TYPE
+    context = contexts.course_context_from_course_id(course_id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(
+            event_name,
+            {
+                'user_id': str(user.id),
+                'course_id': str(course_id),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(get_event_transaction_type())
             }
         )

@@ -28,8 +28,8 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 log = logging.getLogger(__name__)
 
-
-CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
+# providing_args=['user', 'response']
+CREATE_LOGON_COOKIE = Signal()
 
 
 JWT_COOKIE_NAMES = (
@@ -170,6 +170,7 @@ def get_response_with_refreshed_jwt_cookies(request, user):
     response.content = json.dumps(
         {
             'success': True,
+            'user_id': user.id,
             'response_epoch_seconds': current_time,
             'response_http_date': http_date(current_time),
             'expires': expires_date if expires_date else 'not-found',

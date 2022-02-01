@@ -98,7 +98,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         block.xmodule_runtime._services['completion'] = Mock(  # pylint: disable=protected-access
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
-        block.xmodule_runtime._services['user'] = StubUserService()  # pylint: disable=protected-access
+        block.xmodule_runtime._services['user'] = StubUserService(user=Mock())  # pylint: disable=protected-access
         block.parent = parent.location
         return block
 
@@ -109,6 +109,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         module_system = get_test_system()
         module_system.descriptor_runtime = block._runtime  # pylint: disable=protected-access
         block.xmodule_runtime = module_system
+
+        # The render operation will ask modulestore for the current course to get some data. As these tests were
+        # originally not written to be compatible with a real modulestore, we've mocked out the relevant return values.
+        module_system.modulestore = Mock()
+        module_system.modulestore.get_course.return_value = self.course
 
     def _get_rendered_view(self,
                            sequence,
@@ -124,12 +129,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         if extra_context:
             context.update(extra_context)
 
-        # The render operation will ask modulestore for the current course to get some data. As these tests were
-        # originally not written to be compatible with a real modulestore, we've mocked out the relevant return values.
-        with patch.object(SequenceBlock, '_get_course') as mock_course:
-            self.course.self_paced = self_paced
-            mock_course.return_value = self.course
-            return sequence.xmodule_runtime.render(sequence, view, context).content
+        self.course.self_paced = self_paced
+        return sequence.xmodule_runtime.render(sequence, view, context).content
 
     def _assert_view_at_position(self, rendered_html, expected_position):
         """

@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views import View
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
@@ -28,10 +28,10 @@ from openedx.features.content_type_gating.helpers import LIMITED_ACCESS
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -142,7 +142,9 @@ class MasqueradeView(View):
             'user_name': course.user_name or '',
         })
         for partition in partitions:
-            if partition.active:
+            # "random" scheme implies a split_test content group, not a cohort
+            # and masquerading only cares about user cohorts
+            if partition.active and partition.scheme.name != "random":
                 data['available'].extend([
                     {
                         'group_id': group.id,

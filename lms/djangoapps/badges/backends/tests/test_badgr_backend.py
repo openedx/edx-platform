@@ -18,8 +18,8 @@ from lms.djangoapps.badges.backends.badgr import BadgrBackend
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 BADGR_SETTINGS = {
     'BADGR_BASE_URL': 'https://example.com',
@@ -114,7 +114,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         Verify badge spec creation works.
         """
         self.handler._get_access_token = Mock(return_value='12345')
-        self.handler._create_badge(self.badge_class)
+        with self.allow_transaction_exception():
+            self.handler._create_badge(self.badge_class)
         args, kwargs = post.call_args
         assert args[0] == 'https://example.com/v2/issuers/test-issuer/badgeclasses'
         assert kwargs['files']['image'][0] == self.badge_class.image.name

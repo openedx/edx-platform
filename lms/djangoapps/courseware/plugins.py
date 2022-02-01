@@ -1,16 +1,18 @@
 """Course app config for courseware apps."""
-from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from typing import Dict, Optional
 
 from django import urls
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_noop as _
+from django.utils.translation import gettext_noop as _
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.modulestore.django import modulestore
 
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
+from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()
@@ -89,7 +91,7 @@ class TextbooksCourseApp(CourseApp):
         """
         Returns if the textbook app is globally enabled.
         """
-        return TEXTBOOK_ENABLED
+        return len(CourseOverview.get_from_id(course_key).pdf_textbooks) > 0
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
@@ -181,9 +183,9 @@ class ProctoringCourseApp(CourseApp):
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
         """
-        Proctoring is available for all courses.
+        Returns true if the proctoring app is available for all courses.
         """
-        return settings.FEATURES.get("ENABLE_SPECIAL_EXAMS", False)
+        return settings.FEATURES.get('ENABLE_PROCTORED_EXAMS')
 
     @classmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:
@@ -211,4 +213,57 @@ class ProctoringCourseApp(CourseApp):
 
     @staticmethod
     def legacy_link(course_key: CourseKey):
-        return get_proctored_exam_settings_url(course_key)
+        if not proctoring_settings_modal_view_enabled(course_key):
+            return get_proctored_exam_settings_url(course_key)
+
+
+class CustomPagesCourseApp(CourseApp):
+    """
+    Course app config for custom pages app.
+    """
+
+    app_id = "custom_pages"
+    name = _("Custom pages")
+    description = _("Provide additional course content and resources with custom pages")
+    documentation_links = {
+        "learn_more_configuration": settings.CUSTOM_PAGES_HELP_URL,
+    }
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
+        """
+        The custom pages app is available for all courses.
+        """
+        return True
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
+        """
+        Returns if the custom pages app is enabled.
+        For now this feature is disabled without any manual setup
+        """
+        return False
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+        """
+        The custom pages app can be globally enabled/disabled.
+
+        Currently, it isn't possible to enable/disable this app on a per-course basis.
+        """
+        raise ValueError("The custom pages app can not be enabled/disabled for a single course.")
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Returns the allowed operations for the app.
+        """
+        return {
+            # Either the app is available and configurable or not. You cannot disable it from the API yet.
+            "enable": False,
+            "configure": True,
+        }
+
+    @staticmethod
+    def legacy_link(course_key: CourseKey):
+        return urls.reverse('tabs_handler', kwargs={'course_key_string': course_key})

@@ -11,7 +11,7 @@ import pickle
 
 import wrapt
 from django.db.models.signals import post_save, post_delete
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from edx_django_utils.cache import RequestCache, TieredCache
 
@@ -87,7 +87,7 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     the function's name, a stringified list of arguments
     and a stringified list of keyword arguments.
     """
-    arg_map_function = arg_map_function or force_text
+    arg_map_function = arg_map_function or force_str
 
     converted_args = list(map(arg_map_function, args))
     converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))
@@ -223,3 +223,27 @@ def get_cache(name):
     """
     assert name is not None
     return RequestCache(name).data
+
+
+class CacheService:
+    """
+    An XBlock service which provides a cache.
+
+    Args:
+        cache(object): provides get/set functions for retrieving/storing key/value pairs.
+    """
+    def __init__(self, cache, **kwargs):
+        super().__init__(**kwargs)
+        self._cache = cache
+
+    def get(self, key, *args, **kwargs):
+        """
+        Returns the value cached against the given key, or None.
+        """
+        return self._cache.get(key, *args, **kwargs)
+
+    def set(self, key, value, *args, **kwargs):
+        """
+        Caches the value against the given key.
+        """
+        return self._cache.set(key, value, *args, **kwargs)

@@ -10,9 +10,9 @@ help: ## display this help message
 	@grep '^[a-zA-Z]' $(MAKEFILE_LIST) | sort | awk -F ':.*?## ' 'NF==2 {printf "\033[36m  %-25s\033[0m %s\n", $$1, $$2}'
 
 clean: ## archive and delete most git-ignored files
-	# Remove all the git-ignored stuff, but save and restore things marked
-	# by start-noclean/end-noclean. Include Makefile in the tarball so that
-	# there's always at least one file even if there are no private files.
+	@# Remove all the git-ignored stuff, but save and restore things marked
+	@# by start-noclean/end-noclean. Include Makefile in the tarball so that
+	@# there's always at least one file even if there are no private files.
 	sed -n -e '/start-noclean/,/end-noclean/p' < .gitignore > /tmp/private-files
 	-tar cf $(PRIVATE_FILES) Makefile `git ls-files --exclude-from=/tmp/private-files --ignored --others`
 	-git clean -fdX
@@ -45,7 +45,7 @@ extract_translations: ## extract localizable strings from sources
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations: requirements  ## pull translations from Transifex
+pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale
 	i18n_tool transifex pull
 	i18n_tool extract
@@ -67,8 +67,8 @@ pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
 
 requirements: pre-requirements ## install development environment requirements
-	# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
-	# of it if it does not.  Shell wildcarding can't do that with default options.
+	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
+	@# of it if it does not.  Shell wildcarding can't do that with default options.
 	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
@@ -84,15 +84,30 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/doc \
 	requirements/edx/paver \
-	requirements/edx-sandbox/py35 \
 	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
 	scripts/xblock/requirements
 
+define COMMON_CONSTRAINTS_TEMP_COMMENT
+# This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n
+endef
+
+COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
+.PHONY: $(COMMON_CONSTRAINTS_TXT)
+$(COMMON_CONSTRAINTS_TXT):
+	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
+	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
+
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
-compile-requirements: ## Re-compile *.in requirements to *.txt
+compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
+	@# This is a temporary solution to override the real common_constraints.txt
+	@# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
+	@# See BOM-2721 for more details.
+	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
@@ -108,26 +123,33 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
-upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 check-types: ## run static type-checking tests
 	mypy
 
-# These make targets currently only build LMS images.
 docker_build:
-	docker build . -f Dockerfile --target lms -t openedx/edx-platform
-	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:latest-newrelic
+	docker build . -f Dockerfile --target lms     -t openedx/lms
+	docker build . -f Dockerfile --target lms-dev -t openedx/lms-dev
+	docker build . -f Dockerfile --target cms     -t openedx/cms
+	docker build . -f Dockerfile --target cms-dev -t openedx/cms-dev
 
 docker_tag: docker_build
-	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
-	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
+	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
+	docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
+	docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
+	docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_push: docker_tag docker_auth ## push to docker hub
-	docker push 'openedx/edx-platform:latest'
-	docker push "openedx/edx-platform:${GITHUB_SHA}"
-	docker push 'openedx/edx-platform:latest-newrelic'
-	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
+	docker push "openedx/lms:latest"
+	docker push "openedx/lms:${GITHUB_SHA}"
+	docker push "openedx/lms-dev:latest"
+	docker push "openedx/lms-dev:${GITHUB_SHA}"
+	docker push "openedx/cms:latest"
+	docker push "openedx/cms:${GITHUB_SHA}"
+	docker push "openedx/cms-dev:latest"
+	docker push "openedx/cms-dev:${GITHUB_SHA}"

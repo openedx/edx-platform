@@ -225,14 +225,13 @@
                         {
                             email: error.responseJSON.email,
                             platform_name: this.platform_name,
-                            support_url: 'https://support.edx.org/',
                             line_break: HtmlUtils.HTML('<br/>'),
                             strong_start: HtmlUtils.HTML('<strong>'),
                             strong_end: HtmlUtils.HTML('</strong>'),
                             anchorStart: HtmlUtils.HTML(
                                 StringUtils.interpolate(
                                     '<a href="{SupportUrl}">', {
-                                        SupportUrl: 'https://support.edx.org/'
+                                        SupportUrl: this.supportURL,
                                     }
                                 )
                             ),

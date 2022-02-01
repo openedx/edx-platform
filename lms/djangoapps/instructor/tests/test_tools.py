@@ -19,9 +19,9 @@ from pytz import UTC
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_date_signals import handlers
-from xmodule.fields import Date
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..views import tools
 
@@ -252,12 +252,12 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension_invalid_date(self):
         extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=UTC)
-        with pytest.raises(tools.DashboardError):
+        with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
 
     def test_set_due_date_extension_no_date(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
-        with pytest.raises(tools.DashboardError):
+        with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
     def test_reset_due_date_extension(self):

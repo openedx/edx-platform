@@ -19,7 +19,7 @@ import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from six.moves.urllib.parse import urljoin
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -112,6 +112,8 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
                    "&utm_source=opensource-partner"
                    "&utm_content=open-edx-partner-footer-link"
                    "&utm_campaign=open-edx-footer",
+            # Translators: This string is used across Open edX installations
+            # as a callback to edX. Please do not translate `edX.org`
             "text": _("Take free online courses at edX.org"),
         },
     }
@@ -358,6 +360,7 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
 
     if language == settings.LANGUAGE_CODE:
         links.append(('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
+        # Translators: 'Open edX' is a trademark, please keep this untranslated
         links.append(('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
         links.append(('careers', (marketing_link("CAREERS"), _("Careers"))))
         links.append(("news", (marketing_link("NEWS"), _("News"))))
@@ -648,4 +651,6 @@ def get_logo_url_for_email():
     Returns the url for the branded logo image for embedding in email templates.
     """
     default_logo_url = getattr(settings, 'DEFAULT_EMAIL_LOGO_URL', None)
-    return getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url
+    # The LOGO_URL_PNG might be reused in the future for other things, so including an email specific png logo
+    return (getattr(settings, 'LOGO_URL_PNG_FOR_EMAIL', None) or
+            getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url)

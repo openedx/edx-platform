@@ -67,6 +67,10 @@ class TestHelpers(TestCase):
         # Test that the default value is returned if the value for the given key is not found in the configuration
         assert configuration_helpers.get_value('non_existent_name', 'dummy-default-value') == 'dummy-default-value'
 
+        # Test that correct default value is returned
+        assert configuration_helpers.get_value('non_existent_name', '') == ''
+        assert configuration_helpers.get_value('non_existent_name', None) is None
+
     @with_site_configuration(configuration=test_config)
     def test_get_dict(self):
         """

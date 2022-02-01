@@ -40,7 +40,7 @@ class CrossDomainAuthTest(TestCase):
         'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
     })
     @override_settings(
-        CORS_ORIGIN_WHITELIST=["www.edx.org"],
+        CORS_ORIGIN_WHITELIST=["https://www.edx.org"],
         CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
         CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
     )

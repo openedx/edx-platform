@@ -20,8 +20,8 @@ from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from lms.djangoapps.branding.views import index
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -50,6 +50,19 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
             enrollment_start=datetime.datetime.now(UTC) + datetime.timedelta(days=3),
             user_id=self.user.id,
         )
+
+    @staticmethod
+    def get_headers(cache_response):
+        """
+        Django 3.2 has no ._headers
+        See https://docs.djangoproject.com/en/3.2/releases/3.2/#requests-and-responses
+        """
+        if hasattr(cache_response, '_headers'):
+            headers = cache_response._headers.copy()  # pylint: disable=protected-access
+        else:
+            headers = {k.lower(): (k, v) for k, v in cache_response.items()}
+
+        return headers
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_none_user_index_access_with_startdate_fails(self):
@@ -106,7 +119,8 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         # Response should be instance of HttpResponseRedirect.
         assert isinstance(response, HttpResponseRedirect)
         # Location should be "/login".
-        assert response._headers.get('location')[1] == '/login'  # pylint: disable=protected-access
+        headers = self.get_headers(response)
+        assert headers.get('location')[1] == '/login'
 
 
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):

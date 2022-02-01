@@ -18,11 +18,14 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from openedx_events.learning.data import UserData, UserPersonalData
+from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
+from openedx_filters.learning.filters import StudentRegistrationRequested
 from pytz import UTC
 from ratelimit.decorators import ratelimit
 from requests import HTTPError
@@ -37,6 +40,7 @@ from common.djangoapps import third_party_auth
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import (
@@ -52,13 +56,14 @@ from openedx.core.djangoapps.user_api.accounts.api import (
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import (
-    generate_password, generate_username_suggestions, is_registration_api_v1
+    generate_username_suggestions, is_registration_api_v1
 )
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
     RegistrationFormFactory,
     get_registration_extension_form
 )
+from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.student.helpers import (
     AccountValidationError,
@@ -80,6 +85,8 @@ from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 
+from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -94,8 +101,10 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
+MARKETING_EMAILS_OPT_IN = 'marketing_emails_opt_in'
 # used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
+# providing_args=["user", "registration"]
+REGISTER_USER = Signal()
 
 
 # .. toggle_name: registration.enable_failure_logging
@@ -115,7 +124,7 @@ REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
 @transaction.non_atomic_requests
-def create_account_with_params(request, params):
+def create_account_with_params(request, params):  # pylint: disable=too-many-statements
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -162,6 +171,9 @@ def create_account_with_params(request, params):
         if 'confirm_email' in extra_fields:
             del extra_fields['confirm_email']
 
+    if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in params:
+        params['year_of_birth'] = ''
+
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).
     # In this case all related info (required for account linking)
@@ -207,7 +219,7 @@ def create_account_with_params(request, params):
     custom_form = get_registration_extension_form(data=params)
 
     # Perform operations within a transaction that are critical to account creation
-    with outer_atomic(read_committed=True):
+    with outer_atomic():
         # first, create the account
         (user, profile, registration) = do_create_account(form, custom_form)
 
@@ -245,25 +257,43 @@ def create_account_with_params(request, params):
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
-    _track_user_registration(user, profile, params, third_party_provider)
+    _track_user_registration(user, profile, params, third_party_provider, registration)
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
+
+    # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
+    STUDENT_REGISTRATION_COMPLETED.send_event(
+        user=UserData(
+            pii=UserPersonalData(
+                username=user.username,
+                email=user.email,
+                name=user.profile.name,
+            ),
+            id=user.id,
+            is_active=user.is_active,
+        ),
+    )
 
     create_comments_service_user(user)
 
     try:
         _record_registration_attributions(request, new_user)
+        _record_marketing_emails_opt_in_attribute(params.get('marketing_emails_opt_in'), new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
-    if new_user is not None:
-        AUDIT_LOG.info(f"Login success on new account creation - {new_user.username}")
-
+    is_new_user(form.cleaned_data['password'], new_user)
     return new_user
+
+
+def is_new_user(password, user):
+    if user is not None:
+        AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
+        check_pwned_password_and_send_track_event.delay(user.id, password, user.is_staff, True)
 
 
 def _link_user_to_third_party_provider(
@@ -321,28 +351,29 @@ def _link_user_to_third_party_provider(
     return third_party_provider, running_pipeline
 
 
-def _track_user_registration(user, profile, params, third_party_provider):
+def _track_user_registration(user, profile, params, third_party_provider, registration):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        identity_args = [
-            user.id,
-            {
-                'email': user.email,
-                'username': user.username,
-                'name': profile.name,
-                # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
-                'age': profile.age or -1,
-                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
-                'education': profile.level_of_education_display,
-                'address': profile.mailing_address,
-                'gender': profile.gender_display,
-                'country': str(profile.country),
-            }
-        ]
+        traits = {
+            'email': user.email,
+            'username': user.username,
+            'name': profile.name,
+            # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
+            'age': profile.age or -1,
+            'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
+            'education': profile.level_of_education_display,
+            'address': profile.mailing_address,
+            'gender': profile.gender_display,
+            'country': str(profile.country)
+        }
+        if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
+            email_subscribe = 'subscribed' if params.get('marketing_emails_opt_in') == 'true' else 'unsubscribed'
+            traits['email_subscribe'] = email_subscribe
+
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
-        segment.identify(*identity_args)
+        segment.identify(user.id, traits)
         properties = {
             'category': 'conversion',
             # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
@@ -354,7 +385,12 @@ def _track_user_registration(user, profile, params, third_party_provider):
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
+            'activation_key': registration.activation_key if registration else None,
         }
+        # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
+        if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:
+            properties['marketing_emails_opt_in'] = params.get('marketing_emails_opt_in') == 'true'
+
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary
         # fix until we implement this behavior outside of the LMS.
@@ -425,6 +461,14 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
     )
+
+
+def _record_marketing_emails_opt_in_attribute(opt_in, user):
+    """
+    Attribute this user's registration based on form data
+    """
+    if settings.MARKETING_EMAILS_OPT_IN and user and opt_in:
+        UserAttribute.set_user_attribute(user, MARKETING_EMAILS_OPT_IN, opt_in)
 
 
 def _record_registration_attributions(request, user):
@@ -526,6 +570,14 @@ class RegistrationView(APIView):
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
+        try:
+            data = StudentRegistrationRequested.run_filter(form_data=data)
+        except StudentRegistrationRequested.PreventRegistration as exc:
+            errors = {
+                "error_message": [{"user_message": str(exc)}],
+            }
+            return self._create_response(request, errors, status_code=exc.status_code)
+
         response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
@@ -538,7 +590,7 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
-        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA:
+        if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
                 settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
                 True,
@@ -546,6 +598,7 @@ class RegistrationView(APIView):
                 path='/',
                 secure=request.is_secure()
             )  # setting the cookie to show account activation dialogue in platform and learning MFE
+        mark_user_change_as_expected(user.id)
         return response
 
     def _handle_duplicate_email_username(self, request, data):
@@ -742,6 +795,7 @@ class RegistrationValidationView(APIView):
     def name_handler(self, request):
         """ Validates whether fullname is valid """
         name = request.data.get('name')
+        self.username_suggestions = generate_username_suggestions(name)
         return get_name_validation_error(name)
 
     def username_handler(self, request):
@@ -775,7 +829,8 @@ class RegistrationValidationView(APIView):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
-        return get_password_validation_error(password, username, email)
+        reset_password_page = request.data.get('reset_password_page', 'false') == 'true'
+        return get_password_validation_error(password, username, email, reset_password_page)
 
     def country_handler(self, request):
         """ Country validator """

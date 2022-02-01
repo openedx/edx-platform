@@ -14,7 +14,7 @@ from onelogin.saml2.errors import OneLogin_Saml2_Error
 
 from common.djangoapps.third_party_auth import pipeline
 # Define some XML namespaces:
-from common.djangoapps.third_party_auth.tasks import SAML_XML_NS
+from common.djangoapps.third_party_auth.utils import SAML_XML_NS
 
 from .testutil import AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY, SAMLTestCase
 
@@ -164,6 +164,7 @@ class IdPRedirectViewTest(SAMLTestCase):
     """
         Test IdPRedirectView.
     """
+
     def setUp(self):
         super().setUp()
 

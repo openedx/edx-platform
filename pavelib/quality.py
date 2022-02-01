@@ -375,14 +375,14 @@ def run_stylelint(options):
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    violations_limit = int(getattr(options, 'limit', -1))
+    violations_limit = 0
     num_violations = _get_stylelint_violations()
 
     # Record the metric
     _write_metric(num_violations, (Env.METRICS_DIR / "stylelint"))
 
     # Fail if number of violations is greater than the limit
-    if num_violations > violations_limit > -1:
+    if num_violations > violations_limit:
         fail_quality(
             'stylelint',
             "FAILURE: Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
@@ -518,7 +518,7 @@ def run_xsscommitlint():
     _prepare_report_dir(xsscommitlint_report_dir)
 
     sh(
-        "{repo_root}/scripts/{xsscommitlint_script} | tee {xsscommitlint_report}".format(
+        "{repo_root}/scripts/{xsscommitlint_script} -v | tee {xsscommitlint_report}".format(
             repo_root=Env.REPO_ROOT,
             xsscommitlint_script=xsscommitlint_script,
             xsscommitlint_report=xsscommitlint_report,

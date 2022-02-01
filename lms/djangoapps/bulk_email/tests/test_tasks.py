@@ -7,11 +7,13 @@ paths actually work.
 """
 
 
-import json
-from itertools import chain, cycle, repeat
-from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
-from unittest.mock import Mock, patch
-from uuid import uuid4
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+from itertools import chain, cycle, repeat  # lint-amnesty, pylint: disable=wrong-import-order
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
 import pytest
 from boto.exception import AWSConnectionError
 from boto.ses.exceptions import (
@@ -28,6 +30,7 @@ from boto.ses.exceptions import (
 from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
+from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.bulk_email.tasks import _get_course_email_context
@@ -36,7 +39,7 @@ from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtas
 from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 
@@ -472,3 +475,20 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         assert 'account_settings_url' in result
         assert 'email_settings_url' in result
         assert 'platform_name' in result
+
+    @override_settings(BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD=1)
+    def test_ineligible_recipients_filtered_by_last_login(self):
+        """
+        Test that verifies active and enrolled students with last_login dates beyond the set threshold are not sent bulk
+        course emails.
+        """
+        # create students and enrollments for test, then update the last_login dates to fit the scenario under test
+        students = self._create_students(2)
+        students[0].last_login = datetime.now()
+        students[1].last_login = datetime.now() - relativedelta(months=2)
+
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            # we should expect only one email to be sent as the other learner is not eligible to receive the message
+            # based on their last_login date
+            self._test_run_with_task(send_bulk_course_email, 'emailed', 1, 1)

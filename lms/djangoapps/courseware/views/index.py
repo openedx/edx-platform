@@ -16,7 +16,7 @@ from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -47,9 +47,9 @@ from openedx.features.course_experience.url_helpers import make_learning_mfe_cou
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
-from xmodule.modulestore.django import modulestore
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..access import has_access
 from ..access_utils import check_public_access
@@ -66,8 +66,7 @@ from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import (
     courseware_legacy_is_visible,
-    courseware_mfe_is_advertised,
-    is_verified_name_enabled_for_course
+    courseware_mfe_is_advertised
 )
 from .views import CourseTabView
 
@@ -208,7 +207,8 @@ class CoursewareIndex(View):
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
-            unit_key
+            unit_key,
+            params=self.request.GET,
         )
         return url
 
@@ -446,7 +446,7 @@ class CoursewareIndex(View):
             'sequence_title': None,
             'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
-            'is_verified_name_enabled': is_verified_name_enabled_for_course(self.course.id),
+            'render_course_wide_assets': True,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

@@ -22,9 +22,11 @@ from lms.djangoapps.courseware.courses import (
     get_permission_for_course_about
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.learning_sequences.api import get_course_outline
+from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData
 from openedx.core.lib.api.view_utils import LazySequence
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .exceptions import OverEnrollmentLimitException
 from .permissions import can_view_courses_for_username
@@ -106,7 +108,12 @@ def _filter_by_search(course_queryset, search_term):
     )
 
 
-def list_courses(request, username, org=None, filter_=None, search_term=None):
+def list_courses(request,
+                 username,
+                 org=None,
+                 filter_=None,
+                 search_term=None,
+                 permissions=None):
     """
     Yield all available courses.
 
@@ -132,12 +139,15 @@ def list_courses(request, username, org=None, filter_=None, search_term=None):
             by the given key-value pairs.
         search_term (string):
             Search term to filter courses (used by ElasticSearch).
+        permissions (list[str]):
+            If specified, it filters visible `CourseOverview` objects by
+            checking if each permission specified is granted for the username.
 
     Return value:
         Yield `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    course_qs = get_courses(user, org=org, filter_=filter_)
+    course_qs = get_courses(user, org=org, filter_=filter_, permissions=permissions)
     course_qs = _filter_by_search(course_qs, search_term)
     return course_qs
 
@@ -227,9 +237,18 @@ def get_due_dates(request, course_key, user):
                 url: the deep link to the block
                 date: the due date for the block
     """
+    try:
+        outline = get_course_outline(course_key)
+    except (ValueError, CourseOutlineData.DoesNotExist):
+        # Either this course is Old Mongo-backed or doesn't have a generated course outline.
+        course_version = None
+    else:
+        course_version = outline.published_version
+
     dates = get_dates_for_course(
         course_key,
         user,
+        published_version=course_version
     )
 
     store = modulestore()

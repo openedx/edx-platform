@@ -23,7 +23,7 @@ from lms.djangoapps.verify_student.models import (
     VerificationException
 )
 from lms.djangoapps.verify_student.tests import TestVerificationBase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -184,6 +184,20 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         user.profile.name = "Rusty \u01B4"
 
         assert 'Clyde ƴ' == attempt.name
+
+    def test_name_preset(self):
+        """
+        If a name was set when creating the photo verification
+        (from name affirmation / verified name flow) it should not
+        be overwritten by the profile name
+        """
+        user = UserFactory.create()
+        user.profile.name = "Profile"
+
+        preset_attempt = SoftwareSecurePhotoVerification(user=user)
+        preset_attempt.name = "Preset"
+        preset_attempt.mark_ready()
+        assert "Preset" == preset_attempt.name
 
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""

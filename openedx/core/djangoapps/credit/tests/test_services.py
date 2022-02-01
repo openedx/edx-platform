@@ -10,8 +10,8 @@ from openedx.core.djangoapps.credit.api.eligibility import set_credit_requiremen
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.services import CreditService
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -26,7 +26,8 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.service = CreditService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         self.credit_course = CreditCourse.objects.create(course_key=self.course.id, enabled=True)
-        self.profile = UserProfile.objects.create(user_id=self.user.id, name='Foo Bar')
+        self.user.profile.name = 'Foo Bar'
+        self.user.profile.save()
 
     def enroll(self, course_id=None, mode=CourseMode.VERIFIED):
         """

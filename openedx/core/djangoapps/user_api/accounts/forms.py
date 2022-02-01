@@ -6,7 +6,7 @@ Django forms for accounts
 from django import forms
 from django.core.exceptions import ValidationError
 
-from openedx.core.djangoapps.user_authn.utils import generate_password
+from edx_django_utils.user import generate_password
 
 
 class RetirementQueueDeletionForm(forms.Form):

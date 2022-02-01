@@ -5,7 +5,7 @@
 #
 # Translators:
 # Alexandra Messini <alexandra_messini@yahoo.com>, 2015
-# Angelos Chraniotis <chraniotis@gmail.com>, 2016
+# Angelos Chraniotis, 2016
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # EEYEM, 2015
@@ -25,10 +25,11 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Angelos Chraniotis <chraniotis@gmail.com>, 2016
+# Angelos Chraniotis, 2016
 # Bill Y <stsu3lu@gmail.com>, 2015
 # Dimitris Agelakis <minoan07@gmail.com>, 2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
+# Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
 # Elisabeth Georgiado <almanean@yahoo.gr>, 2014
 # Giannoulis Thanasis <thanasis@giannoulis.net>, 2015
 # jimkar02 <jimkar02@gmail.com>, 2015
@@ -82,8 +83,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-08-08 20:44+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)\n"
 "Language: el\n"
@@ -1594,7 +1595,7 @@ msgstr ""
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
-msgstr ""
+msgstr "Τίτλος"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -4626,7 +4627,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4833,7 +4834,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "Δεν μπορέσαμε να δημιουργήσουμε τον λογαριασμό σας"
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
@@ -5413,7 +5414,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr ""
+msgstr "Ρυθμίσεις Λογαριασμού."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""
@@ -5861,7 +5862,7 @@ msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Supported file types: {supportedVideoTypes}"
-msgstr ""
+msgstr "Συμβατοί τύποι αρχείων: {supportedVideoTypes}"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -7024,6 +7025,8 @@ msgstr ""
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
+"Προσθέστε έναν σαφή και περιγραφικό τίτλο για να ενθαρρύνετε τους "
+"συμφοιτητές σας να συμμετάσχουν στην ανάρτησή σας. (Απαιτείται)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Edit your post below."
@@ -7123,7 +7126,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Νέα ανάρτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Visible to"
@@ -7141,7 +7144,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "Ακολουθήστε αυτή την ανάρτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously"
@@ -7166,11 +7169,13 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "ΘΕΜΑ:"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
+"Καταχωρήστε την ανάρτησή σας σε κάποια από τις εβδομάδες, ώστε να βοηθήσετε "
+"τους συμφοιτητές σας να την βρουν. (Απαιτείται)."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Community TA)"
@@ -7199,17 +7204,20 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Post type"
-msgstr ""
+msgstr "ΜΟΡΦΗ:"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
 msgstr ""
+"Επιλέξτε \"Ερώτηση\" αν θέλετε να θέσετε κάποιο θέμα στο οποίο ζητάτε "
+"απάντηση. Επιλέξτε \"Συζήτηση\" για να κοινοποιήσετε κάποιο σχόλιο ή ιδέα "
+"σας που μπορεί να αποτελέσει έναυσμα για συζήτηση. (Απαιτείται)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
+msgstr "Ερώτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
@@ -7274,7 +7282,7 @@ msgstr "ΑΡΧΙΚΗ ΣΕΛΙΔΑ ΤΟΥ ΦΟΡΟΥΜ ΣΥΖΗΤΗΣΕΩΝ"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr ""
+msgstr "Πώς να χρησιμοποιείτε το φόρουμ συζητήσεων του%(platform_name)s"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Find discussions"
@@ -8271,59 +8279,73 @@ msgid "View Program Record"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Credit Opportunities"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Learn More"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 msgid "Additional Professional Opportunities"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "${listPrice}"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid " ${price} {currency} )"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "REMAINING COURSES"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COMPLETED COURSES"
 msgstr "ΜΑΘΗΜΑΤΑ ΠΟΥ ΕΧΟΥΝ ΟΛΟΚΛΗΡΩΘΕΙ"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "As you complete courses, you will see them listed here."
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
@@ -8505,6 +8527,8 @@ msgid ""
 "Please enter your log-in or recovery email address below and we will send "
 "you an email with instructions."
 msgstr ""
+"Παρακαλούμε, εισάγετε το email σας και θα σας αποστείλουμε οδηγίες για τη "
+"δημιουργία νέου κωδικού."
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Recover my password"
@@ -8839,7 +8863,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Activate Your Account"
-msgstr ""
+msgstr "Ενεργοποιήστε τον Λογαριασμό σας"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -10502,7 +10526,8 @@ msgstr ""
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore

@@ -26,7 +26,7 @@ from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.unit_block import UnitBlock
+from xmodule.unit_block import UnitBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ContentLibraryContentTestMixin:
@@ -191,7 +191,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
     if the library allows direct learning.
     """
 
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):

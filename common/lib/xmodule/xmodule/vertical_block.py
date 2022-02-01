@@ -11,28 +11,55 @@ from functools import reduce
 import pytz
 from lxml import etree
 from web_fragments.fragment import Fragment
-
-from xmodule.util.misc import is_xblock_an_assignment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xblock.fields import Boolean, Scope
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.misc import is_xblock_an_assignment
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
 
 log = logging.getLogger(__name__)
 
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 CLASS_PRIORITY = ['video', 'problem']
 
 
-@XBlock.needs('user', 'bookmarks')
+class VerticalFields:
+    """
+    A mixin to introduce fields in the Vertical Block.
+    """
+
+    discussion_enabled = Boolean(
+        display_name=_("Enable in-context discussions for the Unit"),
+        help=_(
+            "Add discussion for the Unit."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+
+@XBlock.needs('user', 'bookmarks', 'mako')
 @XBlock.wants('completion')
 @XBlock.wants('call_to_action')
-class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
+class VerticalBlock(
+    SequenceFields,
+    VerticalFields,
+    XModuleFields,
+    StudioEditableBlock,
+    XmlParserMixin,
+    MakoTemplateBlockBase,
+    XBlock
+):
     """
     Layout XBlock for rendering subblocks vertically.
     """
@@ -124,7 +151,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                     child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
-        fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', fragment_context))
 
         add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')

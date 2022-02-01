@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+import warnings
 from collections import namedtuple
 from functools import partial
 
@@ -33,13 +34,22 @@ from xblock.fields import (
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
 
-from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
+from openedx.core.djangolib.markup import HTML
+
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_REQUEST_COUNTRY_CODE,
+    ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ROLE,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -1732,7 +1742,225 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                     setattr(xblock, field.name, field_value)
 
 
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
+class ModuleSystemShim:
+    """
+    This shim provides the properties formerly available from ModuleSystem which are now being provided by services.
+
+    This shim will be removed, so all properties raise a deprecation warning.
+    """
+
+    @property
+    def anonymous_student_id(self):
+        """
+        Returns the anonymous user ID for the current user and course.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.anonymous_student_id is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        return None
+
+    @property
+    def seed(self):
+        """
+        Returns the numeric current user id, for use as a random seed.
+        Returns 0 if there is no current user.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.seed is deprecated. Please use the user service `user_id` instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.user_id or 0
+
+    @property
+    def user_id(self):
+        """
+        Returns the current user id, or None if there is no current user.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_id is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+        return None
+
+    @property
+    def user_is_staff(self):
+        """
+        Returns whether the current user has staff access to the course.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_staff is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        return None
+
+    @property
+    def user_location(self):
+        """
+        Returns the "country code" associated with the current user's request IP address.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_location is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_current_user().opt_attrs.get(ATTR_KEY_REQUEST_COUNTRY_CODE)
+        return None
+
+    @property
+    def get_real_user(self):
+        """
+        Returns a function that takes `anonymous_student_id` and returns the Django User object
+        associated with `anonymous_student_id`.
+
+        If no `anonymous_student_id` is provided as an argument to this function, then the user service's anonymous user
+        ID is used instead.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.get_real_user is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return self._services['user'].get_user_by_anonymous_id
+        return None
+
+    @property
+    def get_user_role(self):
+        """
+        Returns a function that returns the user's role in the course.
+
+        Implementation is different for LMS and Studio.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.get_user_role is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        user_service = self._services.get('user')
+        if user_service:
+            return partial(self._services['user'].get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
+
+    @property
+    def render_template(self):
+        """
+        Returns a function that takes (template_file, context), and returns rendered html.
+
+        Deprecated in favor of the mako service.
+        """
+        warnings.warn(
+            'Use of runtime.render_template is deprecated. '
+            'Use MakoService.render_template or a JavaScript-based template instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        render_service = self._services.get('mako')
+        if render_service:
+            return render_service.render_template
+        return None
+
+    @property
+    def xqueue(self):
+        """
+        Returns a dict containing the XQueueInterface object, as well as parameters for the specific StudentModule:
+        * interface: XQueueInterface object
+        * construct_callback: function to construct the fully-qualified LMS callback URL.
+        * default_queuename: default queue name for the course in XQueue
+        * waittime: number of seconds to wait in between calls to XQueue
+
+        Deprecated in favor of the xqueue service.
+        """
+        warnings.warn(
+            'runtime.xqueue is deprecated. Please use the xqueue service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        xqueue_service = self._services.get('xqueue')
+        if xqueue_service:
+            return {
+                'interface': xqueue_service.interface,
+                'construct_callback': xqueue_service.construct_callback,
+                'default_queuename': xqueue_service.default_queuename,
+                'waittime': xqueue_service.waittime,
+            }
+        return None
+
+    @property
+    def can_execute_unsafe_code(self):
+        """
+        Returns a function which returns a boolean, indicating whether or not to allow the execution of unsafe,
+        unsandboxed code.
+
+        Deprecated in favor of the sandbox service.
+        """
+        warnings.warn(
+            'runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        sandbox_service = self._services.get('sandbox')
+        if sandbox_service:
+            return sandbox_service.can_execute_unsafe_code
+        # Default to saying "no unsafe code".
+        return lambda: False
+
+    @property
+    def get_python_lib_zip(self):
+        """
+        Returns a function returning a bytestring or None.
+
+        The bytestring is the contents of a zip file that should be importable by other Python code running in the
+        module.
+
+        Deprecated in favor of the sandbox service.
+        """
+        warnings.warn(
+            'runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        sandbox_service = self._services.get('sandbox')
+        if sandbox_service:
+            return sandbox_service.get_python_lib_zip
+        # Default to saying "no lib data"
+        return lambda: None
+
+    @property
+    def cache(self):
+        """
+        Returns a cache object with two methods:
+        * .get(key) returns an object from the cache or None.
+        * .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
+
+        Deprecated in favor of the cache service.
+        """
+        warnings.warn(
+            'runtime.cache is deprecated. Please use the cache service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self._services.get('cache') or DoNothingCache()
+
+
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -1746,14 +1974,14 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
 
     def __init__(
-            self, static_url, track_function, get_module, render_template,
-            replace_urls, descriptor_runtime, user=None, filestore=None,
-            debug=False, hostname="", xqueue=None, publish=None, node_path="",
-            anonymous_student_id='', course_id=None,
-            cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
-            field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            user_location=None, get_python_lib_zip=None, **kwargs):
+            self, static_url, track_function, get_module,
+            replace_urls, descriptor_runtime, filestore=None,
+            debug=False, hostname="", publish=None, node_path="",
+            course_id=None,
+            replace_course_urls=None,
+            replace_jump_to_id_urls=None, error_descriptor_class=None,
+            field_data=None, rebind_noauth_module_to_user=None,
+            **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1768,20 +1996,8 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 
-        render_template - a function that takes (template_file, context), and
-                         returns rendered html.
-
-        user - The user to base the random number generator seed off of for this
-                         request
-
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
-
-        xqueue - Dict containing XqueueInterface object, as well as parameters
-                    for the specific StudentModule:
-                    xqueue = {'interface': XQueueInterface object,
-                              'callback_url': Callback into the LMS,
-                              'queue_name': Target queuename in Xqueue}
 
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
@@ -1789,30 +2005,11 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
-        anonymous_student_id - Used for tracking modules with student id
-
         course_id - the course_id containing this module
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        cache - A cache object with two methods:
-            .get(key) returns an object from the cache or None.
-            .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
-
-        can_execute_unsafe_code - A function returning a boolean, whether or
-            not to allow the execution of unsafe, unsandboxed code.
-
-        get_python_lib_zip - A function returning a bytestring or None.  The
-            bytestring is the contents of a zip file that should be importable
-            by other Python code running in the module.
-
         error_descriptor_class - The class to use to render XModules with errors
-
-        get_real_user - function that takes `anonymous_student_id` and returns real user_id,
-        associated with `anonymous_student_id`.
-
-        get_user_role - A function that returns user role. Implementation is different
-            for LMS and Studio.
 
         field_data - the `FieldData` to use for backing XBlock storage.
 
@@ -1827,40 +2024,24 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         super().__init__(field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
-        self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
-        self.render_template = render_template
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
-        self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
-        self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
-        self.user_is_staff = user is not None and user.is_staff
 
         if publish:
             self.publish = publish
-
-        self.cache = cache or DoNothingCache()
-        self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
-        self.get_python_lib_zip = get_python_lib_zip or (lambda: None)
         self.replace_course_urls = replace_course_urls
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
-        self.get_real_user = get_real_user
-        self.user_location = user_location
-
-        self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
-
-        if user:
-            self.user_id = user.id
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""

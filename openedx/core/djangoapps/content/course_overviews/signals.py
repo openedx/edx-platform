@@ -9,15 +9,16 @@ from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .models import CourseOverview
 
 LOG = logging.getLogger(__name__)
 
-
-COURSE_START_DATE_CHANGED = Signal(providing_args=["updated_course_overview", "previous_start_date"])
-COURSE_PACING_CHANGED = Signal(providing_args=["updated_course_overview", "previous_self_paced"])
+# providing_args=["updated_course_overview", "previous_start_date"]
+COURSE_START_DATE_CHANGED = Signal()
+# providing_args=["updated_course_overview", "previous_self_paced"]
+COURSE_PACING_CHANGED = Signal()
 
 
 @receiver(SignalHandler.course_published)

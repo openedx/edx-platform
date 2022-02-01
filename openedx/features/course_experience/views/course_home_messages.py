@@ -4,13 +4,14 @@ View logic for handling course messages.
 
 
 from datetime import datetime
+from urllib.parse import quote_plus
 
 from babel.dates import format_date, format_timedelta
+from django.conf import settings
 from django.contrib import auth
 from django.template.loader import render_to_string
-from django.utils.http import urlquote_plus
 from django.utils.translation import get_language, to_locale
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from web_fragments.fragment import Fragment
@@ -26,11 +27,12 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from lms.djangoapps.courseware.access_utils import check_public_access
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -122,11 +124,11 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             Text(sign_in_or_register_text).format(
                 sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                     sign_in_label=_('Sign in'),
-                    current_url=urlquote_plus(request.path),
+                    current_url=quote_plus(request.path),
                 ),
                 register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                     register_label=_('register'),
-                    current_url=urlquote_plus(request.path),
+                    current_url=quote_plus(request.path),
                 )
             ),
             title=Text(_('You must be enrolled in the course to see course content.'))
@@ -142,11 +144,13 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             # if a course is a Master's only course, we will not offer user ability to self-enroll
             CourseHomeMessages.register_info_message(
                 request,
-                Text(_('You must be enrolled in the course to see course content. '
-                       'Please contact your degree administrator or edX Support if you have questions.')),
+                Text(_(
+                    'You must be enrolled in the course to see course content. '
+                    'Please contact your degree administrator or {platform_name} Support if you have questions.'
+                )).format(platform_name=settings.PLATFORM_NAME),
                 title=title
             )
-        elif not course.invitation_only:
+        elif not course_is_invitation_only(course):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(

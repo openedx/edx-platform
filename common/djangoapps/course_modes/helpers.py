@@ -2,13 +2,16 @@
 
 
 import logging
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
 
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from slumber.exceptions import SlumberBaseException
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED  # lint-amnesty, pylint: disable=line-too-long
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
@@ -39,16 +42,16 @@ def enrollment_mode_display(mode, verification_status, course_id):
     display_mode = _enrollment_mode_display(mode, verification_status, course_id)
 
     if display_mode == DISPLAY_VERIFIED:
-        if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
-            enrollment_title = _("Your verification is pending")
-            enrollment_value = _("Verified: Pending Verification")
-            show_image = True
-            image_alt = _("ID verification pending")
-        elif verification_status == VERIFY_STATUS_APPROVED:
+        if is_integrity_signature_enabled(course_id) or verification_status == VERIFY_STATUS_APPROVED:
             enrollment_title = _("You're enrolled as a verified student")
             enrollment_value = _("Verified")
             show_image = True
             image_alt = _("ID Verified Ribbon/Badge")
+        elif verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+            enrollment_title = _("Your verification is pending")
+            enrollment_value = _("Verified: Pending Verification")
+            show_image = True
+            image_alt = _("ID verification pending")
     elif display_mode == DISPLAY_HONOR:
         enrollment_title = _("You're enrolled as an honor code student")
         enrollment_value = _("Honor Code")
@@ -61,7 +64,7 @@ def enrollment_mode_display(mode, verification_status, course_id):
         'enrollment_value': str(enrollment_value),
         'show_image': show_image,
         'image_alt': str(image_alt),
-        'display_mode': _enrollment_mode_display(mode, verification_status, course_id)
+        'display_mode': display_mode
     }
 
 
@@ -77,7 +80,10 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
     course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
 
     if enrollment_mode == CourseMode.VERIFIED:
-        if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+        if (
+            is_integrity_signature_enabled(course_id)
+            or verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]
+        ):
             display_mode = DISPLAY_VERIFIED
         elif DISPLAY_HONOR in course_mode_slugs:
             display_mode = DISPLAY_HONOR
@@ -123,3 +129,53 @@ def get_course_final_price(user, sku, course_price):
         result = int(result)
 
     return result
+
+
+def get_verified_track_links(language):
+    """
+    Format the URL's for Value Prop's Track Selection verified option, for the specified language.
+
+    Arguments:
+        language (str): The language from the user's account settings.
+
+    Returns: dict
+        Dictionary with URL's with verified certificate informational links.
+        If not edx.org, returns a dictionary with default URL's.
+    """
+    support_root_url = settings.SUPPORT_SITE_LINK
+    marketing_root_url = settings.MKTG_URLS.get('ROOT')
+
+    enabled_languages = {
+        'en': 'hc/en-us',
+        'es-419': 'hc/es-419',
+    }
+
+    # Add edX specific links only to edx.org
+    if marketing_root_url and 'edx.org' in marketing_root_url:
+        track_verified_url = urljoin(marketing_root_url, 'verified-certificate')
+        if support_root_url and 'support.edx.org' in support_root_url:
+            support_article_params = '/articles/360013426573-'
+            # Must specify the language in the URL since
+            # support links do not auto detect the language settings
+            language_specific_params = {
+                'en': 'What-are-the-differences-between-audit-free-and-verified-paid-courses-',
+                'es-419': ('-Cu%C3%A1les-son-las-diferencias'
+                           '-entre-los-cursos-de-auditor%C3%ADa-gratuitos-y-verificados-pagos-')
+            }
+            if language in ('es-419', 'es'):
+                full_params = enabled_languages['es-419'] + support_article_params + language_specific_params['es-419']
+            else:
+                full_params = enabled_languages['en'] + support_article_params + language_specific_params['en']
+            track_comparison_url = urljoin(
+                support_root_url,
+                full_params
+            )
+            return {
+                'verified_certificate': track_verified_url,
+                'learn_more': track_comparison_url,
+            }
+    # Default URL's are used if not edx.org
+    return {
+        'verified_certificate': marketing_root_url,
+        'learn_more': support_root_url,
+    }

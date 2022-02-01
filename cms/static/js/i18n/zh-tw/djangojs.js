@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)",
     "%(errorCount)s error found in form.": [
       "\u5728\u8868\u55ae\u4e2d\u767c\u73fe%(errorCount)s\u7684\u932f\u8aa4\u3002"
@@ -164,7 +165,6 @@
     "Could not retrieve upload url.": "\u7121\u6cd5\u627e\u5230\u4e0a\u50b3\u7db2\u5740",
     "Could not submit order": "\u7121\u6cd5\u63d0\u4ea4\u8a02\u55ae",
     "Could not submit photos": "\u7121\u6cd5\u63d0\u4ea4\u5716\u7247",
-    "Couldn't Save This Assignment": "\u4e0d\u80fd\u5132\u5b58\u9019\u4f5c\u696d",
     "Country": "\u570b\u5bb6",
     "Country of residence": "\u5c45\u4f4f\u570b\u5bb6",
     "Course Credit Requirements": "\u8ab2\u7a0b\u5b78\u5206\u8981\u6c42",
@@ -440,7 +440,6 @@
     "Photos don't meet the requirements?": "\u7167\u7247\u4e0d\u7b26\u5408\u8981\u6c42\uff1f",
     "Placeholder": "Placeolder",
     "Please address the errors on this page first, and then save your progress.": "\u8acb\u5148\u8aaa\u660e\u672c\u9801\u9762\u51fa\u73fe\u7684\u932f\u8aa4\uff0c\u7136\u5f8c\u5132\u5b58\u60a8\u7684\u9032\u5ea6\u3002",
-    "Please correct the outlined fields.": "\u8acb\u66f4\u6b63\u7cfb\u7d71\u986f\u793a\u7684\u6b04\u4f4d\u3002",
     "Please describe this image or agree that it has no contextual value by checking the checkbox.": "\u8acb\u63cf\u8ff0\u672c\u5716\u7247\u6216\u85c9\u7531\u52fe\u9078\u8907\u9078\u6846\u4ee5\u540c\u610f\u662f\u5426\u8207\u5167\u5bb9\u76f8\u95dc\u3002",
     "Please do not use any spaces in this field.": "\u6b64\u6b04\u4f4d\u7684\u5167\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c",
     "Please do not use any spaces or special characters in this field.": "\u6b64\u6b04\u4f4d\u7684\u5167\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c\u6216\u7279\u6b8a\u5b57\u5143\u3002",
@@ -879,24 +878,24 @@
     ],
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -906,16 +905,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -938,15 +937,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "N j, Y",
     "DATE_INPUT_FORMATS": [
@@ -979,8 +975,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -999,6 +995,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

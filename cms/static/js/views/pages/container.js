@@ -186,6 +186,19 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     modal = new EditXBlockModal(options);
                 event.preventDefault();
 
+                  // check if we want to launch with the new editors (behind waffle flag)
+                var useNewTextEditor = this.$('.edit-button').attr("use-new-editor-text"),
+                    useNewVideoEditor = this.$('.edit-button').attr("use-new-editor-video"),
+                    useNewProblemEditor = this.$('.edit-button').attr("use-new-editor-problem"),
+                    blockType = xblockElement.find('.xblock').attr("data-block-type");
+                if( (useNewTextEditor === "True" && blockType === "html") ||
+                    (useNewVideoEditor === "True" && blockType === "video") ||
+                    (useNewProblemEditor === "True" && blockType === "problem")
+                ) {
+                    var destinationUrl = this.$('.edit-button').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(xblockElement.find('.xblock').attr("data-usage-id"));
+                    window.location.href = destinationUrl;
+                    return;
+                }
                 modal.edit(xblockElement, this.model, {
                     readOnlyView: !this.options.canEdit,
                     refresh: function() {

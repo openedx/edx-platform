@@ -3,16 +3,13 @@
 
 from collections import namedtuple
 from urllib.parse import urlencode  # pylint: disable=import-error
-import pytest
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
-from openedx.core.djangoapps.user_authn.utils import (
-    generate_password, is_safe_login_or_logout_redirect
-)
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
 
 @ddt.ddt
@@ -71,29 +68,3 @@ class TestRedirectUtils(TestCase):
         req = self.request.get(f'/logout?{urlencode(params)}', HTTP_HOST=host)
         actual_is_safe = self._is_safe_redirect(req, redirect_url)
         assert actual_is_safe == expected_is_safe
-
-
-class GeneratePasswordTest(TestCase):
-    """Tests formation of randomly generated passwords."""
-
-    def test_default_args(self):
-        password = generate_password()
-        assert 12 == len(password)
-        assert any(c.isdigit for c in password)
-        assert any(c.isalpha for c in password)
-
-    def test_length(self):
-        length = 25
-        assert length == len(generate_password(length=length))
-
-    def test_chars(self):
-        char = '!'
-        password = generate_password(length=12, chars=(char,))
-
-        assert any(c.isdigit for c in password)
-        assert any(c.isalpha for c in password)
-        assert (char * 10) == password[2:]
-
-    def test_min_length(self):
-        with pytest.raises(ValueError):
-            generate_password(length=7)

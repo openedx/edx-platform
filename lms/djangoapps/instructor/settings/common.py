@@ -1,7 +1,7 @@
 """Common environment variables unique to the instructor plugin."""
 
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 def plugin_settings(settings):
@@ -70,6 +70,18 @@ def plugin_settings(settings):
         # .. toggle_creation_date: 2014-10-21
         # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5670
         'ALLOW_AUTOMATED_SIGNUPS': False,
+
+        # .. toggle_name: FEATURES['ENABLE_AUTOMATED_SIGNUPS_EXTRA_FIELDS']
+        # .. toggle_implementation: DjangoSetting
+        # .. toggle_default: False
+        # .. toggle_description: When True, the CSV file that contains a list of
+        #   new accounts to create and register for a course in the membership
+        #   tab of the instructor dashboard will accept the cohort name to
+        #   assign the new user and the enrollment course mode.
+        # .. toggle_use_cases: open_edx
+        # .. toggle_creation_date: 2021-10-26
+        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21260
+        'ENABLE_AUTOMATED_SIGNUPS_EXTRA_FIELDS': False,
 
         # .. toggle_name: FEATURES['CERTIFICATES_INSTRUCTOR_GENERATION']  # lint-amnesty, pylint: disable=annotation-missing-token
         # .. toggle_implementation: DjangoSetting

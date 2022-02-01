@@ -13,7 +13,7 @@ from functools import wraps
 from django import forms
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 LOGGER = logging.getLogger(__name__)
@@ -135,7 +135,7 @@ class FormDescription:
 
     def add_field(
             self, name, label="", field_type="text", default="",
-            placeholder="", instructions="", required=True, restrictions=None,
+            placeholder="", instructions="", exposed=None, required=True, restrictions=None,
             options=None, include_default_option=False, error_messages=None,
             supplementalLink="", supplementalText=""
     ):
@@ -158,6 +158,9 @@ class FormDescription:
 
             instructions (unicode): Short instructions for using the field
                 (e.g. "This is the email address you used when you registered.")
+
+            exposed (boolean): Whether the field is shown if not required.
+                If the field is not set, the field will be visible if it's required.
 
             required (boolean): Whether the field is required or optional.
 
@@ -195,6 +198,9 @@ class FormDescription:
             )
             raise InvalidFieldError(msg)
 
+        if exposed is None:
+            exposed = required
+
         field_dict = {
             "name": name,
             "label": label,
@@ -202,6 +208,7 @@ class FormDescription:
             "defaultValue": default,
             "placeholder": placeholder,
             "instructions": instructions,
+            "exposed": exposed,
             "required": required,
             "restrictions": {},
             "errorMessages": {},
@@ -268,6 +275,7 @@ class FormDescription:
                     "label": "Cheese or Wine?",
                     "defaultValue": "cheese",
                     "type": "select",
+                    "exposed": True,
                     "required": True,
                     "placeholder": "",
                     "instructions": "",
@@ -283,6 +291,7 @@ class FormDescription:
                     "label": "comments",
                     "defaultValue": "",
                     "type": "text",
+                    "exposed": False,
                     "required": False,
                     "placeholder": "Any comments?",
                     "instructions": "Please enter additional comments here."
@@ -348,7 +357,7 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
         Forces evaluation of ugettext_lazy promises.
         """
         if isinstance(obj, Promise):
-            return force_text(obj)
+            return force_str(obj)
         super().default(obj)
 
 

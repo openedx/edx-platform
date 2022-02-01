@@ -6,7 +6,7 @@ import logging
 from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from eventtracking import tracker
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -20,6 +20,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.api import course_detail
+from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -97,7 +98,7 @@ def reset_course_deadlines(request):
         if course_home_legacy_is_active(course_key):
             body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[str(course_key)]))
         else:
-            body_link = get_learning_mfe_home_url(course_key=str(course_key), view_name='dates')
+            body_link = get_learning_mfe_home_url(course_key=str(course_key), url_fragment='dates')
 
         return Response({
             'body': format_html('<a href="{}">{}</a>', body_link, _('View all dates')),
@@ -151,6 +152,11 @@ class CourseDeadlinesMobileView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
         # Although this course data is not used this method will return 404 if course does not exist
         get_course_with_access(request.user, 'load', course_key)
+
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(
+            request.user, course_key, request=request, only_if_mobile_app=True
+        )
 
         serializer = self.get_serializer({})
         return Response(serializer.data)

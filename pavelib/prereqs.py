@@ -23,8 +23,11 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
 # prerequisites are installed for builds on circleci.com
-if 'TOXENV' in os.environ:
+toxenv = os.environ.get('TOXENV')
+if toxenv and toxenv != 'quality-django32':
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
+elif toxenv and toxenv == 'quality-django32':
+    PYTHON_REQ_FILES = ['requirements/edx/testing.txt', 'requirements/edx/django32.txt']
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
@@ -168,7 +171,11 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    sh(f"{pip_cmd} -r {req_file}")
+
+    if Env.PIP_SRC_DIR:
+        sh(f"{pip_cmd} -r {req_file} --src {Env.PIP_SRC_DIR}")
+    else:
+        sh(f"{pip_cmd} -r {req_file}")
 
 
 @task
@@ -304,7 +311,10 @@ def install_python_prereqs():
     files_to_fingerprint.append(sysconfig.get_python_lib())
 
     # In a virtualenv, "-e installs" get put in a src directory.
-    src_dir = os.path.join(sys.prefix, "src")
+    if Env.PIP_SRC_DIR:
+        src_dir = Env.PIP_SRC_DIR
+    else:
+        src_dir = os.path.join(sys.prefix, "src")
     if os.path.isdir(src_dir):
         files_to_fingerprint.append(src_dir)
 

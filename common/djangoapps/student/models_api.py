@@ -1,7 +1,10 @@
 """
 Provides Python APIs exposed from Student models.
 """
+import datetime
 import logging
+
+from pytz import UTC
 
 from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
 from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
@@ -16,6 +19,7 @@ from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
+from common.djangoapps.student.models import PendingNameChange as _PendingNameChange
 from common.djangoapps.student.models import UserProfile as _UserProfile
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
@@ -103,3 +107,61 @@ def get_course_access_role(user, org, course_id, role):
                       })
         return None
     return course_access_role
+
+
+def get_pending_name_change(user):
+    """
+    Return a string representing the user's pending name change, or None if it does not exist.
+    """
+    try:
+        pending_name_change = _PendingNameChange.objects.get(user=user)
+        return pending_name_change.new_name
+    except _PendingNameChange.DoesNotExist:
+        return None
+
+
+def do_name_change_request(user, new_name, rationale):
+    """
+    Create a name change request. This either updates the user's current PendingNameChange, or creates
+    a new one if it doesn't exist. Returns the PendingNameChange object and a boolean describing whether
+    or not a new one was created.
+    """
+    user_profile = _UserProfile.objects.get(user=user)
+    if user_profile.name == new_name:
+        log_msg = (
+            'user_id={user_id} requested a name change, but the requested name is the same as'
+            'their current profile name. Not taking any action.'.format(user_id=user.id)
+        )
+        log.warning(log_msg)
+        return None, False
+
+    pending_name_change, created = _PendingNameChange.objects.update_or_create(
+        user=user,
+        defaults={
+            'new_name': new_name,
+            'rationale': rationale
+        }
+    )
+
+    return pending_name_change, created
+
+
+def confirm_name_change(user, pending_name_change):
+    """
+    Confirm a pending name change. This updates the user's profile name and deletes the
+    PendingNameChange object.
+    """
+    user_profile = _UserProfile.objects.get(user=user)
+
+    # Store old name in profile metadata
+    meta = user_profile.get_meta()
+    if 'old_names' not in meta:
+        meta['old_names'] = []
+    meta['old_names'].append(
+        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(UTC).isoformat()]
+    )
+    user_profile.set_meta(meta)
+
+    user_profile.name = pending_name_change.new_name
+    user_profile.save()
+    pending_name_change.delete()

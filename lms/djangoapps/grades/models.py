@@ -8,7 +8,6 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
-
 import json
 import logging
 from base64 import b64encode
@@ -28,6 +27,7 @@ from simple_history.models import HistoricalRecords
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from lms.djangoapps.grades import events  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.cache_utils import get_cache
+from lms.djangoapps.grades.signals.signals import COURSE_GRADE_PASSED_FIRST_TIME
 
 log = logging.getLogger(__name__)
 
@@ -645,6 +645,11 @@ class PersistentCourseGrade(TimeStampedModel):
             defaults=kwargs
         )
         if passed and not grade.passed_timestamp:
+            COURSE_GRADE_PASSED_FIRST_TIME.send(
+                sender=None,
+                course_id=course_id,
+                user_id=user_id
+            )
             grade.passed_timestamp = now()
             grade.save()
 

@@ -3,13 +3,12 @@ Tests access.py
 """
 
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from common.djangoapps.student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 from ..access import get_user_role
 
@@ -23,8 +22,16 @@ class RolesTest(TestCase):
         super().setUp()
 
         self.global_admin = AdminFactory()
-        self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')
-        self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
+        self.instructor = UserFactory.create(
+            username='testinstructor',
+            email='testinstructor+courses@edx.org',
+            password='foo',
+        )
+        self.staff = UserFactory.create(
+            username='teststaff',
+            email='teststaff+courses@edx.org',
+            password='foo',
+        )
         self.course_key = CourseLocator('mitX', '101', 'test')
 
     def test_get_user_role_instructor(self):

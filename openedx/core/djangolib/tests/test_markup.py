@@ -7,8 +7,8 @@ import unittest
 
 import ddt
 from bs4 import BeautifulSoup
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from mako.template import Template
 
 from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
@@ -66,7 +66,7 @@ class FormatHtmlTest(unittest.TestCase):
 
     def test_ungettext(self):
         for i in [1, 2]:
-            out = Text(ungettext("1 & {}", "2 & {}", i)).format(HTML("<>"))
+            out = Text(ngettext("1 & {}", "2 & {}", i)).format(HTML("<>"))
             assert out == f'{i} &amp; <>'
 
     def test_strip_all_tags_but_br_filter(self):

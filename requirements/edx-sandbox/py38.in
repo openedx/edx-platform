@@ -6,12 +6,15 @@ lxml                                # XML parser
 matplotlib                          # 2D plotting library
 networkx                            # Utilities for creating, manipulating, and studying network graphs
 nltk                                # Natural language processing; used by the chem package
-numpy                               # Numeric array processing utilities; used by scipy
 openedx-calc
 pyparsing                           # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy                               # Math, science, and engineering library
 sympy                               # Symbolic math library
+
+# numpy>=1.17.0 caused failures in importing numpy in code-jail environment.
+# The issue will be investigated and fixed in https://openedx.atlassian.net/browse/BOM-2841.
+numpy>=1.16.0,<1.17.0
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version

@@ -21,6 +21,7 @@ SITE_NAME = 'localhost:8001'
 HTTPS = 'off'
 
 CMS_BASE = 'localhost:18010'
+SESSION_COOKIE_NAME = 'studio_sessionid'
 
 ################################ LOGGERS ######################################
 
@@ -47,8 +48,6 @@ LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
-FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 ########################### PIPELINE #################################
 
@@ -163,6 +162,9 @@ LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
 ################### FRONTEND APPLICATION COURSE AUTHORING ###################
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
+################### FRONTEND APPLICATION DISCUSSIONS ###################
+DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.
@@ -253,3 +255,12 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+################ Using LMS SSO for login to Studio ################
+SOCIAL_AUTH_EDX_OAUTH2_KEY = 'studio-sso-key'
+SOCIAL_AUTH_EDX_OAUTH2_SECRET = 'studio-sso-secret'  # in stage, prod would be high-entropy secret
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = 'http://edx.devstack.lms:18000'  # routed internally server-to-server
+SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://localhost:18000'  # used in browser redirect
+
+# Don't form the return redirect URL with HTTPS on devstack
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False

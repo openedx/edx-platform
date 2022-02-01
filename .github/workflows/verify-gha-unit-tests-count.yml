@@ -1,0 +1,59 @@
+name: verify unit tests count
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  collect-and-verify:
+    runs-on: [ edx-platform-runner ]
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: |
+          sudo pip install -r requirements/pip.txt
+          sudo pip install -r requirements/edx/testing.txt
+
+      - name: collect tests from all modules
+        run: |
+          echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+
+      - name: get GHA unit test paths
+        run: |
+          echo "cms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --cms-only)" >> $GITHUB_ENV
+          echo "lms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --lms-only)" >> $GITHUB_ENV
+
+
+      - name: collect tests from GHA unit test shards
+        run: |
+          echo "cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+
+
+      - name: add unit tests count
+        run: |
+          echo "root_all_unit_tests_count=$((${{ env.root_cms_unit_tests_count }}+${{ env.root_lms_unit_tests_count }}))" >> $GITHUB_ENV
+          echo "shards_all_unit_tests_count=$((${{ env.cms_unit_tests_count }}+${{ env.lms_unit_tests_count }}))" >> $GITHUB_ENV
+
+      - name: print unit tests count
+        run: |
+          echo CMS unit tests from root: ${{ env.root_cms_unit_tests_count }}
+          echo LMS unit tests from root: ${{ env.root_lms_unit_tests_count }}
+          echo CMS unit tests from shards: ${{ env.cms_unit_tests_count }}
+          echo LMS unit tests from shards: ${{ env.lms_unit_tests_count }}
+          echo All root unit tests count: ${{ env.root_all_unit_tests_count }}
+          echo All shards unit tests count: ${{ env.shards_all_unit_tests_count }}
+
+      - name: fail the check
+        if: ${{ env.root_all_unit_tests_count != env.shards_all_unit_tests_count }}
+        run: |
+          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests
+          workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
+          to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
+          exit 1

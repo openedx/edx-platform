@@ -2,7 +2,7 @@
 Utility library for working with the edx-milestones app
 """
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_toggles.toggles import SettingDictToggle
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidMilestoneRelationshipTypeException, InvalidUserException
@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import get_cache
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 NAMESPACE_CHOICES = {
@@ -23,11 +23,12 @@ NAMESPACE_CHOICES = {
 REQUEST_CACHE_NAME = "milestones"
 
 # TODO this should be moved to edx/edx-milestones
-# .. toggle_name: FEATURES['ENABLE_MILESTONES_APP']
+# .. toggle_name: FEATURES['MILESTONES_APP']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
 # .. toggle_description: Enable the milestones application, which manages significant Course and/or Student events in
-#   the Open edX platform. (see https://github.com/edx/edx-milestones)
+#   the Open edX platform. (see https://github.com/edx/edx-milestones) Note that this feature is required to enable
+#   course pre-requisites.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-11-21
 ENABLE_MILESTONES_APP = SettingDictToggle("FEATURES", "MILESTONES_APP", default=False, module_name=__name__)

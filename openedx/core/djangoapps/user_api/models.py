@@ -199,11 +199,15 @@ class RetirementState(models.Model):
 
     @classmethod
     def get_dead_end_states(cls):
-        return cls.objects.filter(is_dead_end_state=True)
+        # We use models.Value(1) to make use of the indexing on the field. MySQL does not
+        # support boolean types natively, and checking for False will cause a table scan.
+        return cls.objects.filter(is_dead_end_state=models.Value(1))
 
     @classmethod
     def get_dead_end_state_names_list(cls):
-        return cls.objects.filter(is_dead_end_state=True).values_list('state_name', flat=True)
+        # We use models.Value(0) to make use of the indexing on the field. MySQL does not
+        # support boolean types natively, and checking for False will cause a table scan.
+        return cls.objects.filter(is_dead_end_state=models.Value(1)).values_list('state_name', flat=True)
 
     @classmethod
     def get_state_names_list(cls):

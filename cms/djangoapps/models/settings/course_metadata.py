@@ -9,7 +9,7 @@ import logging
 import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
@@ -17,8 +17,8 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import InvalidProctoringProvider
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 
@@ -75,6 +75,7 @@ class CourseMetadata:
         'default_tab',
         'highlights_enabled_for_messaging',
         'is_onboarding_exam',
+        'discussions_settings',
     ]
 
     @classmethod
@@ -152,13 +153,13 @@ class CourseMetadata:
         return exclude_list
 
     @classmethod
-    def fetch(cls, descriptor):
+    def fetch(cls, descriptor, filter_fields=None):
         """
         Fetch the key:value editable course details for the given course from
         persistence and return a CourseMetadata model.
         """
         result = {}
-        metadata = cls.fetch_all(descriptor)
+        metadata = cls.fetch_all(descriptor, filter_fields=filter_fields)
         exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         for key, value in metadata.items():
@@ -168,13 +169,16 @@ class CourseMetadata:
         return result
 
     @classmethod
-    def fetch_all(cls, descriptor):
+    def fetch_all(cls, descriptor, filter_fields=None):
         """
         Fetches all key:value pairs from persistence and returns a CourseMetadata model.
         """
         result = {}
         for field in descriptor.fields.values():
             if field.scope != Scope.settings:
+                continue
+
+            if filter_fields and field.name not in filter_fields:
                 continue
 
             field_help = _(field.help)  # lint-amnesty, pylint: disable=translation-of-non-string

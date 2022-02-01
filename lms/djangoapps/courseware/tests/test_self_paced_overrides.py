@@ -10,9 +10,9 @@ from common.djangoapps.student.tests.factories import BetaTesterFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
-from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @override_settings(

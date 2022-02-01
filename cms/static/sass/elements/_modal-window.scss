@@ -745,6 +745,7 @@
       }
     }
 
+    .edit-discussion,
     .edit-staff-lock,
     .edit-content-visibility,
     .edit-unit-access {
@@ -756,7 +757,8 @@
       }
     }
 
-    // UI: staff lock section
+    // UI: staff lock and discussion
+    .edit-discussion,
     .edit-staff-lock,
     .edit-settings-timed-examination,
     .edit-unit-access {
@@ -828,6 +830,7 @@
     }
   }
 
+  .edit-discussion,
   .edit-unit-access,
   .edit-staff-lock {
     .modal-section-content {
@@ -869,6 +872,7 @@
     }
   }
 
+  .edit-discussion,
   .edit-unit-access,
   .edit-staff-lock {
     .modal-section-content {

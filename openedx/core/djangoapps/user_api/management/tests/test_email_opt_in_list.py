@@ -18,8 +18,8 @@ from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -401,7 +401,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         try:
             with open(output_path) as output_file:
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
-                rows = [row for row in reader]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                rows = list(reader)
         except OSError:
             self.fail(f"Could not find or open output file at '{output_path}'")
 

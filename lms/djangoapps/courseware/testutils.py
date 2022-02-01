@@ -17,10 +17,10 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseEnroll
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .field_overrides import OverrideModulestoreFieldData
 from .tests.helpers import MasqueradeMixin
@@ -162,9 +162,9 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
 
     @ddt.data(
         ('vertical_block', ModuleStoreEnum.Type.mongo, 13),
-        ('vertical_block', ModuleStoreEnum.Type.split, 6),
+        ('vertical_block', ModuleStoreEnum.Type.split, 5),
         ('html_block', ModuleStoreEnum.Type.mongo, 14),
-        ('html_block', ModuleStoreEnum.Type.split, 6),
+        ('html_block', ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
     def test_courseware_html(self, block_name, default_store, mongo_calls):

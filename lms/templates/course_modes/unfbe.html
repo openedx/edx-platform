@@ -1,0 +1,37 @@
+## This template is for track selection with partial or no Feature Based
+## Enrollment (FBE). In other words, it is un-FBE. FBE is when the learner in
+## the default audit track has a limited time to complete the course (course
+## access duration) and has some of the content of the course unavailable (gated
+## content). This template covers un-FBE, which is when the learner is subject
+## to either: (1) gated content but not course access duration; (2) course
+## access duration but not gated content; or (3) neither gated content nor
+## course access duration.
+
+<%page expression_filter="h"/>
+<%inherit file="track_selection.html" />
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%block name="track_selection_certificate_bullets">
+<div class="choice-bullets track-selection-type-unfbe">
+    <ul>
+        <li>${Text(_("Showcase a {link_start}verified certificate{link_end} of completion on your resumé to advance your career")).format(
+            link_start=HTML('<b><u><a class="verified" href="{track_verified_url}" target="_blank">').format(track_verified_url=track_links['verified_certificate']),
+            link_end=HTML('</a></u></b>'),
+        )}</li>
+        <li>${Text(_("Support our {start_bold}mission{end_bold} to increase access to high-quality education for everyone, everywhere")).format(
+            start_bold=HTML('<b>'),
+            end_bold=HTML('</b>'),
+        )}</li>
+    </ul>
+</div>
+</%block>
+
+<%block name="track_selection_audit_bullets">
+<div class="choice-bullets track-selection-type-unfbe">
+    <ul>
+        <li>${_("Get access to the course material, including videos and readings")}</li>
+    </ul>
+</div>
+</%block>

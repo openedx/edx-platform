@@ -8,7 +8,7 @@ import itertools
 import logging
 from contextlib import closing
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from pytz import UTC

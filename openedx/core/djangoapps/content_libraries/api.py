@@ -66,7 +66,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
@@ -109,10 +109,11 @@ from openedx.core.lib.blockstore_api import (
     set_draft_link,
     commit_draft,
     delete_draft,
+    BundleNotFound,
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from . import tasks
 
@@ -176,6 +177,7 @@ class ContentLibraryMetadata:
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
     has_unpublished_deletes = attr.ib(False)
+    allow_lti = attr.ib(False)
     # Allow any user (even unregistered users) to view and interact directly
     # with this library's content in the LMS
     allow_public_learning = attr.ib(False)
@@ -392,6 +394,7 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=bundle_metadata.latest_version,
         last_published=last_published,
+        allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
@@ -1001,12 +1004,15 @@ def get_bundle_links(library_key):
             opaque_key = libraries_linked[link_data.bundle_uuid].library_key
         except KeyError:
             opaque_key = None
-        # Append the link information:
+        try:
+            latest_version = blockstore_cache.get_bundle_version_number(link_data.bundle_uuid)
+        except BundleNotFound:
+            latest_version = 0
         results.append(LibraryBundleLink(
             id=link_name,
             bundle_uuid=link_data.bundle_uuid,
             version=link_data.version,
-            latest_version=blockstore_cache.get_bundle_version_number(link_data.bundle_uuid),
+            latest_version=latest_version,
             opaque_key=opaque_key,
         ))
     return results

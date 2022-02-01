@@ -32,10 +32,10 @@ from common.djangoapps.student.roles import (
     UserBasedRole
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.course_module import CourseSummary
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.course_module import CourseSummary  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 TOTAL_COURSES_COUNT = 10
 USER_COURSES_COUNT = 1
@@ -289,7 +289,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # Calls:
         #    1) query old mongo
         #    2) get_more on old mongo
-        #    3) query split (but no courses so no fetching of data)
+        #    3) query split (handled with MySQL only)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_course_listing_errored_deleted_courses(self, store):

@@ -7,17 +7,17 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.urls import resolve
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
-from xmodule.annotator_mixin import html_to_text
-from xmodule.library_tools import normalize_key_for_search
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.annotator_mixin import html_to_text  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.library_tools import normalize_key_for_search  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -348,7 +348,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         'category': 'courseware_index'
     }
 
-    UNNAMED_MODULE_NAME = ugettext_lazy("(Unnamed)")
+    UNNAMED_MODULE_NAME = gettext_lazy("(Unnamed)")
 
     @classmethod
     def normalize_structure_key(cls, structure_key):

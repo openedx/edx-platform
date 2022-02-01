@@ -1,0 +1,51 @@
+{
+  "consumer": {
+    "name": "frontend-app-learning"
+  },
+  "provider": {
+    "name": "lms"
+  },
+  "interactions": [
+    {
+      "description": "a request to get course blocks",
+      "providerState": "Blocks data exists for course_id course-v1:edX+DemoX+Demo_Course",
+      "request": {
+        "method": "GET",
+        "path": "/api/courses/v2/blocks/",
+        "query": "course_id=course-v1%3AedX%2BDemoX%2BDemo_Course&username=Mock+User&depth=3&requested_fields=children%2Ceffort_activities%2Ceffort_time%2Cshow_gated_sections%2Cgraded%2Cspecial_exam_info%2Chas_scheduled_content"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "root": "block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+          "blocks": {
+            "block-v1:edX+DemoX+Demo_Course+type@course+block@course": {
+              "id": "block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+              "block_id": "course",
+              "lms_web_url": "/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+              "legacy_web_url": "/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@course+block@course?experience=legacy",
+              "student_view_url": "/xblock/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+              "type": "course",
+              "display_name": "Demonstration Course"
+            }
+          }
+        },
+        "matchingRules": {
+          "$.body.root": {
+            "match": "type"
+          },
+          "$.body.blocks": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

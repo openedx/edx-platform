@@ -1,0 +1,108 @@
+name: unit-tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-tests:
+    runs-on: [ edx-platform-runner ]
+    strategy:
+      matrix:
+        python-version: ['3.8']
+        django-version: ["3.2"]
+        shard_name: [
+            "lms-1",
+            "lms-2",
+            "lms-3",
+            "lms-4",
+            "lms-5",
+            "lms-6",
+            "openedx-1",
+            "openedx-2",
+            "openedx-3",
+            "openedx-4",
+            "cms-1",
+            "cms-2",
+            "common-1",
+            "common-2",
+            "common-3",
+        ]
+
+
+    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+      - uses: actions/checkout@v2
+      - name: start mongodb service
+        run: |
+          sudo /etc/init.d/mongodb start
+
+      - name: set settings path
+        run: |
+          echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
+
+#      - name: set pytest randomly option
+#        run: |
+#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
+
+      - name: install requirements
+        run: |
+          sudo pip install -r requirements/pip.txt
+          sudo pip install -r requirements/edx/testing.txt
+          sudo pip install "django~=${{ matrix.django-version }}.0"
+
+      - name: get unit tests for shard
+        run: |
+          echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
+
+      - name: run tests
+        run: |
+          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+
+      - name: rename warnings json file
+        if: success()
+        run: |
+          cd test_root/log
+          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+
+      - name: save pytest warnings json file
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-warnings-json
+          path: |
+            test_root/log/pytest_warnings*.json
+
+  compile-warnings-report:
+    runs-on: [ edx-platform-runner ]
+    needs: [ run-tests ]
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+      - uses: actions/checkout@v2
+      - name: collect pytest warnings files
+        uses: actions/download-artifact@v2
+        with:
+          name: pytest-warnings-json
+          path: test_root/log
+
+      - name: display structure of downloaded files
+        run: ls -la test_root/log
+
+      - name: compile warnings report
+        run: |
+          python openedx/core/process_warnings.py --dir-path test_root/log --html-path reports/pytest_warnings/warning_report_all.html
+
+      - name: save warning report
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-warning-report-html
+          path: |
+            reports/pytest_warnings/warning_report_all.html
+
+

@@ -6,7 +6,6 @@ Decorators that can be used to interact with third_party_auth.
 from functools import wraps
 
 from django.conf import settings
-from django.utils.decorators import available_attrs
 from six.moves.urllib.parse import urlparse  # lint-amnesty, pylint: disable=unused-import
 
 from common.djangoapps.third_party_auth.models import LTIProviderConfig
@@ -31,4 +30,4 @@ def xframe_allow_whitelisted(view_func):
                     x_frame_option = 'ALLOW'
         resp['X-Frame-Options'] = x_frame_option
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)

@@ -25,15 +25,15 @@ from pyquery import PyQuery as pq  # lint-amnesty, pylint: disable=wrong-import-
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import LoginEnrollmentTestCase
 
@@ -238,7 +238,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     @ddt.data(
         # Default site configuration shows course number, org, and display name as subtitle.
-        (dict(),
+        ({},
          "Welcome to HogwartsX's Potions101!", "Introduction to Potions"),
 
         # Show org in title
@@ -420,8 +420,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 42, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 41, 3)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 42, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 41, 3)

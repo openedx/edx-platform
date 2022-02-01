@@ -5,10 +5,9 @@ development mode; otherwise, it is ignored.
 """
 
 
-from django.conf.urls import url
-
+from django.urls import path
 from cms.djangoapps.contentstore.views.dev import dev_mode
 
 urlpatterns = [
-    url(r'^dev_mode$', dev_mode, name='dev_mode'),
+    path('dev_mode', dev_mode, name='dev_mode'),
 ]

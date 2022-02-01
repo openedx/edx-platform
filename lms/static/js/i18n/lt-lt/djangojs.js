@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);
-    if (typeof(v) == 'boolean') {
+    const v = (n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)",
     "%(field)s can only contain up to %(count)d characters.": "%(field)s gali tur\u0117ti iki %(count)d simboli\u0173.",
     "%(field)s must have at least %(count)d characters.": "%(field)s turi tur\u0117ti bent %(count)d simbolius/-i\u0173.",
@@ -146,7 +147,6 @@
     "Could not retrieve upload url.": "Nepavyko nuskaityti \u012fk\u0117limo url nuorodos.",
     "Could not submit order": "Nepavyko pateikti u\u017esakymo.",
     "Could not submit photos": "Nepavyko pateikti nuotrauk\u0173.",
-    "Couldn't Save This Assignment": "Nepavyko i\u0161saugoti \u0161ios u\u017eduoties",
     "Country": "\u0160alis",
     "Course Credit Requirements": "Reikalavimai norint gauti kurso kredit\u0105 ",
     "Course Index": "Kurso indeksas",
@@ -368,7 +368,6 @@
     "Photos don't meet the requirements?": "Nuotraukos neatitinka reikalavim\u0173?",
     "Placeholder": "Vieta\u017eenklis",
     "Please address the errors on this page first, and then save your progress.": "Pra\u0161ome pirmiau i\u0161taisyti klaidas \u0161iame puslapyje ir tik tada i\u0161saugoti savo darb\u0105.",
-    "Please correct the outlined fields.": "Pra\u0161ome pataisyti nurodytus laukus.",
     "Please do not use any spaces in this field.": "Pra\u0161ome \u0161iame lauke nenaudoti joki\u0173 tarp\u0173.",
     "Please do not use any spaces or special characters in this field.": "Pra\u0161ome \u0161iame lauke nenaudoti joki\u0173 tarp\u0173 arba speciali\u0173j\u0173 simboli\u0173.",
     "Please enter a problem location.": "Pra\u0161ome \u012fvesti u\u017edavinio adres\u0105.",
@@ -698,24 +697,24 @@
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email} jau yra kurso {container} komandoje. Jeigu norite prid\u0117ti nauj\u0105 nar\u012f, patikrinkite el. pa\u0161to adres\u0105.",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -725,16 +724,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -760,14 +759,12 @@
       "%d.%m.%Y %H:%M:%S",
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%d.%m.%y %H:%M:%S",
       "%d.%m.%y %H:%M:%S.%f",
       "%d.%m.%y %H:%M",
       "%d.%m.%y %H.%M.%S",
       "%d.%m.%y %H.%M.%S.%f",
       "%d.%m.%y %H.%M",
-      "%d.%m.%y",
       "%Y-%m-%d"
     ],
     "DATE_FORMAT": "Y \\m. E j \\d.",
@@ -796,8 +793,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -816,6 +813,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

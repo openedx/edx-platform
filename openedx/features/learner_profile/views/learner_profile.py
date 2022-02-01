@@ -45,6 +45,8 @@ def learner_profile(request, username):
     """
     if should_redirect_to_profile_microfrontend():
         profile_microfrontend_url = f"{settings.PROFILE_MICROFRONTEND_URL}{username}"
+        if request.GET:
+            profile_microfrontend_url += f'?{request.GET.urlencode()}'
         return redirect(profile_microfrontend_url)
 
     try:
@@ -108,6 +110,8 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'social_platforms': settings.SOCIAL_PLATFORMS,
+            'enable_coppa_compliance': settings.ENABLE_COPPA_COMPLIANCE,
+            'parental_consent_age_limit': settings.PARENTAL_CONSENT_AGE_LIMIT
         },
         'show_program_listing': ProgramsApiConfig.is_enabled(),
         'show_dashboard_tabs': True,

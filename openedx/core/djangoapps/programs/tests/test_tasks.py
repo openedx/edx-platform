@@ -28,7 +28,7 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFa
 from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,8 @@ class AwardProgramCertificateTestCase(TestCase):
         """
         Ensure the correct API call gets made
         """
-        test_username = 'test-username'
+        student = UserFactory(username='test-username', email='test-email@email.com')
+
         test_client = EdxRestApiClient('http://test-server', jwt='test-token')
 
         httpretty.register_uri(
@@ -95,10 +96,11 @@ class AwardProgramCertificateTestCase(TestCase):
             'http://test-server/credentials/',
         )
 
-        tasks.award_program_certificate(test_client, test_username, 123, datetime(2010, 5, 30))
+        tasks.award_program_certificate(test_client, student, 123, datetime(2010, 5, 30))
 
         expected_body = {
-            'username': test_username,
+            'username': student.username,
+            'lms_user_id': student.id,
             'credential': {
                 'program_uuid': 123,
                 'type': tasks.PROGRAM_CERTIFICATE,
@@ -584,7 +586,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
         assert call_args[3] == self.certificate.modified_date
-        assert call_args[4] == self.certificate.date_override.date.date()
+        assert call_args[4] == self.certificate.date_override.date
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """

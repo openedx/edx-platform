@@ -4,12 +4,12 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 
 from django.conf import settings
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
+from xmodule.tabs import TabFragmentViewMixin
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.features.lti_course_tab.tab import DiscussionLtiCourseTab
-from xmodule.tabs import TabFragmentViewMixin
 
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
@@ -18,8 +18,8 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     """
 
     type = 'discussion'
-    title = ugettext_noop('Discussion')
-    priority = None
+    title = gettext_noop('Discussion')
+    priority = 40
     view_name = 'forum_form_discussion'
     fragment_view_name = 'lms.djangoapps.discussion.views.DiscussionBoardFragmentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)

@@ -26,8 +26,8 @@ from common.djangoapps.student.tests.factories import AdminFactory
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..views import CourseDetailView, CourseListUserThrottle, LazyPageNumberPagination
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
@@ -200,6 +200,36 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
                 params.update(filter_)
             response = self.verify_response(params=params)
             assert {course['course_id'] for course in response.data['results']} == {str(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
+
+    def test_get_when_no_permission_then_filters_correctly(self):
+        """
+        Given a user that is instructor in a course
+        And another course he is not an instructor
+        When get
+        Then only the first course is returned
+        """
+
+        # Create a second course to be filtered out of queries.
+        self.create_course(course='should-be-hidden-course')
+
+        # Create instructor (non-staff), and enroll him in the course.
+        instructor_user = self.create_user('the-instructor', is_staff=False)
+        self.setup_user(instructor_user)
+        self.create_enrollment(user=instructor_user, course_id=self.course.id)
+        self.create_courseaccessrole(
+            user=instructor_user,
+            course_id=self.course.id,
+            role='instructor',
+            org='edX',
+        )
+
+        params = {'permissions': 'instructor',
+                  'username': instructor_user.username}
+        response = self.verify_response(params=params)
+
+        self.assertEqual(response.status_code, 200)
+        ids = {c['course_id'] for c in response.json()['results']}
+        self.assertEqual(ids, {str(self.course.id)})
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
@@ -526,7 +556,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
 class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_lazy_page_number_pagination(self):
-        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
+        number_sequence = range(20)
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence
@@ -555,7 +585,7 @@ class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disab
         self.assertDictEqual(expected_response, paginated_response.data)
 
     def test_not_found_error_for_invalid_page(self):
-        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
+        number_sequence = range(20)
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence

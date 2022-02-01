@@ -13,7 +13,7 @@ from dateutil.parser import parse as parse_date
 from django.conf import settings
 from django.http import Http404, QueryDict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import function_trace
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
@@ -62,9 +62,9 @@ from openedx.features.course_experience.utils import is_block_structure_complete
 from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -464,7 +464,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     ]
     blocks.extend([cls(course, user) for cls in default_block_classes])
 
-    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)  # lint-amnesty, pylint: disable=filter-builtin-not-iterating
+    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)
     return sorted(blocks, key=date_block_key_fn)
 
 
@@ -570,8 +570,10 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                 assignment_released = not start or start < now
                 if assignment_released:
                     url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
 
-                complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 past_due = not complete and due < now
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
@@ -702,10 +704,13 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, filter_=None, permissions=None):
     """
-    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
+    Return a LazySequence of courses available, optionally filtered by org code
+    (case-insensitive) or a set of permissions to be satisfied for the specified
+    user.
     """
+
     courses = branding.get_visible_courses(
         org=org,
         filter_=filter_,
@@ -715,13 +720,15 @@ def get_courses(user, org=None, filter_=None):
         'image_set'
     )
 
+    permissions = set(permissions or '')
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
+    permissions.add(permission_name)
 
     return LazySequence(
-        (c for c in courses if has_access(user, permission_name, c)),
+        (c for c in courses if all(has_access(user, p, c) for p in permissions)),
         est_len=courses.count()
     )
 

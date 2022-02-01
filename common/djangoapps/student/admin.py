@@ -18,7 +18,7 @@ from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
 from django.urls import reverse
 from django.utils.translation import ngettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -46,7 +46,7 @@ from common.djangoapps.student.models import (
     UserTestGroup
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -524,7 +524,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
 class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """Admin interface for the CourseEnrollmentCelebration model. """
     raw_id_fields = ('enrollment',)
-    list_display = ('id', 'course', 'user', 'celebrate_first_section')
+    list_display = ('id', 'course', 'user', 'celebrate_first_section', 'celebrate_weekly_goal',)
     search_fields = ('enrollment__course__id', 'enrollment__user__username')
 
     class Meta:
@@ -552,9 +552,20 @@ class UserCelebrationAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
+
+@admin.register(PendingNameChange)
+class PendingNameChangeAdmin(admin.ModelAdmin):
+    """Admin interface for the Pending Name Change model"""
+    readonly_fields = ('user', )
+    list_display = ('user', 'new_name', 'rationale')
+    search_fields = ('user', 'new_name')
+
+    class Meta:
+        model = PendingNameChange
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
-admin.site.register(PendingNameChange)
 admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)

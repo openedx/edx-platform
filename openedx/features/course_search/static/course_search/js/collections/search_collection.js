@@ -55,7 +55,7 @@
                         self.trigger('search');
                     },
                     error: function(self, response) {
-                        self.errorMessage = self.extractErrorMessage(response);
+                        self.errorMessage = self.extractErrorMessage(response); // eslint-disable-line no-param-reassign
                         self.trigger('error');
                     }
                 });
@@ -78,7 +78,7 @@
                         self.trigger('next');
                     },
                     error: function(self, response) {
-                        self.errorMessage = self.extractErrorMessage(response);
+                        self.errorMessage = self.extractErrorMessage(response); // eslint-disable-line no-param-reassign
                         self.trigger('error');
                     },
                     add: true,

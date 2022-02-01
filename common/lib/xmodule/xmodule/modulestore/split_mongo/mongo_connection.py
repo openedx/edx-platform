@@ -13,16 +13,20 @@ from contextlib import contextmanager
 from time import time
 
 from django.core.cache import caches, InvalidCacheBackendError
+from django.db.transaction import TransactionManagementError
 import pymongo
 import pytz
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-
+from openedx.core.lib.cache_utils import request_cached
+from edx_django_utils.cache import RequestCache
 
 log = logging.getLogger(__name__)
 
@@ -243,7 +247,7 @@ class CourseStructureCache:
             self.cache.set(key, compressed_pickled_data, None)
 
 
-class MongoConnection:
+class MongoPersistenceBackend:
     """
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
     """
@@ -257,6 +261,9 @@ class MongoConnection:
         # Set a write concern of 1, which makes writes complete successfully to the primary
         # only before returning. Also makes pymongo report write errors.
         kwargs['w'] = 1
+
+        #make sure the course index cache is fresh.
+        RequestCache(namespace="course_index_cache").clear()
 
         self.database = connect_to_mongodb(
             db, host,
@@ -429,15 +436,18 @@ class MongoConnection:
 
         return courses_queries
 
-    def insert_course_index(self, course_index, course_context=None):
+    def insert_course_index(self, course_index, course_context=None, last_update_already_set=False):
         """
         Create the course_index in the db
         """
         with TIMER.timer("insert_course_index", course_context):
-            course_index['last_update'] = datetime.datetime.now(pytz.utc)
+            # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
+            if not last_update_already_set:
+                course_index['last_update'] = datetime.datetime.now(pytz.utc)
+            # Insert the new index:
             self.course_index.insert_one(course_index)
 
-    def update_course_index(self, course_index, from_index=None, course_context=None):
+    def update_course_index(self, course_index, from_index=None, course_context=None, last_update_already_set=False):
         """
         Update the db record for course_index.
 
@@ -457,8 +467,12 @@ class MongoConnection:
                     'course': course_index['course'],
                     'run': course_index['run'],
                 }
-            course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.replace_one(query, course_index, upsert=False,)
+            # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
+            if not last_update_already_set:
+                course_index['last_update'] = datetime.datetime.now(pytz.utc)
+            # Update the course index:
+            result = self.course_index.replace_one(query, course_index, upsert=False,)
+            return result.modified_count == 1
 
     def delete_course_index(self, course_key):
         """
@@ -522,6 +536,7 @@ class MongoConnection:
         """
         Closes any open connections to the underlying databases
         """
+        RequestCache(namespace="course_index_cache").clear()
         self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
@@ -536,6 +551,7 @@ class MongoConnection:
 
         If connections is True, then close the connection to the database as well.
         """
+        RequestCache(namespace="course_index_cache").clear()
         connection = self.database.client
 
         if database:
@@ -551,3 +567,205 @@ class MongoConnection:
 
         if connections:
             connection.close()
+
+
+class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
+    """
+    Backend for split mongo that can read/write from MySQL and/or S3 instead of Mongo,
+    either partially replacing MongoDB or fully replacing it.
+    """
+
+    # Structures and definitions are only supported in MongoDB for now.
+    # Course indexes are read from MySQL and written to both MongoDB and MySQL
+    # Course indexes are cached within the process using their key and ignore_case atrributes as keys.
+    # This method is request cached. The keys to the cache are the arguements to the method.
+    # The `self` arguement is discarded as a key using an isinstance check.
+    # This is because the DjangoFlexPersistenceBackend could be different in reference to the same course key.
+    @request_cached(
+        "course_index_cache",
+        arg_map_function=lambda arg: str(arg) if not isinstance(arg, DjangoFlexPersistenceBackend) else "")
+    def get_course_index(self, key, ignore_case=False):
+        """
+        Get the course_index from the persistence mechanism whose id is the given key
+        """
+        #######################
+        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
+        return super().get_course_index(key, ignore_case=ignore_case)
+        #######################
+        if key.version_guid and not key.org:  # pylint: disable=unreachable
+            # I don't think it was intentional, but with the MongoPersistenceBackend, using a key with only a version
+            # guid and no org/course/run value would not raise an error, but would always return None. So we need to be
+            # compatible with that.
+            # e.g. test_split_modulestore.py:SplitModuleCourseTests.test_get_course -> get_course(key with only version)
+            #      > _load_items > cache_items > begin bulk operations > get_course_index > results in this situation.
+            log.warning("DjangoFlexPersistenceBackend: get_course_index without org/course/run will always return None")
+            return None
+        # We never include the branch or the version in the course key in the SplitModulestoreCourseIndex table:
+        key = key.for_branch(None).version_agnostic()
+        if not ignore_case:
+            query = {"course_id": key}
+        else:
+            # Case insensitive search is important when creating courses to reject course IDs that differ only by
+            # capitalization.
+            query = {"course_id__iexact": key}
+        try:
+            return SplitModulestoreCourseIndex.objects.get(**query).as_v1_schema()
+        except SplitModulestoreCourseIndex.DoesNotExist:
+            return None
+
+    def find_matching_course_indexes(  # pylint: disable=arguments-differ
+        self,
+        branch=None,
+        search_targets=None,
+        org_target=None,
+        course_context=None,
+        course_keys=None,
+        force_mongo=False,
+    ):
+        """
+        Find the course_index matching particular conditions.
+
+        Arguments:
+            branch: If specified, this branch must exist in the returned courses
+            search_targets: If specified, this must be a dictionary specifying field values
+                that must exist in the search_targets of the returned courses
+            org_target: If specified, this is an ORG filter so that only course_indexs are
+                returned for the specified ORG
+        """
+        #######################
+        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
+        force_mongo = True
+        #######################
+        if force_mongo:
+            # For data migration purposes, this argument will read from MongoDB instead of MySQL
+            return super().find_matching_course_indexes(
+                branch=branch, search_targets=search_targets, org_target=org_target,
+                course_context=course_context, course_keys=course_keys,
+            )
+        queryset = SplitModulestoreCourseIndex.objects.all()
+        if course_keys:
+            queryset = queryset.filter(course_id__in=course_keys)
+        if search_targets:
+            if "wiki_slug" in search_targets:
+                queryset = queryset.filter(wiki_slug=search_targets.pop("wiki_slug"))
+            if search_targets:  # If there are any search targets besides wiki_slug (which we've handled by this point):
+                raise ValueError(f"Unsupported search_targets: {', '.join(search_targets.keys())}")
+        if org_target:
+            queryset = queryset.filter(org=org_target)
+        if branch is not None:
+            branch_field = SplitModulestoreCourseIndex.field_name_for_branch(branch)
+            queryset = queryset.exclude(**{branch_field: ""})
+
+        return (course_index.as_v1_schema() for course_index in queryset)
+
+    def insert_course_index(self, course_index, course_context=None):  # pylint: disable=arguments-differ
+        """
+        Create the course_index in the db
+        """
+        # clear the whole course_index request cache, required for sucessfully cloning a course.
+        # This is a relatively large hammer for the problem, but we mostly only use one course at a time.
+        RequestCache(namespace="course_index_cache").clear()
+
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
+        new_index.save()
+        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        super().insert_course_index(course_index, course_context, last_update_already_set=True)
+
+    def update_course_index(self, course_index, from_index=None, course_context=None):  # pylint: disable=arguments-differ
+        """
+        Update the db record for course_index.
+
+        Arguments:
+            from_index: If set, only update an index if it matches the one specified in `from_index`.
+
+        Exceptions:
+            SplitModulestoreCourseIndex.DoesNotExist: If the given object_id is not valid
+        """
+        # "last_update not only tells us when this course was last updated but also helps prevent collisions"
+        # This code is just copying the behavior of the existing MongoPersistenceBackend
+        # See https://github.com/edx/edx-platform/pull/5200 for context
+        RequestCache(namespace="course_index_cache").clear()
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        # Find the SplitModulestoreCourseIndex entry that we'll be updating:
+        try:
+            index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
+        except SplitModulestoreCourseIndex.DoesNotExist:
+            #######################
+            # TEMP: Maybe the data migration hasn't (completely) run yet?
+            data = SplitModulestoreCourseIndex.fields_from_v1_schema(course_index)
+            if super().get_course_index(data["course_id"]) is None:
+                raise  # This course doesn't exist in MySQL or in MongoDB
+            # This course record exists in MongoDB but not yet in MySQL
+            index_obj = SplitModulestoreCourseIndex(**data)
+            if from_index:
+                index_obj.last_update = from_index["last_update"]  # Make sure this won't get marked as a collision
+            #######################
+
+        # Check for collisions:
+        # Except this collision logic doesn't work when using both MySQL and MongoDB together, one for writes and one
+        # for reads, so we're temporarily defering to Mongo's colision logic.
+        # if from_index and index_obj.last_update != from_index["last_update"]:
+        #     # "last_update not only tells us when this course was last updated but also helps prevent collisions"
+        #     log.warning(
+        #         "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
+        #         "is enabled, as it slows down parallel queries. \nNew index was: %s\nFrom index was: %s",
+        #         course_index, from_index,
+        #     )
+        #     return  # Collision; skip this update
+
+        # Apply updates to the index entry. While doing so, track which branch versions were changed (if any).
+        changed_branches = []
+        for attr, value in SplitModulestoreCourseIndex.fields_from_v1_schema(course_index).items():
+            if attr in ("objectid", "course_id"):
+                # Enforce these attributes as immutable.
+                if getattr(index_obj, attr) != value:
+                    raise ValueError(
+                        f"Attempted to change the {attr} key of a course index entry ({index_obj.course_id})"
+                    )
+            else:
+                if attr.endswith("_version"):
+                    # Model fields ending in _version are branches. If the branch version has changed, convert the field
+                    # name to a branch name and report it in the history below.
+                    if getattr(index_obj, attr) != value:
+                        changed_branches.append(attr[:-8])
+                setattr(index_obj, attr, value)
+        if changed_branches:
+            # For the django simple history, indicate what was changed. Unfortunately at this point we only really know
+            # which branch(es) were changed, not anything more useful than that.
+            index_obj._change_reason = f'Updated {" and ".join(changed_branches)} branch'  # pylint: disable=protected-access
+
+        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        mongo_updated = super().update_course_index(
+            course_index, from_index, course_context, last_update_already_set=True
+        )
+        if mongo_updated:
+            # Save the course index entry and create a historical record:
+            index_obj.save()
+
+    def delete_course_index(self, course_key):
+        """
+        Delete the course_index from the persistence mechanism whose id is the given course_index
+        """
+        RequestCache(namespace="course_index_cache").clear()
+        SplitModulestoreCourseIndex.objects.filter(course_id=course_key).delete()
+        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        super().delete_course_index(course_key)
+
+    def _drop_database(self, database=True, collections=True, connections=True):
+        """
+        Reset data for testing.
+        """
+        RequestCache(namespace="course_index_cache").clear()
+        try:
+            SplitModulestoreCourseIndex.objects.all().delete()
+        except TransactionManagementError as err:
+            # If the test doesn't use 'with self.allow_transaction_exception():', then this error can occur and it may
+            # be non-obvious why, so give a very clear explanation of how to fix it. See the docstring of
+            # allow_transaction_exception() for more details.
+            raise RuntimeError(
+                "post-test cleanup failed with TransactionManagementError. "
+                "Use 'with self.allow_transaction_exception():' from ModuleStoreTestCase/...IsolationMixin to fix it."
+            ) from err
+        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        super()._drop_database(database, collections, connections)
