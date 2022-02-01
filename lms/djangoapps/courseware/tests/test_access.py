@@ -49,7 +49,6 @@ from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-impor
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
-    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
@@ -65,8 +64,6 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     """
     Test if user is coach on ccx.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         """
@@ -164,7 +161,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     """
     TOMORROW = 'tomorrow'
     YESTERDAY = 'yesterday'
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     DATES = {
         TOMORROW: datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1),
         YESTERDAY: datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1),

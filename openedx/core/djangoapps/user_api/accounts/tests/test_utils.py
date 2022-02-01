@@ -122,7 +122,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             self.cruft_user
         )
         assert block_url ==\
-               'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+               'test_url:9999/courses/course-v1:{org}+{course}+{run}/jump_to/'\
+               'block-v1:{org}+{course}+{run}+type@vertical+block@{vertical_id}'.format(
                    org=self.course.location.course_key.org,
                    course=self.course.location.course_key.course,
                    run=self.course.location.course_key.run,

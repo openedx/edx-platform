@@ -130,7 +130,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         path = IDVerificationService.get_verify_location(course.id)
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == (expected_path + '?course_id=Robot/999/Test_Course')
+        assert path == (expected_path + '?course_id=course-v1%3ARobot%2B999%2BTest_Course')
 
     def test_get_verify_location_from_string(self):
         """

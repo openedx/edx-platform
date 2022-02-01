@@ -52,7 +52,9 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .event_transformers import ForumThreadViewedEventTransformer
@@ -2031,6 +2033,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     sources (e.g., a mobile app), we carefully test a myriad of cases, including
     those with incomplete and malformed events.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     CATEGORY_ID = 'i4x-edx-discussion-id'
     CATEGORY_NAME = 'Discussion 1'

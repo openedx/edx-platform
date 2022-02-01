@@ -5,7 +5,6 @@ Test the student dashboard view.
 
 import itertools
 import json
-import re
 import unittest
 from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import patch
@@ -642,16 +641,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         return ''.join(response.content.decode('utf-8').split())
 
     @staticmethod
-    def _pull_course_run_from_course_key(course_key_string):  # lint-amnesty, pylint: disable=missing-function-docstring
-        search_results = re.search(r'Run_[0-9]+$', course_key_string)
-        assert search_results
-        course_run_string = search_results.group(0).replace('_', ' ')
-        return course_run_string
+    def _pull_course_run_from_course_key(course_key: CourseKey):  # lint-amnesty, pylint: disable=missing-function-docstring
+        return course_key.run.replace('_', ' ')
 
     @staticmethod
     def _get_html_for_view_course_button(course_key_string, course_run_string):
         return '''
-            <a href="/courses/{course_key}/course/"
+            <a href="http://learning-mfe/course/{course_key}/home"
                class="course-target-link enter-course"
                data-course-key="{course_key}">
               View Course
@@ -679,7 +675,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         )
 
     @staticmethod
-    def _get_html_for_entitlement_button(course_key_string):
+    def _get_html_for_entitlement_button(course_key: CourseKey):
         return'''
             <div class="course-info">
             <span class="info-university">{org} - </span>
@@ -689,8 +685,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             </span>
             </div>
         '''.format(
-            org=course_key_string.split('/')[0],
-            course=course_key_string.split('/')[1]
+            org=course_key.org,
+            course=course_key.course,
         )
 
     def test_view_course_appears_on_dashboard(self):
@@ -711,7 +707,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_key_string = str(course.id)
         # No completion data means there's no block from which to resume.
         resume_block_key_string = ''
-        course_run_string = self._pull_course_run_from_course_key(course_key_string)
+        course_run_string = self._pull_course_run_from_course_key(course.id)
 
         view_button_html = self._get_html_for_view_course_button(
             course_key_string,
@@ -759,7 +755,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_key_string = str(course_key)
         resume_block_key_string = str(block_keys[-1])
-        course_run_string = self._pull_course_run_from_course_key(course_key_string)
+        course_run_string = self._pull_course_run_from_course_key(course_key)
 
         view_button_html = self._get_html_for_view_course_button(
             course_key_string,
@@ -840,8 +836,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
             else:
                 last_completed_block_string = ''
-                course_run_string = self._pull_course_run_from_course_key(
-                    course_key_string)
+                course_run_string = self._pull_course_run_from_course_key(course_key)
 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
@@ -871,9 +866,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 )
             )
             html_for_entitlement.append(
-                self._get_html_for_entitlement_button(
-                    course_key_string
-                )
+                self._get_html_for_entitlement_button(course_key)
             )
 
         response = self.client.get(reverse('dashboard'))

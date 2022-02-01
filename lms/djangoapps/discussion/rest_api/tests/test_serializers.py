@@ -11,7 +11,7 @@ import httpretty
 from django.test.client import RequestFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -414,6 +414,8 @@ class ThreadSerializerDeserializationTest(
         SharedModuleStoreTestCase
 ):
     """Tests for ThreadSerializer deserialization."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
@@ -646,6 +648,8 @@ class ThreadSerializerDeserializationTest(
 @ddt.ddt
 class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

@@ -148,7 +148,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         self.course.certificates = {'certificates': certificates}
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
     def _create_custom_template(self, org_id=None, mode=None, course_key=None, language=None):
         """
@@ -531,7 +531,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         }
 
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -715,7 +715,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.course.cert_html_view_enabled = True
         self.course.certificate_available_date = datetime.datetime.today() + datetime.timedelta(days=1)
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -759,7 +759,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.course.certificates = {'certificates': test_certificates}
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=str(self.course.id),
@@ -787,7 +787,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         response = self.client.get(test_url)
         self.assertContains(response, 'overridden_number')
@@ -807,7 +807,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.course.certificates = {'certificates': test_certificates}
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -848,7 +848,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.course.certificates = {'certificates': test_certificates}
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -975,7 +975,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.course.self_paced = self_paced
         today = datetime.datetime.utcnow()
         self.course.certificate_available_date = today + datetime.timedelta(cert_avail_delta)
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -1018,7 +1018,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self._add_certificate_date_override()
         today = datetime.datetime.utcnow()
         self.course.certificate_available_date = today + datetime.timedelta(-2)
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -1048,7 +1048,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     def test_render_html_view_invalid_certificate_configuration(self):
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -1744,12 +1744,12 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
             {
                 'name': 'edx.badge.assertion.evidence_visited',
                 'data': {
-                    'course_id': 'testorg/run1/refundable_course',
+                    'course_id': 'course-v1:testorg+run1+refundable_course',
                     'assertion_id': assertion.id,
                     'badge_generator': 'DummyBackend',
                     'badge_name': 'refundable course',
                     'issuing_component': '',
-                    'badge_slug': 'testorgrun1refundable_course_honor_432f164',
+                    'badge_slug': 'course-v1testorgrun1refundable_course_honor_927f3ad',
                     'assertion_json_url': 'https://www.example.com/assertion.json',
                     'assertion_image_url': 'https://www.example.com/image.png',
                     'user_id': self.user.id,

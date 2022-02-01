@@ -37,7 +37,7 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         self.course.enable_subsection_gating = True
         self.course.save()
-        self.store.update_item(self.course, 0)
+        self.update_course(self.course, 0)
 
         # create chapter
         self.chapter1 = ItemFactory.create(

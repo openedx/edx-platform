@@ -16,6 +16,9 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from common.djangoapps.student.tests.factories import UserFactory
@@ -36,10 +39,6 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import mock_get_score
 
@@ -209,7 +208,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         # So in total, 3 sequential parents, with one inaccessible.
         for sequential in (accessible_seq, inaccessible_seq):
             sequential.children = [self.problem.location]
-            modulestore().update_item(sequential, self.user.id)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+                self.store.update_item(sequential, self.user.id)
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()

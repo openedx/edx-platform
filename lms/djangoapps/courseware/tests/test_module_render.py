@@ -49,6 +49,7 @@ from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
     upload_file_to_course,
@@ -1095,6 +1096,8 @@ class TestTOC(ModuleStoreTestCase):
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(SharedModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -1416,6 +1419,7 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
     """
     Test the toc for a course is rendered correctly when there is gated content
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -1555,9 +1559,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
         )
         result_fragment = module.render(STUDENT_VIEW)
-
-        assert f'/c4x/{self.course.location.org}/{self.course.location.course}/asset/foo_content' \
-               in result_fragment.content
+        key = self.course.location
+        assert f'/asset-v1:{key.org}+{key.course}+{key.run}+type@asset+block/foo_content' in result_fragment.content
 
     def test_static_badlink_rewrite(self):
         module = render.get_module(
@@ -1568,8 +1571,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        assert f'/c4x/{self.course.location.org}/{self.course.location.course}/asset/file.jpg'\
-               in result_fragment.content
+        key = self.course.location
+        assert f'/asset-v1:{key.org}+{key.course}+{key.run}+type@asset+block/file.jpg' in result_fragment.content
 
     def test_static_asset_path_use(self):
         '''
@@ -1589,7 +1592,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
 
     def test_course_image(self):
         url = course_image_url(self.course)
-        assert url.startswith('/c4x/')
+        assert url.startswith('/asset-v1:')
 
         self.course.static_asset_path = "toy_course_dir"
         url = course_image_url(self.course)
@@ -1693,6 +1696,7 @@ class DetachedXBlock(XBlock):
 @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -2313,6 +2317,7 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
         service = runtime.service(descriptor, expected_service)
         assert service is not None
 
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_beta_tester_fields_added(self):
         """
         Tests that the beta tester fields are set on LMS runtime.
@@ -2566,6 +2571,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     """
     Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     COURSE_ID = 'edX/LmsModuleShimTest/2021_Fall'
     PYTHON_LIB_FILENAME = 'test_python_lib.zip'
     PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'

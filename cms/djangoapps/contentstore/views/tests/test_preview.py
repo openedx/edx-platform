@@ -15,7 +15,9 @@ from xblock.core import XBlock, XBlockAside
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase, upload_file_to_course,
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -222,6 +224,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
     """
     Tests that the deprecated attributes in the Module System (XBlock Runtime) return the expected values.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     COURSE_ID = 'edX/CmsModuleShimTest/2021_Fall'
     PYTHON_LIB_FILENAME = 'test_python_lib.zip'
     PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'

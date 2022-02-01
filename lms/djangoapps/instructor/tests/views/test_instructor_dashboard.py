@@ -14,6 +14,9 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pyquery import PyQuery as pq
 from pytz import UTC
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -36,9 +39,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def intercept_renderer(path, context):
@@ -81,7 +81,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             org="ACME",
             number="001",
             run="2017",
-            name="How to defeat the Road Runner"
+            display_name="How to defeat the Road Runner"
         )
         self.course_mode.save()
         # Create instructor account
@@ -604,8 +604,6 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
     """
     Tests for the instructor dashboard from the performance point of view.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def setUp(self):
         """
         Set up tests

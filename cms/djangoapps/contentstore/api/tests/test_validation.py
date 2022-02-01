@@ -9,11 +9,11 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @override_settings(PROCTORING_BACKENDS={'DEFAULT': 'proctortrack', 'proctortrack': {}})
@@ -21,8 +21,6 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test course validation view via a RESTful API
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

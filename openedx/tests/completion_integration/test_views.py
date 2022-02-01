@@ -60,6 +60,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assert str(self.course_deprecated.id) == self.COURSE_KEY_DEPRECATED
         self.problem_deprecated = ItemFactory.create(
             parent=self.course_deprecated, category="problem", display_name="Test Problem",
+            publish_item=False,
         )
         assert str(self.problem_deprecated.location) == self.BLOCK_KEY_DEPRECATED
 

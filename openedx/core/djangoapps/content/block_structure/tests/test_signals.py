@@ -39,7 +39,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         assert test_display_name != orig_block_structure.get_xblock_field(self.course_usage_key, 'display_name')
 
         self.course.display_name = test_display_name
-        self.store.update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
 
         # Cached version of course has been updated
         updated_block_structure = bs_manager.get_collected()
@@ -52,7 +52,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
 
         with override_waffle_switch(INVALIDATE_CACHE_ON_PUBLISH, active=invalidate_cache_enabled):
             self.course.display_name = test_display_name
-            self.store.update_item(self.course, self.user.id)
+            self.update_course(self.course, self.user.id)
 
         assert mock_bs_manager_clear.called == invalidate_cache_enabled
 

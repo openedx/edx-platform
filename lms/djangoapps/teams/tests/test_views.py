@@ -6,6 +6,7 @@ import json
 import unittest
 from datetime import datetime
 from unittest.mock import patch
+from urllib.parse import quote
 from uuid import UUID
 
 import ddt
@@ -75,7 +76,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         dashboard, and is redirected to the login page."""
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
-        redirect_url = f'{settings.LOGIN_URL}?next={self.teams_url}'
+        redirect_url = f'{settings.LOGIN_URL}?next={quote(self.teams_url)}'
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):
@@ -173,7 +174,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(bad_team_url)
         assert 404 == response.status_code
 
-        bad_team_url = bad_team_url.replace(bad_org, "invalid/course/id")
+        bad_team_url = bad_team_url.replace(self.course.id.run, "invalid/course/id")
         response = self.client.get(bad_team_url)
         assert 404 == response.status_code
 
@@ -882,7 +883,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(data, 400, [])
         self.assert_no_events_were_emitted()
 
-    @ddt.data((404, {'course_id': 'no/such/course'}), (400, {'topic_id': 'no_such_topic'}))
+    @ddt.data((404, {'course_id': 'course-v1:no+such+course'}), (400, {'topic_id': 'no_such_topic'}))
     @ddt.unpack
     def test_no_results(self, status, data):
         self.get_teams_list(status, data)
@@ -1161,7 +1162,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         'description': "Filler Description"
     }), (404, {
         'name': "Non-existent course ID",
-        'course_id': 'no/such/course',
+        'course_id': 'course-v1:no+such+course',
         'description': "Filler Description"
     }))
     @ddt.unpack
@@ -2125,10 +2126,10 @@ class TestListMembershipAPI(TeamAPITestCase):
             assert users == ['student_on_team_1_private_set_1']
 
     @ddt.data(
-        ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
-        ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, 'Sólar team'),
-        ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
+        ('student_enrolled_both_courses_other_team', 'course-v1:TestX+TS101+Test_Course', 200, 'Nuclear Team'),
+        ('student_enrolled_both_courses_other_team', 'course-v1:MIT+6.002x+Circuits', 200, 'Another Team'),
+        ('student_enrolled', 'course-v1:TestX+TS101+Test_Course', 200, 'Sólar team'),
+        ('student_enrolled', 'course-v1:MIT+6.002x+Circuits', 400, ''),
     )
     @ddt.unpack
     def test_course_filter_with_username(self, user, course_id, status, team_name):
@@ -2145,8 +2146,8 @@ class TestListMembershipAPI(TeamAPITestCase):
             assert membership['results'][0]['team']['team_id'] == self.test_team_name_id_map[team_name].team_id
 
     @ddt.data(
-        ('TestX/TS101/Test_Course', 200),
-        ('MIT/6.002x/Circuits', 400),
+        ('course-v1:TestX+TS101+Test_Course', 200),
+        ('course-v1:MIT+6.002x+Circuits', 400),
     )
     @ddt.unpack
     def test_course_filter_with_team_id(self, course_id, status):
@@ -2210,7 +2211,7 @@ class TestListMembershipAPI(TeamAPITestCase):
             {
                 'team_id': self.solar_team.team_id,
                 'teamset_id': 'topic_0',
-                'course_id': 'TestX/TS101/Non_Existent_Course'
+                'course_id': 'course-v1:TestX+TS101+Non_Existent_Course'
             }
         )
 
@@ -2228,7 +2229,8 @@ class TestListMembershipAPI(TeamAPITestCase):
         )
 
     def test_filter_teamset_course_nonexistant(self):
-        self.get_membership_list(404, {'teamset_id': 'topic_0', 'course_id': 'TestX/TS101/Non_Existent_Course'})
+        self.get_membership_list(404, {'teamset_id': 'topic_0',
+                                       'course_id': 'course-v1:TestX+TS101+Non_Existent_Course'})
 
     def test_filter_teamset_teamset_nonexistant(self):
         self.get_membership_list(404, {'teamset_id': 'nonexistant', 'course_id': str(self.test_course_1.id)})
@@ -2790,8 +2792,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     This test case will be expanded when the view is fully
     implemented (TODO MST-31).
     """
-    good_course_id = 'TestX/TS101/Test_Course'
-    fake_course_id = 'TestX/TS101/Non_Existent_Course'
+    good_course_id = 'course-v1:TestX+TS101+Test_Course'
+    fake_course_id = 'course-v1:TestX+TS101+Non_Existent_Course'
 
     allow_username = 'course_staff'
     deny_username = 'student_enrolled'

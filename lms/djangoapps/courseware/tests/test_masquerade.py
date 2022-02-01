@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.masquerade import (
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -41,6 +42,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # li
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.

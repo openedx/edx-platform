@@ -9,6 +9,8 @@ import itertools
 import json
 import unittest
 from unittest.mock import patch
+from urllib.parse import quote
+
 import pytest
 import ddt
 import httpretty
@@ -23,6 +25,8 @@ from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -43,8 +47,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.models import RateLimitConfiguration
 from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class EnrollmentTestMixin:
@@ -1598,6 +1600,7 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments list API.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
 
     def setUp(self):
@@ -1698,12 +1701,12 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
 
     def test_user_not_authenticated(self):
         self.client.logout()
-        response = self.client.get(self.url, {'course_id': str(self.course.id)})
+        response = self.client.get(self.url, {'course_id': quote(str(self.course.id))})
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_user_not_authorized(self):
         self.client.login(username=self.student1.username, password='edx')
-        response = self.client.get(self.url, {'course_id': str(self.course.id)})
+        response = self.client.get(self.url, {'course_id': quote(str(self.course.id))})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @ddt.data(

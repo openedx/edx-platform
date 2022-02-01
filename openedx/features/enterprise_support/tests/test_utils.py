@@ -20,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
@@ -638,6 +639,7 @@ class TestCourseAccessed(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
             }
         )
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_course_accessed_for_visit_course_home(self):
         """
         Test that a visit to course home does not fall under course access

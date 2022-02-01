@@ -6,21 +6,20 @@ Delete course tests.
 from unittest import mock
 
 from django.core.management import CommandError, call_command
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class DeleteCourseTests(ModuleStoreTestCase):
     """
     Test for course deleting functionality of the 'delete_course' command
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     YESNO_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.delete_course.query_yes_no'
 
     def test_invalid_course_key(self):

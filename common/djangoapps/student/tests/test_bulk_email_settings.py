@@ -42,7 +42,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # URL for email settings modal
         self.email_modal_link = (
             '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
-            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
+            'data-course-id="course-v1:{org}+{num}+{name}" data-course-number="{num}" '
             'data-dashboard-index="0" data-optout="False">Email Settings</a>'
         ).format(
             org=self.course.org,

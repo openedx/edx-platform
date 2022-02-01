@@ -40,10 +40,10 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     STUDENT_EMAIL = "student@example.com"
     STUDENT_PASSWORD = "student"
 
-    CERT_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
-    COURSE_NOT_EXIST_KEY = CourseKey.from_string("test/TestX/Test_Course_Not_Exist")
-    EXISTED_COURSE_KEY_1 = CourseKey.from_string("test1/Test1X/Test_Course_Exist_1")
-    EXISTED_COURSE_KEY_2 = CourseKey.from_string("test2/Test2X/Test_Course_Exist_2")
+    CERT_COURSE_KEY = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+    COURSE_NOT_EXIST_KEY = CourseKey.from_string("course-v1:test+TestX+Test_Course_Not_Exist")
+    EXISTED_COURSE_KEY_1 = CourseKey.from_string("course-v1:test1+Test1X+Test_Course_Exist_1")
+    EXISTED_COURSE_KEY_2 = CourseKey.from_string("course-v1:test2+Test2X+Test_Course_Exist_2")
     CERT_GRADE = 0.89
     CERT_STATUS = CertificateStatuses.downloadable
     CERT_MODE = "verified"

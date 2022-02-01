@@ -22,9 +22,7 @@ from rest_framework.exceptions import PermissionDenied
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -157,6 +155,7 @@ def _set_course_discussion_blackout(course, user_id):
 @ddt.ddt
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -220,6 +219,7 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
     """
     Tests of get_course for courses that have blackout dates.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -258,6 +258,8 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test for get_course_topics"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         httpretty.reset()
@@ -648,6 +650,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_thread_list"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -1727,6 +1730,7 @@ class CreateThreadTest(
         MockSignalHandlerMixin
 ):
     """Tests for create_thread"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     LONG_TITLE = (
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
         'Aenean commodo ligula eget dolor. Aenean massa. Cum sociis '
@@ -2085,6 +2089,8 @@ class CreateCommentTest(
         MockSignalHandlerMixin
 ):
     """Tests for create_comment"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -2445,6 +2451,8 @@ class UpdateThreadTest(
         MockSignalHandlerMixin
 ):
     """Tests for update_thread"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -2798,6 +2806,7 @@ class UpdateCommentTest(
         MockSignalHandlerMixin
 ):
     """Tests for update_comment"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -3582,8 +3591,6 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
     """
     Tests for discussions topic API v2 code.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def setUp(self) -> None:
         super().setUp()
         self.course = CourseFactory.create(
