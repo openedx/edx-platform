@@ -95,6 +95,7 @@ from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
 from common.djangoapps.util.log_sensitive import encrypt_for_log
+from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # .. toggle_name: LOG_REQUEST_USER_CHANGES
@@ -833,6 +834,7 @@ def _delete_cookie(request, response):
         secure=settings.SESSION_COOKIE_SECURE or None,
         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
     )
+    delete_logged_in_cookies(response)
 
     # Note, there is no request.user attribute at this point.
     if hasattr(request, 'session') and hasattr(request.session, 'session_key'):
