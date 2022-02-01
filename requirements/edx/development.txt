@@ -154,7 +154,7 @@ chardet==4.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   pysrt
-charset-normalizer==2.0.10
+charset-normalizer==2.0.11
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
@@ -196,7 +196,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.2
+coverage[toml]==6.3
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -418,7 +418,7 @@ django-sekizai==3.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
-django-ses==2.3.1
+django-ses==2.4.0
     # via -r requirements/edx/testing.txt
 django-simple-history==3.0.0
     # via
@@ -427,7 +427,7 @@ django-simple-history==3.0.0
     #   edx-organizations
     #   edx-proctoring
     #   ora2
-django-splash==1.1.0
+django-splash==1.2.1
     # via -r requirements/edx/testing.txt
 django-statici18n==2.2.0
     # via -r requirements/edx/testing.txt
@@ -436,7 +436,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-user-tasks==2.1.0
+django-user-tasks==2.2.0
     # via -r requirements/edx/testing.txt
 django-waffle==2.3.0
     # via
@@ -497,7 +497,7 @@ edx-ace==1.4.1
     # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.5.0
     # via -r requirements/edx/testing.txt
-edx-auth-backends==4.0.1
+edx-auth-backends==4.1.0
     # via -r requirements/edx/testing.txt
 edx-braze-client==0.1.0
     # via -r requirements/edx/testing.txt
@@ -518,7 +518,7 @@ edx-django-release-util==1.1.1
     # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.4.2
+edx-django-utils==4.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -556,7 +556,7 @@ edx-milestones==0.3.3
     # via -r requirements/edx/testing.txt
 edx-name-affirmation==2.1.0
     # via -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.2.2
+edx-opaque-keys[django]==2.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-bulk-grades
@@ -592,7 +592,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.1.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.17.2
+edx-sga==0.17.3
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
@@ -604,7 +604,7 @@ edx-tincan-py35==1.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-toggles==4.2.0
+edx-toggles==4.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -643,7 +643,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==11.3.0
+faker==12.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1026,7 +1026,7 @@ pycparser==2.21
     # via
     #   -r requirements/edx/testing.txt
     #   cffi
-pycryptodomex==3.13.0
+pycryptodomex==3.14.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
@@ -1248,7 +1248,7 @@ requests==2.27.1
     #   sphinx
     #   tableauserverclient
     #   transifex-client
-requests-oauthlib==1.3.0
+requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
@@ -1431,7 +1431,6 @@ testfixtures==6.18.3
 text-unidecode==1.3
     # via
     #   -r requirements/edx/testing.txt
-    #   faker
     #   python-slugify
 toml==0.10.2
     # via
@@ -1470,7 +1469,7 @@ unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-unidiff==0.7.0
+unidiff==0.7.2
     # via -r requirements/edx/testing.txt
 uritemplate==4.1.1
     # via
@@ -1489,7 +1488,7 @@ urllib3==1.26.8
     #   transifex-client
 user-util==1.0.0
     # via -r requirements/edx/testing.txt
-uvicorn==0.17.0.post1
+uvicorn==0.17.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python

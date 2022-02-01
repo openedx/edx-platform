@@ -114,7 +114,7 @@ cffi==1.15.0
     #   pynacl
 chardet==4.0.0
     # via pysrt
-charset-normalizer==2.0.10
+charset-normalizer==2.0.11
     # via
     #   -r requirements/edx/paver.txt
     #   aiohttp
@@ -327,7 +327,7 @@ django-sekizai==3.0.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.3.1
+django-ses==2.4.0
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -336,7 +336,7 @@ django-simple-history==3.0.0
     #   edx-organizations
     #   edx-proctoring
     #   ora2
-django-splash==1.1.0
+django-splash==1.2.1
     # via -r requirements/edx/base.in
 django-statici18n==2.2.0
     # via -r requirements/edx/base.in
@@ -345,7 +345,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
-django-user-tasks==2.1.0
+django-user-tasks==2.2.0
     # via -r requirements/edx/base.in
 django-waffle==2.3.0
     # via
@@ -395,7 +395,7 @@ edx-ace==1.4.1
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.5.0
     # via -r requirements/edx/base.in
-edx-auth-backends==4.0.1
+edx-auth-backends==4.1.0
     # via -r requirements/edx/base.in
 edx-braze-client==0.1.0
     # via -r requirements/edx/base.in
@@ -416,7 +416,7 @@ edx-django-release-util==1.1.1
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.1.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.4.2
+edx-django-utils==4.5.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -450,7 +450,7 @@ edx-milestones==0.3.3
     # via -r requirements/edx/base.in
 edx-name-affirmation==2.1.0
     # via -r requirements/edx/base.in
-edx-opaque-keys[django]==2.2.2
+edx-opaque-keys[django]==2.3.0
     # via
     #   -r requirements/edx/paver.txt
     #   edx-bulk-grades
@@ -484,7 +484,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.1.0
     # via -r requirements/edx/base.in
-edx-sga==0.17.2
+edx-sga==0.17.3
     # via -r requirements/edx/base.in
 edx-submissions==3.4.4
     # via
@@ -492,7 +492,7 @@ edx-submissions==3.4.4
     #   ora2
 edx-tincan-py35==1.0.0
     # via edx-enterprise
-edx-toggles==4.2.0
+edx-toggles==4.3.1
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -751,7 +751,7 @@ pycountry==22.1.10
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
-pycryptodomex==3.13.0
+pycryptodomex==3.14.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -892,7 +892,7 @@ requests==2.27.1
     #   slumber
     #   social-auth-core
     #   tableauserverclient
-requests-oauthlib==1.3.0
+requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/base.in
     #   social-auth-core
