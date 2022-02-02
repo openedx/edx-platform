@@ -828,9 +828,6 @@ class SubmitPhotosView(View):
             face_image (str): base64-encoded image data of the user's face.
             photo_id_image (str): base64-encoded image data of the user's photo ID.
             full_name (str): The user's full name, if the user is requesting a name change as well.
-            experiment_name (str): The name of an A/B experiment associated with this attempt
-            portrait_photo_mode (str): The mode in which the portrait photo was taken
-            id_photo_mode (str): The mode in which the id photo was taken
 
         """
         # If the user already has an initial verification attempt, we can re-use the photo ID
@@ -861,22 +858,7 @@ class SubmitPhotosView(View):
             return response
 
         # Submit the attempt
-        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
-
-        # Send event to segment for analyzing A/B testing data
-        data = {
-            "attempt_id": attempt.id,
-            "experiment_name": params.get("experiment_name", "original")
-        }
-        self._fire_event(request.user, "edx.bi.experiment.verification.attempt", data)
-
-        if params.get("portrait_photo_mode"):
-            mode_data = {
-                "attempt_id": attempt.id,
-                "portrait_photo_mode": params.get("portrait_photo_mode"),
-                "id_photo_mode": params.get("id_photo_mode")
-            }
-            self._fire_event(request.user, "edx.bi.experiment.verification.attempt.photo.mode", mode_data)
+        self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
 
         self._fire_event(request.user, "edx.bi.verify.submitted", {"category": "verification"})
         self._send_confirmation_email(request.user)
@@ -901,9 +883,6 @@ class SubmitPhotosView(View):
                 "face_image",
                 "photo_id_image",
                 "full_name",
-                "experiment_name",
-                "portrait_photo_mode",
-                "id_photo_mode"
             ]
             if param_name in request.POST
         }
@@ -1161,13 +1140,6 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         return HttpResponseBadRequest(
             f"Result {result} not understood. Known results: PASS, FAIL, SYSTEM FAIL"
         )
-
-    # Send event to segment for analyzing A/B testing data
-    data = {
-        "attempt_id": attempt.id,
-        "result": result
-    }
-    segment.track(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     return HttpResponse("OK!")
 
