@@ -823,17 +823,15 @@ def _is_cookie_present(response):
 
 def _delete_cookie(request, response):
     """
-    Delete the cookie by setting the expiration to a date in the past,
-    while maintaining the domain, secure, and httponly settings.
+    Delete session cookie, as well as related login cookies.
     """
-    response.set_cookie(
+    response.delete_cookie(
         settings.SESSION_COOKIE_NAME,
-        max_age=0,
-        expires='Thu, 01-Jan-1970 00:00:00 GMT',
+        path='/',
         domain=settings.SESSION_COOKIE_DOMAIN,
-        secure=settings.SESSION_COOKIE_SECURE or None,
-        httponly=settings.SESSION_COOKIE_HTTPONLY or None,
     )
+    # Keep JWT cookies and others in sync with session cookie
+    # (meaning, in this case, delete them too).
     delete_logged_in_cookies(response)
 
     # Note, there is no request.user attribute at this point.
