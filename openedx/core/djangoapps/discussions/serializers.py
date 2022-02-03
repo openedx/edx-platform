@@ -295,7 +295,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         plugin_configuration = validated_data.pop('plugin_configuration', {})
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
 
-        if updated_provider_type == Provider.LEGACY:
+        if updated_provider_type in [Provider.LEGACY, Provider.OPEN_EDX]:
             legacy_settings = LegacySettingsSerializer(
                 self._get_course(),
                 context={
