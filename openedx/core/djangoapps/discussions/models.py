@@ -141,7 +141,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [],
-        'has_full_support': True
+        'has_full_support': True,
+        'admin_only_config': False,
     },
     Provider.OPEN_EDX: {
         'features': [
@@ -169,6 +170,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True,
         'supports_in_context_discussions': True,
+        'admin_only_config': False,
     },
     Provider.ED_DISCUSS: {
         'features': [

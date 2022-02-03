@@ -437,6 +437,7 @@ class DiscussionsProviderSerializer(serializers.Serializer):
     external_links = serializers.DictField(help_text="External documentation and links for provider")
     messages = serializers.ListField(child=serializers.CharField(), help_text="Custom messaging for provider")
     has_full_support = serializers.BooleanField(help_text="Whether the provider is fully supported")
+    admin_only_config = serializers.BooleanField(help_text="Whether the provider can only be configured by admins")
 
 
 class DiscussionsFeatureSerializer(serializers.Serializer):
