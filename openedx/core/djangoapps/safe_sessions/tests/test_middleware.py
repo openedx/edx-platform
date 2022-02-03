@@ -191,9 +191,10 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         See assert_response for information on the other
         parameters.
         """
-        with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
+        with patch('django.http.HttpResponse.delete_cookie') as mock_delete_cookie:
             self.assert_response(set_request_user=set_request_user, set_session_cookie=set_session_cookie)
-            assert mock_delete_cookie.called == expect_delete_called
+            assert {'sessionid', 'edx-jwt-cookie-header-payload'} \
+                <= {call.args[0] for call in mock_delete_cookie.call_args_list}
 
     def test_success(self):
         with self.assert_not_logged():
@@ -321,9 +322,10 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         assert self.request.need_to_delete_cookie
         self.cookies_from_request_to_response()
 
-        with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
+        with patch('django.http.HttpResponse.delete_cookie') as mock_delete_cookie:
             SafeSessionMiddleware().process_response(self.request, self.client.response)
-            assert mock_delete_cookie.called
+            assert {'sessionid', 'edx-jwt-cookie-header-payload'} \
+                <= {call.args[0] for call in mock_delete_cookie.call_args_list}
 
     def test_error(self):
         self.request.META['HTTP_ACCEPT'] = 'text/html'
