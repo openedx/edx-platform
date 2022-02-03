@@ -545,7 +545,7 @@ class ImportManager:
         Iterate over the given directories and yield courses.
         """
         if str(self.target_id) == 'course-v1:ArbiX+CS101+2014_T3':
-            logging.info(f'Investigation Log: {self.target_id} : Starting run imports')
+            log.info(f'Investigation Log: {self.target_id} : Starting run imports')
         self.preflight()
         for courselike_key in self.xml_module_store.modules.keys():
             try:
@@ -561,17 +561,17 @@ class ImportManager:
                 # Import all static pieces.
                 self.import_static(data_path, dest_id)
                 if str(self.target_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                    logging.info(f'Investigation Log: {self.target_id} : Import Static Successful')
+                    log.info(f'Investigation Log: {self.target_id} : Import Static Successful')
 
                 # Import asset metadata stored in XML.
                 self.import_asset_metadata(data_path, dest_id)
                 if str(self.target_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                    logging.info(f'Investigation Log: {self.target_id} : Import Asset Metadata Successful')
+                    log.info(f'Investigation Log: {self.target_id} : Import Asset Metadata Successful')
 
                 # Import all children
                 self.import_children(source_courselike, courselike, courselike_key, dest_id)
                 if str(self.target_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                    logging.info(f'Investigation Log: {self.target_id} : Import Children Successful')
+                    log.info(f'Investigation Log: {self.target_id} : Import Children Successful')
 
             # This bulk operation wraps all the operations to populate the draft branch with any items
             # from the /drafts subdirectory.
@@ -583,7 +583,7 @@ class ImportManager:
                 courselike = self.import_drafts(courselike, courselike_key, data_path, dest_id)
 
             if str(self.target_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                logging.info(f'Investigation Log: {self.target_id} : Import Draft Successful')
+                log.info(f'Investigation Log: {self.target_id} : Import Draft Successful')
             yield courselike
 
 
