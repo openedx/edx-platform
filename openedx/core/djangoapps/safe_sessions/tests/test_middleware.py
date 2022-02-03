@@ -333,7 +333,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
 
     @ddt.data(['text/html', 302], ['', 401])
     @ddt.unpack
-    @override_settings(REDIRECT_TO_LOGIN_ON_SAFE_SESSION_AUTH_FAILURE=False)
     def test_error_with_http_accept(self, http_accept, expected_response):
         self.request.META['HTTP_ACCEPT'] = http_accept
         self.verify_error(expected_response)
