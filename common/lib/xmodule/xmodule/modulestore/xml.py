@@ -435,12 +435,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.info(f'Course import {target_course_id}: Starting courselike import from {course_dir}')
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
-            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                log.info(f'Investigation Log: {target_course_id} : Getting course data')
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
-
-            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                log.info(f'Investigation Log: {target_course_id} : Course data fetching complete {course_data}')
 
             org = course_data.get('org')
 
@@ -451,17 +446,11 @@ class XMLModuleStore(ModuleStoreReadBase):
                 tracker(msg)
                 org = 'edx'
 
-            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                log.info(f'Investigation Log: {target_course_id} : Org selected for course {org}')
-
             # Parent XML should be something like 'library.xml' or 'course.xml'
             courselike_label = self.parent_xml.split('.', maxsplit=1)[0]
 
             course = course_data.get(courselike_label)
 
-            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                log.info(f'Investigation Log: {target_course_id} : Course {course} fetched from '
-                         f'courselike_label {courselike_label}')
             if course is None:
                 msg = (
                     "No '{courselike_label}' attribute set for course in {dir}."
@@ -500,8 +489,6 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = self.get_id(org, course, url_name)
 
             if course_ids is not None and course_id not in course_ids:
-                if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
-                    log.info(f'Investigation Log: {target_course_id} : Course ID not in Course IDs (List)')
                 return None
 
             def get_policy(usage_id):
