@@ -43,7 +43,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-class TestSettableEnrollmentState(CacheIsolationTestCase):
+class TestSettableEnrollmentState(SharedModuleStoreTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
         super().setUp()
@@ -65,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         assert mes == ees
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase, metaclass=ABCMeta):
+class TestEnrollmentChangeBase(SharedModuleStoreTestCase, metaclass=ABCMeta):
     """
     Test instructor enrollment administration against database effects.
 

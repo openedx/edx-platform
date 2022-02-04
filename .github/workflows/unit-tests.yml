@@ -45,9 +45,10 @@ jobs:
         run: |
           echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
 
-#      - name: set pytest randomly option
-#        run: |
-#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
+      - name: set pytest randomly option
+        run: |
+          random_shards=(lms-2 lms-4 lms-5 cms-1)
+          echo "pytest_randomly_option=$(if [[ " ${random_shards[@]} " =~ '${{ matrix.shard_name }}' ]]; then echo ''; else echo '-p no:randomly' ; fi)" >> $GITHUB_ENV
 
       - name: install requirements
         run: |
@@ -61,7 +62,7 @@ jobs:
 
       - name: run tests
         run: |
-          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+          python -Wd -m pytest  ${{ env.pytest_randomly_option }} --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
 
       - name: rename warnings json file
         if: success()
