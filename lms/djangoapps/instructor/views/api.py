@@ -40,6 +40,7 @@ from rest_framework.response import Response  # lint-amnesty, pylint: disable=wr
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from submissions import api as sub_api  # installed from the edx-submissions repository  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
@@ -1972,6 +1973,8 @@ def rescore_problem(request, course_id):
             )
         except NotImplementedError as exc:
             return HttpResponseBadRequest(str(exc))
+        except ItemNotFoundError as exc:
+            return HttpResponseBadRequest(f"{module_state_key} not found")
 
     elif all_students:
         try:
@@ -1982,6 +1985,8 @@ def rescore_problem(request, course_id):
             )
         except NotImplementedError as exc:
             return HttpResponseBadRequest(str(exc))
+        except ItemNotFoundError as exc:
+            return HttpResponseBadRequest(f"{module_state_key} not found")
     else:
         return HttpResponseBadRequest()
 
@@ -2015,11 +2020,14 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
 
     try:
         usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
+        block = modulestore().get_item(usage_key)
     except InvalidKeyError:
         return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
+    except ItemNotFoundError:
+        return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
 
     # check the user's access to this specific problem
-    if not has_access(request.user, "staff", modulestore().get_item(usage_key)):
+    if not has_access(request.user, "staff", block):
         _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
             request.user.id,
             problem_to_reset
