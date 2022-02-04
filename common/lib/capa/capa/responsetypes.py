@@ -2546,7 +2546,7 @@ class SymbolicResponse(CustomResponse):
         super(SymbolicResponse, self).setup_response()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def execute_check_function(self, idset, submission):
-        from symmath import symmath_check
+        from symmath.symmath_check import symmath_check
         try:
             # Since we have limited max_inputfields to 1,
             # we can assume that there is only one submission
