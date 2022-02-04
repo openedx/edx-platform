@@ -7,15 +7,12 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreIsolationMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreIsolationMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class ProviderState(ModuleStoreIsolationMixin):
     """ Provider State Setup """
-
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def clean_db(self, user, course_key):   # pylint: disable=unused-argument
         """ clean mongodb instance """
 

@@ -206,6 +206,8 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     """
     Tests the TestCourseNextSectionUpdateResolver.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super().setUp()
         self.today = datetime.datetime.utcnow()

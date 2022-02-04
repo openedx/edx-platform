@@ -675,12 +675,13 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         """
         This test tests that the bulk email context uses http or https urls as appropriate.
         """
+        course_id_fragment = f'{self.course_org}+{self.course_number}+{self.course_run}'
         assert email_context['platform_name'] == settings.PLATFORM_NAME
         assert email_context['course_title'] == self.course_title
         assert email_context['course_url'] == \
-               f'{scheme}://edx.org/courses/{self.course_org}/{self.course_number}/{self.course_run}/'
+               f'{scheme}://edx.org/courses/course-v1:{course_id_fragment}/'
         assert email_context['course_image_url'] == \
-               f'{scheme}://edx.org/c4x/{self.course_org}/{self.course_number}/asset/images_course_image.jpg'
+               f'{scheme}://edx.org/asset-v1:{course_id_fragment}+type@asset+block@images_course_image.jpg'
         assert email_context['email_settings_url'] == f'{scheme}://edx.org/dashboard'
         assert email_context['account_settings_url'] == f'{scheme}://edx.org/account/settings'
 

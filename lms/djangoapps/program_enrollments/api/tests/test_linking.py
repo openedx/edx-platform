@@ -10,6 +10,7 @@ from django.test import TestCase
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.djangoapps.student.api import get_course_access_role
 from common.djangoapps.student.roles import CourseStaffRole
@@ -363,7 +364,7 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.fruit_course, self.animal_course)
 
 
-class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase):
+class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, ModuleStoreTestCase):
     """ Tests for linking error behavior """
 
     def test_program_enrollment_not_found__nonexistant(self):

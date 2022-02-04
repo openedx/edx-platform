@@ -105,7 +105,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         if redirect:
             if has_started:
                 self.assertRedirects(
-                    response, reverse('openedx.course_experience.course_home', kwargs={'course_id': course.id})
+                    response, reverse('openedx.course_experience.course_home', kwargs={'course_id': course.id}),
+                    target_status_code=302,  # for follow-on redirection to MFE (ideally we'd just be sent there first)
                 )
             else:
                 self.assertRedirects(response, reverse('dashboard'))

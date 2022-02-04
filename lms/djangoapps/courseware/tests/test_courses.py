@@ -18,6 +18,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
 
 from lms.djangoapps.courseware.courses import (
     course_open_for_self_enrollment,
@@ -39,13 +46,6 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.xml import XModuleXmlImportTest  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.xml import factories as xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -54,6 +54,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
     GET_COURSE_WITH_ACCESS = 'get_course_with_access'
     GET_COURSE_OVERVIEW_WITH_ACCESS = 'get_course_overview_with_access'
@@ -212,18 +213,24 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
 
     def test_get_image_url(self):
         """Test image URL formatting."""
-        course = CourseFactory.create(org='edX', course='999')
-        assert course_image_url(course) == f'/c4x/edX/999/asset/{course.course_image}'
+        course = CourseFactory.create()
+        key = course.location
+        assert course_image_url(course) ==\
+               f'/asset-v1:{key.org}+{key.course}+{key.run}+type@asset+block@{course.course_image}'
 
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
         course = CourseFactory.create(course_image='before_\N{SNOWMAN}_after.jpg')
-        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before___after.jpg'  # pylint: disable=line-too-long
+        key = course.location
+        assert course_image_url(course) ==\
+               f'/asset-v1:{key.org}+{key.course}+{key.run}+type@asset+block@before___after.jpg'
 
     def test_spaces_in_image_name(self):
         # Verify that image names with spaces in them are cleaned
         course = CourseFactory.create(course_image='before after.jpg')
-        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before_after.jpg'  # pylint: disable=line-too-long
+        key = course.location
+        assert course_image_url(course) ==\
+               f'/asset-v1:{key.org}+{key.course}+{key.run}+type@asset+block@before_after.jpg'
 
     def test_static_asset_path_course_image_default(self):
         """
@@ -262,6 +269,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
 
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     # TODO: this test relies on the specific setup of the toy course.
     # It should be rewritten to build the course it needs and then test that.

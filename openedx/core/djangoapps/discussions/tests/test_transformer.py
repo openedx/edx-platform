@@ -2,7 +2,7 @@
 Tests for discussions course block transformer
 """
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -16,7 +16,6 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
     Tests behaviour of BlockCompletionTransformer
     """
     TRANSFORMER_CLASS_TO_TEST = DiscussionsTopicLinkTransformer
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()

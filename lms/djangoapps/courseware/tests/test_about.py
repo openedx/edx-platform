@@ -35,7 +35,7 @@ from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-impor
 )
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_MIXED_MODULESTORE,
-    TEST_DATA_SPLIT_MODULESTORE,
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
@@ -55,6 +55,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
     """
     Tests about xblock.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -291,6 +292,8 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
     """
     This test case will check the About page when a course has a capped enrollment
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -336,6 +339,8 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -380,6 +385,8 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
     This test case will check the About page for a course that has enrollment start/end
     set but it is currently outside of that period.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
 
@@ -462,8 +469,6 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     Test for unenrolled student tries to access ccx.
     Note: Only CCX coach can enroll a student in CCX. In sum self-registration not allowed.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

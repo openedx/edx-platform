@@ -589,9 +589,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         original_url = reverse(url_name, kwargs={'course_id': str(course.id)})
         login_url = "{login_url}?next={original_url}".format(
             login_url=reverse('signin_user'),
-            original_url=original_url
+            original_url=urllib.parse.quote(original_url),
         )
-        self.assertRedirects(response, login_url)
+        self.assertRedirects(response, login_url, fetch_redirect_response=False)
 
     @ddt.data(
         "verify_student_start_flow",

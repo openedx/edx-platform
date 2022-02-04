@@ -127,13 +127,13 @@ class BaseTranscripts(CourseTestCase):
         """
         data = {
             'parent_locator': str(self.course.location),
-            'category': 'non_video',
-            'type': 'non_video'
+            'category': 'problem',
+            'type': 'problem'
         }
         response = self.client.ajax_post('/xblock/', data)
         usage_key = self._get_usage_key(response)
         item = modulestore().get_item(usage_key)
-        self.set_fields_from_xml(self.item, '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />')
+        self.set_fields_from_xml(self.item, '<problem youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />')
         modulestore().update_item(item, self.user.id)
 
         return usage_key
@@ -1037,19 +1037,19 @@ class TestCheckTranscripts(BaseTranscripts):
         # Not video module: setup
         data = {
             'parent_locator': str(self.course.location),
-            'category': 'not_video',
-            'type': 'not_video'
+            'category': 'problem',
+            'type': 'problem'
         }
         resp = self.client.ajax_post('/xblock/', data)
         usage_key = self._get_usage_key(resp)
         subs_id = str(uuid4())
         item = modulestore().get_item(usage_key)
         self.set_fields_from_xml(self.item, ("""
-            <not_video youtube="" sub="{}">
+            <problem youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </not_video>
+            </problem>
         """.format(subs_id)))
         modulestore().update_item(item, self.user.id)
 

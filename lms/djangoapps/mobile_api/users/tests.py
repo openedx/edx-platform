@@ -645,7 +645,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
     def test_with_display_overrides(self, api_version):
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
-        self.store.update_item(self.course, self.user.id)
+        self.course = self.update_course(self.course, self.user.id)
 
         serialized = self.get_serialized_data(api_version)
         assert serialized['course']['number'] == self.course.display_coursenumber

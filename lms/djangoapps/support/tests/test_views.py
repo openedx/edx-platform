@@ -7,6 +7,7 @@ import json
 import re
 from datetime import datetime, timedelta
 from unittest.mock import patch
+from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import ddt
@@ -28,7 +29,9 @@ from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
 from rest_framework import status
 from social_django.models import UserSocialAuth
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -214,7 +217,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         # Expect a redirect to the login page
         redirect_url = "{login_url}?next={original_url}".format(
             login_url=reverse("signin_user"),
-            original_url=url,
+            original_url=quote(url),
         )
         self.assertRedirects(response, redirect_url)
 
@@ -247,6 +250,7 @@ class SupportViewCertificatesTests(SupportViewTestCase):
     """
     Tests for the certificates support view.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         """Make the user support staff. """
@@ -266,7 +270,7 @@ class SupportViewCertificatesTests(SupportViewTestCase):
 
     def test_certificates_along_with_course_filter(self):
         # Check that an initial filter is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + str(self.course.id)
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + quote(str(self.course.id))
         response = self.client.get(url)
         self.assertContains(response, "userFilter: 'student@example.com'")
         self.assertContains(response, "courseFilter: '" + str(self.course.id) + "'")
@@ -451,7 +455,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'mode': '<script>alert("xss")</script>',
             'reason': 'Financial Assistance'
         })
-        test_key_error = b'&lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt; is not a valid mode for org'
+        test_key_error = b'&lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt; is not a valid mode for course-v1:org'
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert test_key_error in response.content
 
@@ -1797,6 +1801,7 @@ class TestOnboardingView(SupportViewTestCase, ProctoredExamTestCase):
     """
     Tests for OnboardingView
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()

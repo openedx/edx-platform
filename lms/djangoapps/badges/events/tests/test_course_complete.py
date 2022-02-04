@@ -31,8 +31,10 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
         Verify slug generation is working as expected. If this test fails, the algorithm has changed, and it will cause
         the handler to lose track of all badges it made in the past.
         """
-        assert course_complete.course_slug(self.course_key, 'honor') == 'edxcourse_testtest_run_honor_fc5519b'
-        assert course_complete.course_slug(self.course_key, 'verified') == 'edxcourse_testtest_run_verified_a199ec0'
+        assert course_complete.course_slug(self.course_key, 'honor') ==\
+               'course-v1edxcourse_testtest_run_honor_2055051'
+        assert course_complete.course_slug(self.course_key, 'verified') ==\
+               'course-v1edxcourse_testtest_run_verified_d550ad7'
 
     def test_dated_description(self):
         """

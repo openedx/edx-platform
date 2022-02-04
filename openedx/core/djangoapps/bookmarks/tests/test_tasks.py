@@ -6,6 +6,7 @@ Tests for tasks.
 import ddt
 
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 
 from ..models import XBlockCache
@@ -18,6 +19,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     """
     Test the XBlockCache model.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()

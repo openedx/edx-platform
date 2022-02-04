@@ -1075,7 +1075,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1115,7 +1115,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1152,7 +1152,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1186,7 +1186,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },

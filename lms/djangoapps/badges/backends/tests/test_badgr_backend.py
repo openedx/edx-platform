@@ -30,7 +30,7 @@ BADGR_SETTINGS = {
 }
 
 # Should be the hashed result of test_slug as the slug, and test_component as the component
-EXAMPLE_SLUG = '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a'
+EXAMPLE_SLUG = '9e915d55bb304a73d20c453531d3c27f81574218413c23903823d20d11b587ae'
 BADGR_SERVER_SLUG = 'test_badgr_server_slug'
 
 

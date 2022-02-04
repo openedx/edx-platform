@@ -17,6 +17,12 @@ from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -26,8 +32,6 @@ from common.djangoapps.student.tests.factories import AdminFactory
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..views import CourseDetailView, CourseListUserThrottle, LazyPageNumberPagination
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
@@ -313,6 +317,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     Similar to search.tests.test_course_discovery_views but with the course API integration.
     """
 
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
@@ -495,7 +500,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{self.course.org}+')
 
         # The course staff user does *not* have the course instructor role on any courses.
         filtered_response = self.verify_response(params={
@@ -510,7 +515,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'instructor'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course1.org}+')
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -519,7 +524,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course1.org}+')
 
         # The user with both instructor AND staff on a course has the inferred course staff role on that one course.
         self.setup_user(course_instructor_staff_user)
@@ -528,7 +533,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course2.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course2.org}+')
 
     def test_no_libraries(self):
         """
@@ -550,7 +555,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{self.course.org}+')
 
 
 class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

@@ -3,6 +3,7 @@ Test audit user's access to various content based on content-gating features.
 """
 import os
 from datetime import datetime, timedelta
+from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
@@ -11,8 +12,12 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from unittest.mock import patch, Mock  # lint-amnesty, pylint: disable=wrong-import-order
 from pyquery import PyQuery as pq
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -42,9 +47,6 @@ from openedx.features.content_type_gating.services import ContentTypeGatingServi
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 
 METADATA = {
     'group_access': {
@@ -163,6 +165,7 @@ def _assert_block_is_empty(block, user_id, course, request_factory):
 ))
 class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pylint: disable=missing-class-docstring
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     PROBLEM_TYPES = ['problem', 'openassessment', 'drag-and-drop-v2', 'done', 'edx_sga']
     # 'html' is a component that just displays html, in these tests it is used to test that users who do not have access
     # to graded problems still have access to non-problems
@@ -783,6 +786,8 @@ class TestConditionalContentAccess(TestConditionalContent):
     Conditional Content allows course authors to run a/b tests on course content.  We want to make sure that
     even if one of these a/b tests are being run, the student still has the correct access to the content.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -890,6 +895,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
     how it's currently tested). If that method changes to use something other than the template
     message, this method's checks will need to be updated.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -1099,6 +1105,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     to check whether a sequence contains content type gated blocks
     The content_type_gate_for_block can be used to return the content type gate for a given block
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()

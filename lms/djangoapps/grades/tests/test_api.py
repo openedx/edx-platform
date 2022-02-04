@@ -41,7 +41,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
-        self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
+        self.subsection = ItemFactory.create(parent=self.course, category="sequential", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
             user_id=self.user.id,
             course_id=self.course.id,
