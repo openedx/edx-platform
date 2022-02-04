@@ -138,8 +138,7 @@ def site_with_org(scope='function'):
 def test_compile_sass_view(client, monkeypatch, site_with_org):
     monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
     site, org = site_with_org
-    site_configuration = SiteConfigurationFactory.build(
-            site=site)
+    site_configuration = SiteConfigurationFactory.build(site=site)
     site_configuration.save()
 
     url = reverse('compile_sass')
