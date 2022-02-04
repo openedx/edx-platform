@@ -1986,7 +1986,7 @@ def rescore_problem(request, course_id):
         except NotImplementedError as exc:
             return HttpResponseBadRequest(str(exc))
         except ItemNotFoundError as exc:
-            return HttpResponseBadRequest(f"Problem {module_state_key} not found")
+            return HttpResponseBadRequest(f"{module_state_key} not found")
     else:
         return HttpResponseBadRequest()
 
