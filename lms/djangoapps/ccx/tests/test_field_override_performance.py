@@ -30,13 +30,13 @@ from lms.djangoapps.courseware.views.views import progress
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
-from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 

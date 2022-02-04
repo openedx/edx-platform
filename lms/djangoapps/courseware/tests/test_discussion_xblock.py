@@ -24,11 +24,11 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor_in
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xblock_discussion import DiscussionXBlock, loader
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xblock_discussion import DiscussionXBlock, loader  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -300,7 +300,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -321,7 +320,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
-            xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
             request_token='request_token',
         )
 
@@ -332,7 +330,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             <iframe
                 id='discussions-mfe-tab-embed'
                 title='Discussions'
-                src='http://test.url/discussions/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
+                src='http://test.url/edX/toy/2012_Fall/topics/test_discussion_xblock_id'
             />
             """,
             html,
@@ -375,7 +373,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=self.course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
 
@@ -434,12 +431,13 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 4 queries are required to do first discussion xblock render:
+        # 5 queries are required to do first discussion xblock render:
         # * waffle_utils_wafflecourseoverridemodel
+        # * waffle_utils_waffleorgoverridemodel
         # * waffle_flag
         # * django_comment_client_role
         # * lms_xblock_xblockasidesconfig
-        num_queries = 4
+        num_queries = 5
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
                 user=user,
@@ -447,7 +445,6 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 student_data=mock.Mock(name='student_data'),
                 course_id=course.id,
                 track_function=mock.Mock(name='track_function'),
-                xqueue_callback_url_prefix=mock.Mock(name='xqueue_callback_url_prefix'),
                 request_token='request_token',
             )
             with self.assertNumQueries(num_queries):

@@ -55,7 +55,7 @@ from openedx.core.djangoapps.content.block_structure.exceptions import UsageKeyN
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
-from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.

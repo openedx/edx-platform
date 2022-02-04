@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-coverage==6.2
+coverage==6.3
     # via -r requirements/edx/coverage.in
 diff-cover==4.0.0
     # via
@@ -22,5 +22,5 @@ markupsafe==2.0.1
     # via jinja2
 pluggy==1.0.0
     # via diff-cover
-pygments==2.10.0
+pygments==2.11.2
     # via diff-cover

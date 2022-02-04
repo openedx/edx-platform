@@ -380,6 +380,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             monitor_import_failure(target_course_id, 'Updating', exception=exc)
             raise exc
         finally:
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : {course_descriptor}')
             if course_descriptor is None:
                 pass
             elif isinstance(course_descriptor, ErrorBlock):
@@ -433,7 +435,12 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.info(f'Course import {target_course_id}: Starting courselike import from {course_dir}')
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Getting course data')
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
+
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Course data fetching complete {course_data}')
 
             org = course_data.get('org')
 
@@ -444,11 +451,17 @@ class XMLModuleStore(ModuleStoreReadBase):
                 tracker(msg)
                 org = 'edx'
 
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Org selected for course {org}')
+
             # Parent XML should be something like 'library.xml' or 'course.xml'
             courselike_label = self.parent_xml.split('.', maxsplit=1)[0]
 
             course = course_data.get(courselike_label)
 
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Course {course} fetched from '
+                         f'courselike_label {courselike_label}')
             if course is None:
                 msg = (
                     "No '{courselike_label}' attribute set for course in {dir}."
@@ -487,6 +500,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = self.get_id(org, course, url_name)
 
             if course_ids is not None and course_id not in course_ids:
+                if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                    log.info(f'Investigation Log: {target_course_id} : Course ID not in Course IDs (List)')
                 return None
 
             def get_policy(usage_id):
@@ -505,6 +520,9 @@ class XMLModuleStore(ModuleStoreReadBase):
             if self.user_service:
                 services['user'] = self.user_service
 
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Building Import System')
+
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
@@ -519,9 +537,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                 services=services,
                 target_course_id=target_course_id,
             )
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                log.info(f'Investigation Log: {target_course_id} : Building Import System Completed')
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
             # If we fail to load the course, then skip the rest of the loading steps
             if isinstance(course_descriptor, ErrorBlock):
+                if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                    log.info(f'Investigation Log: {target_course_id} : Course Descriptor is instance of ErrorBlock')
                 return course_descriptor
 
             self.content_importers(system, course_descriptor, course_dir, url_name)

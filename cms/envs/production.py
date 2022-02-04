@@ -10,6 +10,7 @@ This is the default template for our main set of AWS servers.
 import codecs
 import copy
 import os
+import warnings
 import yaml
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
@@ -52,7 +53,15 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ############### END ALWAYS THE SAME ################################
 
 # A file path to a YAML file from which to load all the configuration for the edx platform
-CONFIG_FILE = get_env_setting('STUDIO_CFG')
+try:
+    CONFIG_FILE = get_env_setting('CMS_CFG')
+except ImproperlyConfigured:
+    CONFIG_FILE = get_env_setting('STUDIO_CFG')
+    warnings.warn(
+        "STUDIO_CFG environment variable is deprecated. Use CMS_CFG instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     __config__ = yaml.safe_load(f)
@@ -608,3 +617,6 @@ SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW
 
 LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get(
     'LANGUAGE_COOKIE_NAME', LANGUAGE_COOKIE_NAME)
+
+################# Discussions micro frontend URL ########################
+DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', DISCUSSIONS_MICROFRONTEND_URL)

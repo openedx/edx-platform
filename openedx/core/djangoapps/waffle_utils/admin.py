@@ -7,8 +7,8 @@ from django.contrib import admin
 from config_models.admin import KeyedConfigurationModelAdmin
 
 
-from .forms import WaffleFlagCourseOverrideAdminForm
-from .models import WaffleFlagCourseOverrideModel
+from .forms import WaffleFlagCourseOverrideAdminForm, WaffleFlagOrgOverrideAdminForm
+from .models import WaffleFlagCourseOverrideModel, WaffleFlagOrgOverrideModel
 
 
 class WaffleFlagCourseOverrideAdmin(KeyedConfigurationModelAdmin):
@@ -23,8 +23,28 @@ class WaffleFlagCourseOverrideAdmin(KeyedConfigurationModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('waffle_flag', 'course_id', 'note', 'override_choice', 'enabled'),
-            'description': 'Enter a valid course id and an existing waffle flag. The waffle flag name is not validated.'
+            'description':
+                'Enter a valid course id and an existing waffle flag. The waffle flag name is not validated.'
+        }),
+    )
+
+
+class WaffleFlagOrgOverrideAdmin(KeyedConfigurationModelAdmin):
+    """
+    Admin for org override of waffle flags.
+
+    Includes search by org and waffle_flag.
+
+    """
+    form = WaffleFlagOrgOverrideAdminForm
+    search_fields = ['waffle_flag', 'org']
+    fieldsets = (
+        (None, {
+            'fields': ('waffle_flag', 'org', 'note', 'override_choice', 'enabled'),
+            'description':
+                'Enter a valid organization and an existing waffle flag. The waffle flag name is not validated.'
         }),
     )
 
 admin.site.register(WaffleFlagCourseOverrideModel, WaffleFlagCourseOverrideAdmin)
+admin.site.register(WaffleFlagOrgOverrideModel, WaffleFlagOrgOverrideAdmin)

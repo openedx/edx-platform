@@ -1,22 +1,31 @@
 """
 Handle view-logic for the discussions app.
 """
+from typing import Dict
+
+import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import validate_course_key
-from .models import DiscussionsConfiguration
-from .permissions import check_course_permissions, IsStaffOrCourseTeam
-from .serializers import DiscussionsConfigurationSerializer
+from .models import AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features, Provider
+from .permissions import IsStaffOrCourseTeam, check_course_permissions
+from .serializers import (
+    DiscussionsConfigurationSerializer,
+    DiscussionsProvidersSerializer,
+)
 
 
-class DiscussionsConfigurationView(APIView):
+class DiscussionsConfigurationSettingsView(APIView):
     """
-    Handle configuration-related view-logic
+    View for configuring discussion settings.
     """
     authentication_classes = (
         JwtAuthentication,
@@ -25,24 +34,76 @@ class DiscussionsConfigurationView(APIView):
     )
     permission_classes = (IsStaffOrCourseTeam,)
 
-    # pylint: disable=redefined-builtin
-    def get(self, request, course_key_string: str, **_kwargs) -> Response:
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="The course for which to get provider list",
+            ),
+            apidocs.string_parameter(
+                'provider_id',
+                apidocs.ParameterLocation.QUERY,
+                description="The provider_id to fetch data for"
+            )
+        ],
+        responses={
+            200: DiscussionsConfigurationSerializer,
+            400: "Invalid provider ID",
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    def get(self, request: Request, course_key_string: str, **_kwargs) -> Response:
         """
         Handle HTTP/GET requests
         """
+        data = self.get_configuration_data(request, course_key_string)
+        return Response(data)
+
+    @staticmethod
+    def get_configuration_data(request: Request, course_key_string: str) -> Dict:
+        """
+        Get discussions configuration data for the course
+        Args:
+            request (Request): a DRF request
+            course_key_string (str): a course key string
+
+        Returns:
+            Dict: Discussion configuration data for the course
+        """
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
+        provider_type = request.query_params.get('provider_id', None)
+        if provider_type and provider_type not in AVAILABLE_PROVIDER_MAP:
+            raise ValidationError("Unsupported provider type")
         serializer = DiscussionsConfigurationSerializer(
             configuration,
             context={
                 'user_id': request.user.id,
+                'provider_type': provider_type,
             }
         )
-        return Response(serializer.data)
+        return serializer.data
 
     def post(self, request, course_key_string: str, **_kwargs) -> Response:
         """
         Handle HTTP/POST requests
+        """
+        data = self.update_configuration_data(request, course_key_string)
+        return Response(data)
+
+    @staticmethod
+    def update_configuration_data(request, course_key_string):
+        """
+        Update discussion configuration for the course based on data in the request.
+        Args:
+            request (Request): a DRF request
+            course_key_string (str): a course key string
+
+        Returns:
+            Dict: modified course configuration data
         """
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
@@ -61,4 +122,121 @@ class DiscussionsConfigurationView(APIView):
                 check_course_permissions(course, request.user, 'change_provider')
 
             serializer.save()
-        return Response(serializer.data)
+        return serializer.data
+
+
+class DiscussionsProvidersView(APIView):
+    """
+    Read only view that lists details of discussion providers available for a course.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
+    permission_classes = (IsStaffOrCourseTeam,)
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="The course for which to get provider list",
+            )
+        ],
+        responses={
+            200: DiscussionsProvidersSerializer,
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    def get(self, request, course_key_string: str, **_kwargs) -> Response:
+        """
+        Handle HTTP/GET requests
+        """
+        data = self.get_provider_data(course_key_string)
+        return Response(data)
+
+    @staticmethod
+    def get_provider_data(course_key_string: str) -> Dict:
+        """
+        Get provider data for specified course
+        Args:
+            course_key_string (str): course key string
+
+        Returns:
+            Dict: course discussion providers
+        """
+        course_key = validate_course_key(course_key_string)
+        configuration = DiscussionsConfiguration.get(course_key)
+        hidden_providers = []
+        # If the user is currently using the legacy provider, don't show the new provider
+        # TODO: Allow switching between legacy and new providers
+        if configuration.provider_type == Provider.LEGACY:
+            hidden_providers.append(Provider.OPEN_EDX)
+        # If the user is currently using the new provider, don't show the legacy provider
+        elif configuration.provider_type == Provider.OPEN_EDX:
+            hidden_providers.append(Provider.LEGACY)
+        else:
+            # If this is a new course, or some other provider is selected, the new provider
+            # should only show up if the MFE is enabled
+            if not ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
+                hidden_providers.append(Provider.OPEN_EDX)
+        serializer = DiscussionsProvidersSerializer(
+            {
+                'features': [
+                    {'id': feature.value, 'feature_support_type': feature.feature_support_type}
+                    for feature in Features
+                ],
+                'active': configuration.provider_type,
+                'available': {
+                    key: value
+                    for key, value in AVAILABLE_PROVIDER_MAP.items()
+                    if key not in hidden_providers
+                },
+            }
+        )
+        return serializer.data
+
+
+class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView):
+    """
+    Combined view that includes both provider data and discussion configuration.
+
+    Note:
+        This is temporary code for backwards-compatibility and will be removed soon
+        after the frontend supports the new split APIs.
+    """
+
+    def get(self, request: Request, course_key_string: str, **_kwargs) -> Response:
+        """
+        Handle HTTP/GET requests
+        """
+        config_data = self.get_configuration_data(request, course_key_string)
+        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string)
+        return Response({
+            **config_data,
+            "features": provider_data["features"],
+            "providers": {
+                "active": provider_data["active"],
+                "available": provider_data["available"],
+            },
+        })
+
+    def post(self, request, course_key_string: str, **_kwargs) -> Response:
+        """
+        Handle HTTP/POST requests
+        """
+        config_data = self.update_configuration_data(request, course_key_string)
+        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string)
+        return Response(
+            {
+                **config_data,
+                "features": provider_data["features"],
+                "providers": {
+                    "active": provider_data["active"],
+                    "available": provider_data["available"],
+                },
+            }
+        )

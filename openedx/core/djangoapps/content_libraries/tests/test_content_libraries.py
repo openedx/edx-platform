@@ -3,7 +3,9 @@ Tests for Blockstore-based Content Libraries
 """
 from uuid import UUID
 from unittest.mock import patch
+from urllib.parse import urlparse, parse_qsl
 
+import json
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -11,6 +13,9 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase
+from web_fragments.fragment import Fragment
+from webob import Response
+from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import (
@@ -20,6 +25,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
+    URL_LIB_BLOCK_OLX,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.blockstore_cache import cache
@@ -882,7 +888,10 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             endpoint.format(**endpoint_parameters),
         )
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {'detail': "Invalid XBlock key"})
+        msg = f"XBlock {endpoint_parameters.get('block_key')} does not exist, or you don't have permission to view it."
+        self.assertEqual(response.json(), {
+            'detail': msg,
+        })
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""
@@ -903,3 +912,164 @@ class ContentLibraryXBlockValidationTest(APITestCase):
         self.assertEqual(response.json(), {
             'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
         })
+
+
+class AltBlock(XBlock):
+    """Class for testing LabXchange XBlock type overrides."""
+    @XBlock.handler
+    def student_view_user_state(self, request, suffix=""):
+        """
+        Returns a JSON response for testing.
+        """
+        view_state = {
+            "id": str(self.location),
+            "block_type": str(self.location.block_type),
+            "override_type": str(self.__class__),
+        }
+        return Response(
+            json.dumps(view_state),
+            content_type='application/json',
+            charset='UTF-8',
+        )
+
+    def student_view(self, context=None):
+        """
+        Returns an HTML fragment for testing.
+        """
+        return Fragment(f"<div data-usage='{self.location}' data-block-type='{self.location.block_type}'>"
+                        "<div class='AltBlock-wrapper'/></div>")
+
+
+@ddt.ddt
+@elasticsearch_test
+class ContentLibrariesXBlockTypeOverrideTest(ContentLibrariesRestApiTest):
+    """
+    Tests for Blockstore-based Content Libraries XBlock API,
+    where the expected XBlock type returned is overridden in the request.
+    """
+    BLOCK_DATA = (
+        ('block-wo-override', {}, 'video'),
+        ('block-w-override', {'lx_block_types': '1'}, 'alt-block'),
+    )
+
+    def setUp(self):
+        super().setUp()
+        if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
+            ContentLibraryIndexer.remove_all_items()
+            LibraryBlockIndexer.remove_all_items()
+
+        self.olx = """
+        <video display_name="Test Block Type Overrides"
+            youtube_id_1_0="rE42zZ-3wNo"
+            transcripts="{&quot;en&quot;: &quot;transcript.srt&quot;}" />
+        """.strip()
+
+    def create_block(self, slug, block_type='video'):
+        """
+        Add a new library containing a block, using the given slug to keep them unique.
+        """
+        lib = self._create_library(slug=slug, title='Test Block Type Overrides', library_type=COMPLEX)
+        block = self._add_block_to_library(lib['id'], block_type, slug)
+        self._set_library_block_olx(block['id'], self.olx)
+        self._commit_library_changes(lib['id'])
+        return block['id']
+
+    @ddt.data(*BLOCK_DATA)
+    @ddt.unpack
+    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
+    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
+    def test_block_type_metadata(self, slug, api_args, expected_type):
+        """
+        Check that the metadata API returns the overridden block type.
+        """
+        block_key = self.create_block(f"metadata-{slug}")
+        response = self.client.get(
+            URL_BLOCK_METADATA_URL.format(block_key=block_key),
+            api_args,
+        )
+        assert response.data['block_id'] == str(block_key)
+        assert response.data['block_type'] == expected_type
+        assert response.data['display_name'] == 'Test Block Type Overrides'
+
+    @ddt.data(*BLOCK_DATA)
+    @ddt.unpack
+    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
+    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
+    def test_block_type_olx(self, slug, api_args, expected_type):
+        """
+        Check that the OLX API is unchanged when overriding the block type.
+        """
+        block_key = self.create_block(f"olx-{slug}")
+        response = self.client.get(
+            URL_LIB_BLOCK_OLX.format(block_key=block_key),
+            api_args,
+        )
+        assert response.data['olx'] == self.olx
+
+    @ddt.data(*BLOCK_DATA)
+    @ddt.unpack
+    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
+    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
+    def test_block_type_render(self, slug, api_args, expected_type):
+        """
+        Check that the rendered block HTML uses the overridden block type.
+        """
+        block_key = self.create_block(f"render-{slug}")
+        response = self.client.get(
+            URL_BLOCK_RENDER_VIEW.format(block_key=block_key, view_name='student_view'),
+            api_args,
+        )
+        assert response.data['block_id'] == str(block_key)
+        assert response.data['block_type'] == expected_type
+        assert response.data['display_name'] == 'Test Block Type Overrides'
+        assert f"data-usage='{block_key}'" in response.data['content']
+        assert f"data-block-type='{expected_type}'" in response.data['content']
+        if expected_type == 'video':
+            assert 'class="video-wrapper"' in response.data['content']
+        else:
+            assert "class='AltBlock-wrapper'" in response.data['content']
+
+    @ddt.data(*BLOCK_DATA)
+    @ddt.unpack
+    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
+    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
+    def test_block_type_handler(self, slug, api_args, expected_type):
+        # Check that the handler_url contains the block type override params
+        block_key = self.create_block(f"handler-{slug}")
+        response = self.client.get(
+            URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name='student_view_user_state'),
+            api_args,
+        )
+        handler_url = response.data['handler_url']
+        parsed_url = urlparse(handler_url)
+        parsed_qs = dict(parse_qsl(parsed_url.query))
+        assert parsed_qs == api_args
+
+        # Ensure the invoked handler hits the expected Block
+        if expected_type == 'video':
+            expected_response = {
+                'all_sources': [],
+                'duration': None,
+                'encoded_videos': {
+                    'youtube': {
+                        'file_size': 0,
+                        'url': 'https://www.youtube.com/watch?v=rE42zZ-3wNo',
+                    }
+                },
+                'only_on_web': False,
+                'saved_video_position': 0.0,
+                'speed': None,
+                'transcripts': {},
+            }
+        else:
+            expected_response = {
+                "id": f'lb:CL-TEST:handler-{slug}:video:handler-{slug}',
+                "block_type": 'video',
+                "override_type": "<class 'xblock.internal.AltBlockWithMixins'>",
+            }
+        response = self.client.post(handler_url).json()
+        # Can't match the Transcripts download URL exactly, but we can check that it's there and roughly correct
+        if 'transcripts' in response:
+            assert f"lb:CL-TEST:handler-{slug}:video:handler-{slug}" in response['transcripts']['en']
+            del response['transcripts']['en']
+        assert response == expected_response

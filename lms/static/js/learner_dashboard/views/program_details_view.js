@@ -83,6 +83,8 @@ class ProgramDetailsView extends Backbone.View {
       industryPathways: this.options.industryPathways,
       creditPathways: this.options.creditPathways,
       discussionFragment: this.options.discussionFragment,
+      live_fragment: this.options.live_fragment,
+
     };
     data = $.extend(data, this.programModel.toJSON());
     HtmlUtils.setHtml(this.$el, this.tpl(data));
@@ -134,6 +136,13 @@ class ProgramDetailsView extends Backbone.View {
       creditPathways: this.options.creditPathways,
       programTabViewEnabled: this.options.programTabViewEnabled,
     });
+    let hasIframe = false;
+    $('#live-tab').click(() => {
+      if (!hasIframe) {
+        $('#live').html(HtmlUtils.HTML(this.options.live_fragment.iframe).toString());
+        hasIframe = true;
+      }
+    }).bind(this);
   }
 
   trackPurchase() {

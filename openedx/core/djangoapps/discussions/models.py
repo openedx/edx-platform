@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
-from enum import Enum
+from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
@@ -169,7 +169,6 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True,
         'supports_in_context_discussions': True,
-        'visible': False,
     },
     Provider.ED_DISCUSS: {
         'features': [
@@ -196,7 +195,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('Ed Discussion')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.INSCRIBE: {
         'features': [
@@ -224,7 +224,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('InScribe')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.PIAZZA: {
         'features': [
@@ -248,7 +249,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='team@piazza.com',
         )._asdict(),
         'messages': [],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True
     },
     Provider.YELLOWDIG: {
         'features': [
@@ -267,7 +269,7 @@ AVAILABLE_PROVIDER_MAP = {
         ],
         'supports_lti': True,
         'external_links': ProviderExternalLinks(
-            learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
+            learn_more='https://youtu.be/oOcvjjMVFAw',
             configuration='',
             general='https://hubs.ly/H0J5Bn70',
             accessibility='',
@@ -518,10 +520,12 @@ class DiscussionsConfiguration(TimeStampedModel):
         )
 
 
-class ProgramDiscussionsConfiguration(TimeStampedModel):
+class AbstractProgramLTIConfiguration(TimeStampedModel):
     """
-    Associates a program with a discussion provider and configuration
+    Associates a program with a LTI provider and configuration
     """
+    class Meta:
+        abstract = True
 
     program_uuid = models.CharField(
         primary_key=True,
@@ -531,7 +535,7 @@ class ProgramDiscussionsConfiguration(TimeStampedModel):
     )
     enabled = models.BooleanField(
         default=True,
-        help_text=_("If disabled, the discussions in the associated program will be disabled.")
+        help_text=_("If disabled, the LTI in the associated program will be disabled.")
     )
     lti_configuration = models.ForeignKey(
         LtiConfiguration,
@@ -543,26 +547,21 @@ class ProgramDiscussionsConfiguration(TimeStampedModel):
     provider_type = models.CharField(
         blank=False,
         max_length=50,
-        verbose_name=_("Discussion provider"),
-        help_text=_("The discussion provider's id"),
+        verbose_name=_("LTI provider"),
+        help_text=_("The LTI provider's id"),
     )
-    history = HistoricalRecords()
 
     def __str__(self):
         return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
 
     @classmethod
-    def is_enabled(cls, program_uuid) -> bool:
+    def get(cls, program_uuid):
         """
-        Check if there is an active configuration for a given program uuid
-
-        Default to False, if no configuration exists
+        Lookup a program discussion configuration by program uuid.
         """
-        try:
-            configuration = cls.objects.get(program_uuid=program_uuid)
-            return configuration.enabled
-        except cls.DoesNotExist:
-            return False
+        return cls.objects.filter(
+            program_uuid=program_uuid
+        ).first()
 
 
 class DiscussionTopicLink(models.Model):
@@ -609,6 +608,10 @@ class DiscussionTopicLink(models.Model):
         default=True,
         help_text=_("Whether this topic should be shown in-context in the course.")
     )
+    ordering = models.PositiveIntegerField(
+        null=True,
+        help_text=_("Ordering of this topic in its learning context"),
+    )
 
     def __str__(self):
         return (
@@ -618,3 +621,11 @@ class DiscussionTopicLink(models.Model):
             f'enabled_in_context={self.enabled_in_context}'
             f')'
         )
+
+
+class ProgramLiveConfiguration(AbstractProgramLTIConfiguration):
+    history = HistoricalRecords()
+
+
+class ProgramDiscussionsConfiguration(AbstractProgramLTIConfiguration):
+    history = HistoricalRecords()

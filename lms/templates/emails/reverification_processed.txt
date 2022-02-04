@@ -1,5 +1,5 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 % if status == "approved":
 ${_("We have successfully verified your identity for the {assessment} assessment in the {course_name} course."
 ).format(course_name=course_name, assessment=assessment)}

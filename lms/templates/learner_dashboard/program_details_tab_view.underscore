@@ -12,9 +12,11 @@
         <button class="nav-link btn-link" id="profile-tab" data-toggle="tab" data-target="#community" type="button" role="tab" aria-controls="community" aria-selected="false">Community</button>
       </li>
        <% } %>
-      <li class="d-none nav-item" role="presentation">
-        <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#live" type="button" role="tab" aria-controls="live" aria-selected="false">Live</button>
+      <% if (live_fragment.configured) { %>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-link" id="live-tab" data-toggle="tab" data-target="#live" type="button" role="tab" aria-controls="live" aria-selected="false">Live</button>
       </li>
+       <% } %>
       <% if (industryPathways.length > 0 || creditPathways.length > 0) { %>
       <li class="nav-item" role="presentation">
         <button class="nav-link btn-link" id="contact-tab" data-toggle="tab" data-target="#pathways" type="button" role="tab" aria-controls="pathways" aria-selected="false">Pathways</button>
@@ -105,7 +107,9 @@
   <% if (discussionFragment.configured) { %>
        <div class="tab-pane fade" id="community" role="tabpanel" aria-labelledby="community-tab"><%= HtmlUtils.HTML(discussionFragment.iframe) %></div>
   <% } %>
-  <div class="tab-pane fade" id="live" role="tabpanel" aria-labelledby="live-tab">Live tab content</div>
+  <% if (live_fragment.configured) { %>
+  <div class="tab-pane fade" id="live" role="tabpanel" aria-labelledby="live-tab"></div>
+  <% } %>
   <div class="tab-pane fade" id="pathways" role="tabpanel" aria-labelledby="pathaways-tab">
 <% if (creditPathways.length > 0) { %>
     <aside class="aside js-program-pathways program-credit-pathways">

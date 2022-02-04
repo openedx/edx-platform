@@ -22,9 +22,9 @@ from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import require_global_staff
 from openedx.features.announcements.forms import AnnouncementForm
 from openedx.features.announcements.models import Announcement
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

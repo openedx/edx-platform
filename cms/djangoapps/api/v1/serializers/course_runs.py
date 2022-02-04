@@ -12,7 +12,7 @@ from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
 from common.djangoapps.student.models import CourseAccessRole
 from openedx.core.lib.courses import course_image_url
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 IMAGE_TYPES = {
     'image/jpeg': 'jpg',

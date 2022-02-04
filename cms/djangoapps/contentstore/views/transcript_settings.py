@@ -27,7 +27,7 @@ from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
+from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .videos import TranscriptProvider
 

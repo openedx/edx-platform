@@ -227,6 +227,15 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
             response = self.client.get(url)
             assert response.status_code == 200
 
+    def test_legacy_redirect(self):
+        """
+        Verify that the legacy course home page redirects to the MFE correctly.
+        """
+        url = course_home_url(self.course) + '?foo=b$r'
+        response = self.client.get(url)
+        assert response.status_code == 302
+        assert response.get('Location') == 'http://learning-mfe/course/course-v1:edX+test+Test_Course/home?foo=b%24r'
+
 
 @ddt.ddt
 class TestCourseHomePageAccess(CourseHomePageTestCase):

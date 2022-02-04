@@ -4,6 +4,7 @@ Tests for Discussion API internal interface
 
 
 import itertools
+import random
 from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -11,22 +12,29 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import ddt
 import httpretty
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from common.djangoapps.student.tests.factories import (
+    AdminFactory,
     BetaTesterFactory,
     CourseEnrollmentFactory,
     StaffFactory,
-    UserFactory,
+    UserFactory
 )
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
@@ -40,33 +48,40 @@ from lms.djangoapps.discussion.rest_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_course_topics_v2,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
-    update_thread,
+    update_thread
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
     CommentNotFoundError,
     DiscussionBlackOutException,
     DiscussionDisabledError,
-    ThreadNotFoundError,
+    ThreadNotFoundError
 )
+from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response,
+    make_paginated_api_response
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+
+User = get_user_model()
 
 
 def _remove_discussion_tab(course, user_id):
@@ -1585,6 +1600,119 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         # Page past the end
         with pytest.raises(PageNotFoundError):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
+
+
+@ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
+    """
+    Tests for get_user_comments.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
+
+        self.course = CourseFactory.create()
+
+        # create staff user so that we don't need to worry about
+        # permissions here
+        self.user = UserFactory.create(is_staff=True)
+        self.register_get_user_response(self.user)
+
+        self.request = RequestFactory().get(f'/api/discussion/v1/users/{self.user.username}/{self.course.id}')
+        self.request.user = self.user
+
+    def test_call_with_single_results_page(self):
+        """
+        Assert that a minimal call with valid inputs, and single result,
+        returns the expected response structure.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+        )
+        assert "results" in response.data
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 1
+        assert response.data["pagination"]["num_pages"] == 1
+        assert response.data["pagination"]["next"] is None
+        assert response.data["pagination"]["previous"] is None
+
+    @ddt.data(1, 2, 3)
+    def test_call_with_paginated_results(self, page):
+        """
+        Assert that paginated results return the correct pagination
+        information at the pagination boundaries.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment() for _ in range(30)],
+            page=page,
+            num_pages=3,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+            page=page,
+        )
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 30
+        assert response.data["pagination"]["num_pages"] == 3
+
+        if page in (1, 2):
+            assert response.data["pagination"]["next"] is not None
+            assert f"page={page+1}" in response.data["pagination"]["next"]
+        if page in (2, 3):
+            assert response.data["pagination"]["previous"] is not None
+            assert f"page={page-1}" in response.data["pagination"]["previous"]
+        if page == 1:
+            assert response.data["pagination"]["previous"] is None
+        if page == 3:
+            assert response.data["pagination"]["next"] is None
+
+    def test_call_with_invalid_page(self):
+        """
+        Assert that calls for pages that exceed the existing number of
+        results pages raise PageNotFoundError.
+        """
+        self.register_get_comments_response([], page=2, num_pages=1)
+        with pytest.raises(PageNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=self.course.id,
+                page=2,
+            )
+
+    def test_call_with_non_existent_course(self):
+        """
+        Assert that calls for comments in a course that doesn't exist
+        result in a CourseNotFoundError error.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        with pytest.raises(CourseNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=CourseKey.from_string("x/y/z"),
+                page=2,
+            )
 
 
 @ddt.ddt
@@ -3447,3 +3575,171 @@ class RetrieveThreadTest(
             assert not expected_error
         except ThreadNotFoundError:
             assert expected_error
+
+
+@mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
+class CourseTopicsV2Test(ModuleStoreTestCase):
+    """
+    Tests for discussions topic API v2 code.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.course = CourseFactory.create(
+            discussion_topics={f"Course Wide Topic {idx}": {"id": f'course-wide-topic-{idx}'} for idx in range(10)}
+        )
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.verticals = [
+            ItemFactory.create(
+                parent_location=self.sequential.location,
+                category='vertical',
+                display_name=f'vertical-{idx}',
+                start=datetime(2015, 4, 1, tzinfo=UTC),
+            )
+            for idx in range(10)
+        ]
+        staff_only_unit = ItemFactory.create(
+            parent_location=self.sequential.location,
+            category='vertical',
+            display_name='staff-vertical-1',
+            metadata=dict(visible_to_staff_only=True),
+        )
+        self.course_key = course_key = self.course.id
+        self.config = DiscussionsConfiguration.objects.create(context_key=course_key, provider_type=Provider.OPEN_EDX)
+        topic_links = []
+        update_discussions_settings_from_course_task(str(self.course_key))
+        self.staff_only_id = DiscussionTopicLink.objects.filter(
+            usage_key__in=[staff_only_unit.location]
+        ).values_list(
+            'external_id', flat=True,
+        ).get()
+        topic_id_query = DiscussionTopicLink.objects.filter(context_key=course_key).values_list(
+            'external_id', flat=True,
+        )
+        topic_ids = list(topic_id_query.order_by('ordering'))
+        topic_ids.remove(self.staff_only_id)
+        topic_ids_by_name = list(topic_id_query.order_by('title'))
+        topic_ids_by_name.remove(self.staff_only_id)
+        deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
+        for idx, topic_id in enumerate(deleted_topic_ids):
+            usage_key = course_key.make_usage_key('vertical', topic_id)
+            topic_links.append(
+                DiscussionTopicLink(
+                    context_key=course_key,
+                    usage_key=usage_key,
+                    title=f"Discussion on {topic_id}",
+                    external_id=topic_id,
+                    provider_id=Provider.OPEN_EDX,
+                    ordering=idx,
+                    enabled_in_context=False
+                )
+            )
+        DiscussionTopicLink.objects.bulk_create(topic_links)
+        self.topic_ids = topic_ids
+        self.topic_ids_by_name = topic_ids_by_name
+        self.user = UserFactory.create()
+        self.staff = AdminFactory.create()
+        self.topic_stats = {
+            topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
+            for topic_id in self.topic_ids
+        }
+        patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts',
+            mock.Mock(return_value=self.topic_stats),
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_default_response(self):
+        """
+        Test that the standard response contains the correct number of items
+        """
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user)
+        assert len(topics_list) == len(self.topic_ids)
+
+    def test_staff_response(self):
+        """
+        Test that the standard response contains the correct number of items
+        """
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.staff)
+        assert len(topics_list) == len(self.topic_ids) + 1
+        assert any(topic_data.get('id') == self.staff_only_id for topic_data in topics_list)
+
+    def test_filtering(self):
+        """
+        Tests that filtering by topic id works
+        """
+        filter_ids = set(random.sample(self.topic_ids, 4))
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user, topic_ids=filter_ids)
+        assert len(topics_list) == 4
+        # All the filtered ids should be returned
+        assert filter_ids == set(topic_data.get('id') for topic_data in topics_list)
+
+    def test_sort_by_name(self):
+        """
+        Test sorting by name
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.NAME,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        assert returned_topic_ids == self.topic_ids_by_name
+
+    def test_sort_by_structure(self):
+        """
+        Test sorting by course structure
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.COURSE_STRUCTURE,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        # The topics are already sorted in their simulated course order
+        sorted_topic_ids = self.topic_ids
+        assert returned_topic_ids == sorted_topic_ids
+
+    def test_sort_by_activity(self):
+        """
+        Test sorting by activity
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.ACTIVITY,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        # The topics are already sorted in their simulated course order
+        sorted_topic_ids = sorted(
+            self.topic_ids,
+            key=lambda tid: sum(self.topic_stats.get(tid, {}).values()),
+            reverse=True,
+        )
+        assert returned_topic_ids == sorted_topic_ids
+
+    def test_other_providers_ordering_error(self):
+        """
+        Test that activity sorting raises an error for other providers
+        """
+        self.config.provider_type = 'other'
+        self.config.save()
+        with pytest.raises(ValidationError):
+            get_course_topics_v2(
+                course_key=self.course_key,
+                user=self.user,
+                order_by=TopicOrdering.ACTIVITY,
+            )

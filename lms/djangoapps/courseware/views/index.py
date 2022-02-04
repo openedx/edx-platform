@@ -207,7 +207,8 @@ class CoursewareIndex(View):
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
-            unit_key
+            unit_key,
+            params=self.request.GET,
         )
         return url
 

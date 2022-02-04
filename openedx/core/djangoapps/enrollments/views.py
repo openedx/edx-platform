@@ -7,20 +7,37 @@ consist primarily of authentication, request validation, and serialization.
 
 import logging
 
-from common.djangoapps.course_modes.models import CourseMode
-from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
+    ObjectDoesNotExist,
+    ValidationError
+)
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.jwt.authentication import \
+    JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.session.authentication import \
+    SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
-    CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError,
+    CourseEnrollmentError,
+    CourseEnrollmentExistsError,
+    CourseModeNotFoundError
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
@@ -39,15 +56,6 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiServiceClient,
     enterprise_enabled
 )
-from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, User
-from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
-from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -743,7 +751,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 enterprise_api_client = EnterpriseApiServiceClient()
                 consent_client = ConsentApiServiceClient()
                 try:
-                    enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
+                    enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id))
                 except EnterpriseApiException as error:
                     log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
                                   "for user [%s] in course run [%s]", username, course_id)

@@ -31,12 +31,6 @@ from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_ANONYMOUS_USER_ID,
-    ATTR_KEY_USER_IS_STAFF,
-    ATTR_KEY_USER_ID,
-)
-from openedx.core.djangolib.markup import HTML, Text
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -53,6 +47,12 @@ from xmodule.x_module import (
     shim_xmodule_js
 )
 from xmodule.xml_module import XmlMixin
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ID,
+)
+from openedx.core.djangolib.markup import HTML, Text
 
 from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
@@ -121,6 +121,10 @@ class Randomization(String):
 @XBlock.needs('user')
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
+@XBlock.needs('cache')
+@XBlock.needs('sandbox')
+# Studio doesn't provide XQueueService, but the LMS does.
+@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -812,12 +816,15 @@ class ProblemBlock(
         anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
+        sandbox_service = self.runtime.service(self, 'sandbox')
+        cache_service = self.runtime.service(self, 'cache')
+
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
             anonymous_student_id=anonymous_student_id,
-            cache=self.runtime.cache,
-            can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
-            get_python_lib_zip=self.runtime.get_python_lib_zip,
+            cache=cache_service,
+            can_execute_unsafe_code=sandbox_service.can_execute_unsafe_code,
+            get_python_lib_zip=sandbox_service.get_python_lib_zip,
             DEBUG=self.runtime.DEBUG,
             filestore=self.runtime.filestore,
             i18n=self.runtime.service(self, "i18n"),
@@ -825,7 +832,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             seed=seed,  # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
-            xqueue=self.runtime.xqueue,
+            xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -1744,7 +1751,8 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            waittime_between_requests = self.runtime.xqueue['waittime']
+            xqueue_service = self.runtime.service(self, 'xqueue')
+            waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)

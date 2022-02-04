@@ -1,0 +1,14 @@
+{
+    "block-a": {
+        "title": "Defense against the dark arts",
+        "org": "Hogwarts",
+        "number": "DADA101",
+        "courseId": "course-v1:Hogwarts+DADA101+2021_Winter"
+    },
+    "block-b": {
+        "title": "Introduction to Time Travel",
+        "org": "Oxford",
+        "number": "TT101",
+        "courseId": "course-v1:Oxford+TT101+2021_Winter"
+    }
+}

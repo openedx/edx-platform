@@ -1022,7 +1022,7 @@ class LtiToolLaunchView(TemplateResponseMixin, LtiToolView):
         # Render context and response.
         context = self.get_context_data()
         response = self.render_to_response(context)
-        mark_user_change_as_expected(response, edx_user.id)
+        mark_user_change_as_expected(edx_user.id)
         return response
 
     def handle_ags(self):

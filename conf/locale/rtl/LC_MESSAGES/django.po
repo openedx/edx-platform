@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-05 20:51+0000\n"
-"PO-Revision-Date: 2021-12-05 20:51:59.636121\n"
+"POT-Creation-Date: 2021-12-26 20:50+0000\n"
+"PO-Revision-Date: 2021-12-26 20:50:31.353784\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -61,6 +61,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Ŧǝxʇ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -729,34 +734,42 @@ msgstr "Ʉnǝxdǝɔʇǝd ɐɔɔønnʇ sʇɐʇns"
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Your account could not be activated{html_end}Something went "
-"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
-"issue."
+"{html_start}Your {account_or_email} could not be "
+"{activated_or_confirmed}{html_end}Something went wrong, please <a "
+"href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
-"{html_start}Ɏønɹ ɐɔɔønnʇ ɔønld nøʇ bǝ ɐɔʇᴉʌɐʇǝd{html_end}Søɯǝʇɥᴉnƃ ʍǝnʇ "
-"ʍɹønƃ, dlǝɐsǝ <a href=\"{support_url}\">ɔønʇɐɔʇ snddøɹʇ</a> ʇø ɹǝsølʌǝ ʇɥᴉs "
-"ᴉssnǝ."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
-msgstr "{html_start}Ŧɥᴉs ɐɔɔønnʇ ɥɐs ɐlɹǝɐdʎ bǝǝn ɐɔʇᴉʌɐʇǝd.{html_end}"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}Success{html_end} You have activated your account."
-msgstr "{html_start}Snɔɔǝss{html_end} Ɏøn ɥɐʌǝ ɐɔʇᴉʌɐʇǝd ʎønɹ ɐɔɔønnʇ."
+"{html_start}Ɏønɹ {account_or_email} ɔønld nøʇ bǝ "
+"{activated_or_confirmed}{html_end}Søɯǝʇɥᴉnƃ ʍǝnʇ ʍɹønƃ, dlǝɐsǝ <a "
+"href=\"{support_url}\">ɔønʇɐɔʇ snddøɹʇ</a> ʇø ɹǝsølʌǝ ʇɥᴉs ᴉssnǝ."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Success! You have activated your account.{html_end}You will now "
-"receive email updates and alerts from us related to the courses you are "
-"enrolled in. Sign In to continue."
+"{html_start}This {account_or_email} has already been "
+"{activated_or_confirmed}.{html_end}"
 msgstr ""
-"{html_start}Snɔɔǝss! Ɏøn ɥɐʌǝ ɐɔʇᴉʌɐʇǝd ʎønɹ ɐɔɔønnʇ.{html_end}Ɏøn ʍᴉll nøʍ "
-"ɹǝɔǝᴉʌǝ ǝɯɐᴉl nddɐʇǝs ɐnd ɐlǝɹʇs ɟɹøɯ ns ɹǝlɐʇǝd ʇø ʇɥǝ ɔønɹsǝs ʎøn ɐɹǝ "
-"ǝnɹøllǝd ᴉn. Sᴉƃn Ɨn ʇø ɔønʇᴉnnǝ."
+"{html_start}Ŧɥᴉs {account_or_email} ɥɐs ɐlɹǝɐdʎ bǝǝn "
+"{activated_or_confirmed}.{html_end}"
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success{html_end} You have {activated_or_confirmed} your "
+"{account_or_email}."
+msgstr ""
+"{html_start}Snɔɔǝss{html_end} Ɏøn ɥɐʌǝ {activated_or_confirmed} ʎønɹ "
+"{account_or_email}."
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have {activated_or_confirmed} your "
+"{account_or_email}.{html_end}You will now receive email updates and alerts "
+"from us related to the courses you are enrolled in. Sign In to continue."
+msgstr ""
+"{html_start}Snɔɔǝss! Ɏøn ɥɐʌǝ {activated_or_confirmed} ʎønɹ "
+"{account_or_email}.{html_end}Ɏøn ʍᴉll nøʍ ɹǝɔǝᴉʌǝ ǝɯɐᴉl nddɐʇǝs ɐnd ɐlǝɹʇs "
+"ɟɹøɯ ns ɹǝlɐʇǝd ʇø ʇɥǝ ɔønɹsǝs ʎøn ɐɹǝ ǝnɹøllǝd ᴉn. Sᴉƃn Ɨn ʇø ɔønʇᴉnnǝ."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -3594,10 +3607,6 @@ msgid ""
 msgstr ""
 "ɆɌɌØɌ: \"{block_type}\" ᴉs ɐn nnʞnøʍn ɔøɯdønǝnʇ ʇʎdǝ. Ŧɥᴉs ɔøɯdønǝnʇ ʍᴉll bǝ"
 " ɥᴉddǝn ᴉn ŁMS."
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Ŧǝxʇ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -11224,10 +11233,13 @@ msgstr ""
 " ɐ dᴉɟɟǝɹǝnʇ ǝɯɐᴉl ɐddɹǝss."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
 msgid ""
-"This email is already associated with an existing or previous edX account"
+"This email is already associated with an existing or previous "
+"{settings.PLATFORM_NAME} account"
 msgstr ""
-"Ŧɥᴉs ǝɯɐᴉl ᴉs ɐlɹǝɐdʎ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐn ǝxᴉsʇᴉnƃ øɹ dɹǝʌᴉøns ǝdX ɐɔɔønnʇ"
+"Ŧɥᴉs ǝɯɐᴉl ᴉs ɐlɹǝɐdʎ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐn ǝxᴉsʇᴉnƃ øɹ dɹǝʌᴉøns "
+"{settings.PLATFORM_NAME} ɐɔɔønnʇ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -11876,6 +11888,11 @@ msgstr "Ħᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ɔøɯdlǝʇǝd"
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "Ɏǝɐɹ øɟ bᴉɹʇɥ"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "I agree that {platform_name} may send me marketing messages."
+msgstr "Ɨ ɐƃɹǝǝ ʇɥɐʇ {platform_name} ɯɐʎ sǝnd ɯǝ ɯɐɹʞǝʇᴉnƃ ɯǝssɐƃǝs."
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
@@ -12852,10 +12869,6 @@ msgstr "ⱣǝɹɯᴉssᴉønĐǝnᴉǝd: Fɐᴉlǝd ᴉn ɐnʇɥǝnʇᴉɔɐʇ�
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} Snddøɹʇ Łǝʌǝls:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "ĦŦMŁ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
@@ -16550,10 +16563,6 @@ msgstr "Ⱥɔɔǝss ʇɥᴉs ɔønɹsǝ"
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
 msgstr "Ǥǝʇ ɐɔɔǝss ʇø ʇɥǝ ɔønɹsǝ ɯɐʇǝɹᴉɐl, ᴉnɔlndᴉnƃ ʌᴉdǝøs ɐnd ɹǝɐdᴉnƃs"
-
-#: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be locked"
-msgstr "Søɯǝ ƃɹɐdǝd ɔønʇǝnʇ ɯɐʎ bǝ løɔʞǝd"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"

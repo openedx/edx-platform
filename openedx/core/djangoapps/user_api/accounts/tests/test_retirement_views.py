@@ -74,8 +74,8 @@ from common.djangoapps.student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ...tests.factories import UserOrgTagFactory
 from ..views import USER_PROFILE_PII, AccountRetirementView

@@ -8,8 +8,8 @@ from rest_framework import serializers
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features, Provider
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from .models import DiscussionsConfiguration, Provider
 from .utils import available_division_schemes, get_divided_discussions
 
 
@@ -42,16 +42,6 @@ class LtiSerializer(serializers.ModelSerializer):
             if key in self.Meta.fields
         }
         return payload
-
-    def to_representation(self, instance):
-        """
-        Serialize object into a primitive data types.
-        """
-        representation = super().to_representation(instance)
-        if not self.context.get('pii_sharing_allowed'):
-            representation.pop('pii_share_username')
-            representation.pop('pii_share_email')
-        return representation
 
     def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
         """
@@ -218,40 +208,34 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         Serialize data into a dictionary, to be used as a response
         """
         course_key = instance.context_key
+        active_provider = instance.provider_type
+        provider_type = self.context.get('provider_type') or active_provider
         payload = super().to_representation(instance)
+        course_pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_key)
 
-        lti_configuration = LtiSerializer(
-            instance.lti_configuration,
-            context={'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key)}
-        )
-        lti_configuration_data = lti_configuration.data
-
-        provider_type = instance.provider_type
-        plugin_configuration = instance.plugin_configuration
+        # LTI configuration is only stored for the active provider.
+        if provider_type == active_provider:
+            lti_configuration = LtiSerializer(instance=instance.lti_configuration)
+            lti_configuration_data = lti_configuration.data
+            plugin_configuration = instance.plugin_configuration
+        else:
+            lti_configuration_data = {}
+            plugin_configuration = {}
 
         course = get_course_by_id(course_key)
-        legacy_settings = LegacySettingsSerializer(
-            course,
-            data=plugin_configuration,
-        )
-        if legacy_settings.is_valid(raise_exception=True):
-            plugin_configuration = legacy_settings.data
-        features_list = [
-            {'id': feature.value, 'feature_support_type': feature.feature_support_type}
-            for feature in Features
-        ]
+        if provider_type in [Provider.LEGACY, Provider.OPEN_EDX]:
+            legacy_settings = LegacySettingsSerializer(course, data=plugin_configuration)
+            if legacy_settings.is_valid(raise_exception=True):
+                plugin_configuration = legacy_settings.data
+            if provider_type == Provider.OPEN_EDX:
+                plugin_configuration.update({
+                    "group_at_subsection": instance.plugin_configuration.get("group_at_subsection", False)
+                })
+        lti_configuration_data.update({'pii_sharing_allowed': course_pii_sharing_allowed})
         payload.update({
-            'features': features_list,
+            'provider_type': provider_type,
             'lti_configuration': lti_configuration_data,
             'plugin_configuration': plugin_configuration,
-            'providers': {
-                'active': provider_type or DEFAULT_PROVIDER_TYPE,
-                'available': {
-                    key: value
-                    for key, value in AVAILABLE_PROVIDER_MAP.items()
-                    if value.get('visible', True)
-                },
-            },
         })
         return payload
 
@@ -410,7 +394,6 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         """
         Return a serialized representation of the course discussion settings.
         """
-        payload = super().to_representation(instance)
         course = self.context['course']
         instance = self.context['settings']
         course_key = course.id
@@ -443,3 +426,40 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         except ValueError as e:
             raise ValidationError(str(e)) from e
         return instance
+
+
+class DiscussionsProviderSerializer(serializers.Serializer):
+    """
+    Serializer for a discussion provider
+    """
+    features = serializers.ListField(child=serializers.CharField(), help_text="Features supported by the provider")
+    supports_lti = serializers.BooleanField(default=False, help_text="Whether the provider supports LTI")
+    external_links = serializers.DictField(help_text="External documentation and links for provider")
+    messages = serializers.ListField(child=serializers.CharField(), help_text="Custom messaging for provider")
+    has_full_support = serializers.BooleanField(help_text="Whether the provider is fully supported")
+
+
+class DiscussionsFeatureSerializer(serializers.Serializer):
+    """
+    Serializer for discussions features
+    """
+    id = serializers.CharField(help_text="Feature ID")
+    feature_support_type = serializers.CharField(help_text="Feature support level classification")
+
+
+class DiscussionsProvidersSerializer(serializers.Serializer):
+    """
+    Serializer for discussion providers.
+    """
+    active = serializers.CharField(
+        read_only=True,
+        help_text="The current active provider",
+    )
+    features = serializers.ListField(
+        child=DiscussionsFeatureSerializer(read_only=True),
+        help_text="Features support classification levels",
+    )
+    available = serializers.DictField(
+        child=DiscussionsProviderSerializer(read_only=True),
+        help_text="List of available providers",
+    )

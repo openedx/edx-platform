@@ -10,6 +10,7 @@ from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.services import CompletionService
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
@@ -19,6 +20,10 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
+from xmodule.errortracker import make_error_tracker
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import ModuleI18nService
+from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
@@ -30,10 +35,9 @@ from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import Blockst
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
+from openedx.core.lib.cache_utils import CacheService
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
 from common.djangoapps.static_replace import process_static_urls
-from xmodule.errortracker import make_error_tracker  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -240,6 +244,12 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return MakoService()
         elif service_name == "i18n":
             return ModuleI18nService(block=block)
+        elif service_name == 'sandbox':
+            context_key = block.scope_ids.usage_id.context_key
+            return SandboxService(contentstore=contentstore, course_id=context_key)
+        elif service_name == 'cache':
+            return CacheService(cache)
+
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
         # Otherwise, fall back to the base implementation which loads services

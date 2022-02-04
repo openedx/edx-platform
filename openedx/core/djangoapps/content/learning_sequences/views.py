@@ -12,15 +12,17 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core import types
 from openedx.core.lib.api.view_utils import validate_course_key
 
 from .api import get_user_course_outline_details
-from .api.permissions import can_call_public_api, can_see_content_as_other_users
+from .api.permissions import can_call_public_api
 from .data import CourseOutlineData
 
 User = get_user_model()
@@ -162,6 +164,9 @@ class CourseOutlineView(APIView):
         course_key = validate_course_key(course_key_str)
         at_time = datetime.now(timezone.utc)
 
+        # Get target user (and override request user for the benefit of any waffle checks)
+        request.user = self._determine_user(request, course_key)
+
         # We use can_call_public_api to slowly roll this feature out, and be
         # able to turn it off for a course. But it's not really a permissions
         # thing in that it doesn't give them elevated access. If I had it to do
@@ -179,9 +184,13 @@ class CourseOutlineView(APIView):
 
         try:
             # Grab the user's outline and send our response...
-            outline_user = self._determine_user(request, course_key)
-            user_course_outline_details = get_user_course_outline_details(course_key, outline_user, at_time)
+            user_course_outline_details = get_user_course_outline_details(course_key, request.user, at_time)
         except CourseOutlineData.DoesNotExist as does_not_exist_err:
+            if not request.user.id:
+                # Outline is private or doesn't exist. But don't leak whether a course exists or not to anonymous
+                # users with a 404 - give a 401 instead. This mostly prevents drive-by crawlers from creating a bunch
+                # of 404 errors in your error report dashboard.
+                raise NotAuthenticated() from does_not_exist_err
             raise NotFound() from does_not_exist_err
 
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
@@ -191,28 +200,45 @@ class CourseOutlineView(APIView):
         """
         For which user should we get an outline?
 
-        Uses a combination of the user on the request object and a manually
-        passed in "user" parameter. Ensures that the requesting user has
-        permission to view course outline of target user. Raise request-level
+        Uses a combination of the user on the request object, session masquerading
+        data, and a manually passed in "user" parameter. Ensures that the requesting
+        user has permission to view course outline of target user. Raise request-level
         exceptions otherwise.
 
         The "user" querystring param is expected to be a username, with a blank
-        value being interpreted as the anonymous user.
+        value being interpreted as the anonymous user. It will take priority over
+        session masquerading, if provided.
         """
+        has_staff_access = has_access(request.user, 'staff', course_key).has_access
+
         target_username = request.GET.get("user")
+        if target_username is not None:
+            target_user = self._get_target_user(request, course_key, has_staff_access, target_username)
+            # Just like in masquerading, set real_user so that the
+            # SafeSessions middleware can see that the user didn't
+            # change unexpectedly.
+            target_user.real_user = request.user
+            return target_user
 
-        # Sending no "user" querystring param at all defaults us to the user who
-        # is making the request.
-        if target_username is None:
-            return request.user
+        _course_masquerade, user = setup_masquerade(request, course_key, has_staff_access)
+        return user
 
+    @staticmethod
+    def _get_target_user(request, course_key: CourseKey, has_staff_access: bool, target_username: str) -> types.User:
+        """
+        Load and return the requested user with permission checking.
+
+        A blank username will return an anonymous user.
+
+        This was designed for manual API testing and kept in, as it may be useful for future development.
+        """
         # Users can always see the outline as themselves.
         if target_username == request.user.username:
             return request.user
 
         # Otherwise, do a permission check to see if they're allowed to view as
         # other users.
-        if not can_see_content_as_other_users(request.user, course_key):
+        if not has_staff_access:
             display_username = "the anonymous user" if target_username == "" else target_username
             raise PermissionDenied(
                 f"User {request.user.username} does not have permission to "
@@ -220,14 +246,14 @@ class CourseOutlineView(APIView):
             )
 
         # If we've gotten this far, their permissions are fine. Now we handle
-        # the masquerade use case...
+        # the different-user use case...
 
         # Having a "user" querystring that is a blank string is interpreted as
         # "show me this outline as an anonymous user".
         if target_username == "":
             return AnonymousUser()
 
-        # Finally, the actual work of looking up a user to masquerade as.
+        # Finally, the actual work of looking up a user to target.
         try:
             target_user = User.objects.get(username=target_username)
         except User.DoesNotExist as err:

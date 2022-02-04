@@ -4,9 +4,10 @@ Tests for Discussion API views
 
 
 import json
+import random
 from datetime import datetime
 from unittest import mock
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse, urlencode
 
 import ddt
 import httpretty
@@ -26,7 +27,11 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    SuperuserFactory,
+    UserFactory,
+)
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -58,6 +63,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
     in the test client, utility functions, and a test case for unauthenticated
     requests. Subclasses must set self.url in their setUp methods.
     """
+
     client_class = APIClient
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -283,6 +289,198 @@ class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMi
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
+@ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class CommentViewSetListByUserTest(
+    ForumsEnableMixin,
+    CommentsServiceMockMixin,
+    UrlResetMixin,
+    ModuleStoreTestCase,
+):
+    """
+    Common test cases for views retrieving user-published content.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
+
+        self.user = UserFactory.create(password="password")
+        self.register_get_user_response(self.user)
+
+        self.other_user = UserFactory.create(password="password")
+        self.register_get_user_response(self.other_user)
+
+        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(UTC))
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.url = self.build_url(self.user.username, self.course.id)
+
+    def register_mock_endpoints(self):
+        """
+        Register cs_comments_service mocks for sample threads and comments.
+        """
+        self.register_get_threads_response(
+            threads=[
+                make_minimal_cs_thread({
+                    "id": f"test_thread_{index}",
+                    "course_id": str(self.course.id),
+                    "commentable_id": f"test_topic_{index}",
+                    "username": self.user.username,
+                    "user_id": str(self.user.id),
+                    "thread_type": "discussion",
+                    "title": f"Test Title #{index}",
+                    "body": f"Test body #{index}",
+                })
+                for index in range(30)
+            ],
+            page=1,
+            num_pages=1,
+        )
+        self.register_get_comments_response(
+            comments=[
+                make_minimal_cs_comment({
+                    "id": f"test_comment_{index}",
+                    "thread_id": "test_thread",
+                    "user_id": str(self.user.id),
+                    "username": self.user.username,
+                    "created_at": "2015-05-11T00:00:00Z",
+                    "updated_at": "2015-05-11T11:11:11Z",
+                    "body": f"Test body #{index}",
+                    "votes": {"up_count": 4},
+                })
+                for index in range(30)
+            ],
+            page=1,
+            num_pages=1,
+        )
+
+    def build_url(self, username, course_id, **kwargs):
+        """
+        Builds an URL to access content from an user on a specific course.
+        """
+        base = reverse("comment-list")
+        query = urlencode({
+            "username": username,
+            "course_id": str(course_id),
+            **kwargs,
+        })
+        return f"{base}?{query}"
+
+    def assert_successful_response(self, response):
+        """
+        Check that the response was successful and contains the expected fields.
+        """
+        assert response.status_code == status.HTTP_200_OK
+        response_data = json.loads(response.content)
+        assert "results" in response_data
+        assert "pagination" in response_data
+
+    def test_request_by_unauthenticated_user(self):
+        """
+        Unauthenticated users are not allowed to request users content.
+        """
+        self.register_mock_endpoints()
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_request_by_unauthorized_user(self):
+        """
+        Users are not allowed to request content from courses in which
+        they're not either enrolled or staff members.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert json.loads(response.content)["developer_message"] == "Course not found."
+
+    def test_request_by_enrolled_user(self):
+        """
+        Users that are enrolled in a course are allowed to get users'
+        comments in that course.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        CourseEnrollmentFactory.create(user=self.other_user, course_id=self.course.id)
+        self.assert_successful_response(self.client.get(self.url))
+
+    def test_request_by_global_staff(self):
+        """
+        Staff users are allowed to get any user's comments.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        self.assert_successful_response(self.client.get(self.url))
+
+    @ddt.data(CourseStaffRole, CourseInstructorRole)
+    def test_request_by_course_staff(self, role):
+        """
+        Course staff users are allowed to get an user's comments in that
+        course.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        role(course_key=self.course.id).add_users(self.other_user)
+        self.assert_successful_response(self.client.get(self.url))
+
+    def test_request_with_non_existent_user(self):
+        """
+        Requests for users that don't exist result in a 404 response.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url("non_existent", self.course.id)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_request_with_non_existent_course(self):
+        """
+        Requests for courses that don't exist result in a 404 response.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, "x/y/z")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_request_with_invalid_course_id(self):
+        """
+        Requests with invalid course ID should fail form validation.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, "an invalid course")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        parsed_response = json.loads(response.content)
+        assert parsed_response["field_errors"]["course_id"]["developer_message"] == \
+            "'an invalid course' is not a valid course id"
+
+    def test_request_with_empty_results_page(self):
+        """
+        Requests for pages that exceed the available number of pages
+        result in a 404 response.
+        """
+        self.register_get_threads_response(threads=[], page=1, num_pages=1)
+        self.register_get_comments_response(comments=[], page=1, num_pages=1)
+
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, self.course.id, page=2)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
@@ -335,6 +533,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retirement.save()
 
         self.superuser = SuperuserFactory()
+        self.superuser_client = APIClient()
         self.retired_username = get_retired_username_by_username(self.user.username)
         self.url = reverse("retire_discussion_user")
 
@@ -362,7 +561,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user)
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 204, b"")
 
     def test_downstream_forums_error(self):
@@ -372,7 +571,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user, status=500, body="Server error")
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 500, '"Server error"')
 
     def test_nonexistent_user(self):
@@ -383,7 +582,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retired_username = get_retired_username_by_username(nonexistent_username)
         data = {'username': nonexistent_username}
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 404, None)
 
     def test_not_authenticated(self):
@@ -401,8 +600,9 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
     def setUp(self):
         super().setUp()
-        self.client_user = UserFactory()
-        self.client_user.username = "test_replace_username_service_worker"
+        self.worker = UserFactory()
+        self.worker.username = "test_replace_username_service_worker"
+        self.worker_client = APIClient()
         self.new_username = "test_username_replacement"
         self.url = reverse("replace_discussion_username")
 
@@ -423,11 +623,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    def call_api(self, user, data):
+    def call_api(self, user, client, data):
         """ Helper function to call API with data """
         data = json.dumps(data)
         headers = self.build_jwt_headers(user)
-        return self.client.post(self.url, data, content_type='application/json', **headers)
+        return client.post(self.url, data, content_type='application/json', **headers)
 
     @ddt.data(
         [{}, {}],
@@ -439,7 +639,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         data = {
             "username_mappings": mapping_data
         }
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 400
 
     def test_auth(self):
@@ -457,11 +657,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test non-service worker
         random_user = UserFactory()
-        response = self.call_api(random_user, data)
+        response = self.call_api(random_user, APIClient(), data)
         assert response.status_code == 403
 
         # Test service worker
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
 
     def test_basic(self):
@@ -476,7 +676,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'successful_replacements': data["username_mappings"]
         }
         self.register_get_username_replacement_response(self.user)
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
         assert response.data == expected_response
 
@@ -2469,3 +2669,90 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         content = json.loads(response.content.decode('utf-8'))
         assertion = self.assertTrue if action == 'allow' else self.assertFalse
         assertion(any(user.username in x['username'] for x in content['results']))
+
+
+@ddt.ddt
+@httpretty.activate
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+    """
+    Tests for the course stats endpoint
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self) -> None:
+        super().setUp()
+        self.course_key = 'course-v1:test+test+test'
+        seed_permissions_roles(self.course_key)
+        self.user = UserFactory(username='user')
+        self.moderator = UserFactory(username='moderator')
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role.users.add(self.moderator)
+        self.stats = [
+            {
+                "active_flags": random.randint(0, 3),
+                "inactive_flags": random.randint(0, 2),
+                "replies": random.randint(0, 30),
+                "responses": random.randint(0, 100),
+                "threads": random.randint(0, 10),
+                "username": f"user-{idx}"
+            }
+            for idx in range(10)
+        ]
+        self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
+        self.register_course_stats_response(self.course_key, self.stats, 1, 3)
+        self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_regular_user(self):
+        """
+        Tests that for a regular user stats are returned without flag counts
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats_without_flags
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_moderator_user(self):
+        """
+        Tests that for a moderator user stats are returned with flag counts
+        """
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats
+
+    @ddt.data(
+        ("moderator", "flagged", "flagged"),
+        ("moderator", "activity", "activity"),
+        ("moderator", None, "flagged"),
+        ("user", None, "activity"),
+        ("user", "activity", "activity"),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting(self, username, ordering_requested, ordering_performed):
+        """
+        Test valid sorting options and defaults
+        """
+        self.client.login(username=username, password='test')
+        params = {}
+        if ordering_requested:
+            params = {"order_by": ordering_requested}
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f"/api/v1/users/{self.course_key}/stats"
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get("sort_key", None) == [ordering_performed]
+
+    @ddt.data("flagged", "xyz")
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting_error_regular_user(self, order_by):
+        """
+        Test for invalid sorting options for regular users.
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url, {"order_by": order_by})
+        assert "order_by" in response.json()["field_errors"]

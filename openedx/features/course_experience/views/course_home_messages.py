@@ -27,6 +27,7 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from lms.djangoapps.courseware.access_utils import check_public_access
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
@@ -149,7 +150,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
                 )).format(platform_name=settings.PLATFORM_NAME),
                 title=title
             )
-        elif not course.invitation_only:
+        elif not course_is_invitation_only(course):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(

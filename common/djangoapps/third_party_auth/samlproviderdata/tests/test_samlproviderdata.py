@@ -1,8 +1,8 @@
 # pylint: disable=missing-module-docstring
 import copy
 import pytz
-from uuid import uuid4
-from datetime import datetime
+from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils.http import urlencode
