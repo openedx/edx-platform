@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^domain/(?P<subdomain>[\w.@+-]+)/', DomainAvailabilityView.as_view()),
     url(r'^custom_domain/', CustomDomainView.as_view()),
     url(r'^domain_switch/', DomainSwitchView.as_view()),
-    url(r'^compile-sass/', CompileSassView.as_view()),
+    url(r'^compile_sass/', CompileSassView.as_view(), name='compile_sass'),
     url(r'^register/', SiteCreateView.as_view(), name='tahoe_site_creation'),
     url(r'^', include(router.urls)),
 ]

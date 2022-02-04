@@ -273,10 +273,23 @@ class CustomDomainView(CreateAPIView):
 
 
 class CompileSassView(APIView):
+    """
+    Compiles microsite's SASS via API by:
+        - initializing the `api_adapter` for the site
+        - calling SiteConfiguration.compile_microsite_sass()
+
+    Usage:
+
+        POST /appsembler/api/compile_sass/
+            {"site_uuid": "fake-site-uuid"}
+    """
+    permission_classes = (ApiKeyHeaderPermission,)
+
     def post(self, request, format=None):
         site_uuid = request.data.get('site_uuid')
         org = Organization.objects.get(edx_uuid=site_uuid)
         site = org.sites.get()
         configuration = SiteConfiguration.objects.get(site=site)
+        configuration.init_api_client_adapter(site)
         configuration.compile_microsite_sass()
         return Response(status=status.HTTP_200_OK)
