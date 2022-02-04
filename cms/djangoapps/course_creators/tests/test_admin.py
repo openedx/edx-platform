@@ -176,18 +176,3 @@ class CourseCreatorAdminTest(TestCase):
 
         self.request.user = self.user
         self.assertFalse(self.creator_admin.has_change_permission(self.request))
-
-    def test_rate_limit_login(self):
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
-            post_params = {'username': self.user.username, 'password': 'wrong_password'}
-            # try logging in 30 times, the default limit in the number of failed
-            # login attempts in one 5 minute period before the rate gets limited
-            for _ in range(30):
-                response = self.client.post('/admin/login/', post_params)
-                self.assertEqual(response.status_code, 200)
-
-            response = self.client.post('/admin/login/', post_params)
-            # Since we are using the default rate limit behavior, we are
-            # expecting this to return a 403 error to indicate that there have
-            # been too many attempts
-            self.assertEqual(response.status_code, 403)

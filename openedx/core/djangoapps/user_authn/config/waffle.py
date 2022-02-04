@@ -3,7 +3,7 @@ Waffle flags and switches for user authn.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace, WaffleFlag
 
 _WAFFLE_NAMESPACE = 'user_authn'
 _WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix='UserAuthN: ')
@@ -36,4 +36,18 @@ ENABLE_PWNED_PASSWORD_API = LegacyWaffleSwitch(
     _WAFFLE_SWITCH_NAMESPACE,
     'enable_pwned_password_api',
     __name__
+)
+
+
+# .. toggle_name: REDIRECT_TO_LMS
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Set this to True if you want to cms-admin login from lms login.
+# .. in case of logout it will use lms logout also.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 8-Feb-2022
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+REDIRECT_TO_LMS = WaffleFlag(   # lint-amnesty, pylint: disable=toggle-missing-annotation
+    "user_authn.redirect_to_lms", module_name=__name__
 )
