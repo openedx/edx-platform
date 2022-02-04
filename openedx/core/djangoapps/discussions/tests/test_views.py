@@ -757,7 +757,6 @@ class PIISettingsAPITests(DataTest):
         data = self._configure_lti_discussion_provider(provider=provider)
         self._assert_pii_flag_for_course(enabled=False)
         expected_providers = AVAILABLE_PROVIDER_MAP[provider]
-        expected_providers.pop('admin_only_config', None)
         assert data['enabled']
         assert data['provider_type'] == provider
         assert data['providers']['available'][provider] == expected_providers
@@ -782,7 +781,6 @@ class PIISettingsAPITests(DataTest):
             self._assert_pii_flag_for_course(enabled=True)
             data = self._configure_lti_discussion_provider(provider=provider)
             expected_providers = AVAILABLE_PROVIDER_MAP[provider]
-            expected_providers.pop('admin_only_config', None)
             assert data['enabled']
             assert data['provider_type'] == provider
             assert data['providers']['available'][provider] == expected_providers
