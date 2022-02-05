@@ -765,7 +765,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         # NOTE: request.headers seems to pick up initial values, but won't adjust as the request object is edited.
         #   For example, the session cookie will likely be the safe session version.
-        return encrypt_for_log(str(request.headers), settings.SAFE_SESSIONS_DEBUG_PUBLIC_KEY)
+        return encrypt_for_log(str(request.headers), getattr(settings, 'SAFE_SESSIONS_DEBUG_PUBLIC_KEY', None))
 
 
 def obscure_token(value: Union[str, None]) -> Union[str, None]:
