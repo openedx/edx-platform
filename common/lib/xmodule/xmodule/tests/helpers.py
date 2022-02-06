@@ -97,3 +97,15 @@ class StubUserService(UserService):
         Return the original user passed into the service.
         """
         return self.user
+
+
+class StubReplaceURLService:
+    """
+    Stub ReplaceURLService for testing modules.
+    """
+
+    def replace_urls(self, text, static_replace_only=False):
+        """
+        Invokes the configured render_template method.
+        """
+        return text

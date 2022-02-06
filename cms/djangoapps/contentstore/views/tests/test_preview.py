@@ -22,6 +22,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.xblock_config.models import StudioConfig
+from common.djangoapps import static_replace
 from common.djangoapps.student.tests.factories import UserFactory
 
 from ..preview import _preview_module_system, get_preview_fragment
@@ -174,6 +175,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
+@XBlock.needs("replace_urls")
 @XBlock.needs("user")
 @XBlock.needs("teams_configuration")
 class PureXBlock(XBlock):
@@ -205,7 +207,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         self.field_data = mock.Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    @ddt.data("user", "i18n", "field-data", "teams_configuration")
+    @ddt.data("user", "i18n", "field-data", "teams_configuration", "replace_urls")
     def test_expected_services_exist(self, expected_service):
         """
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
@@ -287,3 +289,8 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
     def test_cache(self):
         assert hasattr(self.runtime.cache, 'get')
         assert hasattr(self.runtime.cache, 'set')
+
+    def test_replace_urls(self):
+        html = '<a href="/static/id">'
+        assert self.runtime.replace_urls(html) == \
+            static_replace.replace_static_urls(html, course_id=self.runtime.course_id)

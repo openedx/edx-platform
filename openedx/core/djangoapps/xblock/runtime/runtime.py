@@ -25,6 +25,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
+from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
@@ -37,7 +38,6 @@ from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.cache_utils import CacheService
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
-from common.djangoapps.static_replace import process_static_urls
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -249,6 +249,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return SandboxService(contentstore=contentstore, course_id=context_key)
         elif service_name == 'cache':
             return CacheService(cache)
+        elif service_name == 'replace_urls':
+            return ReplaceURLService(xblock=block, lookup_asset_url=self._lookup_asset_url)
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
@@ -307,6 +309,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # than public_view. They may call any handlers though.
         if (self.user is None or self.user.is_anonymous) and view_name != 'public_view':
             raise PermissionDenied
+
         # We also need to override this method because some XBlocks in the
         # edx-platform codebase use methods like add_webpack_to_fragment()
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
@@ -331,41 +334,12 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # Apply any required transforms to the fragment.
         # We could move to doing this in wrap_xblock() and/or use an array of
         # wrapper methods like the ConfigurableFragmentWrapper mixin does.
-        fragment = wrap_fragment(fragment, self.transform_static_paths_to_urls(block, fragment.content))
+        fragment = wrap_fragment(
+            fragment,
+            ReplaceURLService(xblock=block, lookup_asset_url=self._lookup_asset_url).replace_urls(fragment.content)
+        )
 
         return fragment
-
-    def transform_static_paths_to_urls(self, block, html_str):
-        """
-        Given an HTML string, replace any static file paths like
-            /static/foo.png
-        (which are really pointing to block-specific assets stored in blockstore)
-        with working absolute URLs like
-            https://s3.example.com/blockstore/bundle17/this-block/assets/324.png
-        See common/djangoapps/static_replace/__init__.py
-
-        This is generally done automatically for the HTML rendered by XBlocks,
-        but if an XBlock wants to have correct URLs in data returned by its
-        handlers, the XBlock must call this API directly.
-
-        Note that the paths are only replaced if they are in "quotes" such as if
-        they are an HTML attribute or JSON data value. Thus, to transform only a
-        single path string on its own, you must pass html_str=f'"{path}"'
-        """
-
-        def replace_static_url(original, prefix, quote, rest):  # pylint: disable=unused-argument
-            """
-            Replace a single matched url.
-            """
-            original_url = prefix + rest
-            # Don't mess with things that end in '?raw'
-            if rest.endswith('?raw'):
-                new_url = original_url
-            else:
-                new_url = self._lookup_asset_url(block, rest) or original_url
-            return "".join([quote, new_url, quote])
-
-        return process_static_urls(html_str, replace_static_url)
 
     def _lookup_asset_url(self, block, asset_path):  # pylint: disable=unused-argument
         """
