@@ -3157,9 +3157,10 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         data = {}
         problem = CapaFactory.create(showanswer='always', xml=problem_xml)
-        problem.runtime.replace_jump_to_id_urls = Mock()
+        problem.runtime.service(problem, 'replace_urls').replace_urls = Mock()
+
         problem.get_answer(data)
-        assert problem.runtime.replace_jump_to_id_urls.called
+        assert problem.runtime.service(problem, 'replace_urls').replace_urls.called
 
 
 class ProblemBlockReportGenerationTest(unittest.TestCase):

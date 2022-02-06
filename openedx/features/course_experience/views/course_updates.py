@@ -81,4 +81,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         """
         info_module = get_course_info_section_module(request, request.user, course, 'updates')
         info_block = getattr(info_module, '_xmodule', info_module)
-        return info_block.system.replace_urls(info_module.data) if info_module else ''
+        return info_block.system.service(
+            info_block, "replace_urls"
+        ).replace_urls(info_module.data) if info_module else ''
