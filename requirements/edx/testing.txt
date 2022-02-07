@@ -884,7 +884,7 @@ oauthlib==3.0.1
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
-openedx-calc==3.0.0
+openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.7.1
     # via -r requirements/edx/base.txt
