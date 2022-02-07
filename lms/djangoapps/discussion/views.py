@@ -720,6 +720,7 @@ def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: Us
         "show_mfe": show_mfe,
         "legacy_url": f"{forum_url}?discussions_experience=legacy",
         "mfe_url": f"{forum_url}?discussions_experience=new",
+        "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
         "show_banner": show_banner,
         "discussions_mfe_url": mfe_url,
