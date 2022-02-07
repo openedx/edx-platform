@@ -472,6 +472,12 @@ FEATURES = {
     # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
+
+    # Configure dates to show up in various formats on Schedule & Detail page
+    #  Supported formats
+    #   mm/dd/yyyy
+    #   dd/mm/yyyy
+    'DETAIL_SCHEDULE_FORMAT': 'mm/dd/yyyy'
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
