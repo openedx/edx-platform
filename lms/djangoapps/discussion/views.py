@@ -227,6 +227,7 @@ def inline_discussion(request, course_key, discussion_id):
 
     with function_trace('determine_group_permissions'):
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
+        is_community_ta = utils.is_user_community_ta(request.user, course.id)
         course_discussion_settings = CourseDiscussionSettings.get(course.id)
         group_names_by_id = get_group_names_by_id(course_discussion_settings)
         course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
@@ -237,6 +238,7 @@ def inline_discussion(request, course_key, discussion_id):
                 thread,
                 course_key,
                 is_staff,
+                is_community_ta,
                 course_is_divided,
                 group_names_by_id
             ) for thread in threads
@@ -271,7 +273,9 @@ def forum_form_discussion(request, course_key):
         try:
             unsafethreads, query_params = get_threads(request, course, user_info)  # This might process a search query
             is_staff = has_permission(request.user, 'openclose_thread', course.id)
-            threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
+            threads = [utils.prepare_content(
+                thread, course_key, is_staff, request.user.is_community_ta
+            ) for thread in unsafethreads]
         except cc.utils.CommentClientMaintenanceError:
             return HttpResponseServerError('Forum is in maintenance mode', status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except ValueError:
@@ -336,7 +340,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 user_info=user_info
             )
 
-        content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
+        content = utils.prepare_content(thread.to_dict(), course_key, is_staff, request.user.is_community_ta)
         with function_trace("add_courseware_context"):
             add_courseware_context([content], course, request.user)
 
@@ -482,7 +486,8 @@ def _create_discussion_board_context(request, base_context, thread=None):
         thread_pages = query_params['num_pages']
         root_url = request.path
     is_staff = has_permission(user, 'openclose_thread', course.id)
-    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+    is_community_ta = utils.is_user_community_ta(request.user, course.id)
+    threads = [utils.prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
 
     with function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, user, user_info)
@@ -552,7 +557,8 @@ def create_user_profile_context(request, course_key, user_id):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
-    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+    is_community_ta = utils.is_user_community_ta(request.user, course.id)
+    threads = [utils.prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
     with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
 
@@ -668,10 +674,13 @@ def followed_threads(request, course_key, user_id):
             )
         if request.is_ajax():
             is_staff = has_permission(request.user, 'openclose_thread', course.id)
+            is_community_ta = utils.is_user_community_ta(request.user, course.id)
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
                 'discussion_data': [
-                    utils.prepare_content(thread, course_key, is_staff) for thread in paginated_results.collection
+                    utils.prepare_content(
+                        thread, course_key, is_staff, is_community_ta
+                    ) for thread in paginated_results.collection
                 ],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
