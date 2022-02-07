@@ -40,10 +40,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquera
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.content.learning_sequences.api import (
-    get_user_course_outline,
-    public_api_available as learning_sequences_api_available,
-)
+from openedx.core.djangoapps.content.learning_sequences.api import get_user_course_outline
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_404
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -294,7 +291,7 @@ class OutlineTabView(RetrieveAPIView):
         #
         # The long term goal is to remove the Course Blocks API call entirely,
         # so this is a tiny first step in that migration.
-        if course_blocks and learning_sequences_api_available(course_key):
+        if course_blocks:
             user_course_outline = get_user_course_outline(
                 course_key, request.user, datetime.now(tz=timezone.utc)
             )
