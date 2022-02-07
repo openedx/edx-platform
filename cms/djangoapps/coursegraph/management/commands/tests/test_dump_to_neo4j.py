@@ -220,6 +220,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0,
         )
 
+    @mock.patch('cms.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('cms.djangoapps.coursegraph.tasks.Graph', autospec=True)
     @override_settings(
         COURSEGRAPH_CONNECTION=dict(
@@ -231,12 +232,15 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             password="default-password",
         )
     )
-    def test_dump_to_neo4j_connection_defaults(self, mock_graph_class):
+    def test_dump_to_neo4j_connection_defaults(self, mock_graph_class, mock_matcher_class):
         """
         Test that user can override individual settings.COURSEGRAPH_CONNECTION parameters
         by passing them to `dump_to_neo4j`, whilst falling back to the ones that they
         don't override.
         """
+        self.setup_mock_graph(
+            mock_matcher_class, mock_graph_class
+        )
         call_command(
             'dump_to_neo4j',
             courses=self.course_strings[:1],
@@ -244,7 +248,8 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             secure=False,
             password="overridden-password",
         )
-        mock_graph_class.assert_called_once_with(
+        assert mock_graph_class.call_args.args == ()
+        assert mock_graph_class.call_args.kwargs == dict(
 
             # From settings:
             protocol='bolt',

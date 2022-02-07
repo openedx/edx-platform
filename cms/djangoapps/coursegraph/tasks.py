@@ -134,29 +134,26 @@ def get_command_last_run(course_key, graph):
 
 def get_course_last_published(course_key):
     """
-    We use the CourseStructure table to get when this course was last
-    published.
+    Approximately when was a course last published?
+
+    We use the 'modified' column in the CourseOverview table as a quick and easy
+    (although perhaps inexact) way of determining when a course was last
+    published. This works because CourseOverview rows are re-written upon
+    course publish.
+
     Args:
         course_key: a CourseKey
 
-    Returns: The datetime the course was last published at, converted into
-        text, or None, if there's no record of the last time this course
-        was published.
+    Returns: The datetime the course was last published at, stringified.
+        Uses Python's default str(...) implementation for datetimes, which
+        is sortable and similar to ISO 8601:
+        https://docs.python.org/3/library/datetime.html#datetime.date.__str__
     """
     # Import is placed here to avoid model import at project startup.
-    from xmodule.modulestore.django import modulestore
-    from openedx.core.djangoapps.content.block_structure.models import BlockStructureModel
-    from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-    store = modulestore()
-    course_usage_key = store.make_course_usage_key(course_key)
-    try:
-        structure = BlockStructureModel.get(course_usage_key)
-        course_last_published_date = str(structure.modified)
-    except BlockStructureNotFound:
-        course_last_published_date = None
-
-    return course_last_published_date
+    approx_last_published = CourseOverview.get_from_id(course_key).modified
+    return str(approx_last_published)
 
 
 def strip_branch_and_version(location):
