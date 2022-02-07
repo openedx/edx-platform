@@ -1145,6 +1145,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
 
             course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
+            date_placeholder_format = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'SCHEDULE_DETAIL_FORMAT',
+                settings.FEATURES.get('SCHEDULE_DETAIL_FORMAT', 'mm/dd/yyyy')
+            ).upper()
+
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
@@ -1169,6 +1175,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
                 'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
+                'date_placeholder_format': date_placeholder_format,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
