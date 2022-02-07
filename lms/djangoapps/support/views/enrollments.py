@@ -1,7 +1,7 @@
 """
 Support tool for changing course enrollments.
 """
-
+import markupsafe
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from django.db.models import Q
@@ -117,7 +117,7 @@ class EnrollmentSupportListView(GenericAPIView):
         ]
         if mode not in enrollment_modes:
             return HttpResponseBadRequest(
-                f'{str(mode)} is not a valid mode for {str(course_id)}. '
+                f'{markupsafe.escape(mode)} is not a valid mode for {str(course_id)}. '
                 f'Possible valid modes are {str(enrollment_modes)}'
             )
 
@@ -147,10 +147,9 @@ class EnrollmentSupportListView(GenericAPIView):
             reason = request.data['reason']
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_key)
             if enrollment.mode != old_mode:
-                return HttpResponseBadRequest('User {username} is not enrolled with mode {old_mode}.'.format(
-                    username=user.username,
-                    old_mode=old_mode
-                ))
+                return HttpResponseBadRequest(
+                    f'User {user.username} is not enrolled with mode {markupsafe.escape(old_mode)}.'
+                )
         except KeyError as err:
             return HttpResponseBadRequest(f'The field {str(err)} is required.')
         except InvalidKeyError:

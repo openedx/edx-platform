@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.test.utils import override_settings
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
+from rest_framework import status
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -368,6 +369,27 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
+    def test_create_new_enrollment_invalid_mode(self, search_string_type):
+        """
+        Assert that a new enrollment is not created with a vulnerable/invalid enrollment mode.
+        """
+        test_user = UserFactory.create(username='newStudent', email='test2@example.com', password='test')
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(test_user.email) is None
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(test_user, search_string_type)}
+        )
+        response = self.client.post(url, data={
+            'course_id': str(self.course.id),
+            'mode': '<script>alert("xss")</script>',
+            'reason': 'Financial Assistance'
+        })
+        test_key_error = b'&lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt; is not a valid mode for org'
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert test_key_error in response.content
+
+    @disable_signal(signals, 'post_save')
+    @ddt.data('username', 'email')
     def test_create_existing_enrollment(self, search_string_type):
         """
         Assert that a new enrollment is not created when an enrollment already exist for that course.
@@ -405,6 +427,27 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         assert response.status_code == 200
         assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
         self.assert_enrollment(CourseMode.VERIFIED)
+
+    @disable_signal(signals, 'post_save')
+    @ddt.data('username', 'email')
+    def test_change_enrollment_invalid_old_mode(self, search_string_type):
+        """
+        Assert changing mode fails for an enrollment having a vulnerable/invalid old mode.
+        """
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.patch(url, data={
+            'course_id': str(self.course.id),
+            'old_mode': '<script>alert("xss")</script>',
+            'new_mode': CourseMode.VERIFIED,
+            'reason': 'Financial Assistance'
+        }, content_type='application/json')
+        test_key_error = b'is not enrolled with mode &lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt;'
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert test_key_error in response.content
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
