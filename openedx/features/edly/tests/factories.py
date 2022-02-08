@@ -42,6 +42,7 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
     edx_organizations = SubFactory(OrganizationFactory)
     lms_site = SubFactory(SiteFactory)
     studio_site = SubFactory(SiteFactory)
+    is_active = True
 
     @factory.post_generation
     def edx_organizations(self, create, extracted, **kwargs):

@@ -13,7 +13,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import (
     SiteConfigurationFactory,
     SiteFactory
 )
-from openedx.features.edly import cookies
+from openedx.features.edly.cookies import _get_edly_user_info_cookie_string
 from openedx.features.edly.tests.factories import (
     EdlySubOrganizationFactory,
     EdlyUserFactory
@@ -51,6 +51,19 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         self.client = Client(SERVER_NAME=self.request.site.domain)
         self.client.login(username=self.user.username, password='test')
 
+    def test_disabled_edly_sub_orgainzation_access(self):
+        """
+        Test disabled Edly Organization access for a user.
+        """
+        EdlySubOrganizationFactory(lms_site=self.request.site, is_active=False)
+        self.client.cookies.load(
+            {
+                settings.EDLY_USER_INFO_COOKIE_NAME: _get_edly_user_info_cookie_string(self.request)
+            }
+        )
+        response = self.client.get('/')
+        assert response.status_code != 200
+
     def test_user_with_edly_organization_access(self):
         """
         Test logged in user access based on user's linked edly sub organization.
@@ -58,7 +71,7 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         EdlySubOrganizationFactory(lms_site=self.request.site)
         self.client.cookies.load(
             {
-                settings.EDLY_USER_INFO_COOKIE_NAME: cookies._get_edly_user_info_cookie_string(self.request)
+                settings.EDLY_USER_INFO_COOKIE_NAME: _get_edly_user_info_cookie_string(self.request)
             }
         )
         response = self.client.get('/', follow=True)
@@ -174,7 +187,7 @@ class SettingsOverrideMiddlewareTests(TestCase):
         self.client = Client(SERVER_NAME=self.request.site.domain)
         self.client.cookies.load(
             {
-                settings.EDLY_USER_INFO_COOKIE_NAME: cookies._get_edly_user_info_cookie_string(self.request)
+                settings.EDLY_USER_INFO_COOKIE_NAME: _get_edly_user_info_cookie_string(self.request)
             }
         )
         self.client.login(username=self.user.username, password='test')

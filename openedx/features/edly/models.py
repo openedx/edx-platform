@@ -42,6 +42,11 @@ class EdlySubOrganization(TimeStampedModel):
         related_name='edly_sub_org_for_preview_site',
         null=True, on_delete=models.CASCADE
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_('Is Active'),
+        help_text=_('Enable/Disable an Edly SubOrganization Instance.')
+    )
 
     def __str__(self):
         return '{name}: ({slug})'.format(name=self.name, slug=self.slug)

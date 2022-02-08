@@ -20,6 +20,7 @@ class EdlySubOrganizationAdmin(admin.ModelAdmin):
         'slug',
         'edx_organizations_names',
         'edx_organizations_short_names',
+        'is_active',
         'created',
         'modified'
     ]

@@ -26,6 +26,20 @@ from util.organizations_helpers import get_organizations
 LOGGER = logging.getLogger(__name__)
 
 
+def is_edly_sub_org_active(edly_sub_org):
+    """
+    Checks if the request EdlySubOrganization is enabled or disabled.
+
+    Arguments:
+        request: EdlySubOrganization model class
+
+    Returns:
+        bool: Returns True if site is enabled and False if the site is disabled.
+    """
+
+    return edly_sub_org.is_active
+
+
 def user_has_edly_organization_access(request):
     """
     Check if the requested URL site is allowed for the user.

@@ -9,8 +9,12 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
 
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.features.edly.utils import user_has_edly_organization_access
+from openedx.features.edly.utils import (
+    is_edly_sub_org_active,
+    user_has_edly_organization_access,
+)
 
 logger = getLogger(__name__)
 
@@ -26,6 +30,24 @@ class EdlyOrganizationAccessMiddleware(MiddlewareMixin):
         """
         if request.user.is_superuser or request.user.is_staff:
             return
+
+        edly_sub_org = getattr(request.site, 'edly_sub_org_for_lms', None)
+        if edly_sub_org:
+            if not is_edly_sub_org_active(edly_sub_org):
+                logger.exception('EdlySubOrganization for site %s is disabled.', request.site)
+                marketing_url = marketing_link('ROOT')
+
+                if marketing_url != '#':
+                    return HttpResponseRedirect(marketing_url)
+                else:
+                    logger.exception('Marketing Root URL not found in Site Configurations for %s site. ', request.site)
+                    logout_url = getattr(settings, 'FRONTEND_LOGOUT_URL', None)
+                    if logout_url:
+                        return HttpResponseRedirect(logout_url)
+                    else:
+                        return HttpResponseRedirect(reverse('logout'))
+        else:
+            logger.exception('Requested EdlySubOrganization does not exist.')
 
         if request.user.is_authenticated and not user_has_edly_organization_access(request):
             logger.exception('Edly user %s has no access for site %s.' % (request.user.email, request.site))
