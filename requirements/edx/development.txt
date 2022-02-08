@@ -829,8 +829,10 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==3.4.2
-    # via -r requirements/edx/testing.txt
+lti-consumer-xblock==3.4.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 lxml==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -991,7 +993,7 @@ pillow==9.0.1
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-organizations
-pip-tools==6.5.0
+pip-tools==6.5.1
     # via -r requirements/edx/pip-tools.txt
 platformdirs==2.4.1
     # via
@@ -1445,7 +1447,7 @@ toml==0.10.2
     #   pylint
     #   tox
     #   vulture
-tomli==2.0.0
+tomli==2.0.1
     # via
     #   -r requirements/edx/pip-tools.txt
     #   -r requirements/edx/testing.txt
