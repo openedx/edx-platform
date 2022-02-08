@@ -99,3 +99,9 @@ docutils<0.18
 
 # Temporary constraint on openedx-calc. Latest openedx-calc also contains symmath, which may upend symmath package version
 openedx-calc==2.0.1
+
+# scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
+scipy<1.8.0
+
+
+xblock-lti-consumer<3.4.2
