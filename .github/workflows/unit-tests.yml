@@ -13,7 +13,9 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
-        django-version: ["3.2"]
+        django-version:
+          - "pinned"
+          #- "4.0"
         shard_name: [
             "lms-1",
             "lms-2",
@@ -57,7 +59,15 @@ jobs:
         run: |
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
-          sudo pip install "django~=${{ matrix.django-version }}.0"
+          if [[ "${{ matrix.django-version }}" == "pinned" ]]; then
+            sudo pip install -r requirements/edx/django.txt
+          else
+            sudo pip install "django~=${{ matrix.django-version }}.0"
+          fi
+
+      - name: list installed package versions
+        run: |
+          sudo pip freeze
 
       - name: get unit tests for shard
         run: |
