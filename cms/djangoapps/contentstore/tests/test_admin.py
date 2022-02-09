@@ -4,7 +4,7 @@ Tests that verify that the admin view loads.
 This is not inside a django app because it is a global property of the system.
 """
 import ddt
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 
