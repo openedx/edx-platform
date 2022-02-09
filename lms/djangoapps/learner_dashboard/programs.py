@@ -23,9 +23,12 @@ from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, program_tab_
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import get_pathways, get_programs
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
-from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration, ProgramLiveConfiguration
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import (
+    ProgramDiscussionsConfiguration,
+    ProgramLiveConfiguration,
+    ProgramsApiConfig
+)
 from openedx.core.djangoapps.programs.utils import (
     ProgramDataExtender,
     ProgramProgressMeter,
