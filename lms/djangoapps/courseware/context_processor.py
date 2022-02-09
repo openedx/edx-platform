@@ -5,7 +5,7 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
-
+from django.utils.translation import get_language
 from pytz import timezone
 
 from edx_django_utils.cache import TieredCache
@@ -35,7 +35,7 @@ def user_timezone_locale_prefs(request):
     if not cached_value:
         user_prefs = {
             'user_timezone': None,
-            'user_language': None,
+            'user_language': get_language(),
         }
         if hasattr(request, 'user') and request.user.is_authenticated:
             try:
