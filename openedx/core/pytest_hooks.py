@@ -74,6 +74,6 @@ class DeferPlugin:
         return pytest_sessionfinish(session)
 
 
-def pytest_configure(config):
-    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
-        config.pluginmanager.register(DeferPlugin())
+# def pytest_configure(config):
+#     if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
+#         config.pluginmanager.register(DeferPlugin())

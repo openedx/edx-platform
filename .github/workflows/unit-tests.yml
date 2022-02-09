@@ -64,21 +64,21 @@ jobs:
 
       - name: run tests
         run: |
-          python -Wd -m pytest --random-order --random-order-bucket=global --flake-finder --flake-runs=4 --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+          python -Wd -m pytest --random-order --random-order-bucket=global --flake-finder --flake-runs=4 --ds=${{ env.settings_path }} --json-report --json-report-omit keywords streams collectors log traceback warnings --json-report-file=pytest_report_${{ matrix.shard_name }}.json ${{ env.unit_test_paths }}
 
-      - name: rename warnings json file
-        if: success()
-        run: |
-          cd test_root/log
-          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+#      - name: rename warnings json file
+#        if: success()
+#        run: |
+#          cd test_root/log
+#          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
 
-      - name: save pytest warnings json file
-        if: success()
+      - name: save pytest json file
+#        if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: pytest-warnings-json
+          name: pytest-report-json
           path: |
-            test_root/log/pytest_warnings*.json
+            pytest_report*.json
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]
