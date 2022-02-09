@@ -17,7 +17,7 @@ from lms.djangoapps.ora_staff_grader.errors import (
     XBlockInternalError,
 )
 
-from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler
+from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
 
 
 def get_submissions(request, usage_id):
@@ -42,6 +42,11 @@ def get_submission_info(request, usage_id, submission_uuid):
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
     if response.status_code != 200:
+        details = (
+            json.loads(response.content).get("error", "")
+            if is_json(response.content)
+            else ""
+        )
         raise XBlockInternalError(context={"handler": handler_name})
 
     return json.loads(response.content)
@@ -56,7 +61,12 @@ def get_assessment_info(request, usage_id, submission_uuid):
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
     if response.status_code != 200:
-        raise XBlockInternalError(context={"handler": handler_name})
+        details = (
+            json.loads(response.content).get("error", "")
+            if is_json(response.content)
+            else ""
+        )
+        raise XBlockInternalError(context={"handler": handler_name, "details": details})
 
     return json.loads(response.content)
 
