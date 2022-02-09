@@ -301,6 +301,7 @@ class UpdateGradeView(StaffGraderBaseView):
                         "lock_info": lock_info,
                     }
                 ).data
+                log.error(f"Grade contested for submission: {submission_uuid}")
                 return GradeContestedResponse(context=submission_status)
 
             # Transform grade data and submit assessment, rasies on failure
@@ -373,6 +374,7 @@ class SubmissionLockView(StaffGraderBaseView):
         except LockContestedError:
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
+            log.error(f"Lock contested for submission: {submission_uuid}")
             return LockContestedResponse(context=lock_status)
 
         # Issues with the XBlock handlers
