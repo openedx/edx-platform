@@ -63,9 +63,12 @@ jobs:
           echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
 
       - name: run tests
+        continue-on-error: true
         run: |
           python -Wd -m pytest --random-order --random-order-bucket=global --flake-finder --flake-runs=4 --ds=${{ env.settings_path }} --json-report --json-report-omit keywords streams collectors log traceback warnings --json-report-file=pytest_report_${{ matrix.shard_name }}.json ${{ env.unit_test_paths }}
 
+      - name: list files
+        run: ls -la
 #      - name: rename warnings json file
 #        if: success()
 #        run: |
