@@ -109,6 +109,7 @@ class InitializeView(StaffGraderBaseView):
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f'Bad ORA location provided: {ora_location}')
             return BadOraLocationResponse()
 
         # Issues with the XBlock handlers
@@ -365,6 +366,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f'Bad ORA location provided: {ora_location}')
             return BadOraLocationResponse()
 
         # Return updated lock info on error
