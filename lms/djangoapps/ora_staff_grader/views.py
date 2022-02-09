@@ -105,7 +105,9 @@ class InitializeView(StaffGraderBaseView):
             # Get list of submissions for this ORA
             init_data["submissions"] = get_submissions(request, ora_location)
 
-            return Response(InitializeSerializer(init_data).data)
+            response_data = InitializeSerializer(init_data).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
@@ -168,15 +170,16 @@ class SubmissionFetchView(StaffGraderBaseView):
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionFetchSerializer(
+            response_data = SubmissionFetchSerializer(
                 {
                     "submission_info": submission_info,
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
+            ).data
 
-            return Response(serializer.data)
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
@@ -225,14 +228,15 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionStatusFetchSerializer(
+            response_data = SubmissionStatusFetchSerializer(
                 {
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
+            ).data
 
-            return Response(serializer.data)
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
@@ -317,13 +321,15 @@ class UpdateGradeView(StaffGraderBaseView):
                 request, ora_location, submission_uuid
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
-            serializer = SubmissionStatusFetchSerializer(
+            response_data = SubmissionStatusFetchSerializer(
                 {
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
-            return Response(serializer.data)
+            ).data
+
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
@@ -363,7 +369,10 @@ class SubmissionLockView(StaffGraderBaseView):
             # Validate ORA location
             UsageKey.from_string(ora_location)
             lock_info = claim_submission_lock(request, ora_location, submission_uuid)
-            return Response(LockStatusSerializer(lock_info).data)
+
+            response_data = LockStatusSerializer(lock_info).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
@@ -394,7 +403,10 @@ class SubmissionLockView(StaffGraderBaseView):
             # Validate ORA location
             UsageKey.from_string(ora_location)
             lock_info = delete_submission_lock(request, ora_location, submission_uuid)
-            return Response(LockStatusSerializer(lock_info).data)
+
+            response_data = LockStatusSerializer(lock_info).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
