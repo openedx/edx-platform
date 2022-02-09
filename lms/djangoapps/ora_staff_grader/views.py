@@ -113,6 +113,7 @@ class InitializeView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
@@ -178,12 +179,14 @@ class SubmissionFetchView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()
+
 
 class SubmissionStatusFetchView(StaffGraderBaseView):
     """
@@ -232,6 +235,7 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
@@ -321,6 +325,7 @@ class UpdateGradeView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
@@ -370,6 +375,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
@@ -397,6 +403,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
