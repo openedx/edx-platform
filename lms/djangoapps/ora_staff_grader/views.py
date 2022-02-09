@@ -383,7 +383,8 @@ class SubmissionLockView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
-        except Exception:
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
@@ -397,6 +398,7 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f'Bad ORA location provided: {ora_location}')
             return BadOraLocationResponse()
 
         # Return updated lock info on error
