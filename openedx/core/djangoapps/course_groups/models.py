@@ -132,8 +132,8 @@ class CohortMembership(models.Model):
                 previous_cohort = membership.course_user_group
 
                 try:
-                    membership, previous_cohort = CohortChangeRequested.run_filter(
-                        current_cohort=membership, previous_cohort=previous_cohort,
+                    membership, cohort = CohortChangeRequested.run_filter(
+                        membership=membership, cohort=cohort,
                     )
                 except CohortChangeRequested.PreventCohortChange as exc:
                     raise CohortChangeNotAllowed(str(exc)) from exc
