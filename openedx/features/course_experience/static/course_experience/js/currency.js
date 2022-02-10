@@ -37,7 +37,7 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
         console.error(e);
         console.error("Ignoring malformed 'edx-price-l10n' cookie.");
       } else {
-        throw;
+        throw e;
       }
     }
     if (this.countryL10nData) {
