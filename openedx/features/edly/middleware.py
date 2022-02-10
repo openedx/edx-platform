@@ -46,8 +46,6 @@ class EdlyOrganizationAccessMiddleware(MiddlewareMixin):
                         return HttpResponseRedirect(logout_url)
                     else:
                         return HttpResponseRedirect(reverse('logout'))
-        else:
-            logger.exception('Requested EdlySubOrganization does not exist.')
 
         if request.user.is_authenticated and not user_has_edly_organization_access(request):
             logger.exception('Edly user %s has no access for site %s.' % (request.user.email, request.site))
