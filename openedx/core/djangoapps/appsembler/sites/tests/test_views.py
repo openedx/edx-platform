@@ -1,22 +1,13 @@
 """
 Tests for the Apppsembler API views.
 """
-import pytest
 from mock import patch
 
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from openedx.core.djangoapps.appsembler.sites.utils import make_amc_admin
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-from organizations.tests.factories import OrganizationFactory
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from openedx.core.djangoapps.appsembler.sites import (
-    site_config_client_helpers as client_helpers,
-)
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils import (
     with_organization_context,
@@ -123,27 +114,3 @@ class TestSiteViewSet(APITestCase):
             )
             content = response.content.decode('utf-8')
             assert response.status_code == status.HTTP_200_OK, content
-
-
-@pytest.fixture
-def site_with_org(scope='function'):
-    org = OrganizationFactory.create()
-    assert org.edx_uuid, 'Should have valid uuid'
-    site = Site.objects.create(domain='fake-site')
-    site.organizations.add(org)
-    return site, org
-
-
-@pytest.mark.django_db
-def test_compile_sass_view(client, monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
-    site, org = site_with_org
-    site_configuration = SiteConfigurationFactory.build(site=site)
-    site_configuration.save()
-
-    url = reverse('compile_sass')
-    data = {'site_uuid': org.edx_uuid}
-    response = client.post(url, data=data,
-                           HTTP_X_EDX_API_KEY=settings.EDX_API_KEY)
-    content = response.content.decode('utf-8')
-    assert response.status_code == status.HTTP_200_OK, content

@@ -466,21 +466,6 @@ def sass_to_dict(sass_input):
     return sass_vars
 
 
-def sass_to_json_string(sass_input):
-    sass_dict = sass_to_dict(sass_input)
-    return json.dumps(sass_dict, sort_keys=True, indent=2)
-
-
-def dict_to_sass(dict_input):
-    sass_text = '\n'.join("{}: {};".format(key, val) for (key, val) in dict_input)
-    return sass_text
-
-
-def json_to_sass(json_input):
-    sass_dict = json.loads(json_input)
-    return dict_to_sass(sass_dict)
-
-
 @beeline.traced(name="bootstrap_site")
 def bootstrap_site(site, org_data=None, username=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration

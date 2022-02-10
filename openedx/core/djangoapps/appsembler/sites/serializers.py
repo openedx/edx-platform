@@ -1,26 +1,16 @@
 import beeline
-from django.conf import settings
 from django.contrib.sites.models import Site
-from django.db import transaction
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
 
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_username
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.appsembler.sites.tasks import (
-    import_course_on_site_creation_apply_async,
-)
+
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
-from openedx.core.djangoapps.appsembler.sites.utils import sass_to_dict, dict_to_sass, bootstrap_site
+from openedx.core.djangoapps.appsembler.sites.utils import bootstrap_site
 
-
-class SASSDictField(serializers.DictField):
-    def to_internal_value(self, data):
-        return dict_to_sass(data)
-
-    def to_representation(self, value):
-        return sass_to_dict(value)
+from .tasks import import_course_on_site_creation_after_transaction
 
 
 class SiteConfigurationSerializer(serializers.ModelSerializer):
@@ -155,16 +145,7 @@ class RegistrationSerializer(serializers.Serializer):
             })
             site_configuration.save()
 
-        # clone course
-        if settings.FEATURES.get("APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION", False):
-            beeline.add_context_field("default_course_on_site_creation_flag", True)
-
-            def import_task_on_commit():
-                """
-                Run the import task after the commit to avoid Organization.DoesNotExist error on the Celery.
-                """
-                import_course_on_site_creation_apply_async(organization)
-            transaction.on_commit(import_task_on_commit)
+        import_course_on_site_creation_after_transaction(organization)
 
         return {
             'site': site,
