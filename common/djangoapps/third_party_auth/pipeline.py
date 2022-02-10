@@ -71,7 +71,7 @@ import six
 import social_django
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.contrib.auth import logout
+from django.contrib.auth import logout, REDIRECT_FIELD_NAME
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -89,6 +89,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth.utils import (
     get_associated_user_by_email_response,
     get_user_from_email,
@@ -1014,3 +1015,26 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}
+
+
+def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
+    """
+    Ensure that the redirect url is save if a user logs in or registers by
+    directly hitting the TPA url i.e /auth/login/backend_name?next=<redirect_to>
+    Check it against the LOGIN_REDIRECT_WHITELIST. If it is not safe then
+    redirect to SOCIAL_AUTH_LOGIN_REDIRECT_URL (defaults to /dashboard)
+    """
+    redirect_to = strategy.session_get(REDIRECT_FIELD_NAME, None)
+    request = strategy.request
+
+    if redirect_to and request:
+        is_safe = is_safe_login_or_logout_redirect(
+            redirect_to=redirect_to,
+            request_host=request.get_host(),
+            dot_client_id=None,
+            require_https=request.is_secure(),
+        )
+
+        if not is_safe:
+            safe_redirect_url = getattr(settings, 'SOCIAL_AUTH_LOGIN_REDIRECT_URL', '/dashboard')
+            strategy.session_set(REDIRECT_FIELD_NAME, safe_redirect_url)
