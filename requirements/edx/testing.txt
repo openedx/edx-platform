@@ -627,7 +627,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==12.1.0
+faker==12.2.0
     # via factory-boy
 fastapi==0.73.0
     # via pact-python
@@ -788,7 +788,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==3.4.2
+lti-consumer-xblock==3.4.3
     # via -r requirements/edx/base.txt
 lxml==4.5.0
     # via
@@ -864,7 +864,7 @@ newrelic==7.4.0.172
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-nltk==3.6.7
+nltk==3.7
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -934,7 +934,7 @@ pillow==9.0.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-organizations
-platformdirs==2.4.1
+platformdirs==2.5.0
     # via
     #   pylint
     #   virtualenv
