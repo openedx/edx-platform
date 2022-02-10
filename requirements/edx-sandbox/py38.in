@@ -20,4 +20,3 @@ numpy>=1.16.0,<1.17.0
 # NOTE: if you change code in these packages, you MUST change the version
 # number in its setup.py or the code WILL NOT be installed during deploy.
 -e common/lib/sandbox-packages
--e common/lib/symmath
