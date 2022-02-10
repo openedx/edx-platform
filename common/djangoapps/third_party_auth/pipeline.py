@@ -1016,6 +1016,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         final_username = storage.user.get_username(user)
     return {'username': final_username}
 
+
 def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
     """
     Ensure that the redirect url is save if a user logs in or registers by
