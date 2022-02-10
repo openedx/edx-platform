@@ -79,6 +79,22 @@ class SiteConfigurationTests(TestCase):
         self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK'))
         self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help'))
 
+    def test_hardcoded_values_for_unsaved_config_instance(self):
+        """
+        If a SiteConfiguration has no site yet, the `get_value` will work safely.
+        """
+        site_config = SiteConfiguration(enabled=True)
+        assert site_config.get_value('SITE_NAME') is None
+        assert site_config.get_value('SITE_NAME', 'test.com') == 'test.com'
+
+    def test_hardcoded_values_for_config_instance_with_site(self):
+        """
+        If a SiteConfiguration has no site yet, the `get_value` will work safely.
+        """
+        site_config = SiteConfiguration(enabled=True)
+        site_config.site = Site(domain='my-site.com')
+        assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
+
     def test_get_value_for_org(self):
         """
         Test that get_value_for_org returns correct value for Tahoe custom keys.

@@ -7,7 +7,7 @@ import beeline
 
 import collections
 from logging import getLogger
-import os
+
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -59,6 +59,7 @@ class SiteConfiguration(models.Model):
     """
 
     api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+    cached_hardcoded_values = None  # Tahoe: Used by `get_tahoe_hardcoded_values`
 
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
@@ -81,47 +82,9 @@ class SiteConfiguration(models.Model):
         return self.__str__()
 
     def save(self, **kwargs):
-        # When creating a new object, save default microsite values. Not implemented as a default method on the field
-        # because it depends on other fields that should be already filled.
-        self.site_values = self.site_values or {}
-        if not self.site_values.get('PLATFORM_NAME'):
-            # Initialize the values for new SiteConfiguration objects
-            self.site_values.update(self.get_initial_microsite_values())
-
-        # fix for a bug with some pages requiring uppercase platform_name variable
-        self.site_values['PLATFORM_NAME'] = self.site_values.get('platform_name', '')
-
-        # Set the default language code for new sites if missing
-        # TODO: Move it to somewhere else like in AMC
-        self.site_values['LANGUAGE_CODE'] = self.site_values.get('LANGUAGE_CODE', 'en')
-
-        # We cannot simply use a protocol-relative URL for LMS_ROOT_URL
-        # This is because the URL here will be used by such activities as
-        # sending activation links to new users. The activation link needs the
-        # scheme address verfication emails. The callers using this variable
-        # expect the scheme in the URL
-        self.site_values['LMS_ROOT_URL'] = '{scheme}://{domain}'.format(
-            scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
-            domain=self.site.domain)
-
-        # This ensures if the site has a custom domain set, we set the custom
-        # domain instead the Tahoe URL.
-        self.site_values['SITE_NAME'] = self.site.domain
-
-        # RED-2385: Use Multi-tenant `/help` URL for activation emails.
-        self.site_values['ACTIVATION_EMAIL_SUPPORT_LINK'] = '{root_url}/help'.format(
-            root_url=self.site_values['LMS_ROOT_URL'],
-        )
-
-        # RED-2471: Use Multi-tenant `/help` URL for password reset emails.
-        self.site_values['PASSWORD_RESET_SUPPORT_LINK'] = '{root_url}/help'.format(
-            root_url=self.site_values['LMS_ROOT_URL'],
-        )
-
-        super(SiteConfiguration, self).save(**kwargs)
-
+        super().save(**kwargs)
         # recompile SASS on every save
-        self.compile_microsite_sass()
+        self.compile_microsite_sass()  # TODO: Implement via signals, instead of overriding the "save" method.
         return self
 
     @beeline.traced('site_config.init_api_client_adapter')
@@ -136,8 +99,67 @@ class SiteConfiguration(models.Model):
         if site_helpers.is_enabled_for_site(site):
             self.api_adapter = site_helpers.get_configuration_adapter(site)
 
+    @beeline.traced('site_config.get_tahoe_hardcoded_values')
+    def get_tahoe_hardcoded_values(self):
+        """
+        Tahoe: Getting saner defaults for Tahoe.
+
+        Given a value, return a hard-coded default completely disregarding the stored values.
+        These default site values are derived from site values.
+        """
+        if not self.cached_hardcoded_values:
+            self.cached_hardcoded_values = {
+                'PLATFORM_NAME': self._get_value('platform_name'),
+                'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
+            }
+
+            if hasattr(self, 'site'):
+                # Set `Site`-related values only if a site exists.
+                site_domain = self.site.domain
+
+                # We cannot simply use a protocol-relative URL for LMS_ROOT_URL
+                # This is because the URL here will be used by such activities as
+                # sending activation links to new users. The activation link needs the
+                # scheme address verification emails. The callers using this variable
+                # expect the scheme in the URL
+                root_url = '{scheme}://{domain}'.format(
+                    scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
+                    domain=site_domain,
+                )
+                domain_without_port_number = site_domain.split(':')[0]
+
+                self.cached_hardcoded_values.update(
+                    PLATFORM_NAME=self._get_value('platform_name'),
+                    css_overrides_file="{}.css".format(domain_without_port_number),
+                    ENABLE_COMBINED_LOGIN_REGISTRATION=True,
+                    LMS_ROOT_URL=root_url,
+                    SITE_NAME=site_domain,  # Support for custom domains.
+                    # RED-2471: Use Multi-tenant `/help` URL for password reset emails.
+                    ACTIVATION_EMAIL_SUPPORT_LINK='{root_url}/help'.format(root_url=root_url),
+                    # RED-2385: Use Multi-tenant `/help` URL for activation emails.
+                    PASSWORD_RESET_SUPPORT_LINK='{root_url}/help'.format(root_url=root_url),
+                )
+
+        return self.cached_hardcoded_values
+
     @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
+        """
+        Tahoe: Return configuration value with hardcoded Tahoe values.
+        """
+        if name == 'LANGUAGE_CODE' and default is None:
+            # TODO: Ask Dashboard 2.0 / AMC to set the `LANGUAGE_CODE` by default.
+            default = 'en'
+
+        hardcoded_values = self.get_tahoe_hardcoded_values()
+        if name in hardcoded_values:
+            # Disregard the stored value, and return a Tahoe-compatible version.
+            return hardcoded_values[name]
+        else:
+            return self._get_value(name, default)
+
+    @beeline.traced('site_config._get_value')
+    def _get_value(self, name, default=None):
         """
         Return Configuration value for the key specified as name argument.
 
@@ -198,7 +220,12 @@ class SiteConfiguration(models.Model):
             org (str): Org to use to filter SiteConfigurations
             select_related (list or None): A list of values to pass as arguments to select_related
         """
-        query = cls.objects.filter(site_values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all()
+        query = cls.objects.filter(site_values__contains=org, enabled=True)
+
+        if hasattr(SiteConfiguration, 'sass_variables'):
+            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
+            query = query.defer('page_elements', 'sass_variables')
+
         if select_related is not None:
             query = query.select_related(*select_related)
         for configuration in query:
@@ -242,7 +269,12 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(site_values__contains='course_org_filter', enabled=True).defer('page_elements', 'sass_variables').all():
+        query = cls.objects.filter(site_values__contains='course_org_filter', enabled=True)
+        if hasattr(SiteConfiguration, 'sass_variables'):
+            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
+            query = query.defer('page_elements', 'sass_variables')
+
+        for configuration in query:
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
@@ -329,14 +361,6 @@ class SiteConfiguration(models.Model):
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
-
-    def get_initial_microsite_values(self):
-        domain_without_port_number = self.site.domain.split(':')[0]
-        return {
-            'platform_name': self.site.name,
-            'css_overrides_file': "{}.css".format(domain_without_port_number),
-            'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
-        }
 
 
 def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):
