@@ -18,6 +18,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -117,6 +118,7 @@ from .library import (
 
 log = logging.getLogger(__name__)
 User = get_user_model()
+COURSES_PER_PAGE = 10
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
@@ -551,10 +553,11 @@ def course_listing(request):
 
     split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
+    paginated_active_courses, pagination_context = get_courses_paginator_context(request, active_courses)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
-        'courses': active_courses,
+        'courses': list(paginated_active_courses),
         'split_studio_home': split_library_view_on_dashboard(),
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
@@ -570,8 +573,36 @@ def course_listing(request):
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'optimization_enabled': optimization_enabled,
-        'active_tab': 'courses'
+        'active_tab': 'courses',
+        'pagination_context': pagination_context,
     })
+
+def _generate_courses_pagination_configuration(request):
+    """
+    Returns pagination configuration for the courses list page.
+    """
+    return {
+        'page_number': request.GET.get('page', 1),
+        'courses_per_page': request.session.get('COURSES_PER_PAGE', COURSES_PER_PAGE)
+    }
+
+
+def get_courses_paginator_context(request, courses):
+    """
+    Get paginator context for course listing.
+    """
+    paginator_context = {}
+    pagination_conf = _generate_courses_pagination_configuration(request)
+    if pagination_conf:
+        courses_per_page = pagination_conf.get('courses_per_page')
+        paginator = Paginator(courses, courses_per_page)
+        courses = paginator.page(pagination_conf.get('page_number'))
+        paginator_context = {
+            'current_page': courses.number,
+            'total_pages': courses.paginator.num_pages,
+            'items_on_one_page': courses_per_page
+        }
+    return courses, paginator_context
 
 
 @login_required
