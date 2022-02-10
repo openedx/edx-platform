@@ -28,7 +28,14 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
   }
 
   getCountry() {
-    this.countryL10nData = JSON.parse($.cookie('edx-price-l10n'));
+    try {
+      this.countryL10nData = JSON.parse($.cookie('edx-price-l10n'));
+    } catch (e) {
+      // If cookie is malformed or has JSON SyntaxError, log but continue.
+      // This will show the purchase experience in a non-local currency
+      // but will not prevent the user from interacting with the page.
+      console.error(e);
+    }
     if (this.countryL10nData) {
       window.analytics.track('edx.bi.user.track_selection.local_currency_cookie_set');
       this.setPrice();
