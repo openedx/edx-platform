@@ -13,6 +13,7 @@ from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-o
 from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 
+from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
@@ -21,7 +22,6 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
-from openedx.core.djangoapps.content.learning_sequences.toggles import USE_FOR_OUTLINES
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
@@ -261,6 +261,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             is_onboarding_exam=False,
         )
         sequence.is_proctored_exam = True
+        update_outline_from_modulestore(course.id)
         mock_summary.return_value = {
             'short_description': 'My Exam',
             'suggested_icon': 'fa-foo-bar',
@@ -289,6 +290,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
                                              parent_location=chapter.location)
             ItemFactory.create(category='problem', parent_location=sequential2.location)
+        update_outline_from_modulestore(course.id)
         url = reverse('course-home:outline-tab', args=[course.id])
 
         CourseEnrollment.enroll(self.user, course.id)
@@ -378,24 +380,22 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             if block['type'] == 'sequential'
         )
 
-        # With Learning Sequences active and a course outline loaded, the same
-        # sequence is removed.
-        with override_waffle_flag(USE_FOR_OUTLINES, active=True):
-            new_learning_seq_outline = CourseOutlineData(
-                course_key=self.course.id,
-                title="Test Course Outline!",
-                published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
-                published_version="5ebece4b69dd593d82fe2022",
-                entrance_exam_id=None,
-                days_early_for_beta=None,
-                sections=[],
-                self_paced=False,
-                course_visibility=CourseVisibility.PRIVATE  # pylint: disable=protected-access
-            )
-            replace_course_outline(new_learning_seq_outline)
-            response = self.client.get(self.url)
-            blocks = response.data['course_blocks']['blocks']
-            assert seq_block_id not in blocks
+        # With a course outline loaded, the same sequence is removed.
+        new_learning_seq_outline = CourseOutlineData(
+            course_key=self.course.id,
+            title="Test Course Outline!",
+            published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2022",
+            entrance_exam_id=None,
+            days_early_for_beta=None,
+            sections=[],
+            self_paced=False,
+            course_visibility=CourseVisibility.PRIVATE  # pylint: disable=protected-access
+        )
+        replace_course_outline(new_learning_seq_outline)
+        response = self.client.get(self.url)
+        blocks = response.data['course_blocks']['blocks']
+        assert seq_block_id not in blocks
 
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)

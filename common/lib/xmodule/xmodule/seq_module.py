@@ -9,6 +9,7 @@ import collections
 import json
 import logging
 from datetime import datetime
+from django.conf import settings
 from functools import reduce
 
 from lxml import etree
@@ -21,7 +22,7 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
-from edx_toggles.toggles import LegacyWaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag, SettingDictToggle
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -64,6 +65,15 @@ TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(  # lint-amnesty, pylint: disab
     flag_name='rev_1377_rollout',
     module_name=__name__,
 )
+
+# .. toggle_name: FEATURES['SHOW_PROGRESS_BAR']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: False
+# .. toggle_description: Set to True to show progress bar.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-02-09
+# .. toggle_target_removal_date: None
+SHOW_PROGRESS_BAR = SettingDictToggle("FEATURES", "SHOW_PROGRESS_BAR", default=False, module_name=__name__)
 
 
 class SequenceFields:  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -607,6 +617,9 @@ class SequenceBlock(
 
         fragment = Fragment()
         params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
+        if SHOW_PROGRESS_BAR.is_enabled() and getattr(settings, 'COMPLETION_AGGREGATOR_URL', ''):
+            parent_block_id = self.get_parent().scope_ids.usage_id.block_id
+            params['chapter_completion_aggregator_url'] = '/'.join([settings.COMPLETION_AGGREGATOR_URL, str(self.course_id), parent_block_id]) + '/'
         fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)

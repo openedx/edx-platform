@@ -3,7 +3,13 @@ Tests for util.logging
 """
 
 import re
+
 from common.djangoapps.util.log_sensitive import decrypt_log_message, encrypt_for_log, generate_reader_keys
+
+
+def test_encryption_no_key():
+    to_log = encrypt_for_log("Testing testing 1234", None)
+    assert to_log == '[encryption failed, no key]'
 
 
 def test_encryption_round_trip():

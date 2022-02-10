@@ -10,7 +10,7 @@ Usage:
 
      logger.info(
          "Received invalid auth token %s in Authorization header",
-         encrypt_for_log(token, settings.<YOUR_DEBUG_PUBLIC_KEY>)
+         encrypt_for_log(token, getattr(settings, 'YOUR_DEBUG_PUBLIC_KEY', None))
      )
 
    This will log a message like::
@@ -69,7 +69,16 @@ def encrypt_for_log(message, reader_public_key_b64):
     Returns a string <sender public key> "|" <ciphertext> wrapped in
     some framing text "[encrypted: ...]"; the inner string can be
     decrypted with decrypt_log_message.
+
+    For ease of use, key may be None or empty; a warning message will be
+    returned instead of data, encrypted or otherwise.
     """
+    # If no key was configured, don't raise an error. This method is
+    # expected to be called from debugging code, so it shouldn't blow
+    # up on misconfiguration.
+    if not reader_public_key_b64:
+        return '[encryption failed, no key]'
+
     reader_public_key = PublicKey(b64decode(reader_public_key_b64))
 
     encrypted = Box(logger_private_key, reader_public_key).encrypt(message.encode())

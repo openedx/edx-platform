@@ -9,6 +9,7 @@ from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
@@ -48,6 +49,7 @@ class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
         VerificationDeadline.objects.create(course_key=self.course.id, deadline=datetime(2028, 1, 1))
 
         CourseOverviewFactory.create(run='1T2020')
+        update_outline_from_modulestore(self.course.id)
 
         self.staff_user = self.user
         self.user, password = self.create_non_staff_user()

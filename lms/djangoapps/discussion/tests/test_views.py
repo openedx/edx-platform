@@ -155,6 +155,8 @@ def make_mock_thread_data(  # lint-amnesty, pylint: disable=missing-function-doc
         group_name=None,
         commentable_id=None,
         is_commentable_divided=None,
+        anonymous=False,
+        anonymous_to_peers=False,
 ):
     data_commentable_id = (
         commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
@@ -169,6 +171,8 @@ def make_mock_thread_data(  # lint-amnesty, pylint: disable=missing-function-doc
         "resp_skip": 25,
         "resp_limit": 5,
         "group_id": group_id,
+        "anonymous": anonymous,
+        "anonymous_to_peers": anonymous_to_peers,
         "context": (
             ThreadContext.COURSE if get_team(data_commentable_id) is None else ThreadContext.STANDALONE
         )
@@ -220,7 +224,9 @@ def make_mock_perform_request_impl(  # lint-amnesty, pylint: disable=missing-fun
         group_id=None,
         commentable_id=None,
         num_thread_responses=1,
-        thread_list=None
+        thread_list=None,
+        anonymous=False,
+        anonymous_to_peers=False,
 ):
     def mock_perform_request_impl(*args, **kwargs):
         url = args[1]
@@ -237,7 +243,9 @@ def make_mock_perform_request_impl(  # lint-amnesty, pylint: disable=missing-fun
                 thread_id=thread_id,
                 num_children=num_thread_responses,
                 group_id=group_id,
-                commentable_id=commentable_id
+                commentable_id=commentable_id,
+                anonymous=anonymous,
+                anonymous_to_peers=anonymous_to_peers,
             )
         elif "/users/" in url:
             res = {
@@ -266,6 +274,8 @@ def make_mock_request_impl(  # lint-amnesty, pylint: disable=missing-function-do
         commentable_id=None,
         num_thread_responses=1,
         thread_list=None,
+        anonymous=False,
+        anonymous_to_peers=False,
 ):
     impl = make_mock_perform_request_impl(
         course,
@@ -274,7 +284,9 @@ def make_mock_request_impl(  # lint-amnesty, pylint: disable=missing-function-do
         group_id=group_id,
         commentable_id=commentable_id,
         num_thread_responses=num_thread_responses,
-        thread_list=thread_list
+        thread_list=thread_list,
+        anonymous=anonymous,
+        anonymous_to_peers=anonymous_to_peers,
     )
 
     def mock_request_impl(*args, **kwargs):
@@ -406,6 +418,31 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             "dummy_thread_id"
         )
         assert response.status_code == 405
+
+    def test_post_anonymous_to_ta(self, mock_request):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id,
+                                                          anonymous_to_peers=True)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        request.user.is_community_ta = True
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        # user is community ta, so response must not have username and user_id fields
+        assert response_data['content'].get('username') is None
+        assert response_data['content'].get('user_id') is None
 
     def test_not_found(self, mock_request):
         request = RequestFactory().get("dummy_url")

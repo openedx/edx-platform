@@ -4,9 +4,7 @@
 #
 #    make upgrade
 #
-common/lib/sandbox-packages
-    # via -r requirements/edx-sandbox/py38.in
-common/lib/symmath
+-e common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
@@ -30,8 +28,11 @@ lxml==4.5.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
+    #   openedx-calc
 markupsafe==2.0.1
-    # via chem
+    # via
+    #   chem
+    #   openedx-calc
 matplotlib==3.3.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
@@ -42,7 +43,7 @@ networkx==2.5.1
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-nltk==3.6.7
+nltk==3.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -53,11 +54,9 @@ numpy==1.16.6
     #   matplotlib
     #   openedx-calc
     #   scipy
-openedx-calc==2.0.1
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   -r requirements/edx-sandbox/py38.in
-pillow==9.0.0
+openedx-calc==3.0.1
+    # via -r requirements/edx-sandbox/py38.in
+pillow==9.0.1
     # via matplotlib
 pycparser==2.21
     # via cffi
@@ -77,6 +76,7 @@ regex==2022.1.18
     # via nltk
 scipy==1.7.3
     # via
+    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   chem
     #   openedx-calc
@@ -88,6 +88,6 @@ sympy==1.6.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-    #   symmath
+    #   openedx-calc
 tqdm==4.62.3
     # via nltk
