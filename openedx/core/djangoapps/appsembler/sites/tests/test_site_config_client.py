@@ -45,15 +45,6 @@ def test_is_disabled_for_main_site_with_client(settings, monkeypatch, site_with_
 
 
 @pytest.mark.django_db
-def test_get_single_org_for_site_multiple_orgs(settings, monkeypatch, site_with_org):
-    site, org = site_with_org
-    site.organizations.add(OrganizationFactory.create())
-
-    with pytest.raises(Organization.MultipleObjectsReturned):
-        client_helpers.get_single_org_for_site(site)
-
-
-@pytest.mark.django_db
 def test_is_enabled_for_site_without_client(monkeypatch, site_with_org):
     site, _ = site_with_org
     monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', False)
