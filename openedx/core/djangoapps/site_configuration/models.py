@@ -8,8 +8,6 @@ import beeline
 import collections
 from logging import getLogger
 
-from urllib.parse import urlsplit
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.storage import get_storage_class
@@ -59,7 +57,7 @@ class SiteConfiguration(models.Model):
     """
 
     api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
-    cached_hardcoded_values = None  # Tahoe: Used by `get_tahoe_hardcoded_values`
+    tahoe_config_modifier = None  # Tahoe: Placeholder for `TahoeConfigurationValueModifier` instance
 
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
@@ -99,67 +97,8 @@ class SiteConfiguration(models.Model):
         if site_helpers.is_enabled_for_site(site):
             self.api_adapter = site_helpers.get_configuration_adapter(site)
 
-    @beeline.traced('site_config.get_tahoe_hardcoded_values')
-    def get_tahoe_hardcoded_values(self):
-        """
-        Tahoe: Getting saner defaults for Tahoe.
-
-        Given a value, return a hard-coded default completely disregarding the stored values.
-        These default site values are derived from site values.
-        """
-        if not self.cached_hardcoded_values:
-            self.cached_hardcoded_values = {
-                'PLATFORM_NAME': self._get_value('platform_name'),
-                'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
-            }
-
-            if hasattr(self, 'site'):
-                # Set `Site`-related values only if a site exists.
-                site_domain = self.site.domain
-
-                # We cannot simply use a protocol-relative URL for LMS_ROOT_URL
-                # This is because the URL here will be used by such activities as
-                # sending activation links to new users. The activation link needs the
-                # scheme address verification emails. The callers using this variable
-                # expect the scheme in the URL
-                root_url = '{scheme}://{domain}'.format(
-                    scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
-                    domain=site_domain,
-                )
-                domain_without_port_number = site_domain.split(':')[0]
-
-                self.cached_hardcoded_values.update(
-                    PLATFORM_NAME=self._get_value('platform_name'),
-                    css_overrides_file="{}.css".format(domain_without_port_number),
-                    ENABLE_COMBINED_LOGIN_REGISTRATION=True,
-                    LMS_ROOT_URL=root_url,
-                    SITE_NAME=site_domain,  # Support for custom domains.
-                    # RED-2471: Use Multi-tenant `/help` URL for password reset emails.
-                    ACTIVATION_EMAIL_SUPPORT_LINK='{root_url}/help'.format(root_url=root_url),
-                    # RED-2385: Use Multi-tenant `/help` URL for activation emails.
-                    PASSWORD_RESET_SUPPORT_LINK='{root_url}/help'.format(root_url=root_url),
-                )
-
-        return self.cached_hardcoded_values
-
     @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
-        """
-        Tahoe: Return configuration value with hardcoded Tahoe values.
-        """
-        if name == 'LANGUAGE_CODE' and default is None:
-            # TODO: Ask Dashboard 2.0 / AMC to set the `LANGUAGE_CODE` by default.
-            default = 'en'
-
-        hardcoded_values = self.get_tahoe_hardcoded_values()
-        if name in hardcoded_values:
-            # Disregard the stored value, and return a Tahoe-compatible version.
-            return hardcoded_values[name]
-        else:
-            return self._get_value(name, default)
-
-    @beeline.traced('site_config._get_value')
-    def _get_value(self, name, default=None):
         """
         Return Configuration value for the key specified as name argument.
 
@@ -174,6 +113,12 @@ class SiteConfiguration(models.Model):
         """
         beeline.add_context_field('value_name', name)
         if self.enabled:
+            if self.tahoe_config_modifier:
+                name, default = self.tahoe_config_modifier.normalize_get_value_params(name, default)
+                should_override, overridden_value = self.tahoe_config_modifier.override_value(name)
+                if should_override:
+                    return overridden_value
+
             try:
                 if self.api_adapter:
                     # Tahoe: Use `SiteConfigAdapter` if available.
