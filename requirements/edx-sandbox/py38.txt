@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e common/lib/sandbox-packages
+-e file:///home/runner/work/edx-platform/edx-platform/common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
