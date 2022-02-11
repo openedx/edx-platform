@@ -6,6 +6,7 @@ Views for Enhanced Staff Grader
 
 # NOTE: we intentionally add extra args using @require_params
 # pylint: disable=arguments-differ
+import logging
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
@@ -53,6 +54,8 @@ from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
+log = logging.getLogger(__name__)
 
 
 class StaffGraderBaseView(RetrieveAPIView):
@@ -102,18 +105,23 @@ class InitializeView(StaffGraderBaseView):
             # Get list of submissions for this ORA
             init_data["submissions"] = get_submissions(request, ora_location)
 
-            return Response(InitializeSerializer(init_data).data)
+            response_data = InitializeSerializer(init_data).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
             return BadOraLocationResponse()
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -162,22 +170,25 @@ class SubmissionFetchView(StaffGraderBaseView):
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionFetchSerializer(
+            response_data = SubmissionFetchSerializer(
                 {
                     "submission_info": submission_info,
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
+            ).data
 
-            return Response(serializer.data)
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -217,21 +228,24 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
 
-            serializer = SubmissionStatusFetchSerializer(
+            response_data = SubmissionStatusFetchSerializer(
                 {
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
+            ).data
 
-            return Response(serializer.data)
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -291,6 +305,7 @@ class UpdateGradeView(StaffGraderBaseView):
                         "lock_info": lock_info,
                     }
                 ).data
+                log.error(f"Grade contested for submission: {submission_uuid}")
                 return GradeContestedResponse(context=submission_status)
 
             # Transform grade data and submit assessment, rasies on failure
@@ -306,20 +321,24 @@ class UpdateGradeView(StaffGraderBaseView):
                 request, ora_location, submission_uuid
             )
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
-            serializer = SubmissionStatusFetchSerializer(
+            response_data = SubmissionStatusFetchSerializer(
                 {
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
-            )
-            return Response(serializer.data)
+            ).data
+
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
 
@@ -350,24 +369,31 @@ class SubmissionLockView(StaffGraderBaseView):
             # Validate ORA location
             UsageKey.from_string(ora_location)
             lock_info = claim_submission_lock(request, ora_location, submission_uuid)
-            return Response(LockStatusSerializer(lock_info).data)
+
+            response_data = LockStatusSerializer(lock_info).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
             return BadOraLocationResponse()
 
         # Return updated lock info on error
         except LockContestedError:
             lock_info = check_submission_lock(request, ora_location, submission_uuid)
             lock_status = LockStatusSerializer(lock_info).data
+            log.error(f"Lock contested for submission: {submission_uuid}")
             return LockContestedResponse(context=lock_status)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling
-        except Exception:
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
@@ -377,10 +403,14 @@ class SubmissionLockView(StaffGraderBaseView):
             # Validate ORA location
             UsageKey.from_string(ora_location)
             lock_info = delete_submission_lock(request, ora_location, submission_uuid)
-            return Response(LockStatusSerializer(lock_info).data)
+
+            response_data = LockStatusSerializer(lock_info).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Catch bad ORA location
         except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
             return BadOraLocationResponse()
 
         # Return updated lock info on error
@@ -391,8 +421,10 @@ class SubmissionLockView(StaffGraderBaseView):
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
+            log.error(ex)
             return InternalErrorResponse(context=ex.context)
 
-        # Blanket exception handling
-        except Exception:
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
             return UnknownErrorResponse()

@@ -17,7 +17,7 @@ from lms.djangoapps.ora_staff_grader.errors import (
     XBlockInternalError,
 )
 
-from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler
+from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
 
 
 def get_submissions(request, usage_id):
@@ -33,29 +33,6 @@ def get_submissions(request, usage_id):
     return json.loads(response.content)
 
 
-def get_rubric_config(request, usage_id):
-    """
-    Get rubric data from the ORA's 'get_rubric' XBlock.json_handler
-    """
-    handler_name = "get_rubric"
-    data = {"target_rubric_block_id": usage_id}
-    response = call_xblock_json_handler(request, usage_id, handler_name, data)
-
-    # Unhandled errors might not be JSON, catch before loading
-    if response.status_code != 200:
-        raise XBlockInternalError(context={"handler": handler_name})
-
-    response_data = json.loads(response.content)
-
-    # Handled faillure still returns HTTP 200 but with 'success': False and supplied error message "msg"
-    if not response_data.get("success", False):
-        raise XBlockInternalError(
-            context={"handler": handler_name, "msg": response_data.get("msg", "")}
-        )
-
-    return response_data["rubric"]
-
-
 def get_submission_info(request, usage_id, submission_uuid):
     """
     Get submission content from ORA 'get_submission_info' XBlock.json_handler
@@ -65,6 +42,11 @@ def get_submission_info(request, usage_id, submission_uuid):
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
     if response.status_code != 200:
+        details = (
+            json.loads(response.content).get("error", "")
+            if is_json(response.content)
+            else ""
+        )
         raise XBlockInternalError(context={"handler": handler_name})
 
     return json.loads(response.content)
@@ -79,7 +61,12 @@ def get_assessment_info(request, usage_id, submission_uuid):
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
     if response.status_code != 200:
-        raise XBlockInternalError(context={"handler": handler_name})
+        details = (
+            json.loads(response.content).get("error", "")
+            if is_json(response.content)
+            else ""
+        )
+        raise XBlockInternalError(context={"handler": handler_name, "details": details})
 
     return json.loads(response.content)
 
