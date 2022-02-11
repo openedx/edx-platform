@@ -62,22 +62,22 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
                 )
                 with cls.store.bulk_operations(course_key):
                     section = ItemFactory.create(
-                        parent_location=course.location,
+                        parent=course,
                         category="chapter",
                         display_name="A Section"
                     )
                     sequence = ItemFactory.create(
-                        parent_location=section.location,
+                        parent=section,
                         category="sequential",
                         display_name="A Sequence"
                     )
                     unit = ItemFactory.create(
-                        parent_location=sequence.location,
+                        parent=sequence,
                         category="vertical",
                         display_name="A Unit"
                     )
                     ItemFactory.create(
-                        parent_location=unit.location,
+                        parent=unit,
                         category="html",
                         display_name="An HTML Module"
                     )

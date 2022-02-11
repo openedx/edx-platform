@@ -8,6 +8,7 @@ import json
 import re
 from contextlib import closing
 from datetime import datetime
+from urllib.parse import parse_qs
 
 import httpretty
 from PIL import Image
@@ -30,7 +31,7 @@ def _get_thread_callback(thread_data):
         additional required fields.
         """
         response_data = make_minimal_cs_thread(thread_data)
-        for key, val_list in request.parsed_body.items():
+        for key, val_list in parsed_body(request).items():
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "closed", "pinned"]:
                 response_data[key] = val == "True"
@@ -56,7 +57,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
         # are returned by the comments service
         response_data["thread_id"] = thread_id
         response_data["parent_id"] = parent_id
-        for key, val_list in request.parsed_body.items():
+        for key, val_list in parsed_body(request).items():
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "endorsed"]:
                 response_data[key] = val == "True"
@@ -398,7 +399,7 @@ class CommentsServiceMockMixin:
         """
         Assert that the given mock request had the expected query parameters
         """
-        actual_params = dict(httpretty_request.querystring)
+        actual_params = dict(querystring(httpretty_request))
         actual_params.pop("request_id")  # request_id is random
         assert actual_params == expected_params
 
@@ -472,7 +473,7 @@ def make_minimal_cs_thread(overrides=None):
     ret = {
         "type": "thread",
         "id": "dummy",
-        "course_id": "dummy/dummy/dummy",
+        "course_id": "course-v1:dummy+dummy+dummy",
         "commentable_id": "dummy",
         "group_id": None,
         "user_id": "0",
@@ -595,3 +596,17 @@ class ProfileImageTestMixin:
                 }
             }
         }
+
+
+def parsed_body(request):
+    """Returns a parsed dictionary version of a request body"""
+    # This could just be HTTPrettyRequest.parsed_body, but that method double-decodes '%2B' -> '+' -> ' '.
+    # You can just remove this method when this issue is fixed: https://github.com/gabrielfalcao/HTTPretty/issues/240
+    return parse_qs(request.body.decode('utf8'))
+
+
+def querystring(request):
+    """Returns a parsed dictionary version of a query string"""
+    # This could just be HTTPrettyRequest.querystring, but that method double-decodes '%2B' -> '+' -> ' '.
+    # You can just remove this method when this issue is fixed: https://github.com/gabrielfalcao/HTTPretty/issues/240
+    return parse_qs(request.path.split('?', 1)[-1])

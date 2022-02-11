@@ -13,12 +13,24 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from waffle.testutils import override_switch
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_ABOUT,
+    CATALOG_VISIBILITY_NONE,
+    COURSE_VISIBILITY_PRIVATE,
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
+)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
@@ -26,22 +38,6 @@ from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTE
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
-from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
-    CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
-    COURSE_VISIBILITY_PRIVATE,
-    COURSE_VISIBILITY_PUBLIC,
-    COURSE_VISIBILITY_PUBLIC_OUTLINE
-)
-from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
-    TEST_DATA_MIXED_MODULESTORE,
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import LoginEnrollmentTestCase
 
@@ -51,12 +47,11 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -64,18 +59,9 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         cls.course_without_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_NONE)
         cls.course_with_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_ABOUT)
         cls.purchase_course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course.location,
-            data="OOGIE BLOOGIE", display_name="overview"
-        )
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course_without_about.location,
-            data="WITHOUT ABOUT", display_name="overview"
-        )
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course_with_about.location,
-            data="WITH ABOUT", display_name="overview"
-        )
+        CourseDetails.update_about_item(cls.course, 'overview', 'OOGIE BLOOGIE', None)
+        CourseDetails.update_about_item(cls.course_without_about, 'overview', 'WITHOUT ABOUT', None)
+        CourseDetails.update_about_item(cls.course_with_about, 'overview', 'WITH ABOUT', None)
 
     def setUp(self):
         super().setUp()
@@ -243,12 +229,11 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             self.assertContains(resp, "Enroll Now")
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
     def setUp(self):
         """
         Set up the tests
@@ -261,7 +246,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.xml_course_id = self.store.make_course_key('edX', 'detached_pages', '2014')
         import_course_from_xml(
             self.store,
-            'test_user',
+            self.user.id,
             TEST_DATA_DIR,
             source_dirs=['2014'],
             static_content_store=None,
@@ -288,20 +273,16 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertContains(resp, self.xml_data)
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create(metadata={"max_student_enrollments_allowed": 1})
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course.location,
-            data="OOGIE BLOOGIE", display_name="overview"
-        )
+        CourseDetails.update_about_item(cls.course, 'overview', 'OOGIE BLOOGIE', None)
 
     def test_enrollment_cap(self):
         """
@@ -335,20 +316,15 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.assertNotContains(resp, REG_STR)
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create(metadata={"invitation_only": True})
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course.location,
-            display_name="overview"
-        )
 
     def test_invitation_only(self):
         """
@@ -380,13 +356,12 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertContains(resp, REG_STR)
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
     set but it is currently outside of that period.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     def setUp(self):
         super().setUp()
 
@@ -401,11 +376,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.course.enrollment_end = nextday
         self.course = self.update_course(self.course, self.user.id)
 
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course.location,
-            display_name="overview"
-        )
-
     def test_closed_enrollmement(self):
         url = reverse('about_course', args=[str(self.course.id)])
         resp = self.client.get(url)
@@ -414,7 +384,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         # Check that registration button is not present
         self.assertNotContains(resp, REG_STR)
 
-    def test_course_price_is_not_visble_in_sidebar(self):
+    def test_course_price_is_not_visible_in_sidebar(self):
         url = reverse('about_course', args=[str(self.course.id)])
         resp = self.client.get(url)
         # course price is not visible ihe course_about page when the course
@@ -423,6 +393,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.

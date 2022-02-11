@@ -25,7 +25,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -1600,7 +1600,6 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments list API.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
 
     def setUp(self):
@@ -1613,7 +1612,7 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         self.rate_limit, __ = throttle.parse_rate(throttle.rate)
 
         self.course = CourseFactory.create(org='e', number='d', run='X', emit_signals=True)
-        self.course2 = CourseFactory.create(org='x', number='y', run='Z', emit_signal=True)
+        self.course2 = CourseFactory.create(org='x', number='y', run='Z', emit_signals=True)
 
         for mode_slug in ('honor', 'verified', 'audit'):
             CourseModeFactory.create(

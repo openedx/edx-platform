@@ -43,12 +43,7 @@ from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
-    CourseUserType,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
@@ -402,15 +397,10 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     CREATE_USER = False
     NUM_PROBLEMS = 20
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 220),
-        (ModuleStoreEnum.Type.split, 4, 205),
-    )
-    @ddt.unpack
-    def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
+    def test_index_query_counts(self):
         # TODO: decrease query count as part of REVO-28
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        with self.store.default_store(store_type):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             with self.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -423,8 +413,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(expected_mysql_query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
-            with check_mongo_calls(expected_mongo_query_count):
+        with self.assertNumQueries(205, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+            with check_mongo_calls(4):
                 url = reverse(
                     'courseware_section',
                     kwargs={
@@ -1396,16 +1386,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
         self._get_progress_page()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_student_progress_with_valid_and_invalid_id(self, default_store):
+    def test_student_progress_with_valid_and_invalid_id(self):
         """
-         Check that invalid 'student_id' raises Http404 for both old mongo and
-         split mongo courses.
+         Check that invalid 'student_id' raises Http404.
         """
 
-        # Create new course with respect to 'default_store'
+        # Create new course
         # Enroll student into course
-        self.course = CourseFactory.create(default_store=default_store)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
 
         # Invalid Student Ids (Integer and Non-int)
@@ -2537,17 +2525,14 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_student_state(self, default_store):
+    def test_student_state(self):
         """
         Verify that saved student state is loaded for xblocks rendered in the index view.
         """
         user = UserFactory()
 
-        with modulestore().default_store(default_store):
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(parent_location=course.location, category='chapter')
             section = ItemFactory.create(parent_location=chapter.location, category='view_checker',
@@ -2843,10 +2828,9 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_completion_service_disabled(self, default_store):
+    def test_completion_service_disabled(self):
 
-        self.setup_course(default_store)
+        self.setup_course(ModuleStoreEnum.Type.split)
         assert self.client.login(username=self.user.username, password='test')
 
         response = self.client.get(self.section_1_url)
@@ -2855,12 +2839,11 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         response = self.client.get(self.section_2_url)
         self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_completion_service_enabled(self, default_store):
+    def test_completion_service_enabled(self):
 
         self.override_waffle_switch(True)
 
-        self.setup_course(default_store)
+        self.setup_course(ModuleStoreEnum.Type.split)
         assert self.client.login(username=self.user.username, password='test')
 
         response = self.client.get(self.section_1_url)

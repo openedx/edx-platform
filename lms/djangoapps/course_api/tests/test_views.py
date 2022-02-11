@@ -12,16 +12,13 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 from waffle.testutils import override_switch
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -317,7 +314,6 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     Similar to search.tests.test_course_discovery_views but with the course API integration.
     """
 
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
@@ -348,8 +344,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             'org': org_code,
             'run': '2010',
             'number': 'DemoZ',
-            # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
-            'id': f'{org_code}/DemoZ/2010',
+            'id': f'course-v1:{org_code}+DemoZ+2010',
             'content': {
                 'short_description': short_description,
             },
@@ -357,14 +352,13 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         DemoCourse.index(self.searcher, [search_course])
 
-        org, course, run = search_course['id'].split('/')
+        key = CourseKey.from_string(search_course['id'])
 
         db_course = self.create_course(
             mobile_available=False,
-            org=org,
-            course=course,
-            run=run,
-            short_description=short_description,
+            org=key.org,
+            course=key.course,
+            run=key.run,
         )
 
         return db_course

@@ -221,21 +221,3 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()
-
-    def get_success_enrolled_staff_mongo_count(self):
-        """
-        Override because mongo queries are higher for this
-        particular test. This has not been investigated exhaustively
-        as mongo is no longer used much, and removing user_partitions
-        from inheritance fixes the problem.
-
-        # The 9 mongoDB calls include calls for
-        # Old Mongo:
-        #   (1) fill_in_run
-        #   (2) get_course in get_course_with_access
-        #   (3) get_item for HTML block in get_module_by_usage_id
-        #   (4) get_parent when loading HTML block
-        #   (5)-(8) calls related to the inherited user_partitions field.
-        #   (9) edx_notes descriptor call to get_course
-        """
-        return 9

@@ -104,118 +104,76 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
     """
     REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id', 'api_version']}
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert 'Sample' in response.data['handouts_html']
+    @ddt.data(API_V05, API_V1)
+    def test_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert 'Sample' in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_no_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_no_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # delete handouts in course
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-                self.store.delete_item(handouts_usage_key, self.user.id)
+        # delete handouts in course
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            self.store.delete_item(handouts_usage_key, self.user.id)
 
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert response.data['handouts_html'] is None
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert response.data['handouts_html'] is None
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_empty_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_empty_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # set handouts to empty tags
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<ol></ol>"
-            self.store.update_item(underlying_handouts, self.user.id)
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert response.data['handouts_html'] is None
+        # set handouts to empty tags
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<ol></ol>"
+        self.store.update_item(underlying_handouts, self.user.id)
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert response.data['handouts_html'] is None
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_handouts_static_rewrites(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_handouts_static_rewrites(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            assert "'/static/" in underlying_handouts.data
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        assert "'/static/" in underlying_handouts.data
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert "'/static/" not in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert "'/static/" not in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_jump_to_id_handout_href(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_jump_to_id_handout_href(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<a href=\"/jump_to_id/identifier\">Intracourse Link</a>"
-            self.store.update_item(underlying_handouts, self.user.id)
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<a href=\"/jump_to_id/identifier\">Intracourse Link</a>"
+        self.store.update_item(underlying_handouts, self.user.id)
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert f'/courses/{self.course.id}/jump_to_id/' in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert f'/courses/{self.course.id}/jump_to_id/' in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_course_url_handout_href(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_course_url_handout_href(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<a href=\"/course/identifier\">Linked Content</a>"
-            self.store.update_item(underlying_handouts, self.user.id)
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<a href=\"/course/identifier\">Linked Content</a>"
+        self.store.update_item(underlying_handouts, self.user.id)
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert f'/courses/{self.course.id}/' in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert f'/courses/{self.course.id}/' in response.data['handouts_html']
 
     def add_mobile_available_toy_course(self):
         """ use toy course with handouts, and make it mobile_available """

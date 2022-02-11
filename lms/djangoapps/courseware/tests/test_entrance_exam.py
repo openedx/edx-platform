@@ -8,8 +8,7 @@ from crum import set_current_request
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -22,6 +21,7 @@ from lms.djangoapps.courseware.entrance_exams import (
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
@@ -40,6 +40,7 @@ from common.djangoapps.util.milestones_helpers import (
 )
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -48,8 +49,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
         """
@@ -61,82 +60,75 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        with self.store.bulk_operations(self.course.id):
-            self.chapter = ItemFactory.create(
-                parent=self.course,
-                display_name='Overview'
-            )
-            self.welcome = ItemFactory.create(
-                parent=self.chapter,
-                display_name='Welcome'
-            )
-            ItemFactory.create(
-                parent=self.course,
-                category='chapter',
-                display_name="Week 1"
-            )
-            self.chapter_subsection = ItemFactory.create(
-                parent=self.chapter,
-                category='sequential',
-                display_name="Lesson 1"
-            )
-            chapter_vertical = ItemFactory.create(
-                parent=self.chapter_subsection,
-                category='vertical',
-                display_name='Lesson 1 Vertical - Unit 1'
-            )
-            ItemFactory.create(
-                parent=chapter_vertical,
-                category="problem",
-                display_name="Problem - Unit 1 Problem 1"
-            )
-            ItemFactory.create(
-                parent=chapter_vertical,
-                category="problem",
-                display_name="Problem - Unit 1 Problem 2"
-            )
+        self.chapter = ItemFactory.create(
+            parent=self.course,
+            display_name='Overview'
+        )
+        self.welcome = ItemFactory.create(
+            parent=self.chapter,
+            display_name='Welcome'
+        )
+        ItemFactory.create(
+            parent=self.course,
+            category='chapter',
+            display_name="Week 1"
+        )
+        self.chapter_subsection = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Lesson 1"
+        )
+        chapter_vertical = ItemFactory.create(
+            parent=self.chapter_subsection,
+            category='vertical',
+            display_name='Lesson 1 Vertical - Unit 1'
+        )
+        ItemFactory.create(
+            parent=chapter_vertical,
+            category="problem",
+            display_name="Problem - Unit 1 Problem 1"
+        )
+        ItemFactory.create(
+            parent=chapter_vertical,
+            category="problem",
+            display_name="Problem - Unit 1 Problem 2"
+        )
 
-            ItemFactory.create(
-                category="instructor",
-                parent=self.course,
-                data="Instructor Tab",
-                display_name="Instructor"
-            )
-            self.entrance_exam = ItemFactory.create(
-                parent=self.course,
-                category="chapter",
-                display_name="Entrance Exam Section - Chapter 1",
-                is_entrance_exam=True,
-                in_entrance_exam=True
-            )
-            self.exam_1 = ItemFactory.create(
-                parent=self.entrance_exam,
-                category='sequential',
-                display_name="Exam Sequential - Subsection 1",
-                graded=True,
-                in_entrance_exam=True
-            )
-            subsection = ItemFactory.create(
-                parent=self.exam_1,
-                category='vertical',
-                display_name='Exam Vertical - Unit 1'
-            )
-            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-                question_text='The correct answer is Choice 3',
-                choices=[False, False, True, False],
-                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-            )
-            self.problem_1 = ItemFactory.create(
-                parent=subsection,
-                category="problem",
-                display_name="Exam Problem - Problem 1",
-                data=problem_xml
-            )
-            self.problem_2 = ItemFactory.create(
-                parent=subsection,
-                category="problem",
-                display_name="Exam Problem - Problem 2"
-            )
+        self.entrance_exam = ItemFactory.create(
+            parent=self.course,
+            category="chapter",
+            display_name="Entrance Exam Section - Chapter 1",
+            is_entrance_exam=True,
+            in_entrance_exam=True
+        )
+        self.exam_1 = ItemFactory.create(
+            parent=self.entrance_exam,
+            category='sequential',
+            display_name="Exam Sequential - Subsection 1",
+            graded=True,
+            in_entrance_exam=True
+        )
+        subsection = ItemFactory.create(
+            parent=self.exam_1,
+            category='vertical',
+            display_name='Exam Vertical - Unit 1'
+        )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
+        self.problem_1 = ItemFactory.create(
+            parent=subsection,
+            category="problem",
+            display_name="Exam Problem - Problem 1",
+            data=problem_xml
+        )
+        self.problem_2 = ItemFactory.create(
+            parent=subsection,
+            category="problem",
+            display_name="Exam Problem - Problem 2"
+        )
 
         add_entrance_exam_milestone(self.course, self.entrance_exam)
 
@@ -147,7 +139,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.anonymous_user = AnonymousUserFactory()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
-        modulestore().update_item(self.course, self.request.user.id)
+        self.course = self.update_course(self.course, self.request.user.id)
 
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
@@ -204,13 +196,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                     'url_name': 'Week_1',
                     'display_name': 'Week 1',
                     'display_id': 'week-1'
-                },
-                {
-                    'active': False,
-                    'sections': [],
-                    'url_name': 'Instructor',
-                    'display_name': 'Instructor',
-                    'display_id': 'instructor'
                 },
                 {
                     'active': True,
@@ -316,7 +301,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         minimum_score_pct = 29
         self.course.entrance_exam_minimum_score_pct = float(minimum_score_pct) / 100
-        modulestore().update_item(self.course, self.request.user.id)
+        self.update_course(self.course, self.request.user.id)
 
         # answer the problem so it results in only 20% correct.
         answer_entrance_exam_problem(self.course, self.request, self.problem_1, value=1, max_value=5)

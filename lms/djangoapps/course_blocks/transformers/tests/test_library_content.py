@@ -70,7 +70,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                                     '#ref': 'vertical1',
                                     '#children': [
                                         {
-                                            'metadata': {'category': 'library_content'},
                                             '#type': 'library_content',
                                             '#ref': 'library_content1',
                                             '#children': [
@@ -205,7 +204,6 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
                                     '#ref': 'vertical1',
                                     '#children': [
                                         {
-                                            'metadata': {'category': 'library_content'},
                                             '#type': 'library_content',
                                             '#ref': 'library_content1',
                                             '#children': [

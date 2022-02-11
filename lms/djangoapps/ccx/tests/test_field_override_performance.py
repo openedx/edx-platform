@@ -20,7 +20,7 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xblock.core import XBlock
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 
@@ -215,9 +215,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         if not enable_ccx and view_as_ccx:
             pytest.skip("Can't view a ccx course if ccx is disabled on the course")
 
-        if self.MODULESTORE == TEST_DATA_MONGO_MODULESTORE and view_as_ccx:
-            pytest.skip("Can't use a MongoModulestore test as a CCX course")
-
         with self.settings(
             XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
             MODULESTORE_FIELD_OVERRIDE_PROVIDERS=providers[overrides],
@@ -228,35 +225,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.instrument_course_progress_render(
                 course_width, enable_ccx, view_as_ccx, sql_queries, mongo_reads,
             )
-
-
-class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
-    """
-    Test cases for instrumenting field overrides against the Mongo modulestore.
-    """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-    __test__ = True
-
-    # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 31
-    TEST_DATA = {
-        # (providers, course_width, enable_ccx, view_as_ccx): (
-        #     # of sql queries to default,
-        #     # of mongo queries,
-        # )
-        ('no_overrides', 1, True, False): (QUERY_COUNT, 1),
-        ('no_overrides', 2, True, False): (QUERY_COUNT, 1),
-        ('no_overrides', 3, True, False): (QUERY_COUNT, 1),
-        ('ccx', 1, True, False): (QUERY_COUNT, 1),
-        ('ccx', 2, True, False): (QUERY_COUNT, 1),
-        ('ccx', 3, True, False): (QUERY_COUNT, 1),
-        ('no_overrides', 1, False, False): (QUERY_COUNT, 1),
-        ('no_overrides', 2, False, False): (QUERY_COUNT, 1),
-        ('no_overrides', 3, False, False): (QUERY_COUNT, 1),
-        ('ccx', 1, False, False): (QUERY_COUNT, 1),
-        ('ccx', 2, False, False): (QUERY_COUNT, 1),
-        ('ccx', 3, False, False): (QUERY_COUNT, 1),
-    }
 
 
 class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
