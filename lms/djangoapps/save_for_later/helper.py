@@ -15,7 +15,17 @@ log = logging.getLogger(__name__)
 USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.saveforlater.email.sent'
 
 
-def _get_event_properties(data):
+def _get_program_pacing(course_runs):
+    """
+        get pacing type of published course run of course for program
+    """
+
+    pacing = [course_run.get('pacing_type') if course_run.get('status') == 'published'
+              else '' for course_run in course_runs][0]
+    return 'Self-paced' if pacing == 'self_paced' else 'Instructor-led'
+
+
+def _get_event_properties(request, data):
     """
     set event properties for course and program which are required in braze email template
     """
@@ -27,6 +37,7 @@ def _get_event_properties(data):
 
     if data.get('type') == 'course':
         course = data.get('course')
+        data = request.data
         org_img_url = data.get('org_img_url')
         marketing_url = data.get('marketing_url')
         event_properties.update({
@@ -40,12 +51,17 @@ def _get_event_properties(data):
                 'view_course_url': marketing_url + '?save_for_later=true' if marketing_url else '#',
                 'display_name': course.display_name,
                 'short_description': course.short_description,
+                'weeks_to_complete': data.get('weeks_to_complete'),
+                'min_effort': data.get('min_effort'),
+                'max_effort': data.get('max_effort'),
+                'pacing_type': 'Self-paced' if course.self_paced else 'Instructor-led',
                 'type': 'course',
             }
         })
 
     if data.get('type') == 'program':
         program = data.get('program')
+        price = int(program.get('price_ranges')[0].get('total'))
         event_properties.update({
             'properties': {
                 'program_image_url': program.get('card_image_url'),
@@ -56,6 +72,12 @@ def _get_event_properties(data):
                 'title': program.get('title'),
                 'education_level': program.get('type'),
                 'total_courses': len(program.get('courses')) if program.get('courses') else 0,
+                'weeks_to_complete': program.get('weeks_to_complete'),
+                'min_effort': program.get('min_hours_effort_per_week'),
+                'max_effort': program.get('max_hours_effort_per_week'),
+                'pacing_type': _get_program_pacing(program.get('courses')[0].get('course_runs')),
+                'price': f'${price} USD',
+                'registered': bool(program.get('type') in ['MicroMasters', 'MicroBachelors']),
                 'type': 'program',
             }
         })
@@ -66,7 +88,7 @@ def send_email(request, email, data):
     """
     Send email through Braze
     """
-    event_properties = _get_event_properties(data)
+    event_properties = _get_event_properties(request, data)
     braze_client = BrazeClient(
         api_key=settings.EDX_BRAZE_API_KEY,
         api_url=settings.EDX_BRAZE_API_SERVER,
