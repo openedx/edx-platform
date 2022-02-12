@@ -9,7 +9,7 @@ on:
 
 jobs:
   check_migrations:
-    name: check migrations mysql57
+    name: check migrations
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
