@@ -3,6 +3,7 @@ Course API Views
 """
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache
@@ -48,7 +49,6 @@ from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled as integrity_signature_toggle
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -319,15 +319,18 @@ class CoursewareMeta:
     @property
     def is_integrity_signature_enabled(self):
         """
-        Course waffle flag for the integrity signature feature.
+        Django setting for the integrity signature feature.
         """
-        return integrity_signature_toggle(self.course_key)
+        return settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE', False)
 
     @property
     def user_needs_integrity_signature(self):
         """
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
+        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
+            return False
+
         integrity_signature_required = (
             self.enrollment_object
             # Master's enrollments are excluded here as honor code is handled separately
@@ -342,13 +345,11 @@ class CoursewareMeta:
                 self.course_masquerade
             )
 
-        if (
-            integrity_signature_toggle(self.course_key)
-            and integrity_signature_required
-        ):
+        if integrity_signature_required:
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
                 return True
+
         return False
 
     @property

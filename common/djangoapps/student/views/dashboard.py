@@ -29,7 +29,6 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
@@ -749,16 +748,8 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     else:
         redirect_message = ''
 
-    all_integrity_enabled = True
-    if not course_enrollments:
-        all_integrity_enabled = is_integrity_signature_enabled(None)
-    for enrollment in course_enrollments:
-        if not is_integrity_signature_enabled(enrollment.course_id):
-            all_integrity_enabled = False
-            break
-
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = not all_integrity_enabled and \
+    display_sidebar_on_dashboard = not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and \
         verification_status['status'] in valid_verification_statuses and \
         verification_status['should_display']
 

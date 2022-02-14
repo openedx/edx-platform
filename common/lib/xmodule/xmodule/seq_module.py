@@ -35,7 +35,6 @@ from xmodule.x_module import (
 )
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -950,7 +949,7 @@ class SequenceBlock(
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'is_integrity_signature_enabled': is_integrity_signature_enabled(course_id),
+                'is_integrity_signature_enabled': settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'),
             }
 
             # inject the user's credit requirements and fulfillments

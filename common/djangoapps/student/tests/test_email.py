@@ -15,7 +15,6 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
@@ -32,7 +31,6 @@ from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE, is_integrity_signature_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
@@ -239,7 +237,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         send_proctoring_requirements_email(context)
         self._assert_email()
 
-    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_INTEGRITY_SIGNATURE': True})
     def test_send_proctoring_requirements_email_honor(self):
         self.course = CourseFactory(
             display_name='honor code on course',
@@ -298,7 +296,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
             escape("Before taking a graded proctored exam, you must have approved ID verification photos."),
             id_verification_url,
         ]
-        if not is_integrity_signature_enabled(self.course.id):
+        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
             fragments.extend(idv_fragments)
             return (fragments, [])
         return (fragments, idv_fragments)

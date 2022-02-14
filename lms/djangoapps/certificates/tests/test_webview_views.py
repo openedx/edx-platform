@@ -1643,34 +1643,33 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertNotContains(response, verified_name)
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.is_integrity_signature_enabled')
     @ddt.data(
         True,
         False
     )
-    def test_verified_certificate_description(self, integrity_signature_enabled, mock_integrity_signature):
+    def test_verified_certificate_description(self, enable_integrity_signature):
         """
         Test that for a verified cert, the correct language is used when the integrity signature feature is enabled.
         """
-        mock_integrity_signature.return_value = integrity_signature_enabled
-        self._add_course_certificates(count=1, signatory_count=2, is_active=True)
-        self._create_custom_template_with_verified_description()
-        self.cert.mode = 'verified'
-        self.cert.save()
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=str(self.course.id),
-            uuid=self.cert.verify_uuid
-        )
+        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
+            self._add_course_certificates(count=1, signatory_count=2, is_active=True)
+            self._create_custom_template_with_verified_description()
+            self.cert.mode = 'verified'
+            self.cert.save()
+            test_url = get_certificate_url(
+                user_id=self.user.id,
+                course_id=str(self.course.id),
+                uuid=self.cert.verify_uuid
+            )
 
-        response = self.client.get(test_url)
-        assert response.status_code == 200
-        if not integrity_signature_enabled:
-            self.assertContains(response, 'identity of the learner has been checked and is valid')
-            self.assertNotContains(response, 'Integrity signature enabled')
-        else:
-            self.assertNotContains(response, 'identity of the learner has been checked and is valid')
-            self.assertContains(response, 'Integrity signature enabled')
+            response = self.client.get(test_url)
+            assert response.status_code == 200
+            if not enable_integrity_signature:
+                self.assertContains(response, 'identity of the learner has been checked and is valid')
+                self.assertNotContains(response, 'Integrity signature enabled')
+            else:
+                self.assertNotContains(response, 'identity of the learner has been checked and is valid')
+                self.assertContains(response, 'Integrity signature enabled')
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):

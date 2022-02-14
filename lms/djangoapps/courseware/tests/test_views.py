@@ -99,7 +99,6 @@ from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_s
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1930,7 +1929,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         assert response.title == 'Your certificate will be available soon!'
 
     @ddt.data(True, False)
-    def test_no_certs_generated_and_not_verified(self, waffle_override):
+    def test_no_certs_generated_and_not_verified(self, enable_integrity_signature):
         """
         Verify if the learner is not ID Verified, and the certs are not yet generated,
         but the learner is eligible, the get_cert_data would return cert status Unverified
@@ -1939,14 +1938,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         CertificateGenerationCourseSetting(
             course_key=self.course.id, self_generation_enabled=True
         ).save()
-        with override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=waffle_override):
+        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
             with patch(
                 'lms.djangoapps.certificates.api.certificate_downloadable_status',
                 return_value=self.mock_certificate_downloadable_status()
             ):
                 response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
 
-        if waffle_override:
+        if enable_integrity_signature:
             assert response.cert_status == 'requesting'
             assert response.title == 'Congratulations, you qualified for a certificate!'
         else:

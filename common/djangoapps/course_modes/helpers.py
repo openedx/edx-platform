@@ -11,7 +11,6 @@ from slumber.exceptions import SlumberBaseException
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED  # lint-amnesty, pylint: disable=line-too-long
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
@@ -42,7 +41,7 @@ def enrollment_mode_display(mode, verification_status, course_id):
     display_mode = _enrollment_mode_display(mode, verification_status, course_id)
 
     if display_mode == DISPLAY_VERIFIED:
-        if is_integrity_signature_enabled(course_id) or verification_status == VERIFY_STATUS_APPROVED:
+        if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') or verification_status == VERIFY_STATUS_APPROVED:
             enrollment_title = _("You're enrolled as a verified student")
             enrollment_value = _("Verified")
             show_image = True
@@ -81,7 +80,7 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
 
     if enrollment_mode == CourseMode.VERIFIED:
         if (
-            is_integrity_signature_enabled(course_id)
+            settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE')
             or verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]
         ):
             display_mode = DISPLAY_VERIFIED

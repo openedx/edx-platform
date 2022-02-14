@@ -24,7 +24,6 @@ from lms.djangoapps.certificates.api import get_active_web_certificate, can_show
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
@@ -721,7 +720,7 @@ class VerificationDeadlineDate(DateSummary):
             is_active and
             mode == 'verified' and
             self.verification_status in ('expired', 'none', 'must_reverify') and
-            not is_integrity_signature_enabled(self.course_id)
+            not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE')
         )
 
     @lazy

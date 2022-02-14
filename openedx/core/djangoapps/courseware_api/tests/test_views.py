@@ -43,7 +43,6 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
-from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 
 
 User = get_user_model()
@@ -362,7 +361,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         ('audit', True, False, False),
     )
     @ddt.unpack
-    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
     def test_user_needs_integrity_signature(
         self, enrollment_mode, is_staff, has_integrity_signature, needs_integrity_signature,
     ):
@@ -398,7 +397,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         (3, True),
     )
     @ddt.unpack
-    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
     def test_course_staff_masquerade(self, masquerade_group_id, needs_signature):
         self.user.is_staff = True
         self.user.save()

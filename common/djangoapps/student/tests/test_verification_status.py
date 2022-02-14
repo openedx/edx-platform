@@ -11,7 +11,6 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -28,7 +27,6 @@ from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 
 
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -320,7 +318,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"))
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"), count=2)
 
-    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
+    @patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
     @ddt.data(
         None,
         'past',
@@ -347,7 +345,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self._assert_course_verification_status(None, "verified")
 
     @ddt.data(True, False)
-    def test_integrity_disables_sidebar(self, integrity_flag):
+    def test_integrity_disables_sidebar(self, enable_integrity_signature):
         self._setup_mode_and_enrollment(None, "verified")
 
         #no sidebar when no IDV yet
@@ -360,11 +358,10 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.submit()
         attempt.approve()
 
-        # sidebar only appears after IDV if integrity is not on
-        with patch('common.djangoapps.student.views.dashboard.is_integrity_signature_enabled',
-                   return_value=integrity_flag):
+        # sidebar only appears after IDV if integrity signature setting is not on
+        with patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': enable_integrity_signature}):
             response = self.client.get(self.dashboard_url)
-            if integrity_flag:
+            if enable_integrity_signature:
                 self.assertNotContains(response, "profile-sidebar")
             else:
                 self.assertContains(response, "profile-sidebar")
