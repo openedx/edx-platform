@@ -342,6 +342,9 @@ AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
+################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
+DISCUSSIONS_MFE_FEEDBACK_URL = None
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
