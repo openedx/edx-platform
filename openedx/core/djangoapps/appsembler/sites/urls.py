@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^domain_switch/', DomainSwitchView.as_view()),
     url(r'^register/', SiteCreateView.as_view(), name='tahoe_site_creation'),
     url(r'^v2/compile_sass/', api_v2.CompileSassView.as_view(), name='tahoe_compile_sass'),
+    url(r'^v2/create-site/', api_v2.TahoeSiteCreateView.as_view(), name='tahoe_site_creation_v2'),
     url(r'^', include(router.urls)),
 ]
 
