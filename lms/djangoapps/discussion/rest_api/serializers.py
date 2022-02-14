@@ -164,9 +164,11 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the content should be anonymous to
         the requester.
         """
+        user_id = self.context["request"].user.id
+        is_user_staff = user_id in self.context["staff_user_ids"]
         return (
             obj["anonymous"] or
-            obj["anonymous_to_peers"] and not self.context["is_requester_privileged"]
+            obj["anonymous_to_peers"] and not is_user_staff
         )
 
     def get_author(self, obj):
