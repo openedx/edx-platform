@@ -17,6 +17,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.search import path_to_location
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
@@ -26,9 +31,7 @@ from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.access_response import (
-    CoursewareMicrofrontendDisabledAccessError,
-)
+
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import (
@@ -41,7 +44,6 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.toggles import (
     courseware_legacy_is_visible,
-    courseware_mfe_is_visible,
     course_exit_page_is_active,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
@@ -64,10 +66,6 @@ from common.djangoapps.student.models import (
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
 )
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .serializers import CourseInfoSerializer
 from .utils import serialize_upgrade_info
@@ -115,16 +113,6 @@ class CoursewareMeta:
     def __getattr__(self, name):
         return getattr(self.overview, name)
 
-    def is_microfrontend_enabled_for_user(self):
-        """
-        Can this user see the MFE for this course?
-        """
-        return courseware_mfe_is_visible(
-            course_key=self.course_key,
-            is_global_staff=self.original_user_is_global_staff,
-            is_course_staff=self.original_user_is_staff
-        )
-
     @property
     def enrollment(self):
         """
@@ -160,24 +148,6 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
-
-    @property
-    def username(self):
-        return self.effective_user.username
-
-    @property
-    def course_access(self) -> dict:
-        """
-        Can the user load this course in the learning micro-frontend?
-
-        Return a JSON-friendly access response.
-        """
-        # Only check whether the MFE is enabled if the user would otherwise be allowed to see it
-        # This means that if the user was denied access, they'll see a meaningful message first if
-        # there is one.
-        if self.load_access and not self.is_microfrontend_enabled_for_user():
-            return CoursewareMicrofrontendDisabledAccessError().to_json()
-        return self.load_access.to_json()
 
     @property
     def tabs(self):

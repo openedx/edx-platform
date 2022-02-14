@@ -236,14 +236,3 @@ class AuthenticationRequiredAccessError(AccessError):
         developer_message = "User must be authenticated to view the course"
         user_message = _("You must be logged in to see this course")
         super().__init__(error_code, developer_message, user_message)
-
-
-class CoursewareMicrofrontendDisabledAccessError(AccessError):
-    """
-    Access denied because the courseware micro-frontend is disabled for this user.
-    """
-    def __init__(self):
-        error_code = 'microfrontend_disabled'
-        developer_message = 'Micro-frontend is disabled for this user'
-        user_message = _('Please view your course in the existing experience')
-        super().__init__(error_code, developer_message, user_message)
