@@ -133,7 +133,7 @@ class CohortMembership(models.Model):
 
                 try:
                     membership, cohort = CohortChangeRequested.run_filter(
-                        membership=membership, cohort=cohort,
+                        current_membership=membership, target_cohort=cohort,
                     )
                 except CohortChangeRequested.PreventCohortChange as exc:
                     raise CohortChangeNotAllowed(str(exc)) from exc

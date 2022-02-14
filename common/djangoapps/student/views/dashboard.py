@@ -877,12 +877,15 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'resume_button_urls': resume_button_urls
     })
 
+    dashboard_template = 'dashboard.html'
     try:
-        context = DashboardRenderStarted.run_filter(context=context)
+        context = DashboardRenderStarted.run_filter(
+            context=context, template_name=dashboard_template,
+        )
     except DashboardRenderStarted.PreventDashboardRender as exc:
         raise DashboardRenderNotAllowed(reverse(exc.redirect_to or 'account_settings')) from exc
 
-    response = render_to_response('dashboard.html', context)
+    response = render_to_response(dashboard_template, context)
     if show_account_activation_popup:
         response.delete_cookie(
             settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,

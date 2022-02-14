@@ -242,10 +242,13 @@ class CourseHomeFragmentView(EdxFragmentView):
             'show_search': show_search,
         }
 
+        course_home_template = 'course_experience/course-home-fragment.html'
         try:
-            context = CourseHomeRenderStarted.run_filter(context=context)
+            context, course_home_template = CourseHomeRenderStarted.run_filter(
+                context=context, template_name=course_home_template,
+            )
         except CourseHomeRenderStarted.PreventCourseHomeRender as exc:
             raise CourseAccessRedirect(reverse(exc.redirect_to or 'dashboard')) from exc
 
-        html = render_to_string('course_experience/course-home-fragment.html', context)
+        html = render_to_string(course_home_template, context)
         return Fragment(html)

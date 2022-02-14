@@ -1026,12 +1026,15 @@ def course_about(request, course_id):
             'allow_anonymous': allow_anonymous,
         }
 
+        course_about_template = 'courseware/course_about.html'
         try:
-            context = CourseAboutRenderStarted.run_filter(context=context)
+            context, course_about_template = CourseAboutRenderStarted.run_filter(
+                context=context, template_name=course_about_template,
+            )
         except CourseAboutRenderStarted.PreventCourseAboutRender as exc:
             raise CourseAccessRedirect(reverse(exc.redirect_to or 'dashboard')) from exc
 
-        return render_to_response('courseware/course_about.html', context)
+        return render_to_response(course_about_template, context)
 
 
 @ensure_csrf_cookie

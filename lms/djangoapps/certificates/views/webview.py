@@ -645,7 +645,9 @@ def render_html_view(request, course_id, certificate=None):
         _track_certificate_events(request, course, user, user_certificate)
 
         try:
-            context = CertificateRenderStarted.run_filter(context=context)
+            context, custom_template = CertificateRenderStarted.run_filter(
+                context=context, custom_template=custom_template,
+            )
         except CertificateRenderStarted.PreventCertificateRender:
             return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
