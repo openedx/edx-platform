@@ -26,7 +26,7 @@
 </div>
 <div class="tab-content" id="ProgramTabContent">
   <div class="tab-pane fade show active" id="journey" role="tabpanel" aria-labelledby="journey-tab">
-    <div class="col-md-12 d-flex">
+    <div class="col-md-12 d-md-flex">
         <article class="program-details-content col-md-8">
             <div class="program-heading">
                 <% if (completedCount === totalCount) { %>
@@ -115,7 +115,7 @@
 
   <div class="tab-pane fade" id="pathways" role="tabpanel" aria-labelledby="pathaways-tab">
     <% if (creditPathways.length > 0) { %>
-        <div class="js-program-pathways program-credit-pathways col-md-12 d-flex">
+        <div class="js-program-pathways program-credit-pathways col-md-12 d-md-flex">
             <aside class="col-md-4 program-heading">
                 <h2 class = "divider-heading program-heading-title"><%- gettext('Additional Credit Opportunities') %></h2>
                 <div class="program-heading-message">
@@ -129,7 +129,7 @@
                    </div>
                 </div>
             </aside>
-            <div class="col-md-8">
+            <div class="col-md-8 pr-5">
                 <% for (var i = 0; i < creditPathways.length; i++) {
                     var pathway = creditPathways[i];
                 %>
@@ -154,7 +154,7 @@
     <% } %>
 
     <% if (industryPathways.length > 0) { %>
-        <div class="js-program-pathways program-industry-pathways col-md-12 d-flex">
+        <div class="js-program-pathways program-industry-pathways col-md-12 d-md-flex">
             <aside class="col-md-4">
                <h2 class ="program-heading-title"><%- gettext('Additional Professional Opportunities') %></h2>
             </aside>

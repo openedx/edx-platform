@@ -301,12 +301,14 @@ $btn-color-primary: $primary-dark;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
+    margin-right: 48px;
 
     .program-heading-title {
       font-family: $font-family-sans-serif;
       font-weight: 700;
       margin-bottom: 5px;
       line-height: normal;
+      color: theme-color("primary") !important;
     }
 
     .program-heading-message {
