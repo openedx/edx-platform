@@ -1671,7 +1671,7 @@ def enclosing_sequence_for_gating_checks(block):
     all. LabXchange uses learning pathways, but even content inside courses like
     `static_tab`, `book`, and `about` live outside the sequence hierarchy.
     """
-    seq_tags = ['sequential', 'problemset', 'videosequence']
+    seq_tags = ['sequential']
 
     # If it's being called on a Sequence itself, then don't bother crawling the
     # ancestor tree, because all the sequence metadata we need for gating checks

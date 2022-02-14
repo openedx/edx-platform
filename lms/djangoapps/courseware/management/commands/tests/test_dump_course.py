@@ -123,7 +123,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         assert len(dump[parent_id]['children']) == 3
 
         child_id = dump[parent_id]['children'][1]
-        assert dump[child_id]['category'] == 'videosequence'
+        assert dump[child_id]['category'] == 'sequential'
         assert len(dump[child_id]['children']) == 2
 
         video_id = str(test_course_key.make_usage_key('video', 'Welcome'))
@@ -195,7 +195,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall', names)
         assert_in(f'edX-simple-2012_Fall/policies/{self.url_name}/policy.json', names)
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
-        assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
+        assert_in('edX-simple-2012_Fall/sequential/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
 
 
