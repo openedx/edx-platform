@@ -13,16 +13,16 @@ from django.utils.translation import ugettext as _
     </div>
 
     % if show_mfe:
-    <a class="btn btn-outline-light mr-2" href="${legacy_url}">
+    <a class="btn btn-inverse-primary" href="${legacy_url}">
         ${_("View legacy experience")}
     </a>
     % if share_feedback_url:
-        <a class="btn btn-outline-light" href="${share_feedback_url}">
+        <a class="btn btn-inverse-primary ml-2" href="${share_feedback_url}">
             ${_("Share feedback")}
         </a>
     % endif
     % else:
-    <a class="btn btn-outline-light mr-2" href="${mfe_url}">
+    <a class="btn btn-inverse-primary ml-2" href="${mfe_url}">
         ${_("View the new experience")}
     </a>
     % endif
