@@ -136,6 +136,7 @@ class CourseMode(models.Model):
     CREDIT_MODE = 'credit'
     MASTERS = 'masters'
     EXECUTIVE_EDUCATION = 'executive-education'
+    EXECUTIVE_PROGRAM = 'executive-program'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -158,14 +159,15 @@ class CourseMode(models.Model):
         PROFESSIONAL,
         VERIFIED,
         MASTERS,
-        EXECUTIVE_EDUCATION
+        EXECUTIVE_EDUCATION,
+        EXECUTIVE_PROGRAM
     ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, EXECUTIVE_PROGRAM]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
@@ -174,7 +176,7 @@ class CourseMode(models.Model):
     CREDIT_MODES = [CREDIT_MODE]
 
     # Modes that are eligible to purchase credit
-    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION]
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION, EXECUTIVE_PROGRAM]
 
     # Modes for which certificates/programs may need to be updated
     CERTIFICATE_RELEVANT_MODES = CREDIT_MODES + CREDIT_ELIGIBLE_MODES + [MASTERS]

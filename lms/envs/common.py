@@ -4570,6 +4570,12 @@ COURSE_ENROLLMENT_MODES = {
         "slug": "executive-educations",
         "display_name": _("Executive Education"),
         "min_price": 1
+    },
+    "executive-program": {
+        "id": 9,
+        "slug": "executive-programs",
+        "display_name": _("Executive Program"),
+        "min_price": 1
     }
 }
 
