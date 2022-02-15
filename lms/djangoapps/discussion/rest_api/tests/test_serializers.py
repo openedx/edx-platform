@@ -73,7 +73,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         (FORUM_ROLE_MODERATOR, True, False, True),
         (FORUM_ROLE_MODERATOR, False, True, False),
         (FORUM_ROLE_COMMUNITY_TA, True, False, True),
-        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
+        (FORUM_ROLE_COMMUNITY_TA, False, True, True),
         (FORUM_ROLE_STUDENT, True, False, True),
         (FORUM_ROLE_STUDENT, False, True, True),
     )
@@ -82,7 +82,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         Test that content is properly made anonymous.
 
-        Content should be anonymous iff the anonymous field is true or the
+        Content should be anonymous if the anonymous field is true or the
         anonymous_to_peers field is true and the requester does not have a
         privileged role.
 
