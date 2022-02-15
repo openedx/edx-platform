@@ -268,6 +268,7 @@ def _get_user_info_cookie_data(request, user):
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
+        'email': user.email,
         'header_urls': header_urls,
         'user_image_urls': image_urls,
     }

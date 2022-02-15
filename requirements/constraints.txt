@@ -30,7 +30,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.40.1
+edx-enterprise==3.40.2
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -97,8 +97,14 @@ py2neo<2022
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
 
-# Temporary constraint on openedx-calc. Latest openedx-calc also contains symmath, which may upend symmath package version
-openedx-calc==2.0.1
-
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
+
+# mistune is a dependency of m2r (which is a dependency of sphinxcontrib-openapi)
+# m2r fails to specify the version of mistune that it needs leading to the error message:
+# AttributeError: module 'mistune' has no attribute 'BlockGrammar'
+# See Issue: https://github.com/miyakogi/m2r/issues/66
+# m2r is no longer actively maintained: https://github.com/miyakogi/m2r/pull/43
+# This will be fixed when sphinxcontrib-openapi depends on m2r2 instead of m2r
+# See issue: https://github.com/sphinx-contrib/openapi/issues/123
+mistune<2.0.0
