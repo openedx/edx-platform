@@ -49,7 +49,6 @@ from lms.djangoapps.certificates.utils import (
     get_certificate_url,
     get_preferred_certificate_name
 )
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.catalog.api import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -85,7 +84,7 @@ def get_certificate_description(mode, certificate_type, platform_name, course_ke
                                          "{platform_name} and has completed all of the required tasks for this course "
                                          "under its guidelines. ").format(cert_type=certificate_type,
                                                                           platform_name=platform_name)
-        if not is_integrity_signature_enabled(course_key):
+        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
             certificate_type_description += _("A {cert_type} certificate also indicates that the "
                                               "identity of the learner has been checked and "
                                               "is valid.").format(cert_type=certificate_type)
@@ -253,7 +252,7 @@ def _update_course_context(request, context, course, platform_name):
     context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
     course_number = course.display_coursenumber if course.display_coursenumber else course.number
     context['course_number'] = course_number
-    context['is_integrity_signature_enabled_for_course'] = is_integrity_signature_enabled(course.location.course_key)
+    context['is_integrity_signature_enabled_for_course'] = settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE')
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '

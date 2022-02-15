@@ -11,10 +11,10 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import ddt
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
@@ -25,7 +25,6 @@ from common.djangoapps.course_modes.models import (
     invalidate_course_mode_cache
 )
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -367,25 +366,25 @@ class CourseModeModelTest(TestCase):
         ('no-id-professional', 'dummy', False)
     )
     @ddt.unpack
-    def test_enrollment_mode_display(self, mode, verification_status, enable_flag):
+    def test_enrollment_mode_display(self, mode, verification_status, enable_integrity_signature):
 
-        with override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=enable_flag):
+        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
             if mode == "verified":
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_integrity_signature)
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_integrity_signature)
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, verification_status, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, verification_status, enable_integrity_signature)
             elif mode == "honor":
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, mode, enable_integrity_signature)
             elif mode == "audit":
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, mode, enable_integrity_signature)
             elif mode == "professional":
                 assert enrollment_mode_display(mode, verification_status, self.course_key) ==\
-                       self._enrollment_display_modes_dicts(mode, mode, enable_flag)
+                       self._enrollment_display_modes_dicts(mode, mode, enable_integrity_signature)
 
     @ddt.data(
         (['honor', 'verified', 'credit'], ['honor', 'verified']),

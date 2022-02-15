@@ -102,7 +102,6 @@ from lms.djangoapps.instructor_analytics import basic as instructor_analytics_ba
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -1461,7 +1460,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features.append('team')
         query_features_names['team'] = _('Team')
 
-    if is_integrity_signature_enabled(course_key):
+    if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
         if 'verification_status' in query_features:
             query_features.remove('verification_status')
             query_features_names.pop('verification_status')

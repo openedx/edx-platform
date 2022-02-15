@@ -106,7 +106,6 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
@@ -1254,8 +1253,8 @@ def _downloadable_certificate_message(course, cert_downloadable_status):  # lint
     return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
 
 
-def _missing_required_verification(student, enrollment_mode, course_key):
-    return not is_integrity_signature_enabled(course_key) and (
+def _missing_required_verification(student, enrollment_mode):
+    return not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and (
         enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
@@ -1278,7 +1277,7 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
 
-    if _missing_required_verification(student, enrollment_mode, course.id):
+    if _missing_required_verification(student, enrollment_mode):
         return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA

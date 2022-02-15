@@ -2080,7 +2080,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(83):
+        with self.assertNumQueries(76):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
