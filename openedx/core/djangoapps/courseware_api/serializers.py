@@ -107,6 +107,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     show_calculator = serializers.BooleanField()
     original_user_is_staff = serializers.BooleanField()
     can_view_legacy_courseware = serializers.BooleanField()
+    can_access_proctored_exams = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     course_access = serializers.DictField()
     notes = serializers.DictField()

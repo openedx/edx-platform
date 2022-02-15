@@ -388,6 +388,12 @@ class CoursewareMeta:
         user_timezone_locale = user_timezone_locale_prefs(self.request)
         return user_timezone_locale['user_timezone']
 
+    @property
+    def can_access_proctored_exams(self):
+        enrollment_mode = self.enrollment['mode']
+        enrollment_active = self.enrollment['is_active']
+        return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
