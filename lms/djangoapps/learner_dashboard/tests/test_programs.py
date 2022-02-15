@@ -328,6 +328,11 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
         self.create_programs_config()
 
+    def test_discussion_flags_exist(self):
+        """
+        Test if programTabViewEnabled and discussionFragment exist in html.
+        """
+
         discussion_config = ProgramDiscussionsConfiguration.objects.create(
             program_uuid=self.program_uuid,
             enabled=True,
@@ -341,10 +346,6 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
         )
         discussion_config.save()
 
-    def test_discussion_flags_exist(self):
-        """
-        Test if programTabViewEnabled and discussionFragment exist in html.
-        """
         response = self.client.get(self.url)
         self.assertContains(response, 'programTabViewEnabled: true',)
         self.assertContains(response, 'discussionFragment: {"configured": true, "iframe":')
