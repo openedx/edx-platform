@@ -586,6 +586,11 @@ def course_info(request, course_id):
         if SelfPacedConfiguration.current().enable_course_home_improvements:
             context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
+        # Redirect to Resume Course url if site configuration flag is enabled.
+        if context['resume_course_url'] and configuration_helpers.get_value(
+                'ENABLE_REDIRECT_TO_RESUME_COURSE_ON_COURSE_INFO', False):
+            return redirect(context['resume_course_url'])
+
         if not check_course_open_for_learner(user, course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.

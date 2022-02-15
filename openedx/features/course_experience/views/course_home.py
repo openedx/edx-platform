@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -240,5 +241,11 @@ class CourseHomeFragmentView(EdxFragmentView):
             'has_discount': has_discount,
             'show_search': show_search,
         }
+
+        # Redirect to Resume Course url if site configuration flag is enabled.
+        if context['resume_course_url'] and configuration_helpers.get_value(
+                'ENABLE_REDIRECT_TO_RESUME_COURSE_ON_COURSE_INFO', False):
+            raise CourseAccessRedirect(context['resume_course_url'])
+
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)
