@@ -1120,46 +1120,6 @@ class XModuleDescriptorToXBlockMixin:
     def _translate(cls, key):
         return cls.metadata_translations.get(key, key)
 
-    # ================================= XML PARSING ============================
-    @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
-        """
-        # It'd be great to not reserialize and deserialize the xml
-        xml = etree.tostring(node).decode('utf-8')
-        block = cls.from_xml(xml, runtime, id_generator)
-        return block
-
-    @classmethod
-    def parse_xml_new_runtime(cls, node, runtime, keys):
-        """
-        This XML lives within Blockstore and the new runtime doesn't need this
-        legacy XModule code. Use the "normal" XBlock parsing code.
-        """
-        try:
-            return super().parse_xml_new_runtime(node, runtime, keys)
-        except AttributeError:
-            return super().parse_xml(node, runtime, keys, id_generator=None)
-
-    @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        """
-        Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses.
-
-        Args:
-            xml_data (str): A string of xml that will be translated into data and children
-                for this module
-
-            system (:class:`.XMLParsingSystem):
-
-            id_generator (:class:`xblock.runtime.IdGenerator`): Used to generate the
-                usage_ids and definition_ids when loading this xml
-
-        """
-        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
-
 
 @XBlock.needs("i18n")
 class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method

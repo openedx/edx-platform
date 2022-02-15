@@ -561,9 +561,9 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         if cls.from_xml != XmlMixin.from_xml:
-            # Skip the parse_xml from XmlParserMixin to get the shim parse_xml
-            # from XModuleDescriptor, which actually calls `from_xml`.
-            return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
+            xml = etree.tostring(node).decode('utf-8')
+            block = cls.from_xml(xml, runtime, id_generator)
+            return block
         else:
             return super().parse_xml(node, runtime, keys, id_generator)
 
