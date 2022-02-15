@@ -9,9 +9,9 @@ from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from .data import CourseDiscussionConfigurationData, DiscussionTopicContext
+from openedx_events.learning.data import CourseDiscussionConfigurationData, DiscussionTopicContext
 from .models import DiscussionsConfiguration
-from .signals import COURSE_DISCUSSIONS_UPDATED
+from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def update_discussions_settings_from_course_task(course_key_str: str):
     """
     course_key = CourseKey.from_string(course_key_str)
     config_data = update_discussions_settings_from_course(course_key)
-    COURSE_DISCUSSIONS_UPDATED.send_event(configuration=config_data)
+    COURSE_DISCUSSIONS_CHANGED.send_event(configuration=config_data)
 
 
 def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDiscussionConfigurationData:
