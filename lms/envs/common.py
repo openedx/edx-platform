@@ -4771,6 +4771,10 @@ ORA_GRADING_MICROFRONTEND_URL = None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.
 # .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
 DISCUSSIONS_MICROFRONTEND_URL = None
+# .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_default: None
+# .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
+DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -4944,5 +4948,3 @@ CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-a
 # The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
 # a value of `3` would include learners who have logged in within the past 3 months.
 BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
-
-DISCUSSIONS_MFE_FEEDBACK_URL = None
