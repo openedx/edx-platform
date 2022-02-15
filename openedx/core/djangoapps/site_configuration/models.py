@@ -91,9 +91,13 @@ class SiteConfiguration(models.Model):
             from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
             tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=self)
 
+            if not self.site_values:
+                self.site_values = {}
+
+            if not self.get_value('platform_name'):
+                self.site_values['platform_name'] = self.site.name
+
             if not self.get_value('PLATFORM_NAME'):  # First-time the config is saved with save()
-                if not self.get_value('platform_name'):
-                    self.site_values['platform_name'] = self.site.name
                 self.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
                 self.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
