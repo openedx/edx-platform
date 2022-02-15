@@ -1,7 +1,7 @@
 <header class="js-program-header program-header full-width-banner"></header>
 <!-- TODO: consider if article is the most appropriate element here -->
 
-<div class="col-md-12 d-flex">
+<div class="col-md-12 d-md-flex">
 <article class="program-details-content col-md-8">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
