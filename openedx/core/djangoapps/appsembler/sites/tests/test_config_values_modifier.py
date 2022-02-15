@@ -6,19 +6,31 @@ import pytest
 from unittest.mock import Mock
 
 from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
+from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 @pytest.mark.django_db
-def test_site_config_init_signal():
+def test_site_config_init_signal_with_modifier_flag():
     """
     Ensure SiteConfiguration gets a TahoeConfigurationValueModifier instance after initialization.
     """
-    site_config = SiteConfiguration()
+    with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
+        site_config = SiteConfiguration()
     assert site_config.tahoe_config_modifier, (
         'The `init_configuration_modifier_for_site_config` function should be '
         'connected correctly to SiteConfiguration\'s `post_init`'
     )
+
+
+@pytest.mark.django_db
+def test_site_config_init_signal_without_modifier_flag():
+    """
+    Ensure SiteConfiguration shouldn't get a TahoeConfigurationValueModifier if the waffle flag is disabled.
+    """
+    with ENABLE_CONFIG_VALUES_MODIFIER.override(False):
+        site_config = SiteConfiguration()
+    assert not site_config.tahoe_config_modifier, 'ENABLE_CONFIG_VALUES_MODIFIER is disabled, do not init the modifier'
 
 
 def test_values_normalization():
@@ -84,10 +96,14 @@ def test_modifier_urls_no_site(config_name):
 
 
 @pytest.mark.parametrize('config_name', [
-    'PLATFORM_NAME',
-    'ENABLE_AUTH0',
+    'CONTACT_US_ENABLE',
+    'CERTIFICATES_HTML_VIEW',
 ])
 def test_non_overriding_values(config_name):
     """
     Should not override values other than explicitly mentioned.
     """
+    modifier = TahoeConfigurationValueModifier(site_config_instance=Mock())
+    modifier.site_config_instance.site.domain = 'test.localhost:18000'
+    should_override, _ = modifier.override_value(config_name)
+    assert not should_override, 'Should not override values unless explicitly configured'

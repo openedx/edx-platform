@@ -19,6 +19,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 from .exceptions import TahoeConfigurationException
+from ..appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -79,8 +80,36 @@ class SiteConfiguration(models.Model):
     def __repr__(self):
         return self.__str__()
 
+    def tahoe_update_site_values_on_save(self):
+        """
+        Temp. helper until ENABLE_CONFIG_VALUES_MODIFIER is enabled on production.
+
+        # TODO: RED-2828 Clean up after production QA
+        """
+        if not ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
+            logger.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is disabled, saving override values inline.')
+            from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
+            tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=self)
+
+            if not self.get_value('PLATFORM_NAME'):  # First-time the config is saved with save()
+                if not self.get_value('platform_name'):
+                    self.site_values['platform_name'] = self.site.name
+                self.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
+                self.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+            # Everytime the config is saved with save()
+            self.site_values.update({
+                'PLATFORM_NAME': self.site_values.get('platform_name', ''),
+                'LANGUAGE_CODE': self.site_values.get('LANGUAGE_CODE', 'en'),
+                'LMS_ROOT_URL': tahoe_config_modifier.get_lms_root_url(),
+                'SITE_NAME': tahoe_config_modifier.get_domain(),
+                'ACTIVATION_EMAIL_SUPPORT_LINK': tahoe_config_modifier.get_activation_email_support_link(),
+                'PASSWORD_RESET_SUPPORT_LINK': tahoe_config_modifier.get_password_reset_support_link(),
+            })
+
     def save(self, **kwargs):
         super().save(**kwargs)
+        self.tahoe_update_site_values_on_save()
         # recompile SASS on every save
         self.compile_microsite_sass()  # TODO: Implement via signals, instead of overriding the "save" method.
         return self
