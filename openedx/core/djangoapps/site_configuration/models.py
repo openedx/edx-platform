@@ -7,8 +7,6 @@ import beeline
 
 import collections
 from logging import getLogger
-import os
-from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -21,6 +19,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 from .exceptions import TahoeConfigurationException
+from ..appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -59,6 +58,7 @@ class SiteConfiguration(models.Model):
     """
 
     api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+    tahoe_config_modifier = None  # Tahoe: Placeholder for `TahoeConfigurationValueModifier` instance
 
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
@@ -80,48 +80,42 @@ class SiteConfiguration(models.Model):
     def __repr__(self):
         return self.__str__()
 
+    def tahoe_update_site_values_on_save(self):
+        """
+        Temp. helper until ENABLE_CONFIG_VALUES_MODIFIER is enabled on production.
+
+        # TODO: RED-2828 Clean up after production QA
+        """
+        if not ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
+            logger.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is disabled, saving override values inline.')
+            from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
+            tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=self)
+
+            if not self.site_values:
+                self.site_values = {}
+
+            if not self.get_value('platform_name'):
+                self.site_values['platform_name'] = self.site.name
+
+            if not self.get_value('PLATFORM_NAME'):  # First-time the config is saved with save()
+                self.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
+                self.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+            # Everytime the config is saved with save()
+            self.site_values.update({
+                'PLATFORM_NAME': self.site_values.get('platform_name', ''),
+                'LANGUAGE_CODE': self.site_values.get('LANGUAGE_CODE', 'en'),
+                'LMS_ROOT_URL': tahoe_config_modifier.get_lms_root_url(),
+                'SITE_NAME': tahoe_config_modifier.get_domain(),
+                'ACTIVATION_EMAIL_SUPPORT_LINK': tahoe_config_modifier.get_activation_email_support_link(),
+                'PASSWORD_RESET_SUPPORT_LINK': tahoe_config_modifier.get_password_reset_support_link(),
+            })
+
     def save(self, **kwargs):
-        # When creating a new object, save default microsite values. Not implemented as a default method on the field
-        # because it depends on other fields that should be already filled.
-        self.site_values = self.site_values or {}
-        if not self.site_values.get('PLATFORM_NAME'):
-            # Initialize the values for new SiteConfiguration objects
-            self.site_values.update(self.get_initial_microsite_values())
-
-        # fix for a bug with some pages requiring uppercase platform_name variable
-        self.site_values['PLATFORM_NAME'] = self.site_values.get('platform_name', '')
-
-        # Set the default language code for new sites if missing
-        # TODO: Move it to somewhere else like in AMC
-        self.site_values['LANGUAGE_CODE'] = self.site_values.get('LANGUAGE_CODE', 'en')
-
-        # We cannot simply use a protocol-relative URL for LMS_ROOT_URL
-        # This is because the URL here will be used by such activities as
-        # sending activation links to new users. The activation link needs the
-        # scheme address verfication emails. The callers using this variable
-        # expect the scheme in the URL
-        self.site_values['LMS_ROOT_URL'] = '{scheme}://{domain}'.format(
-            scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
-            domain=self.site.domain)
-
-        # This ensures if the site has a custom domain set, we set the custom
-        # domain instead the Tahoe URL.
-        self.site_values['SITE_NAME'] = self.site.domain
-
-        # RED-2385: Use Multi-tenant `/help` URL for activation emails.
-        self.site_values['ACTIVATION_EMAIL_SUPPORT_LINK'] = '{root_url}/help'.format(
-            root_url=self.site_values['LMS_ROOT_URL'],
-        )
-
-        # RED-2471: Use Multi-tenant `/help` URL for password reset emails.
-        self.site_values['PASSWORD_RESET_SUPPORT_LINK'] = '{root_url}/help'.format(
-            root_url=self.site_values['LMS_ROOT_URL'],
-        )
-
-        super(SiteConfiguration, self).save(**kwargs)
-
+        super().save(**kwargs)
+        self.tahoe_update_site_values_on_save()
         # recompile SASS on every save
-        self.compile_microsite_sass()
+        self.compile_microsite_sass()  # TODO: Implement via signals, instead of overriding the "save" method.
         return self
 
     @beeline.traced('site_config.init_api_client_adapter')
@@ -152,6 +146,12 @@ class SiteConfiguration(models.Model):
         """
         beeline.add_context_field('value_name', name)
         if self.enabled:
+            if self.tahoe_config_modifier:
+                name, default = self.tahoe_config_modifier.normalize_get_value_params(name, default)
+                should_override, overridden_value = self.tahoe_config_modifier.override_value(name)
+                if should_override:
+                    return overridden_value
+
             try:
                 if self.api_adapter:
                     # Tahoe: Use `SiteConfigAdapter` if available.
@@ -198,7 +198,12 @@ class SiteConfiguration(models.Model):
             org (str): Org to use to filter SiteConfigurations
             select_related (list or None): A list of values to pass as arguments to select_related
         """
-        query = cls.objects.filter(site_values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all()
+        query = cls.objects.filter(site_values__contains=org, enabled=True)
+
+        if hasattr(SiteConfiguration, 'sass_variables'):
+            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
+            query = query.defer('page_elements', 'sass_variables')
+
         if select_related is not None:
             query = query.select_related(*select_related)
         for configuration in query:
@@ -242,7 +247,12 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(site_values__contains='course_org_filter', enabled=True).defer('page_elements', 'sass_variables').all():
+        query = cls.objects.filter(site_values__contains='course_org_filter', enabled=True)
+        if hasattr(SiteConfiguration, 'sass_variables'):
+            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
+            query = query.defer('page_elements', 'sass_variables')
+
+        for configuration in query:
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
@@ -329,14 +339,6 @@ class SiteConfiguration(models.Model):
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
-
-    def get_initial_microsite_values(self):
-        domain_without_port_number = self.site.domain.split(':')[0]
-        return {
-            'platform_name': self.site.name,
-            'css_overrides_file': "{}.css".format(domain_without_port_number),
-            'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
-        }
 
 
 def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):

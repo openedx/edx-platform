@@ -1,6 +1,7 @@
 """
 Tests for site configuration's Tahoe customizations.
 """
+import ddt
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -9,14 +10,30 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock
 
+from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
+
+
+def ddt_without_and_with_modifier(test_func):
+    """
+    Decorator to pass `use_modifier` parameter.
+    """
+    test_func = ddt.data({
+        'use_modifier': False,
+    }, {
+        'use_modifier': True,
+    })(test_func)
+
+    test_func = ddt.unpack(test_func)
+    return test_func
 
 
 @override_settings(
     ENABLE_COMPREHENSIVE_THEMING=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
 )
+@ddt.ddt
 class SiteConfigurationTests(TestCase):
     """
     Tests for SiteConfiguration and its signals/receivers.
@@ -47,27 +64,32 @@ class SiteConfigurationTests(TestCase):
         cls.expected_site_root_url = '{scheme}://{domain}'.format(
             scheme=cls.scheme, domain=cls.domain)
 
-    def test_site_configuration_compile_sass(self):
+    @ddt_without_and_with_modifier
+    def test_site_configuration_compile_sass(self, use_modifier):
         """
         Test that and entry is added to SiteConfigurationHistory model each time a new
         SiteConfiguration is added.
         """
-        # add SiteConfiguration to database
-        site_configuration = SiteConfigurationFactory.build(
-            site=self.site,
-        )
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
+            # add SiteConfiguration to database
+            site_configuration = SiteConfigurationFactory.build(
+                site=self.site,
+            )
 
-        site_configuration.save()
+            site_configuration.save()
 
-    def test_get_value(self):
+    @ddt_without_and_with_modifier
+    def test_get_value(self, use_modifier):
         """
         Test that get_value returns correct value for Tahoe custom keys.
         """
         # add SiteConfiguration to database
-        site_configuration = SiteConfigurationFactory.create(
-            site=self.site,
-            site_values=self.test_config
-        )
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
+            site_configuration = SiteConfigurationFactory.create(
+                site=self.site,
+                site_values=self.test_config
+            )
+            assert bool(site_configuration.tahoe_config_modifier) == use_modifier, 'Sanity check for `override()`'
 
         # Make sure entry is saved and retrieved correctly
         self.assertEqual(site_configuration.get_value("PLATFORM_NAME"),
@@ -79,22 +101,56 @@ class SiteConfigurationTests(TestCase):
         self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK'))
         self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help'))
 
-    def test_get_value_for_org(self):
+    @ddt_without_and_with_modifier
+    def test_hardcoded_values_for_unsaved_config_instance(self, use_modifier):
+        """
+        If a SiteConfiguration has no site yet, the `get_value` will work safely.
+        """
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
+            site_config = SiteConfiguration(enabled=True)
+
+        assert site_config.get_value('SITE_NAME') is None
+        assert site_config.get_value('SITE_NAME', 'test.com') == 'test.com'
+
+    def test_hardcoded_values_for_config_instance_with_site_without_modifier(self):
+        """
+        If a SiteConfiguration has a site the `get_value` should return the right one.
+
+        with ENABLE_CONFIG_VALUES_MODIFIER disabled.
+        """
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(False):
+            site = Site.objects.create(domain='my-site.com')
+            site_config = SiteConfiguration(enabled=True, site=site)
+            site_config.save()
+            assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
+
+    def test_hardcoded_values_for_config_instance_with_site_with_modifier(self):
+        """
+        If a SiteConfiguration has a site the `get_value` should return the right one.
+
+        with ENABLE_CONFIG_VALUES_MODIFIER enabled.
+        """
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
+            site = Site.objects.create(domain='my-site.com')
+            site_config = SiteConfiguration(enabled=True, site=site)  # No need to save for the value modifier to work
+            assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
+
+    @ddt_without_and_with_modifier
+    def test_get_value_for_org(self, use_modifier):
         """
         Test that get_value_for_org returns correct value for Tahoe custom keys.
         """
-        # add SiteConfiguration to database
-        SiteConfigurationFactory.create(
-            site=self.site,
-            site_values=self.test_config
-        )
+        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
+            # add SiteConfiguration to database
+            site_config = SiteConfigurationFactory.create(
+                site=self.site,
+                site_values=self.test_config
+            )
+            site_config.save()
 
-        # Test that LMS_ROOT_URL is assigned to the SiteConfiguration on creation
-        self.assertEqual(
-            SiteConfiguration.get_value_for_org(
-                self.test_config['course_org_filter'], 'LMS_ROOT_URL'),
-            self.expected_site_root_url
-        )
+            # Test that LMS_ROOT_URL is assigned to the SiteConfiguration on creation
+            tahoex_org_name = self.test_config['course_org_filter']
+            assert SiteConfiguration.get_value_for_org(tahoex_org_name, 'LMS_ROOT_URL') == self.expected_site_root_url
 
 
 @override_settings(

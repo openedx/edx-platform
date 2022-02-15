@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_init
 
 
 class SitesConfig(AppConfig):
@@ -9,5 +9,9 @@ class SitesConfig(AppConfig):
 
     def ready(self):
         from openedx.core.djangoapps.appsembler.sites.models import patched_clear_site_cache
+        from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
-        pre_save.connect(patched_clear_site_cache, sender='site_configuration.SiteConfiguration')
+        from .config_values_modifier import init_configuration_modifier_for_site_config
+
+        pre_save.connect(patched_clear_site_cache, sender=SiteConfiguration)
+        post_init.connect(init_configuration_modifier_for_site_config, sender=SiteConfiguration)
