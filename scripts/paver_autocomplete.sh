@@ -65,15 +65,6 @@ _paver()
                     return 0
                 fi
                 ;;
-            test_bokchoy)
-                _test_bokchoy_args
-                if [[ -n $COMPREPLY ]]
-                then
-                    return 0
-                fi
-                ;;
-            *)
-                ;;
         esac
 
         if [[ ${#COMP_WORDS[*]} == 3 ]]
@@ -113,27 +104,6 @@ _test_system_args()
         esac
 }
 
-_test_bokchoy_args()
-{
-    local bokchoy_tests cur prev
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD - 1]}"
-
-    case "$prev" in
-        -d|--test_dir)
-            bokchoy_tests=`find common/test/acceptance -name \*.py| sed 's:common/test/acceptance/::'`
-            COMPREPLY=( $(compgen -o filenames -W "$bokchoy_tests" -- $cur) )
-            return 0
-            ;;
-        -t|--test_spec)
-            bokchoy_tests=`find common/test/acceptance/tests -name \*.py| sed 's:common/test/acceptance/::'`
-            COMPREPLY=( $(compgen -o filenames -W "$bokchoy_tests" -- $cur) )
-            return 0
-            ;;
-        *)
-            ;;
-    esac
-}
 # Assign the auto-completion function for our command.
 
 complete -F _paver -o default paver
