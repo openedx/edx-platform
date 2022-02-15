@@ -36,8 +36,14 @@ class CompileSassView(views.APIView):
         site = tahoe_sites.api.get_site_by_uuid(site_uuid)
         configuration = SiteConfiguration.objects.get(site=site)
         configuration.init_api_client_adapter(site)
-        configuration.compile_microsite_sass()
-        return Response(status=status.HTTP_200_OK)
+        sass_status = configuration.compile_microsite_sass()
+
+        if sass_status['successful_sass_compile']:
+            status_code = status.HTTP_200_OK
+        else:
+            status_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(sass_status, status=status_code)
 
 
 class TahoeSiteCreateView(views.APIView):
@@ -52,7 +58,13 @@ class TahoeSiteCreateView(views.APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         site_data = serializer.save()
+
+        # Make some of the fields serializable
+        site_data['organization'] = site_data['organization'].short_name
+        site_data['site'] = site_data['site'].domain
+        del site_data['site_configuration']  # Useless for the API caller
+
         return Response({
             'message': 'Site created successfully',
-            'site_uuid': site_data['site_uuid'],
+            **site_data,
         }, status=status.HTTP_201_CREATED)

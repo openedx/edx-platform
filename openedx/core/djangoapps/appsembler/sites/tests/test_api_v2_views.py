@@ -31,7 +31,10 @@ def site_with_org(scope='function'):
 def test_compile_sass_view(client, monkeypatch, site_with_org):
     monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
     site, org = site_with_org
-    site_configuration = SiteConfigurationFactory.build(site=site)
+    site_configuration = SiteConfigurationFactory.build(
+        site=site,
+        site_values={'css_overrides_file': 'site.css'},
+    )
     site_configuration.save()
 
     url = reverse('tahoe_compile_sass')
@@ -40,6 +43,9 @@ def test_compile_sass_view(client, monkeypatch, site_with_org):
                            HTTP_X_EDX_API_KEY=settings.EDX_API_KEY)
     content = response.content.decode('utf-8')
     assert response.status_code == status.HTTP_200_OK, content
+    response_json = response.json()
+    assert response_json.get('successful_sass_compile'), 'Should compile CSS successfully'
+    assert 'sass_compile_message' in response_json
 
 
 @pytest.mark.django_db
@@ -65,6 +71,9 @@ def test_tahoe_site_create_view(client, site_params):
         res=res.content.decode('utf-8'),
     )
     site_data = res.json()
+
+    assert 'successful_sass_compile' in site_data
+    assert 'sass_compile_message' in site_data
 
     assert uuid.UUID(site_data['site_uuid']), 'Should return a correct uuid'
 

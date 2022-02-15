@@ -7,6 +7,7 @@ from unittest.mock import patch
 from django.db import IntegrityError
 
 from openedx.core.djangoapps.appsembler.sites.serializers_v2 import TahoeSiteCreationSerializer
+from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 
 
 @pytest.mark.django_db
@@ -32,7 +33,7 @@ def test_create_site_serializer_with_uuid():
 
     assert site_data, 'Site should be created'
     assert site_data['site'].domain == 'blue-site.localhost', 'Site domain should be set correctly'
-    assert site_data['site_config'], 'Site config should be created'
+    assert site_data['site_configuration'], 'Site config should be created'
     assert str(site_data['site_uuid']) == site_uuid, 'Should not generate different site UUID'
 
 
@@ -47,11 +48,16 @@ def test_create_site_serializer_with_no_uuid():
     })
 
     assert serializer.is_valid()
-    site_data = serializer.save()
+
+    with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
+        site_data = serializer.save()
 
     assert site_data, 'Site should be created'
     assert site_data['site'].domain == 'blue-site.localhost', 'Site domain should be set correctly'
-    assert site_data['site_config'], 'Site config should be created'
+    assert site_data['site_configuration'], 'Site config should be created'
+    assert not site_data['site_configuration'].site_values, (
+        'Should have empty site_values because of ENABLE_CONFIG_VALUES_MODIFIER'
+    )
     assert site_data['site_uuid'], 'Site uuid is created'
 
 
