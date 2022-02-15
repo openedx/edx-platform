@@ -477,6 +477,11 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5220
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
+    # When an non logged in user (Anonymous) goes to the homepage ('/') shoud the user be
+    # redirected to the dashboard - this is default Microsite behaviour for EducateWorkforce.
+    # Set to False to not redirect the user.
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER': False,
+
     # .. toggle_name: FEATURES['ENABLE_COURSE_SORTING_BY_START_DATE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True

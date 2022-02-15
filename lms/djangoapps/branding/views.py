@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
@@ -34,6 +35,14 @@ def index(request):
     """
     Redirects to main page -- info page if user authenticated, or marketing if not
     """
+    # This is to redirect Microsites when a homepage is not necessarily needed.
+    if not request.user.is_authenticated():
+        if configuration_helpers.get_value(
+                'ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER',
+                settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER', True)
+        ):
+            return redirect(reverse('signin_user'))
+
     if request.user.is_authenticated:
         # Only redirect to dashboard if user has
         # courses in their dashboard. Otherwise UX is a bit cryptic.
