@@ -1160,40 +1160,6 @@ class XModuleDescriptorToXBlockMixin:
         """
         raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
-    def add_xml_to_node(self, node):
-        """
-        Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
-        `node`.
-        """
-        xml_string = self.export_to_xml(self.runtime.export_fs)
-        exported_node = etree.fromstring(xml_string)
-        node.tag = exported_node.tag
-        node.text = exported_node.text
-        node.tail = exported_node.tail
-
-        for key, value in exported_node.items():
-            if key == 'url_name' and value == 'course' and key in node.attrib:
-                # if url_name is set in ExportManager then do not override it here.
-                continue
-            node.set(key, value)
-
-        node.extend(list(exported_node))
-
-    def export_to_xml(self, resource_fs):
-        """
-        Returns an xml string representing this module, and all modules
-        underneath it.  May also write required resources out to resource_fs.
-
-        Assumes that modules have single parentage (that no module appears twice
-        in the same course), and that it is thus safe to nest modules as xml
-        children as appropriate.
-
-        The returned XML should be able to be parsed back into an identical
-        XModuleDescriptor using the from_xml method with the same system, org,
-        and course
-        """
-        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
-
 
 @XBlock.needs("i18n")
 class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method

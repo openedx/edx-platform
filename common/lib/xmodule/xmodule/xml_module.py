@@ -605,9 +605,19 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         `node`.
         """
         if self.export_to_xml != XmlMixin.export_to_xml:  # lint-amnesty, pylint: disable=comparison-with-callable
-            # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
-            # from XModuleDescriptor, which actually calls `export_to_xml`.
-            super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
+            xml_string = self.export_to_xml(self.runtime.export_fs)
+            exported_node = etree.fromstring(xml_string)
+            node.tag = exported_node.tag
+            node.text = exported_node.text
+            node.tail = exported_node.tail
+
+            for key, value in exported_node.items():
+                if key == 'url_name' and value == 'course' and key in node.attrib:
+                    # if url_name is set in ExportManager then do not override it here.
+                    continue
+                node.set(key, value)
+
+            node.extend(list(exported_node))
         else:
             super().add_xml_to_node(node)
 
