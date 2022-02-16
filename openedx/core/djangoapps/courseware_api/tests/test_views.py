@@ -416,6 +416,26 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert 'user_needs_integrity_signature' in courseware_data
         assert courseware_data['user_needs_integrity_signature'] == needs_signature
 
+    @ddt.data(
+        ('audit', False),
+        ('honor', False),
+        ('verified', True),
+        ('masters', True),
+        ('professional', True),
+        ('no-id-professional', True),
+        ('executive-education', True),
+        ('credit', True),
+    )
+    @ddt.unpack
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
+    def test_can_access_proctored_exams(self, mode, result):
+        CourseEnrollment.enroll(self.user, self.course.id, mode)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        courseware_data = response.json()
+        assert 'can_access_proctored_exams' in courseware_data
+        assert courseware_data['can_access_proctored_exams'] == result
+
 
 @ddt.ddt
 class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
