@@ -61,6 +61,7 @@ jobs:
         pip uninstall -y mysqlclient
         pip install --no-binary mysqlclient mysqlclient
 
-    - name: Run Quality Tests
+   - name: run tests
       run: |
-        pylint  ${{ matrix.path }}
+        python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }}
+      
