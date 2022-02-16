@@ -69,6 +69,7 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
+    UnenrollmentNotAllowed,
     UserAttribute,
     UserProfile,
     UserSignupSource,
@@ -410,7 +411,11 @@ def change_enrollment(request, check_access=True):
         if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
-        CourseEnrollment.unenroll(user, course_id)
+        try:
+            CourseEnrollment.unenroll(user, course_id)
+        except UnenrollmentNotAllowed as exc:
+            return HttpResponseBadRequest(str(exc))
+
         REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:
