@@ -503,7 +503,7 @@ edx-auth-backends==4.1.0
     # via -r requirements/edx/testing.txt
 edx-braze-client==0.1.2
     # via -r requirements/edx/testing.txt
-edx-bulk-grades==0.9.2
+edx-bulk-grades==1.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   staff-graded-xblock
