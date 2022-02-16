@@ -879,7 +879,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     dashboard_template = 'dashboard.html'
     try:
-        context = DashboardRenderStarted.run_filter(
+        context, dashboard_template = DashboardRenderStarted.run_filter(
             context=context, template_name=dashboard_template,
         )
     except DashboardRenderStarted.PreventDashboardRender as exc:
