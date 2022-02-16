@@ -11,7 +11,7 @@
        "display_name": "Chapter 2",
        "start": "2015-07-17T12:00"
     },
-    "videosequence/Toy_Videos": {
+    "sequential/Toy_Videos": {
         "display_name": "Toy Videos",
         "format": "Lecture Sequence"
     },

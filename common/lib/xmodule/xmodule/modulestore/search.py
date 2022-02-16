@@ -104,15 +104,15 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
         # This block of code will find the position of a module within a nested tree
         # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
         # sequence, the resulting position is 3_2. However, no positional modules
-        # (e.g. sequential and videosequence) currently deal with this form of
-        # representing nested positions. This needs to happen before jumping to a
-        # module nested in more than one positional module will work.
+        # (e.g. sequential) currently deal with this form of representing nested
+        # positions. This needs to happen before jumping to a module nested in more
+        # than one positional module will work.
 
         if n > 3:
             position_list = []
             for path_index in range(2, n - 1):
                 category = path[path_index].block_type
-                if category == 'sequential' or category == 'videosequence':  # lint-amnesty, pylint: disable=consider-using-in
+                if category == 'sequential':
                     section_desc = modulestore.get_item(path[path_index])
                     # this calls get_children rather than just children b/c old mongo includes private children
                     # in children but not in get_children

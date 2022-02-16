@@ -24,7 +24,6 @@ XBLOCKS = [
     "nonstaff_error = xmodule.error_module:NonStaffErrorBlock",
     "poll_question = xmodule.poll_module:PollBlock",
     "problem = xmodule.capa_module:ProblemBlock",
-    "problemset = xmodule.seq_module:SequenceBlock",
     "randomize = xmodule.randomize_module:RandomizeBlock",
     "sequential = xmodule.seq_module:SequenceBlock",
     "slides = xmodule.template_module:TranslateCustomTagBlock",
@@ -35,7 +34,6 @@ XBLOCKS = [
     "video = xmodule.video_module:VideoBlock",
     "videoalpha = xmodule.video_module:VideoBlock",
     "videodev = xmodule.template_module:TranslateCustomTagBlock",
-    "videosequence = xmodule.seq_module:SequenceBlock",
     "word_cloud = xmodule.word_cloud_module:WordCloudBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
