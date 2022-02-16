@@ -268,49 +268,24 @@ class RequestUtilTestCase(unittest.TestCase):
         ], any_order=True)
 
     @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
-    @patch("openedx.core.lib.request_utils.encrypt_for_log")
-    def test_log_encrypted_cookies_no_key(self, mock_encrypt, mock_capture_cookie_sizes):
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES.is_enabled", return_value=False)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
+    def test_log_cookie_sizes(self, mock_logger, _):
         middleware = CookieMonitoringMiddleware()
-
         cookies_dict = {
             "a": "." * 10,
             "b": "." * 15,
         }
-
         factory = RequestFactory()
         for name, value in cookies_dict.items():
             factory.cookies[name] = value
-
         mock_request = factory.request()
 
         middleware.process_request(mock_request)
-        mock_encrypt.assert_not_called()
 
-    @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
-    @override_settings(COOKIE_HEADER_DEBUG_PUBLIC_KEY="fake-key")
-    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
-    @patch("openedx.core.lib.request_utils.encrypt_for_log")
-    def test_log_encrypted_cookies(self, mock_encrypt, mock_capture_cookie_sizes):
-
-        middleware = CookieMonitoringMiddleware()
-
-        cookies_dict = {
-            "a": "." * 10,
-            "b": "." * 15,
-        }
-
-        factory = RequestFactory()
-        for name, value in cookies_dict.items():
-            factory.cookies[name] = value
-
-        mock_request = factory.request()
-        cookie_header = str(mock_request.META.get('HTTP_COOKIE', ''))
-
-        middleware.process_request(mock_request)
-        mock_encrypt.assert_has_calls([
-            call(cookie_header, "fake-key")
-        ])
+        mock_logger.info.assert_called_once_with(
+            "Large (>= 1) cookie header detected. Cookie sizes: a: 10, b: 15"
+        )
 
 
 class TestGetExpectedErrorSettingsDict(unittest.TestCase):
