@@ -1108,17 +1108,6 @@ class XModuleDescriptorToXBlockMixin:
     """
     Common code needed by XModuleDescriptor and XBlocks converted from XModules.
     """
-    # VS[compat].  Backwards compatibility code that can go away after
-    # importing 2012 courses.
-    # A set of metadata key conversions that we want to make
-    metadata_translations = {
-        'slug': 'url_name',
-        'name': 'display_name',
-    }
-
-    @classmethod
-    def _translate(cls, key):
-        return cls.metadata_translations.get(key, key)
 
 
 @XBlock.needs("i18n")

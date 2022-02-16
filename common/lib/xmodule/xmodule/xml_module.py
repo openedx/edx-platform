@@ -112,21 +112,6 @@ class XmlParserMixin:
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
 
-    # VS[compat].  Backwards compatibility code that can go away after
-    # importing 2012 courses.
-    # A set of metadata key conversions that we want to make
-    metadata_translations = {
-        'slug': 'url_name',
-        'name': 'display_name',
-    }
-
-    @classmethod
-    def _translate(cls, key):
-        """
-        VS[compat]
-        """
-        return cls.metadata_translations.get(key, key)
-
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
 
@@ -275,8 +260,6 @@ class XmlParserMixin:
         """
         metadata = {'xml_attributes': {}}
         for attr, val in xml_object.attrib.items():
-            # VS[compat].  Remove after all key translations done
-            attr = cls._translate(attr)
 
             if attr in cls.metadata_to_strip:
                 # don't load these
@@ -295,7 +278,6 @@ class XmlParserMixin:
         through the attrmap.  Updates the metadata dict in place.
         """
         for attr, value in policy.items():
-            attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
                 # in such a way that they will export to xml unchanged

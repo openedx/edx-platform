@@ -163,11 +163,6 @@ class ProblemBlock(
     mako_template = "widgets/problem-edit.html"
     has_author_view = True
 
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(XmlMixin.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
-
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
