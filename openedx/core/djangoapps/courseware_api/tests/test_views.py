@@ -436,6 +436,29 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
 
+    @ddt.data(
+        (1, False),
+        (2, True),
+        (3, True),
+    )
+    @ddt.unpack
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
+    def test_can_access_proctored_exams_masquerading(self, masquerade_group_id, result):
+        self.user.is_staff = True
+        self.user.save()
+        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
+        masquerade_config = {
+            'role': 'student',
+            'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+            'group_id': masquerade_group_id
+        }
+        self.update_masquerade(**masquerade_config)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        courseware_data = response.json()
+        assert 'can_access_proctored_exams' in courseware_data
+        assert courseware_data['can_access_proctored_exams'] == result
+
 
 @ddt.ddt
 class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):

@@ -391,9 +391,18 @@ class CoursewareMeta:
 
     @property
     def can_access_proctored_exams(self):
-        enrollment_mode = self.enrollment['mode']
-        enrollment_active = self.enrollment['is_active']
-        return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
+        """Returns if the user is eligible to access proctored exams"""
+        if is_masquerading_as_non_audit_enrollment(
+            self.effective_user,
+            self.course_key,
+            self.course_masquerade
+        ):
+            # Masquerading should mimic the correct enrollment track behavior.
+            return True
+        else:
+            enrollment_mode = self.enrollment['mode']
+            enrollment_active = self.enrollment['is_active']
+            return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
 
 class CoursewareInformation(RetrieveAPIView):
