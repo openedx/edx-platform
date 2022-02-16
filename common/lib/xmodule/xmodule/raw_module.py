@@ -24,21 +24,7 @@ class RawMixin:
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
-        try:
-            data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
-            pre_tag_data = []
-            for pre_tag_info in xml_object.findall('.//pre'):
-                if len(pre_tag_info.findall('.//pre')) == 0:
-                    pre_tag_data.append(etree.tostring(pre_tag_info))
-
-            if pre_tag_data:
-                matches = re.finditer(PRE_TAG_REGEX, data)
-                for match_num, match in enumerate(matches):
-                    data = re.sub(match.group(), pre_tag_data[match_num].decode(), data)
-            etree.XML(data)  # it just checks if generated string is valid xml
-            return {'data': data}, []
-        except etree.XMLSyntaxError:
-            return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
+        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
     def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
