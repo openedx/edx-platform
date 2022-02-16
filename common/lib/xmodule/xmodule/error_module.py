@@ -21,7 +21,6 @@ from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 
@@ -47,7 +46,6 @@ class ErrorFields:
 @XBlock.needs('mako')
 class ErrorBlock(
     ErrorFields,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

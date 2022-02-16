@@ -41,7 +41,6 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
-    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
     shim_xmodule_js
@@ -131,7 +130,6 @@ class ProblemBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

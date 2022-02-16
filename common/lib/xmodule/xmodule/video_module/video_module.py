@@ -45,7 +45,7 @@ from xmodule.video_module import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
     HTMLSnippet, ResourceTemplates, shim_xmodule_js,
-    XModuleMixin, XModuleToXBlockMixin, XModuleDescriptorToXBlockMixin,
+    XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_module import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 
@@ -113,7 +113,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         TabsEditingMixin, EmptyDataRawMixin, XmlMixin, EditingMixin,
-        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
+        XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
         LicenseMixin):
     """
     XML source example:

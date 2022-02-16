@@ -29,7 +29,6 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
-    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
 )
@@ -261,7 +260,6 @@ class SequenceBlock(
     ProctoringFields,
     MakoTemplateBlockBase,
     XmlMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

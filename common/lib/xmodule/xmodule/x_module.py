@@ -1104,14 +1104,8 @@ class ResourceTemplates:
                     return template
 
 
-class XModuleDescriptorToXBlockMixin:
-    """
-    Common code needed by XModuleDescriptor and XBlocks converted from XModules.
-    """
-
-
 @XBlock.needs("i18n")
-class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
+class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
