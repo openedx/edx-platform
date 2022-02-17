@@ -181,11 +181,26 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
         'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': 0,
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'NAME': 'edxapp',
+        'OPTIONS': {},
+        'PASSWORD': 'password',
+        'PORT': '3306',
+        'USER': 'edxapp001'
     },
     'student_module_history': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': 0,
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'NAME': 'edxapp',
+        'OPTIONS': {},
+        'PASSWORD': '',
+        'PORT': '3306',
+        'USER': 'root'
     },
 }
 
