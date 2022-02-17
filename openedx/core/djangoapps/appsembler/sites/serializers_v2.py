@@ -66,12 +66,15 @@ class TahoeSiteCreationSerializer(serializers.Serializer):
             **tahoe_custom_site_config_params,
         )
 
+        sass_status = site_config.compile_microsite_sass()
+
         site_config_client_helpers.enable_for_site(site)
         course_creation_task_scheduled = import_course_on_site_creation_after_transaction(organization)
 
         return {
-            'site_config': site_config,
+            'site_configuration': site_config,
             'course_creation_task_scheduled': course_creation_task_scheduled,
             'site_configuration_client_enabled': True,
+            **sass_status,
             **created_site_data,
         }

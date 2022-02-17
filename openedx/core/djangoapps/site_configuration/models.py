@@ -2,11 +2,11 @@
 Django models for site configurations.
 """
 
-
 import beeline
 
 import collections
 from logging import getLogger
+from sass import CompileError
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -114,8 +114,6 @@ class SiteConfiguration(models.Model):
     def save(self, **kwargs):
         super().save(**kwargs)
         self.tahoe_update_site_values_on_save()
-        # recompile SASS on every save
-        self.compile_microsite_sass()  # TODO: Implement via signals, instead of overriding the "save" method.
         return self
 
     @beeline.traced('site_config.init_api_client_adapter')
@@ -274,15 +272,20 @@ class SiteConfiguration(models.Model):
         super(SiteConfiguration, self).delete(using=using)
 
     def compile_microsite_sass(self):
-        # Importing `compile_sass` to avoid test-time Django errors.
+        # Importing `sites.utils` locally to avoid test-time Django errors.
         # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
-        from openedx.core.djangoapps.appsembler.sites.utils import compile_sass
-        css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
-        file_name = self.get_value('css_overrides_file')
+        from openedx.core.djangoapps.appsembler.sites import utils as sites_utils
 
-        if not file_name:
+        storage = self.get_customer_themes_storage()
+        css_file_name = self.get_value('css_overrides_file')
+
+        if not css_file_name:
             if settings.TAHOE_SILENT_MISSING_CSS_CONFIG:
-                return  # Silent the exception below on during testing
+                # Silent the exception below on during testing
+                return {
+                    'successful_sass_compile': False,
+                    'sass_compile_message': 'Skipped compiling due to missing `css_overrides_file`',
+                }
             else:
                 raise TahoeConfigurationException(
                     'Missing `css_overrides_file` from SiteConfiguration for `{site}` config_id=`{id}`'.format(
@@ -291,9 +294,25 @@ class SiteConfiguration(models.Model):
                     )
                 )
 
-        storage = self.get_customer_themes_storage()
-        with storage.open(file_name, 'w') as f:
-            f.write(css_output)
+        try:
+            css_output = sites_utils.compile_sass('main.scss', custom_branding=self._sass_var_override)
+            with storage.open(css_file_name, 'w') as f:
+                f.write(css_output)
+
+            successful_sass_compile = True
+            sass_compile_message = 'Sass compile finished successfully for site {site}'.format(site=self.site.domain)
+        except CompileError as exc:
+            successful_sass_compile = False
+            sass_compile_message = 'Sass compile failed for site {site} with the error: {message}'.format(
+                site=self.site.domain,
+                message=str(exc),
+            )
+            logger.warning(sass_compile_message, exc_info=True)
+
+        return {
+            'successful_sass_compile': successful_sass_compile,
+            'sass_compile_message': sass_compile_message,
+        }
 
     def get_css_url(self):
         storage = self.get_customer_themes_storage()
@@ -339,6 +358,23 @@ class SiteConfiguration(models.Model):
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
+
+
+@receiver(post_save, sender=SiteConfiguration)
+def compile_tahoe_microsite_sass_on_site_config_save(sender, instance, created, **kwargs):
+    """
+    Tahoe: Compile Tahoe microsite scss on saving the SiteConfiguration model.
+
+    This signal receiver maintains backward compatibility with existing sites and the Appsembler Management
+    Console (AMC).
+
+    # TODO: RED-2847 - Remove this signal receiver after all Tahoe sites switch to Dashboard.
+    """
+    sass_status = instance.compile_microsite_sass()
+    if sass_status['successful_sass_compile']:
+        logger.info('tahoe sass compiled successfully: %s', sass_status['sass_compile_message'])
+    else:
+        logger.warning('tahoe css compile error: %s', sass_status['sass_compile_message'])
 
 
 def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):
