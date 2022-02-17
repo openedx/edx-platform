@@ -714,24 +714,23 @@ def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: Us
     Returns:
         A URL for the MFE experience if active for the current request or None
     """
-    experience_param = query_params.get("discussions_experience", "").lower()
     mfe_url = get_discussions_mfe_url(course_key)
     if not mfe_url:
         return {"show_banner": False, "show_mfe": False}
-    show_banner = bool(has_access(user, 'staff', course_key))
-    forum_url = reverse("forum_form_discussion", args=[course_key])
+    discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
     show_mfe = False
-    # Show the MFE if the new experience is requested,
-    # or if the legacy experience is not requested and the MFE is enabled
-    if experience_param == "new" or (experience_param != "legacy" and ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)):
+    # Show the MFE if the new MFE is enabled,
+    # or if the legacy experience is requested show legacy experience
+    if query_params.get("discussions_experience", "").lower() != "legacy" and discussions_mfe_enabled:
         show_mfe = True
+    forum_url = reverse("forum_form_discussion", args=[course_key])
     return {
         "show_mfe": show_mfe,
         "legacy_url": f"{forum_url}?discussions_experience=legacy",
         "mfe_url": f"{forum_url}?discussions_experience=new",
         "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
-        "show_banner": show_banner,
+        "show_banner": discussions_mfe_enabled,
         "discussions_mfe_url": mfe_url,
     }
 
