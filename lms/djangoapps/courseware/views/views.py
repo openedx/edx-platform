@@ -61,6 +61,7 @@ from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_u
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.generation_handler import CertificateGenerationNotAllowed
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
@@ -1531,7 +1532,16 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
-    certs_api.generate_certificate_task(student, course_key, 'self')
+
+    try:
+        certs_api.generate_certificate_task(student, course_key, 'self')
+    except CertificateGenerationNotAllowed as e:
+        log.exception(
+            "Certificate generation not allowed for user %s in course %s",
+            str(student),
+            course_key,
+        )
+        return HttpResponseBadRequest(str(e))
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)

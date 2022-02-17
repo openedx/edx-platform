@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.certificates.generation_handler import CertificateGenerationNotAllowed
 
 from lms.djangoapps.certificates.generation_handler import generate_certificate_task
 from lms.djangoapps.certificates.models import CertificateGenerationCommandConfiguration
@@ -96,4 +97,11 @@ class Command(BaseCommand):
                         user=user.id,
                         course=course_key
                     ))
-                generate_certificate_task(user, course_key)
+                try:
+                    generate_certificate_task(user, course_key)
+                except CertificateGenerationNotAllowed as e:
+                    log.exception(
+                        "Certificate generation not allowed for user %s in course %s",
+                        user.id,
+                        course_key,
+                    )
