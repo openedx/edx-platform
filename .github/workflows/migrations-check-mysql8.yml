@@ -79,5 +79,4 @@ jobs:
 #        ./manage.py lms --settings bok_choy migrate
 #        echo "Running the CMS migrations."
 #        ./manage.py cms --settings bok_choy migrate
-        python -Wd -m pytest -p no:randomly
-        python -Wd -m pytest -p no:randomly
+        python -Wd -m pytest -p no:randomly -vvv
