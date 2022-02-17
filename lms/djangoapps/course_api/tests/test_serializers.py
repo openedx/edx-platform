@@ -78,7 +78,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'effort': '6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
-            'hidden': False,
+            'hidden': True,  # because it's an old mongo course
             'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.

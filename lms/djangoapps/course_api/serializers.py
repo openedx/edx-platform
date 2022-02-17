@@ -123,7 +123,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         Represents whether course is hidden in LMS
         """
         catalog_visibility = course_overview.catalog_visibility
-        return catalog_visibility in ['about', 'none']
+        return catalog_visibility in ['about', 'none'] or course_overview.id.deprecated  # Old Mongo should be hidden
 
     def get_blocks_url(self, course_overview):
         """
