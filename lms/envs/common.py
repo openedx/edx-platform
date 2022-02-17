@@ -3509,7 +3509,7 @@ REGISTRATION_FIELD_ORDER = [
     "year_of_birth",
     "level_of_education",
     "specialty",
-    "profession"
+    "profession",
     "company",
     "title",
     "mailing_address",
@@ -4635,6 +4635,7 @@ LOGISTRATION_API_RATELIMIT = '20/m'
 LOGIN_AND_REGISTER_FORM_RATELIMIT = '100/5m'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
 RESET_PASSWORD_API_RATELIMIT = '30/7d'
+OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 
 ##### PASSWORD RESET RATE LIMIT SETTINGS #####
 PASSWORD_RESET_IP_RATE = '1/m'
