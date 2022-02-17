@@ -211,10 +211,12 @@ class GeneratedCertificate(models.Model):
         'professional',
         'no-id-professional',
         'masters',
-        'executive-education'
+        'executive-education',
+        'unpaid-executive-program',
+        'paid-executive-program',
     )
 
-    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION]  # pylint: disable=line-too-long
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION, CourseMode.UNPAID_EXECUTIVE_PROGRAM, CourseMode.PAID_EXECUTIVE_PROGRAM]  # pylint: disable=line-too-long
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)

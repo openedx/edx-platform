@@ -4582,7 +4582,19 @@ COURSE_ENROLLMENT_MODES = {
         "slug": "executive-educations",
         "display_name": _("Executive Education"),
         "min_price": 1
-    }
+    },
+    "unpaid-executive-program": {
+        "id": 9,
+        "slug": "unpaid-executive-program",
+        "display_name": _("Unpaid Executive Program"),
+        "min_price": 1
+    },
+    "paid-executive-program": {
+        "id": 10,
+        "slug": "paid-executive-program",
+        "display_name": _("Paid Executive Program"),
+        "min_price": 1
+    },
 }
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
