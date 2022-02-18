@@ -35,7 +35,7 @@ class TestClientIP(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        ({}, 'Something', []),
+        ({}, 'Some-Thing', []),
         ({'HTTP_SOME_THING': 'stuff'}, 'Some-Thing', ['stuff']),
         ({'HTTP_SOME_THING': 'stuff'}, 'Some-Thing', ['stuff']),
         ({'HTTP_SOME_THING': '   so,much , stuff '}, 'Some-Thing', ['so', 'much', 'stuff']),
