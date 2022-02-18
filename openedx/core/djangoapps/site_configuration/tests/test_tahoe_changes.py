@@ -208,6 +208,21 @@ def test_site_configuration_compile_sass_on_save_fail_gracefully(caplog, clean_s
 
 
 @pytest.mark.django_db
+def test_site_configuration_compile_sass_missing_override_file(caplog, clean_site_configuration_factory):
+    """
+    Ensure save() is successful on sass compile errors.
+    """
+    caplog.set_level(logging.INFO)
+    site_config = clean_site_configuration_factory(
+        site=Site.objects.create(domain='test.com'),
+    )
+    sass_status = site_config.compile_microsite_sass()
+    assert not sass_status['successful_sass_compile'], 'Should fail due to missing css_overrides_file'
+    assert 'Skipped compiling due to missing `css_overrides_file`' == sass_status['sass_compile_message']
+    assert 'missing `css_overrides_file`' in caplog.text, 'Should log failures instead of throwing an exception'
+
+
+@pytest.mark.django_db
 @patch('openedx.core.djangoapps.appsembler.sites.utils.compile_sass',
        Mock(side_effect=CompileError('CSS is not working -- Omar')))
 def test_site_configuration_compile_sass_failure(caplog, clean_site_configuration_factory):
