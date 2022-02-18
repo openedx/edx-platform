@@ -2,6 +2,7 @@
 
 
 import datetime
+from unittest import skipUnless
 from unittest.mock import patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -11,8 +12,6 @@ from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_name_affirmation.api import create_verified_name, create_verified_name_config
-from edx_name_affirmation.statuses import VerifiedNameStatus
 from edx_toggles.toggles.testutils import override_waffle_switch
 from organizations import api as organizations_api
 
@@ -51,6 +50,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
+from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -65,6 +65,8 @@ FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
 
 FEATURES_WITH_CUSTOM_CERTS_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
 FEATURES_WITH_CUSTOM_CERTS_ENABLED['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED'] = True
+
+name_affirmation_service = get_name_affirmation_service()
 
 
 class CommonCertificatesTestCase(ModuleStoreTestCase):
@@ -1613,10 +1615,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                 )
             )
 
+    @skipUnless(name_affirmation_service is not None, 'Requires Name Affirmation')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @ddt.data((True, VerifiedNameStatus.APPROVED),
-              (True, VerifiedNameStatus.DENIED),
-              (False, VerifiedNameStatus.PENDING))
+    @ddt.data((True, 'approved'),
+              (True, 'denied'),
+              (False, 'pending'))
     @ddt.unpack
     def test_certificate_view_verified_name(self, should_use_verified_name_for_certs, status):
         """
@@ -1624,8 +1627,16 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         their verified name will appear on the certificate rather than their profile name.
         """
         verified_name = 'Jonathan Doe'
-        create_verified_name(self.user, verified_name, self.user.profile.name, status=status)
-        create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
+        name_affirmation_service.create_verified_name(
+            self.user,
+            verified_name,
+            self.user.profile.name,
+            status=status
+        )
+        name_affirmation_service.create_verified_name_config(
+            self.user,
+            use_verified_name_for_certs=should_use_verified_name_for_certs
+        )
 
         self._add_course_certificates(count=1, signatory_count=1)
         test_url = get_certificate_url(
@@ -1635,7 +1646,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         response = self.client.get(test_url, HTTP_HOST='test.localhost')
-        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
+        if should_use_verified_name_for_certs and status == 'approved':
             self.assertContains(response, verified_name)
             self.assertNotContains(response, self.user.profile.name)
         else:

@@ -18,7 +18,6 @@ from django.db.models import Count
 from django.dispatch import receiver
 
 from django.utils.translation import gettext_lazy as _
-from edx_name_affirmation.api import get_verified_name, should_use_verified_name_for_certs
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
@@ -33,6 +32,7 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
 from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx_events.learning.signals import CERTIFICATE_CHANGED, CERTIFICATE_CREATED, CERTIFICATE_REVOKED  # lint-amnesty, pylint: disable=wrong-import-order
@@ -435,9 +435,10 @@ class GeneratedCertificate(models.Model):
         a circular dependency.
         """
         name_to_use = student_api.get_name(user.id)
+        name_affirmation_service = get_name_affirmation_service()
 
-        if should_use_verified_name_for_certs(user):
-            verified_name_obj = get_verified_name(user, is_verified=True)
+        if name_affirmation_service and name_affirmation_service.should_use_verified_name_for_certs(user):
+            verified_name_obj = name_affirmation_service.get_verified_name(user, is_verified=True)
             if verified_name_obj:
                 name_to_use = verified_name_obj.verified_name
 

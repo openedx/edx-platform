@@ -11,7 +11,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
-from edx_name_affirmation.name_change_validator import NameChangeValidator
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -38,7 +37,13 @@ from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
+from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
+
+name_affirmation_installed = is_name_affirmation_installed()
+if name_affirmation_installed:
+    # pylint: disable=import-error
+    from edx_name_affirmation.name_change_validator import NameChangeValidator
 
 # Public access point for this function.
 visible_fields = _visible_fields
@@ -274,6 +279,9 @@ def _does_name_change_require_verification(user_profile, old_name, new_name):
     """
     If name change requires ID verification, do not update it through this API.
     """
+    if not name_affirmation_installed:
+        return False
+
     profile_meta = user_profile.get_meta()
     old_names_list = profile_meta['old_names'] if 'old_names' in profile_meta else []
 
