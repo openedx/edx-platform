@@ -62,9 +62,6 @@ def plugin_settings(settings):
     settings.HIJACK_ALLOW_GET_REQUESTS = True
     settings.HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
 
-    # This flag helps to avoid throwing useless exceptions during testing
-    settings.TAHOE_SILENT_MISSING_CSS_CONFIG = False
-
     # This flag should be removed when we fully migrate all of Tahoe fork to Juniper
     # until then, instead of commenting out code, this flag should be used so we can easily find
     # and fix test issues

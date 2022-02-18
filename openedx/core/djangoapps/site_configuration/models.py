@@ -272,27 +272,32 @@ class SiteConfiguration(models.Model):
         super(SiteConfiguration, self).delete(using=using)
 
     def compile_microsite_sass(self):
+        """
+        Compiles the microsite sass and save it into the storage bucket.
+
+        :return dict {
+          "successful_sass_compile": boolean: whether the CSS was compiled successfully
+          "sass_compile_message": string: Status message that's safe to show for customers.
+        }
+        """
         # Importing `sites.utils` locally to avoid test-time Django errors.
         # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
         from openedx.core.djangoapps.appsembler.sites import utils as sites_utils
 
         storage = self.get_customer_themes_storage()
         css_file_name = self.get_value('css_overrides_file')
-
         if not css_file_name:
-            if settings.TAHOE_SILENT_MISSING_CSS_CONFIG:
-                # Silent the exception below on during testing
-                return {
-                    'successful_sass_compile': False,
-                    'sass_compile_message': 'Skipped compiling due to missing `css_overrides_file`',
-                }
-            else:
-                raise TahoeConfigurationException(
-                    'Missing `css_overrides_file` from SiteConfiguration for `{site}` config_id=`{id}`'.format(
-                        site=self.site.domain,
-                        id=self.id,
-                    )
-                )
+            developer_message = 'Skipped compiling due to missing `css_overrides_file`'
+            exception_message = 'Tahoe: {developer_message} for `{site}` config_id=`{config_id}`'.format(
+                developer_message=developer_message,
+                site=self.site.domain,
+                config_id=self.id,
+            )
+            logger.exception(exception_message, exc_info=TahoeConfigurationException(exception_message))
+            return {
+                'successful_sass_compile': False,
+                'sass_compile_message': developer_message,
+            }
 
         try:
             css_output = sites_utils.compile_sass('main.scss', custom_branding=self._sass_var_override)
