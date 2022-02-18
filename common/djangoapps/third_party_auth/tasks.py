@@ -87,10 +87,10 @@ def fetch_saml_metadata():
                 public_key, sso_url, expires_at = parse_metadata_xml(xml, entity_id)
                 changed = _update_data(entity_id, public_key, sso_url, expires_at)
                 if changed:
-                    log.info("→ Created new record for SAMLProviderData")
+                    log.info(f"→ Created new record for SAMLProviderData for entityID {entity_id}")
                     num_updated += 1
                 else:
-                    log.info("→ Updated existing SAMLProviderData. Nothing has changed.")
+                    log.info(f"→ Updated existing SAMLProviderData. Nothing has changed for entityID {entity_id}")
         except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
             # Catch and process exception in case of errors during fetching and processing saml metadata.
             # Here is a description of each exception.
