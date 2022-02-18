@@ -79,10 +79,9 @@ class TestClientIP(TestCase):
             [
                 {'name': 'CF-Connecting-IP', 'index': 0},
                 {'name': 'X-Forwarded-For', 'index': -2},
-                {'name': 'X-Real-IP', 'index': 0},
             ],
             None,
-            3,
+            2,
         ),
         # One lookup failure before finding a usable header
         (
@@ -92,7 +91,6 @@ class TestClientIP(TestCase):
             [
                 {'name': 'CF-Connecting-IP', 'index': 0},
                 {'name': 'X-Forwarded-For', 'index': -2},
-                {'name': 'X-Real-IP', 'index': 0},
             ],
             '3.3.3.3',
             1,
