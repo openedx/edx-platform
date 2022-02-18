@@ -37,9 +37,32 @@ jobs:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
       - uses: actions/checkout@v2
+
+      # This gives Mongo several chances to start. We started getting flakiness
+      # around 2022-02-15 wherein the start command would sometimes exit with:
+      #
+      #   * Starting database mongodb
+      #     ...fail!
+      #
+      # ...not having produced any logs or other output. We couldn't figure out
+      # what was causing Mongo to fail, so this is a (temporary?) hack to get
+      # PRs unblocked.
       - name: start mongodb service
         run: |
-          sudo /etc/init.d/mongodb start
+          maxtries=5
+          attempt=1
+          while true; do
+            if sudo /etc/init.d/mongodb start; then
+              break
+            elif [[ "$attempt" -ge "$maxtries" ]]; then
+              echo "Failed to start Mongo in $attempt tries, giving up."
+              exit 1
+            else
+              echo "Failed to start Mongo (attempt $attempt), sleeping and trying again"
+              (( attempt++ ))
+              sleep 5
+            fi
+          done
 
       - name: set settings path
         run: |
