@@ -3,6 +3,7 @@ APIs for the Platform 2.0.
 """
 
 import logging
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import views, status
 from rest_framework.response import Response
@@ -33,7 +34,15 @@ class CompileSassView(views.APIView):
 
     def post(self, request, format=None):
         site_uuid = request.data['site_uuid']
-        site = tahoe_sites.api.get_site_by_uuid(site_uuid)
+
+        try:
+            site = tahoe_sites.api.get_site_by_uuid(site_uuid)
+        except ObjectDoesNotExist:
+            return Response({
+                'successful_sass_compile': False,
+                'sass_compile_message': 'Requested site was not found',
+            }, status=status.HTTP_404_NOT_FOUND)
+
         configuration = SiteConfiguration.objects.get(site=site)
         configuration.init_api_client_adapter(site)
         sass_status = configuration.compile_microsite_sass()

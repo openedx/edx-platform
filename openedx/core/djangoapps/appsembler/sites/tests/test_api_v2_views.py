@@ -49,6 +49,19 @@ def test_compile_sass_view(client, monkeypatch, site_with_org):
 
 
 @pytest.mark.django_db
+def test_compile_sass_view_site_not_found(client, monkeypatch):
+    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+    url = reverse('tahoe_compile_sass')
+    data = {'site_uuid': 'ee9894a6-898e-11ec-ab4d-9779d2628f5b'}
+    response = client.post(url, data=data, HTTP_X_EDX_API_KEY=settings.EDX_API_KEY)
+    content = response.content.decode('utf-8')
+    assert response.status_code == status.HTTP_404_NOT_FOUND, content
+    response_json = response.json()
+    assert not response_json.get('successful_sass_compile'), 'Should compile CSS successfully'
+    assert response_json.get('sass_compile_message') == 'Requested site was not found'
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize('site_params', [
     {},
     {'site_uuid': 'ee9894a6-898e-11ec-ab4d-9779d2628f5b'},
