@@ -31,6 +31,7 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -341,6 +342,7 @@ class TestCourseIndexArchived(CourseTestCase):
         self.course.display_name = 'Active Course 1'
         self.ORG = self.course.location.org
         self.save_course()
+        CourseOverviewFactory.create(id=self.course.id, org=self.ORG)
 
         # Active course has end date set to tomorrow
         self.active_course = CourseFactory.create(
@@ -348,10 +350,20 @@ class TestCourseIndexArchived(CourseTestCase):
             org=self.ORG,
             end=self.TOMORROW,
         )
+        CourseOverviewFactory.create(
+            id=self.active_course.id,
+            org=self.ORG,
+            end=self.TOMORROW,
+        )
 
         # Archived course has end date set to yesterday
         self.archived_course = CourseFactory.create(
             display_name='Archived Course',
+            org=self.ORG,
+            end=self.YESTERDAY,
+        )
+        CourseOverviewFactory.create(
+            id=self.archived_course.id,
             org=self.ORG,
             end=self.YESTERDAY,
         )
@@ -391,8 +403,8 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 3, 18),
-        (False, 'staff', None, 3, 18),
+        (True, 'staff', None, 1, 19),
+        (False, 'staff', None, 1, 19),
         # Base user has global staff access
         (True, 'user', ORG, 3, 18),
         (False, 'user', ORG, 3, 18),
