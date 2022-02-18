@@ -108,19 +108,19 @@ class TestClientIP(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        # Nothing usable
-        ([], None),
-        (['XXXXXXXXX'], None),
-        # Simple cases, private and public
-        (['::1'], '::1'),
+        # Walk left until first public IP
         (['1.2.3.4'], '1.2.3.4'),
+        (['1.2.3.4', '5.6.7.8', '10.0.0.1', '127.0.0.1'], '5.6.7.8'),
+        # Or until there's junk or we run out of IPs, even if the best we can do is a private IP
+        (['1.2.3.4', 'XXXXXXXXX', '10.0.0.1', '127.0.0.1'], '10.0.0.1'),
+        (['::1'], '::1'),
         # If we get a public IP, don't worry about junk farther on
         (['XXXXXXXXX', '1.2.3.4', '2606:4700::'], '2606:4700::'),
         (['XXXXXXXXX', '2606:4700::', '10.0.0.1'], '2606:4700::'),
-        # Walk left until first public IP
-        (['1.2.3.4', '5.6.7.8', '10.0.0.1', '127.0.0.1'], '5.6.7.8'),
-        # Or until there's junk, even if the best we can do is a private IP
-        (['1.2.3.4', 'XXXXXXXXX', '10.0.0.1', '127.0.0.1'], '10.0.0.1'),
+        # Nothing usable
+        ([], None),
+        (['XXXXXXXXX'], None),
+        (['1.2.3.4', 'XXXXXXXXX'], None),
     )
     def test_conservative_walk(self, chain, expected):
         assert ip.conservatively_pick_client_ip(chain) == expected
