@@ -62,9 +62,9 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
         assert time_zone == timezone('UTC')
 
-        # We record the timezone when a user hits the courseware api
+        # We record the timezone when a user hits the courseware api. Also sanitize input test
         self.client.login(username=self.user.username, password='foo')
-        self.client.get(f'/api/courseware/course/{course.id}?browser_timezone=America/New_York')
+        self.client.get(f'/api/courseware/course/{course.id}?browser_timezone=America/New_York\x00')
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
         assert time_zone == timezone('America/New_York')
 
@@ -72,3 +72,8 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
         assert time_zone == timezone('Asia/Tokyo')
+
+        # If we do not recognize the user's timezone, we default to UTC
+        with patch('lms.djangoapps.courseware.context_processor.get_user_preference', return_value='Unknown/Timezone'):
+            time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
+        assert time_zone == timezone('UTC')
