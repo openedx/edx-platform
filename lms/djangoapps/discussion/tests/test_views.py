@@ -2280,6 +2280,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.staff_user = AdminFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
     @ddt.data(*itertools.product(("http://test.url", None), (True, False), (True, False)))
     @ddt.unpack
@@ -2294,16 +2295,12 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
                 self.client.login(username=username, password='test')
                 response = self.client.get(reverse("forum_form_discussion", args=[self.course.id]))
                 content = response.content.decode('utf8')
-        if mfe_url and is_staff:
-            assert "You are viewing an educator only preview of the new discussions experience!" in content
-            if toggle_enabled:
-                assert "legacy experience" in content
-                assert "new experience" not in content
-            else:
-                assert "legacy experience" not in content
-                assert "new experience" in content
+        if mfe_url and toggle_enabled:
+            assert "An educator preview of new discussions experience is available!" in content
+            assert "legacy experience" in content
+            assert "new experience" not in content
         else:
-            assert "You are viewing an educator only preview of the new discussions experience!" not in content
+            assert "An educator preview of new discussions experience is available!" not in content
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @ddt.data(*itertools.product((True, False), ("legacy", "new", None)))
@@ -2320,7 +2317,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
                 experience_in_url = f"discussions_experience={experience}"
             response = self.client.get(f"{url}?{experience_in_url}")
             content = response.content.decode('utf8')
-        if (toggle_enabled and experience != "legacy") or experience == "new":
+        if toggle_enabled and experience != "legacy":
             assert "discussions-mfe-tab-embed" in content
         else:
             assert "discussions-mfe-tab-embed" not in content
