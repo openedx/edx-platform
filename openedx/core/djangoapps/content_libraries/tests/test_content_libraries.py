@@ -369,6 +369,60 @@ class ContentLibrariesTestMixin:
 
         # fin
 
+    def test_library_blocks_studio_view(self):
+        """
+        Test the happy path of working with an HTML XBlock in a the studio_view of a content library.
+        """
+        lib = self._create_library(slug="testlib2", title="A Test Library", description="Testing XBlocks")
+        lib_id = lib["id"]
+        assert lib['has_unpublished_changes'] is False
+
+        # A library starts out empty:
+        assert self._get_library_blocks(lib_id) == []
+
+        # Add a 'html' XBlock to the library:
+        block_data = self._add_block_to_library(lib_id, "html", "html1")
+        self.assertDictContainsEntries(block_data, {
+            "id": "lb:CL-TEST:testlib2:html:html1",
+            "display_name": "Text",
+            "block_type": "html",
+            "has_unpublished_changes": True,
+        })
+        block_id = block_data["id"]
+        # Confirm that the result contains a definition key, but don't check its value,
+        # which for the purposes of these tests is an implementation detail.
+        assert 'def_key' in block_data
+
+        # now the library should contain one block and have unpublished changes:
+        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library(lib_id)['has_unpublished_changes'] is True
+
+        # Publish the changes:
+        self._commit_library_changes(lib_id)
+        assert self._get_library(lib_id)['has_unpublished_changes'] is False
+        # And now the block information should also show that block has no unpublished changes:
+        block_data["has_unpublished_changes"] = False
+        self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
+        assert self._get_library_blocks(lib_id) == [block_data]
+
+        # Now update the block's OLX:
+        orig_olx = self._get_library_block_olx(block_id)
+        assert '<html' in orig_olx
+        new_olx = "<html><b>Hello world!</b></html>"
+        self._set_library_block_olx(block_id, new_olx)
+        # now reading it back, we should get that exact OLX (no change to whitespace etc.):
+        assert self._get_library_block_olx(block_id) == new_olx
+        # And the display name and "unpublished changes" status of the block should be updated:
+        self.assertDictContainsEntries(self._get_library_block(block_id), {
+            "display_name": "Text",
+            "has_unpublished_changes": True,
+        })
+
+        # Now view the XBlock's studio view (including draft changes):
+        fragment = self._render_block_view(block_id, "studio_view")
+        assert 'resources' in fragment
+        assert 'Hello world!' in fragment['content']
+
     @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
     def test_list_library_blocks(self, is_indexing_enabled):
