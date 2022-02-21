@@ -170,7 +170,7 @@ class CourseMode(models.Model):
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [
-        VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, UNPAID_EXECUTIVE_PROGRAM, PAID_EXECUTIVE_PROGRAM
+        VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_PROGRAM
     ]
 
     # Modes that allow a student to pursue a non-verified certificate
@@ -182,7 +182,7 @@ class CourseMode(models.Model):
     # Modes that are eligible to purchase credit
     CREDIT_ELIGIBLE_MODES = [
         VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE,
-        EXECUTIVE_EDUCATION, UNPAID_EXECUTIVE_PROGRAM, PAID_EXECUTIVE_PROGRAM,
+        EXECUTIVE_EDUCATION, PAID_EXECUTIVE_PROGRAM,
     ]
 
     # Modes for which certificates/programs may need to be updated

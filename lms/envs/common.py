@@ -4587,7 +4587,7 @@ COURSE_ENROLLMENT_MODES = {
         "id": 9,
         "slug": "unpaid-executive-program",
         "display_name": _("Unpaid Executive Program"),
-        "min_price": 1
+        "min_price": 0
     },
     "paid-executive-program": {
         "id": 10,
