@@ -720,7 +720,7 @@ def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: Us
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
     show_mfe = False
     # Show the MFE if the new MFE is enabled,
-    # or if the legacy experience is requested show legacy experience
+    # or if the legacy experience is not requested via query param
     if query_params.get("discussions_experience", "").lower() != "legacy" and discussions_mfe_enabled:
         show_mfe = True
     forum_url = reverse("forum_form_discussion", args=[course_key])
