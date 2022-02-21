@@ -6,7 +6,7 @@ from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections
-from django.test import LiveServerTestCase, TestCase, override_settings
+from django.test import LiveServerTestCase, TestCase
 from django.utils.text import slugify
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -182,8 +182,6 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
 
 
 @requires_blockstore
-# EphemeralKeyValueStore requires a working cache, and the default test cache doesn't work:
-@override_settings(XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE='blockstore')
 class ContentLibraryRuntimeBServiceTest(ContentLibraryRuntimeTestMixin, TestCase):
     """
     Tests XBlock runtime using XBlocks in a content library using the standalone Blockstore service.
@@ -191,8 +189,6 @@ class ContentLibraryRuntimeBServiceTest(ContentLibraryRuntimeTestMixin, TestCase
 
 
 @requires_blockstore_app
-# EphemeralKeyValueStore requires a working cache, and the default test cache doesn't work:
-@override_settings(XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE='blockstore')
 class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin, LiveServerTestCase):
     """
     Tests XBlock runtime using XBlocks in a content library using the installed Blockstore app.

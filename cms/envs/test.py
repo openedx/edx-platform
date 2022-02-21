@@ -42,7 +42,8 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
     REGISTRATION_EXTRA_FIELDS,
     GRADES_DOWNLOAD,
     SITE_NAME,
-    WIKI_ENABLED
+    WIKI_ENABLED,
+    XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE,
 )
 
 
@@ -177,6 +178,12 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'LOCATION': 'edx_loc_mem_cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
 }
 
 ############################### BLOCKSTORE #####################################
@@ -275,12 +282,6 @@ TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
     'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
 TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch710')
 TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
-
-############################# TEMPLATE CONFIGURATION #############################
-# Adds mako template dirs for content_libraries tests
-MAKO_TEMPLATE_DIRS_BASE.append(
-    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates'
-)
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
