@@ -179,10 +179,8 @@ class DiscussionsProvidersView(APIView):
         elif configuration.provider_type == Provider.OPEN_EDX:
             hidden_providers.append(Provider.LEGACY)
         else:
-            # If this is a new course, or some other provider is selected, the new provider
-            # should only show up if the MFE is enabled
-            if not ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
-                hidden_providers.append(Provider.OPEN_EDX)
+            hidden_providers.append(Provider.OPEN_EDX)
+
         serializer = DiscussionsProvidersSerializer(
             {
                 'features': [
